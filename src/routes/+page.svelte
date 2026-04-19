@@ -461,8 +461,8 @@
 					}
 				}
 				
-				if (nK > bagersteKolonne + 3) {
-					logBesked = "Du kan ikke forlade din gruppe! Vent på dem.";
+				if (nK > bagersteKolonne + 5) {
+					logBesked = "Du er kommet for langt foran de andre spillere. Vent på dem";
 					return;
 				}
 
@@ -543,15 +543,19 @@
 		<h1>{gameState === 'win' ? 'Skyggekysten er besejret' : 'Øen krævede sin pris'}</h1>
 		<p>{spillerNavn} {gameState === 'win' ? 'overlevede rejsen' : `faldt ${BREDDE - 2 - maxKolonne} felter fra kysten`}.</p>
 		
-		<div class="score-board">
-			<h3>Holdets Resultater</h3>
-			{#each Object.entries(alleSpillere).sort((a, b) => b[1].score - a[1].score) as [navn, p] (navn)}
-				<div class="score-row lb-row" class:highlight={navn === spillerNavn}>
-					<span>{navn} {p.isDead ? '💀' : p.isWinner ? '👑' : '🚶'}</span>
-					<span>{p.score} pt</span>
-				</div>
-			{/each}
-		</div>
+<div class="score-board">
+    <h3>Holdets Resultater</h3>
+    {#each Object.entries(alleSpillere).sort((a, b) => {
+        let aScore = a[0] === spillerNavn ? samletScore : a[1].score;
+        let bScore = b[0] === spillerNavn ? samletScore : b[1].score;
+        return bScore - aScore;
+    }) as [navn, p] (navn)}
+        <div class="score-row lb-row" class:highlight={navn === spillerNavn}>
+            <span>{navn} {p.isDead ? '💀' : p.isWinner ? '👑' : '🚶'}</span>
+            <span>{navn === spillerNavn ? samletScore : p.score} pt</span>
+        </div>
+    {/each}
+</div>
 
 		<button class="retry-btn" onclick={nulstilHukommelse}>Afslut</button>
 	</div>
@@ -593,22 +597,24 @@
 					 class:dug={felt.gravet} 
 					 class:unexplored={!felt.udforsket}
 					 style="background-image: url('/tiles/{felt.biome}.png');">
-					<div class="inner">
-						{#if spillerIndex === i} 
-							<span class="player-icon">
-								{#if valgtKarakter?.ikon.startsWith('/')}
-									<img src={valgtKarakter.ikon} alt="Spiller" style="width: 50px; height: 50px;" />
-								{:else}
-									{valgtKarakter?.ikon}
-								{/if}
-							</span> 
-						{/if}
-						
-						{#each Object.entries(alleSpillere) as [navn, p] (navn)}
-							{#if p.index === i && navn !== spillerNavn && !p.isDead}
-								<span class="other-player-icon" title={navn}>{p.ikon || '👤'}</span>
-							{/if}
-						{/each}
+<div class="inner">
+    {#if spillerIndex === i} 
+        <span class="player-icon">
+            {#if valgtKarakter?.ikon.startsWith('/')}
+                <img src={valgtKarakter.ikon} alt="Spiller" style="width: 50px; height: 50px;" />
+            {:else}
+                {valgtKarakter?.ikon}
+            {/if}
+        </span> 
+    {/if}
+    
+    <div class="other-players-group">
+        {#each Object.entries(alleSpillere) as [navn, p] (navn)}
+            {#if p.index === i && navn !== spillerNavn && !p.isDead}
+                <span class="other-player-icon" title={navn}>{p.ikon || '👤'}</span>
+            {/if}
+        {/each}
+    </div>
 
 						{#if felt.udforsket && felt.eventID && !felt.eventFuldført && spillerIndex !== i} 
 							<span class="marker">❗</span> 
@@ -731,7 +737,8 @@
 	.hex.dug { filter: brightness(0.5) sepia(1); }
 	.inner { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; font-size: 40px; }
 	
-	.other-player-icon { font-size: 24px; position: absolute; top: 10px; right: 10px; filter: drop-shadow(0 0 2px black); z-index: 2; animation: bounce 2s infinite; }
+	.other-players-group { position: absolute; top: 5px; right: 5px; display: flex; flex-wrap: wrap; justify-content: flex-end; width: 50px; gap: 2px; z-index: 2; }
+.other-player-icon { font-size: 16px; filter: drop-shadow(0 0 2px black); animation: bounce 2s infinite; }
 	@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
 	.modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 100; }
