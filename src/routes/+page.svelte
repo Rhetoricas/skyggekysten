@@ -105,14 +105,15 @@
 		// Bemærk: error er fjernet for at tilfredsstille Svelte/TS linteren
 		const { data } = await supabase.from('spil_sessioner').select('*').eq('rum_kode', rumKode).single();
 
-		if (data) {
-			gitter = data.kort;
-			spillerIndex = data.start_index;
-			erHost = false;
-			statusBesked = "Rum fundet. Deltager som Guest.";
-			afslørOmraade(spillerIndex, 1);
-			startRealtime();
-			gameState = 'select';
+if (data) {
+    gitter = data.kort;
+    spillerIndex = data.start_index;
+    alleSpillere = data.spillere || {}; // Denne linje giver gæsten synssansen
+    erHost = false;
+    statusBesked = "Rum fundet. Deltager som Guest.";
+    afslørOmraade(spillerIndex, 1);
+    startRealtime();
+    gameState = 'select';
 		} else {
 			erHost = true;
 			statusBesked = "Nyt rum oprettes. Du er Host.";
