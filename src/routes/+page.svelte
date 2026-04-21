@@ -844,17 +844,18 @@ function startRealtime() {
     box-shadow: 0 4px 15px rgba(0,0,0,0.8); 
     display: flex; 
     align-items: center; 
+} /* Denne klamme lukker .msg helt af */
 
-	:global(.event-crystal) {
+:global(.event-crystal) {
     position: absolute;
     height: 65px;
     width: auto;
     z-index: 5;
     pointer-events: none;
-    animation: -global-floatAndGlow 3s ease-in-out infinite;
+    animation: floatAndGlow 3s ease-in-out infinite;
 }
 
-@keyframes -global-floatAndGlow {
+@keyframes floatAndGlow {
     0%, 100% {
         transform: translateY(0) scale(1);
         filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
@@ -864,4 +865,4 @@ function startRealtime() {
         filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.9));
     }
 }
-}</style>
+</style>
