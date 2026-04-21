@@ -3,13 +3,31 @@
     import { supabase } from '$lib/supabaseClient';
     import { eventBibliotek, type SpilEvent, type Valg } from '$lib/eventBibliotek';
 
-    interface Item { id: string; navn: string; level: number; billede: string; }
+interface Item { id: string; navn: string; level: number; billede: string; type: string; }
     interface Karakter { 
         id: string; navn: string; ikon: string; startMsg: string;
-        startHp: number; startGuld: number; sabelLevel: number; skovlLevel: number;
+        startHp: number; startGuld: number; startUdstyr: string[];
         moveCost: number; digCost: number; dmgMod: number; goldMod: number;
         canRest: boolean; fordel: string; ulempe: string;
     }
+
+    const itemDB: Record<string, { id: string, navn: string, type: string, billede: string, bonus: number }> = {
+        'klude': { id: 'klude', navn: 'Klude', type: 'tøj', billede: '🥼', bonus: 0 },
+        'rustning': { id: 'rustning', navn: 'Rustning', type: 'tøj', billede: '🛡️', bonus: 0 },
+        'flot_toej': { id: 'flot_toej', navn: 'Fint tøj', type: 'tøj', billede: '🧥', bonus: 0 },
+        
+        'kniv': { id: 'kniv', navn: 'Kniv', type: 'våben', billede: '🗡️', bonus: 1 },
+        'stav': { id: 'stav', navn: 'Stav', type: 'våben', billede: '🦯', bonus: 1 },
+        'bue': { id: 'bue', navn: 'Bue', type: 'våben', billede: '🏹', bonus: 1 },
+        'oekse': { id: 'oekse', navn: 'Økse', type: 'våben', billede: '🪓', bonus: 2 },
+        'svaerd': { id: 'svaerd', navn: 'Sværd', type: 'våben', billede: '⚔️', bonus: 2 },
+        'sabel': { id: 'sabel', navn: 'Sabel', type: 'våben', billede: '🤺', bonus: 2 },
+
+        'skovl': { id: 'skovl', navn: 'Skovl', type: 'værktøj', billede: '🥄', bonus: 0 },
+        'metaldetektor': { id: 'metaldetektor', navn: 'Detektor', type: 'værktøj', billede: '🧲', bonus: 0 },
+        'soegekvist': { id: 'soegekvist', navn: 'Søgekvist', type: 'værktøj', billede: '🌿', bonus: 0 },
+    };
+
     interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: string; eventFuldført: boolean; biome: string; }
     
     interface SpillerData {
@@ -43,19 +61,24 @@
         'hav': 99
     };
 
-    const tilgaengeligeKarakterer: Karakter[] = [
-        { id: 'knight_m', navn: "Ridder", ikon: "/game_faces/knight_m.png", startMsg: "Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
-        { id: 'knight_f', navn: "Skjoldmø", ikon: "/game_faces/knight_f.png", startMsg: "Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
-        { id: 'magician_m', navn: "Troldmand", ikon: "/game_faces/magician_m.png", startMsg: "Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
-        { id: 'magician_f', navn: "Troldkvinde", ikon: "/game_faces/magician_f.png", startMsg: "Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
-        { id: 'thief_m', navn: "Tyv", ikon: "/game_faces/thief_m.png", startMsg: "Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
-        { id: 'thief_f', navn: "Skygge", ikon: "/game_faces/thief_f.png", startMsg: "Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
-        { id: 'explorer_m', navn: "Udforsker", ikon: "/game_faces/explorer_m.png", startMsg: "Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
-        { id: 'explorer_f', navn: "Eventyrer", ikon: "/game_faces/explorer_f.png", startMsg: "Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
-        { id: 'viking_m', navn: "Viking", ikon: "/game_faces/viking_m.png", startMsg: "Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
-        { id: 'viking_f', navn: "Valkyrie", ikon: "/game_faces/viking_f.png", startMsg: "Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
-        { id: 'royal_m', navn: "Hertug", ikon: "/game_faces/royal_m.png", startMsg: "Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." },
-        { id: 'royal_f', navn: "Hertuginde", ikon: "/game_faces/royal_f.png", startMsg: "Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." }
+const tilgaengeligeKarakterer: Karakter[] = [
+        { id: 'knight_m', navn: "Ridder", ikon: "/game_faces/knight_m.png", startMsg: "Rustningen tynger, men beskytter.", startHp: 120, startGuld: 0, startUdstyr: ['sabel', 'rustning'], moveCost: 2, digCost: 6, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Starter med sabel og rustning (-50% skade).", ulempe: "Koster 2 HP at rykke sig." },
+        { id: 'knight_f', navn: "Skjoldmø", ikon: "/game_faces/knight_f.png", startMsg: "Rustningen tynger, men beskytter.", startHp: 120, startGuld: 0, startUdstyr: ['sabel', 'rustning'], moveCost: 2, digCost: 6, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Starter med sabel og rustning (-50% skade).", ulempe: "Koster 2 HP at rykke sig." },
+        
+        { id: 'magician_m', navn: "Troldmand", ikon: "/game_faces/magician_m.png", startMsg: "Magi beskytter ikke mod mudder.", startHp: 80, startGuld: 250, startUdstyr: ['stav', 'klude'], moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue og en stav.", ulempe: "Tager +50% skade." },
+        { id: 'magician_f', navn: "Troldkvinde", ikon: "/game_faces/magician_f.png", startMsg: "Magi beskytter ikke mod mudder.", startHp: 80, startGuld: 250, startUdstyr: ['stav', 'klude'], moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue og en stav.", ulempe: "Tager +50% skade." },
+        
+        { id: 'thief_m', navn: "Tyv", ikon: "/game_faces/thief_m.png", startMsg: "Hold dig i bevægelse.", startHp: 100, startGuld: 50, startUdstyr: ['kniv', 'klude'], moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.0, canRest: true, fordel: "Hurtig og udstyret med en kniv.", ulempe: "Tager +20% skade." },
+        { id: 'thief_f', navn: "Skygge", ikon: "/game_faces/thief_f.png", startMsg: "Hold dig i bevægelse.", startHp: 100, startGuld: 50, startUdstyr: ['kniv', 'klude'], moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.0, canRest: true, fordel: "Hurtig og udstyret med en kniv.", ulempe: "Tager +20% skade." },
+        
+        { id: 'explorer_m', navn: "Udforsker", ikon: "/game_faces/explorer_m.png", startMsg: "Du kender terrænet.", startHp: 100, startGuld: 0, startUdstyr: ['skovl', 'klude'], moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Den eneste der starter med en skovl.", ulempe: "Mangler våben fra start." },
+        { id: 'explorer_f', navn: "Eventyrer", ikon: "/game_faces/explorer_f.png", startMsg: "Du kender terrænet.", startHp: 100, startGuld: 0, startUdstyr: ['skovl', 'klude'], moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Den eneste der starter med en skovl.", ulempe: "Mangler våben fra start." },
+        
+        { id: 'viking_m', navn: "Viking", ikon: "/game_faces/viking_m.png", startMsg: "Hvile er for de svage.", startHp: 150, startGuld: 0, startUdstyr: ['oekse', 'klude'], moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og tung økse.", ulempe: "Nægter at slå lejr og hvile." },
+        { id: 'viking_f', navn: "Valkyrie", ikon: "/game_faces/viking_f.png", startMsg: "Hvile er for de svage.", startHp: 150, startGuld: 0, startUdstyr: ['oekse', 'klude'], moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og tung økse.", ulempe: "Nægter at slå lejr og hvile." },
+        
+        { id: 'royal_m', navn: "Hertug", ikon: "/game_faces/royal_m.png", startMsg: "Penge løser alt.", startHp: 100, startGuld: 400, startUdstyr: ['flot_toej'], moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Masser af guld og fint tøj (+50% indtægt).", ulempe: "Intet våben. Graving koster 15 HP." },
+        { id: 'royal_f', navn: "Hertuginde", ikon: "/game_faces/royal_f.png", startMsg: "Penge løser alt.", startHp: 100, startGuld: 400, startUdstyr: ['flot_toej'], moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Masser af guld og fint tøj (+50% indtægt).", ulempe: "Intet våben. Graving koster 15 HP." }
     ];
 
     let gameState = $state<'login' | 'select' | 'play' | 'dead' | 'win'>('login'); 
@@ -94,12 +117,13 @@
         }
     });
 
-    let kameraStyle = $derived.by(() => {
+let kameraStyle = $derived.by(() => {
         const r = Math.floor(spillerIndex / BREDDE);
         const k = spillerIndex % BREDDE;
         const x = k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0);
         const y = r * ROW_H;
-        return `transform: translate(${400 - x}px, ${250 - y}px);`;
+        // Beregner nu midten dynamisk ud fra den aktuelle skærm
+        return `transform: translate(calc(50vw - ${x}px), calc(50vh - ${y}px));`;
     });
 
     // --- MULTIPLAYER LOGIK ---
@@ -206,10 +230,10 @@
         maxKolonne = 1;
         logBesked = karakter.startMsg;
 
-        let nytInventory: Item[] = [];
-        if (karakter.sabelLevel > 0) nytInventory.push({ id: 'sabel', navn: 'Sabre', level: karakter.sabelLevel, billede: '⚔️' });
-        if (karakter.skovlLevel > 0) nytInventory.push({ id: 'skovl', navn: 'Shovel', level: karakter.skovlLevel, billede: '🥄' });
-        inventory = nytInventory;
+inventory = karakter.startUdstyr.map(itemId => {
+            const dbItem = itemDB[itemId];
+            return { id: dbItem.id, navn: dbItem.navn, level: dbItem.bonus, billede: dbItem.billede, type: dbItem.type };
+        });
         
         if (erHost) {
             const { error } = await supabase.from('spil_sessioner').insert([{ 
@@ -323,18 +347,26 @@
 
     function kørTerninger() { return Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1; }
 
-    function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: string) {
+function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: string) {
         const k = spillerIndex % BREDDE;
         const svaerhedsgrad = 1 + (k / BREDDE);
+        
+        const toej = inventory.find(i => i.type === 'tøj');
 
         if (type === 'guld' || type === 'fortsaet') {
             let endeligtGuld = vaerdi;
-            if (endeligtGuld > 0 && valgtKarakter) endeligtGuld = Math.floor(endeligtGuld * valgtKarakter.goldMod);
+            if (endeligtGuld > 0 && valgtKarakter) {
+                endeligtGuld = Math.floor(endeligtGuld * valgtKarakter.goldMod);
+                if (toej?.id === 'flot_toej') endeligtGuld = Math.floor(endeligtGuld * 1.5);
+            }
             guldTotal = Math.max(0, guldTotal + endeligtGuld);
         }
         if (type === 'hp' || type === 'fortsaet') {
             let endeligtLiv = vaerdi;
-            if (endeligtLiv < 0 && valgtKarakter) endeligtLiv = Math.floor(endeligtLiv * valgtKarakter.dmgMod * svaerhedsgrad);
+            if (endeligtLiv < 0 && valgtKarakter) {
+                endeligtLiv = Math.floor(endeligtLiv * valgtKarakter.dmgMod * svaerhedsgrad);
+                if (toej?.id === 'rustning') endeligtLiv = Math.floor(endeligtLiv * 0.5);
+            }
             livspoint = Math.max(0, livspoint + endeligtLiv);
         }
         if (type === 'upgrade' && itemType) købEllerOpgrader(itemType);
@@ -353,12 +385,11 @@
             const raaSlag = kørTerninger();
             let modifier = 0; let modTekst = "";
 
-            if (aktivtEvent.type === 'kamp') {
-                const sabel = inventory.find(i => i.id === 'sabel');
-                if (sabel) { modifier = sabel.level; modTekst = ` (+${modifier} ⚔️)`; }
-            } else if (aktivtEvent.type === 'historie') {
-                const skovl = inventory.find(i => i.id === 'skovl');
-                if (skovl) { modifier = skovl.level; modTekst = ` (+${modifier} 🥄)`; }
+            const vaaben = inventory.find(i => i.type === 'våben');
+
+            if (aktivtEvent.type === 'kamp' && vaaben) {
+                modifier = vaaben.level; 
+                modTekst = ` (+${modifier} ${vaaben.billede})`;
             }
 
             const slag = raaSlag + modifier;
@@ -369,11 +400,18 @@
             else if (slag <= 9) res = v.udfald.neutral;
             else if (slag <= 11) res = v.udfald.succes;
             else res = v.udfald.mirakel;
+            
+            let erSkadetMedBue = vaaben?.id === 'bue' && (slag <= 6) && res.vaerdi < 0;
 
-            udfoerAktion(res.aktionType, res.vaerdi, res.itemType);
+            if (erSkadetMedBue) {
+                udfoerAktion(res.aktionType, 0, res.itemType); 
+                res.log += " (Din bue gav dig afstand til at flygte uskadt).";
+            } else {
+                udfoerAktion(res.aktionType, res.vaerdi, res.itemType);
+            }
             
             let farve = '#ccc';
-            if (res.vaerdi < 0) farve = '#ff5555';
+            if (res.vaerdi < 0 && !erSkadetMedBue) farve = '#ff5555';
             if (res.aktionType === 'guld' && res.vaerdi > 0) farve = 'gold';
             if (res.aktionType === 'hp' && res.vaerdi > 0) farve = '#55ff55';
 
@@ -417,16 +455,25 @@
         } else {
             if (guldTotal >= basePris) {
                 guldTotal -= basePris;
-                inventory = [...inventory, { id, navn: id === 'sabel' ? 'Sabre' : 'Shovel', level: 1, billede: id === 'sabel' ? '⚔️' : '🥄' }];
-                logBesked = `Handel gennemført.`; lukEvent(); syncTilDb(true);
+const dbItem = itemDB[id];
+                inventory = [...inventory, { id: dbItem.id, navn: dbItem.navn, level: dbItem.bonus, billede: dbItem.billede, type: dbItem.type }];                logBesked = `Handel gennemført.`; lukEvent(); syncTilDb(true);
             } else logBesked = "Ikke mønter nok.";
         }
     }
 
-    function grav() {
+ function grav() {
         let f = gitter[spillerIndex];
         if (!f || f.gravet || f.eventID || !valgtKarakter) return;
         
+        const harSkovl = inventory.some(i => i.id === 'skovl');
+        if (!harSkovl) {
+            logBesked = "Du kan ikke bryde det hårde mudder uden en skovl.";
+            return;
+        }
+
+        const harDetektor = inventory.some(i => i.id === 'metaldetektor');
+        const harKvist = inventory.some(i => i.id === 'soegekvist');
+
         livspoint -= valgtKarakter.digCost;
         f.gravet = true;
         
@@ -434,9 +481,6 @@
 
         const k = spillerIndex % BREDDE;
         const svaerhedsgrad = 1 + (k / BREDDE);
-
-        const skovl = inventory.find(i => i.id === 'skovl');
-        const bonus = skovl ? skovl.level * 15 : 0;
         const roll = Math.random();
 
         const farligeBiomer = ['bjerg', 'ruin', 'blodskov', 'hule', 'slagmark', 'ritual', 'krystal'];
@@ -446,13 +490,19 @@
         if (roll > trapChance) {
             const subRoll = Math.random();
             if (subRoll < 0.60) {
-                const amount = Math.floor((Math.random() * 40) + 10 + bonus) * valgtKarakter.goldMod;
-                guldTotal += amount; logBesked = `Mudderet gemte på ${amount}G.`;
+                let amount = Math.floor((Math.random() * 40) + 10) * valgtKarakter.goldMod;
+                if (harDetektor) amount *= 2;
+                guldTotal += amount; 
+                logBesked = harDetektor ? `Detektoren bipper vildt! Dobbelt op: ${amount}G.` : `Mudderet gemte på ${amount}G.`;
             } else if (subRoll < 0.85) {
-                livspoint = Math.min(100, livspoint + 15); logBesked = `Rod fundet. Heler 15 HP.`;
+                let heal = harKvist ? 35 : 15;
+                livspoint = Math.min(100, livspoint + heal); 
+                logBesked = harKvist ? `Din kvist fandt stærke lægeurter. Heler ${heal} HP.` : `Rod fundet. Heler ${heal} HP.`;
             } else {
-                const amount = Math.floor(150 + bonus) * valgtKarakter.goldMod;
-                guldTotal += amount; logBesked = `Skattekiste brudt op! ${amount}G indsamlet.`;
+                let amount = Math.floor(150) * valgtKarakter.goldMod;
+                if (harDetektor) amount *= 2;
+                guldTotal += amount; 
+                logBesked = `Skattekiste brudt op! ${amount}G indsamlet.`;
             }
         } else {
             const subRoll = Math.random();
