@@ -21,6 +21,7 @@
         isWinner: boolean;
         score: number;
         ikon?: string;
+        inventory?: Item[];
     }
 
     const BREDDE = 50;
@@ -42,31 +43,26 @@
         'hav': 99
     };
 
-const tilgaengeligeKarakterer: Karakter[] = [
-    { id: 'knight_m', navn: "Ridder", ikon: "/game_faces/knight_m.png", startMsg: "Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
-    { id: 'knight_f', navn: "Skjoldmø", ikon: "/game_faces/knight_f.png", startMsg: "Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
-    
-    { id: 'magician_m', navn: "Troldmand", ikon: "/game_faces/magician_m.png", startMsg: "Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
-    { id: 'magician_f', navn: "Troldkvinde", ikon: "/game_faces/magician_f.png", startMsg: "Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
-    
-    { id: 'thief_m', navn: "Tyv", ikon: "/game_faces/thief_m.png", startMsg: "Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
-    { id: 'thief_f', navn: "Skygge", ikon: "/game_faces/thief_f.png", startMsg: "Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
-    
-    { id: 'explorer_m', navn: "Udforsker", ikon: "/game_faces/explorer_m.png", startMsg: "Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
-    { id: 'explorer_f', navn: "Eventyrer", ikon: "/game_faces/explorer_f.png", startMsg: "Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
-    
-    { id: 'viking_m', navn: "Viking", ikon: "/game_faces/viking_m.png", startMsg: "Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
-    { id: 'viking_f', navn: "Valkyrie", ikon: "/game_faces/viking_f.png", startMsg: "Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
-    
-    { id: 'royal_m', navn: "Hertug", ikon: "/game_faces/royal_m.png", startMsg: "Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." },
-    { id: 'royal_f', navn: "Hertuginde", ikon: "/game_faces/royal_f.png", startMsg: "Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." }
-];
+    const tilgaengeligeKarakterer: Karakter[] = [
+        { id: 'knight_m', navn: "Ridder", ikon: "/game_faces/knight_m.png", startMsg: "Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
+        { id: 'knight_f', navn: "Skjoldmø", ikon: "/game_faces/knight_f.png", startMsg: "Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
+        { id: 'magician_m', navn: "Troldmand", ikon: "/game_faces/magician_m.png", startMsg: "Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
+        { id: 'magician_f', navn: "Troldkvinde", ikon: "/game_faces/magician_f.png", startMsg: "Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
+        { id: 'thief_m', navn: "Tyv", ikon: "/game_faces/thief_m.png", startMsg: "Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
+        { id: 'thief_f', navn: "Skygge", ikon: "/game_faces/thief_f.png", startMsg: "Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
+        { id: 'explorer_m', navn: "Udforsker", ikon: "/game_faces/explorer_m.png", startMsg: "Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
+        { id: 'explorer_f', navn: "Eventyrer", ikon: "/game_faces/explorer_f.png", startMsg: "Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
+        { id: 'viking_m', navn: "Viking", ikon: "/game_faces/viking_m.png", startMsg: "Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
+        { id: 'viking_f', navn: "Valkyrie", ikon: "/game_faces/viking_f.png", startMsg: "Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
+        { id: 'royal_m', navn: "Hertug", ikon: "/game_faces/royal_m.png", startMsg: "Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." },
+        { id: 'royal_f', navn: "Hertuginde", ikon: "/game_faces/royal_f.png", startMsg: "Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." }
+    ];
 
     let gameState = $state<'login' | 'select' | 'play' | 'dead' | 'win'>('login'); 
     
     let spillerNavn = $state('');
-let visMandlige = $state(true);
-let visKvindelige = $state(true);
+    let visMandlige = $state(true);
+    let visKvindelige = $state(true);
     let rumKode = $state('');
     let erHost = $state(false);
     let statusBesked = $state('');
@@ -120,13 +116,44 @@ let visKvindelige = $state(true);
 
         if (data) {
             gitter = data.kort;
-            spillerIndex = data.start_index;
             alleSpillere = data.spillere || {};
             erHost = false;
-            statusBesked = "Rum fundet. Deltager som Guest.";
-            afslørOmraade(spillerIndex, 1);
-            startRealtime();
-            gameState = 'select';
+
+            if (alleSpillere[spillerNavn]) {
+                statusBesked = "Velkommen tilbage. Henter dine data...";
+                const eksisterende = alleSpillere[spillerNavn];
+                
+                spillerIndex = eksisterende.index;
+                livspoint = eksisterende.hp;
+                guldTotal = eksisterende.guld;
+                maxKolonne = eksisterende.kolonne;
+                inventory = eksisterende.inventory || [];
+                
+                valgtKarakter = tilgaengeligeKarakterer.find(k => k.ikon === eksisterende.ikon) || null;
+                
+                afslørOmraade(spillerIndex, 1);
+                startRealtime();
+                
+                if (eksisterende.isDead) {
+                    gameState = 'dead';
+                } else if (eksisterende.isWinner) {
+                    gameState = 'win';
+                } else {
+                    if (kbdRef) window.removeEventListener('keydown', kbdRef);
+                    kbdRef = (ev: KeyboardEvent) => { 
+                        if (ev.key === 'Enter' && !aktivtEvent && gameState === 'play') grav(); 
+                    };
+                    window.addEventListener('keydown', kbdRef);
+                    
+                    gameState = 'play';
+                }
+            } else {
+                statusBesked = "Rum fundet. Deltager som Guest.";
+                spillerIndex = data.start_index;
+                afslørOmraade(spillerIndex, 1);
+                startRealtime();
+                gameState = 'select';
+            }
         } else {
             erHost = true;
             statusBesked = "Nyt rum oprettes. Du er Host.";
@@ -136,41 +163,39 @@ let visKvindelige = $state(true);
         }
     }
 
-function startRealtime() {
-    supabase.channel('rum_' + rumKode)
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'spil_sessioner', filter: `rum_kode=eq.${rumKode}` }, payload => {
-            alleSpillere = payload.new.spillere || {};
-            if (payload.new.kort) {
-                // Skaber et helt nyt array, så Svelte TVINGES til at tegne kortet forfra hos alle
-                gitter = [...payload.new.kort]; 
-            }
-        })
-        .subscribe();
-}
+    function startRealtime() {
+        supabase.channel('rum_' + rumKode)
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'spil_sessioner', filter: `rum_kode=eq.${rumKode}` }, payload => {
+                alleSpillere = payload.new.spillere || {};
+                if (payload.new.kort) {
+                    gitter = [...payload.new.kort]; 
+                }
+            })
+            .subscribe();
+    }
 
     async function syncTilDb(sendKort = false) {
-    const { data } = await supabase.from('spil_sessioner').select('spillere').eq('rum_kode', rumKode).single();
-    if (data) {
-        let opdateredeSpillere = data.spillere || {};
-        opdateredeSpillere[spillerNavn] = {
-            index: spillerIndex,
-            kolonne: maxKolonne,
-            hp: livspoint,
-            guld: guldTotal,
-            isDead: livspoint <= 0,
-            isWinner: gameState === 'win',
-            score: samletScore,
-            ikon: valgtKarakter?.ikon
-        };
+        const { data } = await supabase.from('spil_sessioner').select('spillere').eq('rum_kode', rumKode).single();
+        if (data) {
+            let opdateredeSpillere = data.spillere || {};
+            opdateredeSpillere[spillerNavn] = {
+                index: spillerIndex,
+                kolonne: maxKolonne,
+                hp: livspoint,
+                guld: guldTotal,
+                isDead: livspoint <= 0,
+                isWinner: gameState === 'win',
+                score: samletScore,
+                ikon: valgtKarakter?.ikon,
+                inventory: inventory
+            };
 
-        // Her er den afgørende linje, der fjerner "any" fejlen:
-        const opdatering: { spillere: Record<string, SpillerData>; kort?: Felt[] } = { spillere: opdateredeSpillere };
-        
-        if (sendKort) opdatering.kort = gitter;
+            const opdatering: { spillere: Record<string, SpillerData>; kort?: Felt[] } = { spillere: opdateredeSpillere };
+            if (sendKort) opdatering.kort = gitter;
 
-        await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', rumKode);
+            await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', rumKode);
+        }
     }
-}
 
     // --- SPIL LOGIK ---
 
@@ -514,354 +539,278 @@ function startRealtime() {
 </script>
 
 {#if gameState === 'login'}
-<main class="login-screen">
-    <div class="login-box">
-        <h1>Skyggekysten</h1>
-        <p>Angiv dit navn og et rum for at kæmpe jer over øen sammen.</p>
-        
-<input type="text" placeholder="Dit Spillernavn" bind:value={spillerNavn} />
-
-<div class="gender-toggles">
-    <label class="checkbox-label">
-        <input type="checkbox" bind:checked={visMandlige} />
-        Mand
-    </label>
-    <label class="checkbox-label">
-        <input type="checkbox" bind:checked={visKvindelige} />
-        Kvinde
-    </label>
-</div>
-
-<input type="text" placeholder="Rum Kode (fx 1234)" bind:value={rumKode} />
-        
-        <button class="join-btn" onclick={opretEllerDeltag}>Gå til kysten</button>
-        
-        {#if statusBesked}
-            <p class="status">{statusBesked}</p>
-        {/if}
-    </div>
-</main>
-{:else if gameState === 'select'}
-<main class="selection-screen">
-    <div class="selection-header">
-        <h1>Vælg din skæbne, {spillerNavn}</h1>
-        <button class="nuke-btn" onclick={nulstilHukommelse}>Forlad rum</button>
-    </div>
-<div class="character-gallery">
-{#each tilgaengeligeKarakterer.filter(k => (visMandlige && k.id.endsWith('_m')) || (visKvindelige && k.id.endsWith('_f'))) as k (k.id)}            <button class="character-card" onclick={() => bekræftValg(k)}>
-                <div class="big-icon">
-                    {#if k.ikon.startsWith('/')}
-                        <img src={k.ikon} alt={k.navn} class="char-image" />
-                    {:else}
-                        {k.ikon}
-                    {/if}
-                </div>
-                <h2>{k.navn}</h2>
-                <div class="char-stats">
-                    <span class="stat-badge hp">❤️ {k.startHp}</span>
-                    {#if k.startGuld > 0}<span class="stat-badge gold">💰 {k.startGuld}</span>{/if}
-                    {#if k.sabelLevel > 0}<span class="stat-badge wpn">⚔️ Lvl {k.sabelLevel}</span>{/if}
-                    {#if k.skovlLevel > 0}<span class="stat-badge dig">🥄 Lvl {k.skovlLevel}</span>{/if}
-                </div>
-                <div class="char-desc">
-                    <div class="pro">▲ {k.fordel}</div>
-                    <div class="con">▼ {k.ulempe}</div>
-                </div>
-            </button>
-        {/each}
-    </div>
-</main>
-{:else if gameState === 'dead' || gameState === 'win'}
-<main class="death-screen" class:win-screen={gameState === 'win'}>
-    <div class="death-content">
-        <div class="ghost-icon">{gameState === 'win' ? '👑' : '💀'}</div>
-        <h1>{gameState === 'win' ? 'Skyggekysten er besejret' : 'Øen krævede sin pris'}</h1>
-        <p>{spillerNavn} {gameState === 'win' ? 'overlevede rejsen' : `faldt ${BREDDE - 2 - maxKolonne} felter fra kysten`}.</p>
-        
-        <div class="score-board">
-            <h3>Holdets Resultater</h3>
-            {#each Object.entries(alleSpillere).sort((a, b) => (b[1].score || 0) - (a[1].score || 0)) as [navn, p] (navn)}
-                <div class="score-row lb-row" class:highlight={navn === spillerNavn}>
-                    <span>{navn} {p.isDead ? '💀' : p.isWinner ? '👑' : '🚶'}</span>
-                    <span>{p.score || 0} pt</span>
-                </div>
-            {/each}
-        </div>
-
-        <button class="retry-btn" onclick={nulstilHukommelse}>Afslut</button>
-    </div>
-</main>
-{:else}
-<main class="game-container">
-    <header class="hud">
-<button onclick={nulstilHukommelse} class="stat-box char-btn">
-    {#if valgtKarakter?.ikon.startsWith('/')}
-        <img src={valgtKarakter.ikon} alt="Ikon" style="height: 58px; width: auto; border: none; outline: none; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));" />
-    {:else}
-        <span style="font-size: 40px; line-height: 1;">{valgtKarakter?.ikon}</span>
-    {/if} 
-    <small>ABORT</small>
-</button>
-        <div class="stat-box hp" class:low={livspoint <= 30}>❤️ {livspoint}</div>
-        <div class="stat-box gold">💰 {guldTotal}</div>
-        <div class="inventory">
-            {#each inventory as item (item.id)} <div class="item-slot">{item.billede} <small>+{item.level}</small></div> {/each}
-        </div>
-        <div class="coop-status">
-    {#each Object.entries(alleSpillere) as [navn, p] (navn)}
-        {#if navn !== spillerNavn}
-            <span class="ally-hp" class:dead={p.isDead} title="{navn}">
-                {#if p.ikon && p.ikon.startsWith('/')}
-                    <img src={p.ikon} alt={navn} style="height: 20px; width: auto; vertical-align: bottom; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); margin-right: 4px;" />
-                {:else}
-                    {p.ikon || '👤'}
-                {/if}
-                {p.isDead ? '💀' : p.hp}
-            </span>
-        {/if}
-    {/each}
-</div>
-    </header>
-
-    <div class="camera-lens">
-        <div class="world" style={kameraStyle}>
-            {#each gitter as felt, i (i)}
-    {@const r = Math.floor(i / BREDDE)}
-    {@const erJegHer = spillerIndex === i} <div class="hex" 
-         class:odd={r % 2 !== 0} 
-         class:active={erJegHer} 
-         class:unexplored={!felt.udforsket}
-         style="background-image: url('/tiles/{felt.biome}.png');">
-        
-        {#if felt.gravet}
-            <div class="dug-overlay"></div>
-        {/if}
-
-        <div class="inner">
-            {#if felt.udforsket && felt.eventID && !felt.eventFuldført} 
-                <img src="/tiles/event.png" alt="Event" class="event-crystal" />
-            {/if}
-
-            {#if erJegHer} 
-                <span class="player-icon">
-                    {#if valgtKarakter?.ikon.startsWith('/')}
-                        <img src={valgtKarakter.ikon} alt="Spiller" style="height: 58px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(0 0 5px gold);" />
-                    {:else}
-                        {valgtKarakter?.ikon}
-                    {/if}
-                </span> 
-            {/if}
+    <div class="overlay">
+        <div class="login-box">
+            <h1>Skyggekysten</h1>
+            <p>Angiv dit navn og et rum for at kæmpe jer over øen sammen.</p>
             
-            {#each Object.entries(alleSpillere).filter(([n, p]) => p.index === i && n !== spillerNavn && !p.isDead) as [navn, p], idx (navn)}
-                {@const offset = erJegHer ? idx + 1 : idx}
-                <span class="other-player-icon" title={navn} style="z-index: {90 - idx}; transform: translate({offset * 10}px, {offset * 5}px);">
-                    {#if p.ikon && p.ikon.startsWith('/')}
-                        <img src={p.ikon} alt={navn} style="height: 40px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(-2px 2px 3px rgba(0,0,0,0.8));" />
-                    {:else}
-                        {p.ikon || '👤'}
-                    {/if}
-                </span>
-            {/each}
+            <input type="text" placeholder="Dit Spillernavn" bind:value={spillerNavn} />
+
+            <div class="gender-toggles">
+                <label class="checkbox-label">
+                    <input type="checkbox" bind:checked={visMandlige} />
+                    Mandlige
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" bind:checked={visKvindelige} />
+                    Kvindelige
+                </label>
+            </div>
+
+            <input type="text" placeholder="Rum Kode (fx 1234)" bind:value={rumKode} />
+            <button onclick={opretEllerDeltag}>Gå til kysten</button>
+            <p class="status">{statusBesked}</p>
         </div>
     </div>
-{/each}
+{:else if gameState === 'select'}
+    <div class="overlay">
+        <div class="character-select">
+            <h2>Vælg din karakter, {spillerNavn}</h2>
+            <div class="character-gallery">
+                {#each tilgaengeligeKarakterer.filter(k => (visMandlige && k.id.endsWith('_m')) || (visKvindelige && k.id.endsWith('_f'))) as k (k.id)}
+<div class="char-card" 
+     class:selected={valgtKarakter?.id === k.id} 
+     role="button" 
+     tabindex="0" 
+     onclick={() => valgtKarakter = k}
+     onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') valgtKarakter = k; }}>
+	                         {#if k.ikon.startsWith('/')}
+                            <img src={k.ikon} alt={k.navn} class="char-icon" />
+                        {:else}
+                            <span class="char-icon emoji">{k.ikon}</span>
+                        {/if}
+                        <h3>{k.navn}</h3>
+                        <p class="stats">HP: {k.startHp} | Guld: {k.startGuld}</p>
+                        <p class="desc positive">{k.fordel}</p>
+                        <p class="desc negative">{k.ulempe}</p>
+                    </div>
+                {/each}
+            </div>
+            <button class="confirm-btn" disabled={!valgtKarakter} onclick={() => valgtKarakter && bekræftValg(valgtKarakter)}>
+                Bekræft Valg
+            </button>
+        </div>
+    </div>
+{:else if gameState === 'dead'}
+    <div class="overlay death-screen">
+        <h1>Du bukkede under for Skyggekysten</h1>
+        <p>Din krop giver efter. Din rejse ender her i mudderet.</p>
+        <h2>Endelig Score: {samletScore}</h2>
+        <button onclick={nulstilHukommelse}>Hvil i fred</button>
+    </div>
+{:else if gameState === 'win'}
+    <div class="overlay win-screen">
+        <h1>Skyggekysten er besejret!</h1>
+        <p>Du har nået den fjerne kyst og overlevet mørket.</p>
+        <h2>Endelig Score: {samletScore}</h2>
+        <button onclick={nulstilHukommelse}>Spil igen</button>
+    </div>
+{:else}
+    <div class="game-container">
+        <div class="camera">
+            <div class="map" style={kameraStyle}>
+                {#each gitter as felt, i (i)}
+                    {@const r = Math.floor(i / BREDDE)}
+                    {@const erJegHer = spillerIndex === i} 
+                    
+                    <div class="hex" 
+                         class:odd={r % 2 !== 0} 
+                         class:active={erJegHer} 
+                         class:unexplored={!felt.udforsket}
+                         style="background-image: url('/tiles/{felt.biome}.png');">
+                        
+                        {#if felt.gravet}
+                            <div class="dug-overlay"></div>
+                        {/if}
+
+                        <div class="inner">
+                            {#if felt.udforsket && felt.eventID && !felt.eventFuldført} 
+                                <img src="/tiles/event.png" alt="Event" class="event-crystal" />
+                            {/if}
+
+                            {#if erJegHer} 
+                                <span class="player-icon">
+                                    {#if valgtKarakter?.ikon.startsWith('/')}
+                                        <img src={valgtKarakter.ikon} alt="Spiller" style="height: 58px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(0 0 5px gold);" />
+                                    {:else}
+                                        {valgtKarakter?.ikon}
+                                    {/if}
+                                </span> 
+                            {/if}
+                            
+                            {#each Object.entries(alleSpillere).filter(([n, p]) => p.index === i && n !== spillerNavn && !p.isDead) as [navn, p], idx (navn)}
+                                {@const offset = erJegHer ? idx + 1 : idx}
+                                <span class="other-player-icon" title={navn} style="z-index: {90 - idx}; transform: translate({offset * 10}px, {offset * 5}px);">
+                                    {#if p.ikon && p.ikon.startsWith('/')}
+                                        <img src={p.ikon} alt={navn} style="height: 40px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(-2px 2px 3px rgba(0,0,0,0.8));" />
+                                    {:else}
+                                        {p.ikon || '👤'}
+                                    {/if}
+                                </span>
+                            {/each}
+                        </div>
+                    </div>
+                {/each}
+            </div>
         </div>
 
         {#if aktivtEvent}
-            <div class="modal">
-                {#key aktivtEvent.titel}
-                <div class="card">
-                    <h3>{aktivtEvent.titel}</h3>
-                    {#if aktivtEvent.billedeUrl}
-                        <img src={aktivtEvent.billedeUrl} alt="Event" class="img" onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')} />
-                    {/if}
+            <div class="event-modal">
+                <div class="event-content">
+                    <h2>{aktivtEvent.titel}</h2>
+                    <p class="event-desc">{aktivtEvent.beskrivelse}</p>
                     
                     {#if eventUdfald}
-                        <div class="udfald-boks" style="border-left-color: {eventUdfald.farve};">
-                            <p style="color: {eventUdfald.farve}; font-size: 1.1rem; line-height: 1.5;">{eventUdfald.tekst}</p>
+                        <div class="udfald" style="border-left: 5px solid {eventUdfald.farve};">
+                            {eventUdfald.tekst}
                         </div>
-                        <div class="btns">
-                            <button onclick={accepterUdfald}>Forstået</button>
-                        </div>
+                        <button class="action-btn" onclick={accepterUdfald}>Fortsæt</button>
                     {:else}
-                        <p>{aktivtEvent.tekst}</p>
-                        <div class="btns"> 
-                            {#each aktivtEvent.valg as v, i (i)} 
-                                <button onclick={() => haandterValg(v)} class:risky={v.chance !== undefined || v.udfald !== undefined}>
-                                    {v.tekst}
-                                </button> 
-                            {/each} 
+                        <div class="valg-liste">
+                            {#each aktivtEvent.valg as valg (valg.tekst)}
+                                <button class="valg-btn" onclick={() => haandterValg(valg)}>{valg.tekst}</button>
+                            {/each}
                         </div>
                     {/if}
                 </div>
-                {/key}
             </div>
         {/if}
-    </div>
 
-<footer class="ui">
-    <div class="msg">
-        {#if logBesked}
-            {logBesked}
-        {:else}
-            Klar til at udforske kysten.
-        {/if}
+        <footer class="ui">
+            <div class="stats-panel">
+                <div class="stat-box" title="Helbred">
+                    <span class="icon">❤️</span>
+                    <span class="value">{livspoint}</span>
+                </div>
+                <div class="stat-box gold-box" title="Guld">
+                    <span class="icon">💰</span>
+                    <span class="value">{guldTotal}</span>
+                </div>
+                {#each [0, 1, 2, 3, 4] as i (i)}
+                    <div class="stat-box item-box">
+                        {#if inventory[i]}
+                            <span class="icon">{inventory[i].billede}</span>
+                            <span class="level-badge">Lvl {inventory[i].level}</span>
+                        {:else}
+                            <span class="icon empty"></span>
+                        {/if}
+                    </div>
+                {/each}
+            </div>
+        
+            <div class="log-line">
+                {#if logBesked}
+                    {logBesked}
+                {:else}
+                    Klar til at udforske kysten.
+                {/if}
+            </div>
+        
+            <div class="pad">
+                <div class="dpad-row"><button onclick={() => flytHex('NW')}>NW</button><button onclick={() => flytHex('NE')}>NE</button></div>
+                <div class="dpad-row"><button onclick={() => flytHex('W')}>W</button><button class="dig" onclick={grav}>GRAV</button><button onclick={() => flytHex('E')}>E</button></div>
+                <div class="dpad-row"><button onclick={() => flytHex('SW')}>SW</button><button class="rest" onclick={hvil}>HVIL</button><button onclick={() => flytHex('SE')}>SE</button></div>
+            </div>
+        </footer>
     </div>
-    <div class="pad">
-        <div class="dpad-row"><button onclick={() => flytHex('NW')}>NW</button><button onclick={() => flytHex('NE')}>NE</button></div>
-        <div class="dpad-row"><button onclick={() => flytHex('W')}>W</button><button class="dig" onclick={grav}>GRAV</button><button onclick={() => flytHex('E')}>E</button></div>
-        <div class="dpad-row"><button onclick={() => flytHex('SW')}>SW</button><button class="rest" onclick={hvil}>HVIL</button><button onclick={() => flytHex('SE')}>SE</button></div>
-    </div>
-</footer>
-</main>
 {/if}
 
 <style>
-    :global(body) { background: #000; color: #fff; margin: 0; font-family: sans-serif; overflow: hidden; }
-    .login-screen, .selection-screen, .death-screen { position: fixed; inset: 0; background: #050505; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+    :global(body) { margin: 0; padding: 0; background: #0a0a0a; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
     
-    .login-box { background: #1a1a1a; padding: 40px; border: 2px solid #444; border-radius: 15px; text-align: center; width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-    .login-box h1 { color: gold; margin-bottom: 10px; }
-    .login-box p { color: #888; margin-bottom: 25px; }
-    .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; background: #0a0a0a; border: 1px solid #333; color: white; border-radius: 8px; font-size: 1.1rem; box-sizing: border-box; }
-    .join-btn { width: 100%; padding: 15px; background: #2a4a2a; color: white; border: 1px solid #4a8a4a; border-radius: 8px; cursor: pointer; font-size: 1.2rem; font-weight: bold; transition: background 0.2s; }
-    .join-btn:hover { background: #3a6a3a; }
-    .status { margin-top: 15px; color: #aaa; font-style: italic; }
-.gender-toggles { 
-    display: flex; 
-    gap: 20px; 
-    margin-bottom: 20px; 
-    justify-content: center; 
-}
-.checkbox-label { 
-    color: #ccc; 
-    font-size: 1.1rem; 
-    cursor: pointer; 
-    display: flex; 
-    align-items: center; 
-    gap: 8px; 
-}
-.checkbox-label input[type="checkbox"] { 
-    width: 20px; 
-    height: 20px; 
-    cursor: pointer; 
-    accent-color: #2a4a2a; /* Farven matcher din grønne login-knap */
-}
-    .death-screen { background: rgba(30, 0, 0, 0.95); animation: fade-in 2s; }
-    .win-screen { background: rgba(10, 30, 10, 0.95); }
-    .death-content { text-align: center; }
-    .ghost-icon { font-size: 8rem; margin-bottom: 20px; filter: grayscale(1); opacity: 0.8; }
-    .win-screen .ghost-icon { filter: none; opacity: 1; }
-    
-    .score-board { background: rgba(0,0,0,0.6); border: 1px solid #444; border-radius: 10px; padding: 20px; margin: 20px 0; width: 350px; }
-    .score-board h3 { color: gold; border-bottom: 1px solid #444; padding-bottom: 10px; margin-top: 0; }
-    .score-row { display: flex; justify-content: space-between; margin-bottom: 10px; color: #aaa; font-family: monospace; font-size: 1.1rem; }
-    .lb-row { padding: 5px 0; border-bottom: 1px dotted #333; }
-    .lb-row.highlight { color: #fff; font-weight: bold; }
-    
-    .retry-btn { padding: 15px 40px; background: #500; color: white; border: 1px solid #f00; border-radius: 10px; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
-    .win-screen .retry-btn { background: #1a4a1a; border-color: #2a8a2a; }
-    .hp.low { color: #ff3333; animation: pulse 1s infinite alternate; }
-    
-    @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
-    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .login-box { background: #1a1a1a; padding: 40px; border-radius: 12px; border: 1px solid #333; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .login-box h1 { margin-top: 0; color: #ffcc00; }
+    .login-box input { display: block; width: 100%; padding: 12px; margin-bottom: 20px; background: #0d0d0d; border: 1px solid #444; color: white; border-radius: 6px; box-sizing: border-box; }
+    .login-box button { width: 100%; padding: 14px; background: #2a4a2a; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; transition: 0.2s; font-weight: bold; }
+    .login-box button:hover { background: #3a6a3a; }
+    .status { margin-top: 15px; color: #aaa; font-size: 14px; }
 
-    .selection-header { text-align: center; margin-bottom: 30px; }
-    .selection-header h1 { color: gold; font-size: 3rem; margin: 0; }
-    .nuke-btn { margin-top: 15px; background: #222; color: #888; border: 1px solid #444; padding: 5px 15px; cursor: pointer; border-radius: 5px; }
-.character-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-height: 65vh; overflow-y: auto; padding: 10px; }    .character-card { background: #1a1a1a; padding: 20px; border: 2px solid #333; border-radius: 15px; text-align: center; color: white; cursor: pointer; width: 250px; display: flex; flex-direction: column; align-items: center; }
-    .big-icon { font-size: 4rem; min-height: 80px; display: flex; align-items: center; justify-content: center; }
-.char-image { height: 110px; width: auto; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8)); }    .char-stats { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
-    .stat-badge { font-size: 0.8rem; padding: 4px 8px; border-radius: 4px; background: rgba(0,0,0,0.5); border: 1px solid #555; }
-    .stat-badge.hp { color: #ff5555; border-color: #500; }
-    .stat-badge.gold { color: gold; border-color: #554400; }
-    .stat-badge.wpn { color: #aaa; border-color: #444; }
-    .stat-badge.dig { color: #cd853f; border-color: #630; }
+    .gender-toggles { display: flex; gap: 20px; margin-bottom: 20px; justify-content: center; }
+    .checkbox-label { color: #ccc; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .checkbox-label input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: #2a4a2a; }
+
+    .character-select { background: #1a1a1a; padding: 30px; border-radius: 12px; border: 1px solid #333; max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto; }
+    .character-select h2 { text-align: center; color: #ffcc00; margin-top: 0; }
+    .character-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .char-card { background: #222; border: 2px solid #444; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: 0.2s; }
+    .char-card:hover { border-color: #666; transform: translateY(-2px); }
+    .char-card.selected { border-color: #ffcc00; background: #2a2a20; box-shadow: 0 0 15px rgba(255, 204, 0, 0.2); }
+    .char-icon { height: 80px; width: auto; object-fit: contain; margin-bottom: 10px; }
+    .char-icon.emoji { font-size: 60px; line-height: 80px; display: block; }
+    .char-card h3 { margin: 0 0 10px 0; color: white; }
+    .char-card .stats { font-weight: bold; color: #ccc; font-size: 14px; margin-bottom: 10px; }
+    .char-card .desc { font-size: 12px; margin: 5px 0; }
+    .char-card .positive { color: #88ff88; }
+    .char-card .negative { color: #ff8888; }
+    .confirm-btn { display: block; width: 100%; padding: 15px; background: #ffcc00; color: black; border: none; border-radius: 6px; font-size: 18px; font-weight: bold; cursor: pointer; }
+    .confirm-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
+
+    .death-screen { background: rgba(50,0,0,0.9); flex-direction: column; text-align: center; }
+    .death-screen h1 { color: #ff5555; font-size: 3em; margin-bottom: 10px; }
+    .win-screen { background: rgba(0,50,0,0.9); flex-direction: column; text-align: center; }
+    .win-screen h1 { color: #55ff55; font-size: 3em; margin-bottom: 10px; }
+    .death-screen button, .win-screen button { margin-top: 20px; padding: 15px 30px; font-size: 1.2em; cursor: pointer; }
+
+    .game-container { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    .camera { flex: 1; position: relative; background: #050505; overflow: hidden; }
+    .map { position: absolute; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); width: 4800px; height: 1640px; }
     
-    .char-desc { margin-top: 15px; font-size: 0.85rem; text-align: left; width: 100%; border-top: 1px solid #333; padding-top: 10px; line-height: 1.4; }
-    .char-desc .pro { color: #5a9d5a; margin-bottom: 5px; }
-    .char-desc .con { color: #c45; }
-
-    .game-container { display: flex; flex-direction: column; align-items: center; padding: 10px; }
-    .hud { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; width: 800px; }
-    .stat-box { background: #222; padding: 8px 12px; border-radius: 5px; font-weight: bold; border: 1px solid #444; display: flex; align-items: center; gap: 8px; }
-    .char-btn { border-color: #550000; color: #ff5555; cursor: pointer; }
-    .inventory { display: flex; gap: 5px; }
-    .item-slot { background: #111; padding: 5px 10px; border: 1px solid gold; border-radius: 5px; font-size: 20px; }
+    .hex { position: absolute; width: 96px; height: 110px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
+    .hex.unexplored { filter: brightness(0) !important; opacity: 0.9; }
+    .dug-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); box-shadow: inset 0 0 20px rgba(0,0,0,0.8); z-index: 1; pointer-events: none; }
+    .inner { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 2; }
     
-    .coop-status { margin-left: auto; display: flex; gap: 10px; }
-    .ally-hp { background: #1a1a1a; padding: 5px 10px; border-radius: 5px; border: 1px dashed #555; font-size: 0.9rem; }
-    .ally-hp.dead { opacity: 0.5; color: #888; text-decoration: line-through; }
+    .player-icon { font-size: 40px; z-index: 100; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); display: flex; align-items: center; justify-content: center; }
+    .other-player-icon { font-size: 28px; position: absolute; opacity: 0.8; transition: transform 0.3s; display: flex; align-items: center; justify-content: center; }
 
-    .camera-lens { width: 800px; height: 500px; overflow: hidden; position: relative; border: 3px solid #333; border-radius: 10px; background: #0a0a0a; }
-    .world { display: grid; grid-template-columns: repeat(50, 96px); grid-auto-rows: 82px; position: absolute; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .event-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: flex; align-items: center; justify-content: center; }
+    .event-content { background: #1a1a1a; padding: 30px; border-radius: 8px; border: 1px solid #555; max-width: 500px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+    .event-content h2 { margin-top: 0; color: #ffcc00; }
+    .event-desc { font-size: 16px; line-height: 1.5; margin-bottom: 25px; }
+    .valg-liste { display: flex; flex-direction: column; gap: 10px; }
+    .valg-btn, .action-btn { background: #2a2a2a; border: 1px solid #444; color: white; padding: 12px; font-size: 16px; cursor: pointer; border-radius: 4px; text-align: left; transition: 0.2s; }
+    .valg-btn:hover, .action-btn:hover { background: #3a3a3a; border-color: #666; }
+    .udfald { background: #222; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-size: 16px; }
+    .action-btn { text-align: center; width: 100%; background: #2a4a2a; }
+
+    .ui { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+    .ui > * { pointer-events: auto; }
     
-    .hex { width: 96px; height: 110px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-color: #2d1e14; background-size: cover; background-position: center; position: relative; transition: filter 0.3s, opacity 0.3s; }
-    .hex.odd { transform: translateX(48px); }
-    .hex.unexplored { filter: brightness(0.2) grayscale(1); opacity: 0.4; }
-    .hex.active { z-index: 10; filter: brightness(1.2); border: 2px solid #5a7d2a; box-shadow: inset 0 0 20px rgba(90,125,42,0.8); } 
-.dug-overlay { position: absolute; inset: 0; background-color: rgba(30, 15, 0, 0.6); pointer-events: none; z-index: 1; mix-blend-mode: multiply; }
-.inner { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; font-size: 40px; overflow: visible; z-index: 2; }    
-    .player-icon { display: flex; align-items: center; justify-content: center; z-index: 11; pointer-events: none; }
-    .other-player-icon { font-size: 16px; filter: drop-shadow(0 0 2px black); animation: bounce 2s infinite; }
-    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    .stats-panel { display: flex; gap: 12px; width: 100%; justify-content: center; margin-top: 10px; }
+    .stat-box { width: 65px; height: 65px; background: linear-gradient(180deg, #2a2a2a 0%, #111 100%); border: 2px solid #444; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; color: white; box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 4px 6px rgba(0,0,0,0.5); }
+    .stat-box .icon { font-size: 26px; }
+    .stat-box .value { font-size: 14px; font-weight: bold; margin-top: 4px; text-shadow: 1px 1px 2px black; }
+    .stat-box.gold-box .value { color: gold; }
+    .stat-box .empty { opacity: 0.05; }
+    .level-badge { position: absolute; bottom: -6px; right: -6px; background: #ffcc00; color: #000; font-size: 11px; font-weight: 900; padding: 2px 5px; border-radius: 5px; border: 1px solid #664400; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-    .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 100; }
-    .card { background: #1a1a1a; padding: 25px; border: 2px solid gold; border-radius: 15px; width: 450px; text-align: center; animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .log-line { width: 100%; text-align: center; color: #e0e0e0; font-size: 18px; font-weight: bold; min-height: 27px; margin-bottom: 5px; text-shadow: 0 2px 5px rgba(0,0,0,1); }
 
-    .udfald-boks { background: #111; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid; text-align: left; }
-    
-    .img { max-width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; border: 1px solid #444; }
-    .btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px; }
-    .btns button { padding: 10px 15px; background: #333; color: #fff; cursor: pointer; border-radius: 8px; border: 1px solid #555; font-weight: bold; }
-    .btns button.risky { border-color: #a00; color: #faa; }
-    
-.ui { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 20px; 
-    margin-top: 15px; 
-    align-items: center; 
-    width: 800px; 
-}    .pad { display: flex; flex-direction: column; align-items: center; gap: 5px; background: #111; padding: 10px; border-radius: 10px; border: 1px solid #333; }
-    .dpad-row { display: flex; gap: 5px; justify-content: center; width: 100%; }
-    .pad button { width: 50px; height: 45px; background: #333; color: #fff; border: 1px solid #444; cursor: pointer; border-radius: 5px; font-weight: bold; }
-    .dig { background: #8b4513 !important; width: 80px !important; border-color: #d2691e !important; }
-    .rest { background: #1e3c5a !important; color: #87ceeb !important; border-color: #4682b4 !important;}
-.msg { 
-    width: 100%; 
-    min-height: 60px; 
-    background: linear-gradient(90deg, #111 0%, #1a1a1a 100%); 
-    border: 1px solid #444; 
-    border-left: 6px solid gold; 
-    padding: 15px 25px; 
-    color: #fff; 
-    font-size: 20px; 
-    border-radius: 8px; 
-    box-sizing: border-box; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.8); 
-    display: flex; 
-    align-items: center; 
-} /* Denne klamme lukker .msg helt af */
+    .pad { display: flex; flex-direction: column; align-items: center; gap: 5px; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 50%; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+    .dpad-row { display: flex; gap: 5px; }
+    .pad button { width: 50px; height: 50px; border-radius: 50%; border: none; background: #333; color: white; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.5); transition: 0.1s; }
+    .pad button:active { transform: scale(0.9); background: #555; }
+    .pad button.dig { background: #8b4513; }
+    .pad button.rest { background: #2b5e2b; }
 
-:global(.event-crystal) {
-    position: absolute;
-    height: 65px;
-    width: auto;
-    z-index: 5;
-    pointer-events: none;
-    animation: floatAndGlow 3s ease-in-out infinite;
-}
-
-@keyframes floatAndGlow {
-    0%, 100% {
-        transform: translateY(0) scale(1);
-        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+    :global(.event-crystal) {
+        position: absolute;
+        height: 65px;
+        width: auto;
+        z-index: 5;
+        pointer-events: none;
+        animation: floatAndGlow 3s ease-in-out infinite;
     }
-    50% {
-        transform: translateY(-6px) scale(1.05);
-        filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.9));
+
+    @keyframes floatAndGlow {
+        0%, 100% {
+            transform: translateY(0) scale(1);
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+        }
+        50% {
+            transform: translateY(-6px) scale(1.05);
+            filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.9));
+        }
     }
-}
 </style>
