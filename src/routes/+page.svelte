@@ -42,14 +42,25 @@
         'hav': 99
     };
 
-    const tilgaengeligeKarakterer: Karakter[] = [
-        { id: 'ridder', navn: "Ridderen", ikon: "🛡️", startMsg: "🛡️ Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
-        { id: 'wizard', navn: "Troldmanden", ikon: "🧙‍♂️", startMsg: "🧙‍♂️ Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
-        { id: 'rogue', navn: "Tyven", ikon: "🥷", startMsg: "🥷 Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
-        { id: 'explorer', navn: "Udforskeren", ikon: "🤠", startMsg: "🤠 Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
-        { id: 'viking', navn: "Vikingen", ikon: "🪓", startMsg: "🪓 Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
-        { id: 'lady', navn: "Hertuginden", ikon: "💃", startMsg: "💃 Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." }
-    ];
+const tilgaengeligeKarakterer: Karakter[] = [
+    { id: 'knight_m', navn: "Ridderen", ikon: "/game_faces/knight_m.png", startMsg: "Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
+    { id: 'knight_f', navn: "Skjoldmøen", ikon: "/game_faces/knight_f.png", startMsg: "Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
+    
+    { id: 'magician_m', navn: "Troldmanden", ikon: "/game_faces/magician_m.png", startMsg: "Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
+    { id: 'magician_f', navn: "Troldkvinden", ikon: "/game_faces/magician_f.png", startMsg: "Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
+    
+    { id: 'thief_m', navn: "Tyven", ikon: "/game_faces/thief_m.png", startMsg: "Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
+    { id: 'thief_f', navn: "Skyggen", ikon: "/game_faces/thief_f.png", startMsg: "Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
+    
+    { id: 'explorer_m', navn: "Udforskeren", ikon: "/game_faces/explorer_m.png", startMsg: "Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
+    { id: 'explorer_f', navn: "Eventyreren", ikon: "/game_faces/explorer_f.png", startMsg: "Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
+    
+    { id: 'viking_m', navn: "Vikingen", ikon: "/game_faces/viking_m.png", startMsg: "Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
+    { id: 'viking_f', navn: "Valkyrien", ikon: "/game_faces/viking_f.png", startMsg: "Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
+    
+    { id: 'royal_m', navn: "Hertugen", ikon: "/game_faces/royal_m.png", startMsg: "Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." },
+    { id: 'royal_f', navn: "Hertuginden", ikon: "/game_faces/royal_f.png", startMsg: "Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." }
+];
 
     let gameState = $state<'login' | 'select' | 'play' | 'dead' | 'win'>('login'); 
     
@@ -133,26 +144,28 @@
     }
 
     async function syncTilDb(sendKort = false) {
-        const { data } = await supabase.from('spil_sessioner').select('spillere').eq('rum_kode', rumKode).single();
-        if (data) {
-            let opdateredeSpillere = data.spillere || {};
-            opdateredeSpillere[spillerNavn] = {
-                index: spillerIndex,
-                kolonne: maxKolonne,
-                hp: livspoint,
-                guld: guldTotal,
-                isDead: livspoint <= 0,
-                isWinner: gameState === 'win',
-                score: samletScore,
-                ikon: valgtKarakter?.ikon
-            };
+    const { data } = await supabase.from('spil_sessioner').select('spillere').eq('rum_kode', rumKode).single();
+    if (data) {
+        let opdateredeSpillere = data.spillere || {};
+        opdateredeSpillere[spillerNavn] = {
+            index: spillerIndex,
+            kolonne: maxKolonne,
+            hp: livspoint,
+            guld: guldTotal,
+            isDead: livspoint <= 0,
+            isWinner: gameState === 'win',
+            score: samletScore,
+            ikon: valgtKarakter?.ikon
+        };
 
-            const opdatering: { spillere: Record<string, SpillerData>; kort?: Felt[] } = { spillere: opdateredeSpillere };
-            if (sendKort) opdatering.kort = gitter;
+        // Her er den afgørende linje, der fjerner "any" fejlen:
+        const opdatering: { spillere: Record<string, SpillerData>; kort?: Felt[] } = { spillere: opdateredeSpillere };
+        
+        if (sendKort) opdatering.kort = gitter;
 
-            await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', rumKode);
-        }
+        await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', rumKode);
     }
+}
 
     // --- SPIL LOGIK ---
 
@@ -565,28 +578,33 @@
 {:else}
 <main class="game-container">
     <header class="hud">
-        <button onclick={nulstilHukommelse} class="stat-box char-btn">
-            {#if valgtKarakter?.ikon.startsWith('/')}
-                <img src={valgtKarakter.ikon} alt="Ikon" style="width: 20px; height: 20px; border-radius: 50%;" />
-            {:else}
-                {valgtKarakter?.ikon}
-            {/if} 
-            <small>ABORT</small>
-        </button>
+<button onclick={nulstilHukommelse} class="stat-box char-btn">
+    {#if valgtKarakter?.ikon.startsWith('/')}
+        <img src={valgtKarakter.ikon} alt="Ikon" style="height: 58px; width: auto; border: none; outline: none; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));" />
+    {:else}
+        <span style="font-size: 40px; line-height: 1;">{valgtKarakter?.ikon}</span>
+    {/if} 
+    <small>ABORT</small>
+</button>
         <div class="stat-box hp" class:low={livspoint <= 30}>❤️ {livspoint}</div>
         <div class="stat-box gold">💰 {guldTotal}</div>
         <div class="inventory">
             {#each inventory as item (item.id)} <div class="item-slot">{item.billede} <small>+{item.level}</small></div> {/each}
         </div>
         <div class="coop-status">
-            {#each Object.entries(alleSpillere) as [navn, p] (navn)}
-                {#if navn !== spillerNavn}
-                    <span class="ally-hp" class:dead={p.isDead} title="{navn}">
-                        {p.ikon || '👤'} {p.isDead ? '💀' : p.hp}
-                    </span>
+    {#each Object.entries(alleSpillere) as [navn, p] (navn)}
+        {#if navn !== spillerNavn}
+            <span class="ally-hp" class:dead={p.isDead} title="{navn}">
+                {#if p.ikon && p.ikon.startsWith('/')}
+                    <img src={p.ikon} alt={navn} style="height: 20px; width: auto; vertical-align: bottom; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); margin-right: 4px;" />
+                {:else}
+                    {p.ikon || '👤'}
                 {/if}
-            {/each}
-        </div>
+                {p.isDead ? '💀' : p.hp}
+            </span>
+        {/if}
+    {/each}
+</div>
     </header>
 
     <div class="camera-lens">
@@ -706,8 +724,7 @@
     .character-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
     .character-card { background: #1a1a1a; padding: 20px; border: 2px solid #333; border-radius: 15px; text-align: center; color: white; cursor: pointer; width: 250px; display: flex; flex-direction: column; align-items: center; }
     .big-icon { font-size: 4rem; min-height: 80px; display: flex; align-items: center; justify-content: center; }
-    .char-image { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid gold; }
-    .char-stats { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
+.char-image { height: 110px; width: auto; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8)); }    .char-stats { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
     .stat-badge { font-size: 0.8rem; padding: 4px 8px; border-radius: 4px; background: rgba(0,0,0,0.5); border: 1px solid #555; }
     .stat-badge.hp { color: #ff5555; border-color: #500; }
     .stat-badge.gold { color: gold; border-color: #554400; }
