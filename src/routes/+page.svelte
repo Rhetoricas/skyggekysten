@@ -520,7 +520,6 @@ function startRealtime() {
         <p>Angiv dit navn og et rum for at kæmpe jer over øen sammen.</p>
         
 <input type="text" placeholder="Dit Spillernavn" bind:value={spillerNavn} />
-<input type="text" placeholder="Dit Spillernavn" bind:value={spillerNavn} />
 
 <div class="gender-toggles">
     <label class="checkbox-label">
