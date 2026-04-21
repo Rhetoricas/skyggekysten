@@ -3,33 +3,15 @@
     import { supabase } from '$lib/supabaseClient';
     import { eventBibliotek, type SpilEvent, type Valg } from '$lib/eventBibliotek';
 
-interface Item { id: string; navn: string; level: number; billede: string; type: string; }
+    interface Item { id: string; navn: string; level: number; billede: string; type: string; }
     interface Karakter { 
         id: string; navn: string; ikon: string; startMsg: string;
         startHp: number; startGuld: number; startUdstyr: string[];
         moveCost: number; digCost: number; dmgMod: number; goldMod: number;
         canRest: boolean; fordel: string; ulempe: string;
     }
-
-const itemDB: Record<string, { id: string, navn: string, type: string, billede: string, bonus: number, pris: number }> = {
-        'klude': { id: 'klude', navn: 'Klude', type: 'tøj', billede: '🥼', bonus: 0, pris: 10 },
-        'rustning': { id: 'rustning', navn: 'Rustning', type: 'tøj', billede: '🛡️', bonus: 0, pris: 150 },
-        'flot_toej': { id: 'flot_toej', navn: 'Fint tøj', type: 'tøj', billede: '🧥', bonus: 0, pris: 120 },
-        
-        'kniv': { id: 'kniv', navn: 'Kniv', type: 'våben', billede: '🗡️', bonus: 1, pris: 40 },
-        'stav': { id: 'stav', navn: 'Stav', type: 'våben', billede: '🦯', bonus: 1, pris: 40 },
-        'bue': { id: 'bue', navn: 'Bue', type: 'våben', billede: '🏹', bonus: 1, pris: 80 },
-        'oekse': { id: 'oekse', navn: 'Økse', type: 'våben', billede: '🪓', bonus: 2, pris: 100 },
-        'svaerd': { id: 'svaerd', navn: 'Sværd', type: 'våben', billede: '⚔️', bonus: 2, pris: 120 },
-        'sabel': { id: 'sabel', navn: 'Sabel', type: 'våben', billede: '🤺', bonus: 2, pris: 100 },
-
-        'skovl': { id: 'skovl', navn: 'Skovl', type: 'værktøj', billede: '🥄', bonus: 0, pris: 60 },
-        'metaldetektor': { id: 'metaldetektor', navn: 'Detektor', type: 'værktøj', billede: '🧲', bonus: 0, pris: 200 },
-        'soegekvist': { id: 'soegekvist', navn: 'Søgekvist', type: 'værktøj', billede: '🌿', bonus: 0, pris: 150 },
-    };
-
-interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: string; eventFuldført: boolean; biome: string; shopItem?: string; }
-
+    interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: string; eventFuldført: boolean; biome: string; shopItem?: string; }
+    
     interface SpillerData {
         index: number;
         kolonne: number;
@@ -61,7 +43,24 @@ interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: st
         'hav': 99
     };
 
-const tilgaengeligeKarakterer: Karakter[] = [
+    const itemDB: Record<string, { id: string, navn: string, type: string, billede: string, bonus: number, pris: number }> = {
+        'klude': { id: 'klude', navn: 'Klude', type: 'tøj', billede: '🥼', bonus: 0, pris: 10 },
+        'rustning': { id: 'rustning', navn: 'Rustning', type: 'tøj', billede: '🛡️', bonus: 0, pris: 150 },
+        'flot_toej': { id: 'flot_toej', navn: 'Fint tøj', type: 'tøj', billede: '🧥', bonus: 0, pris: 120 },
+        
+        'kniv': { id: 'kniv', navn: 'Kniv', type: 'våben', billede: '🗡️', bonus: 1, pris: 40 },
+        'stav': { id: 'stav', navn: 'Stav', type: 'våben', billede: '🦯', bonus: 1, pris: 40 },
+        'bue': { id: 'bue', navn: 'Bue', type: 'våben', billede: '🏹', bonus: 1, pris: 80 },
+        'oekse': { id: 'oekse', navn: 'Økse', type: 'våben', billede: '🪓', bonus: 2, pris: 100 },
+        'svaerd': { id: 'svaerd', navn: 'Sværd', type: 'våben', billede: '⚔️', bonus: 2, pris: 120 },
+        'sabel': { id: 'sabel', navn: 'Sabel', type: 'våben', billede: '🤺', bonus: 2, pris: 100 },
+
+        'skovl': { id: 'skovl', navn: 'Skovl', type: 'værktøj', billede: '🥄', bonus: 0, pris: 60 },
+        'metaldetektor': { id: 'metaldetektor', navn: 'Detektor', type: 'værktøj', billede: '🧲', bonus: 0, pris: 200 },
+        'soegekvist': { id: 'soegekvist', navn: 'Søgekvist', type: 'værktøj', billede: '🌿', bonus: 0, pris: 150 },
+    };
+
+    const tilgaengeligeKarakterer: Karakter[] = [
         { id: 'knight_m', navn: "Ridder", ikon: "/game_faces/knight_m.png", startMsg: "Rustningen tynger, men beskytter.", startHp: 120, startGuld: 0, startUdstyr: ['sabel', 'rustning'], moveCost: 2, digCost: 6, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Starter med sabel og rustning (-50% skade).", ulempe: "Koster 2 HP at rykke sig." },
         { id: 'knight_f', navn: "Skjoldmø", ikon: "/game_faces/knight_f.png", startMsg: "Rustningen tynger, men beskytter.", startHp: 120, startGuld: 0, startUdstyr: ['sabel', 'rustning'], moveCost: 2, digCost: 6, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Starter med sabel og rustning (-50% skade).", ulempe: "Koster 2 HP at rykke sig." },
         
@@ -101,11 +100,34 @@ const tilgaengeligeKarakterer: Karakter[] = [
     let logBesked = $state("");
     
     let aktivtEvent = $state<SpilEvent | null>(null); 
-	let aktivShop = $state<string | null>(null);	
     let eventUdfald = $state<{tekst: string, farve: string, naesteTrin?: string} | null>(null);
+    let aktivShop = $state<string | null>(null);
+
+    // --- KAMERA & STYRING ---
+    let kameraOffsetX = $state(0);
+    let kameraOffsetY = $state(0);
+    let isDragging = $state(false);
+    let lastMouseX = $state(0);
+    let lastMouseY = $state(0);
+    let zoomLevel = $state(1); 
 
     let kbdRef: (ev: KeyboardEvent) => void;
     let samletScore = $derived((maxKolonne * 10) + (Math.max(0, livspoint) * 5) + guldTotal);
+
+    let kameraStyle = $derived.by(() => {
+        const r = Math.floor(spillerIndex / BREDDE);
+        const k = spillerIndex % BREDDE;
+        const x = k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0);
+        const y = r * ROW_H;
+        
+        const originX = x + (HEX_W / 2);
+        const originY = y + (ROW_H / 2);
+
+        return `
+            transform-origin: ${originX}px ${originY}px;
+            transform: translate(calc(50vw - ${originX}px + ${kameraOffsetX}px), calc(50vh - ${originY}px + ${kameraOffsetY}px)) scale(${zoomLevel});
+        `;
+    });
 
     $effect(() => {
         if (livspoint <= 0 && gameState === 'play') {
@@ -118,14 +140,51 @@ const tilgaengeligeKarakterer: Karakter[] = [
         }
     });
 
-let kameraStyle = $derived.by(() => {
-        const r = Math.floor(spillerIndex / BREDDE);
-        const k = spillerIndex % BREDDE;
-        const x = k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0);
-        const y = r * ROW_H;
-        // Beregner nu midten dynamisk ud fra den aktuelle skærm
-        return `transform: translate(calc(50vw - ${x}px), calc(50vh - ${y}px));`;
-    });
+    function startTræk(e: PointerEvent) {
+        if (e.button !== 0 || aktivtEvent || aktivShop) return; 
+        isDragging = true;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+        (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    }
+
+    function træk(e: PointerEvent) {
+        if (!isDragging) return;
+        kameraOffsetX += (e.clientX - lastMouseX);
+        kameraOffsetY += (e.clientY - lastMouseY);
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+    }
+
+    function stopTræk(e: PointerEvent) {
+        isDragging = false;
+        (e.currentTarget as Element).releasePointerCapture(e.pointerId);
+    }
+
+    function håndterZoom(e: WheelEvent) {
+        if (aktivtEvent || aktivShop || gameState !== 'play') return;
+        e.preventDefault(); 
+        zoomLevel -= e.deltaY * 0.001; 
+        zoomLevel = Math.max(0.5, Math.min(zoomLevel, 2.0));
+    }
+
+    function opretTastatur() {
+        if (kbdRef) window.removeEventListener('keydown', kbdRef);
+        kbdRef = (ev: KeyboardEvent) => { 
+            if (aktivtEvent || aktivShop || gameState !== 'play') return;
+            
+            const key = ev.key.toLowerCase();
+            if (key === 'enter') grav();
+			else if (key === 'h') hvil();
+            else if (key === 'q') flytHex('NW');
+            else if (key === 'e') flytHex('NE');
+            else if (key === 'a') flytHex('W');
+            else if (key === 'd') flytHex('E');
+            else if (key === 'z') flytHex('SW');
+            else if (key === 'c') flytHex('SE');
+        };
+        window.addEventListener('keydown', kbdRef);
+    }
 
     // --- MULTIPLAYER LOGIK ---
 
@@ -164,12 +223,7 @@ let kameraStyle = $derived.by(() => {
                 } else if (eksisterende.isWinner) {
                     gameState = 'win';
                 } else {
-                    if (kbdRef) window.removeEventListener('keydown', kbdRef);
-                    kbdRef = (ev: KeyboardEvent) => { 
-                        if (ev.key === 'Enter' && !aktivtEvent && gameState === 'play') grav(); 
-                    };
-                    window.addEventListener('keydown', kbdRef);
-                    
+                    opretTastatur();
                     gameState = 'play';
                 }
             } else {
@@ -231,7 +285,7 @@ let kameraStyle = $derived.by(() => {
         maxKolonne = 1;
         logBesked = karakter.startMsg;
 
-inventory = karakter.startUdstyr.map(itemId => {
+        inventory = karakter.startUdstyr.map(itemId => {
             const dbItem = itemDB[itemId];
             return { id: dbItem.id, navn: dbItem.navn, level: dbItem.bonus, billede: dbItem.billede, type: dbItem.type };
         });
@@ -248,11 +302,7 @@ inventory = karakter.startUdstyr.map(itemId => {
         
         await syncTilDb();
 
-        if (kbdRef) window.removeEventListener('keydown', kbdRef);
-        kbdRef = (ev: KeyboardEvent) => { 
-            if (ev.key === 'Enter' && !aktivtEvent && gameState === 'play') grav(); 
-        };
-        window.addEventListener('keydown', kbdRef);
+        opretTastatur();
         gameState = 'play';
     }
 
@@ -315,10 +365,9 @@ inventory = karakter.startUdstyr.map(itemId => {
         
         let alleGyldigeEvents = Object.keys(eventBibliotek).filter(k => !eventBibliotek[k].erSubTrin);
 
-     for (let i = 0; i < antal; i++) {
+        for (let i = 0; i < antal; i++) {
             let f = nytGitter[i];
             
-            // Din eksisterende event-kode
             if (f.biome !== 'hav' && Math.random() < 0.06) { 
                 let muligeEvents = alleGyldigeEvents.filter(key => {
                     const reqBiome = eventBibliotek[key].biome;
@@ -336,7 +385,6 @@ inventory = karakter.startUdstyr.map(itemId => {
                 }
             }
 
-            // HER STARTER BUTIKS-LOGIKKEN (direkte under event-koden)
             if (!f.eventID) { 
                 const itemKeys = Object.keys(itemDB);
                 if (f.biome === 'marked' && Math.random() < 0.33) {
@@ -348,6 +396,7 @@ inventory = karakter.startUdstyr.map(itemId => {
         }
         
         gitter = nytGitter;
+
         const muligeStartFelter = [];
         for (let r = 1; r < HOEJDE - 1; r++) {
             if (gitter[r * BREDDE + 1].biome !== 'hav') muligeStartFelter.push(r * BREDDE + 1);
@@ -358,7 +407,7 @@ inventory = karakter.startUdstyr.map(itemId => {
 
     function kørTerninger() { return Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1; }
 
-function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: string) {
+    function udfoerAktion(type: string | undefined, vaerdi: number) {
         const k = spillerIndex % BREDDE;
         const svaerhedsgrad = 1 + (k / BREDDE);
         
@@ -380,7 +429,6 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
             }
             livspoint = Math.max(0, livspoint + endeligtLiv);
         }
-        if (type === 'upgrade' && itemType) købEllerOpgrader(itemType);
         
         syncTilDb();
     }
@@ -401,6 +449,9 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
             if (aktivtEvent.type === 'kamp' && vaaben) {
                 modifier = vaaben.level; 
                 modTekst = ` (+${modifier} ${vaaben.billede})`;
+            } else if (aktivtEvent.type === 'historie') {
+                const skovl = inventory.find(i => i.id === 'skovl');
+                if (skovl) { modifier = skovl.level > 0 ? skovl.level : 1; modTekst = ` (+${modifier} 🥄)`; }
             }
 
             const slag = raaSlag + modifier;
@@ -415,10 +466,10 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
             let erSkadetMedBue = vaaben?.id === 'bue' && (slag <= 6) && res.vaerdi < 0;
 
             if (erSkadetMedBue) {
-                udfoerAktion(res.aktionType, 0, res.itemType); 
+                udfoerAktion(res.aktionType, 0); // Fjernede itemType her
                 res.log += " (Din bue gav dig afstand til at flygte uskadt).";
             } else {
-                udfoerAktion(res.aktionType, res.vaerdi, res.itemType);
+                udfoerAktion(res.aktionType, res.vaerdi); // Fjernede itemType her
             }
             
             let farve = '#ccc';
@@ -435,7 +486,7 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
 
         if (succes) {
             if (v.aktionType === 'guld' && guldTotal + (v.vaerdi || 0) < 0) { logBesked = "Du har ikke råd."; return; }
-            udfoerAktion(v.aktionType, v.vaerdi || 0, v.itemType);
+            udfoerAktion(v.aktionType, v.vaerdi || 0); // Fjernede itemType her
             let farve = (v.aktionType === 'hp' && v.vaerdi && v.vaerdi < 0) ? '#ff5555' : 'gold';
             eventUdfald = { tekst: v.vaerdi && v.vaerdi > 0 ? `Handlingen lykkedes. Gevinst: ${v.vaerdi}.` : `Valget er truffet.`, farve: farve, naesteTrin: v.naesteTrin };
         } else {
@@ -458,36 +509,39 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
         const dbItem = itemDB[id];
         if (!dbItem) return;
 
-        const basePris = dbItem.pris;
+        const felt = gitter[spillerIndex];
+        const erMarked = felt.biome === 'marked';
         const index = inventory.findIndex(i => i.id === id);
 
         if (index > -1) {
-            // Hvis man opgraderer en ting, man allerede har
+            if (erMarked) {
+                logBesked = `Markedsmanden kigger dumt på dig: "Du har jo allerede en ${dbItem.navn}!"`;
+                return; 
+            }
+
             const vare = inventory[index];
-            const upgradePris = basePris + (vare.level * 20);
-            if (guldTotal >= upgradePris) {
-                guldTotal -= upgradePris; 
+            const pris = vare.level === 1 ? dbItem.pris : dbItem.pris * Math.pow(4, vare.level - 1);
+
+            if (guldTotal >= pris) {
+                guldTotal -= pris; 
                 vare.level += 1; 
-                logBesked = `Udstyr forbedret.`; 
+                logBesked = `${vare.navn} er nu i niveau ${vare.level}.`; 
                 lukEvent(); 
                 syncTilDb(true);
             } else {
-                logBesked = "Smeden afviser dig. Ikke guld nok.";
+                logBesked = `Smeden griner af din fattigdom. Det koster ${pris}G at røre ved det grej.`;
             }
+
         } else {
-            // Hvis man køber en helt ny ting
-            if (guldTotal >= basePris) {
-                guldTotal -= basePris;
+            const pris = erMarked ? dbItem.pris : dbItem.pris * 4;
+            
+            if (guldTotal >= pris) {
+                guldTotal -= pris;
                 
-                // Filtrer det gamle udstyr væk baseret på kategorien
                 let nytInventory = [...inventory];
-                if (dbItem.type === 'våben') {
-                    nytInventory = nytInventory.filter(i => i.type !== 'våben');
-                } else if (dbItem.type === 'tøj') {
-                    nytInventory = nytInventory.filter(i => i.type !== 'tøj');
-                }
+                if (dbItem.type === 'våben') nytInventory = nytInventory.filter(i => i.type !== 'våben');
+                else if (dbItem.type === 'tøj') nytInventory = nytInventory.filter(i => i.type !== 'tøj');
                 
-                // Læg den nye ting i rygsækken
                 inventory = [...nytInventory, { 
                     id: dbItem.id, 
                     navn: dbItem.navn, 
@@ -496,16 +550,16 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
                     type: dbItem.type 
                 }];
                 
-                logBesked = `Handel gennemført.`; 
+                logBesked = `Du har erhvervet en ${dbItem.navn} for ${pris}G.`; 
                 lukEvent(); 
                 syncTilDb(true);
             } else {
-                logBesked = "Ikke mønter nok.";
+                logBesked = `Købmanden ryster på hovedet. Kom tilbage når du har ${pris}G.`;
             }
         }
     }
 
- function grav() {
+    function grav() {
         let f = gitter[spillerIndex];
         if (!f || f.gravet || f.eventID || !valgtKarakter) return;
         
@@ -569,13 +623,14 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
     }
 
     function lukEvent() { 
-        if (gitter[spillerIndex]) gitter[spillerIndex].eventFuldført = true; 
-        aktivtEvent = null; eventUdfald = null;
+        if (gitter[spillerIndex] && aktivtEvent) gitter[spillerIndex].eventFuldført = true; 
+        aktivtEvent = null; 
+        eventUdfald = null;
+        aktivShop = null;
         syncTilDb(true); 
     }
     
     function flytHex(retning: string) {
-        // Tjekker nu også om 'aktivShop' er åben, før man får lov at rykke sig
         if (aktivtEvent || aktivShop || gameState !== 'play' || !valgtKarakter) return; 
         
         const r = Math.floor(spillerIndex / BREDDE); const k = spillerIndex % BREDDE; let nI = spillerIndex; const forskudt = r % 2 !== 0;
@@ -609,6 +664,10 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
                 livspoint -= bevægelsesPris;
                 spillerIndex = nI; 
                 
+                kameraOffsetX = 0;
+                kameraOffsetY = 0;
+                zoomLevel = 1;
+                
                 const synsRadius = f.biome === 'bjerg' ? 2 : 1;
                 afslørOmraade(spillerIndex, synsRadius);
                 
@@ -626,7 +685,6 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
                     return; 
                 }
 
-                // Håndtering af felternes indhold: Udløser enten event eller åbner butik
                 if (f.eventID && !f.eventFuldført) {
                     aktivtEvent = eventBibliotek[f.eventID] || null; 
                 } else if (f.shopItem) {
@@ -669,13 +727,13 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
             <h2>Vælg din karakter, {spillerNavn}</h2>
             <div class="character-gallery">
                 {#each tilgaengeligeKarakterer.filter(k => (visMandlige && k.id.endsWith('_m')) || (visKvindelige && k.id.endsWith('_f'))) as k (k.id)}
-<div class="char-card" 
-     class:selected={valgtKarakter?.id === k.id} 
-     role="button" 
-     tabindex="0" 
-     onclick={() => valgtKarakter = k}
-     onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') valgtKarakter = k; }}>
-	                         {#if k.ikon.startsWith('/')}
+                    <div class="char-card" 
+                         class:selected={valgtKarakter?.id === k.id} 
+                         role="button" 
+                         tabindex="0" 
+                         onclick={() => valgtKarakter = k}
+                         onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') valgtKarakter = k; }}>
+                        {#if k.ikon.startsWith('/')}
                             <img src={k.ikon} alt={k.navn} class="char-icon" />
                         {:else}
                             <span class="char-icon emoji">{k.ikon}</span>
@@ -708,60 +766,57 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
     </div>
 {:else}
     <div class="game-container">
-        <div class="camera">
+        <div class="camera" role="presentation" onwheel={håndterZoom} onpointerdown={startTræk} onpointermove={træk} onpointerup={stopTræk} onpointercancel={stopTræk} style="cursor: {isDragging ? 'grabbing' : 'grab'}; touch-action: none;">
             <div class="map" style={kameraStyle}>
                 {#each gitter as felt, i (i)}
-    {@const r = Math.floor(i / BREDDE)}
-    {@const k = i % BREDDE}
-    {@const x = k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0)}
-    {@const y = r * ROW_H}
-    {@const erJegHer = spillerIndex === i} 
-    
-    <div class="hex" 
-         class:odd={r % 2 !== 0} 
-         class:active={erJegHer} 
-         class:unexplored={!felt.udforsket}
-         style="background-image: url('/tiles/{felt.biome}.png'); left: {x}px; top: {y}px;">
-        
-        {#if felt.gravet}
-            <div class="dug-overlay"></div>
-        {/if}
+                    {@const r = Math.floor(i / BREDDE)}
+                    {@const k = i % BREDDE}
+                    {@const x = k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0)}
+                    {@const y = r * ROW_H}
+                    {@const erJegHer = spillerIndex === i} 
+                    
+                    <div class="hex" 
+                         class:odd={r % 2 !== 0} 
+                         class:active={erJegHer} 
+                         class:unexplored={!felt.udforsket}
+                         style="background-image: url('/tiles/{felt.biome}.png'); left: {x}px; top: {y}px;">
+                        
+                        {#if felt.gravet}
+                            <div class="dug-overlay"></div>
+                        {/if}
 
-        <div class="inner">
-            {#if felt.udforsket && felt.eventID && !felt.eventFuldført} 
-                <img src="/tiles/event.png" alt="Event" class="event-crystal" />
-            {/if}
-{#if felt.udforsket && felt.shopItem} 
-    <img 
-        src={felt.biome === 'by' ? '/tiles/byshop.png' : '/tiles/markedshop.png'} 
-        alt="Butik" 
-        class="shop-icon-img" 
-    />
-{/if}
+                        <div class="inner">
+                            {#if felt.udforsket && felt.eventID && !felt.eventFuldført} 
+                                <img src="/tiles/event.png" alt="Event" class="event-crystal" />
+                            {/if}
 
-            {#if erJegHer} 
-                <span class="player-icon">
-                    {#if valgtKarakter?.ikon.startsWith('/')}
-                        <img src={valgtKarakter.ikon} alt="Spiller" style="height: 58px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(0 0 5px gold);" />
-                    {:else}
-                        {valgtKarakter?.ikon}
-                    {/if}
-                </span> 
-            {/if}
-            
-            {#each Object.entries(alleSpillere).filter(([n, p]) => p.index === i && n !== spillerNavn && !p.isDead) as [navn, p], idx (navn)}
-                {@const offset = erJegHer ? idx + 1 : idx}
-                <span class="other-player-icon" title={navn} style="z-index: {90 - idx}; transform: translate({offset * 10}px, {offset * 5}px);">
-                    {#if p.ikon && p.ikon.startsWith('/')}
-                        <img src={p.ikon} alt={navn} style="height: 40px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(-2px 2px 3px rgba(0,0,0,0.8));" />
-                    {:else}
-                        {p.ikon || '👤'}
-                    {/if}
-                </span>
-            {/each}
-        </div>
-    </div>
-{/each}
+                            {#if felt.udforsket && felt.shopItem} 
+                                <img src={felt.biome === 'by' ? '/tiles/byshop.png' : '/tiles/markedshop.png'} alt="Butik" class="shop-icon-img" />
+                            {/if}
+
+                            {#if erJegHer} 
+                                <span class="player-icon">
+                                    {#if valgtKarakter?.ikon.startsWith('/')}
+                                        <img src={valgtKarakter.ikon} alt="Spiller" style="height: 58px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(0 0 5px gold);" />
+                                    {:else}
+                                        {valgtKarakter?.ikon}
+                                    {/if}
+                                </span> 
+                            {/if}
+                            
+                            {#each Object.entries(alleSpillere).filter(([n, p]) => p.index === i && n !== spillerNavn && !p.isDead) as [navn, p], idx (navn)}
+                                {@const offset = erJegHer ? idx + 1 : idx}
+                                <span class="other-player-icon" title={navn} style="z-index: {90 - idx}; transform: translate({offset * 10}px, {offset * 5}px);">
+                                    {#if p.ikon && p.ikon.startsWith('/')}
+                                        <img src={p.ikon} alt={navn} style="height: 40px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(-2px 2px 3px rgba(0,0,0,0.8));" />
+                                    {:else}
+                                        {p.ikon || '👤'}
+                                    {/if}
+                                </span>
+                            {/each}
+                        </div>
+                    </div>
+                {/each}
             </div>
         </div>
 
@@ -787,7 +842,7 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
             </div>
         {/if}
 
-		{#if aktivShop && itemDB[aktivShop]}
+        {#if aktivShop && itemDB[aktivShop]}
             {@const tilbud = itemDB[aktivShop]}
             <div class="event-modal">
                 <div class="event-content">
@@ -797,11 +852,12 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
                     <div class="udfald" style="border-left: 5px solid gold; text-align: center;">
                         <span style="font-size: 30px;">{tilbud.billede}</span><br>
                         <strong>{tilbud.navn}</strong><br>
-                        Pris: {tilbud.pris} Guld
+                        Pris: {gitter[spillerIndex].biome === 'marked' ? tilbud.pris : tilbud.pris * 4} Guld (Grundpris)
                     </div>
 
                     <div class="valg-liste">
-<button class="action-btn" onclick={() => købEllerOpgrader(aktivShop as string)}>Køb {tilbud.navn}</button>                        <button class="valg-btn" onclick={() => { aktivShop = null; logBesked = "Du forlader butikken."; }}>Nej tak, gå videre</button>
+                        <button class="action-btn" onclick={() => købEllerOpgrader(aktivShop as string)}>Køb/Opgrader {tilbud.navn}</button>
+                        <button class="valg-btn" onclick={() => { aktivShop = null; logBesked = "Du forlader butikken."; }}>Nej tak, gå videre</button>
                     </div>
                 </div>
             </div>
@@ -821,7 +877,9 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
                     <div class="stat-box item-box">
                         {#if inventory[i]}
                             <span class="icon">{inventory[i].billede}</span>
-                            <span class="level-badge">Lvl {inventory[i].level}</span>
+                            {#if inventory[i].level > 0}
+                                <span class="level-badge">Lvl {inventory[i].level}</span>
+                            {/if}
                         {:else}
                             <span class="icon empty"></span>
                         {/if}
@@ -835,12 +893,6 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
                 {:else}
                     Klar til at udforske kysten.
                 {/if}
-            </div>
-        
-            <div class="pad">
-                <div class="dpad-row"><button onclick={() => flytHex('NW')}>NW</button><button onclick={() => flytHex('NE')}>NE</button></div>
-                <div class="dpad-row"><button onclick={() => flytHex('W')}>W</button><button class="dig" onclick={grav}>GRAV</button><button onclick={() => flytHex('E')}>E</button></div>
-                <div class="dpad-row"><button onclick={() => flytHex('SW')}>SW</button><button class="rest" onclick={hvil}>HVIL</button><button onclick={() => flytHex('SE')}>SE</button></div>
             </div>
         </footer>
     </div>
@@ -885,7 +937,7 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
 
     .game-container { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
     .camera { flex: 1; position: relative; background: #050505; overflow: hidden; }
-    .map { position: absolute; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); width: 4800px; height: 1640px; }
+    .map { position: absolute; width: 4800px; height: 1640px; }
     
     .hex { position: absolute; width: 96px; height: 110px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
     .hex.unexplored { filter: brightness(0) !important; opacity: 0.9; }
@@ -894,16 +946,6 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
     
     .player-icon { font-size: 40px; z-index: 100; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); display: flex; align-items: center; justify-content: center; }
     .other-player-icon { font-size: 28px; position: absolute; opacity: 0.8; transition: transform 0.3s; display: flex; align-items: center; justify-content: center; }
-
-.shop-icon-img {
-    position: absolute;
-    height: 60px; /* Juster størrelsen her, hvis teltet/huset er for stort eller småt */
-    width: auto;
-    z-index: 5;
-    pointer-events: none;
-    animation: floatAndGlow 3s ease-in-out infinite;
-    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
-}
 
     .event-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: flex; align-items: center; justify-content: center; }
     .event-content { background: #1a1a1a; padding: 30px; border-radius: 8px; border: 1px solid #555; max-width: 500px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
@@ -928,13 +970,6 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
 
     .log-line { width: 100%; text-align: center; color: #e0e0e0; font-size: 18px; font-weight: bold; min-height: 27px; margin-bottom: 5px; text-shadow: 0 2px 5px rgba(0,0,0,1); }
 
-    .pad { display: flex; flex-direction: column; align-items: center; gap: 5px; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 50%; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
-    .dpad-row { display: flex; gap: 5px; }
-    .pad button { width: 50px; height: 50px; border-radius: 50%; border: none; background: #333; color: white; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.5); transition: 0.1s; }
-    .pad button:active { transform: scale(0.9); background: #555; }
-    .pad button.dig { background: #8b4513; }
-    .pad button.rest { background: #2b5e2b; }
-
     :global(.event-crystal) {
         position: absolute;
         height: 65px;
@@ -942,6 +977,16 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
         z-index: 5;
         pointer-events: none;
         animation: floatAndGlow 3s ease-in-out infinite;
+    }
+
+    .shop-icon-img {
+        position: absolute;
+        height: 60px;
+        width: auto;
+        z-index: 5;
+        pointer-events: none;
+        animation: floatAndGlow 3s ease-in-out infinite;
+        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
     }
 
     @keyframes floatAndGlow {
