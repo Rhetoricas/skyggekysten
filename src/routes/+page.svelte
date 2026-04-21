@@ -640,7 +640,7 @@ function startRealtime() {
 
         <div class="inner">
             {#if felt.udforsket && felt.eventID && !felt.eventFuldført} 
-                <img src="/event.png" alt="Event" class="event-crystal" />
+                <img src="/tiles/event.png" alt="Event" class="event-crystal" />
             {/if}
 
             {#if erJegHer} 
