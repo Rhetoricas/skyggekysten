@@ -43,29 +43,30 @@
     };
 
 const tilgaengeligeKarakterer: Karakter[] = [
-    { id: 'knight_m', navn: "Ridderen", ikon: "/game_faces/knight_m.png", startMsg: "Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
-    { id: 'knight_f', navn: "Skjoldmøen", ikon: "/game_faces/knight_f.png", startMsg: "Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
+    { id: 'knight_m', navn: "Ridder", ikon: "/game_faces/knight_m.png", startMsg: "Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
+    { id: 'knight_f', navn: "Skjoldmø", ikon: "/game_faces/knight_f.png", startMsg: "Din rustning sløver dig i terrænet, men skærmer mod stød.", startHp: 120, startGuld: 0, sabelLevel: 1, skovlLevel: 0, moveCost: 2, digCost: 6, dmgMod: 0.5, goldMod: 1.0, canRest: true, fordel: "Tager kun halv skade i events. Starter med sabel.", ulempe: "Koster 2 HP at rykke sig på flad mark." },
     
-    { id: 'magician_m', navn: "Troldmanden", ikon: "/game_faces/magician_m.png", startMsg: "Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
-    { id: 'magician_f', navn: "Troldkvinden", ikon: "/game_faces/magician_f.png", startMsg: "Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
+    { id: 'magician_m', navn: "Troldmand", ikon: "/game_faces/magician_m.png", startMsg: "Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
+    { id: 'magician_f', navn: "Troldkvinde", ikon: "/game_faces/magician_f.png", startMsg: "Guld køber dig fri af de farer, din krop ikke kan tåle.", startHp: 80, startGuld: 250, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue.", ulempe: "Tager +50% skade. Hårdt at grave (10 HP)." },
     
-    { id: 'thief_m', navn: "Tyven", ikon: "/game_faces/thief_m.png", startMsg: "Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
-    { id: 'thief_f', navn: "Skyggen", ikon: "/game_faces/thief_f.png", startMsg: "Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
+    { id: 'thief_m', navn: "Tyv", ikon: "/game_faces/thief_m.png", startMsg: "Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
+    { id: 'thief_f', navn: "Skygge", ikon: "/game_faces/thief_f.png", startMsg: "Hurtig, svag og grådig. Hold dig i bevægelse.", startHp: 100, startGuld: 50, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.5, canRest: true, fordel: "Får +50% udbytte af alt guld du finder.", ulempe: "Tager +20% skade i alle events." },
     
-    { id: 'explorer_m', navn: "Udforskeren", ikon: "/game_faces/explorer_m.png", startMsg: "Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
-    { id: 'explorer_f', navn: "Eventyreren", ikon: "/game_faces/explorer_f.png", startMsg: "Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
+    { id: 'explorer_m', navn: "Udforsker", ikon: "/game_faces/explorer_m.png", startMsg: "Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
+    { id: 'explorer_f', navn: "Eventyrer", ikon: "/game_faces/explorer_f.png", startMsg: "Terrænet er din ven, men du starter uden penge og våben.", startHp: 100, startGuld: 0, sabelLevel: 0, skovlLevel: 2, moveCost: 1, digCost: 2, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Level 2 skovl giver bonus til udforskning. Graving koster 2 HP.", ulempe: "Mangler kamp-erfaring og guld." },
     
-    { id: 'viking_m', navn: "Vikingen", ikon: "/game_faces/viking_m.png", startMsg: "Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
-    { id: 'viking_f', navn: "Valkyrien", ikon: "/game_faces/viking_f.png", startMsg: "Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
+    { id: 'viking_m', navn: "Viking", ikon: "/game_faces/viking_m.png", startMsg: "Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
+    { id: 'viking_f', navn: "Valkyrie", ikon: "/game_faces/viking_f.png", startMsg: "Blodet koger. Hvile er for de svage.", startHp: 150, startGuld: 0, sabelLevel: 2, skovlLevel: 0, moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.0, canRest: false, fordel: "Enorm HP og Level 2 våben.", ulempe: "Nægter kategorisk at slå lejr og hvile." },
     
-    { id: 'royal_m', navn: "Hertugen", ikon: "/game_faces/royal_m.png", startMsg: "Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." },
-    { id: 'royal_f', navn: "Hertuginden", ikon: "/game_faces/royal_f.png", startMsg: "Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." }
+    { id: 'royal_m', navn: "Hertug", ikon: "/game_faces/royal_m.png", startMsg: "Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." },
+    { id: 'royal_f', navn: "Hertuginde", ikon: "/game_faces/royal_f.png", startMsg: "Mudder ødelægger dine støvler, men dit netværk er stort.", startHp: 100, startGuld: 400, sabelLevel: 0, skovlLevel: 0, moveCost: 1, digCost: 15, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Startkapitalen er svimlende.", ulempe: "Fysisk arbejde er tortur. Graving koster 15 HP." }
 ];
 
     let gameState = $state<'login' | 'select' | 'play' | 'dead' | 'win'>('login'); 
     
     let spillerNavn = $state('');
-	let spillerKøn = $state('m');
+let visMandlige = $state(true);
+let visKvindelige = $state(true);
     let rumKode = $state('');
     let erHost = $state(false);
     let statusBesked = $state('');
@@ -519,10 +520,19 @@ function startRealtime() {
         <p>Angiv dit navn og et rum for at kæmpe jer over øen sammen.</p>
         
 <input type="text" placeholder="Dit Spillernavn" bind:value={spillerNavn} />
-<select bind:value={spillerKøn} class="gender-select">
-    <option value="m">Mandlige karakterer</option>
-    <option value="f">Kvindelige karakterer</option>
-</select>
+<input type="text" placeholder="Dit Spillernavn" bind:value={spillerNavn} />
+
+<div class="gender-toggles">
+    <label class="checkbox-label">
+        <input type="checkbox" bind:checked={visMandlige} />
+        Mand
+    </label>
+    <label class="checkbox-label">
+        <input type="checkbox" bind:checked={visKvindelige} />
+        Kvinde
+    </label>
+</div>
+
 <input type="text" placeholder="Rum Kode (fx 1234)" bind:value={rumKode} />
         
         <button class="join-btn" onclick={opretEllerDeltag}>Gå til kysten</button>
@@ -539,8 +549,7 @@ function startRealtime() {
         <button class="nuke-btn" onclick={nulstilHukommelse}>Forlad rum</button>
     </div>
 <div class="character-gallery">
-    {#each tilgaengeligeKarakterer.filter(k => k.id.endsWith(`_${spillerKøn}`)) as k (k.id)}
-            <button class="character-card" onclick={() => bekræftValg(k)}>
+{#each tilgaengeligeKarakterer.filter(k => (visMandlige && k.id.endsWith('_m')) || (visKvindelige && k.id.endsWith('_f'))) as k (k.id)}            <button class="character-card" onclick={() => bekræftValg(k)}>
                 <div class="big-icon">
                     {#if k.ikon.startsWith('/')}
                         <img src={k.ikon} alt={k.navn} class="char-image" />
@@ -619,9 +628,7 @@ function startRealtime() {
         <div class="world" style={kameraStyle}>
             {#each gitter as felt, i (i)}
     {@const r = Math.floor(i / BREDDE)}
-    {@const erJegHer = spillerIndex === i} 
-    
-    <div class="hex" 
+    {@const erJegHer = spillerIndex === i} <div class="hex" 
          class:odd={r % 2 !== 0} 
          class:active={erJegHer} 
          class:unexplored={!felt.udforsket}
@@ -632,6 +639,10 @@ function startRealtime() {
         {/if}
 
         <div class="inner">
+            {#if felt.udforsket && felt.eventID && !felt.eventFuldført} 
+                <img src="/event.png" alt="Event" class="event-crystal" />
+            {/if}
+
             {#if erJegHer} 
                 <span class="player-icon">
                     {#if valgtKarakter?.ikon.startsWith('/')}
@@ -652,10 +663,6 @@ function startRealtime() {
                     {/if}
                 </span>
             {/each}
-
-            {#if felt.udforsket && felt.eventID && !felt.eventFuldført && !erJegHer} 
-                <span class="marker">❗</span> 
-            {/if}
         </div>
     </div>
 {/each}
@@ -721,8 +728,26 @@ function startRealtime() {
     .join-btn { width: 100%; padding: 15px; background: #2a4a2a; color: white; border: 1px solid #4a8a4a; border-radius: 8px; cursor: pointer; font-size: 1.2rem; font-weight: bold; transition: background 0.2s; }
     .join-btn:hover { background: #3a6a3a; }
     .status { margin-top: 15px; color: #aaa; font-style: italic; }
-	.gender-select { width: 100%; padding: 12px; margin-bottom: 15px; background: #0a0a0a; border: 1px solid #333; color: white; border-radius: 8px; font-size: 1.1rem; box-sizing: border-box; }
-
+.gender-toggles { 
+    display: flex; 
+    gap: 20px; 
+    margin-bottom: 20px; 
+    justify-content: center; 
+}
+.checkbox-label { 
+    color: #ccc; 
+    font-size: 1.1rem; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+}
+.checkbox-label input[type="checkbox"] { 
+    width: 20px; 
+    height: 20px; 
+    cursor: pointer; 
+    accent-color: #2a4a2a; /* Farven matcher din grønne login-knap */
+}
     .death-screen { background: rgba(30, 0, 0, 0.95); animation: fade-in 2s; }
     .win-screen { background: rgba(10, 30, 10, 0.95); }
     .death-content { text-align: center; }
@@ -819,4 +844,24 @@ function startRealtime() {
     box-shadow: 0 4px 15px rgba(0,0,0,0.8); 
     display: flex; 
     align-items: center; 
+
+	:global(.event-crystal) {
+    position: absolute;
+    height: 65px; /* Passer perfekt ind i hexagonen */
+    width: auto;
+    z-index: 5; /* Sikrer at den ligger solidt under alle spiller-ikoner */
+    pointer-events: none;
+    animation: floatAndGlow 3s ease-in-out infinite;
+}
+
+@keyframes floatAndGlow {
+    0%, 100% { 
+        transform: translateY(0) scale(1); 
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)); 
+    }
+    50% { 
+        transform: translateY(-6px) scale(1.05); 
+        filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.9)); 
+    }
+}
 }</style>
