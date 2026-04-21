@@ -847,21 +847,21 @@ function startRealtime() {
 
 	:global(.event-crystal) {
     position: absolute;
-    height: 65px; /* Passer perfekt ind i hexagonen */
+    height: 65px;
     width: auto;
-    z-index: 5; /* Sikrer at den ligger solidt under alle spiller-ikoner */
+    z-index: 5;
     pointer-events: none;
-    animation: floatAndGlow 3s ease-in-out infinite;
+    animation: -global-floatAndGlow 3s ease-in-out infinite;
 }
 
-@keyframes floatAndGlow {
-    0%, 100% { 
-        transform: translateY(0) scale(1); 
-        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)); 
+@keyframes -global-floatAndGlow {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
     }
-    50% { 
-        transform: translateY(-6px) scale(1.05); 
-        filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.9)); 
+    50% {
+        transform: translateY(-6px) scale(1.05);
+        filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.9));
     }
 }
 }</style>
