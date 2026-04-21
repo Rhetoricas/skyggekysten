@@ -150,12 +150,13 @@ function startTræk(e: PointerEvent) {
         
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
-        startMouseX = e.clientX; // Gemmer det absolutte startpunkt
+        startMouseX = e.clientX; 
         startMouseY = e.clientY; 
         
-        (e.currentTarget as Element).setPointerCapture(e.pointerId);
+        // setPointerCapture er SLETTET herfra!
     }
 
+    // Din træk-funktion bliver bare stående som den er...
     function træk(e: PointerEvent) {
         if (!isDragging) return;
         kameraOffsetX += (e.clientX - lastMouseX);
@@ -163,15 +164,14 @@ function startTræk(e: PointerEvent) {
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
         
-        // Registrerer KUN et træk, hvis musen rykker sig mere end 5 pixels
         if (Math.abs(e.clientX - startMouseX) > 5 || Math.abs(e.clientY - startMouseY) > 5) {
             harTrukket = true; 
         }
     }
 
-    function stopTræk(e: PointerEvent) {
+    function stopTræk() {
         isDragging = false;
-        (e.currentTarget as Element).releasePointerCapture(e.pointerId);
+        // releasePointerCapture er SLETTET herfra!
     }
 
     function håndterZoom(e: WheelEvent) {
