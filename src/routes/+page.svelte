@@ -11,25 +11,25 @@ interface Item { id: string; navn: string; level: number; billede: string; type:
         canRest: boolean; fordel: string; ulempe: string;
     }
 
-    const itemDB: Record<string, { id: string, navn: string, type: string, billede: string, bonus: number }> = {
-        'klude': { id: 'klude', navn: 'Klude', type: 'tøj', billede: '🥼', bonus: 0 },
-        'rustning': { id: 'rustning', navn: 'Rustning', type: 'tøj', billede: '🛡️', bonus: 0 },
-        'flot_toej': { id: 'flot_toej', navn: 'Fint tøj', type: 'tøj', billede: '🧥', bonus: 0 },
+const itemDB: Record<string, { id: string, navn: string, type: string, billede: string, bonus: number, pris: number }> = {
+        'klude': { id: 'klude', navn: 'Klude', type: 'tøj', billede: '🥼', bonus: 0, pris: 10 },
+        'rustning': { id: 'rustning', navn: 'Rustning', type: 'tøj', billede: '🛡️', bonus: 0, pris: 150 },
+        'flot_toej': { id: 'flot_toej', navn: 'Fint tøj', type: 'tøj', billede: '🧥', bonus: 0, pris: 120 },
         
-        'kniv': { id: 'kniv', navn: 'Kniv', type: 'våben', billede: '🗡️', bonus: 1 },
-        'stav': { id: 'stav', navn: 'Stav', type: 'våben', billede: '🦯', bonus: 1 },
-        'bue': { id: 'bue', navn: 'Bue', type: 'våben', billede: '🏹', bonus: 1 },
-        'oekse': { id: 'oekse', navn: 'Økse', type: 'våben', billede: '🪓', bonus: 2 },
-        'svaerd': { id: 'svaerd', navn: 'Sværd', type: 'våben', billede: '⚔️', bonus: 2 },
-        'sabel': { id: 'sabel', navn: 'Sabel', type: 'våben', billede: '🤺', bonus: 2 },
+        'kniv': { id: 'kniv', navn: 'Kniv', type: 'våben', billede: '🗡️', bonus: 1, pris: 40 },
+        'stav': { id: 'stav', navn: 'Stav', type: 'våben', billede: '🦯', bonus: 1, pris: 40 },
+        'bue': { id: 'bue', navn: 'Bue', type: 'våben', billede: '🏹', bonus: 1, pris: 80 },
+        'oekse': { id: 'oekse', navn: 'Økse', type: 'våben', billede: '🪓', bonus: 2, pris: 100 },
+        'svaerd': { id: 'svaerd', navn: 'Sværd', type: 'våben', billede: '⚔️', bonus: 2, pris: 120 },
+        'sabel': { id: 'sabel', navn: 'Sabel', type: 'våben', billede: '🤺', bonus: 2, pris: 100 },
 
-        'skovl': { id: 'skovl', navn: 'Skovl', type: 'værktøj', billede: '🥄', bonus: 0 },
-        'metaldetektor': { id: 'metaldetektor', navn: 'Detektor', type: 'værktøj', billede: '🧲', bonus: 0 },
-        'soegekvist': { id: 'soegekvist', navn: 'Søgekvist', type: 'værktøj', billede: '🌿', bonus: 0 },
+        'skovl': { id: 'skovl', navn: 'Skovl', type: 'værktøj', billede: '🥄', bonus: 0, pris: 60 },
+        'metaldetektor': { id: 'metaldetektor', navn: 'Detektor', type: 'værktøj', billede: '🧲', bonus: 0, pris: 200 },
+        'soegekvist': { id: 'soegekvist', navn: 'Søgekvist', type: 'værktøj', billede: '🌿', bonus: 0, pris: 150 },
     };
 
-    interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: string; eventFuldført: boolean; biome: string; }
-    
+interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: string; eventFuldført: boolean; biome: string; shopItem?: string; }
+
     interface SpillerData {
         index: number;
         kolonne: number;
@@ -101,6 +101,7 @@ const tilgaengeligeKarakterer: Karakter[] = [
     let logBesked = $state("");
     
     let aktivtEvent = $state<SpilEvent | null>(null); 
+	let aktivShop = $state<string | null>(null);	
     let eventUdfald = $state<{tekst: string, farve: string, naesteTrin?: string} | null>(null);
 
     let kbdRef: (ev: KeyboardEvent) => void;
@@ -314,9 +315,10 @@ inventory = karakter.startUdstyr.map(itemId => {
         
         let alleGyldigeEvents = Object.keys(eventBibliotek).filter(k => !eventBibliotek[k].erSubTrin);
 
-        for (let i = 0; i < antal; i++) {
+     for (let i = 0; i < antal; i++) {
             let f = nytGitter[i];
             
+            // Din eksisterende event-kode
             if (f.biome !== 'hav' && Math.random() < 0.06) { 
                 let muligeEvents = alleGyldigeEvents.filter(key => {
                     const reqBiome = eventBibliotek[key].biome;
@@ -333,10 +335,19 @@ inventory = karakter.startUdstyr.map(itemId => {
                     alleGyldigeEvents = alleGyldigeEvents.filter(k => k !== valgtEvent);
                 }
             }
+
+            // HER STARTER BUTIKS-LOGIKKEN (direkte under event-koden)
+            if (!f.eventID) { 
+                const itemKeys = Object.keys(itemDB);
+                if (f.biome === 'marked' && Math.random() < 0.33) {
+                    f.shopItem = itemKeys[Math.floor(Math.random() * itemKeys.length)];
+                } else if (f.biome === 'by' && Math.random() < 0.20) {
+                    f.shopItem = itemKeys[Math.floor(Math.random() * itemKeys.length)];
+                }
+            }
         }
         
         gitter = nytGitter;
-
         const muligeStartFelter = [];
         for (let r = 1; r < HOEJDE - 1; r++) {
             if (gitter[r * BREDDE + 1].biome !== 'hav') muligeStartFelter.push(r * BREDDE + 1);
@@ -444,20 +455,53 @@ function udfoerAktion(type: string | undefined, vaerdi: number, itemType?: strin
     }
 
     function købEllerOpgrader(id: string) {
+        const dbItem = itemDB[id];
+        if (!dbItem) return;
+
+        const basePris = dbItem.pris;
         const index = inventory.findIndex(i => i.id === id);
-        const basePris = id === 'sabel' ? 40 : 60;
+
         if (index > -1) {
+            // Hvis man opgraderer en ting, man allerede har
             const vare = inventory[index];
             const upgradePris = basePris + (vare.level * 20);
             if (guldTotal >= upgradePris) {
-                guldTotal -= upgradePris; vare.level += 1; logBesked = `Udstyr forbedret.`; lukEvent(); syncTilDb(true);
-            } else logBesked = "Smeden afviser dig.";
+                guldTotal -= upgradePris; 
+                vare.level += 1; 
+                logBesked = `Udstyr forbedret.`; 
+                lukEvent(); 
+                syncTilDb(true);
+            } else {
+                logBesked = "Smeden afviser dig. Ikke guld nok.";
+            }
         } else {
+            // Hvis man køber en helt ny ting
             if (guldTotal >= basePris) {
                 guldTotal -= basePris;
-const dbItem = itemDB[id];
-                inventory = [...inventory, { id: dbItem.id, navn: dbItem.navn, level: dbItem.bonus, billede: dbItem.billede, type: dbItem.type }];                logBesked = `Handel gennemført.`; lukEvent(); syncTilDb(true);
-            } else logBesked = "Ikke mønter nok.";
+                
+                // Filtrer det gamle udstyr væk baseret på kategorien
+                let nytInventory = [...inventory];
+                if (dbItem.type === 'våben') {
+                    nytInventory = nytInventory.filter(i => i.type !== 'våben');
+                } else if (dbItem.type === 'tøj') {
+                    nytInventory = nytInventory.filter(i => i.type !== 'tøj');
+                }
+                
+                // Læg den nye ting i rygsækken
+                inventory = [...nytInventory, { 
+                    id: dbItem.id, 
+                    navn: dbItem.navn, 
+                    level: dbItem.bonus > 0 ? dbItem.bonus : 1, 
+                    billede: dbItem.billede, 
+                    type: dbItem.type 
+                }];
+                
+                logBesked = `Handel gennemført.`; 
+                lukEvent(); 
+                syncTilDb(true);
+            } else {
+                logBesked = "Ikke mønter nok.";
+            }
         }
     }
 
@@ -531,7 +575,9 @@ const dbItem = itemDB[id];
     }
     
     function flytHex(retning: string) {
-        if (aktivtEvent || gameState !== 'play' || !valgtKarakter) return; 
+        // Tjekker nu også om 'aktivShop' er åben, før man får lov at rykke sig
+        if (aktivtEvent || aktivShop || gameState !== 'play' || !valgtKarakter) return; 
+        
         const r = Math.floor(spillerIndex / BREDDE); const k = spillerIndex % BREDDE; let nI = spillerIndex; const forskudt = r % 2 !== 0;
         if (retning === 'NW') nI = forskudt ? spillerIndex - BREDDE : spillerIndex - BREDDE - 1;
         else if (retning === 'NE') nI = forskudt ? spillerIndex - BREDDE + 1 : spillerIndex - BREDDE;
@@ -580,7 +626,12 @@ const dbItem = itemDB[id];
                     return; 
                 }
 
-                if (f.eventID && !f.eventFuldført) aktivtEvent = eventBibliotek[f.eventID] || null; 
+                // Håndtering af felternes indhold: Udløser enten event eller åbner butik
+                if (f.eventID && !f.eventFuldført) {
+                    aktivtEvent = eventBibliotek[f.eventID] || null; 
+                } else if (f.shopItem) {
+                    aktivShop = f.shopItem; 
+                }
                 
                 syncTilDb();
             }
@@ -680,6 +731,13 @@ const dbItem = itemDB[id];
             {#if felt.udforsket && felt.eventID && !felt.eventFuldført} 
                 <img src="/tiles/event.png" alt="Event" class="event-crystal" />
             {/if}
+{#if felt.udforsket && felt.shopItem} 
+    <img 
+        src={felt.biome === 'by' ? '/tiles/byshop.png' : '/tiles/markedshop.png'} 
+        alt="Butik" 
+        class="shop-icon-img" 
+    />
+{/if}
 
             {#if erJegHer} 
                 <span class="player-icon">
@@ -725,6 +783,26 @@ const dbItem = itemDB[id];
                             {/each}
                         </div>
                     {/if}
+                </div>
+            </div>
+        {/if}
+
+		{#if aktivShop && itemDB[aktivShop]}
+            {@const tilbud = itemDB[aktivShop]}
+            <div class="event-modal">
+                <div class="event-content">
+                    <h2>Købmandens Telt</h2>
+                    <p class="event-desc">En rejsende handelsmand har slået sig ned her. Han har kun én genstand tilbage, men måske er det præcis det, du mangler?</p>
+                    
+                    <div class="udfald" style="border-left: 5px solid gold; text-align: center;">
+                        <span style="font-size: 30px;">{tilbud.billede}</span><br>
+                        <strong>{tilbud.navn}</strong><br>
+                        Pris: {tilbud.pris} Guld
+                    </div>
+
+                    <div class="valg-liste">
+<button class="action-btn" onclick={() => købEllerOpgrader(aktivShop as string)}>Køb {tilbud.navn}</button>                        <button class="valg-btn" onclick={() => { aktivShop = null; logBesked = "Du forlader butikken."; }}>Nej tak, gå videre</button>
+                    </div>
                 </div>
             </div>
         {/if}
@@ -816,6 +894,16 @@ const dbItem = itemDB[id];
     
     .player-icon { font-size: 40px; z-index: 100; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); display: flex; align-items: center; justify-content: center; }
     .other-player-icon { font-size: 28px; position: absolute; opacity: 0.8; transition: transform 0.3s; display: flex; align-items: center; justify-content: center; }
+
+.shop-icon-img {
+    position: absolute;
+    height: 60px; /* Juster størrelsen her, hvis teltet/huset er for stort eller småt */
+    width: auto;
+    z-index: 5;
+    pointer-events: none;
+    animation: floatAndGlow 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+}
 
     .event-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: flex; align-items: center; justify-content: center; }
     .event-content { background: #1a1a1a; padding: 30px; border-radius: 8px; border: 1px solid #555; max-width: 500px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
