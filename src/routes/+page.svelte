@@ -610,47 +610,50 @@
         <div class="camera">
             <div class="map" style={kameraStyle}>
                 {#each gitter as felt, i (i)}
-                    {@const r = Math.floor(i / BREDDE)}
-                    {@const erJegHer = spillerIndex === i} 
-                    
-                    <div class="hex" 
-                         class:odd={r % 2 !== 0} 
-                         class:active={erJegHer} 
-                         class:unexplored={!felt.udforsket}
-                         style="background-image: url('/tiles/{felt.biome}.png');">
-                        
-                        {#if felt.gravet}
-                            <div class="dug-overlay"></div>
-                        {/if}
+    {@const r = Math.floor(i / BREDDE)}
+    {@const k = i % BREDDE}
+    {@const x = k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0)}
+    {@const y = r * ROW_H}
+    {@const erJegHer = spillerIndex === i} 
+    
+    <div class="hex" 
+         class:odd={r % 2 !== 0} 
+         class:active={erJegHer} 
+         class:unexplored={!felt.udforsket}
+         style="background-image: url('/tiles/{felt.biome}.png'); left: {x}px; top: {y}px;">
+        
+        {#if felt.gravet}
+            <div class="dug-overlay"></div>
+        {/if}
 
-                        <div class="inner">
-                            {#if felt.udforsket && felt.eventID && !felt.eventFuldført} 
-                                <img src="/tiles/event.png" alt="Event" class="event-crystal" />
-                            {/if}
+        <div class="inner">
+            {#if felt.udforsket && felt.eventID && !felt.eventFuldført} 
+                <img src="/tiles/event.png" alt="Event" class="event-crystal" />
+            {/if}
 
-                            {#if erJegHer} 
-                                <span class="player-icon">
-                                    {#if valgtKarakter?.ikon.startsWith('/')}
-                                        <img src={valgtKarakter.ikon} alt="Spiller" style="height: 58px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(0 0 5px gold);" />
-                                    {:else}
-                                        {valgtKarakter?.ikon}
-                                    {/if}
-                                </span> 
-                            {/if}
-                            
-                            {#each Object.entries(alleSpillere).filter(([n, p]) => p.index === i && n !== spillerNavn && !p.isDead) as [navn, p], idx (navn)}
-                                {@const offset = erJegHer ? idx + 1 : idx}
-                                <span class="other-player-icon" title={navn} style="z-index: {90 - idx}; transform: translate({offset * 10}px, {offset * 5}px);">
-                                    {#if p.ikon && p.ikon.startsWith('/')}
-                                        <img src={p.ikon} alt={navn} style="height: 40px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(-2px 2px 3px rgba(0,0,0,0.8));" />
-                                    {:else}
-                                        {p.ikon || '👤'}
-                                    {/if}
-                                </span>
-                            {/each}
-                        </div>
-                    </div>
-                {/each}
+            {#if erJegHer} 
+                <span class="player-icon">
+                    {#if valgtKarakter?.ikon.startsWith('/')}
+                        <img src={valgtKarakter.ikon} alt="Spiller" style="height: 58px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(0 0 5px gold);" />
+                    {:else}
+                        {valgtKarakter?.ikon}
+                    {/if}
+                </span> 
+            {/if}
+            
+            {#each Object.entries(alleSpillere).filter(([n, p]) => p.index === i && n !== spillerNavn && !p.isDead) as [navn, p], idx (navn)}
+                {@const offset = erJegHer ? idx + 1 : idx}
+                <span class="other-player-icon" title={navn} style="z-index: {90 - idx}; transform: translate({offset * 10}px, {offset * 5}px);">
+                    {#if p.ikon && p.ikon.startsWith('/')}
+                        <img src={p.ikon} alt={navn} style="height: 40px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(-2px 2px 3px rgba(0,0,0,0.8));" />
+                    {:else}
+                        {p.ikon || '👤'}
+                    {/if}
+                </span>
+            {/each}
+        </div>
+    </div>
+{/each}
             </div>
         </div>
 
