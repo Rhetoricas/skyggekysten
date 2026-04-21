@@ -658,7 +658,7 @@
             <div class="event-modal">
                 <div class="event-content">
                     <h2>{aktivtEvent.titel}</h2>
-                    <p class="event-desc">{aktivtEvent.beskrivelse}</p>
+                    <p class="event-desc">{aktivtEvent.tekst}</p>
                     
                     {#if eventUdfald}
                         <div class="udfald" style="border-left: 5px solid {eventUdfald.farve};">
