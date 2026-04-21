@@ -693,14 +693,20 @@ function startRealtime() {
         {/if}
     </div>
 
-    <footer class="ui">
-        <div class="pad">
-            <div class="dpad-row"><button onclick={() => flytHex('NW')}>NW</button><button onclick={() => flytHex('NE')}>NE</button></div>
-            <div class="dpad-row"><button onclick={() => flytHex('W')}>W</button><button class="dig" onclick={grav}>GRAV</button><button onclick={() => flytHex('E')}>E</button></div>
-            <div class="dpad-row"><button onclick={() => flytHex('SW')}>SW</button><button class="rest" onclick={hvil}>HVIL</button><button onclick={() => flytHex('SE')}>SE</button></div>
-        </div>
-        <div class="msg">{logBesked}</div>
-    </footer>
+<footer class="ui">
+    <div class="msg">
+        {#if logBesked}
+            {logBesked}
+        {:else}
+            Klar til at udforske kysten.
+        {/if}
+    </div>
+    <div class="pad">
+        <div class="dpad-row"><button onclick={() => flytHex('NW')}>NW</button><button onclick={() => flytHex('NE')}>NE</button></div>
+        <div class="dpad-row"><button onclick={() => flytHex('W')}>W</button><button class="dig" onclick={grav}>GRAV</button><button onclick={() => flytHex('E')}>E</button></div>
+        <div class="dpad-row"><button onclick={() => flytHex('SW')}>SW</button><button class="rest" onclick={hvil}>HVIL</button><button onclick={() => flytHex('SE')}>SE</button></div>
+    </div>
+</footer>
 </main>
 {/if}
 
@@ -787,11 +793,30 @@ function startRealtime() {
     .btns button { padding: 10px 15px; background: #333; color: #fff; cursor: pointer; border-radius: 8px; border: 1px solid #555; font-weight: bold; }
     .btns button.risky { border-color: #a00; color: #faa; }
     
-    .ui { display: flex; gap: 20px; margin-top: 15px; align-items: center; }
-    .pad { display: flex; flex-direction: column; align-items: center; gap: 5px; background: #111; padding: 10px; border-radius: 10px; border: 1px solid #333; }
+.ui { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px; 
+    margin-top: 15px; 
+    align-items: center; 
+    width: 800px; 
+}    .pad { display: flex; flex-direction: column; align-items: center; gap: 5px; background: #111; padding: 10px; border-radius: 10px; border: 1px solid #333; }
     .dpad-row { display: flex; gap: 5px; justify-content: center; width: 100%; }
     .pad button { width: 50px; height: 45px; background: #333; color: #fff; border: 1px solid #444; cursor: pointer; border-radius: 5px; font-weight: bold; }
     .dig { background: #8b4513 !important; width: 80px !important; border-color: #d2691e !important; }
     .rest { background: #1e3c5a !important; color: #87ceeb !important; border-color: #4682b4 !important;}
-    .msg { width: 300px; height: 60px; background: #0a0a0a; border: 1px solid #333; padding: 10px; color: #0f0; font-size: 14px; border-radius: 5px; line-height: 1.4; }
-</style>
+.msg { 
+    width: 100%; 
+    min-height: 60px; 
+    background: linear-gradient(90deg, #111 0%, #1a1a1a 100%); 
+    border: 1px solid #444; 
+    border-left: 6px solid gold; 
+    padding: 15px 25px; 
+    color: #fff; 
+    font-size: 20px; 
+    border-radius: 8px; 
+    box-sizing: border-box; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.8); 
+    display: flex; 
+    align-items: center; 
+}</style>
