@@ -65,6 +65,7 @@ const tilgaengeligeKarakterer: Karakter[] = [
     let gameState = $state<'login' | 'select' | 'play' | 'dead' | 'win'>('login'); 
     
     let spillerNavn = $state('');
+	let spillerKøn = $state('m');
     let rumKode = $state('');
     let erHost = $state(false);
     let statusBesked = $state('');
@@ -134,14 +135,17 @@ const tilgaengeligeKarakterer: Karakter[] = [
         }
     }
 
-    function startRealtime() {
-        supabase.channel('rum_' + rumKode)
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'spil_sessioner', filter: `rum_kode=eq.${rumKode}` }, payload => {
-                alleSpillere = payload.new.spillere || {};
-                if (payload.new.kort) gitter = payload.new.kort; 
-            })
-            .subscribe();
-    }
+function startRealtime() {
+    supabase.channel('rum_' + rumKode)
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'spil_sessioner', filter: `rum_kode=eq.${rumKode}` }, payload => {
+            alleSpillere = payload.new.spillere || {};
+            if (payload.new.kort) {
+                // Skaber et helt nyt array, så Svelte TVINGES til at tegne kortet forfra hos alle
+                gitter = [...payload.new.kort]; 
+            }
+        })
+        .subscribe();
+}
 
     async function syncTilDb(sendKort = false) {
     const { data } = await supabase.from('spil_sessioner').select('spillere').eq('rum_kode', rumKode).single();
@@ -514,8 +518,12 @@ const tilgaengeligeKarakterer: Karakter[] = [
         <h1>Skyggekysten</h1>
         <p>Angiv dit navn og et rum for at kæmpe jer over øen sammen.</p>
         
-        <input type="text" placeholder="Dit Spillernavn" bind:value={spillerNavn} />
-        <input type="text" placeholder="Rum Kode (fx 1234)" bind:value={rumKode} />
+<input type="text" placeholder="Dit Spillernavn" bind:value={spillerNavn} />
+<select bind:value={spillerKøn} class="gender-select">
+    <option value="m">Mandlige karakterer</option>
+    <option value="f">Kvindelige karakterer</option>
+</select>
+<input type="text" placeholder="Rum Kode (fx 1234)" bind:value={rumKode} />
         
         <button class="join-btn" onclick={opretEllerDeltag}>Gå til kysten</button>
         
@@ -530,8 +538,8 @@ const tilgaengeligeKarakterer: Karakter[] = [
         <h1>Vælg din skæbne, {spillerNavn}</h1>
         <button class="nuke-btn" onclick={nulstilHukommelse}>Forlad rum</button>
     </div>
-    <div class="character-gallery">
-        {#each tilgaengeligeKarakterer as k (k.id)}
+<div class="character-gallery">
+    {#each tilgaengeligeKarakterer.filter(k => k.id.endsWith(`_${spillerKøn}`)) as k (k.id)}
             <button class="character-card" onclick={() => bekræftValg(k)}>
                 <div class="big-icon">
                     {#if k.ikon.startsWith('/')}
@@ -610,38 +618,47 @@ const tilgaengeligeKarakterer: Karakter[] = [
     <div class="camera-lens">
         <div class="world" style={kameraStyle}>
             {#each gitter as felt, i (i)}
-                {@const r = Math.floor(i / BREDDE)}
-                <div class="hex" 
-                     class:odd={r % 2 !== 0} 
-                     class:active={spillerIndex === i} 
-                     class:dug={felt.gravet} 
-                     class:unexplored={!felt.udforsket}
-                     style="background-image: url('/tiles/{felt.biome}.png');">
-                    <div class="inner">
-                        {#if spillerIndex === i} 
-                            <span class="player-icon">
-                                {#if valgtKarakter?.ikon.startsWith('/')}
-                                    <img src={valgtKarakter.ikon} alt="Spiller" style="width: 50px; height: 50px;" />
-                                {:else}
-                                    {valgtKarakter?.ikon}
-                                {/if}
-                            </span> 
-                        {/if}
-                        
-                        <div class="other-players-group">
-                            {#each Object.entries(alleSpillere) as [navn, p] (navn)}
-                                {#if p.index === i && navn !== spillerNavn && !p.isDead}
-                                    <span class="other-player-icon" title={navn}>{p.ikon || '👤'}</span>
-                                {/if}
-                            {/each}
-                        </div>
+    {@const r = Math.floor(i / BREDDE)}
+    {@const erJegHer = spillerIndex === i} 
+    
+    <div class="hex" 
+         class:odd={r % 2 !== 0} 
+         class:active={erJegHer} 
+         class:unexplored={!felt.udforsket}
+         style="background-image: url('/tiles/{felt.biome}.png');">
+        
+        {#if felt.gravet}
+            <div class="dug-overlay"></div>
+        {/if}
 
-                        {#if felt.udforsket && felt.eventID && !felt.eventFuldført && spillerIndex !== i} 
-                            <span class="marker">❗</span> 
-                        {/if}
-                    </div>
-                </div>
+        <div class="inner">
+            {#if erJegHer} 
+                <span class="player-icon">
+                    {#if valgtKarakter?.ikon.startsWith('/')}
+                        <img src={valgtKarakter.ikon} alt="Spiller" style="height: 58px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(0 0 5px gold);" />
+                    {:else}
+                        {valgtKarakter?.ikon}
+                    {/if}
+                </span> 
+            {/if}
+            
+            {#each Object.entries(alleSpillere).filter(([n, p]) => p.index === i && n !== spillerNavn && !p.isDead) as [navn, p], idx (navn)}
+                {@const offset = erJegHer ? idx + 1 : idx}
+                <span class="other-player-icon" title={navn} style="z-index: {90 - idx}; transform: translate({offset * 10}px, {offset * 5}px);">
+                    {#if p.ikon && p.ikon.startsWith('/')}
+                        <img src={p.ikon} alt={navn} style="height: 40px; width: auto; flex-shrink: 0; object-fit: contain; filter: drop-shadow(-2px 2px 3px rgba(0,0,0,0.8));" />
+                    {:else}
+                        {p.ikon || '👤'}
+                    {/if}
+                </span>
             {/each}
+
+            {#if felt.udforsket && felt.eventID && !felt.eventFuldført && !erJegHer} 
+                <span class="marker">❗</span> 
+            {/if}
+        </div>
+    </div>
+{/each}
         </div>
 
         {#if aktivtEvent}
@@ -698,6 +715,7 @@ const tilgaengeligeKarakterer: Karakter[] = [
     .join-btn { width: 100%; padding: 15px; background: #2a4a2a; color: white; border: 1px solid #4a8a4a; border-radius: 8px; cursor: pointer; font-size: 1.2rem; font-weight: bold; transition: background 0.2s; }
     .join-btn:hover { background: #3a6a3a; }
     .status { margin-top: 15px; color: #aaa; font-style: italic; }
+	.gender-select { width: 100%; padding: 12px; margin-bottom: 15px; background: #0a0a0a; border: 1px solid #333; color: white; border-radius: 8px; font-size: 1.1rem; box-sizing: border-box; }
 
     .death-screen { background: rgba(30, 0, 0, 0.95); animation: fade-in 2s; }
     .win-screen { background: rgba(10, 30, 10, 0.95); }
@@ -721,8 +739,7 @@ const tilgaengeligeKarakterer: Karakter[] = [
     .selection-header { text-align: center; margin-bottom: 30px; }
     .selection-header h1 { color: gold; font-size: 3rem; margin: 0; }
     .nuke-btn { margin-top: 15px; background: #222; color: #888; border: 1px solid #444; padding: 5px 15px; cursor: pointer; border-radius: 5px; }
-    .character-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .character-card { background: #1a1a1a; padding: 20px; border: 2px solid #333; border-radius: 15px; text-align: center; color: white; cursor: pointer; width: 250px; display: flex; flex-direction: column; align-items: center; }
+.character-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-height: 65vh; overflow-y: auto; padding: 10px; }    .character-card { background: #1a1a1a; padding: 20px; border: 2px solid #333; border-radius: 15px; text-align: center; color: white; cursor: pointer; width: 250px; display: flex; flex-direction: column; align-items: center; }
     .big-icon { font-size: 4rem; min-height: 80px; display: flex; align-items: center; justify-content: center; }
 .char-image { height: 110px; width: auto; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8)); }    .char-stats { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
     .stat-badge { font-size: 0.8rem; padding: 4px 8px; border-radius: 4px; background: rgba(0,0,0,0.5); border: 1px solid #555; }
@@ -753,11 +770,9 @@ const tilgaengeligeKarakterer: Karakter[] = [
     .hex.odd { transform: translateX(48px); }
     .hex.unexplored { filter: brightness(0.2) grayscale(1); opacity: 0.4; }
     .hex.active { z-index: 10; filter: brightness(1.2); border: 2px solid #5a7d2a; box-shadow: inset 0 0 20px rgba(90,125,42,0.8); } 
-    .hex.dug { filter: brightness(0.5) sepia(1); }
-    .inner { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; font-size: 40px; overflow: visible; }
-    
+.dug-overlay { position: absolute; inset: 0; background-color: rgba(30, 15, 0, 0.6); pointer-events: none; z-index: 1; mix-blend-mode: multiply; }
+.inner { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; font-size: 40px; overflow: visible; z-index: 2; }    
     .player-icon { display: flex; align-items: center; justify-content: center; z-index: 11; pointer-events: none; }
-    .other-players-group { position: absolute; top: 5px; right: 5px; display: flex; flex-wrap: wrap; justify-content: flex-end; width: 50px; gap: 2px; z-index: 2; }
     .other-player-icon { font-size: 16px; filter: drop-shadow(0 0 2px black); animation: bounce 2s infinite; }
     @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
