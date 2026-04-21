@@ -110,6 +110,7 @@
     let lastMouseX = $state(0);
     let lastMouseY = $state(0);
     let zoomLevel = $state(1); 
+	let harTrukket = $state(false);
 
     let kbdRef: (ev: KeyboardEvent) => void;
     let samletScore = $derived((maxKolonne * 10) + (Math.max(0, livspoint) * 5) + guldTotal);
@@ -140,9 +141,10 @@
         }
     });
 
-    function startTræk(e: PointerEvent) {
+function startTræk(e: PointerEvent) {
         if (e.button !== 0 || aktivtEvent || aktivShop) return; 
         isDragging = true;
+        harTrukket = false; // Nulstiller afbryderen ved nyt klik
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
         (e.currentTarget as Element).setPointerCapture(e.pointerId);
@@ -154,6 +156,7 @@
         kameraOffsetY += (e.clientY - lastMouseY);
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
+        harTrukket = true; // Registrerer at musen har bevæget sig
     }
 
     function stopTræk(e: PointerEvent) {
@@ -630,6 +633,54 @@
         syncTilDb(true); 
     }
     
+    // 1. Kernemotoren der udfører selve rykket
+  function udførBevægelse(nI: number) {
+        if (!valgtKarakter) return; // Stopper TypeScript i at råbe op om null
+
+        let f = gitter[nI];
+        if (!f || f.biome === 'hav') { logBesked = "Havet spærrer vejen."; return; }
+
+        const nK = nI % BREDDE;
+
+        // Afstandsreglen til holdet er slettet herfra!
+
+        const terraenModifier = biomeTerraenCost[f.biome] || 1;
+        const bevægelsesPris = Math.ceil(valgtKarakter.moveCost * terraenModifier);
+
+        livspoint -= bevægelsesPris;
+        spillerIndex = nI; 
+        
+        kameraOffsetX = 0;
+        kameraOffsetY = 0;
+        zoomLevel = 1;
+        
+        const synsRadius = f.biome === 'bjerg' ? 2 : 1;
+        afslørOmraade(spillerIndex, synsRadius);
+        
+        logBesked = `Træder ind i ${f.biome}. Omkostning: ${bevægelsesPris} HP.`;
+        if (nK > maxKolonne) maxKolonne = nK;
+
+        if (livspoint <= 0) { syncTilDb(); return; }
+        if (nK === BREDDE - 2) { 
+            if (alleSpillere[spillerNavn]) {
+                alleSpillere[spillerNavn].score = samletScore;
+                alleSpillere[spillerNavn].isWinner = true;
+            }
+            gameState = 'win'; 
+            syncTilDb(); 
+            return; 
+        }
+
+        if (f.eventID && !f.eventFuldført) {
+            aktivtEvent = eventBibliotek[f.eventID] || null; 
+        } else if (f.shopItem) {
+            aktivShop = f.shopItem; 
+        }
+        
+        syncTilDb();
+    }
+
+    // 2. Tastatur-styringen der bare regner retningen ud og fodrer kernemotoren
     function flytHex(retning: string) {
         if (aktivtEvent || aktivShop || gameState !== 'play' || !valgtKarakter) return; 
         
@@ -642,58 +693,24 @@
         
         const nR = Math.floor(nI / BREDDE); const nK = nI % BREDDE;
         if (nI >= 0 && nI < BREDDE * HOEJDE && Math.abs(k - nK) <= 1 && Math.abs(r - nR) <= 1) { 
-            let f = gitter[nI]; 
-            if (f) {
-                if (f.biome === 'hav') { logBesked = "Havet spærrer vejen."; return; }
-                
-                let bagersteKolonne = maxKolonne;
-                for (const [navn, p] of Object.entries(alleSpillere)) {
-                    if (navn !== spillerNavn && !p.isDead) {
-                        if (p.kolonne < bagersteKolonne) bagersteKolonne = p.kolonne;
-                    }
-                }
-                
-                if (nK > bagersteKolonne + 5) {
-                    logBesked = "For langt væk fra holdet. Afstanden må max være 5 felter.";
-                    return;
-                }
-
-                const terraenModifier = biomeTerraenCost[f.biome] || 1;
-                const bevægelsesPris = Math.ceil(valgtKarakter.moveCost * terraenModifier);
-                
-                livspoint -= bevægelsesPris;
-                spillerIndex = nI; 
-                
-                kameraOffsetX = 0;
-                kameraOffsetY = 0;
-                zoomLevel = 1;
-                
-                const synsRadius = f.biome === 'bjerg' ? 2 : 1;
-                afslørOmraade(spillerIndex, synsRadius);
-                
-                logBesked = `Træder ind i ${f.biome}. Omkostning: ${bevægelsesPris} HP.`;
-                if (nK > maxKolonne) maxKolonne = nK;
-
-                if (livspoint <= 0) { syncTilDb(); return; }
-                if (nK === BREDDE - 2) { 
-                    if (alleSpillere[spillerNavn]) {
-                        alleSpillere[spillerNavn].score = samletScore;
-                        alleSpillere[spillerNavn].isWinner = true;
-                    }
-                    gameState = 'win'; 
-                    syncTilDb(); 
-                    return; 
-                }
-
-                if (f.eventID && !f.eventFuldført) {
-                    aktivtEvent = eventBibliotek[f.eventID] || null; 
-                } else if (f.shopItem) {
-                    aktivShop = f.shopItem; 
-                }
-                
-                syncTilDb();
-            }
+            udførBevægelse(nI);
         }
+    }
+
+    // 3. Den nye muse-styring, der tjekker afstand og blokerer fejl-klik
+    function klikPåHex(nI: number) {
+        // Hvis vi lige har trukket kortet, ignorerer vi klikket
+        if (harTrukket || aktivtEvent || aktivShop || gameState !== 'play' || !valgtKarakter) return; 
+        if (nI === spillerIndex) return;
+
+        // Tjekker om feltet reelt er en nabo
+        const naboer = hentNaboIndices(spillerIndex);
+        if (!naboer.includes(nI)) {
+            logBesked = "Du kan kun rykke til et direkte nabofelt.";
+            return;
+        }
+
+        udførBevægelse(nI);
     }
 </script>
 
@@ -775,13 +792,16 @@
                     {@const y = r * ROW_H}
                     {@const erJegHer = spillerIndex === i} 
                     
-                    <div class="hex" 
+                    
+				<div class="hex" 
                          class:odd={r % 2 !== 0} 
                          class:active={erJegHer} 
                          class:unexplored={!felt.udforsket}
-                         style="background-image: url('/tiles/{felt.biome}.png'); left: {x}px; top: {y}px;">
-                        
-                        {#if felt.gravet}
+                         onclick={() => klikPåHex(i)}
+                         onkeydown={(e) => { if (e.key === 'Enter') klikPåHex(i); }}
+                         role="button"
+                         tabindex="0"
+                         style="background-image: url('/tiles/{felt.biome}.png'); left: {x}px; top: {y}px; cursor: pointer;">	{#if felt.gravet}
                             <div class="dug-overlay"></div>
                         {/if}
 
@@ -935,8 +955,16 @@
     .win-screen h1 { color: #55ff55; font-size: 3em; margin-bottom: 10px; }
     .death-screen button, .win-screen button { margin-top: 20px; padding: 15px 30px; font-size: 1.2em; cursor: pointer; }
 
-    .game-container { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-    .camera { flex: 1; position: relative; background: #050505; overflow: hidden; }
+.game-container { 
+    position: relative; 
+    width: 100vw; 
+    height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; 
+    user-select: none; 
+    -webkit-user-select: none; 
+}    .camera { flex: 1; position: relative; background: #050505; overflow: hidden; }
     .map { position: absolute; width: 4800px; height: 1640px; }
     
     .hex { position: absolute; width: 96px; height: 110px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
@@ -959,6 +987,9 @@
 
     .ui { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
     .ui > * { pointer-events: auto; }
+	.map img {
+    -webkit-user-drag: none;
+}
     
     .stats-panel { display: flex; gap: 12px; width: 100%; justify-content: center; margin-top: 10px; }
     .stat-box { width: 65px; height: 65px; background: linear-gradient(180deg, #2a2a2a 0%, #111 100%); border: 2px solid #444; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; color: white; box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 4px 6px rgba(0,0,0,0.5); }
