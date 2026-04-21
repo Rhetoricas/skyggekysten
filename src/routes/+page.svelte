@@ -111,6 +111,8 @@
     let lastMouseY = $state(0);
     let zoomLevel = $state(1); 
 	let harTrukket = $state(false);
+	let startMouseX = $state(0);
+	let startMouseY = $state(0);
 
     let kbdRef: (ev: KeyboardEvent) => void;
     let samletScore = $derived((maxKolonne * 10) + (Math.max(0, livspoint) * 5) + guldTotal);
@@ -144,9 +146,13 @@
 function startTræk(e: PointerEvent) {
         if (e.button !== 0 || aktivtEvent || aktivShop) return; 
         isDragging = true;
-        harTrukket = false; // Nulstiller afbryderen ved nyt klik
+        harTrukket = false; 
+        
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
+        startMouseX = e.clientX; // Gemmer det absolutte startpunkt
+        startMouseY = e.clientY; 
+        
         (e.currentTarget as Element).setPointerCapture(e.pointerId);
     }
 
@@ -156,7 +162,11 @@ function startTræk(e: PointerEvent) {
         kameraOffsetY += (e.clientY - lastMouseY);
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
-        harTrukket = true; // Registrerer at musen har bevæget sig
+        
+        // Registrerer KUN et træk, hvis musen rykker sig mere end 5 pixels
+        if (Math.abs(e.clientX - startMouseX) > 5 || Math.abs(e.clientY - startMouseY) > 5) {
+            harTrukket = true; 
+        }
     }
 
     function stopTræk(e: PointerEvent) {
