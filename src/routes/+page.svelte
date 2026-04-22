@@ -1308,8 +1308,9 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
         background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" stitchTiles="stitch" /></filter><rect width="100%" height="100%" filter="url(%23f)" opacity="0.5" /></svg>');
         background-color: #1a0a2e;
         background-blend-mode: hard-light;
-        mask-image: linear-gradient(to right, black 0%, black calc(var(--fog-x) - 150px), rgba(0,0,0,0.4) var(--fog-x), transparent calc(var(--fog-x) + 400px));
-        -webkit-mask-image: linear-gradient(to right, black 0%, black calc(var(--fog-x) - 150px), rgba(0,0,0,0.4) var(--fog-x), transparent calc(var(--fog-x) + 400px));
+      /* Den skarpe tågevæg - falmer over blot ét felt (96px) */
+        mask-image: linear-gradient(to right, black 0%, black calc(var(--fog-x) - 30px), rgba(0,0,0,0.8) var(--fog-x), transparent calc(var(--fog-x) + 96px));
+        -webkit-mask-image: linear-gradient(to right, black 0%, black calc(var(--fog-x) - 30px), rgba(0,0,0,0.8) var(--fog-x), transparent calc(var(--fog-x) + 96px));
         transition: mask-image 0.2s linear, -webkit-mask-image 0.2s linear;
     }
 
