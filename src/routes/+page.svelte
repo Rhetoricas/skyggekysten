@@ -513,16 +513,18 @@ function genstartBane() {
         guldTotal = Math.max(0, guldTotal + endeligtGuld);
         delta = endeligtGuld;
     }
-    if (type === 'hp' || type === 'hp_lejr' || type === 'fortsaet') {
+if (type === 'hp' || type === 'hp_lejr' || type === 'fortsaet') {
         let endeligtLiv = vaerdi;
         if (endeligtLiv < 0 && valgtKarakter) {
             endeligtLiv = Math.floor(endeligtLiv * valgtKarakter.dmgMod * svaerhedsgrad);
             if (toej?.id === 'rustning') endeligtLiv = Math.floor(endeligtLiv * 0.5);
         }
+        
         if (type === 'hp_lejr') {
-            const healMulig = Math.max(0, 80 - livspoint);
-            endeligtLiv = Math.min(endeligtLiv, Math.max(0, healMulig));
+            // Hæver direkte op til 80. Ikke mere, ikke mindre.
+            endeligtLiv = Math.max(0, 80 - livspoint); 
         }
+        
         livspoint = Math.max(0, livspoint + endeligtLiv);
         delta = endeligtLiv;
     }
@@ -587,12 +589,15 @@ function genstartBane() {
                 deltaVaerdi = udfoerAktion(res.aktionType, res.vaerdi || 0); 
             }
 
-            let endeligTekst = res.log;
+let endeligTekst = res.log;
             
             if (res.aktionType && res.aktionType !== 'fortsaet') {
-                let label = res.aktionType.includes('hp') ? 'HP' : 'Guld';
-                let fortegn = deltaVaerdi > 0 ? '+' : '';
-                endeligTekst += ` (${fortegn}${deltaVaerdi} ${label})`;
+                // Vi udelukker lejrbålet fra at få sat tal på
+                if (res.aktionType !== 'hp_lejr') {
+                    let label = res.aktionType.includes('hp') ? 'HP' : 'Guld';
+                    let fortegn = deltaVaerdi > 0 ? '+' : '';
+                    endeligTekst += ` (${fortegn}${deltaVaerdi} ${label})`;
+                }
             }
 
             let farve = slag <= 6 ? '#ff5555' : slag <= 8 ? '#aaa' : slag <= 10 ? '#55ff55' : 'gold';
@@ -675,17 +680,16 @@ function genstartBane() {
         }
     }
 
-    function grav() {
+   function grav() {
         let f = gitter[spillerIndex];
         if (!f || f.gravet || f.eventID || !valgtKarakter) return;
         
         const harSkovl = inventory.some(i => i.id === 'skovl');
-        if (!harSkovl) { logBesked = "Du kan ikke bryde det hårde mudder uden en skovl."; return; }
-
         const harDetektor = inventory.some(i => i.id === 'metaldetektor');
         const harKvist = inventory.some(i => i.id === 'soegekvist');
 
-        livspoint -= valgtKarakter.digCost;
+        const hpPris = harSkovl ? valgtKarakter.digCost : 15;
+        livspoint -= hpPris;
         f.gravet = true;
         
         if (livspoint <= 0) { syncTilDb(true); return; }
@@ -701,24 +705,31 @@ function genstartBane() {
         if (roll > trapChance) {
             const subRoll = Math.random();
             if (subRoll < 0.60) {
-                let amount = Math.floor((Math.random() * 40) + 10) * valgtKarakter.goldMod;
-                if (harDetektor) amount *= 2;
-                guldTotal += amount; 
-                logBesked = harDetektor ? `Detektoren bipper vildt! Dobbelt op: ${amount}G.` : `Mudderet gemte på ${amount}G.`;
+                if (harSkovl) {
+                    let amount = Math.floor((Math.random() * 20) + 10) * valgtKarakter.goldMod;
+                    if (harDetektor) amount *= 2;
+                    guldTotal += amount; 
+                    logBesked = harDetektor ? `Detektoren bipper vildt! Dobbelt op: ${amount}G. (-${hpPris} HP)` : `Mudderet gemte på ${amount}G. (-${hpPris} HP)`;
+                } else {
+                    logBesked = `Du river neglene til blods i mudderet. Absolut ingenting. (-${hpPris} HP)`;
+                }
             } else if (subRoll < 0.85) {
                 let heal = harKvist ? 35 : 15;
                 livspoint = Math.min(100, livspoint + heal); 
-                logBesked = harKvist ? `Din kvist fandt stærke lægeurter. Heler ${heal} HP.` : `Rod fundet. Heler ${heal} HP.`;
+                logBesked = harKvist ? `Din kvist fandt stærke lægeurter. Heler ${heal} HP. (-${hpPris} HP)` : `Rod fundet. Heler ${heal} HP. (-${hpPris} HP)`;
             } else {
-                let amount = Math.floor(150) * valgtKarakter.goldMod;
+                let amount = Math.floor(100) * valgtKarakter.goldMod; 
                 if (harDetektor) amount *= 2;
+                if (!harSkovl) amount = Math.floor(amount / 2);
                 guldTotal += amount; 
-                logBesked = `Skattekiste brudt op! ${amount}G indsamlet.`;
+                logBesked = harSkovl 
+                    ? `Skattekiste brudt op! ${amount}G indsamlet. (-${hpPris} HP)` 
+                    : `Dine flænsede fingre graver en kiste halvt fri. Du får ${amount}G. (-${hpPris} HP)`;
             }
         } else {
             const subRoll = Math.random();
-            if (subRoll < 0.5) { udfoerAktion('hp', -15); logBesked = `Gasudslip fra jorden.`; } 
-            else { udfoerAktion('hp', -30); logBesked = `Skovlen ramte en ældgammel fælde.`; }
+            if (subRoll < 0.5) { udfoerAktion('hp', -15); logBesked = `Gasudslip fra jorden. Ekstra -15 HP.`; } 
+            else { udfoerAktion('hp', -30); logBesked = `Du ramte en ældgammel fælde. Ekstra -30 HP.`; }
         }
         syncTilDb(true);
     }
@@ -946,11 +957,11 @@ fogX += tågeFart;
                          tabindex="0"
                          style="background-image: url('/tiles/{felt.biome}.png'); left: {x}px; top: {y}px; cursor: pointer;">
                         
-                        {#if felt.gravet}
-                            <div class="dug-overlay"></div>
-                        {/if}
-
                         <div class="inner">
+                            {#if felt.gravet}
+                                <img src="/tiles/udgravning.webp" alt="Udgravet" class="dug-image" />
+                            {/if}
+
                             {#if felt.udforsket && felt.eventID && felt.eventID !== 'campfire' && !felt.eventFuldført} 
                                 <img src="/tiles/event.png" alt="Event" class="event-crystal" />
                             {/if}
@@ -1019,7 +1030,7 @@ fogX += tågeFart;
             </div>
         {/if}
 
-{#if aktivShop && itemDB[aktivShop]}
+        {#if aktivShop && itemDB[aktivShop]}
             {@const tilbud = itemDB[aktivShop]}
             {@const erMarked = gitter[spillerIndex].biome === 'marked'}
             {@const grundPris = erMarked ? tilbud.pris : tilbud.pris * 4}
@@ -1077,9 +1088,9 @@ fogX += tågeFart;
                     <span class="value">{guldTotal}</span>
                 </div>
                 <div class="stat-box" title="Samlet Score">
-    <span class="icon">🏆</span>
-    <span class="value">{samletScore}</span>
-</div>
+                    <span class="icon">🏆</span>
+                    <span class="value">{samletScore}</span>
+                </div>
                 {#each [0, 1, 2, 3, 4] as i (i)}
                     <div class="stat-box item-box">
                         {#if inventory[i]}
@@ -1165,7 +1176,7 @@ fogX += tågeFart;
         pointer-events: none;
         z-index: 100;
         
-        opacity: 0.7; /* Sætter et loft på max dækning */
+        opacity: 0.8; /* Sætter et loft på max dækning */
         
         background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" stitchTiles="stitch" /></filter><rect width="100%" height="100%" filter="url(%23f)" opacity="0.5" /></svg>');
         background-color: #1a0a2e;
@@ -1185,10 +1196,16 @@ fogX += tågeFart;
     .camera { flex: 1; position: relative; background: #050505; overflow: hidden; }
     .map { position: absolute; width: 4800px; height: 1640px; }
     .map img { -webkit-user-drag: none; }
-    
+    .dug-image {
+        position: absolute;
+        width: 96px;
+        height: auto;
+        z-index: 1; 
+        pointer-events: none;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
     .hex { position: absolute; width: 96px; height: 110px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
     .hex.unexplored { filter: brightness(0) !important; opacity: 0.9; }
-    .dug-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); box-shadow: inset 0 0 20px rgba(0,0,0,0.8); z-index: 1; pointer-events: none; }
     .inner { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 2; }
     
     .player-icon { font-size: 40px; z-index: 100; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); display: flex; align-items: center; justify-content: center; }
@@ -1236,8 +1253,8 @@ fogX += tågeFart;
         50% { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1)); }
     }
 
-    @keyframes campfirePulse {
-        0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.4)); }
-        50% { filter: drop-shadow(0 0 100px rgba(255, 140, 0, 1)); }
+@keyframes campfirePulse {
+        0%, 100% { filter: drop-shadow(0 0 15px rgba(255, 165, 0, 0.6)) drop-shadow(0 0 30px rgba(255, 140, 0, 0.4)); }
+        50% { filter: drop-shadow(0 0 40px rgba(255, 215, 0, 1)) drop-shadow(0 0 80px rgba(255, 140, 0, 0.8)); }
     }
 </style>
