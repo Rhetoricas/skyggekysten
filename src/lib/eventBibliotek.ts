@@ -40,6 +40,33 @@ export interface SpilEvent {
 
 // --- 2. SELVE KATALOGET OVER EVENTS ---
 export const eventBibliotek: Record<string, SpilEvent> = {
+
+    'campfire': {
+    id: 'campfire',
+    biome: 'any',
+    titel: 'Et forladt lejrbål',
+    tekst: 'Asken er stadig varm. Du kan slå lejr her og genvinde kræfterne, eller lede efter efterladte værdier nede i kullene.',
+    type: 'historie',
+    valg: [
+        {
+            tekst: "Hvil ved bålet (+30 HP)",
+            aktionType: 'hp',
+            vaerdi: 30
+        },
+        {
+            tekst: "Rod i asken efter noget brugbart",
+            puljeVaerdi: 20,
+            aktionType: 'guld',
+            udfald: {
+                katastrofe: { log: "Du brænder hænderne slemt på et glødende kulstykke.", aktionType: 'hp', vaerdi: -15, multiplikator: 0 },
+                fiasko: { log: "Asken hvirvler op og blænder dig. Her er ingenting.", aktionType: 'hp', vaerdi: 0, multiplikator: 0 },
+                neutral: { log: "Du vrikker en mønt fri fra asken.", aktionType: 'guld', multiplikator: 1 },
+                succes: { log: "Nogen tabte deres pung i farten.", aktionType: 'guld', multiplikator: 2 },
+                mirakel: { log: "En massiv guldklump ligger uberørt under brændet.", aktionType: 'guld', multiplikator: 4 }
+            }
+        }
+    ]
+},
     
     'blodeg_hoved': {
         id: 'blodeg_hoved',

@@ -393,7 +393,7 @@
                     const randomEventIndex = Math.floor(Math.random() * muligeEvents.length);
                     const valgtEvent = muligeEvents[randomEventIndex];
                     f.eventID = valgtEvent;
-                    alleGyldigeEvents = alleGyldigeEvents.filter(k => k !== valgtEvent);
+                    //alleGyldigeEvents = alleGyldigeEvents.filter(k => k !== valgtEvent);
                 }
             }
 
@@ -702,11 +702,11 @@
             <div class="gender-toggles">
                 <label class="checkbox-label">
                     <input type="checkbox" bind:checked={visMandlige} />
-                    Mandlige
+                    Mand
                 </label>
                 <label class="checkbox-label">
                     <input type="checkbox" bind:checked={visKvindelige} />
-                    Kvindelige
+                    Kvinde
                 </label>
             </div>
 
