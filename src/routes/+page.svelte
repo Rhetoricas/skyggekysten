@@ -1109,31 +1109,33 @@ fogX += tågeFart;
             </div>
         {/if}
 
-        <footer class="ui">
-    <div class="status-row">
-        <div class="status-item">
-            <img src="/inventory/hp.webp" alt="Liv" class="status-icon" />
-            <span class="status-value">{livspoint}</span>
-        </div>
-        <div class="status-item">
-            <img src="/inventory/guld.webp" alt="Guld" class="status-icon" />
-            <span class="status-value">{guldTotal}</span>
-        </div>
-        <div class="status-item">
-            <img src="/inventory/score.webp" alt="Score" class="status-icon" />
-            <span class="status-value">{samletScore}</span>
-        </div>
-    </div>
-
-    <div class="inventory-row">
-        {#each inventory as vare (vare.id)}
-            <div class="inventory-item">
-                <img src={vare.billede} alt={vare.navn} class="item-icon" />
-                {#if vare.level > 1}
-                    <span class="level-text">Lvl {vare.level}</span>
-                {/if}
+  <footer class="ui">
+    <div class="ui-content">
+        <div class="status-row">
+            <div class="status-item">
+                <img src="/inventory/hp.webp" alt="Liv" class="status-icon" />
+                <span class="status-value">{livspoint}</span>
             </div>
-        {/each}
+            <div class="status-item">
+                <img src="/inventory/guld.webp" alt="Guld" class="status-icon" />
+                <span class="status-value">{guldTotal}</span>
+            </div>
+            <div class="status-item">
+                <img src="/inventory/score.webp" alt="Score" class="status-icon" />
+                <span class="status-value">{samletScore}</span>
+            </div>
+        </div>
+
+        <div class="inventory-row">
+            {#each inventory as vare (vare.id)}
+                <div class="inventory-item">
+                    <img src={vare.billede} alt={vare.navn} class="item-icon" />
+                    {#if vare.level > 1}
+                        <span class="level-text">Lvl {vare.level}</span>
+                    {/if}
+                </div>
+            {/each}
+        </div>
     </div>
 
     <div class="log-line">
@@ -1290,7 +1292,8 @@ fogX += tågeFart;
         bottom: 0; 
         left: 0; 
         width: 100%; 
-        padding: 30px 0; 
+        padding: 30px 20px; 
+        box-sizing: border-box;
         display: flex; 
         flex-direction: column; 
         align-items: center; 
@@ -1299,10 +1302,22 @@ fogX += tågeFart;
     }
     .ui > * { pointer-events: auto; }
 
+    /* Den nye vandrette samle-kasse */
+    .ui-content {
+        display: flex;
+        flex-direction: row; /* Tvinger status og inventory til at stå ved siden af hinanden */
+        align-items: flex-end; /* Sørger for at de deler den samme bundlinje */
+        justify-content: center;
+        gap: 60px; /* Afstanden MELLEM status-gruppen og inventory-gruppen */
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
     .status-row {
         display: flex;
-        gap: 60px;
-        margin-bottom: 25px;
+        align-items: flex-end;
+        gap: 30px;
+        /* margin-bottom er fjernet herfra */
     }
     .status-item {
         display: flex;
@@ -1319,38 +1334,31 @@ fogX += tågeFart;
         color: #ffffff;
         font-family: sans-serif;
         font-size: 20px;
-        font-weight: normal; /* Hvid regular skrift */
+        font-weight: normal; 
     }
 
-.inventory-row {
+    .inventory-row {
         display: flex;
-        flex-wrap: nowrap; /* Den absolutte regel: INGEN linjeskift */
-        justify-content: center; /* Samler udstyret på midten */
-        align-items: flex-end; /* Sørger for at de står på en fælles bundlinje */
-        gap: 15px; /* Lidt mindre luft, så der er mere plads til grafikken */
+        flex-wrap: nowrap;
+        align-items: flex-end;
+        gap: 5px; 
         height: 120px;
-        width: 100%;
-        max-width: 100vw;
-        padding: 0 20px;
-        box-sizing: border-box;
-        margin-bottom: 20px;
+        /* width og margin-bottom er fjernet herfra, da forælderen styrer det nu */
     }
-    
     .inventory-item {
         position: relative;
-        flex: 0 1 auto; /* Tillader kassen at skrumpe, når pladsen bliver trang */
-        min-width: 0; /* Et klassisk flexbox-trick, der forhindrer elementer i at bryde rammerne */
+        flex: 0 1 auto;
+        min-width: 0;
         height: 100%;
         display: flex;
         justify-content: center;
     }
-    
     .item-icon {
         max-height: 100%;
-        max-width: 100%; /* Tvinger billedet til at respektere den tilgængelige bredde */
+        max-width: 100%; 
         width: auto;
         height: auto;
-        object-fit: contain; /* Bevarer proportionerne intakt, uanset hvor meget det presses */
+        object-fit: contain; 
         filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
     }
     .level-text {
@@ -1361,13 +1369,12 @@ fogX += tågeFart;
         font-size: 14px;
         text-shadow: 1px 1px 2px black;
     }
-
     .log-line { 
         width: 100%; 
         text-align: center; 
         color: #e0e0e0; 
-        font-size: 22px; 
-        font-weight: regular; 
+        font-size: 18px; 
+        font-weight: bold; 
         min-height: 27px; 
         text-shadow: 0 2px 5px rgba(0,0,0,1); 
     }
