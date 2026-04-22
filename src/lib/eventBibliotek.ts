@@ -42,31 +42,37 @@ export interface SpilEvent {
 export const eventBibliotek: Record<string, SpilEvent> = {
 
 'campfire': {
-    id: 'campfire',
-    biome: 'any',
-    titel: 'Et forladt lejrbål',
-    tekst: 'Asken er stadig varm. Du kan hvile her.',
-    type: 'historie',
-    valg: [
-        {
-            tekst: "Hvil ved bålet",
-            aktionType: 'hp_lejr', // Speciel type til 80 HP cap
-            vaerdi: 30
-        },
-        {
-            tekst: "Rod i asken efter noget værdifuldt",
-            puljeVaerdi: 40,
-            aktionType: 'guld_lejr', // Speciel type til guld-tjek
-            udfald: {
-                katastrofe: { log: "Du brænder dig på kullene.", aktionType: 'hp', vaerdi: -10, multiplikator: 0 },
-                fiasko: { log: "Intet andet end sod.", aktionType: 'hp', vaerdi: 0, multiplikator: 0 },
-                neutral: { log: "En enkelt mønt lå i asken.", aktionType: 'guld', multiplikator: 1 },
-                succes: { log: "Du finder guld gemt i bunden.", aktionType: 'guld', multiplikator: 1.5 },
-                mirakel: { log: "En mindre formue lå under asken.", aktionType: 'guld', multiplikator: 2.5 }
+        id: 'campfire',
+        biome: 'any',
+        titel: 'Et forladt lejrbål',
+        tekst: 'Asken er stadig varm. Du kan hvile her, men den rå kulde gør, at dine sår aldrig heler helt (Max 80 HP).',
+        type: 'historie',
+        valg: [
+            {
+                tekst: "Hvil ved bålet",
+                puljeVaerdi: 0,
+                udfald: {
+                    katastrofe: { log: "Bålet luner dig. (+30 HP)", aktionType: 'hp_lejr', vaerdi: 30 },
+                    fiasko: { log: "Bålet luner dig. (+30 HP)", aktionType: 'hp_lejr', vaerdi: 30 },
+                    neutral: { log: "Bålet luner dig. (+30 HP)", aktionType: 'hp_lejr', vaerdi: 30 },
+                    succes: { log: "Bålet luner dig. (+30 HP)", aktionType: 'hp_lejr', vaerdi: 30 },
+                    mirakel: { log: "Bålet luner dig. (+30 HP)", aktionType: 'hp_lejr', vaerdi: 30 }
+                }
+            },
+            {
+                tekst: "Rod i asken efter noget værdifuldt",
+                puljeVaerdi: 40,
+                aktionType: 'guld_lejr', 
+                udfald: {
+                    katastrofe: { log: "Du brænder fingrene slemt på kullene.", aktionType: 'hp', vaerdi: -10, multiplikator: 0 },
+                    fiasko: { log: "Du får kun aske i lungerne.", aktionType: 'hp', vaerdi: 0, multiplikator: 0 },
+                    neutral: { log: "Du vrikker en enkelt mønt fri.", aktionType: 'guld', multiplikator: 1 },
+                    succes: { log: "Nogen tabte deres pung i farten.", aktionType: 'guld', multiplikator: 1.5 },
+                    mirakel: { log: "En massiv guldklump lå gemt under brændet.", aktionType: 'guld', multiplikator: 2.5 }
+                }
             }
-        }
-    ]
-},
+        ]
+    },
     
     'blodeg_hoved': {
         id: 'blodeg_hoved',

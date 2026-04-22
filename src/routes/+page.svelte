@@ -380,7 +380,7 @@
                 f.isCampfire = true;
                 f.eventID = 'campfire';
             } 
-            else if (Math.random() < 0.06) { 
+            else if (Math.random() < 0.6) { 
                 let muligeEvents = alleGyldigeEvents.filter(key => {
                     const reqBiome = eventBibliotek[key].biome;
                     if (Array.isArray(reqBiome)) {
