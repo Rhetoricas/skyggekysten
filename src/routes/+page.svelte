@@ -136,6 +136,25 @@ async function hentHighscores() {
     let inventory = $state<Item[]>([]);
     let gitter = $state<Felt[]>([]); 
     let logBesked = $state("");
+    let erBevidstløs = $state(false);
+    let stunNedtaelling = $state(0);
+
+    function startBevidstloeshed() {
+        if (erBevidstløs) return;
+        erBevidstløs = true;
+        stunNedtaelling = 30; // Straffen i sekunder
+        
+        const stunTimer = setInterval(() => {
+            stunNedtaelling--;
+            if (stunNedtaelling > 0) {
+                logBesked = `BEVIDSTLØS! Vågner om ${stunNedtaelling} sek...`;
+            } else {
+                clearInterval(stunTimer);
+                erBevidstløs = false;
+                logBesked = "Du slår øjnene op. Hovedet dunker, men du kan kravle videre.";
+            }
+        }, 1000);
+    }
     let fogX = $state(0); 
     let mineKendteFelter = $state<number[]>([]);
 
@@ -576,12 +595,18 @@ if (type === 'hp' || type === 'hp_lejr' || type === 'fortsaet') {
         }
         
         if (type === 'hp_lejr') {
-            // Hæver direkte op til 80. Ikke mere, ikke mindre.
             endeligtLiv = Math.max(0, 80 - livspoint); 
         }
         
-        livspoint = Math.max(0, livspoint + endeligtLiv);
-        delta = endeligtLiv;
+        // HER ER SIKKERHEDSNETTET
+        if (endeligtLiv < 0 && livspoint + endeligtLiv <= 0) {
+            delta = -(livspoint - 1); 
+            livspoint = 1;
+            startBevidstloeshed();
+        } else {
+            livspoint = Math.max(0, livspoint + endeligtLiv);
+            delta = endeligtLiv;
+        }
     }
     
     syncTilDb();
@@ -742,7 +767,9 @@ let endeligTekst = res.log;
     }
 
    function grav() {
-        let f = gitter[spillerIndex];
+       
+    let f = gitter[spillerIndex];
+        if (erBevidstløs) return; 
         if (!f || f.gravet || f.eventID || !valgtKarakter) return;
         
         const harSkovl = inventory.some(i => i.id === 'skovl');
@@ -796,6 +823,7 @@ let endeligTekst = res.log;
     }
 
     function hvil() {
+        if (erBevidstløs) return;
         if (!valgtKarakter?.canRest) { logBesked = "Din stolthed forbyder dig at hvile i fjendeland."; return; }
         if (guldTotal < 40) { logBesked = "En sikker lejr koster nu 40 guld."; return; }
         
@@ -895,6 +923,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
     }
 
     function flytHex(retning: string) {
+        if (erBevidstløs) return;
         if (aktivtEvent || aktivShop || gameState !== 'play' || !valgtKarakter) return; 
         
         const r = Math.floor(spillerIndex / BREDDE); const k = spillerIndex % BREDDE; let nI = spillerIndex; const forskudt = r % 2 !== 0;
@@ -911,6 +940,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
     }
 
     function klikPåHex(nI: number) {
+        if (erBevidstløs) return;
         if (harTrukket || aktivtEvent || aktivShop || gameState !== 'play' || !valgtKarakter) return; 
         if (nI === spillerIndex) return;
 
@@ -1049,7 +1079,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
                             {/if}
 
                             {#if erUdforsket && felt.isCampfire} 
-                                <img src="/tiles/campfire.png" alt="Lejrbål" class="campfire-icon-img" />
+                                <img src="/tiles/campfire.webp" alt="Lejrbål" class="campfire-icon-img" />
                             {/if}
 
                             {#if erUdforsket && felt.shopItem} 
@@ -1084,6 +1114,9 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
         </div>
 
         {#if aktivtEvent}
+        {#if erBevidstløs}
+            <div class="stun-overlay"></div>
+        {/if}
             <div class="event-modal">
                 <div class="event-content">
                     <h2>{aktivtEvent.titel}</h2>
@@ -1315,7 +1348,22 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
 
     .event-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: flex; align-items: center; justify-content: center; }
     .event-content { background: #1a1a1a; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-    
+    .stun-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 150;
+        box-shadow: inset 0 0 150px rgba(200, 0, 0, 0.8);
+        animation: blodPuls 2s infinite;
+    }
+    @keyframes blodPuls { 
+        0%, 100% { opacity: 0.4; } 
+        50% { opacity: 1; } 
+    }
+
 .event-image { 
         width: 100%; 
         max-height: 250px; 
@@ -1355,7 +1403,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
         flex-direction: row; /* Tvinger status og inventory til at stå ved siden af hinanden */
         align-items: flex-end; /* Sørger for at de deler den samme bundlinje */
         justify-content: center;
-        gap: 15px; /* Afstanden MELLEM status-gruppen og inventory-gruppen */
+        gap: 20px; /* Afstanden MELLEM status-gruppen og inventory-gruppen */
         width: 100%;
         margin-bottom: 20px;
     }
@@ -1363,7 +1411,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
     .status-row {
         display: flex;
         align-items: flex-end;
-        gap: 15px;
+        gap: 20px;
         /* margin-bottom er fjernet herfra */
     }
     .status-item {
@@ -1372,7 +1420,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
         align-items: center;
     }
     .status-icon {
-        height: 75px;
+        height: 65px;
         width: auto;
         margin-bottom: 8px;
         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.7));
@@ -1388,7 +1436,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
         display: flex;
         flex-wrap: nowrap;
         align-items: flex-end;
-        gap: 15px; 
+        gap: 18px; 
         height: 120px;
         /* width og margin-bottom er fjernet herfra, da forælderen styrer det nu */
     }
@@ -1431,7 +1479,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
     
 .campfire-icon-img { 
         position: absolute; 
-        height: 40px; 
+        height: 60px; 
         width: auto; 
         z-index: 20; /* Løft bålet op over mudder og spillere */
         pointer-events: none; 

@@ -49,18 +49,18 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         id: 'campfire',
         biome: 'any',
         titel: 'Et forladt lejrbål',
-        tekst: 'Asken er stadig varm. Du kan hvile her, men den rå kulde gør, at dine sår aldrig heler helt (Max 80 HP).',
+        tekst: 'Asken er stadig varm. Du kan hvile her, selv om dine sår ikke heler helt.',
         type: 'historie',
         valg: [
             {
                 tekst: "Hvil ved bålet",
                 puljeVaerdi: 0,
                 udfald: {
-                    katastrofe: { log: "Bålet luner dig. (+30 HP)", aktionType: 'hp_lejr', vaerdi: 30 },
-                    fiasko: { log: "Bålet luner dig. (+30 HP)", aktionType: 'hp_lejr', vaerdi: 30 },
-                    neutral: { log: "Bålet luner dig. (+30 HP)", aktionType: 'hp_lejr', vaerdi: 30 },
-                    succes: { log: "Bålet luner dig. (+30 HP)", aktionType: 'hp_lejr', vaerdi: 30 },
-                    mirakel: { log: "Bålet luner dig. (+30 HP)", aktionType: 'hp_lejr', vaerdi: 30 }
+                    katastrofe: { log: "Bålet luner dig.", aktionType: 'hp_lejr', vaerdi: 30 },
+                    fiasko: { log: "Bålet luner dig.", aktionType: 'hp_lejr', vaerdi: 30 },
+                    neutral: { log: "Bålet luner dig.", aktionType: 'hp_lejr', vaerdi: 30 },
+                    succes: { log: "Bålet luner dig.", aktionType: 'hp_lejr', vaerdi: 30 },
+                    mirakel: { log: "Bålet luner dig.", aktionType: 'hp_lejr', vaerdi: 30 }
                 }
             },
             {
