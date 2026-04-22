@@ -10,8 +10,7 @@
         moveCost: number; digCost: number; dmgMod: number; goldMod: number;
         canRest: boolean; fordel: string; ulempe: string;
     }
-    interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: string; eventFuldført: boolean; biome: string; shopItem?: string; }
-    
+interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: string; eventFuldført: boolean; biome: string; shopItem?: string; isCampfire?: boolean; }    
     interface SpillerData {
         index: number;
         kolonne: number;
@@ -376,12 +375,22 @@ function startTræk(e: PointerEvent) {
 
         let nytGitter: Felt[] = Array(antal).fill(null).map((_, i) => ({ guld: 0, gravet: false, udforsket: false, eventFuldført: false, biome: råKort[i] }));
         
-        let alleGyldigeEvents = Object.keys(eventBibliotek).filter(k => !eventBibliotek[k].erSubTrin);
+        // Henter alle events (undtagen sub-trin og lejrbålet selv, som styres manuelt)
+let alleGyldigeEvents = Object.keys(eventBibliotek).filter(k => !eventBibliotek[k].erSubTrin && k !== 'campfire');        // De fire biomer hvor lejrbål kan opstå
+        const vildmark = ['eng', 'skov', 'mark', 'bjerg'];
 
         for (let i = 0; i < antal; i++) {
             let f = nytGitter[i];
             
-            if (f.biome !== 'hav' && Math.random() < 0.06) { 
+            if (f.biome === 'hav') continue; // Havet ignoreres helt
+
+            // 1. Tjek for lejrbål (2% chance i vildmarken)
+            if (vildmark.includes(f.biome) && Math.random() < 0.02) {
+                f.isCampfire = true;
+                f.eventID = 'campfire';
+            } 
+            // 2. Tjek for almindelige events (kun hvis det ikke blev et lejrbål)
+            else if (Math.random() < 0.06) { 
                 let muligeEvents = alleGyldigeEvents.filter(key => {
                     const reqBiome = eventBibliotek[key].biome;
                     if (Array.isArray(reqBiome)) {
@@ -398,6 +407,7 @@ function startTræk(e: PointerEvent) {
                 }
             }
 
+            // 3. Tjek for butikker (kun hvis feltet stadig er tomt for events/bål)
             if (!f.eventID) { 
                 const itemKeys = Object.keys(itemDB);
                 if (f.biome === 'marked' && Math.random() < 0.33) {
@@ -443,6 +453,19 @@ function startTræk(e: PointerEvent) {
             livspoint = Math.max(0, livspoint + endeligtLiv);
         }
         
+        syncTilDb();
+    }
+
+	function hvilVedLejrbål() {
+        // Tjek livspoint for at se om bålet har effekt
+        if (livspoint >= 50) {
+            // Ingen effekt, da vi allerede har godt helbred
+            eventUdfald = { tekst: "Ilden har ingen helbredende effekt, da du allerede har et godt helbred.", farve: '#ccc' };
+        } else {
+            // Heler op til 50 HP
+            livspoint = 50; 
+            eventUdfald = { tekst: "Varmen heler dine sår og fordriver mørket. Du føler dig frisk igen.", farve: '#55ff55' };
+        }
         syncTilDb();
     }
 
@@ -494,6 +517,11 @@ function startTræk(e: PointerEvent) {
             return;
         }
 
+if (v.aktionType as string === 'hvil_gratis_50') {
+	            hvilVedLejrbål();
+            return;
+        }
+
         let succes = true;
         if (v.chance !== undefined) succes = Math.random() <= v.chance;
 
@@ -528,7 +556,7 @@ function startTræk(e: PointerEvent) {
 
         if (index > -1) {
             if (erMarked) {
-                logBesked = `Markedsmanden kigger dumt på dig: "Du har jo allerede en ${dbItem.navn}!"`;
+                eventUdfald = { tekst: `Markedsmanden kigger dumt på dig: "Du har jo allerede en ${dbItem.navn}!"`, farve: '#ff5555' };
                 return; 
             }
 
@@ -538,11 +566,10 @@ function startTræk(e: PointerEvent) {
             if (guldTotal >= pris) {
                 guldTotal -= pris; 
                 vare.level += 1; 
-                logBesked = `${vare.navn} er nu i niveau ${vare.level}.`; 
-                lukEvent(); 
+                eventUdfald = { tekst: `${vare.navn} er nu opgraderet til niveau ${vare.level}.`, farve: '#55ff55' };
                 syncTilDb(true);
             } else {
-                logBesked = `Smeden griner af din fattigdom. Det koster ${pris}G at røre ved det grej.`;
+                eventUdfald = { tekst: `Smeden griner af din fattigdom. Det koster ${pris}G at røre ved det grej.`, farve: '#ff5555' };
             }
 
         } else {
@@ -563,11 +590,10 @@ function startTræk(e: PointerEvent) {
                     type: dbItem.type 
                 }];
                 
-                logBesked = `Du har erhvervet en ${dbItem.navn} for ${pris}G.`; 
-                lukEvent(); 
+                eventUdfald = { tekst: `Du har erhvervet en ${dbItem.navn} for ${pris}G.`, farve: 'gold' };
                 syncTilDb(true);
             } else {
-                logBesked = `Købmanden ryster på hovedet. Kom tilbage når du har ${pris}G.`;
+                eventUdfald = { tekst: `Købmanden ryster på hovedet. Kom tilbage når du har ${pris}G.`, farve: '#ff5555' };
             }
         }
     }
@@ -662,7 +688,7 @@ function startTræk(e: PointerEvent) {
         
         kameraOffsetX = 0;
         kameraOffsetY = 0;
-        zoomLevel = 1;
+    
         
         const synsRadius = f.biome === 'bjerg' ? 2 : 1;
         afslørOmraade(spillerIndex, synsRadius);
@@ -735,11 +761,11 @@ function startTræk(e: PointerEvent) {
             <div class="gender-toggles">
                 <label class="checkbox-label">
                     <input type="checkbox" bind:checked={visMandlige} />
-                    Mandlige
+                    Mand
                 </label>
                 <label class="checkbox-label">
                     <input type="checkbox" bind:checked={visKvindelige} />
-                    Kvindelige
+                    Kvinde
                 </label>
             </div>
 
@@ -823,6 +849,9 @@ function startTræk(e: PointerEvent) {
                             {#if felt.udforsket && felt.shopItem} 
                                 <img src={felt.biome === 'by' ? '/tiles/byshop.png' : '/tiles/markedshop.png'} alt="Butik" class="shop-icon-img" />
                             {/if}
+							{#if felt.udforsket && felt.isCampfire} 
+                                <img src="/tiles/campfire.png" alt="Lejrbål" class="campfire-icon-img" />
+                            {/if}
 
                             {#if erJegHer} 
                                 <span class="player-icon">
@@ -872,23 +901,30 @@ function startTræk(e: PointerEvent) {
             </div>
         {/if}
 
-        {#if aktivShop && itemDB[aktivShop]}
+{#if aktivShop && itemDB[aktivShop]}
             {@const tilbud = itemDB[aktivShop]}
             <div class="event-modal">
                 <div class="event-content">
                     <h2>Købmandens Telt</h2>
                     <p class="event-desc">En rejsende handelsmand har slået sig ned her. Han har kun én genstand tilbage, men måske er det præcis det, du mangler?</p>
                     
-                    <div class="udfald" style="border-left: 5px solid gold; text-align: center;">
-                        <span style="font-size: 30px;">{tilbud.billede}</span><br>
-                        <strong>{tilbud.navn}</strong><br>
-                        Pris: {gitter[spillerIndex].biome === 'marked' ? tilbud.pris : tilbud.pris * 4} Guld (Grundpris)
-                    </div>
+                    {#if eventUdfald}
+                        <div class="udfald" style="border-left: 5px solid {eventUdfald.farve};">
+                            {eventUdfald.tekst}
+                        </div>
+                        <button class="action-btn" onclick={lukEvent}>Forlad teltet</button>
+                    {:else}
+                        <div class="udfald" style="border-left: 5px solid gold; text-align: center;">
+                            <span style="font-size: 30px;">{tilbud.billede}</span><br>
+                            <strong>{tilbud.navn}</strong><br>
+                            Pris: {gitter[spillerIndex].biome === 'marked' ? tilbud.pris : tilbud.pris * 4} Guld (Grundpris)
+                        </div>
 
-                    <div class="valg-liste">
-                        <button class="action-btn" onclick={() => købEllerOpgrader(aktivShop as string)}>Køb/Opgrader {tilbud.navn}</button>
-                        <button class="valg-btn" onclick={() => { aktivShop = null; logBesked = "Du forlader butikken."; }}>Nej tak, gå videre</button>
-                    </div>
+                        <div class="valg-liste">
+                            <button class="action-btn" onclick={() => købEllerOpgrader(aktivShop as string)}>Køb/Opgrader {tilbud.navn}</button>
+                            <button class="valg-btn" onclick={lukEvent}>Nej tak, gå videre</button>
+                        </div>
+                    {/if}
                 </div>
             </div>
         {/if}
@@ -1020,14 +1056,22 @@ function startTræk(e: PointerEvent) {
         animation: floatAndGlow 3s ease-in-out infinite;
     }
 
-    .shop-icon-img {
+.shop-icon-img {
         position: absolute;
         height: 60px;
         width: auto;
         z-index: 5;
         pointer-events: none;
-        animation: floatAndGlow 3s ease-in-out infinite;
-        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+        animation: shopGlow 3s ease-in-out infinite;
+    }
+
+	.campfire-icon-img {
+        position: absolute;
+        height: 40px; /* Ikke så stort som et hus */
+        width: auto;
+        z-index: 4; /* Lige under krystaller og butikker */
+        pointer-events: none;
+        animation: campfirePulse 3s ease-in-out infinite; /* Special-pulsering */
     }
 
     @keyframes floatAndGlow {
@@ -1040,4 +1084,23 @@ function startTræk(e: PointerEvent) {
             filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.9));
         }
     }
+
+	@keyframes shopGlow {
+        0%, 100% {
+            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.4));
+        }
+        50% {
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1));
+        }
+    }
+
+	@keyframes campfirePulse {
+        0%, 100% {
+            filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.4)); /* Dæmpet orangegul */
+        }
+        50% {
+            filter: drop-shadow(0 0 100px rgba(255, 140, 0, 1)); /* Massive langtrækkende tunger */
+        }
+    }
+
 </style>
