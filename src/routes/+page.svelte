@@ -44,22 +44,27 @@
         'hav': 99
     };
 
-    const itemDB: Record<string, { id: string, navn: string, type: string, billede: string, bonus: number, pris: number }> = {
-        'klude': { id: 'klude', navn: 'Klude', type: 'tøj', billede: '🥼', bonus: 0, pris: 10 },
-        'rustning': { id: 'rustning', navn: 'Rustning', type: 'tøj', billede: '🛡️', bonus: 0, pris: 150 },
-        'flot_toej': { id: 'flot_toej', navn: 'Fint tøj', type: 'tøj', billede: '🧥', bonus: 0, pris: 120 },
+const itemDB: Record<string, { id: string, navn: string, type: string, billede: string, bonus: number, pris: number }> = {
+        // Tøj og Beskyttelse
+        'klude': { id: 'klude', navn: 'Klude', type: 'tøj', billede: '/inventory/klude.webp', bonus: 0, pris: 10 },
+        'rustning': { id: 'rustning', navn: 'Rustning', type: 'tøj', billede: '/inventory/rustning.webp', bonus: 0, pris: 150 },
+        'flot_toej': { id: 'flot_toej', navn: 'Fint tøj', type: 'tøj', billede: '/inventory/flot_toej.webp', bonus: 0, pris: 120 },
         
-        'kniv': { id: 'kniv', navn: 'Kniv', type: 'våben', billede: '🗡️', bonus: 1, pris: 40 },
-        'stav': { id: 'stav', navn: 'Stav', type: 'våben', billede: '🦯', bonus: 1, pris: 40 },
-        'bue': { id: 'bue', navn: 'Bue', type: 'våben', billede: '🏹', bonus: 1, pris: 80 },
-        'oekse': { id: 'oekse', navn: 'Økse', type: 'våben', billede: '🪓', bonus: 2, pris: 100 },
-        'svaerd': { id: 'svaerd', navn: 'Sværd', type: 'våben', billede: '⚔️', bonus: 2, pris: 120 },
-        'sabel': { id: 'sabel', navn: 'Sabel', type: 'våben', billede: '🤺', bonus: 2, pris: 100 },
+        // Våben
+        'kniv': { id: 'kniv', navn: 'Kniv', type: 'våben', billede: '/inventory/kniv.webp', bonus: 1, pris: 40 },
+        'stav': { id: 'stav', navn: 'Stav', type: 'våben', billede: '/inventory/stav.webp', bonus: 1, pris: 40 },
+        'bue': { id: 'bue', navn: 'Bue', type: 'våben', billede: '/inventory/bue.webp', bonus: 1, pris: 80 },
+        'oekse': { id: 'oekse', navn: 'Økse', type: 'våben', billede: '/inventory/oekse.webp', bonus: 2, pris: 100 },
+        'svaerd': { id: 'svaerd', navn: 'Sværd', type: 'våben', billede: '/inventory/svaerd.webp', bonus: 2, pris: 120 },
+        'sabel': { id: 'sabel', navn: 'Sabel', type: 'våben', billede: '/inventory/sabel.webp', bonus: 2, pris: 100 },
 
-        'skovl': { id: 'skovl', navn: 'Skovl', type: 'værktøj', billede: '🥄', bonus: 0, pris: 60 },
-        'metaldetektor': { id: 'metaldetektor', navn: 'Detektor', type: 'værktøj', billede: '🧲', bonus: 0, pris: 200 },
-        'soegekvist': { id: 'soegekvist', navn: 'Søgekvist', type: 'værktøj', billede: '🌿', bonus: 0, pris: 150 },
-    'livseliksir': { id: 'livseliksir', navn: 'Livseliksir', type: 'forbrug', billede: '🧪', bonus: 0, pris: 500 },
+        // Værktøj
+        'skovl': { id: 'skovl', navn: 'Skovl', type: 'værktøj', billede: '/inventory/skovl.webp', bonus: 0, pris: 60 },
+        'metaldetektor': { id: 'metaldetektor', navn: 'Detektor', type: 'værktøj', billede: '/inventory/detector.webp', bonus: 0, pris: 200 },
+        'soegekvist': { id: 'soegekvist', navn: 'Søgekvist', type: 'værktøj', billede: '/inventory/soegekvist.webp', bonus: 0, pris: 150 },
+
+        // Forbrugsstoffer
+        'livseliksir': { id: 'livseliksir', navn: 'Livseliksir', type: 'forbrug', billede: '/inventory/livseliksir.webp', bonus: 0, pris: 500 }
     };
 
     const tilgaengeligeKarakterer: Karakter[] = [
@@ -1105,41 +1110,36 @@ fogX += tågeFart;
         {/if}
 
         <footer class="ui">
-            <div class="stats-panel">
-                <div class="stat-box" title="Helbred">
-                    <span class="icon">❤️</span>
-                    <span class="value">{livspoint}</span>
-                </div>
-                <div class="stat-box gold-box" title="Guld">
-                    <span class="icon">💰</span>
-                    <span class="value">{guldTotal}</span>
-                </div>
-                <div class="stat-box" title="Samlet Score">
-                    <span class="icon">🏆</span>
-                    <span class="value">{samletScore}</span>
-                </div>
-                {#each [0, 1, 2, 3, 4] as i (i)}
-                    <div class="stat-box item-box">
-                        {#if inventory[i]}
-                            <span class="icon">{inventory[i].billede}</span>
-                            {#if inventory[i].level > 0}
-                                <span class="level-badge">Lvl {inventory[i].level}</span>
-                            {/if}
-                        {:else}
-                            <span class="icon empty"></span>
-                        {/if}
-                    </div>
-                {/each}
-            </div>
-        
-            <div class="log-line">
-                {#if logBesked}
-                    {logBesked}
-                {:else}
-                    Klar til at udforske øen.
+    <div class="status-row">
+        <div class="status-item">
+            <img src="/inventory/hp.webp" alt="Liv" class="status-icon" />
+            <span class="status-value">{livspoint}</span>
+        </div>
+        <div class="status-item">
+            <img src="/inventory/guld.webp" alt="Guld" class="status-icon" />
+            <span class="status-value">{guldTotal}</span>
+        </div>
+        <div class="status-item">
+            <img src="/inventory/score.webp" alt="Score" class="status-icon" />
+            <span class="status-value">{samletScore}</span>
+        </div>
+    </div>
+
+    <div class="inventory-row">
+        {#each inventory as vare (vare.id)}
+            <div class="inventory-item">
+                <img src={vare.billede} alt={vare.navn} class="item-icon" />
+                {#if vare.level > 1}
+                    <span class="level-text">Lvl {vare.level}</span>
                 {/if}
             </div>
-        </footer>
+        {/each}
+    </div>
+
+    <div class="log-line">
+        {#if logBesked}{logBesked}{:else}Klar til at udforske Tågeøen.{/if}
+    </div>
+</footer>
     </div>
 {/if}
 
@@ -1285,19 +1285,76 @@ fogX += tågeFart;
     .udfald { background: #222; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-size: 16px; }
     .action-btn { text-align: center; width: 100%; background: #2a4a2a; }
 
-    .ui { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+    .ui { 
+        position: absolute; 
+        bottom: 0; 
+        left: 0; 
+        width: 100%; 
+        padding: 30px 0; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        pointer-events: none; 
+        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+    }
     .ui > * { pointer-events: auto; }
-    
-    .stats-panel { display: flex; gap: 12px; width: 100%; justify-content: center; margin-top: 10px; }
-    .stat-box { width: 65px; height: 65px; background: linear-gradient(180deg, #2a2a2a 0%, #111 100%); border: 2px solid #444; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; color: white; box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 4px 6px rgba(0,0,0,0.5); }
-    .stat-box .icon { font-size: 26px; }
-    .stat-box .value { font-size: 14px; font-weight: bold; margin-top: 4px; text-shadow: 1px 1px 2px black; }
-    .stat-box.gold-box .value { color: gold; }
-    .stat-box .empty { opacity: 0.05; }
-    .level-badge { position: absolute; bottom: -6px; right: -6px; background: #ffcc00; color: #000; font-size: 11px; font-weight: 900; padding: 2px 5px; border-radius: 5px; border: 1px solid #664400; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-    .log-line { width: 100%; text-align: center; color: #e0e0e0; font-size: 18px; font-weight: bold; min-height: 27px; margin-bottom: 5px; text-shadow: 0 2px 5px rgba(0,0,0,1); }
+    .status-row {
+        display: flex;
+        gap: 60px;
+        margin-bottom: 25px;
+    }
+    .status-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .status-icon {
+        height: 65px;
+        width: auto;
+        margin-bottom: 8px;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.7));
+    }
+    .status-value {
+        color: #ffffff;
+        font-family: sans-serif;
+        font-size: 20px;
+        font-weight: normal; /* Hvid regular skrift */
+    }
 
+    .inventory-row {
+        display: flex;
+        gap: 25px;
+        height: 120px; /* Din faste højde */
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .inventory-item {
+        position: relative;
+    }
+    .item-icon {
+        height: 120px; /* Skalerer dine 150px billeder ned til linjen */
+        width: auto;
+        filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+    }
+    .level-text {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        color: gold;
+        font-size: 14px;
+        text-shadow: 1px 1px 2px black;
+    }
+
+    .log-line { 
+        width: 100%; 
+        text-align: center; 
+        color: #e0e0e0; 
+        font-size: 22px; 
+        font-weight: regular; 
+        min-height: 27px; 
+        text-shadow: 0 2px 5px rgba(0,0,0,1); 
+    }
     :global(.event-crystal) { position: absolute; height: 65px; width: auto; z-index: 5; pointer-events: none; animation: floatAndGlow 3s ease-in-out infinite; }
 
     .shop-icon-img { position: absolute; height: 60px; width: auto; z-index: 5; pointer-events: none; animation: shopGlow 3s ease-in-out infinite; }
