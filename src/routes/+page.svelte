@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { browser } from '$app/environment';
     import { supabase } from '$lib/supabaseClient';
     import { eventBibliotek, type SpilEvent, type Valg } from '$lib/eventBibliotek';
@@ -82,6 +83,30 @@
 
     let gameState = $state<'login' | 'select' | 'play' | 'dead' | 'win'>('login'); 
     
+let topTre: Array<{ navn: string, score: number }> = $state([]);
+    async function hentHighscores() {
+        if (!rumKode) return; 
+        const { data, error } = await supabase
+            .from('highscores')
+            .select('navn, score')
+            .eq('rum_kode', rumKode)
+            .order('score', { ascending: false })
+            .limit(3);
+        
+        if (!error && data) {
+            topTre = data;
+        }
+    }
+
+    async function gemHighscore() {
+        if (samletScore > 0 && rumKode) {
+            await supabase
+                .from('highscores')
+                .insert([{ navn: spillerNavn, score: samletScore, rum_kode: rumKode }]);
+        }
+        await hentHighscores(); 
+    }
+
     let spillerNavn = $state('');
     let visMandlige = $state(true);
     let visKvindelige = $state(true);
@@ -125,9 +150,9 @@
     let zoomLevel = $state(1); 
 
     let kbdRef: (ev: KeyboardEvent) => void;
-    let samletScore = $derived((maxKolonne * 10) + (Math.max(0, livspoint) * 5) + guldTotal);
-
-    let kameraStyle = $derived.by(() => {
+let fremdriftPoint = $derived(maxKolonne * 10);
+let winBonus = $derived(gameState === 'win' ? 1000 : 0);
+let samletScore = $derived(Math.floor((guldTotal + fremdriftPoint + winBonus) * (1 + (Math.max(0, livspoint) / 100))));    let kameraStyle = $derived.by(() => {
         const r = Math.floor(spillerIndex / BREDDE);
         const k = spillerIndex % BREDDE;
         const x = k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0);
@@ -149,9 +174,14 @@
                 alleSpillere[spillerNavn].isDead = true;
             }
             gameState = 'dead';
+            gemHighscore();
             syncTilDb();
         }
     });
+
+onMount(() => {
+    hentHighscores();
+});
 
     function startTræk(e: PointerEvent) {
         if (e.button !== 0 || aktivtEvent || aktivShop) return; 
@@ -322,6 +352,48 @@
 
     function nulstilHukommelse() {
         if (browser) window.location.reload();
+    }
+
+function genstartBane() {
+        // 1. Vask kortet rent for mudder og fodspor
+        gitter = gitter.map(f => ({
+            ...f,
+            gravet: false,
+            udforsket: false,
+            eventFuldført: false
+        }));
+
+        // 2. Nulstil spillerens stats til udgangspunktet
+        if (valgtKarakter) {
+            livspoint = valgtKarakter.startHp;
+            guldTotal = valgtKarakter.startGuld;
+            inventory = valgtKarakter.startUdstyr.map(itemId => {
+                const dbItem = itemDB[itemId];
+                return { id: dbItem.id, navn: dbItem.navn, level: dbItem.bonus > 0 ? dbItem.bonus : 1, billede: dbItem.billede, type: dbItem.type };
+            });
+        }
+        
+        maxKolonne = 1;
+        fogX = 0; // Skub tågen tilbage til start
+        
+        // 3. Kast spilleren tilbage til venstre kyst
+        const muligeStartFelter = [];
+        for (let r = 1; r < HOEJDE - 1; r++) {
+            if (gitter[r * BREDDE + 1].biome !== 'hav') muligeStartFelter.push(r * BREDDE + 1);
+        }
+        spillerIndex = muligeStartFelter[Math.floor(Math.random() * muligeStartFelter.length)];
+        
+        afslørOmraade(spillerIndex, 1);
+        
+        logBesked = "Tiden spoler tilbage. Tågen trækker sig. Kysten venter igen.";
+        gameState = 'play';
+        
+        // 4. Send den rene verden op til databasen
+        if (alleSpillere[spillerNavn]) {
+            alleSpillere[spillerNavn].isDead = false;
+            alleSpillere[spillerNavn].isWinner = false;
+        }
+        syncTilDb(true);
     }
 
     function hentNaboIndices(index: number) {
@@ -553,45 +625,52 @@
         const erMarked = felt.biome === 'marked';
         const index = inventory.findIndex(i => i.id === id);
 
+        // 1. Definer grundprisen én gang for alle
+        const grundPris = erMarked ? dbItem.pris : dbItem.pris * 4;
+
         if (index > -1) {
+            // KAN KUN OPGRADERE I BYEN
             if (erMarked) {
                 eventUdfald = { tekst: `Markedsmanden kigger dumt på dig: "Du har jo allerede en ${dbItem.navn}!"`, farve: '#ff5555' };
                 return; 
             }
 
             const vare = inventory[index];
-            const pris = vare.level === 1 ? dbItem.pris : dbItem.pris * Math.pow(4, vare.level - 1);
+            
+            // 2. Den eksponentielle opgraderingspris (Grundpris * 4^nuværende_niveau)
+            const opgraderingsPris = grundPris * Math.pow(4, vare.level);
 
-            if (guldTotal >= pris) {
-                guldTotal -= pris; 
+            if (guldTotal >= opgraderingsPris) {
+                guldTotal -= opgraderingsPris; 
                 vare.level += 1; 
-                eventUdfald = { tekst: `${vare.navn} er nu opgraderet til niveau ${vare.level}.`, farve: '#55ff55' };
+                eventUdfald = { tekst: `${vare.navn} er nu forstærket til niveau ${vare.level}.`, farve: '#55ff55' };
                 syncTilDb(true);
             } else {
-                eventUdfald = { tekst: `Smeden griner af din fattigdom. Det koster ${pris}G at røre ved det grej.`, farve: '#ff5555' };
+                eventUdfald = { tekst: `Smeden griner. Det koster ${opgraderingsPris}G at opgradere til niveau ${vare.level + 1}.`, farve: '#ff5555' };
             }
         } else {
-            const pris = erMarked ? dbItem.pris : dbItem.pris * 4;
-            
-            if (guldTotal >= pris) {
-                guldTotal -= pris;
+            // KØB FOR FØRSTE GANG
+            if (guldTotal >= grundPris) {
+                guldTotal -= grundPris;
                 
                 let nytInventory = [...inventory];
+                // Skil dig af med gamle våben/tøj af samme type
                 if (dbItem.type === 'våben') nytInventory = nytInventory.filter(i => i.type !== 'våben');
                 else if (dbItem.type === 'tøj') nytInventory = nytInventory.filter(i => i.type !== 'tøj');
                 
                 inventory = [...nytInventory, { 
                     id: dbItem.id, 
                     navn: dbItem.navn, 
+                    // Våben starter typisk på deres base-bonus, andre ting på 1
                     level: dbItem.bonus > 0 ? dbItem.bonus : 1, 
                     billede: dbItem.billede, 
                     type: dbItem.type 
                 }];
                 
-                eventUdfald = { tekst: `Du har erhvervet en ${dbItem.navn} for ${pris}G.`, farve: 'gold' };
+                eventUdfald = { tekst: `Du har erhvervet en ${dbItem.navn} for ${grundPris}G.`, farve: 'gold' };
                 syncTilDb(true);
             } else {
-                eventUdfald = { tekst: `Købmanden ryster på hovedet. Kom tilbage når du har ${pris}G.`, farve: '#ff5555' };
+                eventUdfald = { tekst: `Købmanden ryster på hovedet. Kom tilbage når du har ${grundPris}G.`, farve: '#ff5555' };
             }
         }
     }
@@ -699,12 +778,13 @@ const nK = nI % BREDDE;
         if (nK > maxKolonne) maxKolonne = nK;
 
         if (livspoint <= 0) { syncTilDb(); return; }
-        if (nK === BREDDE - 2) { 
+  if (nK === BREDDE - 2) { 
+            gameState = 'win'; 
             if (alleSpillere[spillerNavn]) {
                 alleSpillere[spillerNavn].score = samletScore;
                 alleSpillere[spillerNavn].isWinner = true;
             }
-            gameState = 'win'; 
+            gemHighscore();
             syncTilDb(); 
             return; 
         }
@@ -800,17 +880,42 @@ const nK = nI % BREDDE;
 {:else if gameState === 'dead'}
     <div class="overlay death-screen">
         <h1>Du bukkede under for Skyggekysten</h1>
-        <p>Din krop giver efter. Din rejse ender her i mudderet.</p>
+        <p>Din krop giver op. Din rejse ender her i mudderet.</p>
         <h2>Endelig Score: {samletScore}</h2>
-        <button onclick={nulstilHukommelse}>Hvil i fred</button>
+        <button onclick={genstartBane}>Prøv samme kyst igen</button>
+        <button onclick={nulstilHukommelse} style="background: #444; margin-top: 10px;">Forlad rummet</button>
     </div>
+    <div class="highscore-board">
+    <h3>Top 3 på {rumKode}</h3>
+    {#if topTre.length === 0}
+        <p>Stien er stadig uberørt...</p>
+    {:else}
+        <ol>
+{#each topTre as hs, i (i)}                <li><strong>{hs.navn}</strong>: {hs.score} point</li>
+            {/each}
+        </ol>
+    {/if}
+</div>
 {:else if gameState === 'win'}
     <div class="overlay win-screen">
         <h1>Skyggekysten er besejret!</h1>
         <p>Du har nået den fjerne kyst og overlevet mørket.</p>
         <h2>Endelig Score: {samletScore}</h2>
-        <button onclick={nulstilHukommelse}>Spil igen</button>
+        <button onclick={genstartBane}>Prøv samme kyst igen</button>
+        <button onclick={nulstilHukommelse} style="background: #444; margin-top: 10px;">Forlad rummet</button>
     </div>
+    <div class="highscore-board">
+    <h3>Top 3 på {rumKode}</h3>
+    {#if topTre.length === 0}
+        <p>Stien er stadig uberørt...</p>
+    {:else}
+        <ol>
+            {#each topTre as hs, i (i)}
+                <li><strong>{hs.navn}</strong>: {hs.score} point</li>
+            {/each}
+        </ol>
+    {/if}
+</div>
 {:else}
     <div class="game-container">
         <div class="camera" role="presentation" onwheel={håndterZoom} onpointerdown={startTræk} onpointermove={træk} onpointerup={stopTræk} onpointercancel={stopTræk} style="cursor: {isDragging ? 'grabbing' : 'grab'}; touch-action: none;">
@@ -905,27 +1010,46 @@ const nK = nI % BREDDE;
             </div>
         {/if}
 
-        {#if aktivShop && itemDB[aktivShop]}
+{#if aktivShop && itemDB[aktivShop]}
             {@const tilbud = itemDB[aktivShop]}
+            {@const erMarked = gitter[spillerIndex].biome === 'marked'}
+            {@const grundPris = erMarked ? tilbud.pris : tilbud.pris * 4}
+            {@const ejetVare = inventory.find(i => i.id === aktivShop)}
+            {@const aktuelPris = ejetVare ? grundPris * Math.pow(4, ejetVare.level) : grundPris}
+            
             <div class="event-modal">
                 <div class="event-content">
-                    <h2>Købmandens Telt</h2>
-                    <p class="event-desc">En rejsende handelsmand har slået sig ned her. Han har kun én genstand tilbage, men måske er det præcis det, du mangler?</p>
+                    <h2>{erMarked ? 'Markedet' : 'Den Rejsende Købmand'}</h2>
+                    <p class="event-desc">
+                        {#if ejetVare}
+                            {#if erMarked}
+                                Du har allerede denne genstand, og kræmmerne her kan ikke hjælpe dig med at opgradere.
+                            {:else}
+                                Smeden kigger på dit udstyr. Han kan forstærke din {tilbud.navn} til niveau {ejetVare.level + 1}.
+                            {/if}
+                        {:else}
+                            En handelsmand faldbyder sit gods. Har du guldet, har han grejet.
+                        {/if}
+                    </p>
                     
                     {#if eventUdfald}
                         <div class="udfald" style="border-left: 5px solid {eventUdfald.farve};">
                             {eventUdfald.tekst}
                         </div>
-                        <button class="action-btn" onclick={lukEvent}>Gå ud</button>
+                        <button class="action-btn" onclick={lukEvent}>Forlad butikken</button>
                     {:else}
                         <div class="udfald" style="border-left: 5px solid gold; text-align: center;">
                             <span style="font-size: 30px;">{tilbud.billede}</span><br>
-                            <strong>{tilbud.navn}</strong><br>
-                            Pris: {gitter[spillerIndex].biome === 'marked' ? tilbud.pris : tilbud.pris * 4} Guld (Grundpris)
+                            <strong>{tilbud.navn} {#if ejetVare}(Nuværende: Lvl {ejetVare.level}){/if}</strong><br>
+                            Pris: <strong>{aktuelPris} Guld</strong>
                         </div>
 
                         <div class="valg-liste">
-                            <button class="action-btn" onclick={() => købEllerOpgrader(aktivShop as string)}>Køb/Opgrader {tilbud.navn}</button>
+                            {#if !ejetVare || !erMarked}
+                                <button class="action-btn" onclick={() => købEllerOpgrader(aktivShop as string)}>
+                                    {#if ejetVare}Opgrader{:else}Køb{/if} for {aktuelPris}G
+                                </button>
+                            {/if}
                             <button class="valg-btn" onclick={lukEvent}>Nej tak, gå videre</button>
                         </div>
                     {/if}
@@ -943,6 +1067,10 @@ const nK = nI % BREDDE;
                     <span class="icon">💰</span>
                     <span class="value">{guldTotal}</span>
                 </div>
+                <div class="stat-box" title="Samlet Score">
+    <span class="icon">🏆</span>
+    <span class="value">{samletScore}</span>
+</div>
                 {#each [0, 1, 2, 3, 4] as i (i)}
                     <div class="stat-box item-box">
                         {#if inventory[i]}
@@ -999,7 +1127,27 @@ const nK = nI % BREDDE;
     .char-card .negative { color: #ff8888; }
     .confirm-btn { display: block; width: 100%; padding: 15px; background: #ffcc00; color: black; border: none; border-radius: 6px; font-size: 18px; font-weight: bold; cursor: pointer; }
     .confirm-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
-.creeping-fog {
+.highscore-board {
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid gold;
+        padding: 15px;
+        margin: 15px auto;
+        border-radius: 8px;
+        text-align: left;
+        max-width: 250px;
+        font-family: serif;
+    }
+    .highscore-board h3 { 
+        margin: 0 0 10px 0; 
+        color: gold; 
+        font-size: 16px; 
+        text-transform: uppercase; 
+    }
+    .highscore-board ol { padding-left: 25px; margin: 0; }
+    .highscore-board li { color: #ccc; margin-bottom: 5px; }
+    .highscore-board strong { color: #fff; }
+
+    .creeping-fog {
         position: absolute;
         top: 0;
         left: 0;
@@ -1007,6 +1155,9 @@ const nK = nI % BREDDE;
         height: 100%;
         pointer-events: none;
         z-index: 100;
+        
+        opacity: 0.7; /* Sætter et loft på max dækning */
+        
         background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" stitchTiles="stitch" /></filter><rect width="100%" height="100%" filter="url(%23f)" opacity="0.5" /></svg>');
         background-color: #1a0a2e;
         background-blend-mode: hard-light;
