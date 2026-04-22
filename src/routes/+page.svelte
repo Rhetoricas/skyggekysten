@@ -1139,8 +1139,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
                         <button class="action-btn" onclick={lukEvent}>Forlad butikken</button>
                     {:else}
                         <div class="udfald" style="border-left: 5px solid gold; text-align: center;">
-                            <span style="font-size: 30px;">{tilbud.billede}</span><br>
-                            <strong>{tilbud.navn} {#if ejetVare}(Nuværende: Lvl {ejetVare.level}){/if}</strong><br>
+<img src={tilbud.billede} alt={tilbud.navn} style="height: 80px; width: auto; object-fit: contain; margin-bottom: 10px;" /><br>                            <strong>{tilbud.navn} {#if ejetVare}(Nuværende: Lvl {ejetVare.level}){/if}</strong><br>
                             Pris: <strong>{aktuelPris} Guld</strong>
                         </div>
 
@@ -1356,7 +1355,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
         flex-direction: row; /* Tvinger status og inventory til at stå ved siden af hinanden */
         align-items: flex-end; /* Sørger for at de deler den samme bundlinje */
         justify-content: center;
-        gap: 60px; /* Afstanden MELLEM status-gruppen og inventory-gruppen */
+        gap: 15px; /* Afstanden MELLEM status-gruppen og inventory-gruppen */
         width: 100%;
         margin-bottom: 20px;
     }
@@ -1364,7 +1363,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
     .status-row {
         display: flex;
         align-items: flex-end;
-        gap: 30px;
+        gap: 15px;
         /* margin-bottom er fjernet herfra */
     }
     .status-item {
@@ -1373,7 +1372,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
         align-items: center;
     }
     .status-icon {
-        height: 65px;
+        height: 75px;
         width: auto;
         margin-bottom: 8px;
         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.7));
@@ -1389,7 +1388,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
         display: flex;
         flex-wrap: nowrap;
         align-items: flex-end;
-        gap: 5px; 
+        gap: 15px; 
         height: 120px;
         /* width og margin-bottom er fjernet herfra, da forælderen styrer det nu */
     }
