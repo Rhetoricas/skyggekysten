@@ -41,28 +41,28 @@ export interface SpilEvent {
 // --- 2. SELVE KATALOGET OVER EVENTS ---
 export const eventBibliotek: Record<string, SpilEvent> = {
 
-    'campfire': {
+'campfire': {
     id: 'campfire',
     biome: 'any',
     titel: 'Et forladt lejrbål',
-    tekst: 'Asken er stadig varm. Du kan slå lejr her og genvinde kræfterne, eller lede efter efterladte værdier nede i kullene.',
+    tekst: 'Asken er stadig varm. Du kan hvile her.',
     type: 'historie',
     valg: [
         {
-            tekst: "Hvil ved bålet (+30 HP)",
-            aktionType: 'hp',
+            tekst: "Hvil ved bålet",
+            aktionType: 'hp_lejr', // Speciel type til 80 HP cap
             vaerdi: 30
         },
         {
-            tekst: "Rod i asken efter noget brugbart",
-            puljeVaerdi: 20,
-            aktionType: 'guld',
+            tekst: "Rod i asken efter noget værdifuldt",
+            puljeVaerdi: 40,
+            aktionType: 'guld_lejr', // Speciel type til guld-tjek
             udfald: {
-                katastrofe: { log: "Du brænder hænderne slemt på et glødende kulstykke.", aktionType: 'hp', vaerdi: -15, multiplikator: 0 },
-                fiasko: { log: "Asken hvirvler op og blænder dig. Her er ingenting.", aktionType: 'hp', vaerdi: 0, multiplikator: 0 },
-                neutral: { log: "Du vrikker en mønt fri fra asken.", aktionType: 'guld', multiplikator: 1 },
-                succes: { log: "Nogen tabte deres pung i farten.", aktionType: 'guld', multiplikator: 2 },
-                mirakel: { log: "En massiv guldklump ligger uberørt under brændet.", aktionType: 'guld', multiplikator: 4 }
+                katastrofe: { log: "Du brænder dig på kullene.", aktionType: 'hp', vaerdi: -10, multiplikator: 0 },
+                fiasko: { log: "Intet andet end sod.", aktionType: 'hp', vaerdi: 0, multiplikator: 0 },
+                neutral: { log: "En enkelt mønt lå i asken.", aktionType: 'guld', multiplikator: 1 },
+                succes: { log: "Du finder guld gemt i bunden.", aktionType: 'guld', multiplikator: 1.5 },
+                mirakel: { log: "En mindre formue lå under asken.", aktionType: 'guld', multiplikator: 2.5 }
             }
         }
     ]
@@ -70,7 +70,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
     
     'blodeg_hoved': {
         id: 'blodeg_hoved',
-        biome: ['blodskov', 'skov'],
+        biome: ['blodskov', 'skov', 'mark', 'eng'],
         titel: 'Den Pulserende Egestamme',
         billede: '/events/blodeg1.webp', 
         tekst: 'En massiv egestamme ligger knækket over en dyb kløft. Tyk, rød saft pibler fra barken. Det lugter skarpt af jern. Nede i mørket under stammen glimter noget metallisk. Stammen ser rådden ud, men den er eneste vej over.',

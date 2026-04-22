@@ -422,6 +422,14 @@
         const svaerhedsgrad = 1 + (k / BREDDE);
         const toej = inventory.find(i => i.type === 'tøj');
 
+        if (type === 'hp_lejr') {
+    if (livspoint >= 80) {
+        logBesked = "Du er allerede så rask, som du kan blive her.";
+    } else {
+        livspoint = Math.min(80, livspoint + vaerdi);
+    }
+}
+
         if (type === 'guld' || type === 'fortsaet') {
             let endeligtGuld = vaerdi;
             if (endeligtGuld > 0 && valgtKarakter) {
@@ -446,6 +454,13 @@
         if (v.puljeVaerdi) {
             eventPulje += v.puljeVaerdi;
         }
+
+        if (v.aktionType === 'guld_lejr') {
+    if (guldTotal >= 50) {
+        eventUdfald = { tekst: "Du roder i asken, men finder intet af værdi. Lykken smiler kun til de fattige.", farve: '#aaa' };
+        return;
+    }
+}
 
         if (v.naesteTrin && !v.udfald) {
             logBesked = `Du valgte: ${v.tekst}`;
