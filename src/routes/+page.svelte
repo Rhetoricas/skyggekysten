@@ -1322,19 +1322,35 @@ fogX += tågeFart;
         font-weight: normal; /* Hvid regular skrift */
     }
 
-    .inventory-row {
+.inventory-row {
         display: flex;
-        gap: 25px;
-        height: 120px; /* Din faste højde */
-        align-items: center;
+        flex-wrap: nowrap; /* Den absolutte regel: INGEN linjeskift */
+        justify-content: center; /* Samler udstyret på midten */
+        align-items: flex-end; /* Sørger for at de står på en fælles bundlinje */
+        gap: 15px; /* Lidt mindre luft, så der er mere plads til grafikken */
+        height: 120px;
+        width: 100%;
+        max-width: 100vw;
+        padding: 0 20px;
+        box-sizing: border-box;
         margin-bottom: 20px;
     }
+    
     .inventory-item {
         position: relative;
+        flex: 0 1 auto; /* Tillader kassen at skrumpe, når pladsen bliver trang */
+        min-width: 0; /* Et klassisk flexbox-trick, der forhindrer elementer i at bryde rammerne */
+        height: 100%;
+        display: flex;
+        justify-content: center;
     }
+    
     .item-icon {
-        height: 120px; /* Skalerer dine 150px billeder ned til linjen */
+        max-height: 100%;
+        max-width: 100%; /* Tvinger billedet til at respektere den tilgængelige bredde */
         width: auto;
+        height: auto;
+        object-fit: contain; /* Bevarer proportionerne intakt, uanset hvor meget det presses */
         filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
     }
     .level-text {
