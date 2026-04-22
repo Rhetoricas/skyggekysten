@@ -904,8 +904,9 @@ fogX += tågeFart;
         <p>Din krop giver op. Din rejse ender her i mudderet.</p>
         <h2>Endelig Score: {samletScore}</h2>
         <button onclick={genstartBane}>Prøv samme ø igen</button>
-        <button onclick={nulstilHukommelse} style="background: #444; margin-top: 10px;">Forlad rummet</button>
-        
+<button onclick={nulstilHukommelse} style="background: #5c1616; color: #ffcccc; margin-top: 10px; border: none; padding: 16px 32px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; font-weight: bold;">
+    Prøv en anden ø
+</button>        
         <div class="highscore-board">
             <h3>Top 3 på {rumKode}</h3>
             {#if topTre.length === 0}
@@ -926,8 +927,9 @@ fogX += tågeFart;
         <p>Du har nået den fjerne kyst og overlevet mørket.</p>
         <h2>Endelig Score: {samletScore}</h2>
         <button onclick={genstartBane}>Prøv samme ø igen</button>
-        <button onclick={nulstilHukommelse} style="background: #444; margin-top: 10px;">Forlad rummet</button>
-        
+<button onclick={nulstilHukommelse} style="background: #5c1616; color: #ffcccc; margin-top: 10px; border: none; padding: 16px 32px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; font-weight: bold;">
+    Prøv en anden ø
+</button>        
         <div class="highscore-board">
             <h3>Top 3 på {rumKode}</h3>
             {#if topTre.length === 0}
@@ -1160,7 +1162,7 @@ fogX += tågeFart;
         border-radius: 8px;
         text-align: left;
         min-width: 250px;
-        font-family: serif;
+      
         color: #ffffff; /* Tvinger al standardtekst til at være hvid */
         box-shadow: 0 10px 30px rgba(0,0,0,0.8); /* Giver den dybde */
     }
@@ -1213,8 +1215,16 @@ fogX += tågeFart;
     .death-screen h1 { color: #901a1e; font-size: 3em; margin-bottom: 10px; }
     .win-screen { background: rgba(0,50,0,0.9); flex-direction: column; text-align: center; }
     .win-screen h1 { color: #ffffff; font-size: 3em; margin-bottom: 10px; }
-    .death-screen button, .win-screen button { margin-top: 20px; padding: 15px 30px; font-size: 1.2em; cursor: pointer; }
+.death-screen button, .win-screen button {
+        border: none !important; /* Fjerner alle tænkelige kanter */
+        border-radius: 4px;
+        transition: transform 0.1s, filter 0.2s;
+    }
 
+    .death-screen button:hover, .win-screen button:hover {
+        filter: brightness(1.2);
+        transform: translateY(-2px);
+    }
     .game-container { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; -webkit-user-select: none; }
     .camera { flex: 1; position: relative; background: #050505; overflow: hidden; }
     .map { position: absolute; width: 4800px; height: 1640px; }
