@@ -316,8 +316,7 @@ onMount(() => {
                 inventory: inventory
             };
 
-            const opdatering: { spillere: Record<string, SpillerData>; kort?: Felt[] } = { spillere: opdateredeSpillere };
-            if (sendKort) opdatering.kort = gitter;
+const opdatering: { spillere: Record<string, SpillerData>; kort?: Felt[]; fog_x?: number } = { spillere: opdateredeSpillere, fog_x: fogX };            if (sendKort) opdatering.kort = gitter;
 
             await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', rumKode);
         }
@@ -340,7 +339,8 @@ onMount(() => {
                 rum_kode: rumKode, 
                 kort: gitter, 
                 start_index: spillerIndex,
-                spillere: {}
+                spillere: {},
+                fog_x: 0
             }]);
             if (error) console.error("Kunne ikke gemme kortet:", error);
         }
@@ -474,7 +474,7 @@ function genstartBane() {
                     const randomEventIndex = Math.floor(Math.random() * muligeEvents.length);
                     const valgtEvent = muligeEvents[randomEventIndex];
                     f.eventID = valgtEvent;
-                    //alleGyldigeEvents = alleGyldigeEvents.filter(k => k !== valgtEvent);
+                    alleGyldigeEvents = alleGyldigeEvents.filter(k => k !== valgtEvent);
                 }
             }
 
@@ -766,7 +766,16 @@ const nK = nI % BREDDE;
     livspoint -= bevægelsesPris;
     spillerIndex = nI; 
     
-    fogX += 10; 
+  // Tæl spillere der trækker vejret og ikke er i mål
+let antalLevende = Object.values(alleSpillere).filter(s => !s.isDead && !s.isWinner).length;
+
+// Sikkerhedsnet hvis alle dør
+if (antalLevende < 1) antalLevende = 1;
+
+// Formlen: Base-fart (10) sløves af antal levende ganget med 1.5
+let tågeFart = 10 / (antalLevende * 1.5);
+
+fogX += tågeFart;
         
         kameraOffsetX = 0;
         kameraOffsetY = 0;
