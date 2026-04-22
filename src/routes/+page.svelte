@@ -59,6 +59,7 @@
         'skovl': { id: 'skovl', navn: 'Skovl', type: 'værktøj', billede: '🥄', bonus: 0, pris: 60 },
         'metaldetektor': { id: 'metaldetektor', navn: 'Detektor', type: 'værktøj', billede: '🧲', bonus: 0, pris: 200 },
         'soegekvist': { id: 'soegekvist', navn: 'Søgekvist', type: 'værktøj', billede: '🌿', bonus: 0, pris: 150 },
+    'livseliksir': { id: 'livseliksir', navn: 'Livseliksir', type: 'forbrug', billede: '🧪', bonus: 0, pris: 500 },
     };
 
     const tilgaengeligeKarakterer: Karakter[] = [
@@ -167,8 +168,23 @@ let samletScore = $derived(Math.floor((guldTotal + fremdriftPoint + winBonus) * 
         `;
     });
 
-    $effect(() => {
+$effect(() => {
         if (livspoint <= 0 && gameState === 'play') {
+            // Tjek om der er en eliksir i tasken
+            const potionIndex = inventory.findIndex(i => i.id === 'livseliksir');
+            
+            if (potionIndex > -1) {
+                // Brug eliksiren: Fjern den fra inventory og genopliv spilleren
+                inventory = inventory.filter((_, idx) => idx !== potionIndex);
+                livspoint = 90;
+                logBesked = "Døden greb efter dig, men eliksiren tvang livet tilbage i din krop.";
+                
+                // Vi sender opdateringen til databasen med det samme
+                syncTilDb(true); 
+                return;
+            }
+
+            // Hvis ingen eliksir, så dør man for alvor
             if (alleSpillere[spillerNavn]) {
                 alleSpillere[spillerNavn].score = samletScore;
                 alleSpillere[spillerNavn].isDead = true;
@@ -631,10 +647,16 @@ let endeligTekst = res.log;
         const erMarked = felt.biome === 'marked';
         const index = inventory.findIndex(i => i.id === id);
 
+        
+
         // 1. Definer grundprisen én gang for alle
         const grundPris = erMarked ? dbItem.pris : dbItem.pris * 4;
 
         if (index > -1) {
+            if (inventory[index].id === 'livseliksir') {
+            eventUdfald = { tekst: "Du har allerede en livseliksir. Gem den til du har brug for den.", farve: '#aaa' };
+            return;
+        }
             // KAN KUN OPGRADERE I BYEN
             if (erMarked) {
                 eventUdfald = { tekst: `Markedsmanden kigger dumt på dig: "Du har jo allerede en ${dbItem.navn}!"`, farve: '#ff5555' };
@@ -1013,9 +1035,7 @@ fogX += tågeFart;
                 <div class="event-content">
                     <h2>{aktivtEvent.titel}</h2>
                     
-                    {#if eventUdfald && aktivtEvent.billedeEfter}
-                        <img src={aktivtEvent.billedeEfter} alt={aktivtEvent.titel} class="event-image" />
-                    {:else if !eventUdfald && aktivtEvent.billede}
+{#if aktivtEvent.billede}
                         <img src={aktivtEvent.billede} alt={aktivtEvent.titel} class="event-image" />
                     {/if}
 
@@ -1247,8 +1267,16 @@ fogX += tågeFart;
     .event-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: flex; align-items: center; justify-content: center; }
     .event-content { background: #1a1a1a; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
     
-    .event-image { width: 100%; max-height: 250px; object-fit: cover; margin-bottom: 15px; }
-
+.event-image { 
+        width: 100%; 
+        max-height: 250px; 
+        object-fit: cover; 
+        margin-bottom: 15px; 
+        border: none;
+        border-radius: 8px; 
+        mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    }
     .event-content h2 { margin-top: 0; color: #ffcc00; }
     .event-desc { font-size: 16px; line-height: 1.5; margin-bottom: 25px; }
     .valg-liste { display: flex; flex-direction: column; gap: 10px; }

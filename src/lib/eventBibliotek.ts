@@ -84,7 +84,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         tekst: 'Et udtørret lig dingler højt oppe i en massiv eg. Ravnene har spist øjnene. Lige over liget hviler en jernbeslået kiste på en bred gren. Stammen er glat af råd og mos.',
         type: 'historie',
         biome: 'skov',
-        billede: '/events/placeholder.webp',
+        billede: '/events/ligtrae.webp',
         valg: [
             {
                 tekst: 'Klatr op ad den glatte stamme',
@@ -174,7 +174,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         tekst: 'Et lille skævt hus er flettet af levende rødder og dyreknogler. Det dufter af vanilje og råddent kød. Gennem den sprækkede dør kan du se en massiv stak mønter på et bord.',
         type: 'historie',
         biome: 'skov',
-        billede: '/events/placeholder.webp',
+        billede: '/events/guldhus.webp',
         valg: [
             {
                 tekst: 'Snig dig ind gennem døren',
@@ -269,7 +269,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         tekst: 'En tyk, parfumeret tåge ruller ind mellem træerne. Ud af mørket hører du stemmen fra din afdøde mor. "Jeg fandt skatten, kom herind," kalder hun indsmigrende.',
         type: 'historie',
         biome: 'skov',
-        billede: '/events/placeholder.webp',
+        billede: '/events/skovtaage.webp',
         valg: [
             {
                 tekst: 'Følg stemmerne dybt ind i tågen',
@@ -357,7 +357,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         tekst: 'En massiv træstatue af en glemt skovgud dominerer stien. Gabet er åbent og fuld af sylespidse trætænder. Nede i mørket kan du se refleksionen af rent, gult guld.',
         type: 'historie',
         biome: 'skov',
-        billede: '/events/placeholder.webp',
+        billede: '/events/skovtalter.webp',
         valg: [
             {
                 tekst: 'Stik hånden ind i gabet efter guldet',
