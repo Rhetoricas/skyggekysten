@@ -223,7 +223,8 @@ onMount(() => {
             if (aktivtEvent || aktivShop || gameState !== 'play') return;
             
             const key = ev.key.toLowerCase();
-            if (key === 'enter') grav();
+            if (key === 'g') grav();
+            else if (key === 'enter') klikPåHex(spillerIndex);
             else if (key === 'h') hvil();
             else if (key === 'q') flytHex('NW');
             else if (key === 'e') flytHex('NE');
@@ -385,7 +386,7 @@ function genstartBane() {
         
         afslørOmraade(spillerIndex, 1);
         
-        logBesked = "Tiden spoler tilbage. Tågen trækker sig. Kysten venter igen.";
+        logBesked = "Tiden spoler tilbage. Tågen trækker sig. Kysten er klar.";
         gameState = 'play';
         
         // 4. Send den rene verden op til databasen
@@ -847,7 +848,7 @@ fogX += tågeFart;
 {#if gameState === 'login'}
     <div class="overlay">
         <div class="login-box">
-            <h1>Skyggekysten</h1>
+            <h1>Tågeøen</h1>
             <p>Angiv dit navn og et rum for at kæmpe jer over øen sammen.</p>
             
             <input type="text" placeholder="Dit Spillernavn" bind:value={spillerNavn} />
@@ -899,43 +900,47 @@ fogX += tågeFart;
     </div>
 {:else if gameState === 'dead'}
     <div class="overlay death-screen">
-        <h1>Du bukkede under for Skyggekysten</h1>
+        <h1>Du forlader aldrig tågeøen</h1>
         <p>Din krop giver op. Din rejse ender her i mudderet.</p>
         <h2>Endelig Score: {samletScore}</h2>
-        <button onclick={genstartBane}>Prøv samme kyst igen</button>
+        <button onclick={genstartBane}>Prøv samme ø igen</button>
         <button onclick={nulstilHukommelse} style="background: #444; margin-top: 10px;">Forlad rummet</button>
+        
+        <div class="highscore-board">
+            <h3>Top 3 på {rumKode}</h3>
+            {#if topTre.length === 0}
+                <p>Stien er stadig uberørt...</p>
+            {:else}
+                <ol>
+                    {#each topTre as hs, i (i)}
+                        <li><strong>{hs.navn}</strong>: {hs.score} point</li>
+                    {/each}
+                </ol>
+            {/if}
+        </div>
     </div>
-    <div class="highscore-board">
-    <h3>Top 3 på {rumKode}</h3>
-    {#if topTre.length === 0}
-        <p>Stien er stadig uberørt...</p>
-    {:else}
-        <ol>
-{#each topTre as hs, i (i)}                <li><strong>{hs.navn}</strong>: {hs.score} point</li>
-            {/each}
-        </ol>
-    {/if}
-</div>
+
 {:else if gameState === 'win'}
     <div class="overlay win-screen">
-        <h1>Skyggekysten er besejret!</h1>
+        <h1>Tågeøen er besejret!</h1>
         <p>Du har nået den fjerne kyst og overlevet mørket.</p>
         <h2>Endelig Score: {samletScore}</h2>
-        <button onclick={genstartBane}>Prøv samme kyst igen</button>
+        <button onclick={genstartBane}>Prøv samme ø igen</button>
         <button onclick={nulstilHukommelse} style="background: #444; margin-top: 10px;">Forlad rummet</button>
+        
+        <div class="highscore-board">
+            <h3>Top 3 på {rumKode}</h3>
+            {#if topTre.length === 0}
+                <p>Stien er stadig uberørt...</p>
+            {:else}
+                <ol>
+                    {#each topTre as hs, i (i)}
+                        <li><strong>{hs.navn}</strong>: {hs.score} point</li>
+                    {/each}
+                </ol>
+            {/if}
+        </div>
     </div>
-    <div class="highscore-board">
-    <h3>Top 3 på {rumKode}</h3>
-    {#if topTre.length === 0}
-        <p>Stien er stadig uberørt...</p>
-    {:else}
-        <ol>
-            {#each topTre as hs, i (i)}
-                <li><strong>{hs.navn}</strong>: {hs.score} point</li>
-            {/each}
-        </ol>
-    {/if}
-</div>
 {:else}
     <div class="game-container">
         <div class="camera" role="presentation" onwheel={håndterZoom} onpointerdown={startTræk} onpointermove={træk} onpointerup={stopTræk} onpointercancel={stopTræk} style="cursor: {isDragging ? 'grabbing' : 'grab'}; touch-action: none;">
@@ -1109,7 +1114,7 @@ fogX += tågeFart;
                 {#if logBesked}
                     {logBesked}
                 {:else}
-                    Klar til at udforske kysten.
+                    Klar til at udforske øen.
                 {/if}
             </div>
         </footer>
@@ -1148,25 +1153,43 @@ fogX += tågeFart;
     .confirm-btn { display: block; width: 100%; padding: 15px; background: #ffcc00; color: black; border: none; border-radius: 6px; font-size: 18px; font-weight: bold; cursor: pointer; }
     .confirm-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
 .highscore-board {
-        background: rgba(0, 0, 0, 0.6);
-        border: 1px solid gold;
-        padding: 15px;
-        margin: 15px auto;
+        background: rgba(0, 0, 0, 0.85); /* Gør baggrunden meget mørkere */
+        border: 2px solid gold; /* Tykkere ramme */
+        padding: 20px;
+        margin-top: 30px; /* Skubber den lidt væk fra knapperne */
         border-radius: 8px;
         text-align: left;
-        max-width: 250px;
+        min-width: 250px;
         font-family: serif;
+        color: #ffffff; /* Tvinger al standardtekst til at være hvid */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8); /* Giver den dybde */
     }
     .highscore-board h3 { 
-        margin: 0 0 10px 0; 
+        margin: 0 0 15px 0; 
         color: gold; 
-        font-size: 16px; 
+        font-size: 18px; 
+        text-align: center;
         text-transform: uppercase; 
+        letter-spacing: 1px;
     }
-    .highscore-board ol { padding-left: 25px; margin: 0; }
-    .highscore-board li { color: #ccc; margin-bottom: 5px; }
-    .highscore-board strong { color: #fff; }
-
+    .highscore-board p {
+        color: #ccc;
+        text-align: center;
+        margin: 0;
+    }
+    .highscore-board ol { 
+        padding-left: 20px; 
+        margin: 0; 
+    }
+    .highscore-board li { 
+        color: #ddd; 
+        margin-bottom: 8px; 
+        font-size: 16px;
+    }
+    .highscore-board strong { 
+        color: #fff; 
+        font-weight: bold;
+    }
     .creeping-fog {
         position: absolute;
         top: 0;
@@ -1187,9 +1210,9 @@ fogX += tågeFart;
     }
 
     .death-screen { background: rgba(50,0,0,0.9); flex-direction: column; text-align: center; }
-    .death-screen h1 { color: #ff5555; font-size: 3em; margin-bottom: 10px; }
+    .death-screen h1 { color: #901a1e; font-size: 3em; margin-bottom: 10px; }
     .win-screen { background: rgba(0,50,0,0.9); flex-direction: column; text-align: center; }
-    .win-screen h1 { color: #55ff55; font-size: 3em; margin-bottom: 10px; }
+    .win-screen h1 { color: #ffffff; font-size: 3em; margin-bottom: 10px; }
     .death-screen button, .win-screen button { margin-top: 20px; padding: 15px 30px; font-size: 1.2em; cursor: pointer; }
 
     .game-container { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; -webkit-user-select: none; }
@@ -1241,8 +1264,29 @@ fogX += tågeFart;
 
     .shop-icon-img { position: absolute; height: 60px; width: auto; z-index: 5; pointer-events: none; animation: shopGlow 3s ease-in-out infinite; }
     
-    .campfire-icon-img { position: absolute; height: 40px; width: auto; z-index: 4; pointer-events: none; animation: campfirePulse 3s ease-in-out infinite; }
+.campfire-icon-img { 
+        position: absolute; 
+        height: 40px; 
+        width: auto; 
+        z-index: 20; /* Løft bålet op over mudder og spillere */
+        pointer-events: none; 
+        animation: campfirePulse 2s ease-in-out infinite; 
+    }
 
+    @keyframes campfirePulse {
+        0%, 100% { 
+            filter: 
+                drop-shadow(0 0 10px rgba(255, 200, 0, 0.8)) /* Inderste skarpe gule kerne */
+                drop-shadow(0 0 25px rgba(255, 140, 0, 0.6)) /* Mellemste orange glød */
+                drop-shadow(0 0 60px rgba(255, 60, 0, 0.4)); /* Yderste røde varme */
+        }
+        50% { 
+            filter: 
+                drop-shadow(0 0 20px rgba(255, 220, 0, 1))   /* Intens gul kerne */
+                drop-shadow(0 0 40px rgba(255, 160, 0, 0.8)) /* Kraftig orange glød */
+                drop-shadow(0 0 100px rgba(255, 50, 0, 0.5)); /* Massiv yderkant */
+        }
+    }
     @keyframes floatAndGlow {
         0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)); }
         50% { transform: translateY(-6px) scale(1.05); filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.9)); }
@@ -1253,8 +1297,5 @@ fogX += tågeFart;
         50% { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1)); }
     }
 
-@keyframes campfirePulse {
-        0%, 100% { filter: drop-shadow(0 0 15px rgba(255, 165, 0, 0.6)) drop-shadow(0 0 30px rgba(255, 140, 0, 0.4)); }
-        50% { filter: drop-shadow(0 0 40px rgba(255, 215, 0, 1)) drop-shadow(0 0 80px rgba(255, 140, 0, 0.8)); }
-    }
+
 </style>
