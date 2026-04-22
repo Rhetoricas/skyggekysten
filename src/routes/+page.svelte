@@ -801,7 +801,7 @@ let endeligTekst = res.log;
         
         guldTotal -= 40;
         if (livspoint >= 100) { logBesked = "Du hviler, men dit helbred er allerede optimalt (40G tabt)."; } 
-        else { livspoint = Math.min(100, livspoint + 30); logBesked = "Lejrbålet luner. Restitueret op til max 100 HP."; }
+        else { livspoint = Math.min(100, livspoint + 30); logBesked = "Du slapper af og får hvilet dig 30 hp"; }
 
         if (Math.random() < 0.2) { logBesked = "Overfald i natten!"; udfoerAktion('hp', -25); }
         syncTilDb();
@@ -829,8 +829,8 @@ const nK = nI % BREDDE;
     let bevægelsesPris = Math.ceil(valgtKarakter.moveCost * terraenModifier);
 
     if (erITågen) {
-        bevægelsesPris *= 2;
-        logBesked = `Tågen kvæler dig! Dobbelt HP tab: ${bevægelsesPris} HP.`;
+        bevægelsesPris *= 4;
+        logBesked = `Tågen kvæler dig! Firedobbelt HP tab: ${bevægelsesPris} HP.`;
     } else {
         logBesked = `Træder ind i ${f.biome}. Omkostning: ${bevægelsesPris} HP.`;
     }
@@ -844,8 +844,8 @@ let antalLevende = Object.values(alleSpillere).filter(s => !s.isDead && !s.isWin
 // Sikkerhedsnet hvis alle dør
 if (antalLevende < 1) antalLevende = 1;
 
-// Formlen: Base-fart (10) sløves af antal levende ganget med 1.5
-let tågeFart = 10 / (antalLevende * 1.5);
+// Formlen: Base-fart (15) sløves af antal levende ganget med 1.5
+let tågeFart = 15 / (antalLevende * 1.5);
 
 fogX += tågeFart;
         
@@ -1270,7 +1270,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
         pointer-events: none;
         z-index: 100;
         
-        opacity: 0.8; /* Sætter et loft på max dækning */
+        opacity: 0.9; /* Sætter et loft på max dækning */
         
         background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" stitchTiles="stitch" /></filter><rect width="100%" height="100%" filter="url(%23f)" opacity="0.5" /></svg>');
         background-color: #1a0a2e;
