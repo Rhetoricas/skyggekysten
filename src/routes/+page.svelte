@@ -10,7 +10,8 @@
         moveCost: number; digCost: number; dmgMod: number; goldMod: number;
         canRest: boolean; fordel: string; ulempe: string;
     }
-interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: string; eventFuldført: boolean; biome: string; shopItem?: string; isCampfire?: boolean; }    
+    interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: string; eventFuldført: boolean; biome: string; shopItem?: string; isCampfire?: boolean; }
+    
     interface SpillerData {
         index: number;
         kolonne: number;
@@ -87,6 +88,7 @@ interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: st
     let rumKode = $state('');
     let erHost = $state(false);
     let statusBesked = $state('');
+    let eventPulje = 0;
     
     let alleSpillere = $state<Record<string, SpillerData>>({});
     let valgtKarakter = $state<Karakter | null>(null);
@@ -106,12 +108,12 @@ interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: st
     let kameraOffsetX = $state(0);
     let kameraOffsetY = $state(0);
     let isDragging = $state(false);
+    let harTrukket = $state(false);
     let lastMouseX = $state(0);
     let lastMouseY = $state(0);
+    let startMouseX = $state(0);
+    let startMouseY = $state(0);
     let zoomLevel = $state(1); 
-	let harTrukket = $state(false);
-	let startMouseX = $state(0);
-	let startMouseY = $state(0);
 
     let kbdRef: (ev: KeyboardEvent) => void;
     let samletScore = $derived((maxKolonne * 10) + (Math.max(0, livspoint) * 5) + guldTotal);
@@ -142,27 +144,24 @@ interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: st
         }
     });
 
-function startTræk(e: PointerEvent) {
+    function startTræk(e: PointerEvent) {
         if (e.button !== 0 || aktivtEvent || aktivShop) return; 
         isDragging = true;
-        harTrukket = false; 
+        harTrukket = false;
         
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
-        startMouseX = e.clientX; 
-        startMouseY = e.clientY; 
-        
-        // setPointerCapture er SLETTET herfra!
+        startMouseX = e.clientX;
+        startMouseY = e.clientY;
     }
 
-    // Din træk-funktion bliver bare stående som den er...
     function træk(e: PointerEvent) {
         if (!isDragging) return;
         kameraOffsetX += (e.clientX - lastMouseX);
         kameraOffsetY += (e.clientY - lastMouseY);
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
-        
+
         if (Math.abs(e.clientX - startMouseX) > 5 || Math.abs(e.clientY - startMouseY) > 5) {
             harTrukket = true; 
         }
@@ -170,7 +169,6 @@ function startTræk(e: PointerEvent) {
 
     function stopTræk() {
         isDragging = false;
-        // releasePointerCapture er SLETTET herfra!
     }
 
     function håndterZoom(e: WheelEvent) {
@@ -187,7 +185,7 @@ function startTræk(e: PointerEvent) {
             
             const key = ev.key.toLowerCase();
             if (key === 'enter') grav();
-			else if (key === 'h') hvil();
+            else if (key === 'h') hvil();
             else if (key === 'q') flytHex('NW');
             else if (key === 'e') flytHex('NE');
             else if (key === 'a') flytHex('W');
@@ -197,8 +195,6 @@ function startTræk(e: PointerEvent) {
         };
         window.addEventListener('keydown', kbdRef);
     }
-
-    // --- MULTIPLAYER LOGIK ---
 
     async function opretEllerDeltag() {
         if (spillerNavn.trim() === '' || rumKode.trim() === '') {
@@ -288,8 +284,6 @@ function startTræk(e: PointerEvent) {
         }
     }
 
-    // --- SPIL LOGIK ---
-
     async function bekræftValg(karakter: Karakter) {
         valgtKarakter = karakter;
         livspoint = karakter.startHp;
@@ -313,7 +307,6 @@ function startTræk(e: PointerEvent) {
         }
         
         await syncTilDb();
-
         opretTastatur();
         gameState = 'play';
     }
@@ -375,21 +368,18 @@ function startTræk(e: PointerEvent) {
 
         let nytGitter: Felt[] = Array(antal).fill(null).map((_, i) => ({ guld: 0, gravet: false, udforsket: false, eventFuldført: false, biome: råKort[i] }));
         
-        // Henter alle events (undtagen sub-trin og lejrbålet selv, som styres manuelt)
-let alleGyldigeEvents = Object.keys(eventBibliotek).filter(k => !eventBibliotek[k].erSubTrin && k !== 'campfire');        // De fire biomer hvor lejrbål kan opstå
+        let alleGyldigeEvents = Object.keys(eventBibliotek).filter(k => !eventBibliotek[k].erSubTrin && k !== 'campfire');
         const vildmark = ['eng', 'skov', 'mark', 'bjerg'];
 
         for (let i = 0; i < antal; i++) {
             let f = nytGitter[i];
             
-            if (f.biome === 'hav') continue; // Havet ignoreres helt
+            if (f.biome === 'hav') continue; 
 
-            // 1. Tjek for lejrbål (2% chance i vildmarken)
             if (vildmark.includes(f.biome) && Math.random() < 0.02) {
                 f.isCampfire = true;
                 f.eventID = 'campfire';
             } 
-            // 2. Tjek for almindelige events (kun hvis det ikke blev et lejrbål)
             else if (Math.random() < 0.06) { 
                 let muligeEvents = alleGyldigeEvents.filter(key => {
                     const reqBiome = eventBibliotek[key].biome;
@@ -407,7 +397,6 @@ let alleGyldigeEvents = Object.keys(eventBibliotek).filter(k => !eventBibliotek[
                 }
             }
 
-            // 3. Tjek for butikker (kun hvis feltet stadig er tomt for events/bål)
             if (!f.eventID) { 
                 const itemKeys = Object.keys(itemDB);
                 if (f.biome === 'marked' && Math.random() < 0.33) {
@@ -428,12 +417,9 @@ let alleGyldigeEvents = Object.keys(eventBibliotek).filter(k => !eventBibliotek[
         afslørOmraade(spillerIndex, 1);
     }
 
-    function kørTerninger() { return Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1; }
-
     function udfoerAktion(type: string | undefined, vaerdi: number) {
         const k = spillerIndex % BREDDE;
         const svaerhedsgrad = 1 + (k / BREDDE);
-        
         const toej = inventory.find(i => i.type === 'tøj');
 
         if (type === 'guld' || type === 'fortsaet') {
@@ -456,84 +442,53 @@ let alleGyldigeEvents = Object.keys(eventBibliotek).filter(k => !eventBibliotek[
         syncTilDb();
     }
 
-	function hvilVedLejrbål() {
-        // Tjek livspoint for at se om bålet har effekt
-        if (livspoint >= 50) {
-            // Ingen effekt, da vi allerede har godt helbred
-            eventUdfald = { tekst: "Ilden har ingen helbredende effekt, da du allerede har et godt helbred.", farve: '#ccc' };
-        } else {
-            // Heler op til 50 HP
-            livspoint = 50; 
-            eventUdfald = { tekst: "Varmen heler dine sår og fordriver mørket. Du føler dig frisk igen.", farve: '#55ff55' };
-        }
-        syncTilDb();
-    }
-
     function haandterValg(v: Valg) {
-        if (v.aktionType === 'luk') {
-            logBesked = "Du trækker dig tilbage.";
-            lukEvent();
+        if (v.puljeVaerdi) {
+            eventPulje += v.puljeVaerdi;
+        }
+
+        if (v.naesteTrin && !v.udfald) {
+            logBesked = `Du valgte: ${v.tekst}`;
+            aktivtEvent = eventBibliotek[v.naesteTrin] || null;
             return;
         }
 
-        if (v.udfald && aktivtEvent) {
-            const raaSlag = kørTerninger();
-            let modifier = 0; let modTekst = "";
+        if (v.udfald) {
+            let terning1 = Math.floor(Math.random() * 6) + 1;
+            let terning2 = Math.floor(Math.random() * 6) + 1;
+            let raaSlag = terning1 + terning2;
 
-            const vaaben = inventory.find(i => i.type === 'våben');
-
-            if (aktivtEvent.type === 'kamp' && vaaben) {
-                modifier = vaaben.level; 
-                modTekst = ` (+${modifier} ${vaaben.billede})`;
-            } else if (aktivtEvent.type === 'historie') {
-                const skovl = inventory.find(i => i.id === 'skovl');
-                if (skovl) { modifier = skovl.level > 0 ? skovl.level : 1; modTekst = ` (+${modifier} 🥄)`; }
+            let modifier = 0;
+            if (v.fordelItem && inventory.some(i => i.id === v.fordelItem)) {
+                modifier += 3; 
             }
 
-            const slag = raaSlag + modifier;
-            let res: typeof v.udfald.katastrofe;
+            let slag = raaSlag + modifier;
+            let res;
 
-            if (slag <= 3) res = v.udfald.katastrofe;
+            if (slag <= 4) res = v.udfald.katastrofe;
             else if (slag <= 6) res = v.udfald.fiasko;
-            else if (slag <= 9) res = v.udfald.neutral;
-            else if (slag <= 11) res = v.udfald.succes;
+            else if (slag <= 8) res = v.udfald.neutral;
+            else if (slag <= 10) res = v.udfald.succes;
             else res = v.udfald.mirakel;
-            
-            let erSkadetMedBue = vaaben?.id === 'bue' && (slag <= 6) && res.vaerdi < 0;
 
-            if (erSkadetMedBue) {
-                udfoerAktion(res.aktionType, 0); // Fjernede itemType her
-                res.log += " (Din bue gav dig afstand til at flygte uskadt).";
-            } else {
-                udfoerAktion(res.aktionType, res.vaerdi); // Fjernede itemType her
+            if (res.aktionType === 'guld' && eventPulje > 0) {
+                let endeligVaerdi = Math.floor(eventPulje * (res.multiplikator || 1));
+                udfoerAktion('guld', endeligVaerdi);
+            } else if (res.aktionType) {
+                udfoerAktion(res.aktionType, res.vaerdi || 0); 
             }
+
+            let farve = slag <= 6 ? '#ff5555' : slag <= 8 ? '#aaa' : slag <= 10 ? '#55ff55' : 'gold';
             
-            let farve = '#ccc';
-            if (res.vaerdi < 0 && !erSkadetMedBue) farve = '#ff5555';
-            if (res.aktionType === 'guld' && res.vaerdi > 0) farve = 'gold';
-            if (res.aktionType === 'hp' && res.vaerdi > 0) farve = '#55ff55';
+            eventUdfald = { 
+                tekst: res.log, 
+                farve: farve, 
+                naesteTrin: res.naesteTrin || v.naesteTrin 
+            };
 
-            eventUdfald = { tekst: `🎲 Slag: ${raaSlag}${modTekst} = ${slag}. ${res.log}`, farve: farve, naesteTrin: res.naesteTrin };
-            return;
-        }
-
-if (v.aktionType as string === 'hvil_gratis_50') {
-	            hvilVedLejrbål();
-            return;
-        }
-
-        let succes = true;
-        if (v.chance !== undefined) succes = Math.random() <= v.chance;
-
-        if (succes) {
-            if (v.aktionType === 'guld' && guldTotal + (v.vaerdi || 0) < 0) { logBesked = "Du har ikke råd."; return; }
-            udfoerAktion(v.aktionType, v.vaerdi || 0); // Fjernede itemType her
-            let farve = (v.aktionType === 'hp' && v.vaerdi && v.vaerdi < 0) ? '#ff5555' : 'gold';
-            eventUdfald = { tekst: v.vaerdi && v.vaerdi > 0 ? `Handlingen lykkedes. Gevinst: ${v.vaerdi}.` : `Valget er truffet.`, farve: farve, naesteTrin: v.naesteTrin };
-        } else {
-            const straf = v.failVaerdi || -20;
-            udfoerAktion('hp', straf);
-            eventUdfald = { tekst: `Katastrofe! Din handling slog fejl.`, farve: '#ff5555', naesteTrin: undefined };
+            logBesked = res.log;
+            eventPulje = 0;
         }
     }
 
@@ -571,7 +526,6 @@ if (v.aktionType as string === 'hvil_gratis_50') {
             } else {
                 eventUdfald = { tekst: `Smeden griner af din fattigdom. Det koster ${pris}G at røre ved det grej.`, farve: '#ff5555' };
             }
-
         } else {
             const pris = erMarked ? dbItem.pris : dbItem.pris * 4;
             
@@ -603,10 +557,7 @@ if (v.aktionType as string === 'hvil_gratis_50') {
         if (!f || f.gravet || f.eventID || !valgtKarakter) return;
         
         const harSkovl = inventory.some(i => i.id === 'skovl');
-        if (!harSkovl) {
-            logBesked = "Du kan ikke bryde det hårde mudder uden en skovl.";
-            return;
-        }
+        if (!harSkovl) { logBesked = "Du kan ikke bryde det hårde mudder uden en skovl."; return; }
 
         const harDetektor = inventory.some(i => i.id === 'metaldetektor');
         const harKvist = inventory.some(i => i.id === 'soegekvist');
@@ -662,24 +613,23 @@ if (v.aktionType as string === 'hvil_gratis_50') {
     }
 
     function lukEvent() { 
-        if (gitter[spillerIndex] && aktivtEvent) gitter[spillerIndex].eventFuldført = true; 
+        let f = gitter[spillerIndex];
+        if (f && aktivtEvent && f.eventID !== 'campfire') {
+            f.eventFuldført = true; 
+        }
         aktivtEvent = null; 
         eventUdfald = null;
         aktivShop = null;
         syncTilDb(true); 
     }
     
-    // 1. Kernemotoren der udfører selve rykket
-  function udførBevægelse(nI: number) {
-        if (!valgtKarakter) return; // Stopper TypeScript i at råbe op om null
+    function udførBevægelse(nI: number) {
+        if (!valgtKarakter) return;
 
         let f = gitter[nI];
         if (!f || f.biome === 'hav') { logBesked = "Havet spærrer vejen."; return; }
 
         const nK = nI % BREDDE;
-
-        // Afstandsreglen til holdet er slettet herfra!
-
         const terraenModifier = biomeTerraenCost[f.biome] || 1;
         const bevægelsesPris = Math.ceil(valgtKarakter.moveCost * terraenModifier);
 
@@ -688,7 +638,6 @@ if (v.aktionType as string === 'hvil_gratis_50') {
         
         kameraOffsetX = 0;
         kameraOffsetY = 0;
-    
         
         const synsRadius = f.biome === 'bjerg' ? 2 : 1;
         afslørOmraade(spillerIndex, synsRadius);
@@ -716,7 +665,6 @@ if (v.aktionType as string === 'hvil_gratis_50') {
         syncTilDb();
     }
 
-    // 2. Tastatur-styringen der bare regner retningen ud og fodrer kernemotoren
     function flytHex(retning: string) {
         if (aktivtEvent || aktivShop || gameState !== 'play' || !valgtKarakter) return; 
         
@@ -733,19 +681,12 @@ if (v.aktionType as string === 'hvil_gratis_50') {
         }
     }
 
-    // 3. Den nye muse-styring, der tjekker afstand og blokerer fejl-klik
     function klikPåHex(nI: number) {
-        // Hvis vi lige har trukket kortet, ignorerer vi klikket
         if (harTrukket || aktivtEvent || aktivShop || gameState !== 'play' || !valgtKarakter) return; 
         if (nI === spillerIndex) return;
 
-        // Tjekker om feltet reelt er en nabo
         const naboer = hentNaboIndices(spillerIndex);
-        if (!naboer.includes(nI)) {
-            logBesked = "Du kan kun rykke til et direkte nabofelt.";
-            return;
-        }
-
+        if (!naboer.includes(nI)) { logBesked = "Du kan kun rykke til et direkte nabofelt."; return; }
         udførBevægelse(nI);
     }
 </script>
@@ -761,11 +702,11 @@ if (v.aktionType as string === 'hvil_gratis_50') {
             <div class="gender-toggles">
                 <label class="checkbox-label">
                     <input type="checkbox" bind:checked={visMandlige} />
-                    Mand
+                    Mandlige
                 </label>
                 <label class="checkbox-label">
                     <input type="checkbox" bind:checked={visKvindelige} />
-                    Kvinde
+                    Kvindelige
                 </label>
             </div>
 
@@ -828,8 +769,7 @@ if (v.aktionType as string === 'hvil_gratis_50') {
                     {@const y = r * ROW_H}
                     {@const erJegHer = spillerIndex === i} 
                     
-                    
-				<div class="hex" 
+                    <div class="hex" 
                          class:odd={r % 2 !== 0} 
                          class:active={erJegHer} 
                          class:unexplored={!felt.udforsket}
@@ -837,20 +777,23 @@ if (v.aktionType as string === 'hvil_gratis_50') {
                          onkeydown={(e) => { if (e.key === 'Enter') klikPåHex(i); }}
                          role="button"
                          tabindex="0"
-                         style="background-image: url('/tiles/{felt.biome}.png'); left: {x}px; top: {y}px; cursor: pointer;">	{#if felt.gravet}
+                         style="background-image: url('/tiles/{felt.biome}.png'); left: {x}px; top: {y}px; cursor: pointer;">
+                        
+                        {#if felt.gravet}
                             <div class="dug-overlay"></div>
                         {/if}
 
                         <div class="inner">
-                            {#if felt.udforsket && felt.eventID && !felt.eventFuldført} 
+                            {#if felt.udforsket && felt.eventID && felt.eventID !== 'campfire' && !felt.eventFuldført} 
                                 <img src="/tiles/event.png" alt="Event" class="event-crystal" />
+                            {/if}
+
+                            {#if felt.udforsket && felt.isCampfire} 
+                                <img src="/tiles/campfire.png" alt="Lejrbål" class="campfire-icon-img" />
                             {/if}
 
                             {#if felt.udforsket && felt.shopItem} 
                                 <img src={felt.biome === 'by' ? '/tiles/byshop.png' : '/tiles/markedshop.png'} alt="Butik" class="shop-icon-img" />
-                            {/if}
-							{#if felt.udforsket && felt.isCampfire} 
-                                <img src="/tiles/campfire.png" alt="Lejrbål" class="campfire-icon-img" />
                             {/if}
 
                             {#if erJegHer} 
@@ -883,6 +826,13 @@ if (v.aktionType as string === 'hvil_gratis_50') {
             <div class="event-modal">
                 <div class="event-content">
                     <h2>{aktivtEvent.titel}</h2>
+                    
+                    {#if eventUdfald && aktivtEvent.billedeEfter}
+                        <img src={aktivtEvent.billedeEfter} alt={aktivtEvent.titel} class="event-image" />
+                    {:else if !eventUdfald && aktivtEvent.billede}
+                        <img src={aktivtEvent.billede} alt={aktivtEvent.titel} class="event-image" />
+                    {/if}
+
                     <p class="event-desc">{aktivtEvent.tekst}</p>
                     
                     {#if eventUdfald}
@@ -901,7 +851,7 @@ if (v.aktionType as string === 'hvil_gratis_50') {
             </div>
         {/if}
 
-{#if aktivShop && itemDB[aktivShop]}
+        {#if aktivShop && itemDB[aktivShop]}
             {@const tilbud = itemDB[aktivShop]}
             <div class="event-modal">
                 <div class="event-content">
@@ -1001,17 +951,10 @@ if (v.aktionType as string === 'hvil_gratis_50') {
     .win-screen h1 { color: #55ff55; font-size: 3em; margin-bottom: 10px; }
     .death-screen button, .win-screen button { margin-top: 20px; padding: 15px 30px; font-size: 1.2em; cursor: pointer; }
 
-.game-container { 
-    position: relative; 
-    width: 100vw; 
-    height: 100vh; 
-    display: flex; 
-    flex-direction: column; 
-    overflow: hidden; 
-    user-select: none; 
-    -webkit-user-select: none; 
-}    .camera { flex: 1; position: relative; background: #050505; overflow: hidden; }
+    .game-container { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; -webkit-user-select: none; }
+    .camera { flex: 1; position: relative; background: #050505; overflow: hidden; }
     .map { position: absolute; width: 4800px; height: 1640px; }
+    .map img { -webkit-user-drag: none; }
     
     .hex { position: absolute; width: 96px; height: 110px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
     .hex.unexplored { filter: brightness(0) !important; opacity: 0.9; }
@@ -1022,7 +965,10 @@ if (v.aktionType as string === 'hvil_gratis_50') {
     .other-player-icon { font-size: 28px; position: absolute; opacity: 0.8; transition: transform 0.3s; display: flex; align-items: center; justify-content: center; }
 
     .event-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: flex; align-items: center; justify-content: center; }
-    .event-content { background: #1a1a1a; padding: 30px; border-radius: 8px; border: 1px solid #555; max-width: 500px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+    .event-content { background: #1a1a1a; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+    
+    .event-image { width: 100%; max-height: 250px; object-fit: cover; margin-bottom: 15px; }
+
     .event-content h2 { margin-top: 0; color: #ffcc00; }
     .event-desc { font-size: 16px; line-height: 1.5; margin-bottom: 25px; }
     .valg-liste { display: flex; flex-direction: column; gap: 10px; }
@@ -1033,9 +979,6 @@ if (v.aktionType as string === 'hvil_gratis_50') {
 
     .ui { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
     .ui > * { pointer-events: auto; }
-	.map img {
-    -webkit-user-drag: none;
-}
     
     .stats-panel { display: flex; gap: 12px; width: 100%; justify-content: center; margin-top: 10px; }
     .stat-box { width: 65px; height: 65px; background: linear-gradient(180deg, #2a2a2a 0%, #111 100%); border: 2px solid #444; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; color: white; box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 4px 6px rgba(0,0,0,0.5); }
@@ -1047,60 +990,24 @@ if (v.aktionType as string === 'hvil_gratis_50') {
 
     .log-line { width: 100%; text-align: center; color: #e0e0e0; font-size: 18px; font-weight: bold; min-height: 27px; margin-bottom: 5px; text-shadow: 0 2px 5px rgba(0,0,0,1); }
 
-    :global(.event-crystal) {
-        position: absolute;
-        height: 65px;
-        width: auto;
-        z-index: 5;
-        pointer-events: none;
-        animation: floatAndGlow 3s ease-in-out infinite;
-    }
+    :global(.event-crystal) { position: absolute; height: 65px; width: auto; z-index: 5; pointer-events: none; animation: floatAndGlow 3s ease-in-out infinite; }
 
-.shop-icon-img {
-        position: absolute;
-        height: 60px;
-        width: auto;
-        z-index: 5;
-        pointer-events: none;
-        animation: shopGlow 3s ease-in-out infinite;
-    }
-
-	.campfire-icon-img {
-        position: absolute;
-        height: 40px; /* Ikke så stort som et hus */
-        width: auto;
-        z-index: 4; /* Lige under krystaller og butikker */
-        pointer-events: none;
-        animation: campfirePulse 3s ease-in-out infinite; /* Special-pulsering */
-    }
+    .shop-icon-img { position: absolute; height: 60px; width: auto; z-index: 5; pointer-events: none; animation: shopGlow 3s ease-in-out infinite; }
+    
+    .campfire-icon-img { position: absolute; height: 40px; width: auto; z-index: 4; pointer-events: none; animation: campfirePulse 3s ease-in-out infinite; }
 
     @keyframes floatAndGlow {
-        0%, 100% {
-            transform: translateY(0) scale(1);
-            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
-        }
-        50% {
-            transform: translateY(-6px) scale(1.05);
-            filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.9));
-        }
+        0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)); }
+        50% { transform: translateY(-6px) scale(1.05); filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.9)); }
     }
 
-	@keyframes shopGlow {
-        0%, 100% {
-            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.4));
-        }
-        50% {
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1));
-        }
+    @keyframes shopGlow {
+        0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.4)); }
+        50% { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1)); }
     }
 
-	@keyframes campfirePulse {
-        0%, 100% {
-            filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.4)); /* Dæmpet orangegul */
-        }
-        50% {
-            filter: drop-shadow(0 0 100px rgba(255, 140, 0, 1)); /* Massive langtrækkende tunger */
-        }
+    @keyframes campfirePulse {
+        0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.4)); }
+        50% { filter: drop-shadow(0 0 100px rgba(255, 140, 0, 1)); }
     }
-
 </style>
