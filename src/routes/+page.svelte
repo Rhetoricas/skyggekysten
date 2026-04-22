@@ -99,6 +99,15 @@
     let inventory = $state<Item[]>([]);
     let gitter = $state<Felt[]>([]); 
     let logBesked = $state("");
+    let fogX = $state(0); 
+
+    let spillerPixelX = $derived.by(() => {
+        const r = Math.floor(spillerIndex / BREDDE);
+        const k = spillerIndex % BREDDE;
+        return k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0);
+    });
+
+    let erITågen = $derived(spillerPixelX <= fogX + 100);
     
     let aktivtEvent = $state<SpilEvent | null>(null); 
     let eventUdfald = $state<{tekst: string, farve: string, naesteTrin?: string} | null>(null);
@@ -418,37 +427,37 @@
     }
 
     function udfoerAktion(type: string | undefined, vaerdi: number) {
-        const k = spillerIndex % BREDDE;
-        const svaerhedsgrad = 1 + (k / BREDDE);
-        const toej = inventory.find(i => i.type === 'tøj');
+    const k = spillerIndex % BREDDE;
+    const svaerhedsgrad = 1 + (k / BREDDE);
+    const toej = inventory.find(i => i.type === 'tøj');
+    let delta = 0;
 
+    if (type === 'guld' || type === 'guld_lejr' || type === 'fortsaet') {
+        let endeligtGuld = vaerdi;
+        if (endeligtGuld > 0 && valgtKarakter) {
+            endeligtGuld = Math.floor(endeligtGuld * valgtKarakter.goldMod);
+            if (toej?.id === 'flot_toej') endeligtGuld = Math.floor(endeligtGuld * 1.5);
+        }
+        guldTotal = Math.max(0, guldTotal + endeligtGuld);
+        delta = endeligtGuld;
+    }
+    if (type === 'hp' || type === 'hp_lejr' || type === 'fortsaet') {
+        let endeligtLiv = vaerdi;
+        if (endeligtLiv < 0 && valgtKarakter) {
+            endeligtLiv = Math.floor(endeligtLiv * valgtKarakter.dmgMod * svaerhedsgrad);
+            if (toej?.id === 'rustning') endeligtLiv = Math.floor(endeligtLiv * 0.5);
+        }
         if (type === 'hp_lejr') {
-    if (livspoint >= 80) {
-        logBesked = "Du er allerede så rask, som du kan blive her.";
-    } else {
-        livspoint = Math.min(80, livspoint + vaerdi);
+            const healMulig = Math.max(0, 80 - livspoint);
+            endeligtLiv = Math.min(endeligtLiv, Math.max(0, healMulig));
+        }
+        livspoint = Math.max(0, livspoint + endeligtLiv);
+        delta = endeligtLiv;
     }
+    
+    syncTilDb();
+    return delta;
 }
-
-        if (type === 'guld' || type === 'fortsaet') {
-            let endeligtGuld = vaerdi;
-            if (endeligtGuld > 0 && valgtKarakter) {
-                endeligtGuld = Math.floor(endeligtGuld * valgtKarakter.goldMod);
-                if (toej?.id === 'flot_toej') endeligtGuld = Math.floor(endeligtGuld * 1.5);
-            }
-            guldTotal = Math.max(0, guldTotal + endeligtGuld);
-        }
-        if (type === 'hp' || type === 'fortsaet') {
-            let endeligtLiv = vaerdi;
-            if (endeligtLiv < 0 && valgtKarakter) {
-                endeligtLiv = Math.floor(endeligtLiv * valgtKarakter.dmgMod * svaerhedsgrad);
-                if (toej?.id === 'rustning') endeligtLiv = Math.floor(endeligtLiv * 0.5);
-            }
-            livspoint = Math.max(0, livspoint + endeligtLiv);
-        }
-        
-        syncTilDb();
-    }
 
     function haandterValg(v: Valg) {
         if (v.puljeVaerdi) {
@@ -487,22 +496,42 @@
             else if (slag <= 10) res = v.udfald.succes;
             else res = v.udfald.mirakel;
 
-            if (res.aktionType === 'guld' && eventPulje > 0) {
-                let endeligVaerdi = Math.floor(eventPulje * (res.multiplikator || 1));
-                udfoerAktion('guld', endeligVaerdi);
+            let deltaVaerdi = 0;
+
+            if (res.aktionType === 'guld_lejr' && guldTotal >= 50) {
+                eventUdfald = { 
+                    tekst: "Du roder i asken, men finder intet af værdi. Lykken smiler kun til de fattige.", 
+                    farve: '#aaa',
+                    naesteTrin: res.naesteTrin || v.naesteTrin 
+                };
+                eventPulje = 0;
+                return;
+            }
+
+            if ((res.aktionType === 'guld' || res.aktionType === 'guld_lejr') && eventPulje > 0) {
+                let baseVaerdi = Math.floor(eventPulje * (res.multiplikator || 1));
+                deltaVaerdi = udfoerAktion(res.aktionType, baseVaerdi);
             } else if (res.aktionType) {
-                udfoerAktion(res.aktionType, res.vaerdi || 0); 
+                deltaVaerdi = udfoerAktion(res.aktionType, res.vaerdi || 0); 
+            }
+
+            let endeligTekst = res.log;
+            
+            if (res.aktionType && res.aktionType !== 'fortsaet') {
+                let label = res.aktionType.includes('hp') ? 'HP' : 'Guld';
+                let fortegn = deltaVaerdi > 0 ? '+' : '';
+                endeligTekst += ` (${fortegn}${deltaVaerdi} ${label})`;
             }
 
             let farve = slag <= 6 ? '#ff5555' : slag <= 8 ? '#aaa' : slag <= 10 ? '#55ff55' : 'gold';
             
             eventUdfald = { 
-                tekst: res.log, 
+                tekst: endeligTekst, 
                 farve: farve, 
                 naesteTrin: res.naesteTrin || v.naesteTrin 
             };
 
-            logBesked = res.log;
+            logBesked = endeligTekst;
             eventPulje = 0;
         }
     }
@@ -644,12 +673,21 @@
         let f = gitter[nI];
         if (!f || f.biome === 'hav') { logBesked = "Havet spærrer vejen."; return; }
 
-        const nK = nI % BREDDE;
-        const terraenModifier = biomeTerraenCost[f.biome] || 1;
-        const bevægelsesPris = Math.ceil(valgtKarakter.moveCost * terraenModifier);
+const nK = nI % BREDDE;
+    const terraenModifier = biomeTerraenCost[f.biome] || 1;
+    let bevægelsesPris = Math.ceil(valgtKarakter.moveCost * terraenModifier);
 
-        livspoint -= bevægelsesPris;
-        spillerIndex = nI; 
+    if (erITågen) {
+        bevægelsesPris *= 2;
+        logBesked = `Tågen kvæler dig! Dobbelt HP tab: ${bevægelsesPris} HP.`;
+    } else {
+        logBesked = `Træder ind i ${f.biome}. Omkostning: ${bevægelsesPris} HP.`;
+    }
+
+    livspoint -= bevægelsesPris;
+    spillerIndex = nI; 
+    
+    fogX += 10; 
         
         kameraOffsetX = 0;
         kameraOffsetY = 0;
@@ -834,6 +872,7 @@
                         </div>
                     </div>
                 {/each}
+                <div class="creeping-fog" style="--fog-x: {fogX}px;"></div>
             </div>
         </div>
 
@@ -877,7 +916,7 @@
                         <div class="udfald" style="border-left: 5px solid {eventUdfald.farve};">
                             {eventUdfald.tekst}
                         </div>
-                        <button class="action-btn" onclick={lukEvent}>Forlad teltet</button>
+                        <button class="action-btn" onclick={lukEvent}>Gå ud</button>
                     {:else}
                         <div class="udfald" style="border-left: 5px solid gold; text-align: center;">
                             <span style="font-size: 30px;">{tilbud.billede}</span><br>
@@ -932,6 +971,7 @@
 <style>
     :global(body) { margin: 0; padding: 0; background: #0a0a0a; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
     
+
     .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .login-box { background: #1a1a1a; padding: 40px; border-radius: 12px; border: 1px solid #333; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     .login-box h1 { margin-top: 0; color: #ffcc00; }
@@ -959,6 +999,21 @@
     .char-card .negative { color: #ff8888; }
     .confirm-btn { display: block; width: 100%; padding: 15px; background: #ffcc00; color: black; border: none; border-radius: 6px; font-size: 18px; font-weight: bold; cursor: pointer; }
     .confirm-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
+.creeping-fog {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 100;
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" stitchTiles="stitch" /></filter><rect width="100%" height="100%" filter="url(%23f)" opacity="0.5" /></svg>');
+        background-color: #1a0a2e;
+        background-blend-mode: hard-light;
+        mask-image: linear-gradient(to right, black 0%, black calc(var(--fog-x) - 150px), rgba(0,0,0,0.4) var(--fog-x), transparent calc(var(--fog-x) + 400px));
+        -webkit-mask-image: linear-gradient(to right, black 0%, black calc(var(--fog-x) - 150px), rgba(0,0,0,0.4) var(--fog-x), transparent calc(var(--fog-x) + 400px));
+        transition: mask-image 0.2s linear, -webkit-mask-image 0.2s linear;
+    }
 
     .death-screen { background: rgba(50,0,0,0.9); flex-direction: column; text-align: center; }
     .death-screen h1 { color: #ff5555; font-size: 3em; margin-bottom: 10px; }
