@@ -23,6 +23,7 @@
         score: number;
         ikon?: string;
         inventory?: Item[];
+        kendteFelter?: number[]; // Databasen husker, hvad du har set
     }
 
     const BREDDE = 50;
@@ -89,12 +90,12 @@ const itemDB: Record<string, { id: string, navn: string, type: string, billede: 
 
     let gameState = $state<'login' | 'select' | 'play' | 'dead' | 'win'>('login'); 
     
-let topTre: Array<{ navn: string, score: number }> = $state([]);
-    async function hentHighscores() {
+let topTre: Array<{ navn: string, score: number, karakter?: string }> = $state([]);    
+async function hentHighscores() {
         if (!rumKode) return; 
         const { data, error } = await supabase
             .from('highscores')
-            .select('navn, score')
+            .select('navn, score, karakter') // 'karakter' er tilføjet her
             .eq('rum_kode', rumKode)
             .order('score', { ascending: false })
             .limit(3);
@@ -108,7 +109,12 @@ let topTre: Array<{ navn: string, score: number }> = $state([]);
         if (samletScore > 0 && rumKode) {
             await supabase
                 .from('highscores')
-                .insert([{ navn: spillerNavn, score: samletScore, rum_kode: rumKode }]);
+                .insert([{ 
+                    navn: spillerNavn, 
+                    score: samletScore, 
+                    rum_kode: rumKode,
+                    karakter: valgtKarakter?.navn || 'Ukendt' // Her gemmer vi selve navnet (fx "Tyv")
+                }]);
         }
         await hentHighscores(); 
     }
@@ -131,6 +137,8 @@ let topTre: Array<{ navn: string, score: number }> = $state([]);
     let gitter = $state<Felt[]>([]); 
     let logBesked = $state("");
     let fogX = $state(0); 
+    let mineKendteFelter = $state<number[]>([]);
+
 
     let spillerPixelX = $derived.by(() => {
         const r = Math.floor(spillerIndex / BREDDE);
@@ -145,8 +153,8 @@ let topTre: Array<{ navn: string, score: number }> = $state([]);
     let aktivShop = $state<string | null>(null);
 
     // --- KAMERA & STYRING ---
-    let kameraOffsetX = $state(0);
-    let kameraOffsetY = $state(0);
+    let kameraX = $state(0);
+    let kameraY = $state(0);
     let isDragging = $state(false);
     let harTrukket = $state(false);
     let lastMouseX = $state(0);
@@ -158,20 +166,12 @@ let topTre: Array<{ navn: string, score: number }> = $state([]);
     let kbdRef: (ev: KeyboardEvent) => void;
 let fremdriftPoint = $derived(maxKolonne * 10);
 let winBonus = $derived(gameState === 'win' ? 1000 : 0);
-let samletScore = $derived(Math.floor((guldTotal + fremdriftPoint + winBonus) * (1 + (Math.max(0, livspoint) / 100))));    let kameraStyle = $derived.by(() => {
-        const r = Math.floor(spillerIndex / BREDDE);
-        const k = spillerIndex % BREDDE;
-        const x = k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0);
-        const y = r * ROW_H;
-        
-        const originX = x + (HEX_W / 2);
-        const originY = y + (ROW_H / 2);
-
-        return `
-            transform-origin: ${originX}px ${originY}px;
-            transform: translate(calc(50vw - ${originX}px + ${kameraOffsetX}px), calc(50vh - ${originY}px + ${kameraOffsetY}px)) scale(${zoomLevel});
-        `;
-    });
+let samletScore = $derived(Math.floor((guldTotal + fremdriftPoint + winBonus) * (1 + (Math.max(0, livspoint) / 100))));   
+let kameraStyle = $derived(`
+        transform-origin: ${kameraX}px ${kameraY}px;
+        transform: translate(calc(50vw - ${kameraX}px), calc(50vh - ${kameraY}px)) scale(${zoomLevel});
+        transition: ${isDragging ? 'none' : 'transform 0.3s ease-out'};
+    `);
 
 $effect(() => {
         if (livspoint <= 0 && gameState === 'play') {
@@ -217,8 +217,8 @@ onMount(() => {
 
     function træk(e: PointerEvent) {
         if (!isDragging) return;
-        kameraOffsetX += (e.clientX - lastMouseX);
-        kameraOffsetY += (e.clientY - lastMouseY);
+        kameraX -= (e.clientX - lastMouseX) / zoomLevel;
+        kameraY -= (e.clientY - lastMouseY) / zoomLevel;
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
 
@@ -238,13 +238,21 @@ onMount(() => {
         zoomLevel = Math.max(0.5, Math.min(zoomLevel, 2.0));
     }
 
+    function centrerKameraPåSpiller() {
+        const r = Math.floor(spillerIndex / BREDDE);
+        const k = spillerIndex % BREDDE;
+        kameraX = k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0) + (HEX_W / 2);
+        kameraY = r * ROW_H + (ROW_H / 2);
+    }
+
     function opretTastatur() {
         if (kbdRef) window.removeEventListener('keydown', kbdRef);
         kbdRef = (ev: KeyboardEvent) => { 
             if (aktivtEvent || aktivShop || gameState !== 'play') return;
             
             const key = ev.key.toLowerCase();
-            if (key === 'g') grav();
+            if (key === ' ') { ev.preventDefault(); centrerKameraPåSpiller(); }
+            else if (key === 'g') grav();
             else if (key === 'enter') klikPåHex(spillerIndex);
             else if (key === 'h') hvil();
             else if (key === 'q') flytHex('NW');
@@ -267,9 +275,10 @@ onMount(() => {
         
         const { data } = await supabase.from('spil_sessioner').select('*').eq('rum_kode', rumKode).single();
 
-        if (data) {
+  if (data) {
             gitter = data.kort;
             alleSpillere = data.spillere || {};
+            fogX = data.fog_x || 0; // <--- VIGTIG: Henter tågens nuværende position
             erHost = false;
 
             if (alleSpillere[spillerNavn]) {
@@ -281,6 +290,7 @@ onMount(() => {
                 guldTotal = eksisterende.guld;
                 maxKolonne = eksisterende.kolonne;
                 inventory = eksisterende.inventory || [];
+                mineKendteFelter = eksisterende.kendteFelter || [];
                 
                 valgtKarakter = tilgaengeligeKarakterer.find(k => k.ikon === eksisterende.ikon) || null;
                 
@@ -311,12 +321,16 @@ onMount(() => {
         }
     }
 
-    function startRealtime() {
+function startRealtime() {
         supabase.channel('rum_' + rumKode)
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'spil_sessioner', filter: `rum_kode=eq.${rumKode}` }, payload => {
                 alleSpillere = payload.new.spillere || {};
                 if (payload.new.kort) {
                     gitter = [...payload.new.kort]; 
+                }
+                // Opdater tågen for alle i rummet
+                if (payload.new.fog_x !== undefined) {
+                    fogX = payload.new.fog_x;
                 }
             })
             .subscribe();
@@ -326,6 +340,8 @@ onMount(() => {
         const { data } = await supabase.from('spil_sessioner').select('spillere').eq('rum_kode', rumKode).single();
         if (data) {
             let opdateredeSpillere = data.spillere || {};
+            
+            // Vi bygger dit personlige datasæt, som sendes til databasen
             opdateredeSpillere[spillerNavn] = {
                 index: spillerIndex,
                 kolonne: maxKolonne,
@@ -335,10 +351,18 @@ onMount(() => {
                 isWinner: gameState === 'win',
                 score: samletScore,
                 ikon: valgtKarakter?.ikon,
-                inventory: inventory
+                inventory: inventory,
+                kendteFelter: mineKendteFelter // <-- Her gemmes dit private udsyn!
             };
 
-const opdatering: { spillere: Record<string, SpillerData>; kort?: Felt[]; fog_x?: number } = { spillere: opdateredeSpillere, fog_x: fogX };            if (sendKort) opdatering.kort = gitter;
+            // Vi pakker spillerdata og den fælles tåges position
+            const opdatering: { spillere: Record<string, SpillerData>; kort?: Felt[]; fog_x?: number } = { 
+                spillere: opdateredeSpillere, 
+                fog_x: fogX // <-- Her sendes tågens placering ud til alle
+            }; 
+            
+            // Hvis der er gravet et hul eller lavet et event, sender vi det fælles kort med
+            if (sendKort) opdatering.kort = gitter;
 
             await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', rumKode);
         }
@@ -369,6 +393,7 @@ const opdatering: { spillere: Record<string, SpillerData>; kort?: Felt[]; fog_x?
         
         await syncTilDb();
         opretTastatur();
+        centrerKameraPåSpiller();
         gameState = 'play';
     }
 
@@ -396,7 +421,8 @@ function genstartBane() {
         }
         
         maxKolonne = 1;
-        fogX = 0; // Skub tågen tilbage til start
+        fogX = 0; 
+        mineKendteFelter = [];
         
         // 3. Kast spilleren tilbage til venstre kyst
         const muligeStartFelter = [];
@@ -406,6 +432,7 @@ function genstartBane() {
         spillerIndex = muligeStartFelter[Math.floor(Math.random() * muligeStartFelter.length)];
         
         afslørOmraade(spillerIndex, 1);
+        centrerKameraPåSpiller();
         
         logBesked = "Tiden spoler tilbage. Tågen trækker sig. Kysten er klar.";
         gameState = 'play';
@@ -439,7 +466,13 @@ function genstartBane() {
             }
             nuvaerendeKant = nyKant;
         }
-        fundne.forEach(i => { if (gitter[i]) gitter[i].udforsket = true; });
+        let nyeFelter = [...mineKendteFelter];
+        fundne.forEach(i => { 
+            if (gitter[i] && !nyeFelter.includes(i)) {
+                nyeFelter.push(i);
+            }
+        });
+        mineKendteFelter = nyeFelter;
     }
 
     function initialiserGitter() {
@@ -816,8 +849,22 @@ let tågeFart = 10 / (antalLevende * 1.5);
 
 fogX += tågeFart;
         
-        kameraOffsetX = 0;
-        kameraOffsetY = 0;
+// 1. Find ud af hvor du står i pixels
+        const rK = Math.floor(nI / BREDDE);
+        const kK = nI % BREDDE;
+        const px = kK * HEX_W + (rK % 2 !== 0 ? HEX_W / 2 : 0) + (HEX_W / 2);
+        const py = rK * ROW_H + (ROW_H / 2);
+
+        // 2. Den usynlige kasse (25% fra skærmens midte i alle retninger)
+        const deadzoneX = window.innerWidth * 0.25; 
+        const deadzoneY = window.innerHeight * 0.25;
+
+        // 3. Skub kameraet, hvis du træder uden for kassen
+        if (px > kameraX + deadzoneX) kameraX = px - deadzoneX;
+        else if (px < kameraX - deadzoneX) kameraX = px + deadzoneX;
+
+        if (py > kameraY + deadzoneY) kameraY = py - deadzoneY;
+        else if (py < kameraY - deadzoneY) kameraY = py + deadzoneY;
         
         const synsRadius = f.biome === 'bjerg' ? 2 : 1;
         afslørOmraade(spillerIndex, synsRadius);
@@ -825,15 +872,16 @@ fogX += tågeFart;
         logBesked = `Træder ind i ${f.biome}. Omkostning: ${bevægelsesPris} HP.`;
         if (nK > maxKolonne) maxKolonne = nK;
 
-        if (livspoint <= 0) { syncTilDb(); return; }
-  if (nK === BREDDE - 2) { 
+if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
+        
+        if (nK === BREDDE - 2) { 
             gameState = 'win'; 
             if (alleSpillere[spillerNavn]) {
                 alleSpillere[spillerNavn].score = samletScore;
                 alleSpillere[spillerNavn].isWinner = true;
             }
             gemHighscore();
-            syncTilDb(); 
+            syncTilDb(true); // Ændret til true
             return; 
         }
 
@@ -843,7 +891,7 @@ fogX += tågeFart;
             aktivShop = f.shopItem; 
         }
         
-        syncTilDb();
+        syncTilDb(true); // HER ER MAGIEN. Det sikrer, at dit udsyn deles med alle!
     }
 
     function flytHex(retning: string) {
@@ -941,7 +989,7 @@ fogX += tågeFart;
             {:else}
                 <ol>
                     {#each topTre as hs, i (i)}
-                        <li><strong>{hs.navn}</strong>: {hs.score} point</li>
+                        <li><strong>{hs.navn}</strong> <em>({hs.karakter || 'Ukendt'})</em>: {hs.score} point</li>
                     {/each}
                 </ol>
             {/if}
@@ -964,8 +1012,7 @@ fogX += tågeFart;
             {:else}
                 <ol>
                     {#each topTre as hs, i (i)}
-                        <li><strong>{hs.navn}</strong>: {hs.score} point</li>
-                    {/each}
+<li><strong>{hs.navn}</strong> <em>({hs.karakter || 'Ukendt'})</em>: {hs.score} point</li>                    {/each}
                 </ol>
             {/if}
         </div>
@@ -980,11 +1027,12 @@ fogX += tågeFart;
                     {@const x = k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0)}
                     {@const y = r * ROW_H}
                     {@const erJegHer = spillerIndex === i} 
+                    {@const erUdforsket = mineKendteFelter.includes(i)}
                     
-                    <div class="hex" 
+<div class="hex" 
                          class:odd={r % 2 !== 0} 
                          class:active={erJegHer} 
-                         class:unexplored={!felt.udforsket}
+                         class:unexplored={!erUdforsket}
                          onclick={() => klikPåHex(i)}
                          onkeydown={(e) => { if (e.key === 'Enter') klikPåHex(i); }}
                          role="button"
@@ -996,15 +1044,15 @@ fogX += tågeFart;
                                 <img src="/tiles/udgravning.webp" alt="Udgravet" class="dug-image" />
                             {/if}
 
-                            {#if felt.udforsket && felt.eventID && felt.eventID !== 'campfire' && !felt.eventFuldført} 
+                            {#if erUdforsket && felt.eventID && felt.eventID !== 'campfire' && !felt.eventFuldført} 
                                 <img src="/tiles/event.png" alt="Event" class="event-crystal" />
                             {/if}
 
-                            {#if felt.udforsket && felt.isCampfire} 
+                            {#if erUdforsket && felt.isCampfire} 
                                 <img src="/tiles/campfire.png" alt="Lejrbål" class="campfire-icon-img" />
                             {/if}
 
-                            {#if felt.udforsket && felt.shopItem} 
+                            {#if erUdforsket && felt.shopItem} 
                                 <img src={felt.biome === 'by' ? '/tiles/byshop.png' : '/tiles/markedshop.png'} alt="Butik" class="shop-icon-img" />
                             {/if}
 
