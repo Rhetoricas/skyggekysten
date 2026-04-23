@@ -9,13 +9,14 @@ export interface Udfald {
 
 export interface Valg {
     tekst: string;
-    fordelItem?: string; 
-    puljeVaerdi?: number;     
+    fordelItem?: string;
+    puljeVaerdi?: number;
     aktionType?: string;
-    vaerdi?: number; 
+    vaerdi?: number;
     chance?: number;
     failVaerdi?: number;
     naesteTrin?: string;
+    betingelse?: (inv: { id: string }[]) => { id: string } | undefined | boolean;
     udfald?: {
         katastrofe: Udfald;
         fiasko: Udfald;
@@ -30,7 +31,7 @@ export interface SpilEvent {
     biome: string | string[];
     titel: string;
     tekst: string;
-    type: string;
+    type?: string;
     billede?: string;       // Svelte-motoren leder efter dette!
     billedeEfter?: string;  // Svelte-motoren leder efter dette!
     erSubTrin?: boolean;
@@ -75,6 +76,161 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                     mirakel: { log: "En massiv guldklump lå gemt under brændet.", aktionType: 'guld', multiplikator: 2.5 }
                 }
             }
+        ]
+    },
+
+    'by_auktion_start': {
+        id: 'by_auktion_start',
+        biome: 'by',
+        titel: 'Smøgens Vogter',
+        tekst: "En mand med arret ansigt blokerer smøgen. Han siger hæst, at kælderen under slagteren holder en lukket auktion for sjældne artefakter.",
+        valg: [
+            { tekst: "Fremvis dit våben og kræv adgang", betingelse: (inv) => inv.find(i => i.id === 'svaerd' || i.id === 'oekse'), naesteTrin: 'by_auktion_respekt' },
+            { tekst: "Snig dig ind gennem kældervinduet", naesteTrin: 'by_auktion_kaelder' },
+            { tekst: "Gå en anden vej", aktionType: 'fortsaet', vaerdi: 0 }
+        ]
+    },
+    'by_auktion_respekt': {
+        id: 'by_auktion_respekt',
+        biome: 'by',
+        titel: 'Auktionslokalet',
+        tekst: "Han nikker anerkendende til dit våben og åbner døren. Nede i rummet står en tung kiste på højkant. Folk byder voldsomme summer.",
+        valg: [
+            { tekst: "Scan kisten med magi", betingelse: (inv) => inv.find(i => i.id === 'stav'), aktionType: 'guld', vaerdi: 200 },
+            { tekst: "Råb et trusselsbud og snup kisten", aktionType: 'hp', vaerdi: -40 },
+            { tekst: "Forlad rummet roligt", aktionType: 'fortsaet', vaerdi: 0 }
+        ]
+    },
+    'by_auktion_kaelder': {
+        id: 'by_auktion_kaelder',
+        biome: 'by',
+        titel: 'Fælden Klapper',
+        tekst: "Du lander hårdt på stengulvet. Det er en fælde. Tre vagter trækker deres knive og omringer dig.",
+        valg: [
+            { tekst: "Tag slagene med din rustning", betingelse: (inv) => inv.find(i => i.id === 'rustning'), aktionType: 'hp', vaerdi: -10 },
+            { tekst: "Kæmp dig ud med de bare næver", aktionType: 'hp', vaerdi: -50 }
+        ]
+    },
+
+    'by_alkymist_start': {
+        id: 'by_alkymist_start',
+        biome: 'by',
+        titel: 'Alkymistens Fejltagelse',
+        tekst: "Du hører et brag fra en baggård. En alkymist står dækket af sod og skriger om hjælp. Hans kedel koger over med en voldsom grøn væske.",
+        valg: [
+            { tekst: "Hjælp ham med at stabilisere trykket", naesteTrin: 'by_alkymist_lab' },
+            { tekst: "Udnyt panikken og stjæl hans pengeskab", naesteTrin: 'by_alkymist_tyveri' },
+            { tekst: "Løb væk fra eksplosionsfaren", aktionType: 'fortsaet', vaerdi: 0 }
+        ]
+    },
+    'by_alkymist_lab': {
+        id: 'by_alkymist_lab',
+        biome: 'by',
+        titel: 'Overtryk',
+        tekst: "Væsken ætser gulvbrædderne. Kedlen er sekunder fra at springe i luften.",
+        valg: [
+            { tekst: "Hæld din livseliksir i for at neutralisere", betingelse: (inv) => inv.find(i => i.id === 'livseliksir'), aktionType: 'guld', vaerdi: 400 },
+            { tekst: "Skærm alkymisten med din rustning", betingelse: (inv) => inv.find(i => i.id === 'rustning'), aktionType: 'guld', vaerdi: 150 },
+            { tekst: "Kast dig i dækning bag et bord", aktionType: 'hp', vaerdi: -35 }
+        ]
+    },
+    'by_alkymist_tyveri': {
+        id: 'by_alkymist_tyveri',
+        biome: 'by',
+        titel: 'Runeskabet',
+        tekst: "Du bærer pengeskabet ud i gyden. Det er låst med tykke jernbeslag og bankende runer.",
+        valg: [
+            { tekst: "Knus beslagene med rå magt", betingelse: (inv) => inv.find(i => i.id === 'oekse'), aktionType: 'guld', vaerdi: 150 },
+            { tekst: "Bryd runerne med magi", betingelse: (inv) => inv.find(i => i.id === 'stav'), aktionType: 'guld', vaerdi: 300 },
+            { tekst: "Forsøg at dirke låsen med en hårnål", aktionType: 'hp', vaerdi: -25 }
+        ]
+    },
+
+    'by_smed_start': {
+        id: 'by_smed_start',
+        biome: 'by',
+        titel: 'Gældsinddriverne',
+        tekst: "Byens smed er trængt op i et hjørne af to gældsinddrivere. De svinger med tunge kæder og griner.",
+        valg: [
+            { tekst: "Grib ind og forsvar smeden", naesteTrin: 'by_smed_kamp' },
+            { tekst: "Vent i mørket og se hvad der sker", naesteTrin: 'by_smed_skygge' }
+        ]
+    },
+    'by_smed_kamp': {
+        id: 'by_smed_kamp',
+        biome: 'by',
+        titel: 'Gadeslagsmål',
+        tekst: "Gældsinddriverne vender sig mod dig. De ser professionelle ud. De spreder sig for at angribe dig fra to sider.",
+        valg: [
+            { tekst: "Hold dem tilbage med din rækkevidde", betingelse: (inv) => inv.find(i => i.id === 'stav'), aktionType: 'guld', vaerdi: 200 },
+            { tekst: "Gå direkte i kødet på lederen", betingelse: (inv) => inv.find(i => i.id === 'svaerd'), aktionType: 'guld', vaerdi: 150 },
+            { tekst: "Kast dig ud i et nævekamp", aktionType: 'hp', vaerdi: -45 }
+        ]
+    },
+    'by_smed_skygge': {
+        id: 'by_smed_skygge',
+        biome: 'by',
+        titel: 'Det Tabte Kort',
+        tekst: "Mændene slår smeden bevidstløs og går deres vej. Han har tabt et lille, foldet kort tegnet på et stykke læder.",
+        valg: [
+            { tekst: "Tydd de magiske symboler på kortet", betingelse: (inv) => inv.find(i => i.id === 'stav'), aktionType: 'guld', vaerdi: 250 },
+            { tekst: "Sælg kortet blindt til den næste handlende", aktionType: 'guld', vaerdi: 50 },
+            { tekst: "Lad det ligge i rendestenen", aktionType: 'fortsaet', vaerdi: 0 }
+        ]
+    },
+
+    'by_kloak_start': {
+        id: 'by_kloak_start',
+        biome: 'by',
+        titel: 'Det Tabte Arvestykke',
+        tekst: "Et grædende gadebarn peger ned i en åben kloakrist. Noget har trukket familiens arvestykke ned i mørket.",
+        valg: [
+            { tekst: "Klatr ned i stanken", naesteTrin: 'by_kloak_nede' },
+            { tekst: "Ryst på hovedet og gå videre", aktionType: 'fortsaet', vaerdi: 0 }
+        ]
+    },
+    'by_kloak_nede': {
+        id: 'by_kloak_nede',
+        biome: 'by',
+        titel: 'Kloakkens Konge',
+        tekst: "Nede i mørket sidder en enorm, muteret kloakrotte på en bunke af stjålne smykker og knurrer.",
+        valg: [
+            { tekst: "Fodr den med din livseliksir", betingelse: (inv) => inv.find(i => i.id === 'livseliksir'), aktionType: 'guld', vaerdi: 500 },
+            { tekst: "Klyv dyret midt over", betingelse: (inv) => inv.find(i => i.id === 'oekse'), aktionType: 'guld', vaerdi: 200 },
+            { tekst: "Brænd den med et stikflamme", betingelse: (inv) => inv.find(i => i.id === 'stav'), aktionType: 'guld', vaerdi: 200 },
+            { tekst: "Snup medaljonen og løb for livet", aktionType: 'hp', vaerdi: -60 }
+        ]
+    },
+
+    'by_gadekrig_start': {
+        id: 'by_gadekrig_start',
+        biome: 'by',
+        titel: 'Bandekrig',
+        tekst: "To rivaliserende bander står over for hinanden på torvet. Brolægningen er dækket af glasskår. De Røde Skærf trækker knivene.",
+        valg: [
+            { tekst: "Slut dig til De Røde Skærf", naesteTrin: 'by_gadekrig_roed' },
+            { tekst: "Prøv at krydse torvet uset", naesteTrin: 'by_gadekrig_krydsild' }
+        ]
+    },
+    'by_gadekrig_roed': {
+        id: 'by_gadekrig_roed',
+        biome: 'by',
+        titel: 'Blodigt Lederskab',
+        tekst: "Lederen brøler og peger på dig. Han forlanger, at du fører an i det første blodige angreb mod fjenden.",
+        valg: [
+            { tekst: "Gå forrest som en rullende fæstning", betingelse: (inv) => inv.find(i => i.id === 'rustning'), aktionType: 'guld', vaerdi: 250 },
+            { tekst: "Træk dit sværd og hug løs", betingelse: (inv) => inv.find(i => i.id === 'svaerd'), aktionType: 'guld', vaerdi: 150 },
+            { tekst: "Nægt og træk dig tilbage i skam", aktionType: 'hp', vaerdi: -30 }
+        ]
+    },
+    'by_gadekrig_krydsild': {
+        id: 'by_gadekrig_krydsild',
+        biome: 'by',
+        titel: 'Regn af Pil og Sten',
+        tekst: "Pile og brosten flyver gennem luften. Du er fanget midt på den åbne plads uden dækning.",
+        valg: [
+            { tekst: "Deflekter projektilerne med et magisk skjold", betingelse: (inv) => inv.find(i => i.id === 'stav'), aktionType: 'fortsaet', vaerdi: 0 },
+            { tekst: "Dæk dit hoved med armene og sprint", aktionType: 'hp', vaerdi: -40 }
         ]
     },
 

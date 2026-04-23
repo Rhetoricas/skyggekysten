@@ -11,8 +11,7 @@
         moveCost: number; digCost: number; dmgMod: number; goldMod: number;
         canRest: boolean; fordel: string; ulempe: string;
     }
-    interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: string; eventFuldført: boolean; biome: string; shopItem?: string; isCampfire?: boolean; }
-    
+interface Felt { guld: number; gravet: boolean; udforsket: boolean; eventID?: string; eventFuldført: boolean; biome: string; shopItems?: string[]; isCampfire?: boolean; }    
     interface SpillerData {
         index: number;
         kolonne: number;
@@ -72,9 +71,38 @@ const itemDB: Record<string, { id: string, navn: string, type: string, billede: 
         { id: 'knight_m', navn: "Ridder", ikon: "/game_faces/knight_m.png", startMsg: "Rustningen tynger, men beskytter.", startHp: 120, startGuld: 0, startUdstyr: ['sabel', 'rustning'], moveCost: 2, digCost: 6, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Starter med sabel og rustning (-50% skade).", ulempe: "Koster 2 HP at rykke sig." },
         { id: 'knight_f', navn: "Skjoldmø", ikon: "/game_faces/knight_f.png", startMsg: "Rustningen tynger, men beskytter.", startHp: 120, startGuld: 0, startUdstyr: ['sabel', 'rustning'], moveCost: 2, digCost: 6, dmgMod: 1.0, goldMod: 1.0, canRest: true, fordel: "Starter med sabel og rustning (-50% skade).", ulempe: "Koster 2 HP at rykke sig." },
         
-        { id: 'magician_m', navn: "Troldmand", ikon: "/game_faces/magician_m.png", startMsg: "Magi beskytter ikke mod mudder.", startHp: 80, startGuld: 250, startUdstyr: ['stav', 'klude'], moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue og en stav.", ulempe: "Tager +50% skade." },
-        { id: 'magician_f', navn: "Troldkvinde", ikon: "/game_faces/magician_f.png", startMsg: "Magi beskytter ikke mod mudder.", startHp: 80, startGuld: 250, startUdstyr: ['stav', 'klude'], moveCost: 1, digCost: 10, dmgMod: 1.5, goldMod: 1.0, canRest: true, fordel: "Starter med en massiv formue og en stav.", ulempe: "Tager +50% skade." },
-        
+       { 
+        id: 'magician_m', 
+        navn: "Troldmand", 
+        ikon: "/game_faces/magician_m.png", 
+        startMsg: "Magi beskytter ikke mod mudder.", 
+        startHp: 80, 
+        startGuld: 0, // Pengepung tømt
+        startUdstyr: ['stav', 'klude', 'livseliksir'], // Eliksir tilføjet
+        moveCost: 1, 
+        digCost: 10, 
+        dmgMod: 1.5, 
+        goldMod: 1.0, 
+        canRest: true, 
+        fordel: "Starter med en livseliksir og en stav.", 
+        ulempe: "Starter uden guld og tager +50% skade." 
+    },
+    { 
+        id: 'magician_f', 
+        navn: "Troldkvinde", 
+        ikon: "/game_faces/magician_f.png", 
+        startMsg: "Magi beskytter ikke mod mudder.", 
+        startHp: 80, 
+        startGuld: 0, // Pengepung tømt
+        startUdstyr: ['stav', 'klude', 'livseliksir'], // Eliksir tilføjet
+        moveCost: 1, 
+        digCost: 10, 
+        dmgMod: 1.5, 
+        goldMod: 1.0, 
+        canRest: true, 
+        fordel: "Starter med en livseliksir og en stav.", 
+        ulempe: "Starter uden guld og tager +50% skade." 
+    },
         { id: 'thief_m', navn: "Tyv", ikon: "/game_faces/thief_m.png", startMsg: "Hold dig i bevægelse.", startHp: 100, startGuld: 50, startUdstyr: ['kniv', 'klude'], moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.0, canRest: true, fordel: "Hurtig og udstyret med en kniv.", ulempe: "Tager +20% skade." },
         { id: 'thief_f', navn: "Skygge", ikon: "/game_faces/thief_f.png", startMsg: "Hold dig i bevægelse.", startHp: 100, startGuld: 50, startUdstyr: ['kniv', 'klude'], moveCost: 1, digCost: 5, dmgMod: 1.2, goldMod: 1.0, canRest: true, fordel: "Hurtig og udstyret med en kniv.", ulempe: "Tager +20% skade." },
         
@@ -138,7 +166,7 @@ async function hentHighscores() {
     let logBesked = $state("");
     let erBevidstløs = $state(false);
     let stunNedtaelling = $state(0);
-
+    let aktivShop = $state<string[] | null>(null);
     function startBevidstloeshed() {
         if (erBevidstløs) return;
         erBevidstløs = true;
@@ -169,7 +197,6 @@ async function hentHighscores() {
     
     let aktivtEvent = $state<SpilEvent | null>(null); 
     let eventUdfald = $state<{tekst: string, farve: string, naesteTrin?: string} | null>(null);
-    let aktivShop = $state<string | null>(null);
 
     // --- KAMERA & STYRING ---
     let kameraX = $state(0);
@@ -554,10 +581,15 @@ function genstartBane() {
 
             if (!f.eventID) { 
                 const itemKeys = Object.keys(itemDB);
-                if (f.biome === 'marked' && Math.random() < 0.33) {
-                    f.shopItem = itemKeys[Math.floor(Math.random() * itemKeys.length)];
-                } else if (f.biome === 'by' && Math.random() < 0.20) {
-                    f.shopItem = itemKeys[Math.floor(Math.random() * itemKeys.length)];
+                if (f.biome === 'marked' && Math.random() < 0.33 || f.biome === 'by' && Math.random() < 0.20) {
+                    // Træk vare 1
+                    let vare1 = itemKeys[Math.floor(Math.random() * itemKeys.length)];
+                    // Træk vare 2, og sørg for at det ikke er den samme som vare 1
+                    let vare2 = itemKeys[Math.floor(Math.random() * itemKeys.length)];
+                    while(vare1 === vare2) {
+                        vare2 = itemKeys[Math.floor(Math.random() * itemKeys.length)];
+                    }
+                    f.shopItems = [vare1, vare2]; // Læg dem begge på feltet
                 }
             }
         }
@@ -710,58 +742,52 @@ let endeligTekst = res.log;
         const erMarked = felt.biome === 'marked';
         const index = inventory.findIndex(i => i.id === id);
 
-        
-
-        // 1. Definer grundprisen én gang for alle
-        const grundPris = erMarked ? dbItem.pris : dbItem.pris * 4;
+        // 1. Definer grundprisen
+        const grundPris = dbItem.pris;
 
         if (index > -1) {
             if (inventory[index].id === 'livseliksir') {
-            eventUdfald = { tekst: "Du har allerede en livseliksir. Gem den til du har brug for den.", farve: '#aaa' };
-            return;
-        }
+                eventUdfald = { tekst: "Du har allerede en livseliksir. Gem den til du har brug for den.", farve: "#ffaa00" };
+                return;
+            }
+
             // KAN KUN OPGRADERE I BYEN
             if (erMarked) {
-                eventUdfald = { tekst: `Markedsmanden kigger dumt på dig: "Du har jo allerede en ${dbItem.navn}!"`, farve: '#ff5555' };
-                return; 
+                eventUdfald = { tekst: `Markedsmanden kigger dumt på dig: "Du har jo allerede en ${dbItem.navn}! Jeg laver ikke forbedringer."`, farve: "#ffaa00" };
+                return;
             }
 
             const vare = inventory[index];
-            
-            // 2. Den eksponentielle opgraderingspris (Grundpris * 4^nuværende_niveau)
-            const opgraderingsPris = grundPris * Math.pow(4, vare.level);
+
+            // 2. Den fladere opgraderingspris
+            const opgraderingsPris = grundPris * Math.pow(2, vare.level);
 
             if (guldTotal >= opgraderingsPris) {
-                guldTotal -= opgraderingsPris; 
-                vare.level += 1; 
-                eventUdfald = { tekst: `${vare.navn} er nu forstærket til niveau ${vare.level}.`, farve: '#55ff55' };
+                guldTotal -= opgraderingsPris;
+                vare.level += 1;
+                eventUdfald = { tekst: `${dbItem.navn} er nu forstærket til niveau ${vare.level}.`, farve: "#55ff55" };
                 syncTilDb(true);
             } else {
-                eventUdfald = { tekst: `Smeden griner. Det koster ${opgraderingsPris}G at opgradere til niveau ${vare.level + 1}.`, farve: '#ff5555' };
+                eventUdfald = { tekst: `Smeden griner. Det koster ${opgraderingsPris}G at opgradere.`, farve: "#ff5555" };
             }
         } else {
-            // KØB FOR FØRSTE GANG
+            // 3. Køb af helt ny vare
             if (guldTotal >= grundPris) {
                 guldTotal -= grundPris;
                 
-                let nytInventory = [...inventory];
-                // Skil dig af med gamle våben/tøj af samme type
-                if (dbItem.type === 'våben') nytInventory = nytInventory.filter(i => i.type !== 'våben');
-                else if (dbItem.type === 'tøj') nytInventory = nytInventory.filter(i => i.type !== 'tøj');
-                
-                inventory = [...nytInventory, { 
-                    id: dbItem.id, 
+                // Her tilføjer vi alle de manglende detaljer, så TypeScript er glad!
+                inventory.push({ 
+                    id: id, 
+                    level: 1, 
                     navn: dbItem.navn, 
-                    // Våben starter typisk på deres base-bonus, andre ting på 1
-                    level: dbItem.bonus > 0 ? dbItem.bonus : 1, 
                     billede: dbItem.billede, 
                     type: dbItem.type 
-                }];
+                });
                 
-                eventUdfald = { tekst: `Du har erhvervet en ${dbItem.navn} for ${grundPris}G.`, farve: 'gold' };
+                eventUdfald = { tekst: `Du købte ${dbItem.navn}.`, farve: "#55ff55" };
                 syncTilDb(true);
             } else {
-                eventUdfald = { tekst: `Købmanden ryster på hovedet. Kom tilbage når du har ${grundPris}G.`, farve: '#ff5555' };
+                eventUdfald = { tekst: `Handelsmanden ryster på hovedet. Du mangler ${grundPris - guldTotal} guld.`, farve: "#ff5555" };
             }
         }
     }
@@ -915,8 +941,8 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
 
         if (f.eventID && !f.eventFuldført) {
             aktivtEvent = eventBibliotek[f.eventID] || null; 
-        } else if (f.shopItem) {
-            aktivShop = f.shopItem; 
+        } else if (f.shopItems && f.shopItems.length > 0) {
+            aktivShop = f.shopItems; // Nu gemmer den begge varer!
         }
         
         syncTilDb(true); // HER ER MAGIEN. Det sikrer, at dit udsyn deles med alle!
@@ -969,7 +995,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
                 </label>
             </div>
 
-            <input type="text" placeholder="Rum Kode (fx 1234)" bind:value={rumKode} />
+            <input type="text" placeholder="Tågeøens navn" bind:value={rumKode} />
             <button onclick={opretEllerDeltag}>Gå til kysten</button>
             <p class="status">{statusBesked}</p>
         </div>
@@ -1082,7 +1108,7 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
                                 <img src="/tiles/campfire.webp" alt="Lejrbål" class="campfire-icon-img" />
                             {/if}
 
-                            {#if erUdforsket && felt.shopItem} 
+                            {#if erUdforsket && felt.shopItems} 
                                 <img src={felt.biome === 'by' ? '/tiles/byshop.png' : '/tiles/markedshop.png'} alt="Butik" class="shop-icon-img" />
                             {/if}
 
@@ -1143,26 +1169,14 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
             </div>
         {/if}
 
-        {#if aktivShop && itemDB[aktivShop]}
-            {@const tilbud = itemDB[aktivShop]}
-            {@const erMarked = gitter[spillerIndex].biome === 'marked'}
-            {@const grundPris = erMarked ? tilbud.pris : tilbud.pris * 4}
-            {@const ejetVare = inventory.find(i => i.id === aktivShop)}
-            {@const aktuelPris = ejetVare ? grundPris * Math.pow(4, ejetVare.level) : grundPris}
+        {#if aktivShop && aktivShop.length > 0}
+{@const erMarked = gitter[spillerIndex].biome === 'marked'}
             
             <div class="event-modal">
-                <div class="event-content">
-                    <h2>{erMarked ? 'Markedet' : 'Den Rejsende Købmand'}</h2>
+                <div class="event-content" style="max-width: 700px;">
+                    <h2>{erMarked ? 'Markedet' : 'Byens Smedje & Apotek'}</h2>
                     <p class="event-desc">
-                        {#if ejetVare}
-                            {#if erMarked}
-                                Du har allerede denne genstand, og kræmmerne her kan ikke hjælpe dig med at opgradere.
-                            {:else}
-                                Smeden kigger på dit udstyr. Han kan forstærke din {tilbud.navn} til niveau {ejetVare.level + 1}.
-                            {/if}
-                        {:else}
-                            En handelsmand faldbyder sit gods. Har du guldet, har han grejet.
-                        {/if}
+                        {erMarked ? 'Her kan du købe nyt udstyr, men ikke opgradere det.' : 'Byen tilbyder både salg af nyt udstyr og opgradering af dit eksisterende grej.'}
                     </p>
                     
                     {#if eventUdfald}
@@ -1171,24 +1185,40 @@ if (livspoint <= 0) { syncTilDb(true); return; } // Ændret til true
                         </div>
                         <button class="action-btn" onclick={lukEvent}>Forlad butikken</button>
                     {:else}
-                        <div class="udfald" style="border-left: 5px solid gold; text-align: center;">
-<img src={tilbud.billede} alt={tilbud.navn} style="height: 80px; width: auto; object-fit: contain; margin-bottom: 10px;" /><br>                            <strong>{tilbud.navn} {#if ejetVare}(Nuværende: Lvl {ejetVare.level}){/if}</strong><br>
-                            Pris: <strong>{aktuelPris} Guld</strong>
+                        <div style="display: flex; gap: 20px; margin-bottom: 25px;">
+{#each aktivShop as itemId (itemId)}                               
+                                 {@const tilbud = itemDB[itemId]}
+                                {@const grundPris = tilbud.pris} {@const ejetVare = inventory.find(i => i.id === itemId)}
+                                {@const aktuelPris = ejetVare ? grundPris * Math.pow(2, ejetVare.level) : grundPris}                  
+                                <div style="flex: 1; background: #222; padding: 15px; border: 1px solid gold; border-radius: 6px; text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div>
+                                        <img src={tilbud.billede} alt={tilbud.navn} style="height: 80px; width: auto; object-fit: contain; margin-bottom: 10px;" /><br>
+                                        <strong style="font-size: 18px;">{tilbud.navn} {#if ejetVare}(Lvl {ejetVare.level}){/if}</strong><br>
+                                        <span style="color: #ccc; display: block; margin: 10px 0;">Pris: <strong style="color: gold;">{aktuelPris} Guld</strong></span>
+                                        
+                                        {#if ejetVare && erMarked}
+                                            <p style="color: #ff5555; font-size: 14px;">Markedet kan ikke opgradere denne.</p>
+                                        {/if}
+                                    </div>
+                                    
+                                    <div style="margin-top: 15px;">
+                                        {#if !ejetVare || !erMarked}
+                                            <button class="action-btn" onclick={() => købEllerOpgrader(itemId)}>
+                                                {#if ejetVare}Opgrader{:else}Køb{/if}
+                                            </button>
+                                        {:else}
+                                            <button class="action-btn" style="background: #444; color: #888; cursor: not-allowed;" disabled>Ejes allerede</button>
+                                        {/if}
+                                    </div>
+                                </div>
+                            {/each}
                         </div>
 
-                        <div class="valg-liste">
-                            {#if !ejetVare || !erMarked}
-                                <button class="action-btn" onclick={() => købEllerOpgrader(aktivShop as string)}>
-                                    {#if ejetVare}Opgrader{:else}Køb{/if} for {aktuelPris}G
-                                </button>
-                            {/if}
-                            <button class="valg-btn" onclick={lukEvent}>Nej tak, gå videre</button>
-                        </div>
+                        <button class="valg-btn" style="width: 100%; text-align: center;" onclick={lukEvent}>Nej tak, forlad butikken</button>
                     {/if}
                 </div>
             </div>
         {/if}
-
   <footer class="ui">
     <div class="ui-content">
         <div class="status-row">
