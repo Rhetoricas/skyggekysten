@@ -350,6 +350,7 @@ onMount(() => {
                 } else {
                     opretTastatur();
                     gameState = 'play';
+                    centrerKameraPåSpiller();
                 }
             } else {
                 statusBesked = "Rum fundet. Deltager som Guest.";
