@@ -58,4 +58,26 @@
     .blodofring-btn:hover { filter: drop-shadow(0 0 12px red) brightness(1.2); }
     .blodofring-btn img { height: 45px; width: auto; }
     @keyframes hjertebanken { 0% { transform: scale(1); } 15% { transform: scale(1.15); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+.inventory-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-grow: 1;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none; /* Fortsat ingen synlig scrollbar på mobil */
+    
+    /* Tilføj en maske der fader ud til højre */
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    
+    /* Giver lidt ekstra plads i højre side, så den sidste item kan scrolles fri af masken */
+    padding-right: 2rem; 
+}
+
+.inventory-row::-webkit-scrollbar {
+    display: none;
+}
+
+
 </style>
