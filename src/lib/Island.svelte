@@ -44,7 +44,7 @@ onMount(() => {
     let visKvindelige = $state(true);
     let topTre = $state<Array<{ navn: string, score: number, karakter?: string }>>([]);
 
-    let fremdriftPoint = $derived(spilTilstand.maxKolonne * 10);
+    let fremdriftPoint = $derived(spilTilstand.maxKolonne * 1);
     let winBonus = $derived(spilTilstand.gameState === 'win' ? 1000 : 0);
     
     let harDetektor = $derived(spilTilstand.inventory?.some(i => i.id === 'metaldetektor') ?? false);
@@ -52,7 +52,7 @@ onMount(() => {
     let erITågen = $derived(erSpillerITaagen());
     
     $effect(() => {
-        spilTilstand.samletScore = Math.floor((spilTilstand.guldTotal + fremdriftPoint + winBonus) * (1 + (Math.max(0, spilTilstand.livspoint) / 100)));
+        spilTilstand.samletScore = Math.floor((spilTilstand.guldTotal + fremdriftPoint + winBonus) * (1 + (Math.max(0, spilTilstand.livspoint) / 1000)));
     });
 
     let kameraStyle = $derived(`
@@ -898,12 +898,6 @@ cam.foelgSpiller(nI, BREDDE, HEX_W, ROW_H);        afslørOmraade(spilTilstand.s
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap');
 
-    .energi-sektion { display: flex; flex-direction: column; align-items: center; position: relative; }
-    .blodofring-btn { background: transparent; border: none; cursor: pointer; padding: 0; margin-bottom: -5px; z-index: 10; animation: hjertebanken 1.5s infinite; filter: drop-shadow(0 0 6px darkred); transition: filter 0.2s; }
-    .blodofring-btn:hover { filter: drop-shadow(0 0 12px red) brightness(1.2); }
-    .blodofring-btn img { height: 45px; width: auto; }
-    @keyframes hjertebanken { 0% { transform: scale(1); } 15% { transform: scale(1.15); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 100% { transform: scale(1); } }
-
     .event-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
     .event-boks { background: #1a1a1a; color: #e0e0e0; border: 2px solid #4a4a4a; padding: 20px; width: 600px; max-width: 90%; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
     .event-boks img { width: 100%; height: 200px; object-fit: cover; border-bottom: 2px solid #333; }
@@ -915,11 +909,10 @@ cam.foelgSpiller(nI, BREDDE, HEX_W, ROW_H);        afslørOmraade(spilTilstand.s
     .luk-knap { margin-top: 20px; background: #4a1111 !important; text-align: center !important; }
 
     .taage-kvalt {
-    opacity: 0.6;
-    /* Gør den mørkere, trækker farven ud og giver et mikro-slør */
-    filter: brightness(0.4) grayscale(0.8) blur(0.7px); 
-    transition: all 0.8s ease; /* Lader den fade blødt ind i tågen */
-}
+        opacity: 0.6;
+        filter: brightness(0.4) grayscale(0.8) blur(0.7px); 
+        transition: all 0.8s ease; 
+    }
 
     .island-overskrift {
         position: absolute;
@@ -937,57 +930,55 @@ cam.foelgSpiller(nI, BREDDE, HEX_W, ROW_H);        afslørOmraade(spilTilstand.s
         white-space: nowrap;
     }
 
-:global(.flydende-tal) {
-    position: absolute !important;
-    top: -25px; 
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Cinzel', serif;
-    font-size: 26px;
-    font-weight: bold;
-    color: rgba(255, 255, 255, 0.9);
-    filter: blur(0.5px);
-    pointer-events: none;
-    z-index: 9999;
-    text-shadow: 0 0 8px rgba(255,255,255,0.4), 0 3px 6px rgba(0,0,0,0.9);
-    /* Sat til at vare kortere tid for at nå toppen, og derefter fryse */
-    animation: solidGhost 1.5s ease-out forwards;
-}
+    :global(.flydende-tal) {
+        position: absolute !important;
+        top: -25px; 
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: 'Cinzel', serif;
+        font-size: 26px;
+        font-weight: bold;
+        color: rgba(255, 255, 255, 0.9);
+        filter: blur(0.5px);
+        pointer-events: none;
+        z-index: 9999;
+        text-shadow: 0 0 8px rgba(255,255,255,0.4), 0 3px 6px rgba(0,0,0,0.9);
+        animation: solidGhost 1.5s ease-out forwards;
+    }
 
-@keyframes solidGhost {
-    0% { opacity: 0; transform: translate(-50%, 0px) scale(0.8); }
-    20% { opacity: 1; transform: translate(-50%, -10px) scale(1.05); }
-    50% { opacity: 0.9; transform: translate(-52%, -15px) scale(1); }
-    100% { opacity: 1; transform: translate(-50%, -25px) scale(1); filter: blur(0.5px); }
-}
+    @keyframes solidGhost {
+        0% { opacity: 0; transform: translate(-50%, 0px) scale(0.8); }
+        20% { opacity: 1; transform: translate(-50%, -10px) scale(1.05); }
+        50% { opacity: 0.9; transform: translate(-52%, -15px) scale(1); }
+        100% { opacity: 1; transform: translate(-50%, -25px) scale(1); filter: blur(0.5px); }
+    }
 
-.slut-knapper {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin-top: 30px;
-    margin-bottom: 20px;
-}
+    .slut-knapper {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
 
-.slut-knap {
-    background: #5c1616;
-    color: #ffcccc;
-    border: 1px solid #8b2525;
-    padding: 16px 32px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-    cursor: pointer;
-    font-weight: bold;
-    font-family: 'Cinzel', serif;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    transition: all 0.2s ease;
-}
+    .slut-knap {
+        background: #5c1616;
+        color: #ffcccc;
+        border: 1px solid #8b2525;
+        padding: 16px 32px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        cursor: pointer;
+        font-weight: bold;
+        font-family: 'Cinzel', serif;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        transition: all 0.2s ease;
+    }
 
-.slut-knap:hover {
-    background: #7a1d1d;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.9);
-    transform: translateY(-2px);
-    border-color: #ff5555;
-}
-
+    .slut-knap:hover {
+        background: #7a1d1d;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.9);
+        transform: translateY(-2px);
+        border-color: #ff5555;
+    }
 </style>

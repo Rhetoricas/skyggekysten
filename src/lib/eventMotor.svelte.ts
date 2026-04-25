@@ -25,6 +25,21 @@ export function startEvent(id: string) {
 }
 
 export function lukEvent() {
+    // Find feltet under spilleren i gitteret
+    const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
+    
+    if (felt) {
+        // Fjern eventID med 'undefined' i stedet for 'null'
+        felt.eventID = undefined;
+        
+        // Ret navnet til 'udforsket', præcis som din types.ts kræver
+        felt.udforsket = true;
+
+        // Tving Svelte til at registrere ændringen i arrayet
+        spilTilstand.gitter = [...spilTilstand.gitter];
+    }
+
+    // Nulstil selve event-vinduets interne tilstand
     eventState.aktivt = null;
     eventState.log = [];
     eventState.valgLåst = false;
