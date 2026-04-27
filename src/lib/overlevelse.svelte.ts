@@ -62,8 +62,7 @@ export function fremrykTid() {
 
     while (spilTilstand.nuvaerendeEnergi <= 0) {
         spilTilstand.dag++;
-        spilTilstand.nuvaerendeEnergi += spilTilstand.valgtKarakter.baseEnergi;
-        
+spilTilstand.nuvaerendeEnergi += spilTilstand.maxEnergi;        
         let antalLevende = Object.values(spilTilstand.alleSpillere).filter(s => !s.isDead && !s.isWinner).length;
         if (antalLevende < 1) antalLevende = 1;
         

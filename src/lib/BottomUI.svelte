@@ -1,15 +1,22 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
+    import { itemDB } from '$lib/spildata';
     import { erSpillerITaagen, udfoerBlodofring } from '$lib/overlevelse.svelte';
-    import { grav } from '$lib/undergrund.svelte'; // Korrigeret import-sti
+    import { grav } from '$lib/undergrund.svelte';
 
     let erITågen = $derived(erSpillerITaagen());
 
-    // Central router til alt grej i tasken
+    let aktueltFelt = $derived(
+        spilTilstand.valgtKarakter && spilTilstand.gitter?.length > 0 
+            ? spilTilstand.gitter[spilTilstand.spillerIndex] 
+            : null
+    );
+
     function haandterInventoryKlik(vareId: string) {
         if (vareId === 'skovl') {
             grav();
         }
+        // Plads til at håndtere klik på eliksirer osv. senere
     }
 </script>
 
@@ -20,10 +27,12 @@
 
     <div class="ui-content">
         <div class="status-row">
-            <div class="status-item">
+            <div class="status-item" style="position: relative;">
+                <div class="island-overskrift">{spilTilstand.rumKode}</div>
                 <img src="/inventory/hp.webp" alt="Liv" class="status-icon" />
                 <span class="status-value">{spilTilstand.livspoint}</span>
             </div>
+            
             <div class="status-item">
                 <img src="/inventory/guld.webp" alt="Guld" class="status-icon" />
                 <span class="status-value">{spilTilstand.guldTotal}</span>
@@ -47,19 +56,42 @@
         </div>
         
         <div class="inventory-row">
-            {#each spilTilstand.inventory as vare (vare.id)}
-                <div 
-                    class="inventory-item {vare.id === 'skovl' ? 'klikbar' : ''}" 
-                    onclick={() => haandterInventoryKlik(vare.id)}
-                    onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') haandterInventoryKlik(vare.id); }}
-                    role="button"
-                    tabindex="0"
-                >
-                    <img src={vare.billede} alt={vare.navn} class="inventory-icon" />
-                    {#if vare.level > 1}
-                        <span class="level-text">Lvl {vare.level}</span>
-                    {/if}
-                </div>
+            {#each spilTilstand.mitUdstyr as vare (vare.id)}
+                {@const dbInfo = itemDB[vare.id]}
+                {#if dbInfo}
+                    <div 
+                        class="inventory-item {vare.id === 'skovl' && 
+                        aktueltFelt && 
+                        !aktueltFelt.gravet && 
+                        !aktueltFelt.eventID && 
+                        aktueltFelt.kanGraves 
+                            ? 'klikbar' 
+                            : ''}" 
+                        onclick={() => {
+                            if (vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && !aktueltFelt.eventID && aktueltFelt.kanGraves) {
+                                haandterInventoryKlik(vare.id);
+                            }
+                        }}
+                        onkeydown={(e) => { 
+                            if ((e.key === 'Enter' || e.key === ' ') && vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && !aktueltFelt.eventID && aktueltFelt.kanGraves) {
+                                haandterInventoryKlik(vare.id);
+                            }
+                        }}
+                        role="button"
+                        tabindex="0"
+                    >
+                        <div class="ikon-container">
+                            <img 
+                                src={dbInfo.billede} 
+                                alt={dbInfo.navn} 
+                                class="inventory-icon {vare.id === 'skovl' && aktueltFelt && (aktueltFelt.gravet || aktueltFelt.eventID || !aktueltFelt.kanGraves) ? 'deaktiveret' : ''}" 
+                            />
+                            {#if vare.maengde > 1}
+                                <span class="maengde-badge">{vare.maengde}</span>
+                            {/if}
+                        </div>
+                    </div>
+                {/if}
             {/each}
         </div>
     </div>
@@ -73,7 +105,7 @@
         width: 100vw;
         box-sizing: border-box;
         z-index: 50;
-        padding-bottom: 1rem;
+        padding-bottom: 2.5rem;
         pointer-events: none; 
     }
 
@@ -108,13 +140,28 @@
         gap: 1.5rem;
         flex: 1 1 40%;
         min-width: 200px;
+        position: relative; 
+    }
+
+    .island-overskrift {
+        position: absolute;
+        left: 0;
+        top: -78px; 
+        font-family: 'Cinzel', serif;
+        font-size: 1.9rem;
+        color: white;
+        text-shadow: 2px 2px 4px #000, -1px -1px 2px #000;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        pointer-events: none;
+        white-space: nowrap; 
     }
 
     .inventory-row {
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        gap: 0.5rem;
+        gap: 14px;
         flex-wrap: wrap;
         flex: 1 1 40%;
         min-width: 200px;
@@ -130,7 +177,7 @@
     }
 
     .status-icon {
-        height: 40px;
+        height: 50px;
         width: auto;
         margin-bottom: 4px;
         filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
@@ -141,7 +188,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        outline: none; /* Fjerner den grimme blå standard-firkant, når man klikker */
+        outline: none;
     }
 
     .inventory-item.klikbar {
@@ -158,24 +205,35 @@
         transform: scale(0.95);
     }
 
+    .ikon-container {
+        position: relative;
+        display: inline-block;
+    }
+
     .inventory-icon {
-        height: 50px;
+        height: 92px;
         width: auto;
         border-radius: 4px;
         filter: drop-shadow(0 2px 5px rgba(0,0,0,0.9));
     }
+    
+    .inventory-icon.deaktiveret {
+        filter: grayscale(100%) opacity(50%);
+    }
 
-    .level-text {
+    .maengde-badge {
         position: absolute;
-        bottom: -8px;
-        background: black;
+        bottom: 5px;
+        right: 5px;
+        background-color: rgba(0, 0, 0, 0.8);
         color: gold;
-        font-size: 0.7rem;
-        padding: 2px 4px;
-        border: 1px solid gold;
-        border-radius: 4px;
-        font-family: sans-serif;
+        font-family: monospace;
+        font-size: 1.1rem;
         font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 4px;
+        border: 1px solid #444;
+        pointer-events: none;
     }
 
     .energi-sektion { 
@@ -189,36 +247,48 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        align-self: flex-start;
+        margin-left: 15px; 
+        margin-right: 20px;
+        margin-top: 4px;
+    }
+
+    .dag-taeller {
+        margin-top: 6px;
+        font-size: 14px;
+        color: #ccc;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
 
     .energi-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, 20px);
         gap: 4px;
-        margin-bottom: 4px;
     }
 
     .lysprik {
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: #222;
-        border: 1px solid #000;
-        box-shadow: inset 0 0 4px black;
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        min-height: 20px;
+        background-image: url('/tiles/energi_slukket.webp');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+        background-color: transparent;
     }
 
     .lysprik.taendt {
-        background: #00e5ff;
-        border-color: #fff;
-        box-shadow: 0 0 8px #00e5ff, inset 0 0 4px white;
-    }
-
-    .dag-taeller {
-        font-family: 'Cinzel', serif;
-        color: white;
-        font-weight: bold;
-        font-size: 0.9rem;
-        text-shadow: 1px 1px 2px black;
+        background-image: url('/tiles/energi_taendt.webp');
+        filter: drop-shadow(0 0 5px rgba(0, 255, 204, 0.6));
+        border: none;
+        box-shadow: none;
+        background-color: transparent;
     }
 
     .blodofring-btn { 

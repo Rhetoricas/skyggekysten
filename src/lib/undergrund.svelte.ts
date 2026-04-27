@@ -1,6 +1,7 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb } from './netvaerk';
-import { fremtvingKollaps } from '$lib/overlevelse.svelte';
+import { fremtvingKollaps, fremrykTid } from '$lib/overlevelse.svelte';
+import { afslørOmraade, tilfoejTilRygsæk } from '$lib/spilmotor';
 
 function rand(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -10,7 +11,13 @@ export function genererUndergrund(biome: string) {
     const farlige = ['ruin', 'blodskov', 'hule', 'slagmark', 'ritual', 'krystal'];
     const civ = ['by', 'marked', 'bandit'];
 
-    const feltData = { kanGraves: true, skjultGuld: 0, skjultLiv: 0, skjultFaelde: false };
+    const feltData: { kanGraves: boolean; skjultGuld: number; skjultLiv: number; skjultFaelde: boolean; skjultLoot: string | null } = { 
+        kanGraves: true, 
+        skjultGuld: 0, 
+        skjultLiv: 0, 
+        skjultFaelde: false,
+        skjultLoot: null
+    };
 
     if (civ.includes(biome) || biome === 'hav') {
         feltData.kanGraves = false;
@@ -21,32 +28,33 @@ export function genererUndergrund(biome: string) {
 
     if (biome === 'mark' || biome === 'eng') {
         if (roll < 20) feltData.skjultGuld = rand(10, 30);
-        else if (roll < 35) feltData.skjultLiv = rand(15, 25);
+        else if (roll < 35) feltData.skjultLiv = rand(10, 20);
         else if (roll < 40) feltData.skjultFaelde = true;
+        else if (roll < 42) feltData.skjultLoot = 'fakkel';
     } else if (biome === 'skov') {
         if (roll < 20) feltData.skjultGuld = rand(10, 30);
-        else if (roll < 55) feltData.skjultLiv = rand(30, 50);
+        else if (roll < 55) feltData.skjultLiv = rand(20, 40);
         else if (roll < 60) feltData.skjultFaelde = true;
+        else if (roll < 63) feltData.skjultLoot = 'eliksir';
     } else if (biome === 'bjerg') {
         if (roll < 50) feltData.skjultGuld = rand(30, 60);
-        else if (roll < 55) feltData.skjultLiv = rand(10, 20);
+        else if (roll < 55) feltData.skjultLiv = rand(5, 10);
         else if (roll < 70) feltData.skjultFaelde = true;
+        else if (roll < 74) feltData.skjultLoot = 'fakkel';
     } else if (farlige.includes(biome)) {
-        if (roll < 45) feltData.skjultGuld = rand(50, 100);
-        else if (roll < 55) feltData.skjultLiv = rand(20, 40);
+        if (roll < 45) feltData.skjultGuld = rand(60, 100);
+        else if (roll < 55) feltData.skjultLiv = rand(10, 20);
         else if (roll < 90) feltData.skjultFaelde = true;
+        else if (roll < 95) feltData.skjultLoot = 'eliksir';
     }
 
     return feltData;
 }
 
-let senesteGravning = 0; // Vores tidslås
+let graverNu = false; 
 
 export function grav() {
-    // Blokerer for dobbelt-klik (500 millisekunder)
-    const nu = Date.now();
-    if (nu - senesteGravning < 500) return;
-    senesteGravning = nu;
+    if (graverNu) return; 
 
     if (spilTilstand.erBevidstløs || !spilTilstand.valgtKarakter) return;
     
@@ -58,51 +66,76 @@ export function grav() {
         return;
     }
 
-    const harSkovl = spilTilstand.inventory.some(i => i.id === 'skovl');
-    const energiPris = spilTilstand.valgtKarakter.digCost || 3;
+    graverNu = true;
+
+    const baseGravePris = spilTilstand.valgtKarakter.digCost || 3;
+    const skovlIndex = spilTilstand.inventory.findIndex(i => i.id === 'skovl');
+    const harSkovl = skovlIndex !== -1;
+    
+    let udstyrsLog = ""; 
+
+    const faktiskEnergiPris = harSkovl ? baseGravePris : baseGravePris * 2;
+    spilTilstand.nuvaerendeEnergi -= faktiskEnergiPris;
 
     if (harSkovl) {
-        spilTilstand.nuvaerendeEnergi -= energiPris;
+        const skovl = spilTilstand.inventory[skovlIndex];
+        skovl.brugCount = (skovl.brugCount || 0) + 1;
+
+        if (skovl.brugCount > 5 && Math.random() < 0.25) {
+            spilTilstand.inventory.splice(skovlIndex, 1);
+            spilTilstand.inventory = [...spilTilstand.inventory]; 
+            udstyrsLog = " KNAK! Din skovl splintredes mod undergrunden.";
+        }
     } else {
-        spilTilstand.livspoint -= 15;
-        spilTilstand.logBesked = "Du flænser jorden med de bare næver. (-15 HP)";
+        spilTilstand.livspoint -= 10;
+        udstyrsLog = ` Du flænser jorden med bare næver (-10 HP, -${faktiskEnergiPris} Energi).`;
     }
 
-    // Marker feltet og gem værdierne
-    f.gravet = true;
     const guldVaerdi = f.skjultGuld ?? 0;
     const livVaerdi = f.skjultLiv ?? 0;
+    const faelde = f.skjultFaelde;
+    const fundetLoot = f.skjultLoot;
 
-    // Tøm mudderet øjeblikkeligt, så exploit er umuligt
+    f.gravet = true;
     f.skjultGuld = 0;
     f.skjultLiv = 0;
+    f.skjultFaelde = false;
+    f.skjultLoot = null;
+    afslørOmraade(spilTilstand.spillerIndex, 1);    
 
-    if (f.skjultFaelde) {
-        if (spilTilstand.livspoint <= 20) {
-            spilTilstand.logBesked = "KLIK! En rusten klinge flænger dit ben. Smerten er for overvældende, og alt går i sort...";
-            f.skjultFaelde = false; 
-            fremtvingKollaps();
-            return; 
-        }
+    spilTilstand.gitter[spilTilstand.spillerIndex] = f;
+    spilTilstand.gitter = [...spilTilstand.gitter];
 
+    let fundLog = "Kun sten og orme.";
+
+    if (faelde) {
         spilTilstand.livspoint -= 20;
-        spilTilstand.logBesked = "KLIK! En rusten klinge bider sig fast i dit ben. (-20 HP)";
-        f.skjultFaelde = false; 
-        
+        fundLog = "KLIK! En rusten klinge bider sig fast (-20 HP).";
     } else if (guldVaerdi > 0) {
         const amount = Math.floor(guldVaerdi * spilTilstand.valgtKarakter.goldMod);
         spilTilstand.guldTotal += amount;
-        spilTilstand.logBesked = `Mudderet gemte på ${amount} Guld!`;
-        
+        fundLog = `Mudderet gemte på ${amount} Guld!`;
     } else if (livVaerdi > 0) {
         spilTilstand.livspoint += livVaerdi;
-        spilTilstand.logBesked = `Du graver en saftig rod frem og spiser den. (+${livVaerdi} HP)`;
-        
-    } else {
-        if (harSkovl) spilTilstand.logBesked = "Kun sten og orme.";
+        fundLog = `Du graver en saftig rod frem og spiser den (+${livVaerdi} HP).`;
+    } else if (fundetLoot) {
+        tilfoejTilRygsæk(fundetLoot, 1);
+        fundLog = `Spadens blad rammer noget klangfuldt. Du har gravet en ${fundetLoot} frem!`;
     }
 
-    // Maskinen opdaterer selv brættet nu!
-    spilTilstand.gitter = [...spilTilstand.gitter];
+    spilTilstand.logBesked = fundLog + udstyrsLog;
+
     syncTilDb(true);
+
+    if (spilTilstand.livspoint <= 0) {
+        spilTilstand.livspoint = 1; 
+        spilTilstand.logBesked += " Smerten er for overvældende. Alt går i sort...";
+        fremtvingKollaps();
+    } else {
+        fremrykTid();
+    }
+
+    setTimeout(() => {
+        graverNu = false;
+    }, 1000);
 }

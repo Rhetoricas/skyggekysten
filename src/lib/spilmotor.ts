@@ -1,21 +1,111 @@
-import { spilTilstand } from './spilTilstand.svelte';
-import { syncTilDb } from './netvaerk';
-import { BREDDE, HOEJDE } from './spildata'; 
+import { spilTilstand } from '$lib/spilTilstand.svelte';
+import { syncTilDb } from '$lib/netvaerk';
+import { BREDDE, HOEJDE, biomeVægte, itemDB } from '$lib/spildata'; 
+import { supabase } from '$lib/supabaseClient';
+import { eventBibliotek } from '$lib/eventBibliotek';
+import { genererUndergrund } from '$lib/undergrund.svelte';
+import type { Felt } from '$lib/types';
 
-export function visFlydendeTal(type: string, vaerdi: number) {
-    if (vaerdi === 0) return;
+// ==========================================
+// NY RADAR & GEOMETRI
+// ==========================================
 
-    const tekst = vaerdi > 0 ? `+${vaerdi}` : `${vaerdi}`;
-    const id = spilTilstand.talId++;
+// Fast cirkel af retninger med uret.
+const KOMPAS = ['NE', 'E', 'SE', 'SW', 'W', 'NW'];
+
+// Gitter-matematik for Odd-R
+const OFFSETS = {
+    'NE': [[0, -1], [1, -1]],
+    'E':  [[1, 0],  [1, 0]],
+    'SE': [[0, 1],  [1, 1]],
+    'SW': [[-1, 1], [0, 1]],
+    'W':  [[-1, 0], [-1, 0]],
+    'NW': [[-1, -1], [0, -1]]
+};
+
+export function hentNaboIRetning(index: number, retning: string, bredde: number, maxFelter: number): number | null {
+    const r = Math.floor(index / bredde);
+    const k = index % bredde;
+    const isOdd = r % 2 !== 0 ? 1 : 0;
     
-    spilTilstand.aktiveTal = [...spilTilstand.aktiveTal, { id, type, tekst }];
+    const offset = OFFSETS[retning as keyof typeof OFFSETS];
+    if (!offset) return null;
+
+    const dx = offset[isOdd][0];
+    const dy = offset[isOdd][1];
+
+    const nyK = k + dx;
+    const nyR = r + dy;
+
+    if (nyK < 0 || nyK >= bredde || nyR < 0 || nyR >= (maxFelter / bredde)) return null;
+    
+    const nytIndex = nyR * bredde + nyK;
+    return nytIndex;
 }
 
-export function rydFlydendeTal() {
-    spilTilstand.aktiveTal = [];
+function hentKile(centerIndex: number, retning: string, bredde: number, maxFelter: number): number[] {
+    const retningIndex = KOMPAS.indexOf(retning);
+    if (retningIndex === -1) return [];
+
+    const retninger = [
+        KOMPAS[(retningIndex + 5) % 6], // Venstre
+        KOMPAS[retningIndex],           // Frem
+        KOMPAS[(retningIndex + 1) % 6]  // Højre
+    ];
+
+    const kileFelter = [];
+    for (const ret of retninger) {
+        const nabo = hentNaboIRetning(centerIndex, ret, bredde, maxFelter);
+        if (nabo !== null) kileFelter.push(nabo);
+    }
+    
+    return kileFelter;
 }
 
-// --- KORT OG BEVÆGELSE ---
+export function regnHexAfstand(index1: number, index2: number, bredde: number): number {
+    if (index1 === index2) return 0;
+
+    const r1 = Math.floor(index1 / bredde);
+    const k1 = index1 % bredde;
+    const r2 = Math.floor(index2 / bredde);
+    const k2 = index2 % bredde;
+
+    const offset1 = Math.floor(r1 / 2);
+    const offset2 = Math.floor(r2 / 2);
+
+    const cube_x1 = k1 - offset1;
+    const cube_x2 = k2 - offset2;
+    const cube_z1 = r1;
+    const cube_z2 = r2;
+    const cube_y1 = -cube_x1 - cube_z1;
+    const cube_y2 = -cube_x2 - cube_z2;
+
+    return Math.max(
+        Math.abs(cube_x1 - cube_x2),
+        Math.abs(cube_y1 - cube_y2),
+        Math.abs(cube_z1 - cube_z2)
+    );
+}
+
+// ==========================================
+// EKSISTERENDE SPILMOTOR LOGIK
+// ==========================================
+
+export async function sendAnonymAlarm() {
+    if (!spilTilstand.spillerNavn || !spilTilstand.rumKode) return;
+
+    const message = {
+        type: 'anonym_alarm',
+        senderNavn: spilTilstand.spillerNavn 
+    };
+
+    await supabase.channel(spilTilstand.rumKode).send({
+        type: 'broadcast',
+        event: 'alarm',
+        payload: message
+    });
+}
+
 export function hentNaboIndices(index: number) {
     const r = Math.floor(index / BREDDE);
     const forskudt = r % 2 !== 0;
@@ -25,88 +115,85 @@ export function hentNaboIndices(index: number) {
     return offsets.map(o => index + o).filter(i => i >= 0 && i < BREDDE * HOEJDE);
 }
 
-export function afslørOmraade(index: number, radius: number) {
-    const fundne = [index];
-    let nuvaerendeKant = [index];
-    for (let r = 0; r < radius; r++) {
-        const nyKant: number[] = [];
-        for (const i of nuvaerendeKant) {
-            hentNaboIndices(i).forEach(n => {
-                if (!fundne.includes(n)) { fundne.push(n); nyKant.push(n); }
-            });
-        }
-        nuvaerendeKant = nyKant;
+export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number = 1) {
+    const eksisterendeTing = spilTilstand.mitUdstyr.find(ting => ting.id === genstandId);
+
+    if (eksisterendeTing) {
+        eksisterendeTing.maengde += tilfoejetMaengde;
+    } else {
+        spilTilstand.mitUdstyr.push({
+            id: genstandId,
+            maengde: tilfoejetMaengde
+        });
     }
+    
+    // Magien der vækker Svelte: Vi overskriver arrayet med sig selv
+    spilTilstand.mitUdstyr = [...spilTilstand.mitUdstyr];
+    
+    syncTilDb();
+}
+
+export function brugFraRygsæk(genstandId: string, brugtMaengde: number = 1) {
+    const index = spilTilstand.mitUdstyr.findIndex(ting => ting.id === genstandId);
+    
+    if (index === -1) return;
+
+    spilTilstand.mitUdstyr[index].maengde -= brugtMaengde;
+
+    if (spilTilstand.mitUdstyr[index].maengde <= 0) {
+        spilTilstand.mitUdstyr.splice(index, 1);
+    }
+    
+    // Igen: Væk Svelte ved at skabe et nyt reference-array
+    spilTilstand.mitUdstyr = [...spilTilstand.mitUdstyr];
+    
+    syncTilDb();
+}
+
+// Opdateret afslørOmraade, der nu trækker på karakterens specifikke profil
+export function afslørOmraade(centerIndex: number, radius: number = 1) {
+    const maxFelter = BREDDE * HOEJDE;
+    const karakter = spilTilstand.valgtKarakter;
+    
+    const profil = karakter ? karakter.synsProfil : 'cirkel';
+    const brugRadius = karakter ? karakter.synsRadius : radius;
+    const retning = spilTilstand.retning || 'E';
+
+    const synlige = new Set<number>();
+
+    const tilføjCirkel = (rad: number) => {
+        for (let i = 0; i < maxFelter; i++) {
+            if (regnHexAfstand(centerIndex, i, BREDDE) <= rad) {
+                synlige.add(i);
+            }
+        }
+    };
+
+    // Alle åbner øjnene og ser som minimum en ring omkring sig selv
+    tilføjCirkel(brugRadius);
+
+    // 'frem' profilen kaster desuden lyset et ekstra skridt ind i det ukendte
+    if (profil === 'frem') {
+        const frontCenter = hentNaboIRetning(centerIndex, retning, BREDDE, maxFelter);
+        if (frontCenter !== null) {
+            const kile = hentKile(frontCenter, retning, BREDDE, maxFelter);
+            kile.forEach(f => synlige.add(f));
+        }
+    }
+
+    const fundne = Array.from(synlige);
     const nyeFelter = [...spilTilstand.mineKendteFelter];
+    
     fundne.forEach(i => { 
         if (spilTilstand.gitter[i] && !nyeFelter.includes(i)) {
             nyeFelter.push(i);
         }
     });
+    
     spilTilstand.mineKendteFelter = nyeFelter;
 }
 
-// --- HANDLINGER ---
-export function grav() {
-    rydFlydendeTal();
-    
-    const f = spilTilstand.gitter[spilTilstand.spillerIndex];
-    if (spilTilstand.erBevidstløs) return; 
-    if (!f || f.gravet || f.eventID || !spilTilstand.valgtKarakter) return;
-    
-    const energiPris = spilTilstand.valgtKarakter.digCost;
-    
-    if (spilTilstand.nuvaerendeEnergi < energiPris) {
-        spilTilstand.logBesked = "Du er for træt til at grave. Skift dag for at få ny energi.";
-        return;
-    }
-
-    spilTilstand.nuvaerendeEnergi -= energiPris;
-    f.gravet = true;
-    
-    const harSkovl = spilTilstand.inventory.some(i => i.id === 'skovl');
-    
-    const k = spilTilstand.spillerIndex % BREDDE;
-    const svaerhedsgrad = 1 + (k / BREDDE);
-    const roll = Math.random();
-
-    const farligeBiomer = ['bjerg', 'ruin', 'blodskov', 'hule', 'slagmark', 'ritual', 'krystal'];
-    const isDangerous = farligeBiomer.includes(f.biome);
-    const trapChance = isDangerous ? 0.30 * svaerhedsgrad : 0.05 * svaerhedsgrad;
-
-    if (roll > trapChance) {
-        if (Math.random() < 0.60) {
-            if (harSkovl) {
-                const amount = Math.floor((Math.random() * 20) + 10) * spilTilstand.valgtKarakter.goldMod;
-                spilTilstand.guldTotal += amount; 
-                spilTilstand.logBesked = `Mudderet gemte på ${amount}G. (-${energiPris} Energi)`;
-                visFlydendeTal('guld', amount);
-            } else {
-                spilTilstand.logBesked = `Du river neglene til blods i mudderet. Absolut ingenting. (-${energiPris} Energi)`;
-            }
-        } else {
-            const heal = 15;
-            spilTilstand.livspoint += heal;
-            spilTilstand.logBesked = `Rod fundet. Heler ${heal} HP. (-${energiPris} Energi)`;
-            visFlydendeTal('hp', heal);
-        }
-    } else {
-        spilTilstand.livspoint -= 30;
-        spilTilstand.logBesked = `Du ramte en ældgammel fælde. Ekstra -30 HP.`;
-        visFlydendeTal('hp', -30);
-    }
-    
-    if (spilTilstand.livspoint <= 0) { 
-        syncTilDb(true); 
-        return; 
-    }
-
-    syncTilDb(true);
-}
-
 export function hvil() {
-    rydFlydendeTal();
-    
     if (spilTilstand.erBevidstløs) return;
     
     const karakter = spilTilstand.valgtKarakter;
@@ -122,9 +209,7 @@ export function hvil() {
     }
     
     spilTilstand.guldTotal -= 40;
-    visFlydendeTal('guld', -40);
-    
-    spilTilstand.nuvaerendeEnergi = karakter.baseEnergi;
+    spilTilstand.nuvaerendeEnergi = spilTilstand.maxEnergi;
 
     const maxHp = karakter.startHp;
 
@@ -135,14 +220,118 @@ export function hvil() {
         const faktiskHeal = Math.min(30, pladsTilHeal);
         
         spilTilstand.livspoint += faktiskHeal;
-        visFlydendeTal('hp', faktiskHeal);
         spilTilstand.logBesked = `Du slapper af, får fuld energi og heler sår for ${faktiskHeal} HP.`; 
     }
 
     if (Math.random() < 0.2) { 
         spilTilstand.logBesked = "Overfald i natten!"; 
         spilTilstand.livspoint -= 25; 
-        visFlydendeTal('hp', -25);
     }
+
+    // Tving en opdatering af synsfeltet, så ridderen åbner visiret
+    afslørOmraade(spilTilstand.spillerIndex, karakter.synsRadius,);
+
     syncTilDb();
+}
+
+export function initialiserGitter() {
+    const antal = BREDDE * HOEJDE;
+    const totalVægt = biomeVægte.reduce((sum, b) => sum + b.vaegt, 0);
+
+    let råKort = Array(antal).fill('').map((_, i) => {
+        const r = Math.floor(i / BREDDE);
+        const k = i % BREDDE;
+        if (r === 0 || r === HOEJDE - 1 || k === 0 || k === BREDDE - 1) return 'hav';
+        let roll = Math.random() * totalVægt;
+        for (const b of biomeVægte) {
+            if (roll < b.vaegt) return b.id;
+            roll -= b.vaegt;
+        }
+        return 'mark';
+    });
+
+    for (let pass = 0; pass < 3; pass++) {
+        const nytKort = [...råKort];
+        for (let i = 0; i < antal; i++) {
+            const r = Math.floor(i / BREDDE);
+            const k = i % BREDDE;
+            if (r === 0 || r === HOEJDE - 1 || k === 0 || k === BREDDE - 1) continue;
+            const naboer = hentNaboIndices(i);
+            if (Math.random() < 0.7) {
+                const tilfældigNabo = råKort[naboer[Math.floor(Math.random() * naboer.length)]];
+                const erSjælden = ['hule', 'ritual', 'ruin', 'bandit'].includes(tilfældigNabo);
+                if (!erSjælden || Math.random() < 0.1) nytKort[i] = tilfældigNabo;
+            }
+        }
+        råKort = nytKort;
+    }
+
+    const nytGitter: Felt[] = Array(antal).fill(null).map((_, i) => {
+        const biome = råKort[i];
+        const hemmeligheder = genererUndergrund(biome);
+        return {
+            guld: 0,
+            gravet: false,
+            udforsket: false,
+            eventFuldført: false,
+            biome: biome,
+            ...hemmeligheder
+        };
+    });
+
+    const alleGyldigeEvents = Object.keys(eventBibliotek).filter((k) => !eventBibliotek[k].erSubTrin && k !== 'campfire');
+    const vildmark = ['eng', 'skov', 'mark', 'bjerg'];
+
+    for (const key of alleGyldigeEvents) {
+        const event = eventBibliotek[key];
+        for (let forsøg = 0; forsøg < 100; forsøg++) {
+            const randomIndex = Math.floor(Math.random() * antal);
+            const f = nytGitter[randomIndex];
+
+            if (f.biome === 'hav' || f.eventID) continue;
+
+            const reqBiome = event.biome;
+            const erEtMatch = Array.isArray(reqBiome)
+                ? reqBiome.includes(f.biome) || reqBiome.includes('alle')
+                : reqBiome === f.biome || reqBiome === 'alle' || reqBiome === 'any' || !reqBiome;
+
+            if (erEtMatch) {
+                f.eventID = key;
+                break;
+            }
+        }
+    }
+
+    for (let i = 0; i < antal; i++) {
+        const f = nytGitter[i];
+        if (f.biome === 'hav' || f.eventID) continue;
+
+        if (vildmark.includes(f.biome) && Math.random() < 0.008) {
+            f.isCampfire = true;
+            f.eventID = 'campfire';
+        } else {
+            const salgbareVarer = Object.keys(itemDB).filter((k) => itemDB[k].pris > 0 && itemDB[k].type !== 'forbandelse');
+            if ((f.biome === 'marked' && Math.random() < 0.33) || (f.biome === 'by' && Math.random() < 0.2)) {
+                const vare1 = salgbareVarer[Math.floor(Math.random() * salgbareVarer.length)];
+                let vare2 = salgbareVarer[Math.floor(Math.random() * salgbareVarer.length)];
+                while (vare1 === vare2) {
+                    vare2 = salgbareVarer[Math.floor(Math.random() * salgbareVarer.length)];
+                }
+                f.shopItems = [vare1, vare2];
+            }
+        }
+    }
+
+    spilTilstand.gitter = nytGitter;
+    const muligeStartFelter = [];
+    for (let r = 1; r < HOEJDE - 1; r++) {
+        if (spilTilstand.gitter[r * BREDDE + 1].biome !== 'hav') muligeStartFelter.push(r * BREDDE + 1);
+    }
+    
+    // Sæt en standardretning, så udregningerne ikke fejler
+    spilTilstand.retning = 'E';
+    spilTilstand.spillerIndex = muligeStartFelter[Math.floor(Math.random() * muligeStartFelter.length)];
+    
+    // Første gang vi afslører, er der ikke rigtig en profil at regne på, men funktionen klarer det
+    afslørOmraade(spilTilstand.spillerIndex, 1);
 }
