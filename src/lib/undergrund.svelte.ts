@@ -1,7 +1,7 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb } from './netvaerk';
 import { fremtvingKollaps, fremrykTid } from '$lib/overlevelse.svelte';
-import { afslørOmraade, tilfoejTilRygsæk } from '$lib/spilmotor';
+import { afslørOmraade, tilfoejTilRygsæk, brugFraRygsæk } from '$lib/spilmotor';
 
 function rand(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -69,22 +69,22 @@ export function grav() {
     graverNu = true;
 
     const baseGravePris = spilTilstand.valgtKarakter.digCost || 3;
-    const skovlIndex = spilTilstand.inventory.findIndex(i => i.id === 'skovl');
-    const harSkovl = skovlIndex !== -1;
     
-    let udstyrsLog = ""; 
+    // Vi kigger i den nye stak og sikrer os at TypeScript kender typen
+    const skovlItem = spilTilstand.mitUdstyr.find((i) => i.id === 'skovl');
+    const harSkovl = !!skovlItem && skovlItem.maengde > 0;
+    
+    let udstyrsLog: string; 
 
     const faktiskEnergiPris = harSkovl ? baseGravePris : baseGravePris * 2;
     spilTilstand.nuvaerendeEnergi -= faktiskEnergiPris;
 
     if (harSkovl) {
-        const skovl = spilTilstand.inventory[skovlIndex];
-        skovl.brugCount = (skovl.brugCount || 0) + 1;
-
-        if (skovl.brugCount > 5 && Math.random() < 0.25) {
-            spilTilstand.inventory.splice(skovlIndex, 1);
-            spilTilstand.inventory = [...spilTilstand.inventory]; 
+        if (Math.random() < 0.15) {
+            brugFraRygsæk('skovl', 1);
             udstyrsLog = " KNAK! Din skovl splintredes mod undergrunden.";
+        } else {
+            udstyrsLog = " Du mærker skovlen ramme jorden.";
         }
     } else {
         spilTilstand.livspoint -= 10;
@@ -101,6 +101,7 @@ export function grav() {
     f.skjultLiv = 0;
     f.skjultFaelde = false;
     f.skjultLoot = null;
+    
     afslørOmraade(spilTilstand.spillerIndex, 1);    
 
     spilTilstand.gitter[spilTilstand.spillerIndex] = f;

@@ -1,7 +1,7 @@
 import { eventBibliotek, type SpilEvent, type Valg, type Udfald } from './eventBibliotek';
 import { spilTilstand } from '$lib/spilTilstand.svelte';
-import { itemDB } from '$lib/spildata';
 import { fremtvingKollaps } from './overlevelse.svelte';
+import { tilfoejTilRygsæk, brugFraRygsæk } from '$lib/spilmotor';
 
 export const eventState = $state<{
     aktivt: SpilEvent | null;
@@ -46,8 +46,8 @@ export function lukEvent() {
 }
 
 export function kanViseValg(valg: Valg): boolean {
-    if (valg.kraeverItem && !spilTilstand.inventory.some(i => i.id === valg.kraeverItem)) return false;
-    if (valg.kosterItem && !spilTilstand.inventory.some(i => i.id === valg.kosterItem)) return false;
+    if (valg.kraeverItem && !spilTilstand.mitUdstyr.some(i => i.id === valg.kraeverItem)) return false;
+    if (valg.kosterItem && !spilTilstand.mitUdstyr.some(i => i.id === valg.kosterItem)) return false;
     if (valg.kraeverKarakter && spilTilstand.valgtKarakter?.id !== valg.kraeverKarakter) return false;
     if (valg.gemtForKarakter && spilTilstand.valgtKarakter?.id === valg.gemtForKarakter) return false;
     if (valg.puljeVaerdi && spilTilstand.guldTotal < valg.puljeVaerdi) return false;
@@ -61,11 +61,7 @@ export function tagValg(valg: Valg) {
 
     // 1. Træk betalingen fra spilleren (fjerner kun én kopi af genstanden)
     if (valg.kosterItem) {
-        const index = spilTilstand.inventory.findIndex(i => i.id === valg.kosterItem);
-        if (index !== -1) {
-            spilTilstand.inventory.splice(index, 1);
-            spilTilstand.inventory = [...spilTilstand.inventory];
-        }
+        brugFraRygsæk(valg.kosterItem, 1);
     }
     if (valg.puljeVaerdi) {
         spilTilstand.guldTotal -= valg.puljeVaerdi;
@@ -94,19 +90,10 @@ function eksekverUdfald(udfald: Udfald) {
     if (udfald.aktionType === 'guld' && udfald.vaerdi) spilTilstand.guldTotal += udfald.vaerdi;
 
     if (udfald.givItem) {
-        const dbItem = itemDB[udfald.givItem];
-        if (dbItem) {
-            spilTilstand.inventory.push({ 
-                id: dbItem.id, level: 1, navn: dbItem.navn, billede: dbItem.billede, type: dbItem.type 
-            });
-        }
+        tilfoejTilRygsæk(udfald.givItem, 1);
     }
     if (udfald.mistItem) {
-        const index = spilTilstand.inventory.findIndex(i => i.id === udfald.mistItem);
-        if (index !== -1) {
-            spilTilstand.inventory.splice(index, 1);
-            spilTilstand.inventory = [...spilTilstand.inventory];
-        }
+        brugFraRygsæk(udfald.mistItem, 1);
     }
 
 // Det skudsikre kollaps-tjek via 1-HP hacket

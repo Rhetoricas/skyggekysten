@@ -34,7 +34,6 @@ export interface Karakter {
     ulempe: string;
     baseEnergi: number;
     synsRadius: number;
-    synsProfil: 'cirkel' | 'frem' | 'kile';
 }
 
 export interface SpillerData {
@@ -46,15 +45,14 @@ export interface SpillerData {
     isWinner: boolean;
     score: number;
     ikon?: string;
-    inventory?: Item[];
+    mitUdstyr?: RygsækTing[];
     kendteFelter?: number[];
-    energi?: number; 
-    turNummer: number; 
-    dag?: number; 
+    energi?: number;
+    turNummer: number;
+    dag?: number;
     sidstAktiv?: number;
-    activeAlarm?: boolean; 
+    activeAlarm?: boolean;
     retning: string;
-    udstyr: RygsækTing[]; // Gør op med den gamle metode, hvis du brugte string[]
 }
 
 export interface Felt {

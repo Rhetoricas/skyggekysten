@@ -10,9 +10,6 @@ import type { Felt } from '$lib/types';
 // NY RADAR & GEOMETRI
 // ==========================================
 
-// Fast cirkel af retninger med uret.
-const KOMPAS = ['NE', 'E', 'SE', 'SW', 'W', 'NW'];
-
 // Gitter-matematik for Odd-R
 const OFFSETS = {
     'NE': [[0, -1], [1, -1]],
@@ -41,25 +38,6 @@ export function hentNaboIRetning(index: number, retning: string, bredde: number,
     
     const nytIndex = nyR * bredde + nyK;
     return nytIndex;
-}
-
-function hentKile(centerIndex: number, retning: string, bredde: number, maxFelter: number): number[] {
-    const retningIndex = KOMPAS.indexOf(retning);
-    if (retningIndex === -1) return [];
-
-    const retninger = [
-        KOMPAS[(retningIndex + 5) % 6], // Venstre
-        KOMPAS[retningIndex],           // Frem
-        KOMPAS[(retningIndex + 1) % 6]  // Højre
-    ];
-
-    const kileFelter = [];
-    for (const ret of retninger) {
-        const nabo = hentNaboIRetning(centerIndex, ret, bredde, maxFelter);
-        if (nabo !== null) kileFelter.push(nabo);
-    }
-    
-    return kileFelter;
 }
 
 export function regnHexAfstand(index1: number, index2: number, bredde: number): number {
@@ -150,41 +128,33 @@ export function brugFraRygsæk(genstandId: string, brugtMaengde: number = 1) {
     syncTilDb();
 }
 
-// Opdateret afslørOmraade, der nu trækker på karakterens specifikke profil
-export function afslørOmraade(centerIndex: number, radius: number = 1) {
-    const maxFelter = BREDDE * HOEJDE;
-    const karakter = spilTilstand.valgtKarakter;
-    
-    const profil = karakter ? karakter.synsProfil : 'cirkel';
-    const brugRadius = karakter ? karakter.synsRadius : radius;
-    const retning = spilTilstand.retning || 'E';
+export function afslørOmraade(centerIndex: number, rad: number = 1) {
+    const maxFelter = spilTilstand.gitter.length;
+    const HOEJDE = Math.floor(maxFelter / BREDDE);
+
+    const centerR = Math.floor(centerIndex / BREDDE);
+    const centerK = centerIndex % BREDDE;
 
     const synlige = new Set<number>();
 
-    const tilføjCirkel = (rad: number) => {
-        for (let i = 0; i < maxFelter; i++) {
+    const rMin = Math.max(0, centerR - rad);
+    const rMax = Math.min(HOEJDE - 1, centerR + rad);
+    const kMin = Math.max(0, centerK - rad);
+    const kMax = Math.min(BREDDE - 1, centerK + rad);
+
+    for (let r = rMin; r <= rMax; r++) {
+        for (let k = kMin; k <= kMax; k++) {
+            const i = r * BREDDE + k;
+            
             if (regnHexAfstand(centerIndex, i, BREDDE) <= rad) {
                 synlige.add(i);
             }
         }
-    };
-
-    // Alle åbner øjnene og ser som minimum en ring omkring sig selv
-    tilføjCirkel(brugRadius);
-
-    // 'frem' profilen kaster desuden lyset et ekstra skridt ind i det ukendte
-    if (profil === 'frem') {
-        const frontCenter = hentNaboIRetning(centerIndex, retning, BREDDE, maxFelter);
-        if (frontCenter !== null) {
-            const kile = hentKile(frontCenter, retning, BREDDE, maxFelter);
-            kile.forEach(f => synlige.add(f));
-        }
     }
 
-    const fundne = Array.from(synlige);
     const nyeFelter = [...spilTilstand.mineKendteFelter];
     
-    fundne.forEach(i => { 
+    synlige.forEach(i => { 
         if (spilTilstand.gitter[i] && !nyeFelter.includes(i)) {
             nyeFelter.push(i);
         }
@@ -229,7 +199,7 @@ export function hvil() {
     }
 
     // Tving en opdatering af synsfeltet, så ridderen åbner visiret
-    afslørOmraade(spilTilstand.spillerIndex, karakter.synsRadius,);
+    afslørOmraade(spilTilstand.spillerIndex );
 
     syncTilDb();
 }
@@ -333,5 +303,5 @@ export function initialiserGitter() {
     spilTilstand.spillerIndex = muligeStartFelter[Math.floor(Math.random() * muligeStartFelter.length)];
     
     // Første gang vi afslører, er der ikke rigtig en profil at regne på, men funktionen klarer det
-    afslørOmraade(spilTilstand.spillerIndex, 1);
+    afslørOmraade(spilTilstand.spillerIndex);
 }

@@ -54,12 +54,12 @@ export async function gemHighscore() {
 }
 
 export async function syncTilDb(sendKort = false) {
+if (!spilTilstand.rumKode) return;
     try {
         const { data, error: fetchError } = await supabase.from('spil_sessioner').select('spillere').eq('rum_kode', spilTilstand.rumKode).single();
         
         if (fetchError) {
-            console.error("Netværksfejl under hentning:", fetchError);
-            spilTilstand.logBesked = "Advarsel: Mistet forbindelse til øen. Prøver igen...";
+            console.warn("Lille forsinkelse fra serveren:", fetchError);
             return;
         }
 
@@ -78,7 +78,7 @@ export async function syncTilDb(sendKort = false) {
                 isWinner: spilTilstand.gameState === 'win',
                 score: spilTilstand.samletScore,
                 ikon: spilTilstand.valgtKarakter?.ikon,
-                udstyr: spilTilstand.mitUdstyr, // <-- Her sender vi den nye stak-motor til skyen
+                udstyr: spilTilstand.mitUdstyr,
                 kendteFelter: spilTilstand.mineKendteFelter,
                 retning: spilTilstand.retning
             };
@@ -93,13 +93,11 @@ export async function syncTilDb(sendKort = false) {
             const { error: updateError } = await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', spilTilstand.rumKode);
             
             if (updateError) {
-                console.error("Netværksfejl under opdatering:", updateError);
-                spilTilstand.logBesked = "Advarsel: Kunne ikke gemme dit træk til skyen!";
+                console.error("Kunne ikke skubbe data til skyen lige nu:", updateError);
             }
         }
     } catch (err) {
-        console.error("Uventet netværksnedbrud:", err);
-        spilTilstand.logBesked = "Kritisk fejl: Forbindelsen til serveren er brudt totalt.";
+        console.error("Netværket koblede fra i et øjeblik.", err);
     }
 }
 
