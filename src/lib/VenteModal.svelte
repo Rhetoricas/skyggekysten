@@ -1,14 +1,14 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { startVenteSpil, vendKort, stopVenteSpil, lukVenteSpil } from '$lib/ventespil.svelte';
-
-    let { kanSpilleIgen } = $props();
+    
+    let { kanSpilleIgen } = $props<{ kanSpilleIgen: boolean }>();
 </script>
 
 <div class="vente-overlay">
     <div class="vente-content">
         <h2>Tiden står stille</h2>
-        <p class="vente-desc">Du må vente på, at de andre indhenter dig. Træk et kort.</p>
+        <p class="vente-desc">Du venter på, at de andre indhenter dig. Træk et kort.</p>
 
         <div class="vente-board">
             {#each spilTilstand.venteKort as kort, i (i)}
@@ -72,24 +72,45 @@
 </div>
 
 <style>
-    .vente-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-    .vente-content { background: #1a1a1a; padding: 30px; border-radius: 8px; max-width: 800px; width: 95%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+    .vente-overlay { 
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+        background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); 
+        display: flex; align-items: center; justify-content: center; z-index: 1000; 
+    }
+    .vente-content { 
+        background: #1a1a1a; padding: 30px; border-radius: 8px; max-width: 800px; width: 95%;
+        text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
+    }
     .vente-content h2 { margin-top: 0; color: #ffcc00; }
     .vente-desc { font-size: 16px; margin-bottom: 20px; color: #ccc; }
     .vente-board { display: flex; gap: 20px; justify-content: center; margin: 40px 0; flex-wrap: wrap; }
     .vente-kort { width: 160px; height: 224px; cursor: pointer; perspective: 1000px; }
-    .vente-kort-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+    .vente-kort-inner { 
+        position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; 
+    }
     .vente-kort.flipped .vente-kort-inner { transform: rotateY(180deg); }
-    .vente-kort-front, .vente-kort-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; background-size: cover; background-position: center; box-shadow: 0 5px 15px rgba(0,0,0,0.8); border: 2px solid #444; }
+    .vente-kort-front, .vente-kort-back { 
+        position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; 
+        background-size: cover; background-position: center; box-shadow: 0 5px 15px rgba(0,0,0,0.8); border: 2px solid #444; 
+    }
     .vente-kort-back { transform: rotateY(180deg); display: flex; align-items: center; justify-content: center; }
-    .kort-vaerdi { font-size: 56px; font-weight: 900; color: white; text-shadow: 3px 3px 6px black, -1px -1px 0 black; background: rgba(0,0,0,0.4); padding: 10px 25px; border-radius: 50%; }
-    .pulje-sektion { margin: 25px 0; font-size: 24px; font-weight: bold; color: gold; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+    .kort-vaerdi { 
+        font-size: 56px; font-weight: 900; color: white;
+        text-shadow: 3px 3px 6px black, -1px -1px 0 black; background: rgba(0,0,0,0.4); padding: 10px 25px; border-radius: 50%;
+    }
+    .pulje-sektion { 
+        margin: 25px 0; font-size: 24px; font-weight: bold; color: gold; display: flex; 
+        align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; 
+    }
     .pulje-label { color: #aaa; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; }
     .pulje-item { display: flex; align-items: center; gap: 8px; }
     .pulje-item img { height: 32px; filter: drop-shadow(0 0 2px black); }
     .pulje-divider { color: #444; }
     .handling-sektion { display: flex; gap: 20px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
-    .vente-btn { padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; border: 1px solid #444; transition: 0.2s; color: white; }
+    .vente-btn { 
+        padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 4px;
+        cursor: pointer; border: 1px solid #444; transition: 0.2s; color: white; 
+    }
     .stop-btn { background: #2a4a2a; }
     .stop-btn:hover { background: #3a5a3a; }
     .forlad-btn { background: #2a2a2a; }

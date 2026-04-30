@@ -39,8 +39,7 @@ export function skabKamera() {
     }
 
     function håndterZoom(e: WheelEvent, blokeret: boolean) {
-        // Her er fejlen rettet - intet 'any'
-        if (spilTilstand.inventory?.some((i: { id: string }) => i.id === 'kikkert_250' || i.id === 'kikkert_45')) return;        
+        if (spilTilstand.mitUdstyr?.some(i => i.id === 'kikkert_250' || i.id === 'kikkert_45')) return;        
         if (blokeret) return;
         e.preventDefault(); 
 
@@ -49,24 +48,21 @@ export function skabKamera() {
     }
 
     function centrerPåHex(index: number, bredde: number, hexW: number, rowH: number) {
-        const r = Math.floor(index / bredde);
-        const k = index % bredde;
-        x = k * hexW + (r % 2 !== 0 ? hexW / 2 : 0) + (hexW / 2);
-        y = r * rowH + (rowH / 2);
+        const raekke = Math.floor(index / bredde);
+        const kolonne = index % bredde;
+        x = kolonne * hexW + (raekke % 2 !== 0 ? hexW / 2 : 0) + (hexW / 2);
+        y = raekke * rowH + (rowH / 2);
     }
 
     function foelgSpiller(index: number, bredde: number, hexW: number, rowH: number) {
-        // 1. Find ud af hvor spilleren står i pixels
-        const r = Math.floor(index / bredde);
-        const k = index % bredde;
-        const px = k * hexW + (r % 2 !== 0 ? hexW / 2 : 0) + (hexW / 2);
-        const py = r * rowH + (rowH / 2);
+        const raekke = Math.floor(index / bredde);
+        const kolonne = index % bredde;
+        const px = kolonne * hexW + (raekke % 2 !== 0 ? hexW / 2 : 0) + (hexW / 2);
+        const py = raekke * rowH + (rowH / 2);
 
-        // 2. Den usynlige kasse (25% fra skærmens midte i alle retninger)
         const deadzoneX = window.innerWidth * 0.25; 
         const deadzoneY = window.innerHeight * 0.25;
 
-        // 3. Skub kameraets x og y, hvis spilleren træder uden for kassen
         if (px > x + deadzoneX) x = px - deadzoneX;
         else if (px < x - deadzoneX) x = px + deadzoneX;
 
@@ -74,7 +70,6 @@ export function skabKamera() {
         else if (py < y - deadzoneY) y = py + deadzoneY;
     }
 
-    // Her er funktionen, som island.svelte leder efter!
     function saetZoom(nyVaerdi: number) {
         zoomLevel = nyVaerdi;
     }
@@ -93,6 +88,6 @@ export function skabKamera() {
         håndterZoom,
         centrerPåHex,
         foelgSpiller,
-        saetZoom // Og her gøres den tilgængelig
+        saetZoom 
     };
 }

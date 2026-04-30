@@ -1,9 +1,13 @@
+// types.ts
+export type Biome = 'mark' | 'eng' | 'skov' | 'bjerg' | 'hule' | 'ritual' | 'ruin' | 'bandit' | 'gen' | 'blodskov' | 'by' | 'hav' | 'krystal' | 'marked' | 'slagmark';
+export type ItemType = 'tøj' | 'våben' | 'værktøj' | 'forbrug' | 'forbandelse' | 'skat';
+
 export interface Item {
     id: string;
     navn: string;
     billede: string;
-    type?: string;
-    brugCount?: number; // Holder styr på holdbarhed for spader, våben etc.
+    type?: ItemType;
+    brugCount?: number;
 }
 
 export interface SmidtTing {
@@ -14,7 +18,7 @@ export interface SmidtTing {
 
 export interface RygsækTing {
     id: string;
-    maengde: number; // Fungerer både som antal eliksirer og brændetid for fakler
+    maengde: number;
 }
 
 export interface Karakter { 
@@ -29,7 +33,6 @@ export interface Karakter {
     digCost: number; 
     dmgMod: number; 
     goldMod: number;
-    canRest: boolean; 
     fordel: string; 
     ulempe: string;
     baseEnergi: number;
@@ -66,7 +69,7 @@ export interface Felt {
     gravet: boolean;
     udforsket: boolean;
     eventFuldført: boolean; 
-    biome: string;
+    biome: Biome | string;
     
     isCampfire?: boolean;
     eventID?: string;
@@ -80,6 +83,5 @@ export interface Felt {
     skjultGuld?: number;
     skjultLiv?: number;
     skjultFaelde?: boolean;
-skjultLoot?: string | null;
-
+    skjultLoot?: string | null;
 }

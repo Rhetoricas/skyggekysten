@@ -1,135 +1,89 @@
-import { supabase } from '$lib/supabaseClient';
-import { spilTilstand } from '$lib/spilTilstand.svelte';
-import type { SpillerData, Felt } from '$lib/types'; 
+// netvaerk.ts
+import { supabase } from './supabaseClient';
+import { spilTilstand } from './spilTilstand.svelte';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
-export interface GlobalScore {
-    spillerNavn: string;
-    oeNavn: string;
-    point: number;
+export async function syncTilDb(opdaterKort = false) {
+    if (!spilTilstand.rumKode || !spilTilstand.spillerNavn) return;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const opdatering: any = {};
+    opdatering[`spillere.${spilTilstand.spillerNavn}`] = {
+        index: spilTilstand.spillerIndex,
+        hp: spilTilstand.livspoint,
+        guld: spilTilstand.guldTotal,
+        kolonne: spilTilstand.maxKolonne,
+        dag: spilTilstand.dag,
+        retning: spilTilstand.retning,
+        ikon: spilTilstand.valgtKarakter?.ikon,
+        energi: spilTilstand.nuvaerendeEnergi,
+        mitUdstyr: spilTilstand.mitUdstyr,
+        kendteFelter: spilTilstand.mineKendteFelter,
+        isDead: spilTilstand.gameState === 'dead',
+        isWinner: spilTilstand.gameState === 'win',
+        activeAlarm: false
+    };
+
+    if (opdaterKort) {
+        opdatering['kort'] = spilTilstand.gitter;
+    }
+
+    await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', spilTilstand.rumKode);
+}
+
+export async function gemHighscore() {
+    if (!spilTilstand.spillerNavn || !spilTilstand.rumKode || spilTilstand.samletScore <= 0) return;
+
+    await supabase.from('highscores').insert([{
+        navn: spilTilstand.spillerNavn,
+        rum_kode: spilTilstand.rumKode,
+        score: spilTilstand.samletScore,
+        karakter: spilTilstand.valgtKarakter?.navn
+    }]);
 }
 
 export async function hentHighscores() {
-    if (!spilTilstand.rumKode) return []; 
-    const { data, error } = await supabase
+    const { data } = await supabase
         .from('highscores')
         .select('navn, score, karakter')
         .eq('rum_kode', spilTilstand.rumKode)
         .order('score', { ascending: false })
-        .limit(10); 
-    
-    return (!error && data) ? data : [];
+        .limit(10);
+    return data || [];
 }
 
-export async function hentGlobalTopTi(): Promise<GlobalScore[]> {
-    const { data, error } = await supabase
+export async function hentGlobalTopTi() {
+    const { data } = await supabase
         .from('highscores')
-        .select('navn, score, rum_kode')
+        .select('navn, rum_kode, score')
         .order('score', { ascending: false })
         .limit(10);
-    
-    if (error || !data) {
-        console.error("Kunne ikke læse de globale runer:", error);
-        return [];
-    }
 
-    return data.map(raekke => ({
-        spillerNavn: raekke.navn || 'Anonym',
-        oeNavn: raekke.rum_kode || 'Ukendt Ø',
-        point: raekke.score || 0
+    return (data || []).map(r => ({
+        spillerNavn: r.navn,
+        oeNavn: r.rum_kode,
+        point: r.score
     }));
 }
 
-export async function gemHighscore() {
-    if (spilTilstand.samletScore > 0 && spilTilstand.rumKode) {
-        await supabase
-            .from('highscores')
-            .insert([{ 
-                navn: spilTilstand.spillerNavn, 
-                score: spilTilstand.samletScore, 
-                rum_kode: spilTilstand.rumKode,
-                karakter: spilTilstand.valgtKarakter?.navn || 'Ukendt'
-            }]);
-    }
-    return await hentHighscores(); 
-}
-
-export async function syncTilDb(sendKort = false) {
-if (!spilTilstand.rumKode) return;
-    try {
-        const { data, error: fetchError } = await supabase.from('spil_sessioner').select('spillere').eq('rum_kode', spilTilstand.rumKode).single();
-        
-        if (fetchError) {
-            console.warn("Lille forsinkelse fra serveren:", fetchError);
-            return;
-        }
-
-        if (data) {
-            const opdateredeSpillere = data.spillere || {};
-            
-            opdateredeSpillere[spilTilstand.spillerNavn] = {
-                index: spilTilstand.spillerIndex,
-                kolonne: spilTilstand.maxKolonne,
-                hp: spilTilstand.livspoint,
-                guld: spilTilstand.guldTotal,
-                dag: spilTilstand.dag,
-                energi: spilTilstand.nuvaerendeEnergi, 
-                sidstAktiv: Date.now(),
-                isDead: spilTilstand.livspoint <= 0,
-                isWinner: spilTilstand.gameState === 'win',
-                score: spilTilstand.samletScore,
-                ikon: spilTilstand.valgtKarakter?.ikon,
-                udstyr: spilTilstand.mitUdstyr,
-                kendteFelter: spilTilstand.mineKendteFelter,
-                retning: spilTilstand.retning
-            };
-
-            const opdatering: { spillere: Record<string, SpillerData>; fog_x?: number; kort?: Felt[] } = { 
-                spillere: opdateredeSpillere, 
-                fog_x: spilTilstand.fogX 
-            }; 
-            
-            if (sendKort) opdatering.kort = spilTilstand.gitter;
-
-            const { error: updateError } = await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', spilTilstand.rumKode);
-            
-            if (updateError) {
-                console.error("Kunne ikke skubbe data til skyen lige nu:", updateError);
-            }
-        }
-    } catch (err) {
-        console.error("Netværket koblede fra i et øjeblik.", err);
-    }
-}
-
-let realtimeKanal: ReturnType<typeof supabase.channel> | null = null;
-
+let sub: RealtimeChannel | null = null;
 export function startRealtime() {
-    if (realtimeKanal) {
-        supabase.removeChannel(realtimeKanal);
-    }
-
-    realtimeKanal = supabase.channel('rum_' + spilTilstand.rumKode)
-        .on('postgres_changes', { 
-            event: 'UPDATE', 
-            schema: 'public', 
-            table: 'spil_sessioner', 
-            filter: `rum_kode=eq.${spilTilstand.rumKode}` 
-        }, payload => {
-            spilTilstand.alleSpillere = payload.new.spillere || {};
-            
-            if (payload.new.kort) {
-                spilTilstand.gitter = [...payload.new.kort]; 
-            }
-            if (payload.new.fog_x !== undefined) {
-                spilTilstand.fogX = payload.new.fog_x;
-            }
+    if (!spilTilstand.rumKode || sub) return;
+    sub = supabase
+        .channel(`room:${spilTilstand.rumKode}`)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'spil_sessioner', filter: `rum_kode=eq.${spilTilstand.rumKode}` }, (payload: any) => {
+            const nyData = payload.new;
+            if (nyData.kort) spilTilstand.gitter = nyData.kort;
+            if (nyData.fog_x !== undefined) spilTilstand.fogX = nyData.fog_x;
+            if (nyData.spillere) spilTilstand.alleSpillere = nyData.spillere;
         })
         .subscribe();
 }
 
 export function stopRealtime() {
-    if (realtimeKanal) {
-        supabase.removeChannel(realtimeKanal);
-        realtimeKanal = null;
+    if (sub) {
+        supabase.removeChannel(sub);
+        sub = null;
     }
 }

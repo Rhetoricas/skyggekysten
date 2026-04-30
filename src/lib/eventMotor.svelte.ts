@@ -1,65 +1,57 @@
-import { eventBibliotek, type SpilEvent, type Valg, type Udfald } from './eventBibliotek';
-import { spilTilstand } from '$lib/spilTilstand.svelte';
-import { fremtvingKollaps } from './overlevelse.svelte';
-import { tilfoejTilRygsæk, brugFraRygsæk } from '$lib/spilmotor';
+// eventMotor.svelte.ts
+import { spilTilstand } from './spilTilstand.svelte';
+import { eventBibliotek } from './eventBibliotek';
+import { tilfoejTilRygsæk, brugFraRygsæk } from './spilmotor';
+import { syncTilDb } from './netvaerk';
+import { fremtvingKollaps, fremrykTid } from './overlevelse.svelte';
+import type { Valg } from './eventBibliotek';
 
-export const eventState = $state<{
-    aktivt: SpilEvent | null;
-    log: string[];
-    valgLåst: boolean;
-}>({
-    aktivt: null,
-    log: [],
+export const eventState = $state({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    aktivt: null as any,
+    log: [] as string[],
     valgLåst: false
 });
 
-export function startEvent(id: string) {
-    const event = eventBibliotek[id];
-    if (event) {
-        eventState.aktivt = event;
-        eventState.log = [event.tekst]; 
-        eventState.valgLåst = false;
-    } else {
-        console.error(`Kritisk fejl: Kunne ikke finde event med ID '${id}' i ordbogen.`);
-    }
+export function startEvent(eventID: string) {
+    const evt = eventBibliotek[eventID];
+    if (!evt) return;
+    eventState.aktivt = evt;
+    eventState.log = [evt.tekst];
+    eventState.valgLåst = false;
 }
 
 export function lukEvent() {
-    // Find feltet under spilleren i gitteret
-    const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-    
-    if (felt) {
-        // Fjern eventID med 'undefined' i stedet for 'null'
-        felt.eventID = undefined;
-        
-        // Ret navnet til 'udforsket', præcis som din types.ts kræver
-        felt.udforsket = true;
-
-        // Tving Svelte til at registrere ændringen i arrayet
-        spilTilstand.gitter = [...spilTilstand.gitter];
-    }
-
-    // Nulstil selve event-vinduets interne tilstand
     eventState.aktivt = null;
     eventState.log = [];
     eventState.valgLåst = false;
 }
 
-export function kanViseValg(valg: Valg): boolean {
-    if (valg.kraeverItem && !spilTilstand.mitUdstyr.some(i => i.id === valg.kraeverItem)) return false;
-    if (valg.kosterItem && !spilTilstand.mitUdstyr.some(i => i.id === valg.kosterItem)) return false;
+export function kanViseValg(valg: Valg) {
     if (valg.kraeverKarakter && spilTilstand.valgtKarakter?.id !== valg.kraeverKarakter) return false;
-    if (valg.gemtForKarakter && spilTilstand.valgtKarakter?.id === valg.gemtForKarakter) return false;
     if (valg.puljeVaerdi && spilTilstand.guldTotal < valg.puljeVaerdi) return false;
-    
-    return true; 
+
+    if (valg.kraeverItem) {
+        const harTing = spilTilstand.mitUdstyr?.find(i => i.id === valg.kraeverItem);
+        if (!harTing || harTing.maengde <= 0) return false;
+    }
+
+    if (valg.kosterItem) {
+        const harTing = spilTilstand.mitUdstyr?.find(i => i.id === valg.kosterItem);
+        if (!harTing || harTing.maengde <= 0) return false;
+    }
+
+    return true;
 }
 
 export function tagValg(valg: Valg) {
     if (eventState.valgLåst) return;
-    eventState.valgLåst = true;
 
-    // 1. Træk betalingen fra spilleren (fjerner kun én kopi af genstanden)
+    if (!kanViseValg(valg)) {
+        eventState.log = [...eventState.log, "Du har ikke det nødvendige udstyr eller guld."];
+        return;
+    }
+
     if (valg.kosterItem) {
         brugFraRygsæk(valg.kosterItem, 1);
     }
@@ -67,49 +59,94 @@ export function tagValg(valg: Valg) {
         spilTilstand.guldTotal -= valg.puljeVaerdi;
     }
 
-    // 2. Tjek om vi hopper direkte til et nyt vindue uden belønninger
-    if (valg.naesteTrin && (!valg.udfaldListe || valg.udfaldListe.length === 0)) {
-        startEvent(valg.naesteTrin);
-        return;
-    }
+    eventState.valgLåst = true;
 
-    // 3. Maskinen trækker i blinde fra udfaldslisten
     if (valg.udfaldListe && valg.udfaldListe.length > 0) {
-        const index = Math.floor(Math.random() * valg.udfaldListe.length);
-        const valgtUdfald = valg.udfaldListe[index];
-        eksekverUdfald(valgtUdfald);
+        const resultat = valg.udfaldListe[Math.floor(Math.random() * valg.udfaldListe.length)];
+        let kvittering = "";
+        let samletLogTekst = resultat.log;
+
+        if (resultat.hpAendring) {
+            let endeligHp = resultat.hpAendring;
+            const udsving = Math.abs(endeligHp * 0.25);
+            const tilfaeldig = (Math.random() * udsving * 2) - udsving;
+            endeligHp = Math.round(endeligHp + tilfaeldig);
+            spilTilstand.livspoint += endeligHp;
+            kvittering += ` (${endeligHp > 0 ? '+' : ''}${endeligHp} HP)`;
+        }
+
+        if (resultat.guldAendring) {
+            let endeligGuld = resultat.guldAendring;
+            const udsving = Math.abs(endeligGuld * 0.25);
+            const tilfaeldig = (Math.random() * udsving * 2) - udsving;
+            endeligGuld = Math.round(endeligGuld + tilfaeldig);
+            spilTilstand.guldTotal += endeligGuld;
+            kvittering += ` (${endeligGuld > 0 ? '+' : ''}${endeligGuld} Guld)`;
+        }
+
+        if (kvittering) {
+            samletLogTekst += kvittering;
+        }
+
+        eventState.log = [...eventState.log, samletLogTekst];
+        spilTilstand.logBesked = samletLogTekst;
+
+        if (resultat.givItem) tilfoejTilRygsæk(resultat.givItem, 1);
+        if (resultat.mistItem) brugFraRygsæk(resultat.mistItem, 1);
+
+        syncTilDb(true);
+
+        if (resultat.kollaps || spilTilstand.livspoint <= 0) {
+            setTimeout(() => fremtvingKollaps(), 1500);
+            return;
+        }
+
+        if (resultat.naesteTrin) {
+            setTimeout(() => startEvent(resultat.naesteTrin!), 2000);
+        } else {
+            const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
+            if (felt) felt.eventFuldført = true;
+            syncTilDb(true);
+            fremrykTid();
+            setTimeout(() => lukEvent(), 2000);
+        }
+    } 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    else if ((valg as any).effekt) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const resultat = (valg as any).effekt();
+        eventState.log = [...eventState.log, resultat.logBesked];
+        spilTilstand.logBesked = resultat.logBesked;
+
+        if (resultat.hpOp) spilTilstand.livspoint += resultat.hpOp;
+        if (resultat.hpNed) spilTilstand.livspoint -= resultat.hpNed;
+        if (resultat.guldOp) spilTilstand.guldTotal += resultat.guldOp;
+        if (resultat.guldNed) spilTilstand.guldTotal -= resultat.guldNed;
+        if (resultat.itemUd) tilfoejTilRygsæk(resultat.itemUd, 1);
+        
+        syncTilDb(true);
+
+        if (spilTilstand.livspoint <= 0) {
+            setTimeout(() => fremtvingKollaps(), 1500);
+            return;
+        }
+
+        if (resultat.naesteEvent) {
+            setTimeout(() => startEvent(resultat.naesteEvent), 2000);
+        } else {
+            const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
+            if (felt) felt.eventFuldført = true;
+            syncTilDb(true);
+            fremrykTid();
+            setTimeout(() => lukEvent(), 2000);
+        }
     } else {
-        eventState.log.push("Du rækker ud i mørket, men finder ingenting.");
-    }
-}
-
-function eksekverUdfald(udfald: Udfald) {
-    eventState.log.push(udfald.log);
-
-    if (udfald.aktionType === 'hp' && udfald.vaerdi) spilTilstand.livspoint += udfald.vaerdi;
-    if (udfald.aktionType === 'guld' && udfald.vaerdi) spilTilstand.guldTotal += udfald.vaerdi;
-
-    if (udfald.givItem) {
-        tilfoejTilRygsæk(udfald.givItem, 1);
-    }
-    if (udfald.mistItem) {
-        brugFraRygsæk(udfald.mistItem, 1);
-    }
-
-// Det skudsikre kollaps-tjek via 1-HP hacket
-    if (udfald.aktionType === 'kollaps' || spilTilstand.livspoint <= 0) {
-        lukEvent(); 
-        
-        // Tvinger besvimelsen i gang med 1 HP (overstyrer Sveltes dræber-kode)
-        fremtvingKollaps();
-        
-        return; 
-    }
-
-    // Kører kun videre, hvis karakteren stadig står på benene
-    if (udfald.naesteTrin) {
-        setTimeout(() => {
-            startEvent(udfald.naesteTrin!);
-        }, 3000); 
+        eventState.log = [...eventState.log, "Ingenting skete."];
+        spilTilstand.logBesked = "Ingenting skete.";
+        const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
+        if (felt) felt.eventFuldført = true;
+        syncTilDb(true);
+        fremrykTid();
+        setTimeout(() => lukEvent(), 2000);
     }
 }
