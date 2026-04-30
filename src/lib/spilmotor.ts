@@ -149,12 +149,13 @@ export function hvil() {
     if (!spilTilstand.valgtKarakter || spilTilstand.erBevidstløs) return;
 
     const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-    if (felt?.biome === 'hav') {
-        spilTilstand.logBesked = "Du kan ikke slå lejr på åbent hav.";
+    const vildmark = ['eng', 'skov', 'mark', 'bjerg'];
+    
+    if (!felt || !vildmark.includes(felt.biome as string)) {
+        spilTilstand.logBesked = "Miljøet er for fjendtligt eller uegnet til at slå lejr her.";
         return;
     }
     
-    // Tjek om spilleren faktisk ejer en sovepose
     const harSovepose = spilTilstand.mitUdstyr?.some(ting => ting.id === 'sovepose');
     if (!harSovepose) {
         spilTilstand.logBesked = "Du mangler en sovepose for at slå lejr.";
@@ -166,9 +167,13 @@ export function hvil() {
         return;
     }
 
+    // <--- HER BRUGER VI maxLivspoint I STEDET FOR 100
+    spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 20); 
+    
     spilTilstand.nuvaerendeEnergi = 0;
-    spilTilstand.logBesked = "Du slår lejr og samler kræfter.";
+    spilTilstand.logBesked = "Du pakker dig ind i soveposen. Sår lukkes, mens tågen æder dit forspring.";
     fremrykTid();
+    syncTilDb(true);
 }
 
 export function initialiserGitter() {
@@ -289,10 +294,10 @@ export function initialiserGitter() {
         } else if (felt.biome === 'by' || felt.biome === 'marked') {
             if (Math.random() < 0.6) {
                 const antalVarer = felt.biome === 'by' ? 2 : 1;
-// Klip fra spilmotor.ts
-const pulje = felt.biome === 'marked' 
-    ? markedVarePool 
-    : Object.keys(itemDB).filter(k => itemDB[k].pris > 0 && itemDB[k].type !== 'forbandelse' && itemDB[k].type !== 'skat');                const valgte: string[] = [];
+                const pulje = felt.biome === 'marked' 
+                    ? markedVarePool 
+                    : Object.keys(itemDB).filter(k => itemDB[k].pris > 0 && itemDB[k].type !== 'forbandelse' && itemDB[k].type !== 'skat');                
+                const valgte: string[] = [];
                 for(let j=0; j < antalVarer; j++) {
                     const vare = pulje[Math.floor(Math.random() * pulje.length)];
                     if (!valgte.includes(vare)) valgte.push(vare);

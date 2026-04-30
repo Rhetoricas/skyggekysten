@@ -1,5 +1,4 @@
-// spilTilstand.svelte.ts
-import type { Felt, Karakter, SpillerModstander } from './types';
+import type { Felt, Karakter, SpillerData } from './types'; // <--- RETTET HER
 
 interface FlydendeTal {
     id: number;
@@ -18,6 +17,7 @@ export const spilTilstand = $state({
     gitter: [] as Felt[],
     spillerIndex: 0,
     livspoint: 100,
+    maxLivspoint: 100,
     guldTotal: 0,
     nuvaerendeEnergi: 10,
     maxEnergi: 10,
@@ -29,7 +29,7 @@ export const spilTilstand = $state({
     statusBesked: '',
     logBesked: 'Velkommen til øen.',
     fogX: 0,
-    alleSpillere: {} as Record<string, SpillerModstander>,
+    alleSpillere: {} as Record<string, SpillerData>, // <--- OG RETTET HER
     mitUdstyr: [] as Array<{ id: string; maengde: number }>,
     mineKendteFelter: [] as number[],
     aktivShop: null as string[] | null,

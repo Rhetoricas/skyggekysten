@@ -1,8 +1,13 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { eventState, kanViseValg, tagValg } from '$lib/eventMotor.svelte';
+    import { eventBibliotek } from '$lib/eventBibliotek';
 
     let { lukEvent } = $props<{ lukEvent: () => void }>();
+
+    let aktueltFelt = $derived(spilTilstand.gitter[spilTilstand.spillerIndex]);
+    let rootEvent = $derived(aktueltFelt?.eventID ? eventBibliotek[aktueltFelt.eventID] : null);
+    let grundBiome = $derived(rootEvent ? (Array.isArray(rootEvent.biome) ? rootEvent.biome[0] : rootEvent.biome) : 'event');
 </script>
 
 {#if eventState.aktivt}
@@ -14,7 +19,7 @@
 <div class="event-overlay">
     <div class="event-boks">
         <img
-            src={eventState.aktivt.billede || `/events/ev_${Array.isArray(eventState.aktivt.biome) ? eventState.aktivt.biome[0] : eventState.aktivt.biome}.webp`}
+            src={eventState.aktivt.billede || `/events/ev_${grundBiome}.webp`}
             alt="Event baggrund"
             onerror={(e) => {
                 (e.currentTarget as HTMLImageElement).onerror = null;
@@ -30,8 +35,8 @@
             {/each}
         </div>
 
-        {#if !eventState.valgLåst}
-            <div class="knap-panel">
+        <div class="knap-panel">
+            {#if !eventState.valgLåst}
                 {#each eventState.aktivt.valg as valg (valg.tekst)}
                     {#if kanViseValg(valg)}
                         <button class="valg-btn" onclick={() => tagValg(valg)}>
@@ -45,10 +50,10 @@
                         </button>
                     {/if}
                 {/each}
-                
-                <button class="valg-btn" onclick={lukEvent}>Forlad stedet</button>
-            </div>
-        {/if}
+            {/if}
+            
+            <button class="valg-btn" onclick={lukEvent}>Forlad stedet</button>
+        </div>
     </div>
 </div>
 {/if}

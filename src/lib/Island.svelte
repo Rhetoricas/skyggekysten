@@ -233,6 +233,7 @@
                     const eksisterende = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
                     spilTilstand.spillerIndex = eksisterende.index;
                     spilTilstand.livspoint = eksisterende.hp;
+                    spilTilstand.maxLivspoint = eksisterende.maxHp || 100; // <--- HENTER GAMMEL MAX
                     spilTilstand.guldTotal = eksisterende.guld;
                     spilTilstand.maxKolonne = eksisterende.kolonne;
                     spilTilstand.dag = eksisterende.dag || 1;
@@ -303,6 +304,7 @@
     async function bekræftValg(karakter: Karakter) {
         spilTilstand.valgtKarakter = karakter;
         spilTilstand.livspoint = karakter.startHp;
+        spilTilstand.maxLivspoint = karakter.startHp || 100; // <--- SÆTTER START MAX HP
         spilTilstand.guldTotal = karakter.startGuld;
         spilTilstand.maxKolonne = 1;
         spilTilstand.dag = 1;

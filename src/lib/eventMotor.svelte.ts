@@ -66,13 +66,36 @@ export function tagValg(valg: Valg) {
         let kvittering = "";
         let samletLogTekst = resultat.log;
 
+        // <--- HER HÅNDTERES ÆNDRING AF MAX HP
+        if (resultat.maxHpAendring) {
+            spilTilstand.maxLivspoint += resultat.maxHpAendring;
+            
+            if (resultat.maxHpAendring > 0) {
+                spilTilstand.livspoint += resultat.maxHpAendring;
+            } else {
+                spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint);
+            }
+            kvittering += ` (${resultat.maxHpAendring > 0 ? '+' : ''}${resultat.maxHpAendring} Max HP)`;
+        }
+
         if (resultat.hpAendring) {
             let endeligHp = resultat.hpAendring;
             const udsving = Math.abs(endeligHp * 0.25);
             const tilfaeldig = (Math.random() * udsving * 2) - udsving;
             endeligHp = Math.round(endeligHp + tilfaeldig);
-            spilTilstand.livspoint += endeligHp;
-            kvittering += ` (${endeligHp > 0 ? '+' : ''}${endeligHp} HP)`;
+            
+            const foerHp = spilTilstand.livspoint;
+            const maxHelbred = spilTilstand.maxLivspoint; // <--- HENTER NY MAX
+            
+            spilTilstand.livspoint = Math.min(maxHelbred, spilTilstand.livspoint + endeligHp);
+            
+            const faktiskAendring = spilTilstand.livspoint - foerHp;
+            
+            if (faktiskAendring !== 0) {
+                kvittering += ` (${faktiskAendring > 0 ? '+' : ''}${faktiskAendring} HP)`;
+            } else if (endeligHp > 0) {
+                kvittering += ` (Allerede fuld HP)`;
+            }
         }
 
         if (resultat.guldAendring) {
@@ -118,7 +141,10 @@ export function tagValg(valg: Valg) {
         eventState.log = [...eventState.log, resultat.logBesked];
         spilTilstand.logBesked = resultat.logBesked;
 
-        if (resultat.hpOp) spilTilstand.livspoint += resultat.hpOp;
+        if (resultat.hpOp) {
+            const maxHelbred = spilTilstand.maxLivspoint; // <--- HENTER NY MAX
+            spilTilstand.livspoint = Math.min(maxHelbred, spilTilstand.livspoint + resultat.hpOp);
+        }
         if (resultat.hpNed) spilTilstand.livspoint -= resultat.hpNed;
         if (resultat.guldOp) spilTilstand.guldTotal += resultat.guldOp;
         if (resultat.guldNed) spilTilstand.guldTotal -= resultat.guldNed;

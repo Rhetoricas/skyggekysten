@@ -4,6 +4,7 @@ import type { Biome } from './types';
 export interface Udfald {
     log: string; 
     hpAendring?: number;
+    maxHpAendring?: number; // <--- NY VARIABEL TILFØJET
     guldAendring?: number;
     kollaps?: boolean;
     givItem?: string;         
@@ -39,6 +40,30 @@ export interface SpilEvent {
 }
 
 export const eventBibliotek: Record<string, SpilEvent> = {
+    
+    // <--- HER ER DET NYE ALTER
+    'blodalter': {
+        id: 'blodalter',
+        titel: "Det Røde Alter",
+        tekst: "En pulserende sten står midt i lysningen. Indgraveringerne lover dig en pose guld, hvis du ofrer en flig af din vitalitet. Alteret ser ud til at kunne sluge din styrke permanent.",
+        biome: ['ruin', 'blodskov'],
+        billede: '/events/ev_alter.webp',
+        unik: false,
+        valg: [
+            {
+                tekst: "Lad alteret suge dit blod (Mist 15 Max HP)",
+                udfaldListe: [
+                    { log: "Du presser hænderne mod stenen. Maskinen trækker vejret. Du føler dig svagere, men alteret spytter mønter ud.", maxHpAendring: -15, guldAendring: 60 }
+                ]
+            },
+            {
+                tekst: "Gå derfra",
+                udfaldListe: [
+                    { log: "Du vender ryggen til stenen og sparer dit kød." }
+                ]
+            }
+        ]
+    },
 
     'stjernekikkert': {
         id: "stjernekikkert",
@@ -947,24 +972,35 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         ]
     },
 
-    'campfire': {
+'campfire': {
         id: 'campfire',
-        titel: "Glemt Lejrbål",
-        tekst: "Gløderne varmer lejren. Bålet skaber et sikkert sted at hvile.",
-        biome: ['eng', 'skov', 'mark', 'bjerg'],
+        titel: "Fremmed Lejr",
+        tekst: "En flok vejrbidte rejsende varmer hænderne over et knitrende bål. De stirrer stift på dig. Lederen nikker mod en ledig plads og kræver betaling for at lade dig sove i deres cirkel.",
+        biome: ['eng', 'skov', 'mark', 'bjerg', 'gen'],
         billede: '/events/ev_campfire.webp', 
         unik: false,
         valg: [
             {
-                tekst: "Køb dig til ro (20 Guld)",
+                tekst: "Køb dig til en nats ro (20 Guld)",
                 puljeVaerdi: 20,
-                udfaldListe: [{ log: "Varmen lindrer dine smerter.", hpAendring: 50 }]
+                udfaldListe: [
+                    { log: "De holder ord. Varmen og sikkerheden lader dine sår hele natten over.", hpAendring: 50 },
+                                        { log: "De holder ord. Varmen og sikkerheden lader dine sår hele natten over.", hpAendring: 50 },
+                                                            { log: "De holder ord. Varmen og sikkerheden lader dine sår hele natten over.", hpAendring: 50 },
+                    { log: "Det var en fælde. Du vågner ved at de gennemtæver dig og sparker dig ud i mørket.", hpAendring: -25 }
+                ]
             },
-            {
-                tekst: "Kog din eliksir over bålet",
-                kosterItem: 'livseliksir',
-                udfaldListe: [{ log: "Medicinen forstærkes markant.", hpAendring: 100 }]
-            }
+{
+    tekst: "Del din eliksir med gruppen",
+    kosterItem: 'livseliksir',
+    udfaldListe: [
+        { 
+            log: "Du varmer eliksiren over bålet for at gøre den stærkere og deler den gerne. De giver dig dit guld tilbage og holder vagt, mens du sover tungt og genvinder alle kræfter.", 
+            hpAendring: 100, 
+            guldAendring: 20 
+        }
+    ]
+}
         ]
     },
 
@@ -1481,8 +1517,5 @@ export const eventBibliotek: Record<string, SpilEvent> = {
             }
         ]
     },
-    
-    
-
     
 };

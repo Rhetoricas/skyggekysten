@@ -43,6 +43,7 @@ export interface SpillerData {
     index: number;
     kolonne: number;
     hp: number;
+    maxHp?: number;
     guld: number;
     isDead: boolean;
     isWinner: boolean;
