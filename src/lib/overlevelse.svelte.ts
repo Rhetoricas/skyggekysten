@@ -1,6 +1,7 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb } from './netvaerk';
 import { BREDDE, HEX_W } from './spildata';
+import { tjekUdstyrSlid } from './spilmotor';
 
 export function erSpillerITaagen() {
     const r = Math.floor(spilTilstand.spillerIndex / BREDDE);
@@ -77,7 +78,8 @@ export function fremrykTid() {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const antalLevende = Object.values(spilTilstand.alleSpillere).filter((s: any) => !s.isDead && !s.isWinner).length || 1;
-    let slukkedeFakler = 0;
+    
+    const gammelDag = spilTilstand.dag || 1;
 
     while (spilTilstand.nuvaerendeEnergi <= 0) {
         spilTilstand.dag++;
@@ -86,24 +88,26 @@ export function fremrykTid() {
         if (spilTilstand.dag > 6) {
             spilTilstand.fogX += HEX_W / (antalLevende * 2);
         }
+    }
 
-        if (spilTilstand.mitUdstyr) {
-            const fakkelIndex = spilTilstand.mitUdstyr.findIndex(ting => ting.id === 'fakkel');
-            if (fakkelIndex > -1 && Math.random() < 0.15) {
-                spilTilstand.mitUdstyr.splice(fakkelIndex, 1);
-                slukkedeFakler++;
-            }
+    const nyDag = spilTilstand.dag || 1;
+
+// Kører slid-tjekket, hvis kalenderen har rykket sig
+    if (nyDag > gammelDag) {
+        if (nyDag === 2) {
+            // Her bruger vi = i stedet for += for at rydde den gamle besked væk
+            spilTilstand.logBesked = "Dit blik skærer skarpere. Du føler dig mere klarsynet og kan nu overskue omgivelserne.";
         }
+
+        ['fakkel', 'metaldetektor', 'soegekvist'].forEach(id => {
+            const log = tjekUdstyrSlid(id);
+            if (log) spilTilstand.logBesked += log;
+        });
     }
 
     if (erSpillerITaagen()) {
         tagSkadeOgTjekDød(50, "Tågens syre ætsede dine lunger. (-50 HP)"); 
     } else {
-        if (slukkedeFakler > 0 && !spilTilstand.erBevidstløs) {
-            spilTilstand.logBesked = slukkedeFakler === 1 
-                ? "Din fakkel brændte ud i mørket." 
-                : `${slukkedeFakler} fakler brændte ud under din dvale.`;
-        }
         syncTilDb(true);
     }
 }

@@ -1,8 +1,8 @@
 // spildata.ts
 import type { Karakter, Biome, ItemType } from './types';
 
-export const BREDDE = 50;
-export const HOEJDE = 20;
+export const BREDDE = 100;
+export const HOEJDE = 15;
 export const HEX_W = 96;  
 export const ROW_H = 82; 
 
@@ -20,7 +20,6 @@ export const biomeTerraenCost: Record<Biome, number> = {
     'hav': 4
 };
 
-// Sovepose er nu på markedet
 export const markedVarePool = ['skovl', 'livseliksir', 'klude', 'kniv', 'metaldetektor', 'soegekvist', 'fakkel', 'sovepose'];
 
 export const itemDB: Record<string, { id: string; navn: string; type: ItemType; billede: string; bonus: number; pris: number }> = {

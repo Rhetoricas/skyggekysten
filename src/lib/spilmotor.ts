@@ -1,4 +1,3 @@
-// spilmotor.ts
 import { spilTilstand } from '$lib/spilTilstand.svelte';
 import { syncTilDb } from '$lib/netvaerk';
 import { BREDDE, HOEJDE, biomeVægte, itemDB, markedVarePool } from '$lib/spildata';
@@ -6,7 +5,7 @@ import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
 import { fremrykTid } from '$lib/overlevelse.svelte';
-import type { Felt } from '$lib/types';
+import type { Felt, RygsækTing } from '$lib/types';
 
 const RETNINGER = {
     'NE': [[0, -1], [1, -1]],
@@ -86,15 +85,20 @@ export function hentNaboIndices(index: number) {
 }
 
 export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number = 1) {
-    const fundetTing = spilTilstand.mitUdstyr.find(ting => ting.id === genstandId);
+    // Vi tvinger TS til at se hele arrayet som RygsækTing (inklusive anskaffetDag)
+    const udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    const fundetTing = udstyrListe.find(ting => ting.id === genstandId);
 
     if (fundetTing) {
         fundetTing.maengde += tilfoejetMaengde;
+        fundetTing.anskaffetDag = spilTilstand.dag;
     } else {
-        spilTilstand.mitUdstyr.push({
+        const nyTing: RygsækTing = {
             id: genstandId,
-            maengde: tilfoejetMaengde
-        });
+            maengde: tilfoejetMaengde,
+            anskaffetDag: spilTilstand.dag
+        };
+        udstyrListe.push(nyTing);
     }
     
     syncTilDb();
@@ -167,11 +171,13 @@ export function hvil() {
         return;
     }
 
-    // <--- HER BRUGER VI maxLivspoint I STEDET FOR 100
     spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 20); 
     
     spilTilstand.nuvaerendeEnergi = 0;
-    spilTilstand.logBesked = "Du pakker dig ind i soveposen. Sår lukkes, mens tågen æder dit forspring.";
+    
+    const slidLog = tjekUdstyrSlid('sovepose');
+    spilTilstand.logBesked = "Du pakker dig ind i soveposen. Sår lukkes, mens tågen æder dit forspring." + slidLog;
+    
     fremrykTid();
     syncTilDb(true);
 }
@@ -317,4 +323,19 @@ export function initialiserGitter() {
     spilTilstand.spillerIndex = muligeStartFelter[Math.floor(Math.random() * muligeStartFelter.length)];
     
     afslørOmraade(spilTilstand.spillerIndex);
+}
+
+export function tjekUdstyrSlid(genstandId: string): string {
+    const ting = spilTilstand.mitUdstyr.find((t: RygsækTing) => t.id === genstandId) as RygsækTing | undefined;
+    if (!ting) return "";
+
+    const alder = (spilTilstand.dag || 1) - (ting.anskaffetDag || 1);
+    if (alder > 10) {
+        if (Math.random() <= 0.25) {
+            brugFraRygsæk(genstandId, 1);
+            const vareNavn = itemDB[genstandId]?.navn || genstandId;
+            return ` Din ${vareNavn} bukkede under for sliddet og faldt fra hinanden.`;
+        }
+    }
+    return "";
 }

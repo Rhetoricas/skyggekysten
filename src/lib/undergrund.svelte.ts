@@ -1,8 +1,7 @@
-// undergrund.svelte.ts
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb } from './netvaerk';
 import { fremtvingKollaps, fremrykTid } from '$lib/overlevelse.svelte';
-import { afslørOmraade, brugFraRygsæk, tilfoejTilRygsæk } from '$lib/spilmotor';
+import { afslørOmraade, tilfoejTilRygsæk, tjekUdstyrSlid } from '$lib/spilmotor';
 import type { Biome } from './types';
 
 function tilfaeldigtTal(min: number, max: number) {
@@ -78,16 +77,13 @@ export function grav() {
     const skovlItem = spilTilstand.mitUdstyr.find((i) => i.id === 'skovl');
     const harSkovl = !!skovlItem && skovlItem.maengde > 0;
     
-    let udstyrsLog = ""; 
+    let udstyrsLog: string; 
 
     const faktiskEnergiPris = harSkovl ? baseGravePris : baseGravePris * 2;
     spilTilstand.nuvaerendeEnergi -= faktiskEnergiPris;
 
     if (harSkovl) {
-        if (Math.random() < 0.15) {
-            brugFraRygsæk('skovl', 1);
-            udstyrsLog = " KNAK. Din skovl splintredes mod undergrunden.";
-        }
+        udstyrsLog = tjekUdstyrSlid('skovl');
     } else {
         spilTilstand.livspoint -= 10;
         udstyrsLog = ` Du flænser jorden med bare næver. Du mister 10 HP og ${faktiskEnergiPris} Energi.`;

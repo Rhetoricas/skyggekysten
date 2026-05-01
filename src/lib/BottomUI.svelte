@@ -41,7 +41,8 @@
 
     <div class="ui-content">
         <div class="status-row">
-            <div class="status-item">
+            <!-- HER ER DET BANKENDE HJERTE INDSAT -->
+            <div class="status-item" class:kritisk={spilTilstand.livspoint < 30}>
                 <img src="/inventory/hp.webp" alt="Liv" class="status-icon" />
                 <span class="status-value">{spilTilstand.livspoint}</span>
             </div>
@@ -231,6 +232,7 @@
         color: white;
         font-family: monospace;
         font-size: 1.2rem;
+        transition: color 0.3s ease;
     }
     .status-icon {
         height: 50px;
@@ -356,5 +358,17 @@
         30% { transform: scale(1); } 
         45% { transform: scale(1.15); } 
         100% { transform: scale(1); } 
+    }
+
+    /* NYE REGLER TIL KRITISK HP */
+    .status-item.kritisk {
+        color: #ff4444;
+    }
+    .status-item.kritisk .status-icon {
+        animation: hpPuls 0.6s infinite alternate ease-in-out;
+    }
+    @keyframes hpPuls {
+        0% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) drop-shadow(0 0 2px darkred); }
+        100% { transform: scale(1.3); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) drop-shadow(0 0 10px red) brightness(1.2); }
     }
 </style>

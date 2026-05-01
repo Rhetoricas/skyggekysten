@@ -33,10 +33,12 @@
     const MAX_DAGE_FORAN = 5;
 
     let lokaleScores = $state<Array<{ navn: string; score: number; karakter?: string }>>([]);
-let globaleScores = $state<Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);    
+    let globaleScores = $state<Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);    
     let fremdriftPoint = $derived(spilTilstand.maxKolonne * 1);
     let winBonus = $derived(spilTilstand.gameState === 'win' ? 1000 : 0);
     let flytterNu = false;
+    let sejlendeBaadIndex = $state<number | null>(null);
+    
     let harDetektor = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'metaldetektor') ?? false);
     let harKvist = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'soegekvist') ?? false);
     let harFakkel = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'fakkel') ?? false);
@@ -58,21 +60,24 @@ let globaleScores = $state<Array<{ spillerNavn: string; oeNavn: string; point: n
 
     let bgMusik: HTMLAudioElement | null = null;
 
-onMount(() => {
-    bgMusik = new Audio('/audio/ambient.mp3');
-    bgMusik.loop = true;
-    bgMusik.volume = 0.3;
-});
+    onMount(() => {
+        bgMusik = new Audio('/audio/ambient.mp3');
+        bgMusik.loop = true;
+        bgMusik.volume = 0.3;
+    });
 
-$effect(() => {
-    if (bgMusik) {
-        if (spilTilstand.musikTaendt && spilTilstand.gameState === 'play') {
-            bgMusik.play().catch(() => {});
-        } else {
-            bgMusik.pause();
+    $effect(() => {
+        if (bgMusik) {
+            if (spilTilstand.musikTaendt && spilTilstand.gameState === 'play') {
+                bgMusik.play().catch(() => {});
+            } else {
+                bgMusik.pause();
+                if (spilTilstand.gameState === 'win' || spilTilstand.gameState === 'dead') {
+                    bgMusik.currentTime = 0;
+                }
+            }
         }
-    }
-});
+    });
     
     $effect(() => {
         if (spilTilstand.gameState !== glGameState) {
@@ -81,7 +86,9 @@ $effect(() => {
             }
             if ((spilTilstand.gameState === 'win' || spilTilstand.gameState === 'dead') && !scoreErGemt) {
                 scoreErGemt = true;
-                opdaterOgGemHighscore();
+                (async () => {
+                    await opdaterOgGemHighscore();
+                })();
             }
             glGameState = spilTilstand.gameState;
         }
@@ -136,6 +143,8 @@ $effect(() => {
         transform-origin: ${cam.x}px ${cam.y}px;
         transform: translate(calc(50vw - ${cam.x}px), calc(50vh - ${cam.y}px)) scale(${cam.zoomLevel});
         transition: ${cam.isDragging ? 'none' : 'transform 0.3s ease-out'};
+        width: ${BREDDE * HEX_W + HEX_W}px;
+        height: ${HOEJDE * ROW_H + ROW_H}px;
     `);
     
     $effect(() => {
@@ -167,7 +176,7 @@ $effect(() => {
         const billederTilPreload = [
             '/tiles/byshop.webp', '/tiles/markedshop.webp', '/tiles/udgravning.webp',
             '/tiles/event.png', '/tiles/campfire.webp', '/events/ev_campfire.webp', '/tiles/guldtaage.webp', '/tiles/livtaage.webp',
-            '/inventory/hp.webp', '/inventory/guld.webp', '/tiles/player.webp', '/tiles/energi_slukket.webp', '/tiles/energi_taendt.webp', '/tiles/blodofring.webp'
+            '/inventory/hp.webp', '/inventory/guld.webp', '/tiles/player.webp', '/tiles/energi_slukket.webp', '/tiles/energi_taendt.webp', '/tiles/blodofring.webp', '/tiles/baad.webp'
         ];
         
         standardBiomer.forEach(biome => {
@@ -210,7 +219,6 @@ $effect(() => {
 
         if (spilTilstand.erHost) {
             spilTilstand.fogX = 0;
-            // Vi bevarer kortet, men fjerner alle spor efter tidligere forsøg
             spilTilstand.gitter.forEach(felt => {
                 felt.gravet = false;
                 felt.eventFuldført = false;
@@ -233,6 +241,18 @@ $effect(() => {
         spilTilstand.spillerNavn = rentNavn;
         spilTilstand.rumKode = renKode;
         spilTilstand.statusBesked = 'Forbinder dig til øen...';
+
+if (alarmKanal) supabase.removeChannel(alarmKanal);
+        alarmKanal = supabase
+            .channel(spilTilstand.rumKode) // Slet `alarm_` præfikset her
+            .on('broadcast', { event: 'alarm' }, ({ payload }) => {
+                if (payload.senderNavn === spilTilstand.spillerNavn) return;
+    
+                if (spilTilstand.alleSpillere[payload.senderNavn]) {
+                    spilTilstand.alleSpillere[payload.senderNavn].activeAlarm = true;
+                }
+            })
+            .subscribe();
         
         try {
             const { data, error } = await supabase.from('spil_sessioner').select('*').eq('rum_kode', spilTilstand.rumKode).maybeSingle();
@@ -264,9 +284,13 @@ $effect(() => {
 
                     afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
                     startRealtime();
-                    if (eksisterende.isDead) spilTilstand.gameState = 'dead';
-                    else if (eksisterende.isWinner) spilTilstand.gameState = 'win';
-                    else {
+                    if (eksisterende.isDead) {
+                        scoreErGemt = true;
+                        spilTilstand.gameState = 'dead';
+                    } else if (eksisterende.isWinner) {
+                        scoreErGemt = true;
+                        spilTilstand.gameState = 'win';
+                    } else {
                         spilTilstand.gameState = 'play';
                         cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
                     }
@@ -298,16 +322,6 @@ $effect(() => {
     onMount(() => {
         preloadFiler();
         opdaterOgGemHighscore();
-        alarmKanal = supabase
-            .channel(spilTilstand.rumKode)
-            .on('broadcast', { event: 'alarm' }, ({ payload }) => {
-                if (payload.senderNavn === spilTilstand.spillerNavn) return;
-    
-                if (spilTilstand.alleSpillere[payload.senderNavn]) {
-                    spilTilstand.alleSpillere[payload.senderNavn].activeAlarm = true;
-                }
-            })
-            .subscribe();
     });
     
     onDestroy(() => {
@@ -315,8 +329,7 @@ $effect(() => {
         if (alarmKanal) supabase.removeChannel(alarmKanal);
     });
     
-async function opdaterOgGemHighscore() {
-        // Vi tvinger maskinen til at regne scoren ud her og nu, før den sender det til skyen
+    async function opdaterOgGemHighscore() {
         spilTilstand.samletScore = Math.floor(
             (spilTilstand.guldTotal + (spilTilstand.maxKolonne * 1) + (spilTilstand.gameState === 'win' ? 1000 : 0)) *
                 (1 + Math.max(0, spilTilstand.livspoint) / 1000)
@@ -356,6 +369,19 @@ async function opdaterOgGemHighscore() {
         
         afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
         
+        const muligeBaadFelter = [];
+        for (let raekke = 1; raekke < HOEJDE - 1; raekke++) {
+            const indeks = raekke * BREDDE + (BREDDE - 2);
+            if (!spilTilstand.gitter[indeks].hasBoat && spilTilstand.gitter[indeks].biome !== 'hav') {
+                muligeBaadFelter.push(indeks);
+            }
+        }
+        
+        if (muligeBaadFelter.length > 0) {
+            const baadIndeks = muligeBaadFelter[Math.floor(Math.random() * muligeBaadFelter.length)];
+            spilTilstand.gitter[baadIndeks].hasBoat = true;
+        }
+        
         if (spilTilstand.erHost) {
             const { data } = await supabase.from('spil_sessioner').select('rum_kode').eq('rum_kode', spilTilstand.rumKode).maybeSingle();
             if (!data) {
@@ -369,9 +395,10 @@ async function opdaterOgGemHighscore() {
             }
         }
         
-        await syncTilDb();
+        await syncTilDb(true);
         cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
         spilTilstand.gameState = 'play';
+        spilTilstand.logBesked = "Du er lige skyllet op på kysten. Hovedet dunker, og du er for groggy til at overskue horisonten.";
     }
 
     function lukEventOgShop() {
@@ -392,7 +419,7 @@ async function opdaterOgGemHighscore() {
         return Math.min(...aktive.map((s: any) => s.dag || 1));
     }
 
-   function udførBevægelse(nytIndeks: number) {
+function udførBevægelse(nytIndeks: number) {
         if (flytterNu || !spilTilstand.valgtKarakter) return;
         flytterNu = true;
 
@@ -406,8 +433,22 @@ async function opdaterOgGemHighscore() {
         const felt = spilTilstand.gitter[nytIndeks];
         if (!felt) { flytterNu = false; return; }
         
+        // Energien styres stadig af karakterens pris og landskabets besvær
         const pris = Math.round(spilTilstand.valgtKarakter.moveCost * (biomeTerraenCost[felt.biome as Biome] || 1));
         spilTilstand.nuvaerendeEnergi -= erITågen ? pris * 2 : pris;
+
+        const farligeBiomer = ['bjerg', 'hule', 'ritual', 'ruin', 'bandit', 'blodskov', 'krystal', 'slagmark'];
+        const hpStraf = farligeBiomer.includes(felt.biome as string) ? 2 : 1;
+        spilTilstand.livspoint -= hpStraf;
+
+        if (spilTilstand.livspoint <= 0) {
+            tagSkadeOgTjekDød(0, "", "Marchen sled din sidste gnist væk. Du kollapser i støvet.");
+            if (spilTilstand.gameState === 'dead') {
+                flytterNu = false;
+                syncTilDb(true);
+                return;
+            }
+        }
 
         if (felt.biome === 'hav') {
             tagSkadeOgTjekDød(
@@ -424,10 +465,17 @@ async function opdaterOgGemHighscore() {
         if ((nytIndeks % BREDDE) > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nytIndeks % BREDDE;
         fremrykTid();
         
-        if ((nytIndeks % BREDDE) === BREDDE - 2) {
-            spilTilstand.gameState = 'win';
+        if (felt.hasBoat) {
+            felt.hasBoat = false;
+            sejlendeBaadIndex = nytIndeks;
+            setTimeout(() => {
+                spilTilstand.gameState = 'win';
+            }, 3000);
         } else {
-            if (felt.eventID && !felt.eventFuldført) startEvent(felt.eventID);
+            if (felt.eventID && !felt.eventFuldført) {
+                felt.eventFuldført = true;
+                startEvent(felt.eventID);
+            }
             else if (felt.shopItems && felt.shopItems.length > 0) spilTilstand.aktivShop = felt.shopItems;
         }
 
@@ -477,11 +525,11 @@ async function opdaterOgGemHighscore() {
 
 <div class="game-container">
     <div class="camera" role="presentation"
-        onwheel={(e) => cam.håndterZoom(e, !!eventState.aktivt || !!spilTilstand.aktivShop)}
-        onpointerdown={(e) => cam.startTræk(e, !!eventState.aktivt || !!spilTilstand.aktivShop)}
+        onwheel={(e) => cam.håndterZoom(e, !!eventState.aktivt || !!spilTilstand.aktivShop || spilTilstand.dag < 2)}
+        onpointerdown={(e) => cam.startTræk(e, !!eventState.aktivt || !!spilTilstand.aktivShop || spilTilstand.dag < 2)}
         onpointermove={cam.træk}
         onpointerup={cam.stopTræk}
-        style="cursor: {cam.isDragging ? 'grabbing' : 'grab'}; touch-action: none;"
+        style="cursor: {cam.isDragging ? 'grabbing' : (spilTilstand.dag < 2 ? 'default' : 'grab')}; touch-action: none;"
     >
         <div class="map" style={kameraStyle}>
             {#each spilTilstand.gitter as felt, i (i)}
@@ -500,6 +548,13 @@ async function opdaterOgGemHighscore() {
                     style="background-image: {baggrund}; left: {posX}px; top: {posY}px;"
                 >
                     <div class="inner" class:opslugt={erOpslugt}>
+                        {#if erUdforsket && felt.hasBoat}
+                            {#if !erOpslugt}
+                                <div class="sejr-lys"></div>
+                            {/if}
+                            <img src="/tiles/baad.webp" alt="Flugtbåd" class="escape-boat" />
+                        {/if}
+
                         {#if erUdforsket && !felt.gravet}
                             {#if harDetektor && (felt.skjultGuld ?? 0) > 0}
                                 <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 100});" />
@@ -540,7 +595,7 @@ async function opdaterOgGemHighscore() {
                             {/if}
                         {/each}
                         
-                        {#if spilTilstand.spillerIndex === i}
+                        {#if spilTilstand.spillerIndex === i && sejlendeBaadIndex !== i}
                             <span class="player-icon" style="position: relative; display: inline-flex; justify-content: center; z-index: 20;">
                                 <img src={spilTilstand.valgtKarakter?.ikon} alt="" style="height: 58px;" />
                             </span>
@@ -555,6 +610,13 @@ async function opdaterOgGemHighscore() {
                         {/each}
                     </div>
                 </div>
+
+                {#if sejlendeBaadIndex === i}
+                    <div class="sailing-container" style="left: {posX}px; top: {posY}px;">
+                        <img src="/tiles/baad.webp" alt="Flugtbåd" class="escape-boat" />
+                        <img src={spilTilstand.valgtKarakter?.ikon} alt="" class="sejler-ikon" />
+                    </div>
+                {/if}
             {/each}
         </div>
     </div>
@@ -574,8 +636,7 @@ async function opdaterOgGemHighscore() {
         height: 100%;
     }
     .map { 
-        position: absolute; width: 4800px;
-        height: 1640px;
+        position: absolute; 
     }
     .hex { 
         position: absolute; width: 96px;
@@ -587,6 +648,51 @@ async function opdaterOgGemHighscore() {
     .inner { 
         position: relative;
         width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    }
+    .sailing-container {
+        position: absolute;
+        width: 96px;
+        height: 110px;
+        z-index: 100;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: sailAway 3s forwards cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sejler-ikon {
+        height: 40px;
+        position: relative;
+        z-index: 2;
+        margin-bottom: 15px;
+    }
+    @keyframes sailAway {
+        0% { transform: translateX(0) scale(1); opacity: 1; }
+        100% { transform: translateX(300px) scale(0.5); opacity: 0; }
+    }
+    .escape-boat {
+        position: absolute;
+        width: 75px;
+        height: auto;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 15;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+    }
+    .sejr-lys {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(ellipse at center, transparent 30%, rgba(255, 180, 0, 0.5) 70%, rgba(255, 215, 0, 0.9) 100%);
+        mix-blend-mode: color-dodge;
+        pointer-events: none;
+        z-index: 5;
+        animation: guldPuls 2.5s infinite alternate ease-in-out;
+    }
+    @keyframes guldPuls {
+        0% { opacity: 0.4; filter: brightness(1); }
+        100% { opacity: 1; filter: brightness(1.6); }
     }
     .mist-icon {
         position: absolute; top: 50%; left: 50%;

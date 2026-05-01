@@ -1,4 +1,3 @@
-// netvaerk.ts
 import { supabase } from './supabaseClient';
 import { spilTilstand } from './spilTilstand.svelte';
 import type { RealtimeChannel } from '@supabase/supabase-js';
@@ -6,11 +5,10 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 export async function syncTilDb(opdaterKort = false) {
     if (!spilTilstand.rumKode || !spilTilstand.spillerNavn) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const opdatering: any = {};
-    opdatering[`spillere.${spilTilstand.spillerNavn}`] = {
+    spilTilstand.alleSpillere[spilTilstand.spillerNavn] = {
         index: spilTilstand.spillerIndex,
         hp: spilTilstand.livspoint,
+        maxHp: spilTilstand.maxLivspoint, 
         guld: spilTilstand.guldTotal,
         kolonne: spilTilstand.maxKolonne,
         dag: spilTilstand.dag,
@@ -22,6 +20,12 @@ export async function syncTilDb(opdaterKort = false) {
         isDead: spilTilstand.gameState === 'dead',
         isWinner: spilTilstand.gameState === 'win',
         activeAlarm: false
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const opdatering: any = {
+        spillere: spilTilstand.alleSpillere
     };
 
     if (opdaterKort) {

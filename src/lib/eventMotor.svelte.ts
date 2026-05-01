@@ -1,16 +1,18 @@
-// eventMotor.svelte.ts
 import { spilTilstand } from './spilTilstand.svelte';
 import { eventBibliotek } from './eventBibliotek';
 import { tilfoejTilRygsæk, brugFraRygsæk } from './spilmotor';
 import { syncTilDb } from './netvaerk';
-import { fremtvingKollaps, fremrykTid } from './overlevelse.svelte';
+import { fremrykTid } from './overlevelse.svelte';
 import type { Valg } from './eventBibliotek';
 
 export const eventState = $state({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     aktivt: null as any,
     log: [] as string[],
-    valgLåst: false
+    valgLåst: false,
+    naesteTrin: null as string | null,
+    erFaerdig: false,
+    afventerKollaps: false
 });
 
 export function startEvent(eventID: string) {
@@ -19,12 +21,18 @@ export function startEvent(eventID: string) {
     eventState.aktivt = evt;
     eventState.log = [evt.tekst];
     eventState.valgLåst = false;
+    eventState.naesteTrin = null;
+    eventState.erFaerdig = false;
+    eventState.afventerKollaps = false;
 }
 
 export function lukEvent() {
     eventState.aktivt = null;
     eventState.log = [];
     eventState.valgLåst = false;
+    eventState.naesteTrin = null;
+    eventState.erFaerdig = false;
+    eventState.afventerKollaps = false;
 }
 
 export function kanViseValg(valg: Valg) {
@@ -66,7 +74,6 @@ export function tagValg(valg: Valg) {
         let kvittering = "";
         let samletLogTekst = resultat.log;
 
-        // <--- HER HÅNDTERES ÆNDRING AF MAX HP
         if (resultat.maxHpAendring) {
             spilTilstand.maxLivspoint += resultat.maxHpAendring;
             
@@ -85,7 +92,7 @@ export function tagValg(valg: Valg) {
             endeligHp = Math.round(endeligHp + tilfaeldig);
             
             const foerHp = spilTilstand.livspoint;
-            const maxHelbred = spilTilstand.maxLivspoint; // <--- HENTER NY MAX
+            const maxHelbred = spilTilstand.maxLivspoint; 
             
             spilTilstand.livspoint = Math.min(maxHelbred, spilTilstand.livspoint + endeligHp);
             
@@ -120,18 +127,18 @@ export function tagValg(valg: Valg) {
         syncTilDb(true);
 
         if (resultat.kollaps || spilTilstand.livspoint <= 0) {
-            setTimeout(() => fremtvingKollaps(), 1500);
+            eventState.afventerKollaps = true;
             return;
         }
 
         if (resultat.naesteTrin) {
-            setTimeout(() => startEvent(resultat.naesteTrin!), 2000);
+            eventState.naesteTrin = resultat.naesteTrin;
         } else {
             const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
             if (felt) felt.eventFuldført = true;
             syncTilDb(true);
             fremrykTid();
-            setTimeout(() => lukEvent(), 2000);
+            eventState.erFaerdig = true;
         }
     } 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -142,7 +149,7 @@ export function tagValg(valg: Valg) {
         spilTilstand.logBesked = resultat.logBesked;
 
         if (resultat.hpOp) {
-            const maxHelbred = spilTilstand.maxLivspoint; // <--- HENTER NY MAX
+            const maxHelbred = spilTilstand.maxLivspoint; 
             spilTilstand.livspoint = Math.min(maxHelbred, spilTilstand.livspoint + resultat.hpOp);
         }
         if (resultat.hpNed) spilTilstand.livspoint -= resultat.hpNed;
@@ -153,18 +160,18 @@ export function tagValg(valg: Valg) {
         syncTilDb(true);
 
         if (spilTilstand.livspoint <= 0) {
-            setTimeout(() => fremtvingKollaps(), 1500);
+            eventState.afventerKollaps = true;
             return;
         }
 
         if (resultat.naesteEvent) {
-            setTimeout(() => startEvent(resultat.naesteEvent), 2000);
+            eventState.naesteTrin = resultat.naesteEvent;
         } else {
             const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
             if (felt) felt.eventFuldført = true;
             syncTilDb(true);
             fremrykTid();
-            setTimeout(() => lukEvent(), 2000);
+            eventState.erFaerdig = true;
         }
     } else {
         eventState.log = [...eventState.log, "Ingenting skete."];
@@ -173,6 +180,6 @@ export function tagValg(valg: Valg) {
         if (felt) felt.eventFuldført = true;
         syncTilDb(true);
         fremrykTid();
-        setTimeout(() => lukEvent(), 2000);
+        eventState.erFaerdig = true;
     }
 }

@@ -1,5 +1,4 @@
 <script lang="ts">
-    // ShopModal.svelte
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
     import { tilfoejTilRygsæk, brugFraRygsæk } from '$lib/spilmotor';
@@ -60,11 +59,17 @@
 
         <div class="sell-section">
             <p>Dine ting (klik for at sælge):</p>
+            
             <div class="inventory-small-row">
+                <div class="small-item guld-item" title="Din formue">
+                    <img src="/inventory/guld.webp" alt="Guld" />
+                    <span class="count">{spilTilstand.guldTotal}</span>
+                </div>
+
                 {#each spilTilstand.mitUdstyr as vare (vare.id)}
                     {@const dbInfo = itemDB[vare.id]}
                     {#if dbInfo}
-                        <div class="small-item" 
+                        <div class="small-item clickable" 
                              onclick={() => sælgVare(vare.id)} 
                              onkeydown={(e) => { if (e.key === 'Enter') sælgVare(vare.id); }}
                              role="button" tabindex="0">
@@ -102,11 +107,20 @@
     .vare-pris { color: gold; font-weight: bold; }
     
     .sell-section { border-top: 1px solid #222; padding-top: 20px; margin-top: 20px; }
-    .sell-section p { font-size: 0.9rem; color: #666; margin-bottom: 10px; }
+    .sell-section p { font-size: 0.9rem; color: #666; margin-bottom: 15px; }
+    
     .inventory-small-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    
     .small-item { 
         position: relative; width: 40px; height: 40px; border: 1px solid #333; 
-        cursor: pointer; background: #080808; 
+        background: #080808; 
+    }
+    .small-item.clickable {
+        cursor: pointer;
+    }
+    .small-item.guld-item {
+        cursor: default;
+        border-color: #554400; 
     }
     .small-item img { width: 100%; height: 100%; object-fit: contain; }
     .small-item .count { 
