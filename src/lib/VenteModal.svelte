@@ -22,7 +22,7 @@
         <h2>Tiden står stille</h2>
         <p class="vente-desc">
             Du har slået lejr <strong style="color: gold;">{dageForan} {dageForan === 1 ? 'dag' : 'dage'}</strong> foran den langsomste på øen. 
-            En imp dukker pludselig op med et magisk kortspil. Træk et kort, mens de andre arbejder sig fremad.
+            En imp dukker pludselig op med et magisk kortspil. Betal ham 5 guld for at trække et kort, mens de andre arbejder sig fremad.
         </p>
 
         <div class="vente-board">
@@ -74,7 +74,7 @@
                         disabled={totalFormue < 5}
                         onclick={() => startVenteSpil(true)}
                     >
-                        Spil igen (Koster 5 Guld)
+                        Start ny runde (Koster 5 Guld)
                     </button>
                 {:else}
                     <button class="vente-btn udsolgt-btn" disabled>

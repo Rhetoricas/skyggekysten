@@ -1,7 +1,7 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb } from './netvaerk';
 import { BREDDE, HEX_W } from './spildata';
-import { tjekUdstyrSlid } from './spilmotor';
+import { tjekUdstyrSlid, brugFraRygsæk } from './spilmotor';
 
 export function erSpillerITaagen() {
     const r = Math.floor(spilTilstand.spillerIndex / BREDDE);
@@ -10,21 +10,28 @@ export function erSpillerITaagen() {
 }
 
 function brugEliksir() {
-    const potionIndex = spilTilstand.mitUdstyr?.findIndex(i => i.id === 'livseliksir') ?? -1;
-    if (potionIndex > -1) {
-        spilTilstand.mitUdstyr.splice(potionIndex, 1);
+    const harEliksir = spilTilstand.mitUdstyr?.some(i => i.id === 'livseliksir' && i.maengde > 0);
+    if (harEliksir) {
+        brugFraRygsæk('livseliksir', 1);
         spilTilstand.livspoint = 90;
         return true;
     }
     return false;
 }
 
-// Kald denne udefra (fx Island.svelte), når du trækker HP uden for tågen
 export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: string) {
     if (spilTilstand.gameState !== 'play') return;
     spilTilstand.livspoint -= skade;
     
     if (spilTilstand.livspoint <= 0) {
+        const erHavet = besked.includes("havet") || besked.includes("saltvand") || besked.includes("hav");
+
+        if (!erHavet && !erSpillerITaagen()) {
+            fremtvingKollaps();
+            if (doedsBesked) spilTilstand.logBesked = doedsBesked + " " + spilTilstand.logBesked;
+            return;
+        }
+
         if (brugEliksir()) {
             spilTilstand.logBesked = `Du gik i brædderne. ${besked} Eliksiren tvang livet tilbage i din krop.`;
             syncTilDb(true);
@@ -45,32 +52,25 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
 }
 
 export function tjekOverlevelse() {
-    // Hvis spilleren allerede er død (fx af havet), afbryder vi tjekket fuldstændigt
     if (spilTilstand.gameState !== 'play' || spilTilstand.livspoint > 0) return;
 
-    if (brugEliksir()) {
-        spilTilstand.logBesked = "Døden greb efter dig. Eliksiren tvang livet tilbage i din krop.";
-        syncTilDb(true);
-        return;
-    }
-
     if (erSpillerITaagen()) {
+        if (brugEliksir()) {
+            spilTilstand.logBesked = "Døden greb efter dig. Eliksiren tvang livet tilbage i din krop.";
+            syncTilDb(true);
+            return;
+        }
+
         spilTilstand.gameState = 'dead';
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = true;
         }
         spilTilstand.logBesked = "Tågen omsluttede dig helt. Mørket flåede det sidste liv ud af din krop.";
         syncTilDb(true);
-        return; // Den afgørende return, der forhindrer spilleren i at "besvime" og genopstå
+        return;
     }
 
-    // Hvis HP falder til 0 af generel udmattelse (hvor man IKKE er i havet eller tågen)
-    spilTilstand.gameState = 'dead';
-    if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
-        spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = true;
-    }
-    spilTilstand.logBesked = "Din krop bukkede under for skader og udmattelse. Du rejser dig ikke igen.";
-    syncTilDb(true);
+    fremtvingKollaps();
 }
 
 export function fremrykTid() {
@@ -86,16 +86,15 @@ export function fremrykTid() {
         spilTilstand.nuvaerendeEnergi += spilTilstand.valgtKarakter.baseEnergi;        
         
         if (spilTilstand.dag > 6) {
-            spilTilstand.fogX += HEX_W / (antalLevende * 2);
+            // Tågen bevæger sig nu 1 fuldt felt pr. dag i solospil
+            spilTilstand.fogX += HEX_W / antalLevende;
         }
     }
 
     const nyDag = spilTilstand.dag || 1;
 
-// Kører slid-tjekket, hvis kalenderen har rykket sig
     if (nyDag > gammelDag) {
         if (nyDag === 2) {
-            // Her bruger vi = i stedet for += for at rydde den gamle besked væk
             spilTilstand.logBesked = "Dit blik skærer skarpere. Du føler dig mere klarsynet og kan nu overskue omgivelserne.";
         }
 

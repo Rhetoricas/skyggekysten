@@ -1,11 +1,10 @@
-// ventespil.svelte.ts
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb } from './netvaerk';
 
 let rundeGuld = 0;
 let rundeLiv = 0;
 
-function delNyeKort() {
+export function delNyeKort() {
     spilTilstand.logBesked = "Impen blander kortene på ny.";
     
     const typer = ['slut'];
@@ -22,12 +21,12 @@ function delNyeKort() {
     spilTilstand.venteKort = typer.map((type, indeks) => {
         let vaerdi = 0;
         if (type === 'liv') {
-            vaerdi = Math.floor(Math.random() * 3) + 1;
+            vaerdi = Math.floor(Math.random() * 5) + 1;
         } else if (type === 'guld') {
             if (indeks === jackpotIndex) {
-                vaerdi = 50;
+                vaerdi = 100;
             } else {
-                vaerdi = Math.floor(Math.random() * 5) + 1;
+                vaerdi = Math.floor(Math.random() * 4) + 2;
             }
         }
         return { type, vaerdi, afsloeret: false };
@@ -90,7 +89,7 @@ export function vendKort(indeks: number) {
         if (kort.type === 'guld') {
             spilTilstand.ventePuljeGuld += kort.vaerdi;
             rundeGuld += kort.vaerdi; 
-            if (kort.vaerdi === 50) spilTilstand.logBesked = "Jackpot. Du fandt den legendariske guldskat.";
+            if (kort.vaerdi === 100) spilTilstand.logBesked = "Jackpot! Du fandt den legendariske guldskat.";
         }
 
         spilTilstand.venteFase = 'viser_gevinst';
@@ -140,5 +139,6 @@ export function lukVenteSpil() {
 
     spilTilstand.venteSpilAktiv = false;
     spilTilstand.venteRunde = 0;
+    spilTilstand.venteFase = 'venter';
     syncTilDb(true);
 }

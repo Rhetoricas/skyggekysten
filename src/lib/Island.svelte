@@ -437,8 +437,16 @@ function udførBevægelse(nytIndeks: number) {
         const pris = Math.round(spilTilstand.valgtKarakter.moveCost * (biomeTerraenCost[felt.biome as Biome] || 1));
         spilTilstand.nuvaerendeEnergi -= erITågen ? pris * 2 : pris;
 
-        const farligeBiomer = ['bjerg', 'hule', 'ritual', 'ruin', 'bandit', 'blodskov', 'krystal', 'slagmark'];
-        const hpStraf = farligeBiomer.includes(felt.biome as string) ? 2 : 1;
+        const nulHp = ['by', 'mark', 'eng', 'marked', 'hoejland'];
+        const toHp = ['bjerg', 'hule'];
+        let hpStraf = 1;
+        
+        if (nulHp.includes(felt.biome as string)) {
+            hpStraf = 0;
+        } else if (toHp.includes(felt.biome as string)) {
+            hpStraf = 2;
+        }
+
         spilTilstand.livspoint -= hpStraf;
 
         if (spilTilstand.livspoint <= 0) {

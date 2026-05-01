@@ -1,4 +1,3 @@
-// spildata.ts
 import type { Karakter, Biome, ItemType } from './types';
 
 export const BREDDE = 100;
@@ -20,7 +19,7 @@ export const biomeTerraenCost: Record<Biome, number> = {
     'hav': 4
 };
 
-export const markedVarePool = ['skovl', 'livseliksir', 'klude', 'kniv', 'metaldetektor', 'soegekvist', 'fakkel', 'sovepose'];
+export const markedVarePool = ['skovl', 'livseliksir', 'klude', 'kniv', 'metaldetektor', 'soegekvist', 'fakkel', 'sovepose', 'mad'];
 
 export const itemDB: Record<string, { id: string; navn: string; type: ItemType; billede: string; bonus: number; pris: number }> = {
     'klude': { id: 'klude', navn: 'Klude', type: 'tøj', billede: '/inventory/klude.webp', bonus: 0, pris: 10 },
@@ -38,6 +37,7 @@ export const itemDB: Record<string, { id: string; navn: string; type: ItemType; 
     'livseliksir': { id: 'livseliksir', navn: 'Livseliksir', type: 'forbrug', billede: '/inventory/livseliksir.webp', bonus: 0, pris: 500 },
     'fakkel': { id: 'fakkel', navn: 'Fakkel', type: 'værktøj', billede: '/inventory/fakkel.webp', bonus: 0, pris: 150 },
     'sovepose': { id: 'sovepose', navn: 'Sovepose', type: 'værktøj', billede: '/inventory/sovepose.webp', bonus: 0, pris: 100 },
+    'mad': { id: 'mad', navn: 'Madration', type: 'forbrug', billede: '/inventory/food.webp', bonus: 0, pris: 30 },
     'kikkert_250': { id: 'kikkert_250', navn: 'Gylden Kikkert (Nær)', type: 'forbandelse', billede: '/inventory/kikkert.webp', bonus: 0, pris: 0 },
     'kikkert_45': { id: 'kikkert_45', navn: 'Gylden Kikkert (Fjern)', type: 'forbandelse', billede: '/inventory/kikkert.webp', bonus: 0, pris: 0 },
     'diamant': { id: 'diamant', navn: 'Diamant', type: 'skat', billede: '/inventory/diamant.webp', bonus: 0, pris: 500 }

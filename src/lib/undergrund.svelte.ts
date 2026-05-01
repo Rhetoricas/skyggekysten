@@ -60,7 +60,7 @@ export function grav() {
     if (spilTilstand.erBevidstløs || !spilTilstand.valgtKarakter) return;
     
     const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-    if (!felt || felt.gravet || felt.eventID) return;
+    if (!felt || felt.gravet) return;
     
     if (!felt.kanGraves) {
         spilTilstand.logBesked = "Du kan ikke grave her.";
@@ -86,7 +86,7 @@ export function grav() {
         udstyrsLog = tjekUdstyrSlid('skovl');
     } else {
         spilTilstand.livspoint -= 10;
-        udstyrsLog = ` Du flænser jorden med bare næver. Du mister 10 HP og ${faktiskEnergiPris} Energi.`;
+        udstyrsLog = ` Du graver i jorden med bare næver. Du mister 10 HP og ${faktiskEnergiPris} Energi.`;
     }
 
     const guldVaerdi = felt.skjultGuld ?? 0;
@@ -101,11 +101,11 @@ export function grav() {
     
     afslørOmraade(spilTilstand.spillerIndex, 1);    
 
-    let fundLog = "Kun sten og orme.";
+    let fundLog = "Du finder kun sten og orme.";
 
     if (faelde) {
-        spilTilstand.livspoint -= 20;
-        fundLog = "KLIK. En rusten klinge bider sig fast. Du mister 20 HP.";
+        spilTilstand.livspoint -= 10;
+        fundLog = "KLIK. En nedgravet fælde bider sig fast i dit ben";
     } else if (guldVaerdi > 0) {
         const maengde = Math.floor(guldVaerdi * spilTilstand.valgtKarakter.goldMod);
         spilTilstand.guldTotal += maengde;

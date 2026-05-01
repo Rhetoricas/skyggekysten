@@ -25,7 +25,8 @@ export async function syncTilDb(opdaterKort = false) {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const opdatering: any = {
-        spillere: spilTilstand.alleSpillere
+        spillere: spilTilstand.alleSpillere,
+        fog_x: Math.round(spilTilstand.fogX)
     };
 
     if (opdaterKort) {

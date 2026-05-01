@@ -3,7 +3,8 @@
     import { itemDB } from '$lib/spildata';
     import { erSpillerITaagen, udfoerBlodofring } from '$lib/overlevelse.svelte';
     import { grav } from '$lib/undergrund.svelte';
-    import { hvil } from '$lib/spilmotor';
+    import { hvil, brugFraRygsæk } from '$lib/spilmotor';
+    import { syncTilDb } from '$lib/netvaerk';
 
     let erITågen = $derived(erSpillerITaagen());
     let aktueltFelt = $derived(
@@ -11,6 +12,7 @@
             ? spilTilstand.gitter[spilTilstand.spillerIndex] 
             : null
     );
+    let kanGrave = $derived(aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves);
 
     let aktuelLog = $state(spilTilstand.logBesked || '');
     let forrigeLog = $state('');
@@ -22,11 +24,32 @@
         }
     });
 
+    function spisMad() {
+        const maxEnergi = spilTilstand.valgtKarakter?.baseEnergi || 0;
+        const aktuelEnergi = spilTilstand.nuvaerendeEnergi || 0;
+        const fuldHp = spilTilstand.livspoint >= spilTilstand.maxLivspoint;
+        const fuldEnergi = aktuelEnergi >= maxEnergi;
+
+        if (fuldHp && fuldEnergi) {
+            spilTilstand.logBesked = "Du er allerede mæt og fuldt udhvilet.";
+            return;
+        }
+
+        brugFraRygsæk('mad', 1);
+        spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 10);
+        spilTilstand.nuvaerendeEnergi = Math.min(maxEnergi, aktuelEnergi + 1);
+        
+        spilTilstand.logBesked = "Du spiser din madration. (+10 HP, +1 Energi)";
+        syncTilDb(true);
+    }
+
     function haandterInventoryKlik(vareId: string) {
         if (vareId === 'skovl') {
             grav();
         } else if (vareId === 'sovepose') {
             hvil();
+        } else if (vareId === 'mad') {
+            spisMad();
         }
     }
 </script>
@@ -41,7 +64,6 @@
 
     <div class="ui-content">
         <div class="status-row">
-            <!-- HER ER DET BANKENDE HJERTE INDSAT -->
             <div class="status-item" class:kritisk={spilTilstand.livspoint < 30}>
                 <img src="/inventory/hp.webp" alt="Liv" class="status-icon" />
                 <span class="status-value">{spilTilstand.livspoint}</span>
@@ -70,23 +92,41 @@
         </div>
         
         <div class="inventory-row">
+            <div
+                class="grav-knap inventory-item {kanGrave ? 'klikbar' : ''}"
+                role="button"
+                tabindex={kanGrave ? 0 : -1}
+                onclick={() => { if (kanGrave) grav(); }}
+                onkeydown={(e) => { if (kanGrave && (e.key === 'Enter' || e.key === ' ')) grav(); }}
+            >
+                <div class="ikon-container">
+                    <img src="/screens/gravhaand.webp" alt="Grav" class="inventory-icon {kanGrave ? '' : 'deaktiveret'}" style="height: 60px;" />
+                </div>
+            </div>
+
             {#each spilTilstand.mitUdstyr as vare (vare.id)}
                 {@const dbInfo = itemDB[vare.id]}
                 {#if dbInfo}
                     <div 
-                        class="inventory-item {(vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && !aktueltFelt.eventID && aktueltFelt.kanGraves) || (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0)) ? 'klikbar' : ''}" 
+                        class="inventory-item {(vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) || (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0)) || (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0))) ? 'klikbar' : ''}" 
                         onclick={() => {
-                            if (vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && !aktueltFelt.eventID && aktueltFelt.kanGraves) {
+                            if (vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) {
                                 haandterInventoryKlik(vare.id);
                             } else if (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0)) {
+                                haandterInventoryKlik(vare.id);
+                            } else if (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0))) {
                                 haandterInventoryKlik(vare.id);
                             }
                         }}
                         onkeydown={(e) => { 
-                            if ((e.key === 'Enter' || e.key === ' ') && vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && !aktueltFelt.eventID && aktueltFelt.kanGraves) {
-                                haandterInventoryKlik(vare.id);
-                            } else if ((e.key === 'Enter' || e.key === ' ') && vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0)) {
-                                haandterInventoryKlik(vare.id);
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                if (vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) {
+                                    haandterInventoryKlik(vare.id);
+                                } else if (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0)) {
+                                    haandterInventoryKlik(vare.id);
+                                } else if (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0))) {
+                                    haandterInventoryKlik(vare.id);
+                                }
                             }
                         }}
                         role="button"
@@ -96,7 +136,7 @@
                             <img 
                                 src={dbInfo.billede} 
                                 alt={dbInfo.navn} 
-                                class="inventory-icon {(vare.id === 'skovl' && aktueltFelt && (aktueltFelt.gravet || aktueltFelt.eventID || !aktueltFelt.kanGraves)) || (vare.id === 'sovepose' && (aktueltFelt?.biome === 'hav' || (spilTilstand.nuvaerendeEnergi || 0) === (spilTilstand.valgtKarakter?.baseEnergi || 0))) ? 'deaktiveret' : ''}" 
+                                class="inventory-icon {(vare.id === 'skovl' && aktueltFelt && (aktueltFelt.gravet || !aktueltFelt.kanGraves)) || (vare.id === 'sovepose' && (aktueltFelt?.biome === 'hav' || (spilTilstand.nuvaerendeEnergi || 0) === (spilTilstand.valgtKarakter?.baseEnergi || 0))) || (vare.id === 'mad' && spilTilstand.livspoint >= spilTilstand.maxLivspoint && (spilTilstand.nuvaerendeEnergi || 0) >= (spilTilstand.valgtKarakter?.baseEnergi || 0)) ? 'deaktiveret' : ''}" 
                             />
                             {#if vare.maengde > 1}
                                 <span class="maengde-badge">{vare.maengde}</span>
@@ -111,10 +151,10 @@
                 onclick={() => spilTilstand.musikTaendt = !spilTilstand.musikTaendt} 
                 title={spilTilstand.musikTaendt ? 'Sluk al lyd' : 'Tænd al lyd'}
             >
-<img 
-    src={spilTilstand.musikTaendt ? '/screens/musicon.webp' : '/screens/musicoff.webp'} 
-    alt="Lyd afspiller" 
-/>
+                <img 
+                    src={spilTilstand.musikTaendt ? '/screens/musicon.webp' : '/screens/musicoff.webp'} 
+                    alt="Lyd afspiller" 
+                />
             </button>
         </div>
     </div>
@@ -175,7 +215,7 @@
         align-items: flex-end;
         justify-content: center;
         width: 100%;
-        gap: 2rem;
+        gap: 0.5rem;
         padding: 0 1rem;
         box-sizing: border-box;
         pointer-events: auto; 
@@ -296,8 +336,8 @@
         flex-direction: column;
         align-items: center;
         align-self: flex-start;
-        margin-left: 15px; 
-        margin-right: 20px;
+        margin-left: 10px; 
+        margin-right: 10px;
         margin-top: 4px;
     }
     .dag-taeller {
@@ -360,7 +400,6 @@
         100% { transform: scale(1); } 
     }
 
-    /* NYE REGLER TIL KRITISK HP */
     .status-item.kritisk {
         color: #ff4444;
     }

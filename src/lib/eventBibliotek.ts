@@ -1,4 +1,5 @@
 // eventBibliotek.ts
+import { spilTilstand } from './spilTilstand.svelte';
 import type { Biome } from './types';
 
 export interface Udfald {
@@ -22,7 +23,16 @@ export interface Valg {
     fordelKarakter?: string;  
     puljeVaerdi?: number;     
     naesteTrin?: string;      
-    udfaldListe?: Udfald[];   
+    udfaldListe?: Udfald[];
+    effekt?: () => {
+        logBesked: string;
+        hpOp?: number;
+        hpNed?: number;
+        guldOp?: number;
+        guldNed?: number;
+        itemUd?: string;
+        naesteEvent?: string;
+    };
 }
 
 export interface SpilEvent {
@@ -1166,15 +1176,18 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         billede: '/events/ev_campfire.webp', 
         unik: false,
         valg: [
-            {
+{
                 tekst: "Køb dig til en nats ro (20 Guld)",
                 puljeVaerdi: 20,
-                udfaldListe: [
-                    { log: "De holder ord. Varmen og sikkerheden lader dine sår hele natten over.", hpAendring: 50 },
-                                        { log: "De holder ord. Varmen og sikkerheden lader dine sår hele natten over.", hpAendring: 50 },
-                                                            { log: "De holder ord. Varmen og sikkerheden lader dine sår hele natten over.", hpAendring: 50 },
-                    { log: "Det var en fælde. Du vågner ved at de gennemtæver dig og sparker dig ud i mørket.", hpAendring: -25 }
-                ]
+                effekt: () => {
+                    const overlev = Math.random();
+                    if (overlev < 0.75) {
+                        return { logBesked: "De holder ord. Varmen og sikkerheden lader dine sår hele natten over.", hpOp: 50 };
+                    } else {
+                        spilTilstand.nuvaerendeEnergi = 0;
+                        return { logBesked: "Du betaler og drikker af deres krus. Alt går i sort. Du vågner afbrudt og mørbanket, totalt drænet for energi. Tågen er rykket nærmere." };
+                    }
+                }
             },
 {
     tekst: "Del din eliksir med gruppen",
@@ -2587,5 +2600,5 @@ export const eventBibliotek: Record<string, SpilEvent> = {
             }
         ]
     },
-    
+
 };

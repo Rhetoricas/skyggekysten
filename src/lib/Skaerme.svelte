@@ -28,8 +28,17 @@
     let udvalgteSkæbner = $state<Karakter[]>([]);
     let forrigeState = spilTilstand.gameState;
 
-$effect(() => {
+    function blandKarakterer() {
+        const blandet = [...tilgaengeligeKarakterer].sort(() => Math.random() - 0.5);
+        udvalgteSkæbner = blandet.slice(0, 8);
+    }
+
+    $effect(() => {
         if (spilTilstand.gameState !== forrigeState) {
+            if (spilTilstand.gameState === 'select') {
+                blandKarakterer();
+            }
+
             if (spilTilstand.musikTaendt) {
                 if (spilTilstand.gameState === 'dead' && lydDoed) {
                     lydDoed.currentTime = 0;
@@ -59,8 +68,7 @@ $effect(() => {
             l.volume = 0.8;
         });
 
-        const blandet = [...tilgaengeligeKarakterer].sort(() => Math.random() - 0.5);
-        udvalgteSkæbner = blandet.slice(0, 8);
+        blandKarakterer();
     });
 
     function findNiveau(score: number) {
@@ -94,6 +102,10 @@ $effect(() => {
             e.preventDefault();
             startSpilMedLyd();
         }
+    }
+    
+    function toggleLyd() {
+        spilTilstand.musikTaendt = !spilTilstand.musikTaendt;
     }
 </script>
 
@@ -131,6 +143,10 @@ $effect(() => {
                 <img src="/events/launch.webp" alt="Båd" class="launch-image bottom-image clickable-boat" />
             </button>
         </div>
+        
+        <button class="lyd-toggle-start" onclick={toggleLyd}>
+            {spilTilstand.musikTaendt ? '🔊 Lyd Til' : '🔇 Lyd Fra'}
+        </button>
     </div>
 
 {:else if spilTilstand.gameState === 'select'}
@@ -395,4 +411,22 @@ $effect(() => {
     .point { font-weight: bold; }
     .karakter-navn { color: #9aa69d; font-size: 0.75rem; }
     .status { color: #ff8888; margin-top: 15px; }
+
+    .lyd-toggle-start {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        border: 1px solid #444;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        z-index: 1001;
+        transition: 0.2s;
+    }
+    .lyd-toggle-start:hover {
+        background: rgba(0,0,0,0.8);
+        border-color: #888;
+    }
 </style>

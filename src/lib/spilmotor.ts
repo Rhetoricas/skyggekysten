@@ -6,6 +6,7 @@ import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
 import { fremrykTid } from '$lib/overlevelse.svelte';
 import type { Felt, RygsækTing } from '$lib/types';
+import { delNyeKort } from '$lib/ventespil.svelte';
 
 const RETNINGER = {
     'NE': [[0, -1], [1, -1]],
@@ -85,7 +86,6 @@ export function hentNaboIndices(index: number) {
 }
 
 export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number = 1) {
-    // Vi tvinger TS til at se hele arrayet som RygsækTing (inklusive anskaffetDag)
     const udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
     const fundetTing = udstyrListe.find(ting => ting.id === genstandId);
 
@@ -101,6 +101,7 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
         udstyrListe.push(nyTing);
     }
     
+    spilTilstand.mitUdstyr = [...spilTilstand.mitUdstyr];
     syncTilDb();
 }
 
@@ -115,6 +116,7 @@ export function brugFraRygsæk(genstandId: string, brugtMaengde: number = 1) {
         spilTilstand.mitUdstyr.splice(indeks, 1);
     }
     
+    spilTilstand.mitUdstyr = [...spilTilstand.mitUdstyr];
     syncTilDb();
 }
 
@@ -216,7 +218,7 @@ export function initialiserGitter() {
         raaKort = nytKort;
     }
 
-    const bySementer = 3;
+    const bySementer = 5;
     const byStoerrelse = 8;
     const markedSementer = 6;
     const markedStoerrelse = 3;
@@ -267,28 +269,58 @@ export function initialiserGitter() {
         };
     });
 
-    const alleGyldigeEvents = Object.keys(eventBibliotek).filter((noegle) => !eventBibliotek[noegle].erSubTrin && noegle !== 'campfire');
-    const vildmark = ['eng', 'skov', 'mark', 'bjerg'];
+    let ledigeEvents = Object.keys(eventBibliotek).filter((noegle) => !eventBibliotek[noegle].erSubTrin && noegle !== 'campfire');
 
-    for (const noegle of alleGyldigeEvents) {
-        const begivenhed = eventBibliotek[noegle];
-        for (let forsoeg = 0; forsoeg < 100; forsoeg++) {
-            const tilfaeldigtIndeks = Math.floor(Math.random() * antal);
-            const felt = nytGitter[tilfaeldigtIndeks];
+    const eventChancer: Record<string, number> = {
+        'hule': 0.80,
+        'ritual': 0.80,
+        'ruin': 0.80,
+        'bandit': 0.80,
+        'krystal': 0.15,
+        'blodskov': 0.15,
+        'slagmark': 0.15,
+        'by': 0.15,
+        'marked': 0.15,
+        'hoejland': 0.05,
+        'bjerg': 0.04,
+        'skov': 0.04,
+        'eng': 0.04,
+        'mark': 0.04
+    };
 
-            if (felt.biome === 'hav' || felt.eventID) continue;
+    const tilfaeldigeFelter = Array.from({length: antal}, (_, i) => i).sort((a, b) => {
+        const kolA = a % BREDDE;
+        const kolB = b % BREDDE;
+        if (kolA !== kolB) return kolB - kolA;
+        return Math.random() - 0.5;
+    });
 
-            const kraevetBiome = begivenhed.biome;
-            const erMatch = Array.isArray(kraevetBiome)
-                ? (kraevetBiome as string[]).includes(felt.biome as string) || (kraevetBiome as string[]).includes('alle')
-                : kraevetBiome === felt.biome || kraevetBiome === 'alle' || kraevetBiome === 'any' || !kraevetBiome;
+    for (const indeks of tilfaeldigeFelter) {
+        const felt = nytGitter[indeks];
+        if (felt.biome === 'hav' || felt.eventID) continue;
 
-            if (erMatch) {
-                felt.eventID = noegle;
-                break;
+        const chance = eventChancer[felt.biome as string] || 0.05;
+
+        if (Math.random() < chance) {
+            const matchendeEvents = ledigeEvents.filter(noegle => {
+                const kraevetBiome = eventBibliotek[noegle].biome;
+                return Array.isArray(kraevetBiome)
+                    ? (kraevetBiome as string[]).includes(felt.biome as string) || (kraevetBiome as string[]).includes('alle')
+                    : kraevetBiome === felt.biome || kraevetBiome === 'alle' || kraevetBiome === 'any' || !kraevetBiome;
+            });
+
+            if (matchendeEvents.length > 0) {
+                const valgtEvent = matchendeEvents[Math.floor(Math.random() * matchendeEvents.length)];
+                felt.eventID = valgtEvent;
+
+                if (eventBibliotek[valgtEvent].unik) {
+                    ledigeEvents = ledigeEvents.filter(e => e !== valgtEvent);
+                }
             }
         }
     }
+
+    const vildmark = ['eng', 'skov', 'mark', 'bjerg'];
 
     for (let indeks = 0; indeks < antal; indeks++) {
         const felt = nytGitter[indeks];
@@ -323,6 +355,8 @@ export function initialiserGitter() {
     spilTilstand.spillerIndex = muligeStartFelter[Math.floor(Math.random() * muligeStartFelter.length)];
     
     afslørOmraade(spilTilstand.spillerIndex);
+    
+    delNyeKort();
 }
 
 export function tjekUdstyrSlid(genstandId: string): string {
