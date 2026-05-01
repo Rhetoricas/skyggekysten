@@ -6,7 +6,7 @@ let rundeGuld = 0;
 let rundeLiv = 0;
 
 function delNyeKort() {
-    spilTilstand.logBesked = "Kroejeren blander kortene på ny.";
+    spilTilstand.logBesked = "Impen blander kortene på ny.";
     
     const typer = ['slut'];
     const antalLiv = Math.random() > 0.5 ? 2 : 1;

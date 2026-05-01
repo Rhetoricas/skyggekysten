@@ -1,4 +1,4 @@
-import type { Felt, Karakter, SpillerData } from './types'; // <--- RETTET HER
+import type { Felt, Karakter, SpillerData } from './types';
 
 interface FlydendeTal {
     id: number;
@@ -29,11 +29,20 @@ export const spilTilstand = $state({
     statusBesked: '',
     logBesked: 'Velkommen til øen.',
     fogX: 0,
-    alleSpillere: {} as Record<string, SpillerData>, // <--- OG RETTET HER
+    alleSpillere: {} as Record<string, SpillerData>,
     mitUdstyr: [] as Array<{ id: string; maengde: number }>,
     mineKendteFelter: [] as number[],
     aktivShop: null as string[] | null,
+    
+    // Byggeklodserne til ventespillet
     venteSpilAktiv: false,
+    ventePuljeGuld: 0,
+    ventePuljeLiv: 0,
+    venteFase: 'venter' as 'venter' | 'spiller' | 'viser_gevinst' | 'tabt' | 'vundet' | 'trukket',
+    sidsteVenteDag: 0,
+    venteRunde: 0,
+    venteKort: [] as Array<{ type: string; vaerdi: number; afsloeret: boolean }>,
+    
     erBevidstløs: false,
     aktiveTal: [] as FlydendeTal[],
     musikTaendt: true,

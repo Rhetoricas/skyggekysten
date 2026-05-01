@@ -3,12 +3,27 @@
     import { startVenteSpil, vendKort, stopVenteSpil, lukVenteSpil } from '$lib/ventespil.svelte';
     
     let { kanSpilleIgen } = $props<{ kanSpilleIgen: boolean }>();
+
+    let langsomsteDag = $derived.by(() => {
+        const spillere = Object.values(spilTilstand.alleSpillere);
+        if (spillere.length <= 1) return spilTilstand.dag;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const aktive = spillere.filter((s: any) => !s.isDead && !s.isWinner);
+        if (aktive.length === 0) return spilTilstand.dag;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return Math.min(...aktive.map((s: any) => s.dag || 1));
+    });
+
+    let dageForan = $derived(Math.max(0, (spilTilstand.dag || 1) - langsomsteDag));
 </script>
 
 <div class="vente-overlay">
     <div class="vente-content">
         <h2>Tiden står stille</h2>
-        <p class="vente-desc">Du venter på, at de andre indhenter dig. Træk et kort.</p>
+        <p class="vente-desc">
+            Du har slået lejr <strong style="color: gold;">{dageForan} {dageForan === 1 ? 'dag' : 'dage'}</strong> foran den langsomste på øen. 
+            En imp dukekr op med et magisk kortspil. Træk et kort, mens de andre arbejder sig fremad.
+        </p>
 
         <div class="vente-board">
             {#each spilTilstand.venteKort as kort, i (i)}
