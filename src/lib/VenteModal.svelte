@@ -22,7 +22,7 @@
         <h2>Tiden står stille</h2>
         <p class="vente-desc">
             Du har slået lejr <strong style="color: gold;">{dageForan} {dageForan === 1 ? 'dag' : 'dage'}</strong> foran den langsomste på øen. 
-            En imp dukekr op med et magisk kortspil. Træk et kort, mens de andre arbejder sig fremad.
+            En imp dukker pludselig op med et magisk kortspil. Træk et kort, mens de andre arbejder sig fremad.
         </p>
 
         <div class="vente-board">

@@ -9,13 +9,13 @@ export const ROW_H = 82;
 export const biomeVægte: Array<{ id: Biome; vaegt: number }> = [
     { id: 'mark', vaegt: 20 }, { id: 'eng', vaegt: 20 }, { id: 'skov', vaegt: 20 }, { id: 'bjerg', vaegt: 20 },
     { id: 'hule', vaegt: 2 }, { id: 'ritual', vaegt: 2 }, { id: 'ruin', vaegt: 2 }, { id: 'bandit', vaegt: 2 },
-    { id: 'gen', vaegt: 15 }, { id: 'blodskov', vaegt: 5 }, { id: 'hav', vaegt: 10 },
+    { id: 'hoejland', vaegt: 15 }, { id: 'blodskov', vaegt: 5 }, { id: 'hav', vaegt: 10 },
     { id: 'krystal', vaegt: 5 }, { id: 'slagmark', vaegt: 5 }
 ];
 
 export const biomeTerraenCost: Record<Biome, number> = {
     'mark': 1, 'eng': 1, 'by': 1, 'marked': 1,
-    'skov': 1.5, 'ruin': 1.5, 'ritual': 1.5, 'bandit': 1.5, 'gen': 1.5, 'slagmark': 1.5,
+    'skov': 1.5, 'ruin': 1.5, 'ritual': 1.5, 'bandit': 1.5, 'hoejland': 1.5, 'slagmark': 1.5,
     'bjerg': 2.5, 'blodskov': 2.5, 'hule': 2.5, 'krystal': 2,
     'hav': 4
 };

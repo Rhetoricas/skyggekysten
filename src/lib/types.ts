@@ -1,4 +1,4 @@
-export type Biome = 'mark' | 'eng' | 'skov' | 'bjerg' | 'hule' | 'ritual' | 'ruin' | 'bandit' | 'gen' | 'blodskov' | 'by' | 'hav' | 'krystal' | 'marked' | 'slagmark';
+export type Biome = 'mark' | 'eng' | 'skov' | 'bjerg' | 'hule' | 'ritual' | 'ruin' | 'bandit' | 'hoejland' | 'blodskov' | 'by' | 'hav' | 'krystal' | 'marked' | 'slagmark';
 export type ItemType = 'tøj' | 'våben' | 'værktøj' | 'forbrug' | 'forbandelse' | 'skat';
 
 export interface Item {
