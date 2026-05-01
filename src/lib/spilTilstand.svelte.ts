@@ -35,5 +35,6 @@ export const spilTilstand = $state({
     aktivShop: null as string[] | null,
     venteSpilAktiv: false,
     erBevidstløs: false,
-    aktiveTal: [] as FlydendeTal[]
+    aktiveTal: [] as FlydendeTal[],
+    musikTaendt: true,
 });

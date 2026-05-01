@@ -16,8 +16,8 @@ export const biomeVægte: Array<{ id: Biome; vaegt: number }> = [
 export const biomeTerraenCost: Record<Biome, number> = {
     'mark': 1, 'eng': 1, 'by': 1, 'marked': 1,
     'skov': 1.5, 'ruin': 1.5, 'ritual': 1.5, 'bandit': 1.5, 'gen': 1.5, 'slagmark': 1.5,
-    'bjerg': 2.5, 'blodskov': 2.5, 'hule': 2, 'krystal': 2,
-    'hav': 3
+    'bjerg': 2.5, 'blodskov': 2.5, 'hule': 2.5, 'krystal': 2,
+    'hav': 4
 };
 
 // Sovepose er nu på markedet

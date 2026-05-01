@@ -6,7 +6,7 @@
     import type { RealtimeChannel } from '@supabase/supabase-js';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime } from '$lib/netvaerk';
+    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi } from '$lib/netvaerk';
     import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
     import { tjekOverlevelse, fremrykTid, erSpillerITaagen, tagSkadeOgTjekDød } from '$lib/overlevelse.svelte';    
@@ -33,6 +33,7 @@
     const MAX_DAGE_FORAN = 5;
 
     let lokaleScores = $state<Array<{ navn: string; score: number; karakter?: string }>>([]);
+let globaleScores = $state<Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);    
     let fremdriftPoint = $derived(spilTilstand.maxKolonne * 1);
     let winBonus = $derived(spilTilstand.gameState === 'win' ? 1000 : 0);
     let flytterNu = false;
@@ -54,6 +55,24 @@
     let glGuld = $state(0);
     let glGameState = $state('start');
     let scoreErGemt = false;
+
+    let bgMusik: HTMLAudioElement | null = null;
+
+onMount(() => {
+    bgMusik = new Audio('/audio/ambient.mp3');
+    bgMusik.loop = true;
+    bgMusik.volume = 0.3;
+});
+
+$effect(() => {
+    if (bgMusik) {
+        if (spilTilstand.musikTaendt && spilTilstand.gameState === 'play') {
+            bgMusik.play().catch(() => {});
+        } else {
+            bgMusik.pause();
+        }
+    }
+});
     
     $effect(() => {
         if (spilTilstand.gameState !== glGameState) {
@@ -233,7 +252,7 @@
                     const eksisterende = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
                     spilTilstand.spillerIndex = eksisterende.index;
                     spilTilstand.livspoint = eksisterende.hp;
-                    spilTilstand.maxLivspoint = eksisterende.maxHp || 100; // <--- HENTER GAMMEL MAX
+                    spilTilstand.maxLivspoint = eksisterende.maxHp || 100;
                     spilTilstand.guldTotal = eksisterende.guld;
                     spilTilstand.maxKolonne = eksisterende.kolonne;
                     spilTilstand.dag = eksisterende.dag || 1;
@@ -296,15 +315,22 @@
         if (alarmKanal) supabase.removeChannel(alarmKanal);
     });
     
-    async function opdaterOgGemHighscore() {
+async function opdaterOgGemHighscore() {
+        // Vi tvinger maskinen til at regne scoren ud her og nu, før den sender det til skyen
+        spilTilstand.samletScore = Math.floor(
+            (spilTilstand.guldTotal + (spilTilstand.maxKolonne * 1) + (spilTilstand.gameState === 'win' ? 1000 : 0)) *
+                (1 + Math.max(0, spilTilstand.livspoint) / 1000)
+        );
+
         await gemHighscore();
         lokaleScores = await hentHighscores();
+        globaleScores = await hentGlobalTopTi();
     }
 
     async function bekræftValg(karakter: Karakter) {
         spilTilstand.valgtKarakter = karakter;
         spilTilstand.livspoint = karakter.startHp;
-        spilTilstand.maxLivspoint = karakter.startHp || 100; // <--- SÆTTER START MAX HP
+        spilTilstand.maxLivspoint = karakter.startHp || 100;
         spilTilstand.guldTotal = karakter.startGuld;
         spilTilstand.maxKolonne = 1;
         spilTilstand.dag = 1;
@@ -446,6 +472,7 @@
     {genstartBane} 
     nulstilHukommelse={() => browser && window.location.reload()} 
     {lokaleScores} 
+    {globaleScores}
 />
 
 <div class="game-container">

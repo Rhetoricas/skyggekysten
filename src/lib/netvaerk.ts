@@ -48,22 +48,44 @@ export async function hentHighscores() {
         .select('navn, score, karakter')
         .eq('rum_kode', spilTilstand.rumKode)
         .order('score', { ascending: false })
-        .limit(10);
-    return data || [];
+        .limit(30);
+
+    const unikke = [];
+    const fundne = new Set();
+    for (const raekke of data || []) {
+        const noegle = `${raekke.navn}-${raekke.score}-${raekke.karakter}`;
+        if (!fundne.has(noegle)) {
+            fundne.add(noegle);
+            unikke.push(raekke);
+            if (unikke.length === 10) break;
+        }
+    }
+    return unikke;
 }
 
 export async function hentGlobalTopTi() {
     const { data } = await supabase
         .from('highscores')
-        .select('navn, rum_kode, score')
+        .select('navn, rum_kode, score, karakter')
         .order('score', { ascending: false })
-        .limit(10);
+        .limit(30);
 
-    return (data || []).map(r => ({
-        spillerNavn: r.navn,
-        oeNavn: r.rum_kode,
-        point: r.score
-    }));
+    const unikke = [];
+    const fundne = new Set();
+    for (const raekke of data || []) {
+        const noegle = `${raekke.navn}-${raekke.score}-${raekke.rum_kode}-${raekke.karakter}`;
+        if (!fundne.has(noegle)) {
+            fundne.add(noegle);
+            unikke.push({
+                spillerNavn: raekke.navn,
+                oeNavn: raekke.rum_kode,
+                point: raekke.score,
+                karakter: raekke.karakter
+            });
+            if (unikke.length === 10) break;
+        }
+    }
+    return unikke;
 }
 
 let sub: RealtimeChannel | null = null;

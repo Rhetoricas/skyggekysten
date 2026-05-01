@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { tilgaengeligeKarakterer } from '$lib/spildata';
-    import { hentGlobalTopTi } from '$lib/netvaerk';
+    import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import type { Karakter } from '$lib/types';
 
     let {
@@ -10,13 +10,15 @@
         bekræftValg,
         genstartBane,
         nulstilHukommelse,
-        lokaleScores
+        lokaleScores,
+        globaleScores
     } = $props<{
         opretEllerDeltag: () => void;
         bekræftValg: (k: Karakter) => void;
         genstartBane: () => void;
         nulstilHukommelse: () => void;
         lokaleScores: Array<{ navn: string; score: number; karakter?: string }>;
+        globaleScores: Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>;
     }>();
 
     let lydStart: HTMLAudioElement | null = null;
@@ -24,31 +26,30 @@
     let lydSejr: HTMLAudioElement | null = null;
 
     let udvalgteSkæbner = $state<Karakter[]>([]);
-    type GlobalScore = { spillerNavn: string; oeNavn: string; point: number };
-    let globalHighscore = $state<GlobalScore[]>([]);
-
     let forrigeState = spilTilstand.gameState;
 
-    $effect(() => {
+$effect(() => {
         if (spilTilstand.gameState !== forrigeState) {
-            if (spilTilstand.gameState === 'dead') {
-                if (lydDoed) {
+            if (spilTilstand.musikTaendt) {
+                if (spilTilstand.gameState === 'dead' && lydDoed) {
                     lydDoed.currentTime = 0;
                     lydDoed.play().catch(() => {});
-                }
-                hentGlobalTopTi().then(data => globalHighscore = data).catch(() => {});
-            } else if (spilTilstand.gameState === 'win') {
-                if (lydSejr) {
+                } else if (spilTilstand.gameState === 'win' && lydSejr) {
                     lydSejr.currentTime = 0;
                     lydSejr.play().catch(() => {});
                 }
-                hentGlobalTopTi().then(data => globalHighscore = data).catch(() => {});
             }
             forrigeState = spilTilstand.gameState;
         }
+
+        if (!spilTilstand.musikTaendt) {
+            if (lydStart) lydStart.pause();
+            if (lydDoed) lydDoed.pause();
+            if (lydSejr) lydSejr.pause();
+        }
     });
 
-    onMount(async () => {
+    onMount(() => {
         lydStart = new Audio('/audio/start.mp3');
         lydDoed = new Audio('/audio/death.mp3');
         lydSejr = new Audio('/audio/win.mp3');
@@ -60,12 +61,6 @@
 
         const blandet = [...tilgaengeligeKarakterer].sort(() => Math.random() - 0.5);
         udvalgteSkæbner = blandet.slice(0, 8);
-
-        try {
-            globalHighscore = await hentGlobalTopTi();
-        } catch {
-            console.warn("Global highscore ikke tilgængelig");
-        }
     });
 
     function findNiveau(score: number) {
@@ -81,13 +76,13 @@
         return `/screens/m${findNiveau(score) + 1}.webp`;
     }
 
-    function findTitel(score: number) {
-        const titler = ['Novice', 'Vandrer', 'Spejder', 'Udforsker', 'Pioner', 'Banebryder', 'Erobrer', 'Overlever', 'Hersker', 'Guddommelig'];
-        return titler[findNiveau(score)];
+    function formaterNavn(tekst: string) {
+        if (!tekst) return '';
+        return tekst.charAt(0).toUpperCase() + tekst.slice(1).toLowerCase();
     }
 
     function startSpilMedLyd() {
-        if (lydStart) {
+        if (spilTilstand.musikTaendt && lydStart) {
             lydStart.currentTime = 0;
             lydStart.play().catch(() => {});
         }
@@ -105,14 +100,14 @@
 {#if spilTilstand.gameState === 'start'}
     <div class="overlay">
         <div class="login-box">
-            <h1>Tågeøen</h1>
+            <h1>Tågeøerne</h1>
             <p>Skriv dit navn og hvilken ø, du vil forsøge at besejre.</p>
             <p class="vent-tekst">Hvis I er flere, der spiller sammen, så vent på kysten indtil alle er ankommet.</p>
             
             <input 
                 type="text" 
                 bind:value={spilTilstand.spillerNavn} 
-                maxlength="15" 
+                maxlength="10" 
                 placeholder="Dit navn" 
                 class="large-input" 
                 onkeydown={trykEnter}
@@ -121,7 +116,7 @@
             <input 
                 type="text" 
                 bind:value={spilTilstand.rumKode} 
-                maxlength="15" 
+                maxlength="10" 
                 placeholder="Øens navn" 
                 class="large-input" 
                 onkeydown={trykEnter}
@@ -141,7 +136,7 @@
 {:else if spilTilstand.gameState === 'select'}
     <div class="overlay">
         <div class="character-select">
-            <h2>Vælg din karakter, {spilTilstand.spillerNavn}</h2>
+            <h2>Vælg din karakter, {formaterNavn(spilTilstand.spillerNavn)}</h2>
             <p class="instruktion">Skæbnen har tildelt dig otte mulige helte. Vælg med omhu.</p>
             
             <div class="character-gallery">
@@ -174,8 +169,10 @@
             <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" />
         </div>
         
-        <h1 class="doeds-titel">Du kom ikke væk fra tågeøen</h1>
-        <p class="beskrivelse">{spilTilstand.logBesked}</p>
+        <h1 class="doeds-titel">Du kom ikke væk fra Tågeøen {formaterNavn(spilTilstand.rumKode)}</h1>
+        <p class="beskrivelse" style="max-width: 600px; line-height: 1.5; text-align: center; margin: 10px auto;">
+            {spilTilstand.logBesked} {genererSlutHistorie(hentTitel(spilTilstand.valgtKarakter?.id || 'explorer', findNiveau(spilTilstand.samletScore) + 1), findNiveau(spilTilstand.samletScore) + 1, spilTilstand.rumKode, false)}
+        </p>
         
         <div class="score-container">
             <img src="/screens/death.webp" alt="Døden" class="pergament-billede" />
@@ -184,7 +181,6 @@
             </h2>
         </div>
         
-        <h3 class="spiller-titel">{findTitel(spilTilstand.samletScore)}</h3>
 
         <div class="slut-knapper">
             <button class="spil-knap slut-knap-styled" onclick={genstartBane}>
@@ -199,14 +195,14 @@
             <div class="tavle">
                 <img src="/screens/boardlocal.webp" alt="Lokal tavle" class="tavle-billede" />
                 <div class="tavle-indhold lokal-indhold">
-                    <h3>Top 10 på {spilTilstand.rumKode}</h3>
+                    <h3>Top 10 på {formaterNavn(spilTilstand.rumKode)}</h3>
                     {#if lokaleScores.length === 0}
                         <p class="tom-liste">Øens kyster er uberørte</p>
                     {:else}
                         <ol>
                             {#each lokaleScores as hs, i (i)}
                                 <li>
-                                    <span class="navn">{hs.navn} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
+                                    <span class="navn">{formaterNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
                                     <span class="point">{hs.score}</span>
                                 </li>
                             {/each}
@@ -218,13 +214,13 @@
                 <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
                 <div class="tavle-indhold global-indhold">
                     <h3>Top 10 global</h3>
-                    {#if globalHighscore.length === 0}
+                    {#if globaleScores.length === 0}
                         <p class="tom-liste">Ingen data endnu</p>
                     {:else}
                         <ol>
-                            {#each globalHighscore as score, i (i)}
+                            {#each globaleScores as score, i (i)}
                                 <li>
-                                    <span class="navn">{score.spillerNavn} <span class="oe-navn">({score.oeNavn})</span></span>
+                                    <span class="navn">{formaterNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {score.oeNavn.toUpperCase()})</span></span>
                                     <span class="point">{score.point}</span>
                                 </li>
                             {/each}
@@ -240,8 +236,10 @@
         <div class="medalje-sektion">
             <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" />
         </div>
-        <h1 class="sejr-titel">Tågeøen er besejret!</h1>
-        <p class="underrubrik">Du har nået den fjerne kyst og overlevet mørket.</p>
+        <h1 class="sejr-titel">Tågeøen {formaterNavn(spilTilstand.rumKode)} er besejret!</h1>
+        <p class="underrubrik" style="max-width: 600px; line-height: 1.5; text-align: center; margin: 10px auto;">
+            {genererSlutHistorie(hentTitel(spilTilstand.valgtKarakter?.id || 'explorer', findNiveau(spilTilstand.samletScore) + 1), findNiveau(spilTilstand.samletScore) + 1, spilTilstand.rumKode, true)}
+        </p>
         
         <div class="score-container">
             <img src="/screens/pergament.webp" alt="Pergament" class="pergament-billede" />
@@ -250,7 +248,6 @@
             </h2>
         </div>
         
-        <h3 class="spiller-titel">{findTitel(spilTilstand.samletScore)}</h3>
 
         <div class="slut-knapper">
             <button class="spil-knap slut-knap-styled" onclick={genstartBane}>
@@ -265,14 +262,14 @@
             <div class="tavle">
                 <img src="/screens/boardlocal.webp" alt="Lokal tavle" class="tavle-billede" />
                 <div class="tavle-indhold lokal-indhold">
-                    <h3>Top 10 på {spilTilstand.rumKode}</h3>
+                    <h3>Top 10 på {formaterNavn(spilTilstand.rumKode)}</h3>
                     {#if lokaleScores.length === 0}
                         <p class="tom-liste">Øens kyster er uberørte</p>
                     {:else}
                         <ol>
                             {#each lokaleScores as hs, i (i)}
                                 <li>
-                                    <span class="navn">{hs.navn} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
+                                    <span class="navn">{formaterNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
                                     <span class="point">{hs.score}</span>
                                 </li>
                             {/each}
@@ -284,13 +281,13 @@
                 <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
                 <div class="tavle-indhold global-indhold">
                     <h3>Top 10 global</h3>
-                    {#if globalHighscore.length === 0}
+                    {#if globaleScores.length === 0}
                         <p class="tom-liste">Ingen data endnu</p>
                     {:else}
                         <ol>
-                            {#each globalHighscore as score, i (i)}
+                            {#each globaleScores as score, i (i)}
                                 <li>
-                                    <span class="navn">{score.spillerNavn} <span class="oe-navn">({score.oeNavn})</span></span>
+                                    <span class="navn">{formaterNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {score.oeNavn.toUpperCase()})</span></span>
                                     <span class="point">{score.point}</span>
                                 </li>
                             {/each}
@@ -360,36 +357,31 @@
     .positive { color: #88ff88; }
     .negative { color: #ff8888; }
 
-    /* Dødsskærm layout */
-.death-screen { 
+    .death-screen { 
         flex-direction: column; text-align: center; background: rgba(40, 0, 0, 0.95); 
         overflow-y: auto; padding: 0 1rem 3rem 1rem; justify-content: flex-start; 
     }
     .doeds-titel { font-size: 2.5rem; margin: 1rem 0; text-transform: uppercase; font-family: 'Cinzel', serif; color: #ff4444; }
-    .score-tekst-doed { position: absolute; top: 22%; left: 50%; transform: translate(-50%, -50%); color: #ffcc00; font-size: 2.4rem; font-family: 'Cinzel', serif; font-weight: bold; text-shadow: 2px 2px 5px black; text-align: center; width: 100%; line-height: 1; margin: 0; }
+    .score-tekst-doed { position: absolute; top: 18%; left: 50%; transform: translate(-50%, -50%); color: #ffcc00; font-size: 2.4rem; font-family: 'Cinzel', serif; font-weight: bold; text-shadow: 2px 2px 5px black; text-align: center; width: 100%; line-height: 1; margin: 0; }
     .lille-score-doed { font-size: 1.2rem; color: #ff8888; text-transform: uppercase; letter-spacing: 1px; margin-right: 10px; }
     .beskrivelse { color: #ccc; margin: 10px auto 30px auto; max-width: 500px; line-height: 1.4; }
 
-    /* Sejrsskærm layout */
     .sejrsskaerm {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #053315;
         display: flex; flex-direction: column; align-items: center; color: #ffffff; 
         padding: 0 1rem 3rem 1rem; box-sizing: border-box; overflow-y: auto; z-index: 1000;
         font-family: system-ui, -apple-system, sans-serif;
     }
-.stor-medalje { 
+    .stor-medalje { 
         width: 100%; max-width: 250px; height: auto; margin-top: 0; 
     }
-        .sejr-titel { font-size: 2.5rem; margin: 1rem 0; text-transform: uppercase; font-family: 'Cinzel', serif; }
+    .sejr-titel { font-size: 2.5rem; margin: 1rem 0; text-transform: uppercase; font-family: 'Cinzel', serif; }
     .underrubrik { color: #d1e8d5; margin-bottom: 0.5rem; }
 
-    /* Fælles score-container og tavler */
     .score-container { position: relative; width: 100%; max-width: 400px; margin: 1.5rem 0; }
     .pergament-billede { width: 100%; height: auto; }
-    .score-tekst { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #3b2818; font-size: 2.4rem; font-family: 'Cinzel', serif; font-weight: bold; text-align: center; line-height: 1; width: 100%; margin: 0; }
+    .score-tekst { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); color: #3b2818; font-size: 2.4rem; font-family: 'Cinzel', serif; font-weight: bold; text-align: center; line-height: 1; width: 100%; margin: 0; }
     .lille-score { font-size: 1.2rem; color: #5a4027; letter-spacing: 2px; text-transform: uppercase; margin-right: 10px; }
-    
-    .spiller-titel { color: #e8c678; text-transform: uppercase; margin-bottom: 2rem; font-size: 1.8rem; font-family: 'Cinzel', serif; }
 
     .slut-knapper { display: flex; gap: 1.5rem; margin-bottom: 2rem; justify-content: center; }
     .highscore-container { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; width: 100%; max-width: 900px; margin-top: 20px; }

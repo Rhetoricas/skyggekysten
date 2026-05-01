@@ -12,6 +12,16 @@
             : null
     );
 
+    let aktuelLog = $state(spilTilstand.logBesked || '');
+    let forrigeLog = $state('');
+
+    $effect(() => {
+        if (spilTilstand.logBesked && spilTilstand.logBesked !== aktuelLog) {
+            forrigeLog = aktuelLog;
+            aktuelLog = spilTilstand.logBesked;
+        }
+    });
+
     function haandterInventoryKlik(vareId: string) {
         if (vareId === 'skovl') {
             grav();
@@ -23,8 +33,10 @@
 
 <footer class="ui">
     <div class="island-overskrift">{spilTilstand.rumKode}</div>
-    <div class="log-line">
-        {#if spilTilstand.logBesked}{spilTilstand.logBesked}{:else}&nbsp;{/if}
+    
+    <div class="log-container">
+        <div class="log-line aktuel">{aktuelLog || '\u00A0'}</div>
+        <div class="log-line forrige">{forrigeLog || '\u00A0'}</div>
     </div>
 
     <div class="ui-content">
@@ -92,6 +104,17 @@
                     </div>
                 {/if}
             {/each}
+
+            <button 
+                class="musik-toggle-btn lille" 
+                onclick={() => spilTilstand.musikTaendt = !spilTilstand.musikTaendt} 
+                title={spilTilstand.musikTaendt ? 'Sluk al lyd' : 'Tænd al lyd'}
+            >
+<img 
+    src={spilTilstand.musikTaendt ? '/screens/musicon.webp' : '/screens/musicoff.webp'} 
+    alt="Lyd afspiller" 
+/>
+            </button>
         </div>
     </div>
 </footer>
@@ -121,16 +144,29 @@
         pointer-events: none;
         margin-bottom: 0.2rem;
     }
+    .log-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 0.8rem;
+        pointer-events: none;
+    }
     .log-line {
         text-align: center;
         width: 100%;
         font-family: 'Cinzel', serif;
-        color: white;
         text-shadow: 1px 1px 4px black, 0 0 10px black;
-        margin-bottom: 0.8rem;
+    }
+    .log-line.aktuel {
+        color: white;
+        font-size: 1.2rem;
         min-height: 1.5rem;
-        font-size: 1.1rem;
-        pointer-events: none;
+    }
+    .log-line.forrige {
+        color: #888;
+        font-size: 0.95rem;
+        min-height: 1.2rem;
+        margin-top: 2px;
     }
     .ui-content {
         display: flex;
@@ -160,6 +196,33 @@
         flex-wrap: wrap;
         flex: 1 1 40%;
         min-width: 200px;
+    }
+    .musik-toggle-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        transition: transform 0.2s, filter 0.2s;
+    }
+    .musik-toggle-btn.lille {
+        margin-left: auto;
+        align-self: flex-end;
+        margin-bottom: 5px;
+    }
+    .musik-toggle-btn.lille img {
+        height: 30px;
+        width: auto;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+    .musik-toggle-btn.lille:hover img {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    .musik-toggle-btn:active {
+        transform: scale(0.95);
     }
     .status-item {
         display: flex;
