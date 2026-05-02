@@ -77,25 +77,18 @@ export function tagValg(valg: Valg) {
         if (resultat.maxHpAendring) {
             spilTilstand.maxLivspoint += resultat.maxHpAendring;
             
-            if (resultat.maxHpAendring > 0) {
-                spilTilstand.livspoint += resultat.maxHpAendring;
-            } else {
-                spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint);
-            }
+            // Vi tvinger den gennem den sikre setter for at justere til det nye loft/bund
+            spilTilstand.livspoint += (resultat.maxHpAendring > 0 ? resultat.maxHpAendring : 0);
             kvittering += ` (${resultat.maxHpAendring > 0 ? '+' : ''}${resultat.maxHpAendring} Max HP)`;
         }
 
         if (resultat.hpAendring) {
             let endeligHp = resultat.hpAendring;
             const udsving = Math.abs(endeligHp * 0.25);
-            const tilfaeldig = (Math.random() * udsving * 2) - udsving;
-            endeligHp = Math.round(endeligHp + tilfaeldig);
+            endeligHp = Math.round(endeligHp + (Math.random() * udsving * 2) - udsving);
             
             const foerHp = spilTilstand.livspoint;
-            const maxHelbred = spilTilstand.maxLivspoint; 
-            
-            spilTilstand.livspoint = Math.min(maxHelbred, spilTilstand.livspoint + endeligHp);
-            
+            spilTilstand.livspoint += endeligHp;
             const faktiskAendring = spilTilstand.livspoint - foerHp;
             
             if (faktiskAendring !== 0) {
@@ -108,10 +101,15 @@ export function tagValg(valg: Valg) {
         if (resultat.guldAendring) {
             let endeligGuld = resultat.guldAendring;
             const udsving = Math.abs(endeligGuld * 0.25);
-            const tilfaeldig = (Math.random() * udsving * 2) - udsving;
-            endeligGuld = Math.round(endeligGuld + tilfaeldig);
+            endeligGuld = Math.round(endeligGuld + (Math.random() * udsving * 2) - udsving);
+
+            const foerGuld = spilTilstand.guldTotal;
             spilTilstand.guldTotal += endeligGuld;
-            kvittering += ` (${endeligGuld > 0 ? '+' : ''}${endeligGuld} Guld)`;
+            const faktiskGuldAendring = spilTilstand.guldTotal - foerGuld;
+
+            if (faktiskGuldAendring !== 0) {
+                kvittering += ` (${faktiskGuldAendring > 0 ? '+' : ''}${faktiskGuldAendring} Guld)`;
+            }
         }
 
         if (kvittering) {
@@ -148,10 +146,7 @@ export function tagValg(valg: Valg) {
         eventState.log = [...eventState.log, resultat.logBesked];
         spilTilstand.logBesked = resultat.logBesked;
 
-        if (resultat.hpOp) {
-            const maxHelbred = spilTilstand.maxLivspoint; 
-            spilTilstand.livspoint = Math.min(maxHelbred, spilTilstand.livspoint + resultat.hpOp);
-        }
+        if (resultat.hpOp) spilTilstand.livspoint += resultat.hpOp;
         if (resultat.hpNed) spilTilstand.livspoint -= resultat.hpNed;
         if (resultat.guldOp) spilTilstand.guldTotal += resultat.guldOp;
         if (resultat.guldNed) spilTilstand.guldTotal -= resultat.guldNed;

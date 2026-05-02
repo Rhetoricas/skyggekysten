@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { untrack } from 'svelte';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
     import { erSpillerITaagen, udfoerBlodofring } from '$lib/overlevelse.svelte';
@@ -14,21 +15,33 @@
     );
     let kanGrave = $derived(aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves);
 
-    let aktuelLog = $state(spilTilstand.logBesked || '');
-    let forrigeLog = $state('');
+    let logHistorik = $state<string[]>([]);
+    let visLog = $state(false);
+    let logContainerRef = $state<HTMLDivElement | null>(null);
 
     $effect(() => {
-        if (spilTilstand.logBesked && spilTilstand.logBesked !== aktuelLog) {
-            forrigeLog = aktuelLog;
-            aktuelLog = spilTilstand.logBesked;
+        const besked = spilTilstand.logBesked;
+        if (besked) {
+            untrack(() => {
+                if (logHistorik.length === 0 || besked !== logHistorik[logHistorik.length - 1]) {
+                    logHistorik = [...logHistorik, besked];
+                }
+            });
         }
     });
 
+    $effect(() => {
+        if (visLog && logHistorik.length && logContainerRef) {
+            logContainerRef.scrollTop = logContainerRef.scrollHeight;
+        }
+    });
+
+    let aktuelLog = $derived(logHistorik[logHistorik.length - 1] || '');
+    let forrigeLog = $derived(logHistorik[logHistorik.length - 2] || '');
+
     function spisMad() {
-        const maxEnergi = spilTilstand.valgtKarakter?.baseEnergi || 0;
-        const aktuelEnergi = spilTilstand.nuvaerendeEnergi || 0;
         const fuldHp = spilTilstand.livspoint >= spilTilstand.maxLivspoint;
-        const fuldEnergi = aktuelEnergi >= maxEnergi;
+        const fuldEnergi = spilTilstand.nuvaerendeEnergi >= spilTilstand.maxEnergi;
 
         if (fuldHp && fuldEnergi) {
             spilTilstand.logBesked = "Du er allerede mæt og fuldt udhvilet.";
@@ -36,8 +49,8 @@
         }
 
         brugFraRygsæk('mad', 1);
-        spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 10);
-        spilTilstand.nuvaerendeEnergi = Math.min(maxEnergi, aktuelEnergi + 1);
+        spilTilstand.livspoint += 10;
+        spilTilstand.nuvaerendeEnergi += 1;
         
         spilTilstand.logBesked = "Du spiser din madration. (+10 HP, +1 Energi)";
         syncTilDb(true);
@@ -54,10 +67,35 @@
     }
 </script>
 
+{#if visLog}
+    <div class="log-modal-overlay" onclick={() => visLog = false} role="presentation">
+        <div class="log-modal-content" onclick={(e) => e.stopPropagation()} role="presentation">
+            <div class="log-header">
+                <h2>Logbog</h2>
+                <button class="luk-btn" onclick={() => visLog = false}>✕</button>
+            </div>
+            <div class="log-liste" bind:this={logContainerRef}>
+                {#each logHistorik as linje, i (i)}
+                    <p class="log-post" class:nyeste={i === logHistorik.length - 1}>
+                        {linje}
+                    </p>
+                {/each}
+            </div>
+        </div>
+    </div>
+{/if}
+
 <footer class="ui">
     <div class="island-overskrift">{spilTilstand.rumKode}</div>
     
-    <div class="log-container">
+    <div 
+        class="log-container klikbar" 
+        onclick={() => visLog = true}
+        onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') visLog = true; }}
+        role="button"
+        tabindex="0"
+        title="Åbn logbogen"
+    >
         <div class="log-line aktuel">{aktuelLog || '\u00A0'}</div>
         <div class="log-line forrige">{forrigeLog || '\u00A0'}</div>
     </div>
@@ -108,13 +146,13 @@
                 {@const dbInfo = itemDB[vare.id]}
                 {#if dbInfo}
                     <div 
-                        class="inventory-item {(vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) || (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0)) || (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0))) ? 'klikbar' : ''}" 
+                        class="inventory-item {(vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) || (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi) || (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi)) ? 'klikbar' : ''}" 
                         onclick={() => {
                             if (vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) {
                                 haandterInventoryKlik(vare.id);
-                            } else if (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0)) {
+                            } else if (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi) {
                                 haandterInventoryKlik(vare.id);
-                            } else if (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0))) {
+                            } else if (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi)) {
                                 haandterInventoryKlik(vare.id);
                             }
                         }}
@@ -122,9 +160,9 @@
                             if (e.key === 'Enter' || e.key === ' ') {
                                 if (vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) {
                                     haandterInventoryKlik(vare.id);
-                                } else if (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0)) {
+                                } else if (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi) {
                                     haandterInventoryKlik(vare.id);
-                                } else if (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || (spilTilstand.nuvaerendeEnergi || 0) < (spilTilstand.valgtKarakter?.baseEnergi || 0))) {
+                                } else if (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi)) {
                                     haandterInventoryKlik(vare.id);
                                 }
                             }
@@ -136,7 +174,7 @@
                             <img 
                                 src={dbInfo.billede} 
                                 alt={dbInfo.navn} 
-                                class="inventory-icon {(vare.id === 'skovl' && aktueltFelt && (aktueltFelt.gravet || !aktueltFelt.kanGraves)) || (vare.id === 'sovepose' && (aktueltFelt?.biome === 'hav' || (spilTilstand.nuvaerendeEnergi || 0) === (spilTilstand.valgtKarakter?.baseEnergi || 0))) || (vare.id === 'mad' && spilTilstand.livspoint >= spilTilstand.maxLivspoint && (spilTilstand.nuvaerendeEnergi || 0) >= (spilTilstand.valgtKarakter?.baseEnergi || 0)) ? 'deaktiveret' : ''}" 
+                                class="inventory-icon {(vare.id === 'skovl' && aktueltFelt && (aktueltFelt.gravet || !aktueltFelt.kanGraves)) || (vare.id === 'sovepose' && (aktueltFelt?.biome === 'hav' || spilTilstand.nuvaerendeEnergi >= spilTilstand.maxEnergi)) || (vare.id === 'mad' && spilTilstand.livspoint >= spilTilstand.maxLivspoint && spilTilstand.nuvaerendeEnergi >= spilTilstand.maxEnergi) ? 'deaktiveret' : ''}" 
                             />
                             {#if vare.maengde > 1}
                                 <span class="maengde-badge">{vare.maengde}</span>
@@ -190,7 +228,14 @@
         flex-direction: column;
         align-items: center;
         margin-bottom: 0.8rem;
-        pointer-events: none;
+    }
+    .log-container.klikbar {
+        pointer-events: auto;
+        cursor: pointer;
+        transition: transform 0.1s;
+    }
+    .log-container.klikbar:hover {
+        transform: scale(1.02);
     }
     .log-line {
         text-align: center;
@@ -409,5 +454,39 @@
     @keyframes hpPuls {
         0% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) drop-shadow(0 0 2px darkred); }
         100% { transform: scale(1.3); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) drop-shadow(0 0 10px red) brightness(1.2); }
+    }
+
+    .log-modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+        background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
+        z-index: 1500; display: flex; align-items: center; justify-content: center;
+        pointer-events: auto;
+    }
+    .log-modal-content {
+        background: #1a1a1a; width: 90%; max-width: 600px; height: 60dvh; max-height: 800px;
+        border: 1px solid #444; border-radius: 8px; display: flex; flex-direction: column;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+    }
+    .log-header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 15px 20px; border-bottom: 1px solid #333;
+    }
+    .log-header h2 { 
+        margin: 0; color: #ffcc00; font-family: 'Cinzel', serif; font-size: 1.5rem; 
+    }
+    .luk-btn {
+        background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer; padding: 0;
+    }
+    .luk-btn:hover { color: white; }
+    .log-liste {
+        padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+        flex-grow: 1;
+    }
+    .log-post {
+        margin: 0; color: #aaa; line-height: 1.5; border-left: 2px solid #333; padding-left: 12px;
+        font-family: system-ui, -apple-system, sans-serif;
+    }
+    .log-post.nyeste {
+        color: white; border-left-color: #ffcc00; font-size: 1.05rem;
     }
 </style>

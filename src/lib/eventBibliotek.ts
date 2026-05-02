@@ -272,7 +272,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
             {
                 tekst: "Hug ribbenene over",
                 kraeverItem: 'svaerd',
-                udfaldListe: [{ log: "En sky af giftige sporer siver ud fra deres lunger.", hpAendring: -20, naesteTrin: 'omfavnelse_sporer' }]
+                udfaldListe: [{ log: "En sky af giftige sporer siver out fra deres lunger.", hpAendring: -20, naesteTrin: 'omfavnelse_sporer' }]
             },
             {
                 tekst: "Grav dem fri",
@@ -739,7 +739,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         biome: 'any',
         valg: [
             {
-                tekst: "Kast dig over stenen",
+                tekst: "Kast cast dig over stenen",
                 udfaldListe: [{ log: "Sværdet flænger din side, men stenen er din.", hpAendring: -45, givItem: 'diamant' }]
             },
             {
@@ -1422,7 +1422,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
     'labyrint_moerke': {
         id: 'labyrint_moerke',
         titel: "mørkets blindgyde",
-        tekst: "Du kan intet se. Væggene trækker sig langsomt sammen om dig. Du mærker en metaldør foran dig og en blød, kødfuld væg til siden.",
+        tekst: "Du kan intet se. Væggene trækker sig langsomt sammen om dig. Du mærker en metaldør foran মাঠে og en blød, kødfuld væg til siden.",
         erSubTrin: true,
         biome: 'any',
         valg: [

@@ -22,7 +22,8 @@
         <h2>Tiden står stille</h2>
         <p class="vente-desc">
             Du har slået lejr <strong style="color: gold;">{dageForan} {dageForan === 1 ? 'dag' : 'dage'}</strong> foran den langsomste på øen. 
-            En imp dukker pludselig op med et magisk kortspil. Betal ham 5 guld for at trække et kort, mens de andre arbejder sig fremad.
+            En imp dukker pludselig op med et magisk kortspil. <br><br>
+            <strong>Regler:</strong> Betal 5 guld for at spille. Træk kort for at vinde guld eller helbred. Trækker du kraniet, mister du alt det, du har vundet i <em>denne</em> runde. Du kan stoppe når som helst og sikre din pulje til næste runde.
         </p>
 
         <div class="vente-board">

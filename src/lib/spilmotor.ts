@@ -219,9 +219,7 @@ export function initialiserGitter() {
     }
 
     const bySementer = 5;
-    const byStoerrelse = 8;
     const markedSementer = 6;
-    const markedStoerrelse = 3;
 
     function spredBiome(startIndeks: number, type: 'by' | 'marked', maxStr: number) {
         const aabne = [startIndeks];
@@ -249,11 +247,14 @@ export function initialiserGitter() {
 
     for (let i = 0; i < bySementer; i++) {
         const seed = Math.floor(Math.random() * antal);
-        spredBiome(seed, 'by', byStoerrelse);
+        const tilfaeldigByStoerrelse = Math.floor(Math.random() * 6) + 5; 
+        spredBiome(seed, 'by', tilfaeldigByStoerrelse);
     }
+    
     for (let i = 0; i < markedSementer; i++) {
         const seed = Math.floor(Math.random() * antal);
-        spredBiome(seed, 'marked', markedStoerrelse);
+        const tilfaeldigMarkedStoerrelse = Math.floor(Math.random() * 5) + 1; 
+        spredBiome(seed, 'marked', tilfaeldigMarkedStoerrelse);
     }
 
     const nytGitter: Felt[] = Array(antal).fill(null).map((_, indeks) => {

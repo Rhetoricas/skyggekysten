@@ -44,7 +44,7 @@ export function skabKamera() {
         e.preventDefault(); 
 
         zoomLevel -= e.deltaY * 0.001; 
-        zoomLevel = Math.max(0.5, Math.min(zoomLevel, 2.0));
+        zoomLevel = Math.max(0.3, Math.min(zoomLevel, 3.0));
     }
 
     function centrerPåHex(index: number, bredde: number, hexW: number, rowH: number) {

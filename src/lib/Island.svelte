@@ -141,7 +141,7 @@
 
     let kameraStyle = $derived(`
         transform-origin: ${cam.x}px ${cam.y}px;
-        transform: translate(calc(50vw - ${cam.x}px), calc(50vh - ${cam.y}px)) scale(${cam.zoomLevel});
+        transform: translate(calc(50vw - ${cam.x}px), calc(50dvh - ${cam.y}px)) scale(${cam.zoomLevel});
         transition: ${cam.isDragging ? 'none' : 'transform 0.3s ease-out'};
         width: ${BREDDE * HEX_W + HEX_W}px;
         height: ${HOEJDE * ROW_H + ROW_H}px;
@@ -242,9 +242,9 @@
         spilTilstand.rumKode = renKode;
         spilTilstand.statusBesked = 'Forbinder dig til øen...';
 
-if (alarmKanal) supabase.removeChannel(alarmKanal);
+        if (alarmKanal) supabase.removeChannel(alarmKanal);
         alarmKanal = supabase
-            .channel(spilTilstand.rumKode) // Slet `alarm_` præfikset her
+            .channel(spilTilstand.rumKode)
             .on('broadcast', { event: 'alarm' }, ({ payload }) => {
                 if (payload.senderNavn === spilTilstand.spillerNavn) return;
     
@@ -271,8 +271,11 @@ if (alarmKanal) supabase.removeChannel(alarmKanal);
                 if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
                     const eksisterende = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
                     spilTilstand.spillerIndex = eksisterende.index;
-                    spilTilstand.livspoint = eksisterende.hp;
+                    
+                    // --- VIGTIGT: Sæt maxLivspoint først ---
                     spilTilstand.maxLivspoint = eksisterende.maxHp || 100;
+                    spilTilstand.livspoint = eksisterende.hp;
+                    
                     spilTilstand.guldTotal = eksisterende.guld;
                     spilTilstand.maxKolonne = eksisterende.kolonne;
                     spilTilstand.dag = eksisterende.dag || 1;
@@ -342,8 +345,11 @@ if (alarmKanal) supabase.removeChannel(alarmKanal);
 
     async function bekræftValg(karakter: Karakter) {
         spilTilstand.valgtKarakter = karakter;
-        spilTilstand.livspoint = karakter.startHp;
+        
+        // --- VIGTIGT: Sæt maxLivspoint først ---
         spilTilstand.maxLivspoint = karakter.startHp || 100;
+        spilTilstand.livspoint = karakter.startHp;
+        
         spilTilstand.guldTotal = karakter.startGuld;
         spilTilstand.maxKolonne = 1;
         spilTilstand.dag = 1;
@@ -419,7 +425,7 @@ if (alarmKanal) supabase.removeChannel(alarmKanal);
         return Math.min(...aktive.map((s: any) => s.dag || 1));
     }
 
-function udførBevægelse(nytIndeks: number) {
+    function udførBevægelse(nytIndeks: number) {
         if (flytterNu || !spilTilstand.valgtKarakter) return;
         flytterNu = true;
 
@@ -433,7 +439,6 @@ function udførBevægelse(nytIndeks: number) {
         const felt = spilTilstand.gitter[nytIndeks];
         if (!felt) { flytterNu = false; return; }
         
-        // Energien styres stadig af karakterens pris og landskabets besvær
         const pris = Math.round(spilTilstand.valgtKarakter.moveCost * (biomeTerraenCost[felt.biome as Biome] || 1));
         spilTilstand.nuvaerendeEnergi -= erITågen ? pris * 2 : pris;
 
@@ -476,6 +481,11 @@ function udførBevægelse(nytIndeks: number) {
         if (felt.hasBoat) {
             felt.hasBoat = false;
             sejlendeBaadIndex = nytIndeks;
+            
+            if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
+                spilTilstand.alleSpillere[spilTilstand.spillerNavn].isWinner = true;
+            }
+            
             setTimeout(() => {
                 spilTilstand.gameState = 'win';
             }, 3000);
@@ -637,7 +647,7 @@ function udførBevægelse(nytIndeks: number) {
 <style>
     .game-container { 
         width: 100vw;
-        height: 100vh; overflow: hidden; background: #000; 
+        height: 100dvh; overflow: hidden; background: #000; 
     }
     .camera { 
         width: 100%;

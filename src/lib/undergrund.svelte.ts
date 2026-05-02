@@ -28,25 +28,25 @@ export function genererUndergrund(biome: Biome | string) {
     const terningKast = Math.random() * 100;
 
     if (biome === 'mark' || biome === 'eng') {
-        if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(10, 30);
+        if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(5, 15);
         else if (terningKast < 35) feltData.skjultLiv = tilfaeldigtTal(10, 20);
         else if (terningKast < 40) feltData.skjultFaelde = true;
         else if (terningKast < 42) feltData.skjultLoot = 'fakkel';
     } else if (biome === 'skov') {
-        if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(10, 30);
+        if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(5, 15);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(20, 40);
         else if (terningKast < 60) feltData.skjultFaelde = true;
-        else if (terningKast < 63) feltData.skjultLoot = 'eliksir';
+        else if (terningKast < 63) feltData.skjultLoot = 'livseliksir';
     } else if (biome === 'bjerg') {
-        if (terningKast < 50) feltData.skjultGuld = tilfaeldigtTal(30, 60);
+        if (terningKast < 50) feltData.skjultGuld = tilfaeldigtTal(15, 30);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(5, 10);
         else if (terningKast < 70) feltData.skjultFaelde = true;
         else if (terningKast < 74) feltData.skjultLoot = 'fakkel';
     } else if (farlige.includes(biome)) {
-        if (terningKast < 45) feltData.skjultGuld = tilfaeldigtTal(60, 100);
+        if (terningKast < 45) feltData.skjultGuld = tilfaeldigtTal(25, 50);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(10, 20);
         else if (terningKast < 90) feltData.skjultFaelde = true;
-        else if (terningKast < 95) feltData.skjultLoot = 'eliksir';
+        else if (terningKast < 95) feltData.skjultLoot = 'livseliksir';
     }
 
     return feltData;
@@ -108,11 +108,20 @@ export function grav() {
         fundLog = "KLIK. En nedgravet fælde bider sig fast i dit ben";
     } else if (guldVaerdi > 0) {
         const maengde = Math.floor(guldVaerdi * spilTilstand.valgtKarakter.goldMod);
+        const foerGuld = spilTilstand.guldTotal;
         spilTilstand.guldTotal += maengde;
-        fundLog = `Mudderet gemte på ${maengde} Guld.`;
+        const faktiskGuld = spilTilstand.guldTotal - foerGuld;
+        fundLog = `Mudderet gemte på ${faktiskGuld} Guld.`;
     } else if (livVaerdi > 0) {
-        spilTilstand.livspoint += livVaerdi;
-        fundLog = `Du graver en saftig rod frem og spiser den. Du heler ${livVaerdi} HP.`;
+        const aktuelHp = spilTilstand.livspoint;
+        spilTilstand.livspoint += livVaerdi; 
+        const faktiskHeling = spilTilstand.livspoint - aktuelHp;
+        
+        if (faktiskHeling > 0) {
+            fundLog = `Du graver en saftig rod frem og spiser den. Du heler ${faktiskHeling} HP.`;
+        } else {
+            fundLog = `Du graver en rod frem, men du er allerede mæt. Helbredet forbliver intakt.`;
+        }
     } else if (fundetLoot) {
         tilfoejTilRygsæk(fundetLoot, 1);
         fundLog = `Spadens blad rammer noget klangfuldt. Du har gravet en ${fundetLoot} frem.`;

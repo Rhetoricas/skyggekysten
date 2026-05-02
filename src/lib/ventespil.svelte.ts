@@ -5,8 +5,6 @@ let rundeGuld = 0;
 let rundeLiv = 0;
 
 export function delNyeKort() {
-    spilTilstand.logBesked = "Impen blander kortene på ny.";
-    
     const typer = ['slut'];
     const antalLiv = Math.random() > 0.5 ? 2 : 1;
     const antalGuld = 3 - antalLiv;
@@ -45,6 +43,9 @@ export function startVenteSpil(kosterPenge: boolean = false) {
             spilTilstand.ventePuljeGuld = 0;
             spilTilstand.guldTotal -= restPris;
         }
+        spilTilstand.logBesked = "Du lægger 5 guld på bordet. Impen blander kortene.";
+    } else {
+        spilTilstand.logBesked = "Impen blander kortene til første runde.";
     }
     
     spilTilstand.venteSpilAktiv = true;

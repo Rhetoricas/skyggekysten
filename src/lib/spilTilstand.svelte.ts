@@ -1,4 +1,4 @@
-import type { Felt, Karakter, SpillerData } from './types';
+import type { Felt, Karakter, SpillerData, RygsækTing } from './types';
 
 interface FlydendeTal {
     id: number;
@@ -16,25 +16,35 @@ export const spilTilstand = $state({
     gameState: 'start' as 'start' | 'select' | 'play' | 'dead' | 'win',
     gitter: [] as Felt[],
     spillerIndex: 0,
-    livspoint: 100,
+    
     maxLivspoint: 100,
-    guldTotal: 0,
-    nuvaerendeEnergi: 10,
-    maxEnergi: 10,
+    _livspoint: 100,
+    get livspoint(): number { return this._livspoint; },
+    set livspoint(v: number) { this._livspoint = Math.max(0, Math.min(this.maxLivspoint, v)); },
+    
+    _guldTotal: 0,
+    get guldTotal(): number { return this._guldTotal; },
+    set guldTotal(v: number) { this._guldTotal = Math.max(0, Math.round(v)); },
+    
+    valgtKarakter: null as Karakter | null,
+
+    get maxEnergi(): number { return this.valgtKarakter?.baseEnergi || 10; },
+    _nuvaerendeEnergi: 10,
+    get nuvaerendeEnergi(): number { return this._nuvaerendeEnergi; },
+    set nuvaerendeEnergi(v: number) { this._nuvaerendeEnergi = Math.max(0, Math.min(this.maxEnergi, v)); },
+
     dag: 1,
     retning: 'S',
     maxKolonne: 0,
     samletScore: 0,
-    valgtKarakter: null as Karakter | null,
     statusBesked: '',
     logBesked: 'Velkommen til øen.',
     fogX: 0,
     alleSpillere: {} as Record<string, SpillerData>,
-    mitUdstyr: [] as Array<{ id: string; maengde: number }>,
+    mitUdstyr: [] as RygsækTing[],
     mineKendteFelter: [] as number[],
     aktivShop: null as string[] | null,
     
-    // Byggeklodserne til ventespillet
     venteSpilAktiv: false,
     ventePuljeGuld: 0,
     ventePuljeLiv: 0,

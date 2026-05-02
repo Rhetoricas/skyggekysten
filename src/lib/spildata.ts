@@ -1,7 +1,7 @@
 import type { Karakter, Biome, ItemType } from './types';
 
 export const BREDDE = 100;
-export const HOEJDE = 15;
+export const HOEJDE = 25;
 export const HEX_W = 96;  
 export const ROW_H = 82; 
 
