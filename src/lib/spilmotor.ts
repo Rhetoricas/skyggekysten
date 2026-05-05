@@ -91,7 +91,6 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
 
     if (fundetTing) {
         fundetTing.maengde += tilfoejetMaengde;
-        fundetTing.anskaffetDag = spilTilstand.dag;
     } else {
         const nyTing: RygsækTing = {
             id: genstandId,
@@ -271,6 +270,9 @@ export function initialiserGitter() {
     });
 
     let ledigeEvents = Object.keys(eventBibliotek).filter((noegle) => !eventBibliotek[noegle].erSubTrin && noegle !== 'campfire');
+    
+    const eventForbrug = new Map<string, number>();
+    ledigeEvents.forEach(e => eventForbrug.set(e, 0));
 
     const eventChancer: Record<string, number> = {
         'hule': 0.80,
@@ -283,6 +285,7 @@ export function initialiserGitter() {
         'by': 0.15,
         'marked': 0.15,
         'hoejland': 0.05,
+        'hav': 0.05,
         'bjerg': 0.04,
         'skov': 0.04,
         'eng': 0.04,
@@ -298,24 +301,35 @@ export function initialiserGitter() {
 
     for (const indeks of tilfaeldigeFelter) {
         const felt = nytGitter[indeks];
-        if (felt.biome === 'hav' || felt.eventID) continue;
+        if (felt.eventID) continue;
 
         const chance = eventChancer[felt.biome as string] || 0.05;
 
         if (Math.random() < chance) {
             const matchendeEvents = ledigeEvents.filter(noegle => {
                 const kraevetBiome = eventBibliotek[noegle].biome;
+                
+                if (felt.biome === 'hav') {
+                    return Array.isArray(kraevetBiome) && kraevetBiome.includes('hav');
+                }
+                
                 return Array.isArray(kraevetBiome)
                     ? (kraevetBiome as string[]).includes(felt.biome as string) || (kraevetBiome as string[]).includes('alle')
                     : kraevetBiome === felt.biome || kraevetBiome === 'alle' || kraevetBiome === 'any' || !kraevetBiome;
             });
 
             if (matchendeEvents.length > 0) {
-                const valgtEvent = matchendeEvents[Math.floor(Math.random() * matchendeEvents.length)];
+                const minBrugt = Math.min(...matchendeEvents.map(e => eventForbrug.get(e) || 0));
+                const mulige = matchendeEvents.filter(e => (eventForbrug.get(e) || 0) === minBrugt);
+                
+                const valgtEvent = mulige[Math.floor(Math.random() * mulige.length)];
                 felt.eventID = valgtEvent;
 
                 if (eventBibliotek[valgtEvent].unik) {
                     ledigeEvents = ledigeEvents.filter(e => e !== valgtEvent);
+                    eventForbrug.delete(valgtEvent);
+                } else {
+                    eventForbrug.set(valgtEvent, (eventForbrug.get(valgtEvent) || 0) + 1);
                 }
             }
         }
@@ -368,6 +382,12 @@ export function tjekUdstyrSlid(genstandId: string): string {
     if (alder > 10) {
         if (Math.random() <= 0.25) {
             brugFraRygsæk(genstandId, 1);
+            
+            const tilbage = spilTilstand.mitUdstyr.find((t: RygsækTing) => t.id === genstandId);
+            if (tilbage) {
+                tilbage.anskaffetDag = spilTilstand.dag;
+            }
+
             const vareNavn = itemDB[genstandId]?.navn || genstandId;
             return ` Din ${vareNavn} bukkede under for sliddet og faldt fra hinanden.`;
         }

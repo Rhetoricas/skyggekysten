@@ -1,6 +1,10 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import type { Biome } from './types';
 
+import { klokkenPaaTorvetEvents } from './klokken_paa_torvet_events';
+import { blodskovensHjerteEvents } from './event_blodskov';
+import { glashjertetEvents } from './event_glashjertet';
+
 export interface Udfald {
     log: string; 
     hpAendring?: number;
@@ -50,6 +54,10 @@ export interface SpilEvent {
 
 export const eventBibliotek: Record<string, SpilEvent> = {
     
+    ...(klokkenPaaTorvetEvents as unknown as Record<string, SpilEvent>),
+    ...(blodskovensHjerteEvents as unknown as Record<string, SpilEvent>),
+    ...(glashjertetEvents as unknown as Record<string, SpilEvent>),
+
     'blodalter': {
         id: 'blodalter', titel: "Et Gammelt Alter", biome: ['ruin', 'blodskov'], billede: '/events/ev_alter.webp', unik: false,
         tekst: "Et sort stenalter trækker sig ud af tågen. Der sidder guldstykker fast i indtørret snavs på overfladen, og stenen brummer svagt.",

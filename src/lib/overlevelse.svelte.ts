@@ -120,14 +120,20 @@ export function fremrykTid() {
     const nyDag = spilTilstand.dag || 1;
 
     if (nyDag > gammelDag) {
+        let samletLog = "";
+
         if (nyDag === 2) {
-            spilTilstand.logBesked = "Dit blik skærer skarpere. Du føler dig mere klarsynet og kan nu overskue omgivelserne.";
+            samletLog += " Dit blik skærer skarpere. Du føler dig mere klarsynet og kan nu overskue omgivelserne.";
         }
 
         ['fakkel', 'metaldetektor', 'soegekvist'].forEach(id => {
             const log = tjekUdstyrSlid(id);
-            if (log) spilTilstand.logBesked += log;
+            if (log) samletLog += log;
         });
+
+        if (samletLog !== "") {
+            spilTilstand.logBesked = spilTilstand.logBesked + samletLog;
+        }
     }
 
     if (erSpillerITaagen()) {
