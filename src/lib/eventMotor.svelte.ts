@@ -18,8 +18,13 @@ export const eventState = $state({
 export function startEvent(eventID: string) {
     const evt = eventBibliotek[eventID];
     if (!evt) return;
+    
     eventState.aktivt = evt;
     eventState.log = [evt.tekst];
+    
+    spilTilstand.logBesked = `--- ${evt.titel.toUpperCase()} ---`;
+    spilTilstand.logBesked = evt.tekst;
+    
     eventState.valgLåst = false;
     eventState.naesteTrin = null;
     eventState.erFaerdig = false;
@@ -76,8 +81,6 @@ export function tagValg(valg: Valg) {
 
         if (resultat.maxHpAendring) {
             spilTilstand.maxLivspoint += resultat.maxHpAendring;
-            
-            // Vi tvinger den gennem den sikre setter for at justere til det nye loft/bund
             spilTilstand.livspoint += (resultat.maxHpAendring > 0 ? resultat.maxHpAendring : 0);
             kvittering += ` (${resultat.maxHpAendring > 0 ? '+' : ''}${resultat.maxHpAendring} Max HP)`;
         }
@@ -86,6 +89,10 @@ export function tagValg(valg: Valg) {
             let endeligHp = resultat.hpAendring;
             const udsving = Math.abs(endeligHp * 0.25);
             endeligHp = Math.round(endeligHp + (Math.random() * udsving * 2) - udsving);
+            
+            if (endeligHp < 0) {
+                endeligHp = -spilTilstand.beregnSkade(Math.abs(endeligHp));
+            }
             
             const foerHp = spilTilstand.livspoint;
             spilTilstand.livspoint += endeligHp;
@@ -102,6 +109,10 @@ export function tagValg(valg: Valg) {
             let endeligGuld = resultat.guldAendring;
             const udsving = Math.abs(endeligGuld * 0.25);
             endeligGuld = Math.round(endeligGuld + (Math.random() * udsving * 2) - udsving);
+
+            if (endeligGuld > 0) {
+                endeligGuld = spilTilstand.beregnGuldIndkomst(endeligGuld);
+            }
 
             const foerGuld = spilTilstand.guldTotal;
             spilTilstand.guldTotal += endeligGuld;
@@ -147,8 +158,8 @@ export function tagValg(valg: Valg) {
         spilTilstand.logBesked = resultat.logBesked;
 
         if (resultat.hpOp) spilTilstand.livspoint += resultat.hpOp;
-        if (resultat.hpNed) spilTilstand.livspoint -= resultat.hpNed;
-        if (resultat.guldOp) spilTilstand.guldTotal += resultat.guldOp;
+        if (resultat.hpNed) spilTilstand.livspoint -= spilTilstand.beregnSkade(resultat.hpNed);
+        if (resultat.guldOp) spilTilstand.guldTotal += spilTilstand.beregnGuldIndkomst(resultat.guldOp);
         if (resultat.guldNed) spilTilstand.guldTotal -= resultat.guldNed;
         if (resultat.itemUd) tilfoejTilRygsæk(resultat.itemUd, 1);
         

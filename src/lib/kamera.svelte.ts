@@ -74,6 +74,12 @@ export function skabKamera() {
         zoomLevel = nyVaerdi;
     }
 
+    function nulstil() {
+        zoomLevel = 1;
+        isDragging = false;
+        harTrukket = false;
+    }
+
     return {
         get x() { return x; },
         set x(val) { x = val; },
@@ -88,6 +94,7 @@ export function skabKamera() {
         håndterZoom,
         centrerPåHex,
         foelgSpiller,
-        saetZoom 
+        saetZoom,
+        nulstil
     };
 }

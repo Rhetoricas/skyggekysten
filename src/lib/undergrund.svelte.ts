@@ -85,8 +85,9 @@ export function grav() {
     if (harSkovl) {
         udstyrsLog = tjekUdstyrSlid('skovl');
     } else {
-        spilTilstand.livspoint -= 10;
-        udstyrsLog = ` Du graver i jorden med bare næver. Du mister 10 HP og ${faktiskEnergiPris} Energi.`;
+        const skade = spilTilstand.beregnSkade(10);
+        spilTilstand.livspoint -= skade;
+        udstyrsLog = ` Du graver i jorden med bare næver. Du mister ${skade} HP og ${faktiskEnergiPris} Energi.`;
     }
 
     const guldVaerdi = felt.skjultGuld ?? 0;
@@ -104,10 +105,12 @@ export function grav() {
     let fundLog = "Du finder kun sten og orme.";
 
     if (faelde) {
-        spilTilstand.livspoint -= 10;
-        fundLog = "KLIK. En nedgravet fælde bider sig fast i dit ben";
+        const faeldeSkade = spilTilstand.beregnSkade(10);
+        spilTilstand.livspoint -= faeldeSkade;
+        fundLog = `KLIK. En nedgravet fælde bider sig fast i dit ben (-${faeldeSkade} HP)`;
     } else if (guldVaerdi > 0) {
-        const maengde = Math.floor(guldVaerdi * spilTilstand.valgtKarakter.goldMod);
+        let maengde = Math.floor(guldVaerdi * spilTilstand.valgtKarakter.goldMod);
+        maengde = spilTilstand.beregnGuldIndkomst(maengde);
         const foerGuld = spilTilstand.guldTotal;
         spilTilstand.guldTotal += maengde;
         const faktiskGuld = spilTilstand.guldTotal - foerGuld;

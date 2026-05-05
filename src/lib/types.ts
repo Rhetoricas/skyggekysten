@@ -80,6 +80,7 @@ export interface Felt {
     type?: string;
     opdaget?: boolean;
     billede?: string;
+    gravstenIkon?: string;
 
     kanGraves?: boolean;
     skjultGuld?: number;

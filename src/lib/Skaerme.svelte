@@ -103,15 +103,26 @@
             startSpilMedLyd();
         }
     }
-    
-    function toggleLyd() {
-        spilTilstand.musikTaendt = !spilTilstand.musikTaendt;
-    }
 </script>
 
 {#if spilTilstand.gameState === 'start'}
     <div class="overlay">
-        <div class="login-box">
+        <button 
+            class="musik-toggle-btn top-right" 
+            onclick={() => spilTilstand.musikTaendt = !spilTilstand.musikTaendt} 
+            title={spilTilstand.musikTaendt ? 'Sluk al lyd' : 'Tænd al lyd'}
+        >
+            <img 
+                src={spilTilstand.musikTaendt ? '/screens/musicon.webp' : '/screens/musicoff.webp'} 
+                alt="Lyd afspiller" 
+            />
+        </button>
+
+        <div class="login-box combined-box">
+            <button type="button" class="boat-btn-wrapper" onclick={(e) => { e.preventDefault(); startSpilMedLyd(); }}>
+                <img src="/events/launch.webp" alt="Båd" class="launch-image top-image clickable-boat" />
+            </button>
+
             <h1>Tågeøerne</h1>
             <p>Skriv dit navn og hvilken ø, du vil forsøge at besejre.</p>
             <p class="vent-tekst">Hvis I er flere, der spiller sammen, så vent på kysten indtil alle er ankommet.</p>
@@ -139,14 +150,25 @@
             </button>
             <p class="status larger-status">{spilTilstand.statusBesked}</p>
             
-            <button type="button" class="boat-btn-wrapper" onclick={(e) => { e.preventDefault(); startSpilMedLyd(); }}>
-                <img src="/events/launch.webp" alt="Båd" class="launch-image bottom-image clickable-boat" />
-            </button>
+            <div class="tavle start-tavle">
+                <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
+                <div class="tavle-indhold global-indhold">
+                    <h3>Top 10 global</h3>
+                    {#if globaleScores.length === 0}
+                        <p class="tom-liste">Ingen data endnu</p>
+                    {:else}
+                        <ol>
+                            {#each globaleScores as score, i (i)}
+                                <li>
+                                    <span class="navn">{formaterNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {score.oeNavn.toUpperCase()})</span></span>
+                                    <span class="point">{score.point}</span>
+                                </li>
+                            {/each}
+                        </ol>
+                    {/if}
+                </div>
+            </div>
         </div>
-        
-        <button class="lyd-toggle-start" onclick={toggleLyd}>
-            {spilTilstand.musikTaendt ? '🔊 Lyd Til' : '🔇 Lyd Fra'}
-        </button>
     </div>
 
 {:else if spilTilstand.gameState === 'select'}
@@ -322,6 +344,10 @@
         z-index: 1000;
         font-family: system-ui, -apple-system, sans-serif;
     }
+    .combined-box {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
     .login-box {
         background: #1a1a1a; padding: 40px; border-radius: 12px; border: 1px solid #333;
         text-align: center; max-width: 500px; width: 90%;
@@ -329,8 +355,8 @@
     }
     
     .boat-btn-wrapper { background: none; border: none; padding: 0; margin: 0; cursor: pointer; outline: none; }
-    .launch-image { max-width: 150px; height: auto; margin: 10px 0; border-radius: 4px; }
-    .bottom-image { margin-top: 30px; max-width: 300px; }
+    .launch-image { max-width: 150px; height: auto; border-radius: 4px; }
+    .top-image { margin-top: 0; margin-bottom: 15px; }
     .clickable-boat { transition: transform 0.2s, filter 0.2s; }
     .clickable-boat:hover { transform: scale(1.05); filter: brightness(1.2); }
 
@@ -353,6 +379,10 @@
 
     .login-boat-btn { width: 220px; height: 65px; margin-top: 10px; }
     .slut-knap-styled { width: 220px; height: 65px; }
+    
+    .start-tavle {
+        margin-top: 30px; width: 100%; max-width: 320px;
+    }
 
     .character-select {
         background: #1a1a1a; padding: 30px; border-radius: 12px; border: 1px solid #333;
@@ -412,21 +442,32 @@
     .karakter-navn { color: #9aa69d; font-size: 0.75rem; }
     .status { color: #ff8888; margin-top: 15px; }
 
-    .lyd-toggle-start {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        background: rgba(0,0,0,0.6);
-        color: white;
-        border: 1px solid #444;
-        padding: 8px 12px;
-        border-radius: 6px;
+    .musik-toggle-btn {
+        background: transparent;
+        border: none;
         cursor: pointer;
-        z-index: 1001;
-        transition: 0.2s;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        transition: transform 0.2s, filter 0.2s;
     }
-    .lyd-toggle-start:hover {
-        background: rgba(0,0,0,0.8);
-        border-color: #888;
+    .musik-toggle-btn img {
+        height: 30px;
+        width: auto;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+    .musik-toggle-btn:hover img {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    .musik-toggle-btn:active {
+        transform: scale(0.95);
+    }
+    .musik-toggle-btn.top-right {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1001;
     }
 </style>

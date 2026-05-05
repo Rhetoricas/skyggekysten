@@ -9,11 +9,21 @@ export function erSpillerITaagen() {
     return (k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0)) < spilTilstand.fogX;
 }
 
+let sidstBrugtEliksir = 0;
+
 function brugEliksir() {
+    const nu = Date.now();
+    
+    if (nu - sidstBrugtEliksir < 1000) {
+        spilTilstand.livspoint = 90;
+        return true; 
+    }
+
     const harEliksir = spilTilstand.mitUdstyr?.some(i => i.id === 'livseliksir' && i.maengde > 0);
     if (harEliksir) {
         brugFraRygsæk('livseliksir', 1);
         spilTilstand.livspoint = 90;
+        sidstBrugtEliksir = nu;
         return true;
     }
     return false;
@@ -21,32 +31,43 @@ function brugEliksir() {
 
 export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: string) {
     if (spilTilstand.gameState !== 'play') return;
-    spilTilstand.livspoint -= skade;
     
+    const faktiskSkade = spilTilstand.beregnSkade(skade);
+    spilTilstand.livspoint -= faktiskSkade;
+    
+    const beskedMedTal = faktiskSkade > 0 ? `${besked} (-${faktiskSkade} HP)` : besked;
+
     if (spilTilstand.livspoint <= 0) {
         const erHavet = besked.includes("havet") || besked.includes("saltvand") || besked.includes("hav");
 
         if (!erHavet && !erSpillerITaagen()) {
             fremtvingKollaps();
-            if (doedsBesked) spilTilstand.logBesked = doedsBesked + " " + spilTilstand.logBesked;
+            if (spilTilstand.erBevidstløs && doedsBesked) {
+                spilTilstand.logBesked = doedsBesked + " " + spilTilstand.logBesked;
+            }
             return;
         }
 
         if (brugEliksir()) {
-            spilTilstand.logBesked = `Du gik i brædderne. ${besked} Eliksiren tvang livet tilbage i din krop.`;
+            spilTilstand.logBesked = `Du gik i brædderne. ${beskedMedTal} Eliksiren tvang livet tilbage i din krop.`;
             syncTilDb(true);
             return;
         }
         
-        spilTilstand.gameState = 'dead';
+        spilTilstand.gameState = 'dead_map';
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = true;
         }
+
+        const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
+        if (aktueltFelt && spilTilstand.valgtKarakter) {
+            aktueltFelt.gravstenIkon = spilTilstand.valgtKarakter.ikon;
+        }
         
-        spilTilstand.logBesked = doedsBesked || `${besked} Din krop gav endegyldigt op.`;
+        spilTilstand.logBesked = doedsBesked || `${beskedMedTal} Din krop gav endegyldigt op.`;
         syncTilDb(true);
     } else {
-        spilTilstand.logBesked = besked;
+        spilTilstand.logBesked = beskedMedTal;
         syncTilDb(true);
     }
 }
@@ -61,10 +82,16 @@ export function tjekOverlevelse() {
             return;
         }
 
-        spilTilstand.gameState = 'dead';
+        spilTilstand.gameState = 'dead_map';
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = true;
         }
+
+        const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
+        if (aktueltFelt && spilTilstand.valgtKarakter) {
+            aktueltFelt.gravstenIkon = spilTilstand.valgtKarakter.ikon;
+        }
+
         spilTilstand.logBesked = "Tågen omsluttede dig helt. Mørket flåede det sidste liv ud af din krop.";
         syncTilDb(true);
         return;
@@ -85,9 +112,8 @@ export function fremrykTid() {
         spilTilstand.dag++;
         spilTilstand.nuvaerendeEnergi += spilTilstand.valgtKarakter.baseEnergi;        
         
-        if (spilTilstand.dag > 6) {
-            // Tågen bevæger sig nu 1 fuldt felt pr. dag i solospil
-            spilTilstand.fogX += HEX_W / antalLevende;
+        if (spilTilstand.dag > 5) {
+            spilTilstand.fogX += (HEX_W * 1.5) / antalLevende;        
         }
     }
 
@@ -105,7 +131,7 @@ export function fremrykTid() {
     }
 
     if (erSpillerITaagen()) {
-        tagSkadeOgTjekDød(50, "Tågens syre ætsede dine lunger. (-50 HP)"); 
+        tagSkadeOgTjekDød(50, "Tågens syre ætsede dine lunger."); 
     } else {
         syncTilDb(true);
     }
@@ -117,15 +143,16 @@ export function udfoerBlodofring() {
         return;
     }
     
-    spilTilstand.livspoint -= 10;
+    const skade = spilTilstand.beregnSkade(10);
+    spilTilstand.livspoint -= skade;
     spilTilstand.nuvaerendeEnergi += 1;
-    spilTilstand.logBesked = "Du drikker dit eget blod. Jernsmagen tvinger kroppen et skridt videre. (-10 HP, +1 Energi)";
+    spilTilstand.logBesked = `Du drikker dit eget blod. Jernsmagen tvinger kroppen et skridt videre. (-${skade} HP, +1 Energi)`;
     
     syncTilDb(true);
 }
 
 export function fremtvingKollaps() {
-    if (spilTilstand.gameState !== 'play') return;
+    if (spilTilstand.gameState !== 'play' || spilTilstand.erBevidstløs) return;
 
     if (brugEliksir()) {
         spilTilstand.logBesked = "Du var ved at kollapse. Eliksiren pumpede nyt liv i dine årer.";
@@ -147,7 +174,7 @@ export function fremtvingKollaps() {
     fremrykTid();
 
     setTimeout(() => {
-        if (spilTilstand.gameState !== 'dead') {
+        if (spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'dead') {
             spilTilstand.livspoint = 10;
             spilTilstand.erBevidstløs = false;
             spilTilstand.logBesked = mistetGuld > 0 

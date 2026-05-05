@@ -1,8 +1,9 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { eventState, kanViseValg, tagValg, startEvent } from '$lib/eventMotor.svelte';
-    import { eventBibliotek } from '$lib/eventBibliotek';
+    import { eventBibliotek, type Valg } from '$lib/eventBibliotek';
     import { fremtvingKollaps } from '$lib/overlevelse.svelte';
+    import { itemDB } from '$lib/spildata';
 
     let { lukEvent } = $props<{ lukEvent: () => void }>();
 
@@ -30,7 +31,6 @@
     <div class="stun-overlay"></div>
 {/if}
 
-<!-- Hele baggrunden lytter nu efter klik, hvis valget er låst -->
 <div class="event-overlay" role="presentation" onclick={() => eventState.valgLåst && haandterKlikVidere()}>
     <div class="event-boks" class:klik-klar={eventState.valgLåst}>
         <img
@@ -53,21 +53,39 @@
         <div class="knap-panel">
             {#if !eventState.valgLåst}
                 {#each eventState.aktivt.valg as valg (valg.tekst)}
-                    {#if kanViseValg(valg)}
-                        <!-- e.stopPropagation() stopper klikket fra at aktivere baggrunden -->
-                        <button class="valg-btn" onclick={(e) => { e.stopPropagation(); tagValg(valg); }}>
-                            {valg.tekst}
-                            {#if valg.kosterItem}
-                                <span class="pris">(Koster {valg.kosterItem})</span>
-                            {/if}
-                            {#if valg.puljeVaerdi}
-                                <span class="pris">(Koster {valg.puljeVaerdi} Guld)</span>
-                            {/if}
-                        </button>
-                    {/if}
+                    {@const harAdgang = kanViseValg(valg)}
+                    
+                    <button 
+                        class="valg-btn" 
+                        class:ulåst={harAdgang}
+                        class:låst={!harAdgang}
+                        disabled={!harAdgang}
+                        onclick={(e) => { e.stopPropagation(); tagValg(valg); }}
+                    >
+                        <span class="valg-tekst">{valg.tekst}</span>
+                        
+                        {#if !harAdgang}
+                            <div class="manglende-betingelse">
+                                {#if valg.kraeverKarakter}
+                                    <span class="mangel-ikon karakter-mangel" title="Kræver specifik helt"></span>
+                                {/if}
+                                {#if valg.kraeverItem && itemDB[valg.kraeverItem]}
+                                    <img src={itemDB[valg.kraeverItem].billede} alt="Mangler genstand" class="mangel-ikon" title="Du mangler dette" />
+                                {/if}
+                                {#if valg.kosterItem && itemDB[valg.kosterItem]}
+                                    <img src={itemDB[valg.kosterItem].billede} alt="Koster genstand" class="mangel-ikon koster-mangel" title="Du skal betale med dette" />
+                                {/if}
+                                {#if valg.puljeVaerdi}
+                                    <span class="mangel-guld">Mangler {valg.puljeVaerdi} Guld</span>
+                                {/if}
+                            </div>
+                        {/if}
+                    </button>
                 {/each}
                 
-                <button class="valg-btn" onclick={(e) => { e.stopPropagation(); lukEvent(); }}>Forlad stedet</button>
+                {#if eventState.aktivt.valg.every((v: Valg) => !kanViseValg(v))}
+                    <button class="valg-btn ulåst flygt-btn" onclick={(e) => { e.stopPropagation(); lukEvent(); }}>Flygt fra faren!</button>
+                {/if}
             {:else}
                 <p class="klik-videre-tekst">Klik for at fortsætte...</p>
             {/if}
@@ -131,10 +149,71 @@
     .valg-btn { 
         padding: 14px; background: #2a2a2a; color: white; border: 1px solid #555; cursor: pointer; 
         text-align: left; border-radius: 4px; transition: 0.2s; font-size: 1rem; font-family: system-ui, -apple-system, sans-serif;
+        display: flex; justify-content: space-between; align-items: center;
     }
     
-    .valg-btn:hover { background: #3a3a3a; border-color: #777; transform: translateX(5px); }
-    .pris { color: #ff5555; font-size: 0.85em; margin-left: 10px; }
+    .ulåst:hover { background: #3a3a3a; border-color: #777; transform: translateX(5px); }
+    
+    .låst {
+        background: #111;
+        color: #555;
+        border-color: #222;
+        cursor: not-allowed;
+    }
+    
+    .valg-tekst {
+        flex-grow: 1;
+        padding-right: 15px;
+        line-height: 1.3;
+    }
+
+.manglende-betingelse {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.65; /* Løftet en anelse for bedre læsbarhed */
+        filter: grayscale(100%);
+        min-width: 50px;
+        max-width: 60px;
+        border-left: 1px solid #333;
+        padding-left: 10px;
+    }
+
+    .mangel-ikon {
+        width: 32px !important; 
+        height: 32px !important; 
+        max-width: 32px !important; 
+        max-height: 32px !important; 
+        object-fit: contain;
+        display: block;
+    }
+
+    .karakter-mangel {
+        background: url('/tiles/player.webp') center/contain no-repeat;
+    }
+
+    .koster-mangel {
+        border-bottom: 1px solid #880000;
+        padding-bottom: 1px;
+    }
+    
+    .mangel-guld {
+        font-size: 0.7em;
+        color: #888;
+        font-weight: bold;
+        text-align: center;
+        line-height: 1;
+    }
+
+    .flygt-btn {
+        background-color: #4a1111;
+        border-color: #8a2222;
+        justify-content: center;
+        font-weight: bold;
+        color: #ffcccc;
+    }
 
     .klik-videre-tekst {
         text-align: center;

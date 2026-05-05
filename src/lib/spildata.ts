@@ -1,7 +1,7 @@
 import type { Karakter, Biome, ItemType } from './types';
 
 export const BREDDE = 100;
-export const HOEJDE = 25;
+export const HOEJDE = 20;
 export const HEX_W = 96;  
 export const ROW_H = 82; 
 
@@ -38,8 +38,8 @@ export const itemDB: Record<string, { id: string; navn: string; type: ItemType; 
     'fakkel': { id: 'fakkel', navn: 'Fakkel', type: 'værktøj', billede: '/inventory/fakkel.webp', bonus: 0, pris: 150 },
     'sovepose': { id: 'sovepose', navn: 'Sovepose', type: 'værktøj', billede: '/inventory/sovepose.webp', bonus: 0, pris: 100 },
     'mad': { id: 'mad', navn: 'Madration', type: 'forbrug', billede: '/inventory/food.webp', bonus: 0, pris: 30 },
-    'kikkert_250': { id: 'kikkert_250', navn: 'Gylden Kikkert (Nær)', type: 'forbandelse', billede: '/inventory/kikkert.webp', bonus: 0, pris: 0 },
-    'kikkert_45': { id: 'kikkert_45', navn: 'Gylden Kikkert (Fjern)', type: 'forbandelse', billede: '/inventory/kikkert.webp', bonus: 0, pris: 0 },
+    'kikkert_250': { id: 'kikkert_250', navn: 'Gylden Kikkert (Nær)', type: 'forbandelse', billede: '/inventory/kikkert.webp', bonus: 0, pris: 100 },
+    'kikkert_45': { id: 'kikkert_45', navn: 'Gylden Kikkert (Fjern)', type: 'forbandelse', billede: '/inventory/kikkert.webp', bonus: 0, pris: 100 },
     'diamant': { id: 'diamant', navn: 'Diamant', type: 'skat', billede: '/inventory/diamant.webp', bonus: 0, pris: 500 }
 }
 
