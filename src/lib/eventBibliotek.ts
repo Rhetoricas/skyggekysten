@@ -60,14 +60,14 @@ export const eventBibliotek: Record<string, SpilEvent> = {
 
     'blodalter': {
         id: 'blodalter', titel: "Et Gammelt Alter", biome: ['ruin', 'blodskov'], billede: '/events/ev_alter.webp', unik: false,
-        tekst: "Et sort stenalter trækker sig ud af tågen. Der sidder guldstykker fast i indtørret snavs på overfladen, og stenen brummer svagt.",
+        tekst: "Et sort stenalter skiller sig ud fra omgivelserne. Der sidder guldstykker fast i indtørret snavs på overfladen, og stenen brummer svagt.",
         valg: [
-            { tekst: "Hæld eliksir over stenen for at rense den", kosterItem: 'livseliksir', udfaldListe: [{ log: "Væsken ætser snavset væk. Et lille skjult rum åbner sig og afslører et velholdt sværd.", givItem: 'svaerd', guldAendring: 150 }] },
+            { tekst: "Hæld eliksir over stenen for at rense den", kosterItem: 'livseliksir', udfaldListe: [{ log: "Væsken ætser snavset væk. Et lille skjult rum åbner sig og afslører et velholdt sværd.", givItem: 'svaerd', guldAendring: 250 }] },
             { tekst: "Vrist guldet løs med råstyrke", udfaldListe: [
-                { log: "Alteret forsvarer sig. Du får et stød, der kaster dig hårdt tilbage mod klipperne.", hpAendring: -37 },
-                { log: "Du får et solidt greb. Stenen giver efter, og du trækker både guld og en diamant fri.", hpAendring: -5, guldAendring: 250, givItem: 'diamant' }
+                { log: "Alteret forsvarer sig. Du får et stød, der kaster dig hårdt tilbage mod klipperne. Men du fik fat i noget guld.", hpAendring: -37, guldAendring: 250 },
+                { log: "Du får et solidt greb. Stenen giver efter, og du trækker både guld og en diamant fri.", hpAendring: -5, guldAendring: 250 }
             ]},
-            { tekst: "Læg hænderne på stenen og ofr noget af din livskraft", udfaldListe: [{ log: "Kulden trækker ind i dig og tapper dig permanent for kræfter. Til gengæld løsner en stor diamant sig fra alteret.", maxHpAendring: -7, givItem: 'diamant', guldAendring: 250 }] }
+            { tekst: "Læg hænderne på stenen og overfør noget af din livskraft", udfaldListe: [{ log: "Kulden trækker ind i dig og tapper dig permanent for kræfter. Til gengæld løsner både en stor diamant og noget guld sig fra alteret.", maxHpAendring: -5, givItem: 'diamant', guldAendring: 250 }] }
         ]
     },
 
@@ -75,10 +75,10 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         id: "stjernekikkert", titel: "Tågens Øje", biome: ["bjerg", "mark", "ruin"], unik: true,
         tekst: "En forladt stjernekikkert ligger i mudderet. Linsen udsender et skarpt violet lys, der giver dig hovedpine.",
         valg: [
-            { tekst: "Knus kikkerten med din økse", kraeverItem: "oekse", udfaldListe: [{ log: "Messingrøret bøjer sammen under slaget. Linsen overlever og viser sig at være en værdifuld diamant.", givItem: "diamant", guldAendring: 80 }] },
+            { tekst: "Knus kikkerten med din økse", kraeverItem: "oekse", udfaldListe: [{ log: "Messingrøret bøjer sammen under slaget. Linsen overlever og viser sig at være en værdifuld diamant.", givItem: "diamant" }] },
             { tekst: "Kig direkte ind i det violette lys", udfaldListe: [
-                { log: "Lyset brænder i øjnene. Det føles som om, energien forsvinder fra din krop.", hpAendring: -42 },
-                { log: "Du afmonterer forsigtigt linsen og opdager, at det er en slebet diamant.", hpAendring: -7, givItem: "diamant", guldAendring: 250 }
+                { log: "Lyset brænder i øjnene. Det føles som om, livet forsvinder fra din krop inden det kommer koncentreret tilbage.", hpAendring: -40, maxHpAendring: 5 },
+                { log: "Du afmonterer forsigtigt linsen og opdager, at det er en slebet diamant.", givItem: "diamant" }
             ]},
             { tekst: "Dæk linsen til med klude, før du rører den", kosterItem: "klude", udfaldListe: [{ log: "Stoffet skærmer dig mod lyset. Du pakker kikkerten sikkert ned sammen med nogle tabte mønter.", givItem: "kikkert_250", guldAendring: 150 }] }
         ]
@@ -89,11 +89,11 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         tekst: "En tyk træstamme er flækket. Indeni vokser en mærkelig blød svamp, som har viklet sig om nogle rustne våben og en læderpung.",
         valg: [
             { tekst: "Træk genstandene ud med hænderne", udfaldListe: [
-                { log: "Svampen udsender en syrlig væske, der giver dig grimme brandsår på underarmen.", hpAendring: -42 },
+                { log: "Svampen udsender en syrlig væske, der giver dig grimme brandsår på underarmen.", hpAendring: -22 },
                 { log: "Du er hurtig nok. Du river et våben og pungen til dig, inden svampen reagerer.", hpAendring: -7, givItem: 'svaerd', guldAendring: 280 }
             ]},
             { tekst: "Hæld eliksir over svampen for at skrumpe den", kosterItem: 'livseliksir', udfaldListe: [{ log: "Væsken får massen til at trække sig sammen. Du kan nu se dybere ind i træstammen.", naesteTrin: 'koedvuggen_indre' }] },
-            { tekst: "Hak dig vej gennem fibrene med din økse", kraeverItem: 'oekse', udfaldListe: [{ log: "Du hugger dig igennem, men stammen sprøjter irriterende saft ud over dig. Du står nu foran kernen.", hpAendring: -12, naesteTrin: 'koedvuggen_kamp' }] }
+            { tekst: "Hak dig vej gennem fibrene med din økse", kraeverItem: 'oekse', udfaldListe: [{ log: "Du hugger dig igennem, men stammen sprøjter saft ud over dig. Du står nu foran kernen.", hpAendring: -12, naesteTrin: 'koedvuggen_kamp' }] }
         ]
     },
 
@@ -101,12 +101,12 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         id: 'koedvuggen_indre', titel: "Stammens Kerne", biome: 'any', erSubTrin: true,
         tekst: "Kernen lyser svagt. En rund genstand ligger halvt begravet i nogle gamle knogler og guldstykker.",
         valg: [
-            { tekst: "Brug søgekvisten til at finde en sikker vej", kraeverItem: 'soegekvist', udfaldListe: [{ log: "Kvisten guider din hånd udenom de farlige sporer. Du samler guldskatten op.", guldAendring: 250 }] },
+            { tekst: "Brug søgekvisten til at finde ud af hvad du skal tage fat i", kraeverItem: 'soegekvist', udfaldListe: [{ log: "Kvisten guider din hånd udenom de farlige sporer. Du samler alle guldstykkerne op.", guldAendring: 254 }] },
             { tekst: "Grib fat i den runde genstand", udfaldListe: [
-                { log: "Genstanden brænder dig voldsomt, og du må trække hånden til dig uden udbytte.", hpAendring: -37 },
-                { log: "Den køler ned, da du rører den. Det er en funklende diamant.", hpAendring: -10, givItem: 'diamant', guldAendring: 200 }
+                { log: "Genstanden brænder dig voldsomt, og du må trække hånden til dig uden andet udbytte end et par guldstykker.", hpAendring: -18, guldAendring: 26 },
+                { log: "Den køler ned, da du rører den. Det er en funklende diamant.", hpAendring: -10, givItem: 'diamant' }
             ]},
-            { tekst: "Stik dit sværd ind i kernen", kosterItem: 'svaerd', udfaldListe: [{ log: "Sværdet sætter sig fast for altid. Til gengæld triller en smuk diamant ned i gruset.", givItem: 'diamant', guldAendring: 250 }] }
+            { tekst: "Stik dit sværd ind i kernen", kosterItem: 'svaerd', udfaldListe: [{ log: "Sværdet sætter sig fast for altid. Til gengæld triller både en smuk diamant og nogle guldklumper ned i gruset.", givItem: 'diamant', guldAendring: 210 }] }
         ]
     },
 
@@ -114,12 +114,12 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         id: 'koedvuggen_kamp', titel: "Hårde Rødder", biome: 'any', erSubTrin: true,
         tekst: "Tykke rødder skyder op fra jorden og slår ud efter dine ben for at forsvare stammen.",
         valg: [
-            { tekst: "Svid rødderne væk med din fakkel", kosterItem: 'fakkel', udfaldListe: [{ log: "Ilden får rødderne til at trække sig tilbage. Du finder en gammel rustning i bunden.", givItem: 'rustning', guldAendring: 180 }] },
+            { tekst: "Svid rødderne væk med din fakkel", kosterItem: 'fakkel', udfaldListe: [{ log: "Ilden får rødderne til at trække sig tilbage. Du finder en gammel rustning og noget guld i bunden.", givItem: 'rustning', guldAendring: 180 }] },
             { tekst: "Træd rødderne ned med støvlerne", udfaldListe: [
-                { log: "Rødderne er stærke og dækket af torne. Du får dybe rifter på benene.", hpAendring: -37 },
-                { log: "Du tramper dem ned. Vejen er banet, og du skraber en god mængde guld sammen.", hpAendring: -10, guldAendring: 300 }
+                { log: "Rødderne er stærke og dækket af torne. Du får dybe rifter på benene, inden du kan samle guldet op.", hpAendring: -37, guldAendring: 254 },
+                { log: "Du tramper dem ned. Vejen er banet, og du skraber en alle guldstykkerne sammen.", hpAendring: -10, guldAendring: 254 }
             ]},
-            { tekst: "Skær dem over med din kniv", kraeverItem: 'kniv', udfaldListe: [{ log: "Du kapper de største rødder over. Du får et par skrammer, men sikrer dig guldet.", hpAendring: -7, guldAendring: 150 }] }
+            { tekst: "Skær dem over med din kniv", kraeverItem: 'kniv', udfaldListe: [{ log: "Du kapper de største rødder over. Du får et par skrammer, men sikrer dig guldet.", hpAendring: -7, guldAendring: 254 }] }
         ]
     },
 
@@ -128,11 +128,11 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         tekst: "Mudderet hæver og sænker sig. En stor, gennemsigtig blære ånder tungt i overfladen, og der ligger mønter inde i den.",
         valg: [
             { tekst: "Stik armen hurtigt ind, når den åbner sig", udfaldListe: [
-                { log: "Den klapper sammen om din arm med et smæld. Det trækker hårdt i skulderen at komme fri.", hpAendring: -42 },
+                { log: "Den klapper sammen om din arm med et smæld. Det trækker hårdt i skulderen at komme fri. Du fik fat i nogle guldstykker", hpAendring: -22, guldAendring: 250 },
                 { log: "Du fanger dens rytme og trækker en pung og en diamant ud, lige før den lukker i.", hpAendring: -7, guldAendring: 250, givItem: 'diamant' }
             ]},
-            { tekst: "Dæk den til med en skovl for at stoppe bevægelsen", kraeverItem: 'skovl', udfaldListe: [{ log: "Du skovler jord over den, indtil den ligger helt stille. Du kan nu roligt samle mønterne.", guldAendring: 180 }] },
-            { tekst: "Brug din rustning til at klemme den flad", kosterItem: 'rustning', udfaldListe: [{ log: "Blæren brister. Rustningen ætses i stykker af indholdet, men du finder en ædelsten i resterne.", givItem: 'diamant', guldAendring: 250 }] }
+            { tekst: "Dæk den til med jord for at kvæle den", kraeverItem: 'skovl', udfaldListe: [{ log: "Du skovler jord over den, indtil den ligger helt stille. Du kan nu roligt samle mønterne.", guldAendring: 180 }] },
+            { tekst: "Brug din rustning til at klemme den flad", kosterItem: 'rustning', udfaldListe: [{ log: "Blæren brister. Rustningen ætses i stykker af indholdet, men du finder en ædelsten og noget guld i resterne.", givItem: 'diamant', guldAendring: 250 }] }
         ]
     },
 
@@ -140,7 +140,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         id: 'parasitmarkedet', titel: "Den Gamle Rustning", biome: ['ruin', 'slagmark'], unik: true,
         tekst: "En rustning står efterladt i gruset. Den vrimler med store insekter, der kravler rundt om en læderpung i midten.",
         valg: [
-            { tekst: "Brug dit fine tøj til at lokke insekterne væk", kosterItem: 'flot_toej', udfaldListe: [{ log: "Insekterne foretrækker stoffet og forlader rustningen. Du kan nu inspicere udstyret.", naesteTrin: 'parasit_rustning' }] },
+            { tekst: "Brug dit fine tøj til at lokke insekterne væk", kosterItem: 'flot_toej', udfaldListe: [{ log: "Insekterne foretrækker det fine stof og kravler ud af rustningen. Du kan nu inspicere udstyret.", naesteTrin: 'parasit_rustning' }] },
             { tekst: "Grib pungen med hænderne", udfaldListe: [
                 { log: "Insekterne forsvarer sig aggressivt. Du bliver bidt gentagne gange og hæver op.", hpAendring: -40, naesteTrin: 'parasit_pungen' },
                 { log: "Du slår insekterne væk og får fat i pungen med kun et par enkelte bid.", hpAendring: -5, naesteTrin: 'parasit_pungen' }
@@ -153,51 +153,51 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         id: 'parasit_pungen', titel: "Læderposen", biome: 'any', erSubTrin: true,
         tekst: "Læderposen føles varm i din hånd. Noget bevæger sig nede i den.",
         valg: [
-            { tekst: "Hæld eliksir i posen for at drukne indholdet", kosterItem: 'livseliksir', udfaldListe: [{ log: "Væsken får al bevægelse til at stoppe. Nede i bunden fisker du en diamant op.", givItem: 'diamant', guldAendring: 250 }] },
-            { tekst: "Skær posen forsigtigt op med din kniv", kraeverItem: 'kniv', udfaldListe: [{ log: "Du sprætter siden op og undgår faren i toppen. En diamant triller ud.", givItem: 'diamant', guldAendring: 100 }] },
+            { tekst: "Hæld eliksir i posen for at drukne indholdet", kosterItem: 'livseliksir', udfaldListe: [{ log: "Væsken får al bevægelse til at stoppe. Nede i bunden fisker du en diamant og noget guld op.", givItem: 'diamant', guldAendring: 250 }] },
+            { tekst: "Skær posen forsigtigt op med din kniv", kraeverItem: 'kniv', udfaldListe: [{ log: "Du sprætter siden op. En diamant triller ud.", givItem: 'diamant' }] },
             { tekst: "Ryst indholdet ud på jorden", udfaldListe: [
-                { log: "Noget skarpt stikker dig gennem læderet, da du griber om posen.", hpAendring: -37 },
-                { log: "Du ryster den hårdt. En gammel detektor og nogle mønter falder ud i gruset.", hpAendring: -7, givItem: 'metaldetektor', guldAendring: 150 }
+                { log: "Noget skarpt stikker dig gennem læderet, da du griber om posen.", givItem: 'kniv', hpAendring: -37 },
+                { log: "Du ryster den hårdt. En gammel kniv og nogle mønter falder ud i gruset.", hpAendring: -7, givItem: 'kniv', guldAendring: 150 }
             ]}
         ]
     },
 
     'parasit_rustning': {
         id: 'parasit_rustning', titel: "Det Tomme Panser", biome: 'any', erSubTrin: true,
-        tekst: "Insekterne er væk. Rustningen ser stærk ud, men indersiden er dækket af en mærkelig, slimelig væske.",
+        tekst: "Insekterne er væk. Rustningen ser stærk ud, men indersiden er dækket af en mærkelig, slimet væske.",
         valg: [
             { tekst: "Tag rustningen på alligevel", udfaldListe: [
                 { log: "Væsken svider voldsomt mod din hud. Det er ubehageligt, men du har nu et panser.", hpAendring: -42, givItem: 'rustning' },
-                { log: "Væsken er indtørret og gør ingen skade. Du spænder rustningen fast.", hpAendring: -2, givItem: 'rustning', guldAendring: 100 }
+                { log: "Væsken er indtørret og gør ingen skade. Du spænder rustningen fast.", hpAendring: -2, givItem: 'rustning' }
             ]},
-            { tekst: "Rens indersiden med din eliksir", kosterItem: 'livseliksir', udfaldListe: [{ log: "Eliksiren renser metallet perfekt. Du tager den på og finder lidt guld i en inderlomme.", givItem: 'rustning', guldAendring: 350 }] },
+            { tekst: "Rens indersiden med din eliksir", kosterItem: 'livseliksir', udfaldListe: [{ log: "Eliksiren renser metallet perfekt. Du tager den på og føler dig straks meget stærkere.", givItem: 'rustning', maxHpAendring: 8 }] },
             { tekst: "Skrab slimen væk med din skovl", kraeverItem: 'skovl', udfaldListe: [{ log: "Du får kradset det meste af. Væsken irriterer dine hænder, men rustningen er nu brugbar.", hpAendring: -12, givItem: 'rustning' }] }
         ]
     },
 
     'de_omfavnede': {
         id: 'de_omfavnede', titel: "De To Skeletter", biome: ['skov', 'ruin'], unik: true,
-        tekst: "To skeletter sidder viklet ind i hinanden under et træ. Mellem dem ligger en perle, men hele området er dækket af et gult pulver.",
+        tekst: "To skeletter sidder viklet ind i hinanden under et træ. Mellem dem ligger en diamant, og hele området er dækket af et gult pulver.",
         valg: [
             { tekst: "Brug metaldetektoren til at finde en sikker vej", kraeverItem: 'metaldetektor', udfaldListe: [{ log: "Detektoren bipper væk fra skeletterne og leder dig hen til et nedgravet skrin.", naesteTrin: 'omfavnelse_kiste' }] },
             { tekst: "Hold vejret og forsøg at tage perlen", udfaldListe: [
-                { log: "Du kommer til at indånde pulveret. Det får dig til at hoste voldsomt og dræner din energi.", hpAendring: -42, naesteTrin: 'omfavnelse_sporer' },
-                { log: "Du holder vejret perfekt og snupper perlen fra støvet.", hpAendring: -5, givItem: 'diamant', guldAendring: 250 }
+                { log: "Du kommer til at indånde pulveret. Det får dig til at hoste voldsomt og dræner dig for liv.", hpAendring: -42, naesteTrin: 'omfavnelse_sporer' },
+                { log: "Du holder vejret og snupper diamanten fra støvet.", givItem: 'diamant' }
             ]},
-            { tekst: "Brug dit fine tøj som filter over ansigtet", kosterItem: 'flot_toej', udfaldListe: [{ log: "Tøjet skærmer dine lunger. Du får stenen med dig, som viser sig at være en ægte diamant.", givItem: 'diamant', guldAendring: 150 }] }
+            { tekst: "Brug dit fine tøj som filter over ansigtet", kosterItem: 'flot_toej', udfaldListe: [{ log: "Tøjet skærmer dine lunger. Du får diamanten med dig og føler dig stærkere.", givItem: 'diamant', maxHpAendring: 8 }] }
         ]
     },
 
     'omfavnelse_sporer': {
         id: 'omfavnelse_sporer', titel: "Gult Støv", biome: 'any', erSubTrin: true,
-        tekst: "Støvet er ubehageligt tæt omkring skeletterne. Perlen ligger stadig derinde.",
+        tekst: "Støvet er ubehageligt tæt omkring skeletterne. Diamanten ligger der stadig.",
         valg: [
             { tekst: "Luk øjnene og ræk ud efter stenen i blinde", udfaldListe: [
-                { log: "Du famler rundt og skærer dig på skarpe knogler. Du må trække dig tilbage uden perlen.", hpAendring: -42 },
-                { log: "Dine fingre lukker sig om juvelen i første forsøg. Du træder hurtigt ud i den friske luft.", hpAendring: -7, givItem: 'diamant', guldAendring: 200 }
+                { log: "Du famler rundt og skærer dig på skarpe knogler. Du må trække dig tilbage uden perlen.", hpAendring: -12 },
+                { log: "Dine fingre lukker sig om juvelen i andet forsøg. Du træder hurtigt ud i den friske luft.", hpAendring: -12, givItem: 'diamant', }
             ]},
-            { tekst: "Kast mønter på jorden for at binde støvet", puljeVaerdi: 100, udfaldListe: [{ log: "Vægten af de mange mønter presser støvskyen ned. Du samler roligt dine egne og deres værdier op.", guldAendring: 300 }] },
-            { tekst: "Bind kludene for munden som en maske", kosterItem: 'klude', udfaldListe: [{ log: "Masken fjerner det værste. Du får fat i den smukke perle og et par tabte mønter.", givItem: 'diamant', guldAendring: 80 }] }
+            { tekst: "Kast mønter på jorden for at binde støvet", puljeVaerdi: 100, udfaldListe: [{ log: "Mønter ser ud til at få støvskyen til at forsvinde. Du samler roligt alle værdierne op igen.", givItem: 'diamant', guldAendring: 100 }] },
+            { tekst: "Bind kludene for munden som en maske", kosterItem: 'klude', udfaldListe: [{ log: "Masken fjerner det værste. Du får fat i den smukke diamant og et par tabte mønter.", givItem: 'diamant', guldAendring: 80 }] }
         ]
     },
 
@@ -205,25 +205,25 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         id: 'omfavnelse_kiste', titel: "Det Lille Skrin", biome: 'any', erSubTrin: true,
         tekst: "Et lille jernskrin sidder fast i jorden. Hængslerne er rustet fuldstændig fast.",
         valg: [
-            { tekst: "Brug din fakkel til at varme låsen op", kosterItem: 'fakkel', udfaldListe: [{ log: "Varmen gør metallet skørt, så du kan bryde det op. Indeni ligger en eliksir og guld.", givItem: 'livseliksir', guldAendring: 250 }] },
+            { tekst: "Brug din fakkel til at varme låsen op", kosterItem: 'fakkel', udfaldListe: [{ log: "Varmen gør metallet skørt, så du kan bryde det op. Indeni ligger en eliksir og noget guld.", givItem: 'livseliksir', guldAendring: 250 }] },
             { tekst: "Vip låsen op med din kniv", kraeverItem: 'kniv', udfaldListe: [{ log: "Du får dirket låsen op uden besvær og tømmer skrinet for mønter.", guldAendring: 220 }] },
-            { tekst: "Slå skrinet åbent med hælen", udfaldListe: [
-                { log: "Metallet er for hårdt. Du slår foden voldsomt og må opgive.", hpAendring: -37 },
-                { log: "Rusten har ædt det meste af jernet. Det går i stykker ved første spark, og en diamant triller ud.", hpAendring: -5, givItem: 'diamant', guldAendring: 250 }
+            { tekst: "Slå skrinet åbent med din støvle", udfaldListe: [
+                { log: "Metallet er for hårdt. Du slår din fod og må opgive.", hpAendring: -22 },
+                { log: "Rusten har ædt det meste af jernet. Det går i stykker ved første spark, og en diamant triller ud.", hpAendring: -5, givItem: 'diamant' }
             ]}
         ]
     },
 
     'enkens_byrde': {
         id: 'enkens_byrde', titel: "Kvinden ved Hullet", biome: ['mark', 'eng'], unik: true,
-        tekst: "En kvinde sidder på kanten af et slughul i jorden. Hun lader bevidst blod dryppe fra sin hånd ned i mørket.",
+        tekst: "En kvinde sidder på kanten af et hul i jorden. Hun lader bevidst blod dryppe fra sin hånd ned i mørket.",
         valg: [
-            { tekst: "Skub til hende for at se ned i hullet", udfaldListe: [
-                { log: "Hun klamrer sig til dig, og I er ved at falde ned. Du river dig fri, men vrider armen af led.", hpAendring: -42, naesteTrin: 'enken_bunden' },
+            { tekst: "Skub til hende for bedre at kunne se ned i hullet", udfaldListe: [
+                { log: "Hun klamrer sig til dig, og I er ved at falde ned. Du river dig fri, men vrider armen af led.", hpAendring: -22, naesteTrin: 'enken_bunden' },
                 { log: "Hun rykker sig skræmt tilbage og flygter. Du ser hendes efterladte taske og ignorerer hullet.", hpAendring: -5, guldAendring: 200, naesteTrin: 'enken_bunden' }
             ]},
-            { tekst: "Træk dit sværd og bed hende om at forsvinde", kraeverItem: 'svaerd', udfaldListe: [{ log: "Hun rejser sig og løber lydløst ind i tågen. Hendes taske ligger tilbage på kanten.", naesteTrin: 'enken_bunden' }] },
-            { tekst: "Rens hendes sår med din eliksir", kosterItem: 'livseliksir', udfaldListe: [{ log: "Hendes sår lukkes. Nede fra hullet lyder en skuffet knurren, der lynhurtigt kommer nærmere.", naesteTrin: 'enken_angreb' }] }
+            { tekst: "Træk dit sværd og sig hun skal forsvinde", kraeverItem: 'svaerd', udfaldListe: [{ log: "Hun rejser sig og løber lydløst ind i tågen. Hendes taske ligger tilbage på kanten.", naesteTrin: 'enken_bunden' }] },
+            { tekst: "Rens hendes sår på hånden med din eliksir", kosterItem: 'livseliksir', udfaldListe: [{ log: "Hendes sår lukkes. Nede fra hullet lyder en skuffet knurren, der lynhurtigt kommer nærmere.", naesteTrin: 'enken_angreb' }] }
         ]
     },
 
@@ -232,11 +232,11 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         tekst: "Kvindens taske er lukket stramt med ståltråd. Den lugter af kemikalier.",
         valg: [
             { tekst: "Træk ståltråden op med fingrene", udfaldListe: [
-                { log: "En sky af ubehagelig røg siver ud. Det svider i halsen at indånde den.", hpAendring: -40 },
+                { log: "En sky af ubehagelig røg siver ud. Det svider i halsen at indånde den. Du leder i tasken og finder en diamant", hpAendring: -30, givItem: 'diamant' },
                 { log: "Du løsner låsen uden problemer. I tasken ligger en flot diamant og lidt guld.", hpAendring: -5, givItem: 'diamant', guldAendring: 250 }
             ]},
-            { tekst: "Læg dit fine tøj over tasken for at dæmpe indholdet", kosterItem: 'flot_toej', udfaldListe: [{ log: "Tøjet tager skade af gassen, men beskytter dig. Du redder diamanten fra tasken.", givItem: 'diamant', guldAendring: 150 }] },
-            { tekst: "Brug skovlen til at åbne den på afstand", kraeverItem: 'skovl', udfaldListe: [{ log: "Du slår tasken åben og står langt væk, da røgen fordamper. Derefter tager du guldet.", guldAendring: 280 }] }
+            { tekst: "Læg dit fine tøj over tasken for at dæmpe indholdet", kosterItem: 'flot_toej', udfaldListe: [{ log: "Tøjet tager skade af gassen, men beskytter dig. Du finder en diamant og noget guld i tasken.", givItem: 'diamant', guldAendring: 150 }] },
+            { tekst: "Brug skovlen til at banke på tasken på afstand", kraeverItem: 'skovl', udfaldListe: [{ log: "Du slår tasken åben og står langt væk, da giftig røgen fordamper ud af tasken. Bagefter kan du tage guldet.", guldAendring: 280 }] }
         ]
     },
 
@@ -244,12 +244,12 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         id: 'enken_angreb', titel: "Dyr i Mørket", biome: 'any', erSubTrin: true,
         tekst: "Et stort, blindt rovdyr klatrer op mod kanten af hullet. Det er tydeligvis sultent.",
         valg: [
-            { tekst: "Skyd det med buen, før det når helt op", kraeverItem: 'bue', udfaldListe: [{ log: "Pilen får dyret til at slippe grebet og falde tilbage i dybet. Du tager kvindens taske som tak.", guldAendring: 280 }] },
+            { tekst: "Skyd det med buen, før det når helt op", kraeverItem: 'bue', udfaldListe: [{ log: "Pilen får dyret til at slippe grebet og falde tilbage i dybet. Kvinden giver dig sin taske fuld af guld som tak.", guldAendring: 280 }] },
             { tekst: "Kast en sten mod dyrets hoved", udfaldListe: [
-                { log: "Du rammer forbi. Dyret når kanten og flænser dit ben, inden du får sparket det ned.", hpAendring: -42 },
-                { log: "Du rammer den lige i snotten. Den falder ned igen. Du finder en ædelsten og mønter på kanten.", hpAendring: -5, givItem: 'diamant', guldAendring: 250 }
+                { log: "Du rammer forbi. Dyret når kanten og flænser dit ben, inden du får sparket det ned.", hpAendring: -42, givItem: 'diamant', guldAendring: 250 },
+                { log: "Du rammer rovdyret lige i ansigtet. Det falder ned igen. Du finder en ædelsten og mønter på kanten.", hpAendring: -5, givItem: 'diamant', guldAendring: 250 }
             ]},
-            { tekst: "Slå det ned med din økse", kosterItem: 'oekse', udfaldListe: [{ log: "Øksen sætter sig fast i dyret og forsvinder med det ned i hullet. Kvinden takker dig med en ædelsten.", givItem: 'diamant', guldAendring: 150 }] }
+            { tekst: "Slå det ned med din økse", kosterItem: 'oekse', udfaldListe: [{ log: "Øksen sætter sig fast i dyret og ryger med ned i hullet. Kvinden takker dig og giver dig en ædelsten og noget guld.", givItem: 'diamant', guldAendring: 150 }] }
         ]
     },
 
@@ -1540,11 +1540,11 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         tekst: "Et forladt markedstelt er styrtet sammen. Mønter ligger dækket af et tykt lag snavs og lærred.",
         valg: [
             { tekst: "Saml pengene en for en under lærredet", udfaldListe: [
-                { log: "Du støver jorden af og tager det med dig, som du finder.", guldAendring: 30 },
-                { log: "Tykket støv får dig til at nyse ubehageligt, men du piller mønterne op.", hpAendring: -2, guldAendring: 35 }
+                { log: "Du renser overfladen og tager det med dig, som du finder.", guldAendring: 30 },
+                { log: "Støvet får dig til at nyse ubehageligt, mens du piller mønterne op.", hpAendring: -5, guldAendring: 35 }
             ]},
             { tekst: "Skovl jorden væk og saml bunken", kraeverItem: 'skovl', udfaldListe: [{ log: "Du blotlægger det hele og skovler mønterne nemt over i tasken.", guldAendring: 45 }] },
-            { tekst: "Sæt ild til dugen for overblik", kosterItem: 'fakkel', udfaldListe: [{ log: "Flammen rydder teltdugen. Det efterlader mønterne åbne på jorden til din fornøjelse.", guldAendring: 55 }] }
+            { tekst: "Sæt ild til dugen for at se, hvad der er tilbage", kosterItem: 'fakkel', udfaldListe: [{ log: "Flammen brænder teltdugen. Det efterlader mønterne åbne på jorden lige til at samle op.", guldAendring: 125 }] }
         ]
     }
 };
