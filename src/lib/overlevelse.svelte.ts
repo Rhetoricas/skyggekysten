@@ -77,7 +77,7 @@ export function tjekOverlevelse() {
 
     if (erSpillerITaagen()) {
         if (brugEliksir()) {
-            spilTilstand.logBesked = "Døden greb efter dig. Eliksiren tvang livet tilbage i din krop.";
+            spilTilstand.logBesked = "Du var ved at kollapse, men din livseliksir redder dig og giver liv tilbage i din krop.";
             syncTilDb(true);
             return;
         }
@@ -92,7 +92,7 @@ export function tjekOverlevelse() {
             aktueltFelt.gravstenIkon = spilTilstand.valgtKarakter.ikon;
         }
 
-        spilTilstand.logBesked = "Tågen omsluttede dig helt. Mørket flåede det sidste liv ud af din krop.";
+        spilTilstand.logBesked = "Tågen omslutter dig helt og trækker det sidste liv ud af din krop.";
         syncTilDb(true);
         return;
     }
@@ -123,7 +123,7 @@ export function fremrykTid() {
         let samletLog = "";
 
         if (nyDag === 2) {
-            samletLog += " Dit blik skærer skarpere. Du føler dig mere klarsynet og kan nu overskue omgivelserne.";
+            samletLog += " Dit blik bliver skarpere. Du føler dig mere klar og kan nu overskue omgivelserne.";
         }
 
         ['fakkel', 'metaldetektor', 'soegekvist'].forEach(id => {
@@ -144,15 +144,19 @@ export function fremrykTid() {
 }
 
 export function udfoerBlodofring() {
-    if (!erSpillerITaagen() || spilTilstand.livspoint <= 10) {
-        spilTilstand.logBesked = "Du har ikke blod nok at give af.";
+    if (!erSpillerITaagen()) {
+        spilTilstand.logBesked = "Du kan kun drikke af dit blod, når tågen omslutter dig.";
+        return;
+    }
+    if (spilTilstand.maxLivspoint <= 10) {
+        spilTilstand.logBesked = "Din krop kan ikke tage flere permanente ar.";
         return;
     }
     
-    const skade = spilTilstand.beregnSkade(10);
-    spilTilstand.livspoint -= skade;
-    spilTilstand.nuvaerendeEnergi += 1;
-    spilTilstand.logBesked = `Du drikker dit eget blod. Jernsmagen tvinger kroppen et skridt videre. (-${skade} HP, +1 Energi)`;
+    spilTilstand.maxLivspoint -= 10;
+    spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 50);
+    
+    spilTilstand.logBesked = `Du ofrer din sundhed for at overleve i tågen. (-10 Max HP, +50 HP)`;
     
     syncTilDb(true);
 }
