@@ -1,7 +1,7 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb } from './netvaerk';
 import { fremtvingKollaps, fremrykTid } from '$lib/overlevelse.svelte';
-import { afslørOmraade, tilfoejTilRygsæk, tjekUdstyrSlid } from '$lib/spilmotor';
+import { afslørOmraade, tilfoejTilRygsæk } from '$lib/spilmotor';
 import type { Biome } from './types';
 
 function tilfaeldigtTal(min: number, max: number) {
@@ -10,7 +10,7 @@ function tilfaeldigtTal(min: number, max: number) {
 
 export function genererUndergrund(biome: Biome | string) {
     const farlige = ['ruin', 'blodskov', 'hule', 'slagmark', 'ritual', 'krystal'];
-    const civilisation = ['by', 'marked', 'bandit'];
+    const civilisation = ['by', 'marked']; // Bandit fjernet herfra
 
     const feltData: { kanGraves: boolean; skjultGuld: number; skjultLiv: number; skjultFaelde: boolean; skjultLoot: string | null } = { 
         kanGraves: true, 
@@ -27,7 +27,15 @@ export function genererUndergrund(biome: Biome | string) {
 
     const terningKast = Math.random() * 100;
 
-    if (biome === 'mark' || biome === 'eng') {
+    // Ny logik for banditlejren
+    if (biome === 'bandit') {
+        if (terningKast < 50) {
+            feltData.skjultGuld = tilfaeldigtTal(50, 100); // 50% chance for massivt guld
+        } else if (terningKast < 90) {
+            feltData.skjultFaelde = true; // 40% chance for fælde
+        }
+        // De resterende 10% er tomt land
+    } else if (biome === 'mark' || biome === 'eng') {
         if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(5, 15);
         else if (terningKast < 35) feltData.skjultLiv = tilfaeldigtTal(10, 20);
         else if (terningKast < 40) feltData.skjultFaelde = true;
@@ -68,7 +76,6 @@ export function grav() {
     }
 
     graverNu = true;
-
     felt.gravet = true;
     spilTilstand.gitter[spilTilstand.spillerIndex] = felt;
     spilTilstand.gitter = [...spilTilstand.gitter];
@@ -77,15 +84,13 @@ export function grav() {
     const skovlItem = spilTilstand.mitUdstyr.find((i) => i.id === 'skovl');
     const harSkovl = !!skovlItem && skovlItem.maengde > 0;
     
-    let udstyrsLog: string; 
+    let udstyrsLog = ""; 
 
-    const faktiskEnergiPris = harSkovl ? baseGravePris : baseGravePris * 2;
+    const faktiskEnergiPris = harSkovl ? baseGravePris : baseGravePris + 4;
     spilTilstand.nuvaerendeEnergi -= faktiskEnergiPris;
 
-    if (harSkovl) {
-        udstyrsLog = tjekUdstyrSlid('skovl');
-    } else {
-        const skade = spilTilstand.beregnSkade(10);
+    if (!harSkovl) {
+        const skade = spilTilstand.beregnSkade(4);
         spilTilstand.livspoint -= skade;
         udstyrsLog = ` Du graver i jorden med bare næver. Du mister ${skade} HP og ${faktiskEnergiPris} Energi.`;
     }
@@ -99,6 +104,12 @@ export function grav() {
     felt.skjultLiv = 0;
     felt.skjultFaelde = false;
     felt.skjultLoot = null;
+    
+    if (felt.biome === 'mark') {
+        felt.afgroede = undefined;
+        felt.smadretFremTilBlok = undefined;
+        felt.hoestetFremTilBlok = undefined;
+    }
     
     afslørOmraade(spilTilstand.spillerIndex, 1);    
 
@@ -123,7 +134,7 @@ export function grav() {
         if (faktiskHeling > 0) {
             fundLog = `Du graver en saftig rod frem og spiser den. Du heler ${faktiskHeling} HP.`;
         } else {
-            fundLog = `Du graver en rod frem, men du er allerede mæt. Helbredet forbliver intakt.`;
+            fundLog = `Du graver en rod frem, men du er allerede mæt.`;
         }
     } else if (fundetLoot) {
         tilfoejTilRygsæk(fundetLoot, 1);
@@ -131,7 +142,6 @@ export function grav() {
     }
 
     spilTilstand.logBesked = fundLog + udstyrsLog;
-
     syncTilDb(true);
 
     if (spilTilstand.livspoint <= 0) {

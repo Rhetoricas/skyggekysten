@@ -7,7 +7,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi } from '$lib/netvaerk';
-    import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand } from '$lib/spilmotor';
+    import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, tjekMiljoeSlitage, udfoerPortalTeleport } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
     import { fremrykTid, erSpillerITaagen, tagSkadeOgTjekDød } from '$lib/overlevelse.svelte';    
     import { eventState, startEvent, lukEvent as motorLukEvent } from '$lib/eventMotor.svelte';
@@ -41,9 +41,7 @@
     
     let harDetektor = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'metaldetektor') ?? false);
     let harKvist = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'soegekvist') ?? false);
-    let harFakkel = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'fakkel') ?? false);
-    let aktuelSynsRadius = $derived(Math.max(spilTilstand.valgtKarakter?.synsRadius || 1, harFakkel ? 2 : 1));
-    
+    let aktuelSynsRadius = $derived(Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn));
     let erITågen = $derived(erSpillerITaagen());
     
     let glHp = $state(0);
@@ -51,13 +49,11 @@
     let scoreErGemt = false;
 
     let bgMusik: HTMLAudioElement | null = null;
-
     onMount(() => {
         bgMusik = new Audio('/audio/ambient.mp3');
         bgMusik.loop = true;
         bgMusik.volume = 0.3;
     });
-
     $effect(() => {
         if (bgMusik) {
             if (spilTilstand.musikTaendt && spilTilstand.gameState === 'play') {
@@ -70,7 +66,6 @@
             }
         }
     });
-
     $effect(() => {
         const state = spilTilstand.gameState;
         
@@ -83,7 +78,6 @@
             }
         });
     });
-    
     $effect(() => {
         const tjekFokus = () => {
             if (!document.hidden && spilTilstand.gameState === 'play') {
@@ -93,7 +87,6 @@
         document.addEventListener('visibilitychange', tjekFokus);
         return () => document.removeEventListener('visibilitychange', tjekFokus);
     });
-    
     $effect(() => {
         if (spilTilstand.gameState !== 'play') {
             glHp = spilTilstand.livspoint;
@@ -113,8 +106,8 @@
             glGuld = spilTilstand.guldTotal;
         }
     });
-    
     let uniktTalId = 0;
+    
     function affyrTal(tekst: string, type: string) {
         if (!spilTilstand.aktiveTal) spilTilstand.aktiveTal = [];
         uniktTalId++;
@@ -136,10 +129,8 @@
         width: ${BREDDE * HEX_W + HEX_W}px;
         height: ${HOEJDE * ROW_H + ROW_H}px;
     `);
-
     let alarmKanal: RealtimeChannel | null = null;
     let preloadedEvents = new SvelteSet<string>();
-
     $effect(() => {
         if (spilTilstand.gameState !== 'play' || !spilTilstand.mineKendteFelter || !spilTilstand.gitter) return;
         
@@ -156,20 +147,19 @@
             }
         }
     });
-    
     function preloadFiler() {
         const standardBiomer = ['mark', 'eng', 'skov', 'bjerg', 'hule', 'ritual', 'ruin', 'bandit', 'blodskov', 'by', 'hav', 'krystal', 'marked', 'slagmark'];
         const billederTilPreload = [
             '/tiles/byshop.webp', '/tiles/markedshop.webp', '/tiles/udgravning.webp',
             '/tiles/event.png', '/tiles/campfire.webp', '/events/ev_campfire.webp', '/tiles/guldtaage.webp', '/tiles/livtaage.webp',
-            '/inventory/hp.webp', '/inventory/guld.webp', '/tiles/player.webp', '/tiles/energi_slukket.webp', '/tiles/energi_taendt.webp', '/tiles/blodofring.webp', '/tiles/baad.webp', '/tiles/gravsted.webp'
+            '/inventory/hp.webp', '/inventory/guld.webp', '/tiles/player.webp', '/tiles/energi_slukket.webp', '/tiles/energi_taendt.webp', '/tiles/blodofring.webp', '/tiles/baad.webp', '/tiles/gravsted.webp',
+            '/tiles/wheat.webp', '/tiles/growingwheat.webp', '/tiles/brokenwheat.webp',
+            '/tiles/beans.webp', '/tiles/growingbean.webp', '/tiles/brokenbean.webp', '/tiles/portal.webp'
         ];
-        
         standardBiomer.forEach(biome => {
             billederTilPreload.push(`/tiles/${biome}.webp`);
             billederTilPreload.push(`/tiles/${biome}_taage.webp`);
         });
-        
         Object.values(itemDB).forEach(item => billederTilPreload.push(item.billede));
         tilgaengeligeKarakterer.forEach(karakter => billederTilPreload.push(karakter.ikon));
 
@@ -196,18 +186,28 @@
     }
 
     async function genstartBane() {
+        const timeoutGraense = Date.now() - (3 * 60 * 1000);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const aktiveSpillere = Object.values(spilTilstand.alleSpillere).filter((s: any) => {
+            if (s.isDead || s.isWinner) return false;
+            if (s.sidstAktiv && s.sidstAktiv < timeoutGraense) return false;
+            return true;
+        });
+        if (aktiveSpillere.length > 0 && spilTilstand.rumKode) {
+            alert('Du kan ikke genstarte øen for alle, mens der stadig er andre aktive spillere derude.');
+            return;
+        }
+
         spilTilstand.logHistorik = [];
         spilTilstand.logBesked = '';
         visDoedsLog = false;
         
         cam.nulstil();
-        
         Object.keys(spilTilstand.alleSpillere).forEach(navn => {
             spilTilstand.alleSpillere[navn].isDead = false;
             spilTilstand.alleSpillere[navn].isWinner = false;
             spilTilstand.alleSpillere[navn].dag = 1;
         });
-
         spilTilstand.fogX = 0;
         spilTilstand.dag = 1;
         
@@ -215,8 +215,9 @@
             felt.gravet = false;
             felt.eventFuldført = false;
             felt.hasBoat = false;
+            felt.smadretFremTilBlok = undefined;
+            felt.hoestetFremTilBlok = undefined;
         });
-
         spilTilstand.gameState = 'select';
         await syncTilDb(true);
     }
@@ -239,13 +240,15 @@
             .channel(spilTilstand.rumKode)
             .on('broadcast', { event: 'alarm' }, ({ payload }) => {
                 if (payload.senderNavn === spilTilstand.spillerNavn) return;
-    
                 if (spilTilstand.alleSpillere[payload.senderNavn]) {
                     spilTilstand.alleSpillere[payload.senderNavn].activeAlarm = true;
                 }
             })
+            .on('broadcast', { event: 'baal' }, ({ payload }) => {
+                afslørOmraade(payload.centerIndex, payload.radius);
+                syncTilDb(true);
+            })
             .subscribe();
-        
         try {
             const { data, error } = await supabase.from('spil_sessioner').select('*').eq('rum_kode', spilTilstand.rumKode).maybeSingle();
             if (error) {
@@ -259,7 +262,6 @@
                 spilTilstand.alleSpillere = data.spillere || {};
                 spilTilstand.fogX = data.fog_x || 0;
                 spilTilstand.erHost = false;
-                
                 if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
                     const eksisterende = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
                     spilTilstand.spillerIndex = eksisterende.index;
@@ -278,9 +280,9 @@
 
                     afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
                     startRealtime();
-                    
                     if (eksisterende.isDead || eksisterende.isWinner) {
-                        spilTilstand.gameState = 'select';
+                        spilTilstand.gameState = eksisterende.isWinner ? 'win' : 'dead';
+                        spilTilstand.statusBesked = eksisterende.isWinner ? 'Du er allerede sluppet væk.' : 'Du er død på øen.';
                     } else {
                         spilTilstand.gameState = 'play';
                         cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
@@ -312,18 +314,15 @@
 
     onMount(() => {
         preloadFiler();
-        
         (async () => {
             lokaleScores = await hentHighscores();
             globaleScores = await hentGlobalTopTi();
         })();
     });
-    
     onDestroy(() => {
         stopRealtime();
         if (alarmKanal) supabase.removeChannel(alarmKanal);
     });
-
     async function opdaterOgGemHighscore() {
         const winBonus = spilTilstand.gameState === 'win' ? 1000 : 0;
         const fremdriftPoint = spilTilstand.maxKolonne * 1;
@@ -332,7 +331,6 @@
             (spilTilstand.guldTotal + fremdriftPoint + winBonus) *
                 (1 + Math.max(0, spilTilstand.livspoint) / 1000)
         );
-
         await gemHighscore();
         lokaleScores = await hentHighscores();
         globaleScores = await hentGlobalTopTi();
@@ -340,7 +338,6 @@
 
     async function bekræftValg(karakter: Karakter) {
         spilTilstand.valgtKarakter = karakter;
-        
         spilTilstand.maxLivspoint = karakter.startHp || 100;
         spilTilstand.livspoint = karakter.startHp;
         
@@ -350,10 +347,13 @@
         spilTilstand.nuvaerendeEnergi = karakter.baseEnergi;
         spilTilstand.mitUdstyr = [];
         spilTilstand.mineKendteFelter = [];
+        
+        spilTilstand.logHistorik = []; // <--- Din nye rengøring
 
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = false;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isWinner = false;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].dag = 1; // <--- Sikkerhedsnet
         }
 
         const muligeStartFelter = [];
@@ -373,7 +373,6 @@
         for (const itemId of karakter.startUdstyr) { tilfoejTilRygsæk(itemId, 1); }
         
         afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
-        
         const muligeBaadFelter = [];
         for (let raekke = 1; raekke < HOEJDE - 1; raekke++) {
             const indeks = raekke * BREDDE + (BREDDE - 2);
@@ -403,7 +402,7 @@
         await syncTilDb(true);
         cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
         spilTilstand.gameState = 'play';
-        spilTilstand.logBesked = "Du er lige skyllet op på kysten, og du er for omtåget til at overskue horisonten denne dag.";
+        spilTilstand.logBesked = "Du er lige gået i land på kysten og er for omtåget til at overskue horisonten.";
     }
 
     function lukEventOgShop() {
@@ -411,15 +410,27 @@
         if (felt && eventState.aktivt && felt.eventID !== 'campfire') felt.eventFuldført = true;
         motorLukEvent();
         spilTilstand.aktivShop = null;
-        syncTilDb(true);
+        
+        if (felt && felt.hasPortal) {
+            udfoerPortalTeleport();
+        } else {
+            syncTilDb(true);
+        }
     }
 
     function hentLangsomsteDag() {
         const spillere = Object.values(spilTilstand.alleSpillere);
         if (spillere.length <= 1) return spilTilstand.dag;
+        
+        const timeoutGraense = Date.now() - (3 * 60 * 1000);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const aktive = spillere.filter((s: any) => !s.isDead && !s.isWinner);
+        const aktive = spillere.filter((s: any) => {
+            if (s.isDead || s.isWinner) return false;
+            if (s.sidstAktiv && s.sidstAktiv < timeoutGraense) return false;
+            return true;
+        });
         if (aktive.length === 0) return spilTilstand.dag;
+        
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return Math.min(...aktive.map((s: any) => s.dag || 1));
     }
@@ -438,28 +449,43 @@
         const felt = spilTilstand.gitter[nytIndeks];
         if (!felt) { flytterNu = false; return; }
         
-        const pris = Math.round(spilTilstand.valgtKarakter.moveCost * (biomeTerraenCost[felt.biome as Biome] || 1));
-        spilTilstand.nuvaerendeEnergi -= erITågen ? pris * 2 : pris;
-
-        const helende = ['mark'];
-        const nulHp = ['by', 'eng', 'marked', 'hoejland', 'skov'];
+        const grundPris = biomeTerraenCost[felt.biome as Biome] || 1;
+        const biomeRabat = spilTilstand.valgtKarakter.biomeMod?.[felt.biome as string] || 0;
+        const pris = Math.max(1, spilTilstand.valgtKarakter.moveCost + spilTilstand.rygsækEffekt.move + grundPris + biomeRabat);
+        
+        spilTilstand.nuvaerendeEnergi -= erITågen ? pris + 2 : pris;
+        const helende: string[] = [];
+        const nulHp = ['mark', 'by', 'eng', 'marked', 'hoejland', 'skov'];
         const toHp = ['bjerg', 'hule'];
-        
-        let hpStraf = 1;
-        
+        let hpStraf = 0;
         if (helende.includes(felt.biome as string)) {
             hpStraf = -1;
         } else if (nulHp.includes(felt.biome as string)) {
             hpStraf = 0;
         } else if (toHp.includes(felt.biome as string)) {
-            hpStraf = 2;
+            hpStraf = 3;
         }
 
         if (hpStraf > 0) {
             hpStraf = spilTilstand.beregnSkade(hpStraf);
             spilTilstand.livspoint -= hpStraf;
         } else if (hpStraf < 0) {
-            spilTilstand.livspoint -= hpStraf; 
+            spilTilstand.livspoint -= hpStraf;
+        }
+
+        // LANDBRUGS LOGIK
+        const nuBlok = Math.ceil((spilTilstand.dag || 1) / 5);
+        const erHvedeTid = nuBlok % 2 !== 0; 
+        const erSmadret = felt.smadretFremTilBlok !== undefined && nuBlok <= felt.smadretFremTilBlok;
+        const erHoestet = felt.hoestetFremTilBlok !== undefined && nuBlok <= felt.hoestetFremTilBlok;
+        if (felt.biome === 'mark' && felt.afgroede && !erSmadret && !erHoestet) {
+            const erModen = (felt.afgroede === 'hvede' && erHvedeTid) || (felt.afgroede === 'boenner' && !erHvedeTid);
+            if (erModen) {
+                spilTilstand.livspoint += 3;
+                felt.hoestetFremTilBlok = nuBlok;
+            } else {
+                felt.smadretFremTilBlok = nuBlok + 1;
+            }
         }
 
         if (spilTilstand.livspoint <= 0) {
@@ -477,7 +503,6 @@
                 "Du trådte ud i havet og slugte koldt saltvand.", 
                 "De kolde bølger trak dig under. Du er død."
             );
-            
             if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'dead') {
                 flytterNu = false;
                 return;
@@ -489,20 +514,59 @@
         
         afslørOmraade(nytIndeks, Math.max(felt.biome === 'bjerg' ? 2 : 1, aktuelSynsRadius));
         if ((nytIndeks % BREDDE) > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nytIndeks % BREDDE;
-        fremrykTid();
         
+        // --- NY LOGIK TIL GAVER OG BONUSSER ---
+        const charId = spilTilstand.valgtKarakter.id;
+        const b = felt.biome as string;
+        let specialLog = "";
+
+        if ((charId === 'thief_m' || charId === 'thief_f') && (b === 'marked' || b === 'by')) {
+            spilTilstand.guldTotal += 5;
+            specialLog = " Du snupper diskret et par mønter i mængden.";
+        } else if ((charId === 'joker_m' || charId === 'joker_f') && b === 'marked') {
+            spilTilstand.guldTotal += 10;
+            specialLog = " Markedet belønner din gøgl og optræden med guld.";
+        } else if ((charId === 'royal_m' || charId === 'royal_f') && b === 'by') {
+            spilTilstand.guldTotal += 5;
+            specialLog = " Du opkræver en smule skat fra lokalbefolkningen.";
+        } else if ((charId === 'magician_m' || charId === 'magician_f') && b === 'ritual') {
+            spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 5);
+            specialLog = " Mørk magi strømmer helende ind i dine årer.";
+        }
+
+        const slidLog = tjekMiljoeSlitage(felt.biome as string);
+        let samletLog = slidLog ? slidLog.trim() : "";
+        
+        if (specialLog) {
+            samletLog = samletLog ? `${samletLog} ${specialLog}` : specialLog.trim();
+        }
+
+        if (samletLog) {
+            spilTilstand.logBesked = samletLog;
+        }
+        // ----------------------------------------
+
+        // Portalen suger dig væk øjeblikkeligt FØR tiden rykker
+        if (felt.hasPortal) {
+            udfoerPortalTeleport();
+            syncTilDb(true);
+            setTimeout(() => flytterNu = false, 200);
+            return;
+        }
+
+        fremrykTid();
+
         if (felt.hasBoat) {
             felt.hasBoat = false;
             sejlendeBaadIndex = nytIndeks;
-            
             if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
                 spilTilstand.alleSpillere[spilTilstand.spillerNavn].isWinner = true;
             }
             
             spilTilstand.logBesked = "Du mærker bådens ru træ under dine støvler. Havet åbner sig. Du har overlevet øen og kan trække vejret frit.";
-            
             setTimeout(() => {
                 spilTilstand.gameState = 'win_map';
+                syncTilDb(true); 
             }, 3000);
         } else {
             if (felt.eventID && !felt.eventFuldført) {
@@ -588,6 +652,24 @@
                             <img src="/tiles/baad.webp" alt="Flugtbåd" class="escape-boat" />
                         {/if}
 
+                        {#if erUdforsket && !erOpslugt && felt.afgroede && felt.biome === 'mark'}                            
+                            {@const nuBlok = Math.ceil((spilTilstand.dag || 1) / 5)}
+                            {@const erHvedeTid = nuBlok % 2 !== 0}
+                            {@const erModen = (felt.afgroede === 'hvede' && erHvedeTid) || (felt.afgroede === 'boenner' && !erHvedeTid)}
+                            {@const erSmadret = felt.smadretFremTilBlok !== undefined && nuBlok <= felt.smadretFremTilBlok}
+                            {@const erHoestet = felt.hoestetFremTilBlok !== undefined && nuBlok <= felt.hoestetFremTilBlok}
+
+                            {#if erSmadret}
+                                <img src="/tiles/{felt.afgroede === 'hvede' ? 'brokenwheat.webp' : 'brokenbean.webp'}" class="crop-icon" alt="" />
+                            {:else if !erHoestet}
+                                {#if erModen}
+                                    <img src="/tiles/{felt.afgroede === 'hvede' ? 'wheat.webp' : 'beans.webp'}" class="crop-icon moden" alt="" />
+                                {:else}
+                                    <img src="/tiles/{felt.afgroede === 'hvede' ? 'growingwheat.webp' : 'growingbean.webp'}" class="crop-icon" alt="" />
+                                {/if}
+                            {/if}
+                        {/if}
+
                         {#if erUdforsket && !felt.gravet}
                             {#if harDetektor && (felt.skjultGuld ?? 0) > 0}
                                 <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 100});" />
@@ -607,6 +689,10 @@
                             {:else}
                                 <img src="/tiles/event.png" alt="" class="event-crystal" />
                             {/if}
+                        {/if}
+
+                        {#if erUdforsket && felt.hasPortal}
+                            <img src="/tiles/portal.webp" alt="Portal" class="portal-icon" />
                         {/if}
 
                         {#if erUdforsket && felt.shopItems && felt.shopItems.length > 0}
@@ -634,7 +720,7 @@
                                 </span>
                             {/if}
                         {/each}
-                        
+
                         {#if spilTilstand.spillerIndex === i && sejlendeBaadIndex !== i && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map' && spilTilstand.gameState !== 'dead'}
                             <span class="player-icon" style="position: relative; display: inline-flex; justify-content: center; z-index: 20;">
                                 <img src={spilTilstand.valgtKarakter?.ikon} alt="" style="height: 58px;" />
@@ -704,11 +790,10 @@
         height: 100%;
     }
     .map { 
-        position: absolute; 
+        position: absolute;
     }
     .hex { 
-        position: absolute; width: 96px;
-        height: 110px;
+        position: absolute; width: 96px; height: 110px;
         clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); 
         background-size: cover;
     }
@@ -717,277 +802,190 @@
         position: relative;
         width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
     }
+    .crop-icon {
+        position: absolute; bottom: 22px; right: 18px;
+        width: 40px; height: auto;
+        z-index: 11; pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.8));
+    }
+    .crop-icon.moden { width: 40px; bottom: 20px; right: 15px; z-index: 12;
+    }
     .sailing-container {
-        position: absolute;
-        width: 96px;
-        height: 110px;
-        z-index: 100;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        position: absolute; width: 96px; height: 110px;
+        z-index: 100; display: flex;
+        justify-content: center; align-items: center;
         animation: sailAway 3s forwards cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .sejler-ikon {
-        height: 40px;
-        position: relative;
-        z-index: 2;
-        margin-bottom: 15px;
+    .sejler-ikon { height: 40px; position: relative; z-index: 2; margin-bottom: 15px;
     }
     @keyframes sailAway {
-        0% { transform: translateX(0) scale(1); opacity: 1; }
-        100% { transform: translateX(300px) scale(0.5); opacity: 0; }
+        0% { transform: translateX(0) scale(1);
+        opacity: 1; }
+        100% { transform: translateX(300px) scale(0.5); opacity: 0;
+        }
     }
     .escape-boat {
         position: absolute;
-        width: 75px;
-        height: auto;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-        z-index: 15;
+        width: 75px; height: auto; top: 50%; left: 50%;
+        transform: translate(-50%, -50%); pointer-events: none; z-index: 15;
         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
     }
     .sejr-lys {
-        position: absolute;
-        width: 100%;
-        height: 100%;
+        position: absolute; width: 100%; height: 100%;
         background: radial-gradient(ellipse at center, transparent 30%, rgba(255, 180, 0, 0.5) 70%, rgba(255, 215, 0, 0.9) 100%);
-        mix-blend-mode: color-dodge;
-        pointer-events: none;
+        mix-blend-mode: color-dodge; pointer-events: none;
         z-index: 5;
         animation: guldPuls 2.5s infinite alternate ease-in-out;
     }
     @keyframes guldPuls {
-        0% { opacity: 0.4; filter: brightness(1); }
-        100% { opacity: 1; filter: brightness(1.6); }
+        0% { opacity: 0.4;
+        filter: brightness(1); }
+        100% { opacity: 1; filter: brightness(1.6);
+        }
     }
     .mist-icon {
-        position: absolute; top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
+        position: absolute;
+        top: 50%; left: 50%; transform: translate(-50%, -50%);
         pointer-events: none; width: 50px; z-index: 12;
     }
     .dug-image {
-        position: absolute;
-        width: 90px; height: 52px; top: 58%; left: 50%;
+        position: absolute; width: 90px; height: 52px;
+        top: 58%; left: 50%;
         transform: translate(-50%, -50%); pointer-events: none; z-index: 10;
     }
-    .event-crystal { 
-        height: 60px;
-        animation: float 3s infinite ease-in-out; z-index: 15; position: relative;
-    }
+    .event-crystal { height: 60px;
+        animation: float 3s infinite ease-in-out; z-index: 15; position: relative; }
     .campfire-icon {
         position: absolute;
         width: 80px; height: 80px; top: 50%; left: 50%;
         transform: translate(-50%, -50%); pointer-events: none; z-index: 14;
     }
-    .shop-icon {
+    .portal-icon {
         position: absolute;
-        width: 80px;
-        height: 80px;
-        top: 55%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        width: 65px; height: 65px;
+        z-index: 9;
         pointer-events: none;
-        z-index: 14;
+        animation: pulsate 2s infinite alternate ease-in-out;
+    }
+    @keyframes pulsate {
+        0% { transform: scale(0.95); filter: drop-shadow(0 0 5px purple); }
+        100% { transform: scale(1.05); filter: drop-shadow(0 0 15px magenta); }
+    }
+    .shop-icon {
+        position: absolute; width: 80px; height: 80px;
+        top: 55%; left: 50%;
+        transform: translate(-50%, -50%); pointer-events: none; z-index: 14;
         filter: drop-shadow(0 0 15px rgba(255, 165, 0, 0.9)) drop-shadow(0 4px 6px rgba(0,0,0,0.8));
     }
     @keyframes float { 
-        0%, 100% { transform: translateY(0); } 
-        50% { transform: translateY(-5px); } 
+        0%, 100% { transform: translateY(0);
+        } 
+        50% { transform: translateY(-5px);
+        } 
     }
-    .modstander-icon { 
-        position: absolute;
-        top: 10px; z-index: 16; display: flex; justify-content: center; width: 100%;
-    }
+    .modstander-icon { position: absolute; top: 10px; z-index: 16; display: flex;
+        justify-content: center; width: 100%; }
     .gravsten-container {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 60px;
-        z-index: 13;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; z-index: 13;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
         pointer-events: none;
     }
-    .gravsten-ikon {
-        position: absolute;
-        width: 100%;
-        height: auto;
-        z-index: 1;
-        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
-    }
+    .gravsten-ikon { position: absolute; width: 100%; height: auto; z-index: 1;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
     .gravsten-portraet {
         position: relative;
-        z-index: 2;
-        width: 38px;
-        margin-top: -8px;
-        filter: grayscale(100%) sepia(10%) brightness(0.6) contrast(1.2);
-        opacity: 0.85;
+        z-index: 2; width: 38px; margin-top: -8px;
+        filter: grayscale(100%) sepia(10%) brightness(0.6) contrast(1.2); opacity: 0.85;
     }
-    .skjult-lyd img { 
-        opacity: 1;
-        animation: whisper 2s infinite alternate;
+    .skjult-lyd img { opacity: 1; animation: whisper 2s infinite alternate;
     }
-    .alarm-aktiv img { 
-        animation: alarmPuls 0.8s infinite alternate ease-in-out;
+    .alarm-aktiv img { animation: alarmPuls 0.8s infinite alternate ease-in-out;
     }
     @keyframes alarmPuls {
-        0% { transform: scale(1); filter: drop-shadow(0 0 2px white); }
-        100% { transform: scale(1.1); filter: drop-shadow(0 0 10px orange) brightness(1.2); }
+        0% { transform: scale(1);
+        filter: drop-shadow(0 0 2px white); }
+        100% { transform: scale(1.1);
+        filter: drop-shadow(0 0 10px orange) brightness(1.2); }
     }
-    @keyframes whisper { 
-        0% { opacity: 0.2; } 
-        100% { opacity: 0.5; } 
-    }
+    @keyframes whisper { 0% { opacity: 0.2;
+        } 100% { opacity: 0.5; } }
     .flydende-tal {
         position: absolute;
         bottom: 50px; font-family: serif; font-weight: bold;
         animation: rise 2.5s forwards; pointer-events: none; z-index: 100;
     }
     @keyframes rise { 
-        0% { opacity: 0; transform: translateY(0); } 
-        20% { opacity: 1; } 
-        100% { opacity: 0; transform: translateY(-30px); } 
+        0% { opacity: 0;
+        transform: translateY(0); } 
+        20% { opacity: 1;
+        } 
+        100% { opacity: 0; transform: translateY(-30px);
+        } 
     }
-    .opslugt { 
-        opacity: 0.8;
-        filter: grayscale(0.8) brightness(0.6);
+    .opslugt { opacity: 0.8; filter: grayscale(0.8) brightness(0.6);
     }
     
     .slut-banner {
         position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100vw;
+        bottom: 0; left: 0; width: 100vw;
         background: linear-gradient(to top, rgba(50, 0, 0, 1), rgba(20, 0, 0, 0.9));
-        border-top: 2px solid #ff4444;
-        padding: 30px;
-        text-align: center;
-        z-index: 2000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
+        border-top: 2px solid #ff4444; padding: 30px; text-align: center;
+        z-index: 2000; display: flex; flex-direction: column; align-items: center; gap: 15px;
     }
     .slut-banner.vundet {
         background: linear-gradient(to top, rgba(40, 30, 0, 1), rgba(20, 15, 0, 0.9));
         border-top: 2px solid #ffcc00;
     }
-    .slut-banner p {
-        color: #ffcccc;
-        font-size: 1.2rem;
-        margin: 0;
-        font-family: 'Cinzel', serif;
+    .slut-banner p { color: #ffcccc; font-size: 1.2rem; margin: 0; font-family: 'Cinzel', serif;
     }
-    .slut-banner.vundet p {
-        color: #ffeeaa;
+    .slut-banner.vundet p { color: #ffeeaa; }
+    .slut-knapper { display: flex; gap: 20px;
+        align-items: center; margin-top: 10px; }
+    .log-ikon-btn { background: transparent; border: none; cursor: pointer; transition: transform 0.2s;
+        padding: 0; }
+    .log-ikon-btn:hover { transform: scale(1.1); }
+    .log-ikon-btn img { width: 50px;
+        height: 50px; filter: drop-shadow(0 0 5px rgba(255, 68, 68, 0.5));
     }
-    .slut-knapper {
-        display: flex;
-        gap: 20px;
-        align-items: center;
-        margin-top: 10px;
-    }
-    .log-ikon-btn {
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        transition: transform 0.2s;
-        padding: 0;
-    }
-    .log-ikon-btn:hover {
-        transform: scale(1.1);
-    }
-    .log-ikon-btn img {
-        width: 50px;
-        height: 50px;
-        filter: drop-shadow(0 0 5px rgba(255, 68, 68, 0.5));
-    }
-    .slut-banner.vundet .log-ikon-btn img {
-        filter: drop-shadow(0 0 5px rgba(255, 204, 0, 0.5));
+    .slut-banner.vundet .log-ikon-btn img { filter: drop-shadow(0 0 5px rgba(255, 204, 0, 0.5));
     }
     .accepter-slut-btn {
-        background: #220000;
-        border: 1px solid #ff4444;
+        background: #220000; border: 1px solid #ff4444;
         color: #ff4444;
-        padding: 15px 30px;
-        font-size: 1rem;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: 0.2s;
+        padding: 15px 30px; font-size: 1rem; text-transform: uppercase; cursor: pointer; transition: 0.2s;
     }
-    .accepter-slut-btn:hover {
-        background: #ff4444;
-        color: black;
-    }
-    .slut-banner.vundet .accepter-slut-btn {
-        background: #221a00;
-        border-color: #ffcc00;
-        color: #ffcc00;
-    }
-    .slut-banner.vundet .accepter-slut-btn:hover {
-        background: #ffcc00;
-        color: black;
+    .accepter-slut-btn:hover { background: #ff4444; color: black; }
+    .slut-banner.vundet .accepter-slut-btn { background: #221a00;
+        border-color: #ffcc00; color: #ffcc00; }
+    .slut-banner.vundet .accepter-slut-btn:hover { background: #ffcc00; color: black;
     }
     
     .log-modal-overlay {
         position: fixed;
         top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0, 0, 0, 0.85);
-        display: flex; justify-content: center; align-items: center;
+        background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center;
         z-index: 3000;
     }
     .log-modal {
         background: #111;
-        border: 2px solid #555;
-        border-radius: 8px;
-        width: 600px;
-        max-width: 90%;
-        max-height: 80vh;
-        display: flex;
-        flex-direction: column;
-        padding: 20px;
+        border: 2px solid #555; border-radius: 8px; width: 600px;
+        max-width: 90%; max-height: 80vh; display: flex; flex-direction: column; padding: 20px;
     }
-    .log-modal h3 {
-        color: #ffcc00;
-        margin-top: 0;
-        font-family: 'Cinzel', serif;
-        text-align: center;
+    .log-modal h3 { color: #ffcc00; margin-top: 0; font-family: 'Cinzel', serif; text-align: center;
     }
     .log-liste {
-        flex-grow: 1;
-        overflow-y: auto;
-        margin: 15px 0;
+        flex-grow: 1; overflow-y: auto; margin: 15px 0;
         padding-right: 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+        display: flex; flex-direction: column; gap: 10px;
     }
-    .log-liste p {
-        color: #ddd;
-        margin: 0;
-        line-height: 1.4;
-        border-bottom: 1px solid #333;
-        padding-bottom: 10px;
-    }
-    .log-liste p:last-child {
-        border-bottom: none;
+    .log-liste p { color: #ddd; margin: 0;
+        line-height: 1.4; border-bottom: 1px solid #333; padding-bottom: 10px; }
+    .log-liste p:last-child { border-bottom: none;
     }
     .luk-log-btn {
-        background: #333;
-        color: white;
-        border: 1px solid #777;
-        padding: 10px;
-        cursor: pointer;
-        border-radius: 4px;
-        font-weight: bold;
-        transition: 0.2s;
+        background: #333; color: white;
+        border: 1px solid #777; padding: 10px;
+        cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.2s;
     }
-    .luk-log-btn:hover {
-        background: #555;
-    }
+    .luk-log-btn:hover { background: #555; }
 </style>

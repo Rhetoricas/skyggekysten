@@ -54,6 +54,8 @@ export function kanViseValg(valg: Valg) {
         if (!harTing || harTing.maengde <= 0) return false;
     }
 
+    if (valg.kosterEnergi && spilTilstand.nuvaerendeEnergi < valg.kosterEnergi) return false;
+
     return true;
 }
 
@@ -65,19 +67,18 @@ export function tagValg(valg: Valg) {
         return;
     }
 
-    if (valg.kosterItem) {
-        brugFraRygsæk(valg.kosterItem, 1);
-    }
-    if (valg.puljeVaerdi) {
-        spilTilstand.guldTotal -= valg.puljeVaerdi;
-    }
+    if (valg.kosterItem) brugFraRygsæk(valg.kosterItem, 1);
+    if (valg.puljeVaerdi) spilTilstand.guldTotal -= valg.puljeVaerdi;
+    if (valg.kosterEnergi) spilTilstand.nuvaerendeEnergi -= valg.kosterEnergi;
 
     eventState.valgLåst = true;
 
+    let samletLogTekst = "";
+    let kvittering = "";
+
     if (valg.udfaldListe && valg.udfaldListe.length > 0) {
         const resultat = valg.udfaldListe[Math.floor(Math.random() * valg.udfaldListe.length)];
-        let kvittering = "";
-        let samletLogTekst = resultat.log;
+        samletLogTekst = resultat.log;
 
         if (resultat.maxHpAendring) {
             spilTilstand.maxLivspoint += resultat.maxHpAendring;
@@ -89,103 +90,108 @@ export function tagValg(valg: Valg) {
             let endeligHp = resultat.hpAendring;
             const udsving = Math.abs(endeligHp * 0.25);
             endeligHp = Math.round(endeligHp + (Math.random() * udsving * 2) - udsving);
-            
-            if (endeligHp < 0) {
-                endeligHp = -spilTilstand.beregnSkade(Math.abs(endeligHp));
-            }
+            if (endeligHp < 0) endeligHp = -spilTilstand.beregnSkade(Math.abs(endeligHp));
             
             const foerHp = spilTilstand.livspoint;
             spilTilstand.livspoint += endeligHp;
             const faktiskAendring = spilTilstand.livspoint - foerHp;
-            
-            if (faktiskAendring !== 0) {
-                kvittering += ` (${faktiskAendring > 0 ? '+' : ''}${faktiskAendring} HP)`;
-            } else if (endeligHp > 0) {
-                kvittering += ` (Allerede fuld HP)`;
-            }
+            if (faktiskAendring !== 0) kvittering += ` (${faktiskAendring > 0 ? '+' : ''}${faktiskAendring} HP)`;
         }
 
         if (resultat.guldAendring) {
             let endeligGuld = resultat.guldAendring;
-            const udsving = Math.abs(endeligGuld * 0.25);
-            endeligGuld = Math.round(endeligGuld + (Math.random() * udsving * 2) - udsving);
-
-            if (endeligGuld > 0) {
-                endeligGuld = spilTilstand.beregnGuldIndkomst(endeligGuld);
-            }
-
+            if (endeligGuld > 0) endeligGuld = spilTilstand.beregnGuldIndkomst(endeligGuld);
             const foerGuld = spilTilstand.guldTotal;
             spilTilstand.guldTotal += endeligGuld;
-            const faktiskGuldAendring = spilTilstand.guldTotal - foerGuld;
-
-            if (faktiskGuldAendring !== 0) {
-                kvittering += ` (${faktiskGuldAendring > 0 ? '+' : ''}${faktiskGuldAendring} Guld)`;
-            }
+            const faktiskGuld = spilTilstand.guldTotal - foerGuld;
+            if (faktiskGuld !== 0) kvittering += ` (${faktiskGuld > 0 ? '+' : ''}${faktiskGuld} Guld)`;
         }
 
-        if (kvittering) {
-            samletLogTekst += kvittering;
+        if (resultat.givItem) {
+            resultat.givItem.split(',').forEach(item => {
+                const id = item.trim();
+                tilfoejTilRygsæk(id, 1);
+                kvittering += ` (+${id})`;
+            });
         }
-
-        eventState.log = [...eventState.log, samletLogTekst];
-        spilTilstand.logBesked = samletLogTekst;
-
-        if (resultat.givItem) tilfoejTilRygsæk(resultat.givItem, 1);
-        if (resultat.mistItem) brugFraRygsæk(resultat.mistItem, 1);
-
-        syncTilDb(true);
-
-        if (resultat.kollaps || spilTilstand.livspoint <= 0) {
-            eventState.afventerKollaps = true;
-            return;
+        if (resultat.mistItem) {
+            resultat.mistItem.split(',').forEach(item => {
+                const id = item.trim();
+                brugFraRygsæk(id, 1);
+                kvittering += ` (-${id})`;
+            });
         }
-
-        if (resultat.naesteTrin) {
-            eventState.naesteTrin = resultat.naesteTrin;
-        } else {
-            const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-            if (felt) felt.eventFuldført = true;
-            syncTilDb(true);
-            fremrykTid();
-            eventState.erFaerdig = true;
-        }
-    } 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    else if ((valg as any).effekt) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const resultat = (valg as any).effekt();
-        eventState.log = [...eventState.log, resultat.logBesked];
-        spilTilstand.logBesked = resultat.logBesked;
-
-        if (resultat.hpOp) spilTilstand.livspoint += resultat.hpOp;
-        if (resultat.hpNed) spilTilstand.livspoint -= spilTilstand.beregnSkade(resultat.hpNed);
-        if (resultat.guldOp) spilTilstand.guldTotal += spilTilstand.beregnGuldIndkomst(resultat.guldOp);
-        if (resultat.guldNed) spilTilstand.guldTotal -= resultat.guldNed;
-        if (resultat.itemUd) tilfoejTilRygsæk(resultat.itemUd, 1);
         
-        syncTilDb(true);
+        if (resultat.naesteTrin) eventState.naesteTrin = resultat.naesteTrin;
+        if (resultat.kollaps) eventState.afventerKollaps = true;
 
-        if (spilTilstand.livspoint <= 0) {
-            eventState.afventerKollaps = true;
-            return;
+    } 
+    else if ('effekt' in valg) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const valgMedEffekt = valg as any;
+        const resultat = valgMedEffekt.effekt();
+        samletLogTekst = resultat.logBesked;
+
+        if (resultat.maxHpAendring) {
+            spilTilstand.maxLivspoint += resultat.maxHpAendring;
+            spilTilstand.livspoint += (resultat.maxHpAendring > 0 ? resultat.maxHpAendring : 0);
+            kvittering += ` (${resultat.maxHpAendring > 0 ? '+' : ''}${resultat.maxHpAendring} Max HP)`;
         }
 
-        if (resultat.naesteEvent) {
-            eventState.naesteTrin = resultat.naesteEvent;
-        } else {
-            const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-            if (felt) felt.eventFuldført = true;
-            syncTilDb(true);
-            fremrykTid();
-            eventState.erFaerdig = true;
+        if (resultat.hpOp) {
+            const foer = spilTilstand.livspoint;
+            spilTilstand.livspoint += resultat.hpOp;
+            kvittering += ` (+${spilTilstand.livspoint - foer} HP)`;
         }
-    } else {
-        eventState.log = [...eventState.log, "Ingenting skete."];
-        spilTilstand.logBesked = "Ingenting skete.";
+        if (resultat.hpNed) {
+            const skade = spilTilstand.beregnSkade(resultat.hpNed);
+            spilTilstand.livspoint -= skade;
+            kvittering += ` (-${skade} HP)`;
+        }
+        if (resultat.guldOp) {
+            const indkomst = spilTilstand.beregnGuldIndkomst(resultat.guldOp);
+            spilTilstand.guldTotal += indkomst;
+            kvittering += ` (+${indkomst} Guld)`;
+        }
+        if (resultat.guldNed) {
+            spilTilstand.guldTotal -= resultat.guldNed;
+            kvittering += ` (-${resultat.guldNed} Guld)`;
+        }
+        if (resultat.energiOp) {
+            spilTilstand.nuvaerendeEnergi += resultat.energiOp;
+            kvittering += ` (+${resultat.energiOp} Energi)`;
+        }
+        if (resultat.energiNed) {
+            spilTilstand.nuvaerendeEnergi -= resultat.energiNed;
+            kvittering += ` (-${resultat.energiNed} Energi)`;
+        }
+        if (resultat.itemUd) {
+            resultat.itemUd.split(',').forEach((item: string) => {
+                const id = item.trim();
+                tilfoejTilRygsæk(id, 1);
+                kvittering += ` (+${id})`;
+            });
+        }
+
+        if (resultat.naesteEvent) eventState.naesteTrin = resultat.naesteEvent;
+    }
+
+    const fuldBesked = samletLogTekst + kvittering;
+    eventState.log = [...eventState.log, fuldBesked];
+    spilTilstand.logBesked = fuldBesked;
+
+    syncTilDb(true);
+
+    if (spilTilstand.livspoint <= 0) {
+        eventState.afventerKollaps = true;
+        return;
+    }
+
+    if (!eventState.naesteTrin) {
         const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
         if (felt) felt.eventFuldført = true;
-        syncTilDb(true);
         fremrykTid();
         eventState.erFaerdig = true;
+        syncTilDb(true);
     }
 }

@@ -1,4 +1,5 @@
 import type { Felt, Karakter, SpillerData, RygsækTing } from './types';
+import { itemDB } from './spildata';
 
 interface FlydendeTal {
     id: number;
@@ -28,32 +29,36 @@ export const spilTilstand = $state({
     
     valgtKarakter: null as Karakter | null,
 
-    get maxEnergi(): number { return this.valgtKarakter?.baseEnergi || 10; },
+    get rygsækEffekt() {
+        return (this.mitUdstyr || []).reduce((acc: { move: number; dmg: number; syn: number; energi: number; gold: number }, slot: RygsækTing) => {
+            const info = itemDB[slot.id];
+            if (!info) return acc;
+            return {
+                move: acc.move + (info.moveMod || 0) * slot.maengde,
+                dmg: acc.dmg + (info.dmgMod || 0) * slot.maengde,
+                syn: acc.syn + (info.synsMod || 0) * slot.maengde,
+                energi: acc.energi + (info.energiMod || 0) * slot.maengde,
+                gold: acc.gold + (info.goldMod || 0) * slot.maengde
+            };
+        }, { move: 0, dmg: 0, syn: 0, energi: 0, gold: 0 });
+    },
+
+    get maxEnergi(): number { return (this.valgtKarakter?.baseEnergi || 10) + this.rygsækEffekt.energi; },
     _nuvaerendeEnergi: 10,
     get nuvaerendeEnergi(): number { return this._nuvaerendeEnergi; },
-    set nuvaerendeEnergi(v: number) { this._nuvaerendeEnergi = Math.max(0, Math.min(this.maxEnergi, v)); },
+    set nuvaerendeEnergi(v: number) { this._nuvaerendeEnergi = Math.min(this.maxEnergi, v); },
 
     beregnSkade(skade: number) {
         if (skade <= 0) return 0;
-        const udstyr = this.mitUdstyr || [];
-        const harRustning = udstyr.some(i => i.id === 'rustning' && i.maengde > 0);
-        const harFintToej = udstyr.some(i => i.id === 'flot_toej' && i.maengde > 0);
-        const harKlude = udstyr.some(i => i.id === 'klude' && i.maengde > 0);
-
-        let reduktion = 0;
-        if (harRustning) {
-            reduktion = 0.30;
-        } else if (harFintToej || harKlude) {
-            reduktion = 0.05;
-        }
-
-        return Math.ceil(skade * (1 - reduktion));
+        const base = this.valgtKarakter?.dmgMod ?? 1.0;
+        const multiplikator = Math.max(0, base + this.rygsækEffekt.dmg);
+        return Math.ceil(skade * multiplikator);
     },
 
     beregnGuldIndkomst(indkomst: number) {
         if (indkomst <= 0) return 0;
-        const harFintToej = (this.mitUdstyr || []).some(i => i.id === 'flot_toej' && i.maengde > 0);
-        return harFintToej ? Math.round(indkomst * 1.15) : Math.round(indkomst);
+        const base = this.valgtKarakter?.goldMod ?? 1.0;
+        return Math.round(indkomst * (base + this.rygsækEffekt.gold));
     },
 
     dag: 1,
@@ -62,13 +67,27 @@ export const spilTilstand = $state({
     samletScore: 0,
     statusBesked: '',
     
-    _logBesked: 'Velkommen til øen.',
-    logHistorik: ['Velkommen til øen.'] as string[],
-    get logBesked(): string { return this._logBesked; },
-    set logBesked(v: string) { 
-        this._logBesked = v;
-        if (v.trim() !== '') {
-            this.logHistorik.push(v);
+    _logBesked: '',
+    logHistorik: [] as string[],
+    get logBesked(): string { 
+        return this.logHistorik.length > 0 ? this.logHistorik[this.logHistorik.length - 1] : ''; 
+    },
+set logBesked(v: string) { 
+        const rensetV = v.trim();
+        const prefix = `DAG ${this.dag}`;
+        const fuldBesked = rensetV === '' ? prefix : `${prefix} - ${rensetV}`;
+        
+        const sidsteIndex = this.logHistorik.length - 1;
+        
+        if (sidsteIndex >= 0) {
+            const sidsteLinje = this.logHistorik[sidsteIndex];
+            if (sidsteLinje === prefix && rensetV !== '') {
+                this.logHistorik[sidsteIndex] = fuldBesked;
+            } else if (sidsteLinje !== fuldBesked) {
+                this.logHistorik.push(fuldBesked);
+            }
+        } else {
+            this.logHistorik.push(fuldBesked);
         }
     },
 

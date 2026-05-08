@@ -1,7 +1,7 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb } from './netvaerk';
 import { BREDDE, HEX_W } from './spildata';
-import { tjekUdstyrSlid, brugFraRygsæk } from './spilmotor';
+import { brugFraRygsæk } from './spilmotor';
 
 export function erSpillerITaagen() {
     const r = Math.floor(spilTilstand.spillerIndex / BREDDE);
@@ -41,15 +41,12 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
         const erHavet = besked.includes("havet") || besked.includes("saltvand") || besked.includes("hav");
 
         if (!erHavet && !erSpillerITaagen()) {
-            fremtvingKollaps();
-            if (spilTilstand.erBevidstløs && doedsBesked) {
-                spilTilstand.logBesked = doedsBesked + " " + spilTilstand.logBesked;
-            }
+            fremtvingKollaps(doedsBesked || beskedMedTal);
             return;
         }
 
         if (brugEliksir()) {
-            spilTilstand.logBesked = `Du gik i brædderne. ${beskedMedTal} Eliksiren tvang livet tilbage i din krop.`;
+            spilTilstand.logBesked = `Du gik i brædderne. ${beskedMedTal} Eliksiren gav livet tilbage i din krop.`;
             syncTilDb(true);
             return;
         }
@@ -64,7 +61,7 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
             aktueltFelt.gravstenIkon = spilTilstand.valgtKarakter.ikon;
         }
         
-        spilTilstand.logBesked = doedsBesked || `${beskedMedTal} Din krop gav endegyldigt op.`;
+        spilTilstand.logBesked = doedsBesked || `${beskedMedTal} Din krop gav op.`;
         syncTilDb(true);
     } else {
         spilTilstand.logBesked = beskedMedTal;
@@ -113,7 +110,8 @@ export function fremrykTid() {
         spilTilstand.nuvaerendeEnergi += spilTilstand.valgtKarakter.baseEnergi;        
         
         if (spilTilstand.dag > 5) {
-            spilTilstand.fogX += (HEX_W * 1.5) / antalLevende;        
+            const dynamiskFart = 1 + Math.pow(spilTilstand.dag / 100, 2);
+            spilTilstand.fogX += (HEX_W * dynamiskFart) / antalLevende;        
         }
     }
 
@@ -123,16 +121,11 @@ export function fremrykTid() {
         let samletLog = "";
 
         if (nyDag === 2) {
-            samletLog += " Dit blik bliver skarpere. Du føler dig mere klar og kan nu overskue omgivelserne.";
+            samletLog += "Du kan nu overskue omgivelserne og zoome ud og ind.";
         }
 
-        ['fakkel', 'metaldetektor', 'soegekvist'].forEach(id => {
-            const log = tjekUdstyrSlid(id);
-            if (log) samletLog += log;
-        });
-
-        if (samletLog !== "") {
-            spilTilstand.logBesked = spilTilstand.logBesked + samletLog;
+        if (samletLog.trim() !== "") {
+            spilTilstand.logBesked = samletLog.trim();
         }
     }
 
@@ -161,11 +154,12 @@ export function udfoerBlodofring() {
     syncTilDb(true);
 }
 
-export function fremtvingKollaps() {
+export function fremtvingKollaps(brugerdefineretAarsag?: string) {
     if (spilTilstand.gameState !== 'play' || spilTilstand.erBevidstløs) return;
 
     if (brugEliksir()) {
-        spilTilstand.logBesked = "Du var ved at kollapse. Eliksiren pumpede nyt liv i dine årer.";
+        const aarsag = brugerdefineretAarsag ? `${brugerdefineretAarsag} ` : "Du var ved at kollapse. ";
+        spilTilstand.logBesked = `${aarsag}Eliksiren pumpede nyt liv i dine årer.`;
         syncTilDb(true);
         return; 
     }
@@ -177,9 +171,11 @@ export function fremtvingKollaps() {
     const mistetGuld = Math.floor(spilTilstand.guldTotal / 2);
     spilTilstand.guldTotal -= mistetGuld;
 
-    spilTilstand.logBesked = mistetGuld > 0 
+    const basisKollaps = mistetGuld > 0 
         ? `Du kollapser. Mens du ligger bevidstløs, forsvinder ${mistetGuld} guld fra dine lommer.` 
         : "Du kollapser af udmattelse. Tiden går. Tågen kryber tættere på.";
+
+    spilTilstand.logBesked = brugerdefineretAarsag ? `${brugerdefineretAarsag} ${basisKollaps}` : basisKollaps;
     
     fremrykTid();
 

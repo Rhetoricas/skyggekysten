@@ -4,7 +4,7 @@ import { BREDDE, HOEJDE, biomeVægte, itemDB, markedVarePool } from '$lib/spilda
 import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
-import { fremrykTid } from '$lib/overlevelse.svelte';
+import { fremrykTid, fremtvingKollaps } from '$lib/overlevelse.svelte';
 import type { Felt, RygsækTing } from '$lib/types';
 import { delNyeKort } from '$lib/ventespil.svelte';
 
@@ -150,14 +150,84 @@ export function afslørOmraade(centerIndex: number, radius: number = 1) {
     });
 }
 
+function udfoerKerneTeleport(kilde: 'stav' | 'portal') {
+    if (spilTilstand.erBevidstløs || !spilTilstand.valgtKarakter) return;
+
+    if (kilde === 'stav') {
+        const stavItem = spilTilstand.mitUdstyr.find(i => i.id === 'stav');
+        if (!stavItem || stavItem.maengde <= 0) return;
+    }
+
+    const pris = spilTilstand.valgtKarakter.baseEnergi;
+
+    spilTilstand.nuvaerendeEnergi -= pris;
+
+    const gammeltIndeks = spilTilstand.spillerIndex;
+    const raekke = Math.floor(gammeltIndeks / BREDDE);
+    const kolonne = gammeltIndeks % BREDDE;
+
+    const nyKolonne = Math.min(kolonne + 4, BREDDE - 1);
+    const nytIndeks = raekke * BREDDE + nyKolonne;
+
+    spilTilstand.spillerIndex = nytIndeks;
+    afslørOmraade(nytIndeks, Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn));
+
+    if (nyKolonne > spilTilstand.maxKolonne) {
+        spilTilstand.maxKolonne = nyKolonne;
+    }
+
+    const felt = spilTilstand.gitter[nytIndeks];
+    let ekstraLog = "";
+
+    if (felt) {
+        if (felt.biome === 'hav') {
+            const skade = spilTilstand.beregnSkade(30);
+            spilTilstand.livspoint -= skade;
+            ekstraLog = ` Du ${kilde === 'stav' ? 'materialiserer dig' : 'spyttes ud'} over åbent vand og styrter i havet! (-${skade} HP)`;
+        } else if (felt.biome === 'bjerg') {
+            const skade = spilTilstand.beregnSkade(15);
+            spilTilstand.livspoint -= skade;
+            ekstraLog = ` Du lander brutalt i de takkede klipper! (-${skade} HP)`;
+        } else if (felt.skjultFaelde && !felt.gravet) {
+            const faeldeSkade = spilTilstand.beregnSkade(15);
+            spilTilstand.livspoint -= faeldeSkade;
+            felt.skjultFaelde = false;
+            felt.gravet = true;
+            ekstraLog = ` KLIK! Du lander direkte oven i en skjult fælde! (-${faeldeSkade} HP)`;
+        }
+    }
+
+    const slidLog = tjekMiljoeSlitage(felt.biome as string);
+    const startLog = kilde === 'stav' 
+        ? "Rummet folder sig sammen. Du kastes blindt mod øst." 
+        : "Portalens sug flår dig afsted mod øst.";
+    
+    spilTilstand.logBesked = `${startLog}${ekstraLog}${slidLog}`;
+    
+    fremrykTid();
+    syncTilDb(true);
+
+    if (spilTilstand.livspoint <= 0) {
+        fremtvingKollaps(kilde === 'stav' ? "Landingen slog luften ud af dig." : "Portalens voldsomme kræfter rev din sidste livsgnist væk.");
+    }
+}
+
+export function udfoerTeleport() {
+    udfoerKerneTeleport('stav');
+}
+
+export function udfoerPortalTeleport() {
+    udfoerKerneTeleport('portal');
+}
+
 export function hvil() {
     if (!spilTilstand.valgtKarakter || spilTilstand.erBevidstløs) return;
 
     const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-    const vildmark = ['eng', 'skov', 'mark', 'bjerg'];
+    const vildmark = ['eng', 'skov', 'mark', 'bjerg', 'hoejland' ];
     
     if (!felt || !vildmark.includes(felt.biome as string)) {
-        spilTilstand.logBesked = "Miljøet er for fjendtligt eller uegnet til at slå lejr her.";
+        spilTilstand.logBesked = "Miljøet er uegnet til at slå lejr i.";
         return;
     }
     
@@ -176,8 +246,7 @@ export function hvil() {
     
     spilTilstand.nuvaerendeEnergi = 0;
     
-    const slidLog = tjekUdstyrSlid('sovepose');
-    spilTilstand.logBesked = "Du pakker dig ind i soveposen. Sår lukkes, mens tågen æder dit forspring." + slidLog;
+    spilTilstand.logBesked = "Du pakker dig ind i soveposen. Sår lukkes, mens tågen æder dit forspring.";
     
     fremrykTid();
     syncTilDb(true);
@@ -275,21 +344,9 @@ export function initialiserGitter() {
     ledigeEvents.forEach(e => eventForbrug.set(e, 0));
 
     const eventChancer: Record<string, number> = {
-        'hule': 0.80,
-        'ritual': 0.80,
-        'ruin': 0.80,
-        'bandit': 0.80,
-        'krystal': 0.15,
-        'blodskov': 0.15,
-        'slagmark': 0.15,
-        'by': 0.15,
-        'marked': 0.15,
-        'hoejland': 0.05,
-        'hav': 0.05,
-        'bjerg': 0.04,
-        'skov': 0.04,
-        'eng': 0.04,
-        'mark': 0.04
+        'hule': 0.80, 'ritual': 0.80, 'ruin': 0.80, 'bandit': 0.80, 'krystal': 0.15,
+        'blodskov': 0.15, 'slagmark': 0.15, 'by': 0.15, 'marked': 0.15, 'hoejland': 0.05,
+        'hav': 0.05, 'bjerg': 0.04, 'skov': 0.04, 'eng': 0.04, 'mark': 0.04
     };
 
     const tilfaeldigeFelter = Array.from({length: antal}, (_, i) => i).sort((a, b) => {
@@ -303,16 +360,13 @@ export function initialiserGitter() {
         const felt = nytGitter[indeks];
         if (felt.eventID) continue;
 
-        const chance = eventChancer[felt.biome as string] || 0.05;
+const pauseEvents = false; 
+const chance = pauseEvents ? 0 : (eventChancer[felt.biome as string] || 0.05) / 10;
 
         if (Math.random() < chance) {
             const matchendeEvents = ledigeEvents.filter(noegle => {
                 const kraevetBiome = eventBibliotek[noegle].biome;
-                
-                if (felt.biome === 'hav') {
-                    return Array.isArray(kraevetBiome) && kraevetBiome.includes('hav');
-                }
-                
+                if (felt.biome === 'hav') return Array.isArray(kraevetBiome) && kraevetBiome.includes('hav');
                 return Array.isArray(kraevetBiome)
                     ? (kraevetBiome as string[]).includes(felt.biome as string) || (kraevetBiome as string[]).includes('alle')
                     : kraevetBiome === felt.biome || kraevetBiome === 'alle' || kraevetBiome === 'any' || !kraevetBiome;
@@ -321,7 +375,6 @@ export function initialiserGitter() {
             if (matchendeEvents.length > 0) {
                 const minBrugt = Math.min(...matchendeEvents.map(e => eventForbrug.get(e) || 0));
                 const mulige = matchendeEvents.filter(e => (eventForbrug.get(e) || 0) === minBrugt);
-                
                 const valgtEvent = mulige[Math.floor(Math.random() * mulige.length)];
                 felt.eventID = valgtEvent;
 
@@ -339,6 +392,11 @@ export function initialiserGitter() {
 
     for (let indeks = 0; indeks < antal; indeks++) {
         const felt = nytGitter[indeks];
+        
+        if (Math.random() < 0.005) {
+            felt.hasPortal = true;
+        }
+
         if (felt.biome === 'hav' || felt.eventID) continue;
 
         if (vildmark.includes(felt.biome as string) && Math.random() < 0.008) {
@@ -360,6 +418,25 @@ export function initialiserGitter() {
         }
     }
 
+    for (let indeks = 0; indeks < antal; indeks++) {
+        const felt = nytGitter[indeks];
+        if (felt.biome !== 'mark') continue;
+
+        const naboer = hentNaboIndices(indeks);
+        let hvedeCount = 0;
+        let boenneCount = 0;
+
+        for (const naboIdx of naboer) {
+            const naboFelt = nytGitter[naboIdx];
+            if (naboFelt && naboFelt.afgroede === 'hvede') hvedeCount++;
+            if (naboFelt && naboFelt.afgroede === 'boenner') boenneCount++;
+        }
+
+        if (hvedeCount > boenneCount) felt.afgroede = 'hvede';
+        else if (boenneCount > hvedeCount) felt.afgroede = 'boenner';
+        else felt.afgroede = Math.random() < 0.5 ? 'hvede' : 'boenner';
+    }
+
     spilTilstand.gitter = nytGitter;
     const muligeStartFelter = [];
     for (let raekke = 1; raekke < HOEJDE - 1; raekke++) {
@@ -370,27 +447,109 @@ export function initialiserGitter() {
     spilTilstand.spillerIndex = muligeStartFelter[Math.floor(Math.random() * muligeStartFelter.length)];
     
     afslørOmraade(spilTilstand.spillerIndex);
-    
     delNyeKort();
 }
 
-export function tjekUdstyrSlid(genstandId: string): string {
-    const ting = spilTilstand.mitUdstyr.find((t: RygsækTing) => t.id === genstandId) as RygsækTing | undefined;
-    if (!ting) return "";
+export function tjekMiljoeSlitage(biome: string): string {
+    const logBeskeder: string[] = [];
+    let mistetFintToej = 0;
 
-    const alder = (spilTilstand.dag || 1) - (ting.anskaffetDag || 1);
-    if (alder > 10) {
-        if (Math.random() <= 0.25) {
-            brugFraRygsæk(genstandId, 1);
-            
-            const tilbage = spilTilstand.mitUdstyr.find((t: RygsækTing) => t.id === genstandId);
-            if (tilbage) {
-                tilbage.anskaffetDag = spilTilstand.dag;
+    spilTilstand.mitUdstyr = spilTilstand.mitUdstyr.filter(vare => {
+        if (biome === 'hav') {
+            if (vare.id === 'rustning') {
+                logBeskeder.push("Dit tunge panser trækker dig mod bunden. Du smider rustningen i havet.");
+                return false;
             }
+            if (vare.id === 'fakkel') {
+                logBeskeder.push("Vandet drukner din fakkel.");
+                return false;
+            }
+        } else if (biome === 'hule') {
+            if (vare.id === 'flot_toej') {
+                mistetFintToej += vare.maengde;
+                logBeskeder.push("Hulens skarpe sten flænser dit fine tøj til klude.");
+                return false;
+            }
+            if (vare.id === 'sovepose') {
+                logBeskeder.push("Den ekstreme fugt får din sovepose til at rådne væk.");
+                return false;
+            }
+        } else if (biome === 'blodskov') {
+            if (vare.id === 'flot_toej') {
+                mistetFintToej += vare.maengde;
+                logBeskeder.push("Blodskovens torne river dit fine tøj i laser.");
+                return false;
+            }
+        } else if (biome === 'krystal') {
+            if (vare.id === 'metaldetektor') {
+                logBeskeder.push("Krystallernes resonans kortslutter din metaldetektor.");
+                return false;
+            }
+            if (vare.id === 'kikkert_250' || vare.id === 'kikkert_45') {
+                logBeskeder.push("Krystallens lys splintrer kikkertens linser");
+                return false;
+            }
+        } else if (biome === 'ruin') {
+            if (vare.id === 'mad') {
+                logBeskeder.push("Skadedyrene i ruinen stjæler din mad.");
+                return false;
+            }
+        } else if (biome === 'ritual') {
+            if (vare.id === 'soegekvist') {
+                logBeskeder.push("Den mørke magi brænder din søgekvist til aske.");
+                return false;
+            }
+        }
+        return true;
+    });
 
-            const vareNavn = itemDB[genstandId]?.navn || genstandId;
-            return ` Din ${vareNavn} bukkede under for sliddet og faldt fra hinanden.`;
+    if (mistetFintToej > 0) {
+        const klude = spilTilstand.mitUdstyr.find(i => i.id === 'klude');
+        if (klude) {
+            klude.maengde += mistetFintToej;
+        } else {
+            spilTilstand.mitUdstyr.push({ id: 'klude', maengde: mistetFintToej });
         }
     }
-    return "";
+
+    return logBeskeder.length > 0 ? " " + logBeskeder.join(" ") : "";
+}
+
+export async function sendBaalSignal(centerIndex: number, radius: number) {
+    if (!spilTilstand.rumKode) return;
+    await supabase.channel(spilTilstand.rumKode).send({
+        type: 'broadcast',
+        event: 'baal',
+        payload: { centerIndex, radius }
+    });
+}
+
+export function taendBaal() {
+    if (spilTilstand.erBevidstløs || !spilTilstand.valgtKarakter) return;
+    
+    const fakkel = spilTilstand.mitUdstyr.find(i => i.id === 'fakkel');
+    if (!fakkel || fakkel.maengde <= 0) return;
+
+    brugFraRygsæk('fakkel', 1);
+
+    const radius = Math.max(1, spilTilstand.valgtKarakter.synsRadius + spilTilstand.rygsækEffekt.syn) + 2;
+    afslørOmraade(spilTilstand.spillerIndex, radius);
+    
+    spilTilstand.logBesked = "Du planter faklen i jorden og antænder et massivt bål. Lyset flænger tågen og guider dine medspillere.";
+    
+    sendBaalSignal(spilTilstand.spillerIndex, radius);
+    fremrykTid();
+    syncTilDb(true);
+}
+
+export function bygOgHopGennemPortal() {
+    const hop = Math.floor(Math.random() * 11) + 5; 
+    const hopIndeks = Math.min(spilTilstand.gitter.length - 1, spilTilstand.spillerIndex + hop);
+    
+    spilTilstand.gitter[spilTilstand.spillerIndex].hasPortal = true;
+    spilTilstand.gitter[hopIndeks].hasPortal = true;
+    
+    spilTilstand.spillerIndex = hopIndeks;
+    
+    return true;
 }

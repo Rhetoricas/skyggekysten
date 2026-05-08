@@ -37,6 +37,7 @@ export interface Karakter {
     ulempe: string;
     baseEnergi: number;
     synsRadius: number;
+    biomeMod?: Record<string, number>;
 }
 
 export interface SpillerData {
@@ -66,6 +67,7 @@ export interface Felt {
     x?: number;
     y?: number;
     hasBoat?: boolean;
+    hasPortal?: boolean;
     
     guld: number;
     gravet: boolean;
@@ -87,4 +89,9 @@ export interface Felt {
     skjultLiv?: number;
     skjultFaelde?: boolean;
     skjultLoot?: string | null;
+
+    // Landbrugs-data
+    afgroede?: 'hvede' | 'boenner';
+    smadretFremTilBlok?: number;
+    hoestetFremTilBlok?: number;
 }

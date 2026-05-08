@@ -11,9 +11,16 @@
     let rootEvent = $derived(aktueltFelt?.eventID ? eventBibliotek[aktueltFelt.eventID] : null);
     let grundBiome = $derived(rootEvent ? (Array.isArray(rootEvent.biome) ? rootEvent.biome[0] : rootEvent.biome) : 'event');
 
+    $effect(() => {
+        if (eventState.log.length > 0) {
+            const container = document.querySelector('.log-container');
+            if (container) container.scrollTop = container.scrollHeight;
+        }
+    });
+
     function haandterKlikVidere() {
         if (!eventState.valgLåst) return;
-        
+
         if (eventState.naesteTrin) {
             startEvent(eventState.naesteTrin);
         } else if (eventState.afventerKollaps) {
@@ -51,6 +58,7 @@
         </div>
 
         <div class="knap-panel">
+        
             {#if !eventState.valgLåst}
                 {#each eventState.aktivt.valg as valg (valg.tekst)}
                     {@const harAdgang = kanViseValg(valg)}
@@ -78,6 +86,9 @@
                                 {#if valg.puljeVaerdi}
                                     <span class="mangel-guld">Mangler {valg.puljeVaerdi} Guld</span>
                                 {/if}
+                                {#if valg.kosterEnergi}
+                                    <span class="mangel-guld">Mangler {valg.kosterEnergi} Energi</span>
+                                {/if}
                             </div>
                         {/if}
                     </button>
@@ -96,7 +107,8 @@
 
 <style>
     .stun-overlay { 
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 150;
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 150;
         box-shadow: inset 0 0 150px rgba(200, 0, 0, 0.8); animation: blodPuls 2s infinite;
     }
     
@@ -106,15 +118,19 @@
     }
     
     .event-overlay { 
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 1000;
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center;
+        z-index: 1000;
         font-family: system-ui, -apple-system, sans-serif;
     }
     
     .event-boks { 
-        background: #1a1a1a; color: #e0e0e0; border: 2px solid #4a4a4a; padding: 20px; width: 600px; max-width: 90%;
+        background: #1a1a1a;
+        color: #e0e0e0; border: 2px solid #4a4a4a; padding: 20px; width: 600px; max-width: 90%;
         min-height: 650px;
-        max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; border-radius: 8px;
+        max-height: 90vh; overflow-y: auto; display: flex;
+        flex-direction: column; gap: 15px; border-radius: 8px;
     }
 
     .klik-klar {
@@ -127,28 +143,35 @@
     }
     
     .event-boks img { 
-        width: 100%; height: 200px; object-fit: cover; border-bottom: 2px solid #333; border-radius: 4px;
+        width: 100%;
+        height: 200px; object-fit: cover; border-bottom: 2px solid #333; border-radius: 4px;
     }
     
     .event-boks h2 { 
-        margin: 0; color: #ffcc00; font-family: 'Cinzel', serif; font-size: 1.8rem;
+        margin: 0;
+        color: #ffcc00; font-family: 'Cinzel', serif; font-size: 1.8rem;
     }
     
     .log-container {
         flex-grow: 1;
+        overflow-y: auto;
     }
     
     .log-container p { 
-        margin: 5px 0; line-height: 1.5; font-size: 1.05rem;
+        margin: 5px 0;
+        line-height: 1.5; font-size: 1.05rem;
     }
     
     .knap-panel { 
-        display: flex; flex-direction: column; gap: 10px; margin-top: auto;
+        display: flex;
+        flex-direction: column; gap: 10px; margin-top: auto;
     }
     
     .valg-btn { 
-        padding: 14px; background: #2a2a2a; color: white; border: 1px solid #555; cursor: pointer; 
-        text-align: left; border-radius: 4px; transition: 0.2s; font-size: 1rem; font-family: system-ui, -apple-system, sans-serif;
+        padding: 14px;
+        background: #2a2a2a; color: white; border: 1px solid #555; cursor: pointer; 
+        text-align: left; border-radius: 4px; transition: 0.2s; font-size: 1rem;
+        font-family: system-ui, -apple-system, sans-serif;
         display: flex; justify-content: space-between; align-items: center;
     }
     
@@ -167,13 +190,13 @@
         line-height: 1.3;
     }
 
-.manglende-betingelse {
+    .manglende-betingelse {
         display: flex;
         flex-direction: column;
         gap: 4px;
         align-items: center;
         justify-content: center;
-        opacity: 0.65; /* Løftet en anelse for bedre læsbarhed */
+        opacity: 0.65;
         filter: grayscale(100%);
         min-width: 50px;
         max-width: 60px;
@@ -183,7 +206,7 @@
 
     .mangel-ikon {
         width: 32px !important; 
-        height: 32px !important; 
+        height: 32px !important;
         max-width: 32px !important; 
         max-height: 32px !important; 
         object-fit: contain;

@@ -5,6 +5,10 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 export async function syncTilDb(opdaterKort = false) {
     if (!spilTilstand.rumKode || !spilTilstand.spillerNavn) return;
 
+    // Fix: Tjekker både gameState og de lokale flag for at sikre korrekt status i DB, selv under animationer/forsinkelser
+    const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isDead ?? false);
+    const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isWinner ?? false);
+
     spilTilstand.alleSpillere[spilTilstand.spillerNavn] = {
         index: spilTilstand.spillerIndex,
         hp: spilTilstand.livspoint,
@@ -17,8 +21,9 @@ export async function syncTilDb(opdaterKort = false) {
         energi: spilTilstand.nuvaerendeEnergi,
         mitUdstyr: spilTilstand.mitUdstyr,
         kendteFelter: spilTilstand.mineKendteFelter,
-        isDead: spilTilstand.gameState === 'dead',
-        isWinner: spilTilstand.gameState === 'win',
+        isDead: isDead,
+        isWinner: isWinner,
+        sidstAktiv: Date.now(), // Heartbeat til AFK-tjek (3 min grænse)
         activeAlarm: false
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
