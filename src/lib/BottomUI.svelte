@@ -2,28 +2,31 @@
     import { untrack } from 'svelte';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
-    import { erSpillerITaagen, udfoerBlodofring } from '$lib/overlevelse.svelte';
     import { grav } from '$lib/undergrund.svelte';
     import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
 
-    let erITågen = $derived(erSpillerITaagen());
     let aktueltFelt = $derived(
         spilTilstand.valgtKarakter && spilTilstand.gitter?.length > 0 
             ? spilTilstand.gitter[spilTilstand.spillerIndex] 
             : null
     );
+
     let kanGrave = $derived(aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves);
 
     let visLog = $state(false);
     let logContainerRef = $state<HTMLDivElement | null>(null);
+
+    // KORREKTE UDSREGNINGER (Karakter + Rygsæk)
     let totalMove = $derived((spilTilstand.valgtKarakter?.moveCost ?? 1) + spilTilstand.rygsækEffekt.move);
-    let dmgDiff = $derived(Math.round(spilTilstand.rygsækEffekt.dmg * 100));
-    let goldDiff = $derived(Math.round(spilTilstand.rygsækEffekt.gold * 100));
+    let totalArmor = $derived(100 - Math.round(((spilTilstand.valgtKarakter?.dmgMod ?? 1.0) + spilTilstand.rygsækEffekt.dmg) * 100));
+    let totalGoldMod = $derived(Math.round(((spilTilstand.valgtKarakter?.goldMod ?? 1.0) + spilTilstand.rygsækEffekt.gold) * 100));
     let totalSyn = $derived((spilTilstand.valgtKarakter?.synsRadius ?? 1) + spilTilstand.rygsækEffekt.syn);
-    let maxEnergi = $derived(spilTilstand.maxEnergi);
+
     let aktuelLog = $derived(spilTilstand.logHistorik.length > 0 ? spilTilstand.logHistorik[spilTilstand.logHistorik.length - 1] : '');
     let forrigeLog = $derived(spilTilstand.logHistorik.length > 1 ? spilTilstand.logHistorik[spilTilstand.logHistorik.length - 2] : '');
+
+    let rensedeLogLinjer = $derived(spilTilstand.logHistorik.filter(linje => linje.includes(' - ')));
 
     $effect(() => {
         const dag = spilTilstand.dag;
@@ -36,17 +39,7 @@
     });
 
     $effect(() => {
-        const dag = spilTilstand.dag;
-        untrack(() => {
-            const prefix = `[Dag ${dag}]`;
-            if (dag > 1 && spilTilstand.gameState === 'play' && (!aktuelLog || !aktuelLog.startsWith(prefix))) {
-                spilTilstand.logBesked = "";
-            }
-        });
-    });
-
-    $effect(() => {
-        if (visLog && spilTilstand.logHistorik.length && logContainerRef) {
+        if (visLog && rensedeLogLinjer.length && logContainerRef) {
             logContainerRef.scrollTop = logContainerRef.scrollHeight;
         }
     });
@@ -91,8 +84,8 @@
             </div>
             
             <div class="log-liste" bind:this={logContainerRef}>
-                {#each spilTilstand.logHistorik as linje, i (i)}
-                    <p class="log-post" class:nyeste={i === spilTilstand.logHistorik.length - 1}>
+                {#each rensedeLogLinjer as linje, i (i)}
+                    <p class="log-post" class:nyeste={i === rensedeLogLinjer.length - 1}>
                         {linje}
                     </p>
                 {/each}
@@ -116,20 +109,29 @@
     </div>
 
     <div class="instrument-braet">
-        {#if spilTilstand.rygsækEffekt.move !== 0}
-            <span class="mod-badge move">🥾 {totalMove} pr. skridt</span>
+        {#if totalMove !== 1}
+            <span class="mod-badge move {totalMove > 1 ? 'negativ' : ''}">
+                <img src="/ui/stat_move.webp" alt="" />
+                {totalMove}
+            </span>
         {/if}
-        {#if spilTilstand.rygsækEffekt.dmg !== 0}
-            <span class="mod-badge dmg">🛡️ {dmgDiff > 0 ? '+' : ''}{dmgDiff}% skade</span>
+        {#if totalArmor !== 0}
+            <span class="mod-badge dmg {totalArmor < 0 ? 'negativ' : ''}">
+                <img src="/ui/stat_dmg.webp" alt="" />
+                {totalArmor}%
+            </span>
         {/if}
-        {#if spilTilstand.rygsækEffekt.syn !== 0}
-            <span class="mod-badge syn">👁️ {totalSyn} udsyn</span>
+        {#if totalGoldMod !== 100}
+            <span class="mod-badge gold {totalGoldMod < 100 ? 'negativ' : ''}">
+                <img src="/ui/stat_gold.webp" alt="" />
+                {totalGoldMod}%
+            </span>
         {/if}
-        {#if spilTilstand.rygsækEffekt.energi !== 0}
-            <span class="mod-badge energi">⚡ {maxEnergi} max</span>
-        {/if}
-        {#if spilTilstand.rygsækEffekt.gold !== 0}
-            <span class="mod-badge gold">💰 {goldDiff > 0 ? '+' : ''}{goldDiff}% guld</span>
+        {#if totalSyn !== 1}
+            <span class="mod-badge syn {totalSyn < 1 ? 'negativ' : ''}">
+                <img src="/ui/stat_syn.webp" alt="" />
+                {totalSyn}
+            </span>
         {/if}
     </div>
 
@@ -146,11 +148,6 @@
             </div>
         
             <div class="energi-sektion">
-                {#if erITågen}
-                    <button class="blodofring-btn" onclick={udfoerBlodofring} title="Ofring: 10 HP for 1 Energi">
-                        <img src="/tiles/blodofring.webp" alt="Blodofring" />
-                    </button>
-                {/if}
                 <div class="energi-container">
                     <div class="energi-grid">
                         {#each Array(9) as tomPlads, i (i)}
@@ -178,10 +175,7 @@
                 {@const dbInfo = itemDB[vare.id]}
                 {#if dbInfo}
                     <div 
-                        class="inventory-item {(vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) ||
-(vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi) ||
-(vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi)) ||
-(vare.id === 'stav') || (vare.id === 'fakkel') ? 'klikbar' : ''}" 
+                        class="inventory-item {(vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) || (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi) || (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi)) || (vare.id === 'stav') || (vare.id === 'fakkel') ? 'klikbar' : ''}" 
                         onclick={() => {
                             if (vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) {
                                 haandterInventoryKlik(vare.id);
@@ -292,30 +286,37 @@
         min-height: 1.2rem;
         margin-top: 2px;
     }
+    
     .instrument-braet {
         width: 100%;
         display: flex;
         justify-content: center;
         gap: 12px;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
     }
     .mod-badge {
-        background: rgba(0, 0, 0, 0.75);
-        border: 1px solid #444;
-        color: #eee;
-        padding: 4px 10px;
-        border-radius: 4px;
+        background: transparent;
+        color: #aaa;
+        padding: 2px 6px;
         font-family: monospace;
-        font-size: 0.9rem;
+        font-size: 1.1rem;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 0;
     }
-    .mod-badge.dmg { color: #88ff88; }
-    .mod-badge.gold { color: gold; }
-    .mod-badge.move { color: #ff6666; }
-    .mod-badge.syn { color: #88ccff; }
-    .mod-badge.energi { color: #ffcc00; }
+    .mod-badge img {
+        width: 24px;
+        height: auto;
+        opacity: 0.85;
+        margin-right: 0px;
+    }
+    .mod-badge.negativ {
+        color: #cc5555 !important;
+    }
+    .mod-badge.negativ img {
+        filter: grayscale(100%) !important;
+        opacity: 0.5 !important;
+    }
 
     .ui-content {
         display: flex;
@@ -428,31 +429,6 @@
         opacity: 1;
         transform: scale(1.1);
     }
-    .blodofring-btn {
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        margin-bottom: -5px;
-        z-index: 10;
-        animation: hjertebanken 1.5s infinite;
-        filter: drop-shadow(0 0 6px darkred);
-        transition: filter 0.2s;
-    }
-    .blodofring-btn:hover {
-        filter: drop-shadow(0 0 12px red) brightness(1.2);
-    }
-    .blodofring-btn img {
-        height: 45px;
-        width: auto;
-    }
-    @keyframes hjertebanken {
-        0% { transform: scale(1); }
-        15% { transform: scale(1.15); }
-        30% { transform: scale(1); }
-        45% { transform: scale(1.15); }
-        100% { transform: scale(1); }
-    }
     .log-modal-overlay {
         position: fixed;
         top: 0; left: 0;
@@ -477,4 +453,4 @@
     .log-post { color: #aaa;
         border-left: 2px solid #333; padding-left: 12px; margin-bottom: 10px; }
     .log-post.nyeste { color: white; border-left-color: #ffcc00; }
-</style>
+</style> 

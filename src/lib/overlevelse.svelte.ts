@@ -110,7 +110,7 @@ export function fremrykTid() {
         spilTilstand.nuvaerendeEnergi += spilTilstand.valgtKarakter.baseEnergi;        
         
         if (spilTilstand.dag > 5) {
-            const dynamiskFart = 1 + Math.pow(spilTilstand.dag / 100, 2);
+            const dynamiskFart = 0.5 + Math.pow(spilTilstand.dag / 100, 2);
             spilTilstand.fogX += (HEX_W * dynamiskFart) / antalLevende;        
         }
     }

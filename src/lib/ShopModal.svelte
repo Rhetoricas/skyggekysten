@@ -52,6 +52,9 @@
                         <img src={tilbud.billede} alt="" class="vare-ikon" />
                         <strong class="vare-navn">{tilbud.navn}</strong>
                         <span class="vare-pris">{tilbud.pris} Guld</span>
+                        {#if tilbud.beskrivelse}
+                            <p class="vare-regler">{tilbud.beskrivelse}</p>
+                        {/if}
                     </div>
                 {/if}
             {/each}
@@ -92,19 +95,42 @@
         align-items: center; justify-content: center;
     }
     .shop-content { 
-        background: #111; padding: 30px; border-radius: 4px; border: 1px solid #333;
-        max-width: 600px; width: 90%; text-align: center;
+        background: #111; padding: 30px; border-radius: 4px;
+        border: 1px solid #333;
+        max-width: 800px; width: 90%; text-align: center;
     }
     h2 { color: #ffcc00; text-transform: uppercase; margin-bottom: 30px; }
-    .shop-grid { display: flex; gap: 40px; justify-content: center; margin-bottom: 40px; }
-    .vare-kort { 
-        cursor: pointer; transition: transform 0.1s; display: flex; 
-        flex-direction: column; align-items: center; gap: 10px;
+    
+    .shop-grid { 
+        display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px;
     }
-    .vare-kort:hover { transform: scale(1.1); }
-    .vare-ikon { height: 100px; width: auto; }
-    .vare-navn { color: #eee; }
+    .vare-kort { 
+        cursor: pointer; transition: transform 0.1s;
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+        width: 160px; /* Holder teksten og kortet i en fast kolonnebredde */
+        padding: 10px;
+        border: 1px solid transparent;
+        border-radius: 6px;
+    }
+    .vare-kort:hover { 
+        transform: scale(1.05);
+        background: rgba(255, 255, 255, 0.05);
+        border-color: #333;
+    }
+    .vare-ikon { height: 80px; width: auto; }
+    .vare-navn { color: #eee; font-size: 1.1rem; }
     .vare-pris { color: gold; font-weight: bold; }
+    
+    .vare-regler {
+        font-size: 0.9rem;
+        color: #999;
+        line-height: 1.4;
+        margin: 5px 0 0 0;
+        font-style: italic;
+        border-top: 1px solid #333;
+        padding-top: 8px;
+        text-align: center;
+    }
     
     .sell-section { border-top: 1px solid #222; padding-top: 20px; margin-top: 20px; }
     .sell-section p { font-size: 0.9rem; color: #666; margin-bottom: 15px; }
@@ -113,23 +139,20 @@
     
     .small-item { 
         position: relative; width: 40px; height: 40px; border: 1px solid #333; 
-        background: #080808; 
+        background: #080808;
     }
-    .small-item.clickable {
-        cursor: pointer;
-    }
-    .small-item.guld-item {
-        cursor: default;
-        border-color: #554400; 
-    }
+    .small-item.clickable { cursor: pointer; }
+    .small-item.guld-item { cursor: default; border-color: #554400; }
     .small-item img { width: 100%; height: 100%; object-fit: contain; }
     .small-item .count { 
         position: absolute; bottom: -2px; right: -2px; background: black; 
-        color: gold; font-size: 0.7rem; padding: 0 3px; 
+        color: gold; font-size: 0.7rem; padding: 0 3px;
     }
     
     .forlad-btn { 
         margin-top: 40px; background: transparent; border: 1px solid #444; 
         color: #888; padding: 10px 20px; cursor: pointer; 
+        border-radius: 4px; transition: 0.2s;
     }
+    .forlad-btn:hover { background: #333; color: white; }
 </style>

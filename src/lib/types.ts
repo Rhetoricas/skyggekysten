@@ -58,6 +58,7 @@ export interface SpillerData {
     sidstAktiv?: number;
     activeAlarm?: boolean;
     retning: string;
+    besoegteMiner?: number[];
 }
 
 export interface Felt {
@@ -90,8 +91,10 @@ export interface Felt {
     skjultFaelde?: boolean;
     skjultLoot?: string | null;
 
-    // Landbrugs-data
     afgroede?: 'hvede' | 'boenner';
     smadretFremTilBlok?: number;
     hoestetFremTilBlok?: number;
+
+    hasGoldmine?: boolean;
+    mineOwner?: string;
 }

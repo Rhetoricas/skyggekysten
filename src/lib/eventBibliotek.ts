@@ -54,11 +54,46 @@ export interface SpilEvent {
 
 export const eventBibliotek: Record<string, SpilEvent> = {
 
+    'campfire': {
+        id: 'campfire',
+        titel: "Fremmed Lejr",
+        tekst: "En flok vejrbidte rejsende sidder ved et knitrende bål. De stirrer stift på dig. Lederen nikker og tilbyder dig en plads i nærheden af bålet",
+        biome: ['eng', 'skov', 'mark', 'bjerg', 'hoejland'],
+        billede: '/events/ev_campfire.webp', 
+        unik: false,
+        valg: [
+            {
+                tekst: "Køb dig til en bedre plads tættere ved ilden",
+                puljeVaerdi: 10,
+                udfaldListe: [
+                    { log: "De gør plads. Varmen og sikkerheden er vidunderlig.", hpAendring: 50 }
+                ]
+            },
+            {
+                tekst: "Del din eliksir med gruppen",
+                kosterItem: 'livseliksir',
+                udfaldListe: [
+                    { 
+                        log: "Du varmer eliksiren over bålet og deler med dem. De giver dig en pose guld som tak og holder vagt, mens du sover og genvinder dine kræfter og mere til.", 
+                        hpAendring: 100, 
+                        maxHpAendring: 10,
+                        guldAendring: 50 
+                    }
+                ]
+            },
+            {
+                tekst: "Læg dig i yderkanten af lejren",
+                udfaldListe: [{ log: "Du sover uroligt i græsset. Det er koldt på afstand af ilden, men du får hvilet benene.", hpAendring: 20 }]
+            }
+        ]
+    },
+
     'kikkerten_i_messing': {
         id: 'kikkerten_i_messing',
         titel: "Det Faste Greb",
         biome: ['ruin', 'bjerg', 'by'],
         unik: true,
+        billede: '/events/ev_kikkert.webp',
         tekst: "En tung messingkikkert er støbt fast i en sten. En mekanisme klapper stramt om dit håndled, og en metallisk stemme rasler fra røret. 'Se fremtiden, eller bliv stående.' Du er tvunget til at vælge en linse for at komme fri.",
         valg: [
             { 
@@ -97,7 +132,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 effekt: () => {
                     return { 
                         logBesked: "Den kraftige væske ætser messingrøret væk. Mekanismen falder fra hinanden, og du opdager, at begge linser i virkeligheden er enorme diamanter.",
-                        itemUd: 'diamant, diamant' // Motoren tilføjer to stk. fordi vi splitter ved komma
+                        itemUd: 'diamant, diamant' 
                     };
                 }
             }
@@ -109,6 +144,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         titel: "Flimmeret",
         biome: ['ritual', 'blodskov', 'eng'],
         unik: false,
+        billede: '/events/ev_portal.webp',
         tekst: "Luften flimrer over jorden som en varmedis. Revnen lugter skarpt af ozon og spytter små gnister ud i græsset.",
         valg: [
             { 
@@ -172,6 +208,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         titel: "Kogende Jord",
         biome: ['bjerg', 'skov', 'hoejland'],
         unik: false,
+        billede: '/events/ev_kilde.webp',
         tekst: "En lille gejser skyder damp op fra undergrunden. Gassen river i lungerne, men får samtidig dit hjerte til at hamre overnaturligt hurtigt.",
         valg: [
             { 
@@ -179,7 +216,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 effekt: () => {
                     const energi = Math.floor(Math.random() * 3) + 3;
                     return { 
-                        logBesked: `Du fylder brystet med jordgas. Det ætser dit indre, men musklerne spændes med overskudskraft. (+${energi} Energi)`, 
+                        logBesked: "Du fylder brystet med jordgas. Det ætser dit indre, men musklerne spændes med overskudskraft.", 
                         hpNed: 12,
                         energiOp: energi
                     };
@@ -191,7 +228,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 effekt: () => {
                     const energi = Math.floor(Math.random() * 3) + 3;
                     return { 
-                        logBesked: `Stoffet tager den giftige kant. Du suger ren kraft ind uden at hoste blod. (+${energi} Energi)`, 
+                        logBesked: "Stoffet tager den giftige kant. Du suger ren kraft ind uden at hoste blod.", 
                         energiOp: energi
                     };
                 } 
@@ -201,7 +238,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 effekt: () => {
                     const energi = Math.floor(Math.random() * 3) + 3;
                     return { 
-                        logBesked: `Vandet smager af kobber. Det rammer dig med massiv energi, men forgifter din krop permanent. (+${energi} Energi, -2 Max HP)`, 
+                        logBesked: "Vandet smager af kobber. Det rammer dig med massiv energi, men forgifter din krop permanent.", 
                         energiOp: energi,
                         maxHpAendring: -2
                     };
@@ -221,6 +258,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         titel: "Kold Mudder",
         biome: ['slagmark', 'mark', 'eng'],
         unik: false,
+        billede: '/events/ev_lig.webp',
         tekst: "En uheldig stakkel ligger halvt begravet i mudderet. Andre forbipasserende har for længst flænset tøjet for alt synligt af værdi.",
         valg: [
             { 
@@ -231,7 +269,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                         const guld = Math.floor(Math.random() * 31) + 20;
                         return { logBesked: "Du mærker en tung pung under overfladen og trækker den fri.", guldOp: guld };
                     } else {
-                        return { logBesked: "Du får kun koldt mudder under neglene. Der var ingenting gemt hernede." };
+                        return { logBesked: "Du får kun koldt mudder under neglene. Der var intet værdifuldt tilbage." };
                     }
                 } 
             },
@@ -261,7 +299,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
             {
                 tekst: "Lad ham ligge i fred",
                 effekt: () => {
-                    return { logBesked: "Du roder ikke ved de døde. Du går videre ud over marken." };
+                    return { logBesked: "Du roder ikke ved de døde. Du går videre ud." };
                 }
             }
         ]

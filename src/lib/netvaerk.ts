@@ -2,43 +2,57 @@ import { supabase } from './supabaseClient';
 import { spilTilstand } from './spilTilstand.svelte';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
+let syncKoe: ReturnType<typeof setTimeout> | null = null;
+let kortSkalOpdateres = false;
+let lokalUploadTid = 0;
+
 export async function syncTilDb(opdaterKort = false) {
     if (!spilTilstand.rumKode || !spilTilstand.spillerNavn) return;
 
-    // Fix: Tjekker både gameState og de lokale flag for at sikre korrekt status i DB, selv under animationer/forsinkelser
-    const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isDead ?? false);
-    const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isWinner ?? false);
+    if (opdaterKort) kortSkalOpdateres = true;
 
-    spilTilstand.alleSpillere[spilTilstand.spillerNavn] = {
-        index: spilTilstand.spillerIndex,
-        hp: spilTilstand.livspoint,
-        maxHp: spilTilstand.maxLivspoint, 
-        guld: spilTilstand.guldTotal,
-        kolonne: spilTilstand.maxKolonne,
-        dag: spilTilstand.dag,
-        retning: spilTilstand.retning,
-        ikon: spilTilstand.valgtKarakter?.ikon,
-        energi: spilTilstand.nuvaerendeEnergi,
-        mitUdstyr: spilTilstand.mitUdstyr,
-        kendteFelter: spilTilstand.mineKendteFelter,
-        isDead: isDead,
-        isWinner: isWinner,
-        sidstAktiv: Date.now(), // Heartbeat til AFK-tjek (3 min grænse)
-        activeAlarm: false
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
+    if (syncKoe) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const opdatering: any = {
-        spillere: spilTilstand.alleSpillere,
-        fog_x: Math.round(spilTilstand.fogX)
-    };
+    syncKoe = setTimeout(async () => {
+        syncKoe = null;
+        const sendKort = kortSkalOpdateres;
+        kortSkalOpdateres = false; 
 
-    if (opdaterKort) {
-        opdatering['kort'] = spilTilstand.gitter;
-    }
+        const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isDead ?? false);
+        const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isWinner ?? false);
 
-    await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', spilTilstand.rumKode);
+        spilTilstand.alleSpillere[spilTilstand.spillerNavn] = {
+            index: spilTilstand.spillerIndex,
+            hp: spilTilstand.livspoint,
+            maxHp: spilTilstand.maxLivspoint, 
+            guld: spilTilstand.guldTotal,
+            kolonne: spilTilstand.maxKolonne,
+            dag: spilTilstand.dag,
+            retning: spilTilstand.retning,
+            ikon: spilTilstand.valgtKarakter?.ikon,
+            energi: spilTilstand.nuvaerendeEnergi,
+            mitUdstyr: spilTilstand.mitUdstyr,
+            kendteFelter: spilTilstand.mineKendteFelter,
+            isDead: isDead,
+            isWinner: isWinner,
+            sidstAktiv: Date.now(), 
+            activeAlarm: false
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any;
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const opdatering: any = {
+            spillere: spilTilstand.alleSpillere,
+            fog_x: Math.round(spilTilstand.fogX)
+        };
+
+        if (sendKort) {
+            opdatering['kort'] = spilTilstand.gitter;
+        }
+
+        lokalUploadTid = Date.now();
+        await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', spilTilstand.rumKode);
+    }, 1000); 
 }
 
 export async function gemHighscore() {
@@ -106,9 +120,20 @@ export function startRealtime() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'spil_sessioner', filter: `rum_kode=eq.${spilTilstand.rumKode}` }, (payload: any) => {
             const nyData = payload.new;
-            if (nyData.kort) spilTilstand.gitter = nyData.kort;
+            
+            if (Date.now() - lokalUploadTid > 2000) {
+                if (nyData.kort) spilTilstand.gitter = nyData.kort;
+            }
+            
             if (nyData.fog_x !== undefined) spilTilstand.fogX = nyData.fog_x;
-            if (nyData.spillere) spilTilstand.alleSpillere = nyData.spillere;
+            
+            if (nyData.spillere) {
+                Object.keys(nyData.spillere).forEach(navn => {
+                    if (navn !== spilTilstand.spillerNavn) {
+                        spilTilstand.alleSpillere[navn] = nyData.spillere[navn];
+                    }
+                });
+            }
         })
         .subscribe();
 }

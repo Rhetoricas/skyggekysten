@@ -154,7 +154,7 @@
             '/tiles/event.png', '/tiles/campfire.webp', '/events/ev_campfire.webp', '/tiles/guldtaage.webp', '/tiles/livtaage.webp',
             '/inventory/hp.webp', '/inventory/guld.webp', '/tiles/player.webp', '/tiles/energi_slukket.webp', '/tiles/energi_taendt.webp', '/tiles/blodofring.webp', '/tiles/baad.webp', '/tiles/gravsted.webp',
             '/tiles/wheat.webp', '/tiles/growingwheat.webp', '/tiles/brokenwheat.webp',
-            '/tiles/beans.webp', '/tiles/growingbean.webp', '/tiles/brokenbean.webp', '/tiles/portal.webp'
+            '/tiles/beans.webp', '/tiles/growingbean.webp', '/tiles/brokenbean.webp', '/tiles/portal.webp', '/tiles/goldmine.webp'
         ];
         standardBiomer.forEach(biome => {
             billederTilPreload.push(`/tiles/${biome}.webp`);
@@ -186,7 +186,7 @@
     }
 
     async function genstartBane() {
-        const timeoutGraense = Date.now() - (3 * 60 * 1000);
+        const timeoutGraense = Date.now() - (5 * 60 * 1000);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const aktiveSpillere = Object.values(spilTilstand.alleSpillere).filter((s: any) => {
             if (s.isDead || s.isWinner) return false;
@@ -217,6 +217,7 @@
             felt.hasBoat = false;
             felt.smadretFremTilBlok = undefined;
             felt.hoestetFremTilBlok = undefined;
+            felt.mineOwner = undefined;
         });
         spilTilstand.gameState = 'select';
         await syncTilDb(true);
@@ -348,12 +349,13 @@
         spilTilstand.mitUdstyr = [];
         spilTilstand.mineKendteFelter = [];
         
-        spilTilstand.logHistorik = []; // <--- Din nye rengøring
+        spilTilstand.logHistorik = []; 
 
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = false;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isWinner = false;
-            spilTilstand.alleSpillere[spilTilstand.spillerNavn].dag = 1; // <--- Sikkerhedsnet
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].dag = 1; 
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].besoegteMiner = [];
         }
 
         const muligeStartFelter = [];
@@ -410,7 +412,6 @@
         if (felt && eventState.aktivt && felt.eventID !== 'campfire') felt.eventFuldført = true;
         motorLukEvent();
         spilTilstand.aktivShop = null;
-        
         if (felt && felt.hasPortal) {
             udfoerPortalTeleport();
         } else {
@@ -422,7 +423,7 @@
         const spillere = Object.values(spilTilstand.alleSpillere);
         if (spillere.length <= 1) return spilTilstand.dag;
         
-        const timeoutGraense = Date.now() - (3 * 60 * 1000);
+        const timeoutGraense = Date.now() - (5 * 60 * 1000);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const aktive = spillere.filter((s: any) => {
             if (s.isDead || s.isWinner) return false;
@@ -452,7 +453,6 @@
         const grundPris = biomeTerraenCost[felt.biome as Biome] || 1;
         const biomeRabat = spilTilstand.valgtKarakter.biomeMod?.[felt.biome as string] || 0;
         const pris = Math.max(1, spilTilstand.valgtKarakter.moveCost + spilTilstand.rygsækEffekt.move + grundPris + biomeRabat);
-        
         spilTilstand.nuvaerendeEnergi -= erITågen ? pris + 2 : pris;
         const helende: string[] = [];
         const nulHp = ['mark', 'by', 'eng', 'marked', 'hoejland', 'skov'];
@@ -473,7 +473,6 @@
             spilTilstand.livspoint -= hpStraf;
         }
 
-        // LANDBRUGS LOGIK
         const nuBlok = Math.ceil((spilTilstand.dag || 1) / 5);
         const erHvedeTid = nuBlok % 2 !== 0; 
         const erSmadret = felt.smadretFremTilBlok !== undefined && nuBlok <= felt.smadretFremTilBlok;
@@ -514,12 +513,10 @@
         
         afslørOmraade(nytIndeks, Math.max(felt.biome === 'bjerg' ? 2 : 1, aktuelSynsRadius));
         if ((nytIndeks % BREDDE) > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nytIndeks % BREDDE;
-        
-        // --- NY LOGIK TIL GAVER OG BONUSSER ---
         const charId = spilTilstand.valgtKarakter.id;
         const b = felt.biome as string;
         let specialLog = "";
-
+        
         if ((charId === 'thief_m' || charId === 'thief_f') && (b === 'marked' || b === 'by')) {
             spilTilstand.guldTotal += 5;
             specialLog = " Du snupper diskret et par mønter i mængden.";
@@ -534,19 +531,40 @@
             specialLog = " Mørk magi strømmer helende ind i dine årer.";
         }
 
+        if (felt.hasGoldmine) {
+            const spiller = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
+            if (!spiller.besoegteMiner) spiller.besoegteMiner = [];
+            
+            const varEjer = felt.mineOwner === spilTilstand.spillerNavn;
+            const harBesoegt = spiller.besoegteMiner.includes(nytIndeks);
+            
+            if (!varEjer) {
+                const ejedeMiner = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
+                felt.mineOwner = spilTilstand.spillerNavn;
+                
+                if (!harBesoegt) {
+                    spiller.besoegteMiner.push(nytIndeks);
+                    const basisGuld = 100 + (ejedeMiner * 50);
+                    const faktiskGuld = spilTilstand.beregnGuldIndkomst(basisGuld);
+                    spilTilstand.guldTotal += faktiskGuld;
+                    specialLog += specialLog ? ` Du overtager minen og sikrer dig ${faktiskGuld} guld.` : `Du overtager minen og sikrer dig ${faktiskGuld} guld.`;
+                } else {
+                    specialLog += specialLog ? ` Du flår skødet tilbage og generobrer din mine.` : `Du flår skødet tilbage og generobrer din mine.`;
+                }
+            }
+        }
+
         const slidLog = tjekMiljoeSlitage(felt.biome as string);
         let samletLog = slidLog ? slidLog.trim() : "";
         
         if (specialLog) {
-            samletLog = samletLog ? `${samletLog} ${specialLog}` : specialLog.trim();
+            samletLog = samletLog ? `${samletLog} ${specialLog.trim()}` : specialLog.trim();
         }
 
         if (samletLog) {
             spilTilstand.logBesked = samletLog;
         }
-        // ----------------------------------------
 
-        // Portalen suger dig væk øjeblikkeligt FØR tiden rykker
         if (felt.hasPortal) {
             udfoerPortalTeleport();
             syncTilDb(true);
@@ -555,7 +573,6 @@
         }
 
         fremrykTid();
-
         if (felt.hasBoat) {
             felt.hasBoat = false;
             sejlendeBaadIndex = nytIndeks;
@@ -573,12 +590,13 @@
                 felt.eventFuldført = true;
                 startEvent(felt.eventID);
             }
-            else if (felt.shopItems && felt.shopItems.length > 0) spilTilstand.aktivShop = felt.shopItems;
-        }
-
-        syncTilDb(true);
-        setTimeout(() => flytterNu = false, 200);
+    else if (felt.shopItems && felt.shopItems.length > 0) spilTilstand.aktivShop = felt.shopItems;
     }
+
+    spilTilstand.gitter = [...spilTilstand.gitter]; // <-- Det lokale spark tvinger grafikken til at opdatere her og nu
+    syncTilDb(true);
+    setTimeout(() => flytterNu = false, 200);
+   }
 
     function flytHex(retning: string) {
         if (spilTilstand.erBevidstløs || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.gameState !== 'play') return;
@@ -683,6 +701,15 @@
                             <img src="/tiles/udgravning.webp" alt="" class="dug-image" />
                         {/if}
                         
+{#if erUdforsket && felt.hasGoldmine}
+    <div class="goldmine-container">
+        <img src="/tiles/goldmine.webp" alt="Guldmine" class="goldmine-icon" />
+        {#if felt.mineOwner}
+            <img src={felt.mineOwner === spilTilstand.spillerNavn ? spilTilstand.valgtKarakter?.ikon : (spilTilstand.alleSpillere[felt.mineOwner]?.ikon || '/tiles/player.webp')} alt="Ejer" class="mine-owner-portrait" />
+        {/if}
+    </div>
+{/if}
+
                         {#if erUdforsket && felt.eventID && !felt.eventFuldført}
                             {#if felt.eventID === 'campfire'}
                                 <img src="/tiles/campfire.webp" alt="" class="campfire-icon" />
@@ -771,7 +798,7 @@
         <div class="log-modal" onclick={(e) => e.stopPropagation()} role="presentation">
             <h3>Din Rejse</h3>
             <div class="log-liste">
-                {#each spilTilstand.logHistorik as linje, index (index)}
+                {#each spilTilstand.logHistorik.filter(l => l.includes(' - ')) as linje, index (index)}
                     <p>{linje}</p>
                 {/each}
             </div>
@@ -852,6 +879,28 @@
         top: 58%; left: 50%;
         transform: translate(-50%, -50%); pointer-events: none; z-index: 10;
     }
+    .goldmine-container {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -45%);
+        width: 80px; z-index: 12;
+        pointer-events: none;
+        display: flex; justify-content: center; align-items: center;
+    }
+    .goldmine-icon {
+        width: 100%; height: auto;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+    }
+    .mine-owner-portrait {
+        position: absolute;
+        width: 34px; height: 34px;
+        bottom: 0px; right: -5px;
+        border-radius: 50%;
+        border: 2px solid #ffcc00;
+        background: #111;
+        object-fit: cover;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.9);
+    }
     .event-crystal { height: 60px;
         animation: float 3s infinite ease-in-out; z-index: 15; position: relative; }
     .campfire-icon {
@@ -864,14 +913,21 @@
         width: 65px; height: 65px;
         z-index: 9;
         pointer-events: none;
-        animation: pulsate 2s infinite alternate ease-in-out;
+        animation: portalPuls 2.5s infinite alternate ease-in-out;
     }
-    @keyframes pulsate {
-        0% { transform: scale(0.95); filter: drop-shadow(0 0 5px purple); }
-        100% { transform: scale(1.05); filter: drop-shadow(0 0 15px magenta); }
+    @keyframes portalPuls {
+        0% { 
+            transform: scale(0.95);
+            filter: drop-shadow(0 0 5px rgba(0, 150, 255, 0.6)); 
+        }
+        100% { 
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 15px rgba(0, 220, 255, 1)) brightness(1.2); 
+        }
     }
     .shop-icon {
-        position: absolute; width: 80px; height: 80px;
+        position: absolute;
+        width: 80px; height: 80px;
         top: 55%; left: 50%;
         transform: translate(-50%, -50%); pointer-events: none; z-index: 14;
         filter: drop-shadow(0 0 15px rgba(255, 165, 0, 0.9)) drop-shadow(0 4px 6px rgba(0,0,0,0.8));
@@ -908,7 +964,7 @@
         filter: drop-shadow(0 0 10px orange) brightness(1.2); }
     }
     @keyframes whisper { 0% { opacity: 0.2;
-        } 100% { opacity: 0.5; } }
+    } 100% { opacity: 0.5; } }
     .flydende-tal {
         position: absolute;
         bottom: 50px; font-family: serif; font-weight: bold;

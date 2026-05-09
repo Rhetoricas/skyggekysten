@@ -360,8 +360,8 @@ export function initialiserGitter() {
         const felt = nytGitter[indeks];
         if (felt.eventID) continue;
 
-const pauseEvents = false; 
-const chance = pauseEvents ? 0 : (eventChancer[felt.biome as string] || 0.05) / 10;
+        const pauseEvents = false; 
+        const chance = pauseEvents ? 0 : (eventChancer[felt.biome as string] || 0.05) / 10;
 
         if (Math.random() < chance) {
             const matchendeEvents = ledigeEvents.filter(noegle => {
@@ -399,7 +399,9 @@ const chance = pauseEvents ? 0 : (eventChancer[felt.biome as string] || 0.05) / 
 
         if (felt.biome === 'hav' || felt.eventID) continue;
 
-        if (vildmark.includes(felt.biome as string) && Math.random() < 0.008) {
+        if (felt.biome === 'bjerg' && Math.random() < 0.04) {
+            felt.hasGoldmine = true;
+        } else if (vildmark.includes(felt.biome as string) && Math.random() < 0.008) {
             felt.isCampfire = true;
             felt.eventID = 'campfire';
         } else if (felt.biome === 'by' || felt.biome === 'marked') {
@@ -543,13 +545,22 @@ export function taendBaal() {
 }
 
 export function bygOgHopGennemPortal() {
-    const hop = Math.floor(Math.random() * 11) + 5; 
-    const hopIndeks = Math.min(spilTilstand.gitter.length - 1, spilTilstand.spillerIndex + hop);
+    const gammeltIndeks = spilTilstand.spillerIndex;
+    const raekke = Math.floor(gammeltIndeks / BREDDE);
+    const kolonne = gammeltIndeks % BREDDE;
+
+    const nyKolonne = Math.min(kolonne + 4, BREDDE - 1);
+    const hopIndeks = raekke * BREDDE + nyKolonne;
     
-    spilTilstand.gitter[spilTilstand.spillerIndex].hasPortal = true;
-    spilTilstand.gitter[hopIndeks].hasPortal = true;
+    spilTilstand.gitter[gammeltIndeks].hasPortal = true;
     
     spilTilstand.spillerIndex = hopIndeks;
+
+    if (nyKolonne > spilTilstand.maxKolonne) {
+        spilTilstand.maxKolonne = nyKolonne;
+    }
+    
+    afslørOmraade(hopIndeks, Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn));
     
     return true;
 }
