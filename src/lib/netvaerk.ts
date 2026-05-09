@@ -36,10 +36,11 @@ export async function syncTilDb(opdaterKort = false) {
             isDead: isDead,
             isWinner: isWinner,
             sidstAktiv: Date.now(), 
-            activeAlarm: false
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any;
-
+            activeAlarm: false,
+        browserId: localStorage.getItem('taage_browser_id'),
+        besoegteMiner: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.besoegteMiner || [] // <-- Denne linje
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+} as any;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const opdatering: any = {
             spillere: spilTilstand.alleSpillere,

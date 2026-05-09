@@ -1,4 +1,6 @@
-import { bygOgHopGennemPortal } from './spilmotor';
+import { spilTilstand } from '$lib/spilTilstand.svelte';
+import { syncTilDb } from './netvaerk';
+import { bygOgHopGennemPortal, udvindMeteorSkat, udloesNaturkatastrofe } from './spilmotor';
 import type { Biome } from './types';
 
 export interface Udfald {
@@ -16,7 +18,7 @@ export interface Valg {
     tekst: string;
     kraeverItem?: string;     
     kosterItem?: string;
-    kosterEnergi?: number;    // Ny variabel til energi-pris
+    kosterEnergi?: number;    
     kraeverKarakter?: string; 
     gemtForKarakter?: string; 
     fordelItem?: string;      
@@ -30,9 +32,9 @@ export interface Valg {
         hpNed?: number;
         guldOp?: number;
         guldNed?: number;
-        energiOp?: number;    // Ny effekt
-        energiNed?: number;   // Ny effekt
-        maxHpAendring?: number; // Ny effekt
+        energiOp?: number;    
+        energiNed?: number;   
+        maxHpAendring?: number; 
         itemUd?: string;
         naesteEvent?: string;
     };
@@ -300,6 +302,76 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 tekst: "Lad ham ligge i fred",
                 effekt: () => {
                     return { logBesked: "Du roder ikke ved de døde. Du går videre ud." };
+                }
+            }
+        ]
+    },
+
+'stjernekald': {
+        id: 'stjernekald',
+        titel: 'Stjernekaldet',
+        tekst: 'Et massivt alter af obsidian tårner sig op foran dig. Inskriptionerne lover stor rigdom trukket direkte ud af himmelrummet. De advarer dog også om, at stjernernes vrede vil knuse jorden og brænde kødet af den, der tør kalde.',
+        biome: 'ritual',
+        billede: '/events/ev_ritual.webp',
+        unik: false,
+        valg: [
+            {
+                tekst: 'Læs ritualet højt og træk himlen ned',
+                effekt: () => {
+                    udloesNaturkatastrofe(spilTilstand.spillerIndex);
+                    return { logBesked: "Du læser de ukendte ord højt. En massiv skygge kastes pludselig over øen." };
+                }
+            },
+            {
+                tekst: 'Vend ryggen til galskaben',
+                effekt: () => {
+                    const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
+                    if (felt) felt.eventFuldført = false; 
+                    syncTilDb(true);
+                    return { logBesked: "Du ryster på hovedet og lader alteret stå urørt." };
+                }
+            }
+        ]
+    },
+    'meteor_skat': {
+        id: 'meteor_skat',
+        titel: 'Det Glødende Krater',
+        tekst: 'Klippen pulserer af en næsten overnaturlig varme. I midten af krateret ligger en kugle af sten, guld og sammenpresset kulstof. Du kan forsøge at åbne den nu, før klippen størkner. Varmen er utålelig.',
+        biome: 'meteor',
+        billede: '/events/meteor.webp',
+        unik: false,
+        valg: [
+            {
+                tekst: 'Grav med skovlen',
+                kosterItem: 'skovl',
+                effekt: () => { return udvindMeteorSkat('skovl'); }
+            },
+            {
+                tekst: 'Flæk stenen med øksen',
+                kosterItem: 'oekse',
+                effekt: () => { return udvindMeteorSkat('oekse'); }
+            },
+            {
+                tekst: 'Brug sværdet som brækjern',
+                kosterItem: 'svaerd',
+                effekt: () => { return udvindMeteorSkat('svaerd'); }
+            },
+            {
+                tekst: 'Hæld livseliksir over stenen for at køle den',
+                kosterItem: 'livseliksir',
+                effekt: () => { return udvindMeteorSkat('livseliksir'); }
+            },
+            {
+                tekst: 'Grav denfri med hænderne>',
+                effekt: () => { return udvindMeteorSkat('haender'); }
+            },
+            {
+                tekst: 'Varmen er for intens. Opgiv det.',
+                effekt: () => {
+                    const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
+                    if (felt) felt.eventFuldført = false; 
+                    syncTilDb(true);
+                    return { logBesked: "Du skåner dig selv og dit udstyr og lader stenen ligge." };
                 }
             }
         ]

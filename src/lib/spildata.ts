@@ -7,7 +7,7 @@ export const ROW_H = 82;
 
 export const biomeVægte: Array<{ id: Biome; vaegt: number }> = [
     { id: 'mark', vaegt: 20 }, { id: 'eng', vaegt: 20 }, { id: 'skov', vaegt: 20 }, { id: 'bjerg', vaegt: 20 },
-    { id: 'hule', vaegt: 2 }, { id: 'ritual', vaegt: 2 }, { id: 'ruin', vaegt: 2 }, { id: 'bandit', vaegt: 2 },
+    { id: 'hule', vaegt: 3}, { id: 'ritual', vaegt: 3 }, { id: 'ruin', vaegt: 3 }, { id: 'bandit', vaegt: 3 },
     { id: 'hoejland', vaegt: 15 }, { id: 'blodskov', vaegt: 5 }, { id: 'hav', vaegt: 10 },
     { id: 'krystal', vaegt: 5 }, { id: 'slagmark', vaegt: 5 }
 ];
@@ -16,7 +16,7 @@ export const biomeTerraenCost: Record<Biome, number> = {
     'mark': 1, 'eng': 1, 'by': 0, 'marked': 0,
     'skov': 3, 'ruin': 3, 'ritual': 3, 'bandit': 2, 'hoejland': 2, 'slagmark': 2,
     'bjerg': 5, 'blodskov': 4, 'hule': 4, 'krystal': 4,
-    'hav': 5
+    'hav': 5, 'meteor': 1
 };
 
 export const markedVarePool = ['skovl', 'livseliksir', 'klude', 'kniv', 'metaldetektor', 'soegekvist', 'fakkel', 'sovepose', 'mad'];

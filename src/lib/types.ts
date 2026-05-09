@@ -1,4 +1,4 @@
-export type Biome = 'mark' | 'eng' | 'skov' | 'bjerg' | 'hule' | 'ritual' | 'ruin' | 'bandit' | 'hoejland' | 'blodskov' | 'by' | 'hav' | 'krystal' | 'marked' | 'slagmark';
+export type Biome = 'mark' | 'eng' | 'skov' | 'bjerg' | 'hule' | 'ritual' | 'ruin' | 'bandit' | 'hoejland' | 'blodskov' | 'by' | 'hav' | 'krystal' | 'marked' | 'slagmark' | 'meteor';
 export type ItemType = 'tøj' | 'våben' | 'værktøj' | 'forbrug' | 'forbandelse' | 'skat';
 
 export interface Item {
@@ -59,6 +59,7 @@ export interface SpillerData {
     activeAlarm?: boolean;
     retning: string;
     besoegteMiner?: number[];
+    browserId?: string | null;
 }
 
 export interface Felt {
@@ -97,4 +98,5 @@ export interface Felt {
 
     hasGoldmine?: boolean;
     mineOwner?: string;
+    hasMeteorStone?: boolean;
 }

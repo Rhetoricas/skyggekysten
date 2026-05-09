@@ -36,17 +36,17 @@ export function genererUndergrund(biome: Biome | string) {
         }
         // De resterende 10% er tomt land
     } else if (biome === 'mark' || biome === 'eng') {
-        if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(5, 15);
+        if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(10, 20);
         else if (terningKast < 35) feltData.skjultLiv = tilfaeldigtTal(10, 20);
         else if (terningKast < 40) feltData.skjultFaelde = true;
         else if (terningKast < 42) feltData.skjultLoot = 'fakkel';
     } else if (biome === 'skov') {
-        if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(5, 15);
+        if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(10, 15);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(20, 40);
         else if (terningKast < 60) feltData.skjultFaelde = true;
         else if (terningKast < 63) feltData.skjultLoot = 'livseliksir';
     } else if (biome === 'bjerg') {
-        if (terningKast < 50) feltData.skjultGuld = tilfaeldigtTal(15, 30);
+        if (terningKast < 50) feltData.skjultGuld = tilfaeldigtTal(15, 40);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(5, 10);
         else if (terningKast < 70) feltData.skjultFaelde = true;
         else if (terningKast < 74) feltData.skjultLoot = 'fakkel';

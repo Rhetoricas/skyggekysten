@@ -54,6 +54,7 @@
         bgMusik.loop = true;
         bgMusik.volume = 0.3;
     });
+
     $effect(() => {
         if (bgMusik) {
             if (spilTilstand.musikTaendt && spilTilstand.gameState === 'play') {
@@ -66,6 +67,7 @@
             }
         }
     });
+
     $effect(() => {
         const state = spilTilstand.gameState;
         
@@ -78,6 +80,7 @@
             }
         });
     });
+
     $effect(() => {
         const tjekFokus = () => {
             if (!document.hidden && spilTilstand.gameState === 'play') {
@@ -87,6 +90,7 @@
         document.addEventListener('visibilitychange', tjekFokus);
         return () => document.removeEventListener('visibilitychange', tjekFokus);
     });
+
     $effect(() => {
         if (spilTilstand.gameState !== 'play') {
             glHp = spilTilstand.livspoint;
@@ -106,6 +110,7 @@
             glGuld = spilTilstand.guldTotal;
         }
     });
+
     let uniktTalId = 0;
     
     function affyrTal(tekst: string, type: string) {
@@ -129,8 +134,10 @@
         width: ${BREDDE * HEX_W + HEX_W}px;
         height: ${HOEJDE * ROW_H + ROW_H}px;
     `);
+
     let alarmKanal: RealtimeChannel | null = null;
     let preloadedEvents = new SvelteSet<string>();
+
     $effect(() => {
         if (spilTilstand.gameState !== 'play' || !spilTilstand.mineKendteFelter || !spilTilstand.gitter) return;
         
@@ -147,19 +154,23 @@
             }
         }
     });
+
     function preloadFiler() {
-        const standardBiomer = ['mark', 'eng', 'skov', 'bjerg', 'hule', 'ritual', 'ruin', 'bandit', 'blodskov', 'by', 'hav', 'krystal', 'marked', 'slagmark'];
+        const standardBiomer = ['mark', 'eng', 'skov', 'bjerg', 'hule', 'ritual', 'ruin', 'bandit', 'blodskov', 'by', 'hav', 'krystal', 'marked', 'slagmark', 'meteor'];
         const billederTilPreload = [
             '/tiles/byshop.webp', '/tiles/markedshop.webp', '/tiles/udgravning.webp',
             '/tiles/event.png', '/tiles/campfire.webp', '/events/ev_campfire.webp', '/tiles/guldtaage.webp', '/tiles/livtaage.webp',
             '/inventory/hp.webp', '/inventory/guld.webp', '/tiles/player.webp', '/tiles/energi_slukket.webp', '/tiles/energi_taendt.webp', '/tiles/blodofring.webp', '/tiles/baad.webp', '/tiles/gravsted.webp',
             '/tiles/wheat.webp', '/tiles/growingwheat.webp', '/tiles/brokenwheat.webp',
-            '/tiles/beans.webp', '/tiles/growingbean.webp', '/tiles/brokenbean.webp', '/tiles/portal.webp', '/tiles/goldmine.webp'
+            '/tiles/beans.webp', '/tiles/growingbean.webp', '/tiles/brokenbean.webp', '/tiles/portal.webp', '/tiles/goldmine.webp',
+            '/tiles/meteorsten.webp'
         ];
+
         standardBiomer.forEach(biome => {
             billederTilPreload.push(`/tiles/${biome}.webp`);
             billederTilPreload.push(`/tiles/${biome}_taage.webp`);
         });
+
         Object.values(itemDB).forEach(item => billederTilPreload.push(item.billede));
         tilgaengeligeKarakterer.forEach(karakter => billederTilPreload.push(karakter.ikon));
 
@@ -183,6 +194,16 @@
         else if (tast === 'd') flytHex('E');
         else if (tast === 'z') flytHex('SW');
         else if (tast === 'c') flytHex('SE');
+        else if (tast === 'm') {
+            const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
+            if (felt.eventID === 'meteor_skat' && !felt.eventFuldført) {
+                startEvent('meteor_skat');
+            } else {
+                felt.eventID = 'stjernekald';
+                felt.eventFuldført = false;
+                startEvent('stjernekald');
+            }
+        }
     }
 
     async function genstartBane() {
@@ -193,6 +214,7 @@
             if (s.sidstAktiv && s.sidstAktiv < timeoutGraense) return false;
             return true;
         });
+
         if (aktiveSpillere.length > 0 && spilTilstand.rumKode) {
             alert('Du kan ikke genstarte øen for alle, mens der stadig er andre aktive spillere derude.');
             return;
@@ -203,11 +225,13 @@
         visDoedsLog = false;
         
         cam.nulstil();
+
         Object.keys(spilTilstand.alleSpillere).forEach(navn => {
             spilTilstand.alleSpillere[navn].isDead = false;
             spilTilstand.alleSpillere[navn].isWinner = false;
             spilTilstand.alleSpillere[navn].dag = 1;
         });
+
         spilTilstand.fogX = 0;
         spilTilstand.dag = 1;
         
@@ -232,6 +256,12 @@
             return;
         }
 
+        let mitBrowserId = localStorage.getItem('taage_browser_id');
+        if (!mitBrowserId) {
+            mitBrowserId = Math.random().toString(36).substring(2);
+            localStorage.setItem('taage_browser_id', mitBrowserId);
+        }
+
         spilTilstand.spillerNavn = rentNavn;
         spilTilstand.rumKode = renKode;
         spilTilstand.statusBesked = 'Forbinder dig til øen...';
@@ -250,8 +280,10 @@
                 syncTilDb(true);
             })
             .subscribe();
+
         try {
             const { data, error } = await supabase.from('spil_sessioner').select('*').eq('rum_kode', spilTilstand.rumKode).maybeSingle();
+
             if (error) {
                 console.error("Netværksfejl:", error);
                 spilTilstand.statusBesked = 'Kunne ikke forbinde til øen.';
@@ -263,8 +295,18 @@
                 spilTilstand.alleSpillere = data.spillere || {};
                 spilTilstand.fogX = data.fog_x || 0;
                 spilTilstand.erHost = false;
-                if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
-                    const eksisterende = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
+
+                const fundetNavn = Object.keys(spilTilstand.alleSpillere).find(n => n.toLowerCase() === rentNavn.toLowerCase());
+
+                if (fundetNavn) {
+                    const eksisterende = spilTilstand.alleSpillere[fundetNavn];
+
+                    if (!eksisterende.isDead && !eksisterende.isWinner && eksisterende.browserId && eksisterende.browserId !== mitBrowserId) {
+                        spilTilstand.statusBesked = `Navnet '${fundetNavn}' er allerede i brug af en anden rejsende.`;
+                        return;
+                    }
+
+                    spilTilstand.spillerNavn = fundetNavn;
                     spilTilstand.spillerIndex = eksisterende.index;
                     
                     spilTilstand.maxLivspoint = eksisterende.maxHp || 100;
@@ -281,6 +323,7 @@
 
                     afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
                     startRealtime();
+
                     if (eksisterende.isDead || eksisterende.isWinner) {
                         spilTilstand.gameState = eksisterende.isWinner ? 'win' : 'dead';
                         spilTilstand.statusBesked = eksisterende.isWinner ? 'Du er allerede sluppet væk.' : 'Du er død på øen.';
@@ -320,10 +363,12 @@
             globaleScores = await hentGlobalTopTi();
         })();
     });
+
     onDestroy(() => {
         stopRealtime();
         if (alarmKanal) supabase.removeChannel(alarmKanal);
     });
+
     async function opdaterOgGemHighscore() {
         const winBonus = spilTilstand.gameState === 'win' ? 1000 : 0;
         const fremdriftPoint = spilTilstand.maxKolonne * 1;
@@ -332,6 +377,7 @@
             (spilTilstand.guldTotal + fremdriftPoint + winBonus) *
                 (1 + Math.max(0, spilTilstand.livspoint) / 1000)
         );
+
         await gemHighscore();
         lokaleScores = await hentHighscores();
         globaleScores = await hentGlobalTopTi();
@@ -375,6 +421,7 @@
         for (const itemId of karakter.startUdstyr) { tilfoejTilRygsæk(itemId, 1); }
         
         afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
+
         const muligeBaadFelter = [];
         for (let raekke = 1; raekke < HOEJDE - 1; raekke++) {
             const indeks = raekke * BREDDE + (BREDDE - 2);
@@ -407,11 +454,17 @@
         spilTilstand.logBesked = "Du er lige gået i land på kysten og er for omtåget til at overskue horisonten.";
     }
 
-    function lukEventOgShop() {
+function lukEventOgShop() {
         const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-        if (felt && eventState.aktivt && felt.eventID !== 'campfire') felt.eventFuldført = true;
+        
+        // Vi freder meteor og alter, så de ikke autolukkes, når modalen forsvinder
+        if (felt && eventState.aktivt && felt.eventID !== 'campfire' && felt.eventID !== 'meteor_skat' && felt.eventID !== 'stjernekald') {
+            felt.eventFuldført = true;
+        }
+        
         motorLukEvent();
         spilTilstand.aktivShop = null;
+        
         if (felt && felt.hasPortal) {
             udfoerPortalTeleport();
         } else {
@@ -430,6 +483,7 @@
             if (s.sidstAktiv && s.sidstAktiv < timeoutGraense) return false;
             return true;
         });
+
         if (aktive.length === 0) return spilTilstand.dag;
         
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -439,7 +493,6 @@
    function udførBevægelse(nytIndeks: number) {
     if (flytterNu || !spilTilstand.valgtKarakter) return;
 
-    // AFK-logik: Hvis du har sovet i over 5 minutter og tågen har indhentet dig
     const mig = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
     if (mig && mig.sidstAktiv && (Date.now() - mig.sidstAktiv > 5 * 60 * 1000) && erITågen) {
         flytterNu = true;
@@ -491,7 +544,7 @@
     const erHvedeTid = nuBlok % 2 !== 0; 
     const erSmadret = felt.smadretFremTilBlok !== undefined && nuBlok <= felt.smadretFremTilBlok;
     const erHoestet = felt.hoestetFremTilBlok !== undefined && nuBlok <= felt.hoestetFremTilBlok;
-    
+
     if (felt.biome === 'mark' && felt.afgroede && !erSmadret && !erHoestet) {
         const erModen = (felt.afgroede === 'hvede' && erHvedeTid) || (felt.afgroede === 'boenner' && !erHvedeTid);
         if (erModen) {
@@ -526,7 +579,6 @@
 
     spilTilstand.spillerIndex = nytIndeks;
     cam.foelgSpiller(nytIndeks, BREDDE, HEX_W, ROW_H);
-    
     afslørOmraade(nytIndeks, Math.max(felt.biome === 'bjerg' ? 2 : 1, aktuelSynsRadius));
     if ((nytIndeks % BREDDE) > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nytIndeks % BREDDE;
     
@@ -554,7 +606,6 @@
         
         const varEjer = felt.mineOwner === spilTilstand.spillerNavn;
         const harBesoegt = spiller.besoegteMiner.includes(nytIndeks);
-        
         if (!varEjer) {
             const ejedeMiner = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
             felt.mineOwner = spilTilstand.spillerNavn;
@@ -592,7 +643,7 @@
 
     fremrykTid();
     if (felt.hasBoat) {
-        felt.hasBoat = false; // Båden fjernes nu korrekt efter brug
+        felt.hasBoat = false;
         sejlendeBaadIndex = nytIndeks;
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isWinner = true;
@@ -618,9 +669,11 @@
 
     function flytHex(retning: string) {
         if (spilTilstand.erBevidstløs || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.gameState !== 'play') return;
+
         const raekke = Math.floor(spilTilstand.spillerIndex / BREDDE);
         const kolonne = spilTilstand.spillerIndex % BREDDE;
         const forskudt = raekke % 2 !== 0;
+
         let nytIndeks = spilTilstand.spillerIndex;
 
         if (retning === 'NW') nytIndeks = forskudt ? nytIndeks - BREDDE : nytIndeks - BREDDE - 1;
@@ -632,6 +685,7 @@
 
         const nyRaekke = Math.floor(nytIndeks / BREDDE);
         const nyKolonne = nytIndeks % BREDDE;
+
         if (nytIndeks >= 0 && nytIndeks < BREDDE * HOEJDE && Math.abs(kolonne - nyKolonne) <= 1 && Math.abs(raekke - nyRaekke) <= 1) udførBevægelse(nytIndeks);
     }
 
@@ -706,12 +760,16 @@
                             {/if}
                         {/if}
 
+                        {#if erUdforsket && !erOpslugt && felt.biome === 'meteor' && felt.hasMeteorStone}
+                            <img src="/tiles/meteorsten.webp" class="meteor-stone-icon" alt="" />
+                        {/if}
+
                         {#if erUdforsket && !felt.gravet}
                             {#if harDetektor && (felt.skjultGuld ?? 0) > 0}
-                                <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 100});" />
+                                <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 80});" />
                             {/if}
                             {#if harKvist && (felt.skjultLiv ?? 0) > 0}
-                                <img src="/tiles/livtaage.webp" alt="" class="mist-icon" style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultLiv ?? 0) / 50});" />
+                                <img src="/tiles/livtaage.webp" alt="" class="mist-icon" style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultLiv ?? 0) / 40});" />
                             {/if}
                         {/if}
                         
@@ -719,19 +777,19 @@
                             <img src="/tiles/udgravning.webp" alt="" class="dug-image" />
                         {/if}
                         
-{#if erUdforsket && felt.hasGoldmine}
-    <div class="goldmine-container">
-        <img src="/tiles/goldmine.webp" alt="Guldmine" class="goldmine-icon" />
-        {#if felt.mineOwner}
-            <img src={felt.mineOwner === spilTilstand.spillerNavn ? spilTilstand.valgtKarakter?.ikon : (spilTilstand.alleSpillere[felt.mineOwner]?.ikon || '/tiles/player.webp')} alt="Ejer" class="mine-owner-portrait" />
-        {/if}
-    </div>
-{/if}
+                        {#if erUdforsket && felt.hasGoldmine}
+                            <div class="goldmine-container">
+                                <img src="/tiles/goldmine.webp" alt="Guldmine" class="goldmine-icon" />
+                                {#if felt.mineOwner}
+                                    <img src={felt.mineOwner === spilTilstand.spillerNavn ? spilTilstand.valgtKarakter?.ikon : (spilTilstand.alleSpillere[felt.mineOwner]?.ikon || '/tiles/player.webp')} alt="Ejer" class="mine-owner-portrait" />
+                                {/if}
+                            </div>
+                        {/if}
 
                         {#if erUdforsket && felt.eventID && !felt.eventFuldført}
                             {#if felt.eventID === 'campfire'}
                                 <img src="/tiles/campfire.webp" alt="" class="campfire-icon" />
-                            {:else}
+{:else if felt.eventID !== 'meteor_skat'}
                                 <img src="/tiles/event.png" alt="" class="event-crystal" />
                             {/if}
                         {/if}
@@ -852,7 +910,16 @@
         width: 40px; height: auto;
         z-index: 11; pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.8));
     }
-    .crop-icon.moden { width: 40px; bottom: 20px; right: 15px; z-index: 12;
+    .crop-icon.moden { width: 40px; bottom: 20px; right: 15px; z-index: 12; }
+    .meteor-stone-icon {
+        position: absolute;
+        bottom: 34%;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 50px;
+        z-index: 13;
+        pointer-events: none;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
     }
     .sailing-container {
         position: absolute; width: 96px; height: 110px;
@@ -860,13 +927,10 @@
         justify-content: center; align-items: center;
         animation: sailAway 3s forwards cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .sejler-ikon { height: 40px; position: relative; z-index: 2; margin-bottom: 15px;
-    }
+    .sejler-ikon { height: 40px; position: relative; z-index: 2; margin-bottom: 15px; }
     @keyframes sailAway {
-        0% { transform: translateX(0) scale(1);
-        opacity: 1; }
-        100% { transform: translateX(300px) scale(0.5); opacity: 0;
-        }
+        0% { transform: translateX(0) scale(1); opacity: 1; }
+        100% { transform: translateX(300px) scale(0.5); opacity: 0; }
     }
     .escape-boat {
         position: absolute;
@@ -882,10 +946,8 @@
         animation: guldPuls 2.5s infinite alternate ease-in-out;
     }
     @keyframes guldPuls {
-        0% { opacity: 0.4;
-        filter: brightness(1); }
-        100% { opacity: 1; filter: brightness(1.6);
-        }
+        0% { opacity: 0.4; filter: brightness(1); }
+        100% { opacity: 1; filter: brightness(1.6); }
     }
     .mist-icon {
         position: absolute;
@@ -920,10 +982,12 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.9);
     }
     .event-crystal { height: 60px;
-        animation: float 3s infinite ease-in-out; z-index: 15; position: relative; }
+        animation: float 3s infinite ease-in-out; z-index: 15;
+        position: relative; }
     .campfire-icon {
         position: absolute;
-        width: 80px; height: 80px; top: 50%; left: 50%;
+        width: 80px;
+        height: 80px; top: 50%; left: 50%;
         transform: translate(-50%, -50%); pointer-events: none; z-index: 14;
     }
     .portal-icon {
@@ -934,14 +998,8 @@
         animation: portalPuls 2.5s infinite alternate ease-in-out;
     }
     @keyframes portalPuls {
-        0% { 
-            transform: scale(0.95);
-            filter: drop-shadow(0 0 5px rgba(0, 150, 255, 0.6)); 
-        }
-        100% { 
-            transform: scale(1.05);
-            filter: drop-shadow(0 0 15px rgba(0, 220, 255, 1)) brightness(1.2); 
-        }
+        0% { transform: scale(0.95); filter: drop-shadow(0 0 5px rgba(0, 150, 255, 0.6)); }
+        100% { transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(0, 220, 255, 1)) brightness(1.2); }
     }
     .shop-icon {
         position: absolute;
@@ -951,53 +1009,40 @@
         filter: drop-shadow(0 0 15px rgba(255, 165, 0, 0.9)) drop-shadow(0 4px 6px rgba(0,0,0,0.8));
     }
     @keyframes float { 
-        0%, 100% { transform: translateY(0);
-        } 
-        50% { transform: translateY(-5px);
-        } 
+        0%, 100% { transform: translateY(0); } 
+        50% { transform: translateY(-5px); } 
     }
-    .modstander-icon { position: absolute; top: 10px; z-index: 16; display: flex;
-        justify-content: center; width: 100%; }
+    .modstander-icon { position: absolute; top: 10px; z-index: 16; display: flex; justify-content: center; width: 100%; }
     .gravsten-container {
         position: absolute;
         top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; z-index: 13;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         pointer-events: none;
     }
-    .gravsten-ikon { position: absolute; width: 100%; height: auto; z-index: 1;
-        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
+    .gravsten-ikon { position: absolute; width: 100%; height: auto; z-index: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
     .gravsten-portraet {
         position: relative;
         z-index: 2; width: 38px; margin-top: -8px;
         filter: grayscale(100%) sepia(10%) brightness(0.6) contrast(1.2); opacity: 0.85;
     }
-    .skjult-lyd img { opacity: 1; animation: whisper 2s infinite alternate;
-    }
-    .alarm-aktiv img { animation: alarmPuls 0.8s infinite alternate ease-in-out;
-    }
+    .skjult-lyd img { opacity: 1; animation: whisper 2s infinite alternate; }
+    .alarm-aktiv img { animation: alarmPuls 0.8s infinite alternate ease-in-out; }
     @keyframes alarmPuls {
-        0% { transform: scale(1);
-        filter: drop-shadow(0 0 2px white); }
-        100% { transform: scale(1.1);
-        filter: drop-shadow(0 0 10px orange) brightness(1.2); }
+        0% { transform: scale(1); filter: drop-shadow(0 0 2px white); }
+        100% { transform: scale(1.1); filter: drop-shadow(0 0 10px orange) brightness(1.2); }
     }
-    @keyframes whisper { 0% { opacity: 0.2;
-    } 100% { opacity: 0.5; } }
+    @keyframes whisper { 0% { opacity: 0.2; } 100% { opacity: 0.5; } }
     .flydende-tal {
         position: absolute;
         bottom: 50px; font-family: serif; font-weight: bold;
         animation: rise 2.5s forwards; pointer-events: none; z-index: 100;
     }
     @keyframes rise { 
-        0% { opacity: 0;
-        transform: translateY(0); } 
-        20% { opacity: 1;
-        } 
-        100% { opacity: 0; transform: translateY(-30px);
-        } 
+        0% { opacity: 0; transform: translateY(0); } 
+        20% { opacity: 1; } 
+        100% { opacity: 0; transform: translateY(-30px); } 
     }
-    .opslugt { opacity: 0.8; filter: grayscale(0.8) brightness(0.6);
-    }
+    .opslugt { opacity: 0.8; filter: grayscale(0.8) brightness(0.6); }
     
     .slut-banner {
         position: fixed;
@@ -1010,29 +1055,20 @@
         background: linear-gradient(to top, rgba(40, 30, 0, 1), rgba(20, 15, 0, 0.9));
         border-top: 2px solid #ffcc00;
     }
-    .slut-banner p { color: #ffcccc; font-size: 1.2rem; margin: 0; font-family: 'Cinzel', serif;
-    }
+    .slut-banner p { color: #ffcccc; font-size: 1.2rem; margin: 0; font-family: 'Cinzel', serif; }
     .slut-banner.vundet p { color: #ffeeaa; }
-    .slut-knapper { display: flex; gap: 20px;
-        align-items: center; margin-top: 10px; }
-    .log-ikon-btn { background: transparent; border: none; cursor: pointer; transition: transform 0.2s;
-        padding: 0; }
+    .slut-knapper { display: flex; gap: 20px; align-items: center; margin-top: 10px; }
+    .log-ikon-btn { background: transparent; border: none; cursor: pointer; transition: transform 0.2s; padding: 0; }
     .log-ikon-btn:hover { transform: scale(1.1); }
-    .log-ikon-btn img { width: 50px;
-        height: 50px; filter: drop-shadow(0 0 5px rgba(255, 68, 68, 0.5));
-    }
-    .slut-banner.vundet .log-ikon-btn img { filter: drop-shadow(0 0 5px rgba(255, 204, 0, 0.5));
-    }
+    .log-ikon-btn img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(255, 68, 68, 0.5)); }
+    .slut-banner.vundet .log-ikon-btn img { filter: drop-shadow(0 0 5px rgba(255, 204, 0, 0.5)); }
     .accepter-slut-btn {
-        background: #220000; border: 1px solid #ff4444;
-        color: #ff4444;
+        background: #220000; border: 1px solid #ff4444; color: #ff4444;
         padding: 15px 30px; font-size: 1rem; text-transform: uppercase; cursor: pointer; transition: 0.2s;
     }
     .accepter-slut-btn:hover { background: #ff4444; color: black; }
-    .slut-banner.vundet .accepter-slut-btn { background: #221a00;
-        border-color: #ffcc00; color: #ffcc00; }
-    .slut-banner.vundet .accepter-slut-btn:hover { background: #ffcc00; color: black;
-    }
+    .slut-banner.vundet .accepter-slut-btn { background: #221a00; border-color: #ffcc00; color: #ffcc00; }
+    .slut-banner.vundet .accepter-slut-btn:hover { background: #ffcc00; color: black; }
     
     .log-modal-overlay {
         position: fixed;
@@ -1045,17 +1081,14 @@
         border: 2px solid #555; border-radius: 8px; width: 600px;
         max-width: 90%; max-height: 80vh; display: flex; flex-direction: column; padding: 20px;
     }
-    .log-modal h3 { color: #ffcc00; margin-top: 0; font-family: 'Cinzel', serif; text-align: center;
-    }
+    .log-modal h3 { color: #ffcc00; margin-top: 0; font-family: 'Cinzel', serif; text-align: center; }
     .log-liste {
         flex-grow: 1; overflow-y: auto; margin: 15px 0;
         padding-right: 10px;
         display: flex; flex-direction: column; gap: 10px;
     }
-    .log-liste p { color: #ddd; margin: 0;
-        line-height: 1.4; border-bottom: 1px solid #333; padding-bottom: 10px; }
-    .log-liste p:last-child { border-bottom: none;
-    }
+    .log-liste p { color: #ddd; margin: 0; line-height: 1.4; border-bottom: 1px solid #333; padding-bottom: 10px; }
+    .log-liste p:last-child { border-bottom: none; }
     .luk-log-btn {
         background: #333; color: white;
         border: 1px solid #777; padding: 10px;

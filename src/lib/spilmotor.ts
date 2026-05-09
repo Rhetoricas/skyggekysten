@@ -4,7 +4,7 @@ import { BREDDE, HOEJDE, biomeVægte, itemDB, markedVarePool } from '$lib/spilda
 import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
-import { fremrykTid, fremtvingKollaps } from '$lib/overlevelse.svelte';
+import { fremrykTid, fremtvingKollaps, tagSkadeOgTjekDød } from '$lib/overlevelse.svelte';
 import type { Felt, RygsækTing } from '$lib/types';
 import { delNyeKort } from '$lib/ventespil.svelte';
 
@@ -563,4 +563,83 @@ export function bygOgHopGennemPortal() {
     afslørOmraade(hopIndeks, Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn));
     
     return true;
+}
+
+export async function udloesNaturkatastrofe(centerIndex: number) {
+    const felter = spilTilstand.gitter;
+    const paavirkede = new Set<number>();
+
+    paavirkede.add(centerIndex);
+
+    const ring1 = hentNaboIndices(centerIndex);
+    for (const r1 of ring1) {
+        if (Math.random() < 0.60) paavirkede.add(r1);
+    }
+
+    const lukkedeFelter = new Set([centerIndex, ...ring1]);
+    const inficeredeRing1 = Array.from(paavirkede).filter(i => i !== centerIndex);
+
+    for (const inficeret of inficeredeRing1) {
+        const ring2 = hentNaboIndices(inficeret);
+        for (const r2 of ring2) {
+            if (!lukkedeFelter.has(r2) && Math.random() < 0.30) {
+                paavirkede.add(r2);
+            }
+        }
+    }
+
+    const paavirkedeArray = Array.from(paavirkede);
+
+    for (const idx of paavirkedeArray) {
+        felter[idx].biome = 'meteor';
+        felter[idx].hasGoldmine = false;
+        felter[idx].hasBoat = false;
+        felter[idx].afgroede = undefined;
+        felter[idx].shopItems = undefined;
+        felter[idx].eventID = 'meteor_skat';
+        felter[idx].eventFuldført = false;
+        felter[idx].hasMeteorStone = true;
+
+        if (!spilTilstand.mineKendteFelter.includes(idx)) {
+            spilTilstand.mineKendteFelter.push(idx);
+        }
+    }
+
+    spilTilstand.gitter = [...felter];
+
+    if (spilTilstand.rumKode) {
+        await supabase.channel(spilTilstand.rumKode).send({
+            type: 'broadcast',
+            event: 'meteor',
+            payload: { ramteFelter: paavirkedeArray }
+        });
+    }
+
+    if (paavirkedeArray.includes(spilTilstand.spillerIndex)) {
+        tagSkadeOgTjekDød(30, "Et øredøvende brag flænger himlen. Meteoren knuser jorden under dig.", "Du bliver slemt forbrændt i krateret.");
+    }
+
+    syncTilDb(true);
+}
+
+export function udvindMeteorSkat(metode: string): { logBesked: string; hpNed?: number; guldOp?: number; itemUd?: string } {
+    const pris = spilTilstand.valgtKarakter ? spilTilstand.valgtKarakter.baseEnergi * 2 : 10;
+    spilTilstand.nuvaerendeEnergi -= pris;
+    
+    const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
+    felt.hasMeteorStone = false;
+    
+    if (metode === 'haender') {
+        return {
+            logBesked: `Du får det meste af guldet ud af den brandvarme sten.`,
+            hpNed: 20,
+            guldOp: 150
+        };
+    } else {
+        return {
+            logBesked: `Dit værktøj er slidt op, men du lykkes med at få stenen åbnet`,
+            guldOp: 300,
+            itemUd: 'diamant' 
+        };
+    }
 }
