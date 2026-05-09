@@ -436,167 +436,185 @@
         return Math.min(...aktive.map((s: any) => s.dag || 1));
     }
 
-    function udførBevægelse(nytIndeks: number) {
-        if (flytterNu || !spilTilstand.valgtKarakter) return;
-        flytterNu = true;
+   function udførBevægelse(nytIndeks: number) {
+    if (flytterNu || !spilTilstand.valgtKarakter) return;
 
-        if (spilTilstand.dag >= hentLangsomsteDag() + MAX_DAGE_FORAN) {
-            spilTilstand.logBesked = 'Du må vente på de andre spillere.';
-            spilTilstand.venteSpilAktiv = true;
+    // AFK-logik: Hvis du har sovet i over 5 minutter og tågen har indhentet dig
+    const mig = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
+    if (mig && mig.sidstAktiv && (Date.now() - mig.sidstAktiv > 5 * 60 * 1000) && erITågen) {
+        flytterNu = true;
+        spilTilstand.livspoint = 0;
+        spilTilstand.gameState = 'dead_map';
+        if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = true;
+        }
+        spilTilstand.logBesked = "Du vågner fra din dvale, men det er for sent. Tågen har allerede fortrukket alt liv fra dine knogler.";
+        syncTilDb(true);
+        setTimeout(() => flytterNu = false, 200);
+        return;
+    }
+
+    flytterNu = true;
+
+    if (spilTilstand.dag >= hentLangsomsteDag() + MAX_DAGE_FORAN) {
+        spilTilstand.logBesked = 'Du må vente på de andre spillere.';
+        spilTilstand.venteSpilAktiv = true;
+        flytterNu = false;
+        return;
+    }
+
+    const felt = spilTilstand.gitter[nytIndeks];
+    if (!felt) { flytterNu = false; return; }
+    
+    const grundPris = biomeTerraenCost[felt.biome as Biome] || 1;
+    const biomeRabat = spilTilstand.valgtKarakter.biomeMod?.[felt.biome as string] || 0;
+    const pris = Math.max(1, spilTilstand.valgtKarakter.moveCost + spilTilstand.rygsækEffekt.move + grundPris + biomeRabat);
+    
+    spilTilstand.nuvaerendeEnergi -= erITågen ? pris + 2 : pris;
+    
+    const nulHp = ['mark', 'by', 'eng', 'marked', 'hoejland', 'skov'];
+    const toHp = ['bjerg', 'hule'];
+    let hpStraf = 0;
+    
+    if (nulHp.includes(felt.biome as string)) {
+        hpStraf = 0;
+    } else if (toHp.includes(felt.biome as string)) {
+        hpStraf = 3;
+    }
+
+    if (hpStraf > 0) {
+        hpStraf = spilTilstand.beregnSkade(hpStraf);
+        spilTilstand.livspoint -= hpStraf;
+    }
+
+    const nuBlok = Math.ceil((spilTilstand.dag || 1) / 5);
+    const erHvedeTid = nuBlok % 2 !== 0; 
+    const erSmadret = felt.smadretFremTilBlok !== undefined && nuBlok <= felt.smadretFremTilBlok;
+    const erHoestet = felt.hoestetFremTilBlok !== undefined && nuBlok <= felt.hoestetFremTilBlok;
+    
+    if (felt.biome === 'mark' && felt.afgroede && !erSmadret && !erHoestet) {
+        const erModen = (felt.afgroede === 'hvede' && erHvedeTid) || (felt.afgroede === 'boenner' && !erHvedeTid);
+        if (erModen) {
+            spilTilstand.livspoint += 3;
+            felt.hoestetFremTilBlok = nuBlok;
+        } else {
+            felt.smadretFremTilBlok = nuBlok + 1;
+        }
+    }
+
+    if (spilTilstand.livspoint <= 0) {
+        tagSkadeOgTjekDød(0, "", "Marchen sled din sidste gnist væk. Du kollapser i støvet.");
+        if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'dead') {
+            flytterNu = false;
+            spilTilstand.gitter = [...spilTilstand.gitter];
+            syncTilDb(true);
+            return;
+        }
+    }
+
+    if (felt.biome === 'hav') {
+        tagSkadeOgTjekDød(
+            30, 
+            "Du trådte ud i havet og slugte koldt saltvand.", 
+            "De kolde bølger trak dig under. Du er død."
+        );
+        if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'dead') {
             flytterNu = false;
             return;
         }
-
-        const felt = spilTilstand.gitter[nytIndeks];
-        if (!felt) { flytterNu = false; return; }
-        
-        const grundPris = biomeTerraenCost[felt.biome as Biome] || 1;
-        const biomeRabat = spilTilstand.valgtKarakter.biomeMod?.[felt.biome as string] || 0;
-        const pris = Math.max(1, spilTilstand.valgtKarakter.moveCost + spilTilstand.rygsækEffekt.move + grundPris + biomeRabat);
-        spilTilstand.nuvaerendeEnergi -= erITågen ? pris + 2 : pris;
-        const helende: string[] = [];
-        const nulHp = ['mark', 'by', 'eng', 'marked', 'hoejland', 'skov'];
-        const toHp = ['bjerg', 'hule'];
-        let hpStraf = 0;
-        if (helende.includes(felt.biome as string)) {
-            hpStraf = -1;
-        } else if (nulHp.includes(felt.biome as string)) {
-            hpStraf = 0;
-        } else if (toHp.includes(felt.biome as string)) {
-            hpStraf = 3;
-        }
-
-        if (hpStraf > 0) {
-            hpStraf = spilTilstand.beregnSkade(hpStraf);
-            spilTilstand.livspoint -= hpStraf;
-        } else if (hpStraf < 0) {
-            spilTilstand.livspoint -= hpStraf;
-        }
-
-        const nuBlok = Math.ceil((spilTilstand.dag || 1) / 5);
-        const erHvedeTid = nuBlok % 2 !== 0; 
-        const erSmadret = felt.smadretFremTilBlok !== undefined && nuBlok <= felt.smadretFremTilBlok;
-        const erHoestet = felt.hoestetFremTilBlok !== undefined && nuBlok <= felt.hoestetFremTilBlok;
-        if (felt.biome === 'mark' && felt.afgroede && !erSmadret && !erHoestet) {
-            const erModen = (felt.afgroede === 'hvede' && erHvedeTid) || (felt.afgroede === 'boenner' && !erHvedeTid);
-            if (erModen) {
-                spilTilstand.livspoint += 3;
-                felt.hoestetFremTilBlok = nuBlok;
-            } else {
-                felt.smadretFremTilBlok = nuBlok + 1;
-            }
-        }
-
-        if (spilTilstand.livspoint <= 0) {
-            tagSkadeOgTjekDød(0, "", "Marchen sled din sidste gnist væk. Du kollapser i støvet.");
-            if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'dead') {
-                flytterNu = false;
-                syncTilDb(true);
-                return;
-            }
-        }
-
-        if (felt.biome === 'hav') {
-            tagSkadeOgTjekDød(
-                30, 
-                "Du trådte ud i havet og slugte koldt saltvand.", 
-                "De kolde bølger trak dig under. Du er død."
-            );
-            if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'dead') {
-                flytterNu = false;
-                return;
-            }
-        }
-
-        spilTilstand.spillerIndex = nytIndeks;
-        cam.foelgSpiller(nytIndeks, BREDDE, HEX_W, ROW_H);
-        
-        afslørOmraade(nytIndeks, Math.max(felt.biome === 'bjerg' ? 2 : 1, aktuelSynsRadius));
-        if ((nytIndeks % BREDDE) > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nytIndeks % BREDDE;
-        const charId = spilTilstand.valgtKarakter.id;
-        const b = felt.biome as string;
-        let specialLog = "";
-        
-        if ((charId === 'thief_m' || charId === 'thief_f') && (b === 'marked' || b === 'by')) {
-            spilTilstand.guldTotal += 5;
-            specialLog = " Du snupper diskret et par mønter i mængden.";
-        } else if ((charId === 'joker_m' || charId === 'joker_f') && b === 'marked') {
-            spilTilstand.guldTotal += 10;
-            specialLog = " Markedet belønner din gøgl og optræden med guld.";
-        } else if ((charId === 'royal_m' || charId === 'royal_f') && b === 'by') {
-            spilTilstand.guldTotal += 5;
-            specialLog = " Du opkræver en smule skat fra lokalbefolkningen.";
-        } else if ((charId === 'magician_m' || charId === 'magician_f') && b === 'ritual') {
-            spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 5);
-            specialLog = " Mørk magi strømmer helende ind i dine årer.";
-        }
-
-        if (felt.hasGoldmine) {
-            const spiller = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
-            if (!spiller.besoegteMiner) spiller.besoegteMiner = [];
-            
-            const varEjer = felt.mineOwner === spilTilstand.spillerNavn;
-            const harBesoegt = spiller.besoegteMiner.includes(nytIndeks);
-            
-            if (!varEjer) {
-                const ejedeMiner = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
-                felt.mineOwner = spilTilstand.spillerNavn;
-                
-                if (!harBesoegt) {
-                    spiller.besoegteMiner.push(nytIndeks);
-                    const basisGuld = 100 + (ejedeMiner * 50);
-                    const faktiskGuld = spilTilstand.beregnGuldIndkomst(basisGuld);
-                    spilTilstand.guldTotal += faktiskGuld;
-                    specialLog += specialLog ? ` Du overtager minen og sikrer dig ${faktiskGuld} guld.` : `Du overtager minen og sikrer dig ${faktiskGuld} guld.`;
-                } else {
-                    specialLog += specialLog ? ` Du flår skødet tilbage og generobrer din mine.` : `Du flår skødet tilbage og generobrer din mine.`;
-                }
-            }
-        }
-
-        const slidLog = tjekMiljoeSlitage(felt.biome as string);
-        let samletLog = slidLog ? slidLog.trim() : "";
-        
-        if (specialLog) {
-            samletLog = samletLog ? `${samletLog} ${specialLog.trim()}` : specialLog.trim();
-        }
-
-        if (samletLog) {
-            spilTilstand.logBesked = samletLog;
-        }
-
-        if (felt.hasPortal) {
-            udfoerPortalTeleport();
-            syncTilDb(true);
-            setTimeout(() => flytterNu = false, 200);
-            return;
-        }
-
-        fremrykTid();
-        if (felt.hasBoat) {
-            felt.hasBoat = false;
-            sejlendeBaadIndex = nytIndeks;
-            if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
-                spilTilstand.alleSpillere[spilTilstand.spillerNavn].isWinner = true;
-            }
-            
-            spilTilstand.logBesked = "Du mærker bådens ru træ under dine støvler. Havet åbner sig. Du har overlevet øen og kan trække vejret frit.";
-            setTimeout(() => {
-                spilTilstand.gameState = 'win_map';
-                syncTilDb(true); 
-            }, 3000);
-        } else {
-            if (felt.eventID && !felt.eventFuldført) {
-                felt.eventFuldført = true;
-                startEvent(felt.eventID);
-            }
-    else if (felt.shopItems && felt.shopItems.length > 0) spilTilstand.aktivShop = felt.shopItems;
     }
 
-    spilTilstand.gitter = [...spilTilstand.gitter]; // <-- Det lokale spark tvinger grafikken til at opdatere her og nu
+    spilTilstand.spillerIndex = nytIndeks;
+    cam.foelgSpiller(nytIndeks, BREDDE, HEX_W, ROW_H);
+    
+    afslørOmraade(nytIndeks, Math.max(felt.biome === 'bjerg' ? 2 : 1, aktuelSynsRadius));
+    if ((nytIndeks % BREDDE) > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nytIndeks % BREDDE;
+    
+    const charId = spilTilstand.valgtKarakter.id;
+    const b = felt.biome as string;
+    let specialLog = "";
+    
+    if ((charId === 'thief_m' || charId === 'thief_f') && (b === 'marked' || b === 'by')) {
+        spilTilstand.guldTotal += 5;
+        specialLog = " Du snupper diskret et par mønter i mængden.";
+    } else if ((charId === 'joker_m' || charId === 'joker_f') && b === 'marked') {
+        spilTilstand.guldTotal += 10;
+        specialLog = " Markedet belønner din gøgl og optræden med guld.";
+    } else if ((charId === 'royal_m' || charId === 'royal_f') && b === 'by') {
+        spilTilstand.guldTotal += 5;
+        specialLog = " Du opkræver en smule skat fra lokalbefolkningen.";
+    } else if ((charId === 'magician_m' || charId === 'magician_f') && b === 'ritual') {
+        spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 5);
+        specialLog = " Mørk magi strømmer helende ind i dine årer.";
+    }
+
+    if (felt.hasGoldmine) {
+        const spiller = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
+        if (!spiller.besoegteMiner) spiller.besoegteMiner = [];
+        
+        const varEjer = felt.mineOwner === spilTilstand.spillerNavn;
+        const harBesoegt = spiller.besoegteMiner.includes(nytIndeks);
+        
+        if (!varEjer) {
+            const ejedeMiner = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
+            felt.mineOwner = spilTilstand.spillerNavn;
+            
+            if (!harBesoegt) {
+                spiller.besoegteMiner.push(nytIndeks);
+                const basisGuld = 100 + (ejedeMiner * 50);
+                const faktiskGuld = spilTilstand.beregnGuldIndkomst(basisGuld);
+                spilTilstand.guldTotal += faktiskGuld;
+                specialLog += specialLog ? ` Du overtager minen og sikrer dig ${faktiskGuld} guld.` : `Du overtager minen og sikrer dig ${faktiskGuld} guld.`;
+            } else {
+                specialLog += specialLog ? ` Du flår skødet tilbage og generobrer din mine.` : `Du flår skødet tilbage og generobrer din mine.`;
+            }
+        }
+    }
+
+    const slidLog = tjekMiljoeSlitage(felt.biome as string);
+    let samletLog = slidLog ? slidLog.trim() : "";
+    
+    if (specialLog) {
+        samletLog = samletLog ? `${samletLog} ${specialLog.trim()}` : specialLog.trim();
+    }
+
+    if (samletLog) {
+        spilTilstand.logBesked = samletLog;
+    }
+
+    if (felt.hasPortal) {
+        udfoerPortalTeleport();
+        spilTilstand.gitter = [...spilTilstand.gitter];
+        syncTilDb(true);
+        setTimeout(() => flytterNu = false, 200);
+        return;
+    }
+
+    fremrykTid();
+    if (felt.hasBoat) {
+        felt.hasBoat = false; // Båden fjernes nu korrekt efter brug
+        sejlendeBaadIndex = nytIndeks;
+        if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].isWinner = true;
+        }
+        
+        spilTilstand.logBesked = "Du mærker bådens ru træ under dine støvler. Havet åbner sig. Du har overlevet øen og kan trække vejret frit.";
+        setTimeout(() => {
+            spilTilstand.gameState = 'win_map';
+            syncTilDb(true); 
+        }, 3000);
+    } else {
+        if (felt.eventID && !felt.eventFuldført) {
+            felt.eventFuldført = true;
+            startEvent(felt.eventID);
+        }
+        else if (felt.shopItems && felt.shopItems.length > 0) spilTilstand.aktivShop = felt.shopItems;
+    }
+
+    spilTilstand.gitter = [...spilTilstand.gitter];
     syncTilDb(true);
     setTimeout(() => flytterNu = false, 200);
-   }
+}
 
     function flytHex(retning: string) {
         if (spilTilstand.erBevidstløs || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.gameState !== 'play') return;

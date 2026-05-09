@@ -5,7 +5,17 @@ export function skabKamera() {
     let y = $state(0);
     let isDragging = $state(false);
     let harTrukket = $state(false);
-    let zoomLevel = $state(1);
+    
+    // Vi gemmer spillerens "rigtige" zoom her
+    let baseZoom = $state(1);
+    
+    // Forbandelsen lytter på rygsækken og tvinger værdien om på 2.5 eller 0.45
+    const zoomLevel = $derived.by(() => {
+        if (!spilTilstand.mitUdstyr) return baseZoom;
+        if (spilTilstand.mitUdstyr.some(i => i.id === 'kikkert_250')) return 2.5;
+        if (spilTilstand.mitUdstyr.some(i => i.id === 'kikkert_45')) return 0.45;
+        return baseZoom;
+    });
     
     let lastMouseX = 0;
     let lastMouseY = 0;
@@ -39,12 +49,18 @@ export function skabKamera() {
     }
 
     function håndterZoom(e: WheelEvent, blokeret: boolean) {
-        if (spilTilstand.mitUdstyr?.some(i => i.id === 'kikkert_250' || i.id === 'kikkert_45')) return;        
+        const harForbandelse = spilTilstand.mitUdstyr?.some(i => i.id === 'kikkert_250' || i.id === 'kikkert_45');
+        
+        if (harForbandelse) {
+            spilTilstand.logBesked = "Forbandelsen tvinger dit syn ud af fokus. Du kan ikke ændre afstanden.";
+            return;
+        }
+        
         if (blokeret) return;
         e.preventDefault(); 
 
-        zoomLevel -= e.deltaY * 0.001; 
-        zoomLevel = Math.max(0.3, Math.min(zoomLevel, 3.0));
+        baseZoom -= e.deltaY * 0.001; 
+        baseZoom = Math.max(0.3, Math.min(baseZoom, 3.0));
     }
 
     function centrerPåHex(index: number, bredde: number, hexW: number, rowH: number) {
@@ -71,11 +87,11 @@ export function skabKamera() {
     }
 
     function saetZoom(nyVaerdi: number) {
-        zoomLevel = nyVaerdi;
+        baseZoom = nyVaerdi;
     }
 
     function nulstil() {
-        zoomLevel = 1;
+        baseZoom = 1;
         isDragging = false;
         harTrukket = false;
     }
