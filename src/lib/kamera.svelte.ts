@@ -9,11 +9,11 @@ export function skabKamera() {
     // Vi gemmer spillerens "rigtige" zoom her
     let baseZoom = $state(1);
     
-    // Forbandelsen lytter på rygsækken og tvinger værdien om på 2.5 eller 0.45
+    // Forbandelsen lytter på rygsækken og tvinger værdien om
     const zoomLevel = $derived.by(() => {
         if (!spilTilstand.mitUdstyr) return baseZoom;
-        if (spilTilstand.mitUdstyr.some(i => i.id === 'kikkert_250')) return 2.5;
-        if (spilTilstand.mitUdstyr.some(i => i.id === 'kikkert_45')) return 0.45;
+        if (spilTilstand.mitUdstyr.some(i => i.id === 'kikkert_250')) return 3;
+        if (spilTilstand.mitUdstyr.some(i => i.id === 'kikkert_45')) return 0.4;
         return baseZoom;
     });
     

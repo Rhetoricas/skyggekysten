@@ -107,14 +107,11 @@
     .vare-kort { 
         cursor: pointer; transition: transform 0.1s;
         display: flex; flex-direction: column; align-items: center; gap: 8px;
-        width: 160px; /* Holder teksten og kortet i en fast kolonnebredde */
-        padding: 10px;
-        border: 1px solid transparent;
-        border-radius: 6px;
+        width: 160px;
+        padding: 10px; border: 1px solid transparent; border-radius: 6px;
     }
     .vare-kort:hover { 
-        transform: scale(1.05);
-        background: rgba(255, 255, 255, 0.05);
+        transform: scale(1.05); background: rgba(255, 255, 255, 0.05);
         border-color: #333;
     }
     .vare-ikon { height: 80px; width: auto; }
@@ -122,14 +119,9 @@
     .vare-pris { color: gold; font-weight: bold; }
     
     .vare-regler {
-        font-size: 0.9rem;
-        color: #999;
-        line-height: 1.4;
-        margin: 5px 0 0 0;
-        font-style: italic;
-        border-top: 1px solid #333;
-        padding-top: 8px;
-        text-align: center;
+        font-size: 0.9rem; color: #999; line-height: 1.4;
+        margin: 5px 0 0 0; font-style: italic; border-top: 1px solid #333;
+        padding-top: 8px; text-align: center;
     }
     
     .sell-section { border-top: 1px solid #222; padding-top: 20px; margin-top: 20px; }

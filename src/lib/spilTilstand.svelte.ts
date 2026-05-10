@@ -18,6 +18,8 @@ export const spilTilstand = $state({
     gitter: [] as Felt[],
     spillerIndex: 0,
     
+    kameraFokus: null as number | null,
+
     maxLivspoint: 100,
     _livspoint: 100,
     get livspoint(): number { return this._livspoint; },
@@ -32,13 +34,13 @@ export const spilTilstand = $state({
     get rygsækEffekt() {
         return (this.mitUdstyr || []).reduce((acc: { move: number; dmg: number; syn: number; energi: number; gold: number }, slot: RygsækTing) => {
             const info = itemDB[slot.id];
-            if (!info) return acc;
+            if (!info || slot.maengde <= 0) return acc;
             return {
-                move: acc.move + (info.moveMod || 0) * slot.maengde,
-                dmg: acc.dmg + (info.dmgMod || 0) * slot.maengde,
-                syn: acc.syn + (info.synsMod || 0) * slot.maengde,
-                energi: acc.energi + (info.energiMod || 0) * slot.maengde,
-                gold: acc.gold + (info.goldMod || 0) * slot.maengde
+                move: acc.move + (info.moveMod || 0),
+                dmg: acc.dmg + (info.dmgMod || 0),
+                syn: acc.syn + (info.synsMod || 0),
+                energi: acc.energi + (info.energiMod || 0),
+                gold: acc.gold + (info.goldMod || 0)
             };
         }, { move: 0, dmg: 0, syn: 0, energi: 0, gold: 0 });
     },
@@ -72,7 +74,7 @@ export const spilTilstand = $state({
     get logBesked(): string { 
         return this.logHistorik.length > 0 ? this.logHistorik[this.logHistorik.length - 1] : ''; 
     },
-set logBesked(v: string) { 
+    set logBesked(v: string) { 
         const rensetV = v.trim();
         const prefix = `DAG ${this.dag}`;
         const fuldBesked = rensetV === '' ? prefix : `${prefix} - ${rensetV}`;

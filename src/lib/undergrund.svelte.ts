@@ -10,7 +10,7 @@ function tilfaeldigtTal(min: number, max: number) {
 
 export function genererUndergrund(biome: Biome | string) {
     const farlige = ['ruin', 'blodskov', 'hule', 'slagmark', 'ritual', 'krystal'];
-    const civilisation = ['by', 'marked']; // Bandit fjernet herfra
+    const civilisation = ['by', 'marked'];
 
     const feltData: { kanGraves: boolean; skjultGuld: number; skjultLiv: number; skjultFaelde: boolean; skjultLoot: string | null } = { 
         kanGraves: true, 
@@ -27,14 +27,12 @@ export function genererUndergrund(biome: Biome | string) {
 
     const terningKast = Math.random() * 100;
 
-    // Ny logik for banditlejren
     if (biome === 'bandit') {
         if (terningKast < 50) {
-            feltData.skjultGuld = tilfaeldigtTal(50, 100); // 50% chance for massivt guld
+            feltData.skjultGuld = tilfaeldigtTal(50, 100); 
         } else if (terningKast < 90) {
-            feltData.skjultFaelde = true; // 40% chance for fælde
+            feltData.skjultFaelde = true; 
         }
-        // De resterende 10% er tomt land
     } else if (biome === 'mark' || biome === 'eng') {
         if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(10, 20);
         else if (terningKast < 35) feltData.skjultLiv = tilfaeldigtTal(10, 20);
@@ -119,6 +117,11 @@ export function grav() {
         const faeldeSkade = spilTilstand.beregnSkade(10);
         spilTilstand.livspoint -= faeldeSkade;
         fundLog = `KLIK. En nedgravet fælde bider sig fast i dit ben (-${faeldeSkade} HP)`;
+    } else if (fundetLoot === 'skattekiste') {
+        spilTilstand.guldTotal += 500;
+        tilfoejTilRygsæk('diamant', 1);
+        felt.tomSkattekiste = true;
+        fundLog = `Spadens stål rammer hårdt træ. Du flår kisten åben og finder en massiv formue! (+500 Guld, +Diamant)`;
     } else if (guldVaerdi > 0) {
         let maengde = Math.floor(guldVaerdi * spilTilstand.valgtKarakter.goldMod);
         maengde = spilTilstand.beregnGuldIndkomst(maengde);

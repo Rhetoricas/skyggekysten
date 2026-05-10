@@ -60,6 +60,7 @@ export interface SpillerData {
     retning: string;
     besoegteMiner?: number[];
     browserId?: string | null;
+    harSkattekort?: boolean;
 }
 
 export interface Felt {
@@ -91,6 +92,8 @@ export interface Felt {
     skjultLiv?: number;
     skjultFaelde?: boolean;
     skjultLoot?: string | null;
+    tomSkattekiste?: boolean;
+    isSkatteKlynge?: boolean;
 
     afgroede?: 'hvede' | 'boenner';
     smadretFremTilBlok?: number;
@@ -99,4 +102,7 @@ export interface Felt {
     hasGoldmine?: boolean;
     mineOwner?: string;
     hasMeteorStone?: boolean;
+
+    grundBiome?: string | Biome;
+    grundEvent?: string;
 }

@@ -19,7 +19,7 @@ export const biomeTerraenCost: Record<Biome, number> = {
     'hav': 5, 'meteor': 1
 };
 
-export const markedVarePool = ['skovl', 'livseliksir', 'klude', 'kniv', 'metaldetektor', 'soegekvist', 'fakkel', 'sovepose', 'mad'];
+export const markedVarePool = ['skovl', 'livseliksir', 'klude', 'kniv', 'metaldetektor', 'soegekvist', 'fakkel', 'sovepose', 'mad', 'hemmelighed'];
 
 export const itemDB: Record<string, { id: string; navn: string; type: ItemType; billede: string; pris: number; moveMod?: number; dmgMod?: number; synsMod?: number; energiMod?: number; goldMod?: number; beskrivelse?: string }> = {
     'klude': { id: 'klude', navn: 'Klude', type: 'tøj', billede: '/inventory/klude.webp', pris: 10, dmgMod: -0.05, beskrivelse: "Giver en smule beskyttelse. Du tager 5% mindre skade." },
@@ -40,7 +40,8 @@ export const itemDB: Record<string, { id: string; navn: string; type: ItemType; 
     'mad': { id: 'mad', navn: 'Madration', type: 'forbrug', billede: '/inventory/food.webp', pris: 30, beskrivelse: "Medbragt mad, der giver +10 HP og +1 Energi. Bliver stjålet og spist af skadedyr, hvis du tager det med i et ruin-felt." },
     'kikkert_250': { id: 'kikkert_250', navn: 'Gylden Kikkert', type: 'forbandelse', billede: '/inventory/kikkert.webp', pris: 100, beskrivelse: "Krystallernes lys splintrer dens linser i krystal-felter." },
     'kikkert_45': { id: 'kikkert_45', navn: 'Gylden Kikkert', type: 'forbandelse', billede: '/inventory/kikkert.webp', pris: 100, beskrivelse: "Krystallernes lys splintrer dens linser i krystal-felter." },
-    'diamant': { id: 'diamant', navn: 'Diamant', type: 'skat', billede: '/inventory/diamant.webp', pris: 500, beskrivelse: "En sjælden og værdifuld ædelsten, der nemt kan sælges." }
+    'diamant': { id: 'diamant', navn: 'Diamant', type: 'skat', billede: '/inventory/diamant.webp', pris: 500, beskrivelse: "En sjælden og værdifuld ædelsten, der nemt kan sælges." },
+    'hemmelighed': { id: 'hemmelighed', navn: 'Hemmelighed', type: 'forbrug', billede: '/inventory/treasuremap.webp', pris: 100, beskrivelse: "Et fysisk skattekort. Brug det for at få ruten brændt ind på dit indre landkort." }
 }
 
 export const tilgaengeligeKarakterer: Karakter[] = [
@@ -58,8 +59,8 @@ export const tilgaengeligeKarakterer: Karakter[] = [
     { id: 'royal_f', navn: "Hertuginde", ikon: "/game_faces/royal_f.webp", startMsg: "Penge løser alt.", startHp: 100, startGuld: 500, startUdstyr: ['flot_toej', 'sovepose'], moveCost: 1, digCost: 10, dmgMod: 1.1, goldMod: 1.2, fordel: "Masser af guld og fint tøj.", ulempe: "Intet våben. Gravning koster mere HP.", baseEnergi: 6, synsRadius: 1 },
     { id: 'hunter_m', navn: "Jæger", ikon: "/game_faces/hunter_m.webp", startMsg: "Hold afstand til byttet.", startHp: 90, startGuld: 20, startUdstyr: ['bue', 'klude', 'sovepose'], moveCost: 1, digCost: 6, dmgMod: 1.1, goldMod: 1.0, fordel: "Starter med bue og højt syn.", ulempe: "Lav start-HP.", baseEnergi: 8, synsRadius: 2, biomeMod: { 'skov': -2, 'blodskov': -2 } },
     { id: 'hunter_f', navn: "Skytte", ikon: "/game_faces/hunter_f.webp", startMsg: "Hold afstand til byttet.", startHp: 90, startGuld: 20, startUdstyr: ['bue', 'klude', 'sovepose'], moveCost: 1, digCost: 6, dmgMod: 1.1, goldMod: 1.0, fordel: "Starter med bue og højt syn.", ulempe: "Lav start-HP.", baseEnergi: 8, synsRadius: 2, biomeMod: { 'skov': -2, 'blodskov': -2 } },
-    { id: 'pirate_m', navn: "Kaptajn", ikon: "/game_faces/pirate_m.webp", startMsg: "Havet tog alt andet.", startHp: 110, startGuld: 150, startUdstyr: ['sabel', 'klude'], moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.2, fordel: "Høj startkapital og hurtig sabel.", ulempe: "Ingen sovepose.", baseEnergi: 7, synsRadius: 1, biomeMod: { 'hav': -3 } },
-    { id: 'pirate_f', navn: "Korsar", ikon: "/game_faces/pirate_f.webp", startMsg: "Havet tog alt andet.", startHp: 110, startGuld: 150, startUdstyr: ['sabel', 'klude'], moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.2, fordel: "Høj startkapital og hurtig sabel.", ulempe: "Ingen sovepose.", baseEnergi: 7, synsRadius: 1, biomeMod: { 'hav': -3 } },
+    { id: 'pirate_m', navn: "Kaptajn", ikon: "/game_faces/pirate_m.webp", startMsg: "Havet tog alt andet.", startHp: 110, startGuld: 150, startUdstyr: ['sabel', 'klude', 'hemmelighed'], moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.2, fordel: "Høj kapital, sabel og et hemmeligt kort.", ulempe: "Ingen sovepose.", baseEnergi: 7, synsRadius: 1, biomeMod: { 'hav': -3 } },
+    { id: 'pirate_f', navn: "Korsar", ikon: "/game_faces/pirate_f.webp", startMsg: "Havet tog alt andet.", startHp: 110, startGuld: 150, startUdstyr: ['sabel', 'klude', 'hemmelighed'], moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.2, fordel: "Høj kapital, sabel og et hemmeligt kort.", ulempe: "Ingen sovepose.", baseEnergi: 7, synsRadius: 1, biomeMod: { 'hav': -3 } },
     { id: 'dwarf_m', navn: "Dværg", ikon: "/game_faces/dwarf_m.webp", startMsg: "Klippen tygger knogler til støv.", startHp: 130, startGuld: 80, startUdstyr: ['skovl', 'oekse', 'klude'], moveCost: 1.5, digCost: 2, dmgMod: 1.0, goldMod: 1.3, fordel: "Mestergraver og guldjæger.", ulempe: "Tung og langsom at flytte.", baseEnergi: 7, synsRadius: 1, biomeMod: { 'bjerg': -3, 'krystal': -2 } },
     { id: 'dwarf_f', navn: "Minegraver", ikon: "/game_faces/dwarf_f.webp", startMsg: "Klippen tygger knogler til støv.", startHp: 130, startGuld: 80, startUdstyr: ['skovl', 'oekse', 'klude'], moveCost: 1.5, digCost: 2, dmgMod: 1.0, goldMod: 1.3, fordel: "Mestergraver og guldjæger.", ulempe: "Tung og langsom at flytte.", baseEnergi: 7, synsRadius: 1, biomeMod: { 'bjerg': -3, 'krystal': -2 } },
     { id: 'orc_m', navn: "Ork", ikon: "/game_faces/orc_m.webp", startMsg: "Smerte gør dig stærk.", startHp: 160, startGuld: 0, startUdstyr: ['svaerd', 'klude'], moveCost: 1, digCost: 6, dmgMod: 0.8, goldMod: 0.8, fordel: "Masser af liv og tyk hud.", ulempe: "Dårlig til at grave guld.", baseEnergi: 8, synsRadius: 1, biomeMod: { 'slagmark': -2 } },

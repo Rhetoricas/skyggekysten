@@ -17,6 +17,13 @@ const RETNINGER = {
     'NW': [[-1, -1], [0, -1]]
 } as const;
 
+export function rystSkaerm(varighed: number = 1200) {
+    if (typeof document !== 'undefined') {
+        document.body.classList.add('jordskaelv');
+        setTimeout(() => document.body.classList.remove('jordskaelv'), varighed);
+    }
+}
+
 export function hentNaboIRetning(index: number, retning: keyof typeof RETNINGER, bredde: number, maxFelter: number): number | null {
     const raekke = Math.floor(index / bredde);
     const kolonne = index % bredde;
@@ -252,6 +259,85 @@ export function hvil() {
     syncTilDb(true);
 }
 
+export function aktiverHemmelighed() {
+    const kort = spilTilstand.mitUdstyr.find(i => i.id === 'hemmelighed');
+    if (!kort || kort.maengde <= 0) return;
+
+    brugFraRygsæk('hemmelighed', 1);
+
+    const klynge = spilTilstand.gitter.reduce((acc, felt, idx) => {
+        if (felt.isSkatteKlynge) acc.push(idx);
+        return acc;
+    }, [] as number[]);
+
+    if (klynge.length > 0) {
+        const nyeFelter = new Set(spilTilstand.mineKendteFelter);
+        klynge.forEach(idx => nyeFelter.add(idx));
+        spilTilstand.mineKendteFelter = Array.from(nyeFelter);
+
+        // HACK: Vi smider et usynligt skattekort_aabent item i rygsækken
+        // Databasen synkroniserer rygsækken perfekt, så Svelte aldrig glemmer det
+        tilfoejTilRygsæk('skattekort_aabent', 1);
+        
+        spilTilstand.kameraFokus = klynge[Math.floor(klynge.length / 2)];
+        
+        spilTilstand.logBesked = "Du ruller pergamentet ud. Syv røde krydser brænder sig fast på dit indre landkort.";
+    } else {
+        spilTilstand.logBesked = "Kortet smuldrer i dine hænder. Det var værdiløst.";
+    }
+    
+    spilTilstand.gitter = [...spilTilstand.gitter];
+    syncTilDb(true);
+}
+
+export function plantSkat(gitter: Felt[]) {
+    gitter.forEach(f => {
+        f.isSkatteKlynge = false;
+        f.tomSkattekiste = false;
+    });
+
+    const muligeCentre: number[] = [];
+    const minKol = Math.floor(BREDDE * 0.50);
+    const maxKol = Math.floor(BREDDE * 0.75);
+
+    for (let i = 0; i < gitter.length; i++) {
+        const kol = i % BREDDE;
+        if (kol >= minKol && kol <= maxKol) {
+            const naboer = hentNaboIndices(i);
+            if (naboer.length === 6) {
+                const alleGyldige = [i, ...naboer].every(idx => {
+                    const felt = gitter[idx];
+                    return felt.kanGraves && felt.biome !== 'hav' && felt.biome !== 'by' && felt.biome !== 'marked' && felt.biome !== 'meteor' && !felt.hasPortal && !felt.eventID;
+                });
+                if (alleGyldige) {
+                    muligeCentre.push(i);
+                }
+            }
+        }
+    }
+
+    if (muligeCentre.length > 0) {
+        const center = muligeCentre[Math.floor(Math.random() * muligeCentre.length)];
+        const klynge = [center, ...hentNaboIndices(center)];
+        const skatteFelt = klynge[Math.floor(Math.random() * klynge.length)];
+        
+        klynge.forEach(idx => {
+            gitter[idx].isSkatteKlynge = true;
+            if (idx === skatteFelt) {
+                gitter[idx].skjultLoot = 'skattekiste';
+                gitter[idx].skjultFaelde = false;
+                gitter[idx].skjultGuld = 0;
+                gitter[idx].skjultLiv = 0;
+            } else {
+                gitter[idx].skjultFaelde = true;
+                gitter[idx].skjultLoot = null;
+                gitter[idx].skjultGuld = 0;
+                gitter[idx].skjultLiv = 0;
+            }
+        });
+    }
+}
+
 export function initialiserGitter() {
     const antal = BREDDE * HOEJDE;
     const totalVaegt = biomeVægte.reduce((sum, biome) => sum + biome.vaegt, 0);
@@ -286,8 +372,8 @@ export function initialiserGitter() {
         raaKort = nytKort;
     }
 
-    const bySementer = 5;
-    const markedSementer = 6;
+    const bySementer = Math.floor(antal / 400);
+    const markedSementer = Math.floor(antal / 200);
 
     function spredBiome(startIndeks: number, type: 'by' | 'marked', maxStr: number) {
         const aabne = [startIndeks];
@@ -344,9 +430,9 @@ export function initialiserGitter() {
     ledigeEvents.forEach(e => eventForbrug.set(e, 0));
 
     const eventChancer: Record<string, number> = {
-        'hule': 0.80, 'ritual': 0.80, 'ruin': 0.80, 'bandit': 0.80, 'krystal': 0.15,
-        'blodskov': 0.15, 'slagmark': 0.15, 'by': 0.15, 'marked': 0.15, 'hoejland': 0.05,
-        'hav': 0.05, 'bjerg': 0.04, 'skov': 0.04, 'eng': 0.04, 'mark': 0.04
+        'hule': 0.50, 'ritual': 0.90, 'ruin': 0.50, 'bandit': 0.10, 'krystal': 0.02,
+        'blodskov': 0.02, 'slagmark': 0.02, 'by': 0.02, 'marked': 0.02, 'hoejland': 0.01,
+        'hav': 0.005, 'bjerg': 0.01, 'skov': 0.01, 'eng': 0.01, 'mark': 0.01
     };
 
     const tilfaeldigeFelter = Array.from({length: antal}, (_, i) => i).sort((a, b) => {
@@ -361,7 +447,7 @@ export function initialiserGitter() {
         if (felt.eventID) continue;
 
         const pauseEvents = false; 
-        const chance = pauseEvents ? 0 : (eventChancer[felt.biome as string] || 0.05) / 10;
+        const chance = pauseEvents ? 0 : (eventChancer[felt.biome as string] || 0.05);
 
         if (Math.random() < chance) {
             const matchendeEvents = ledigeEvents.filter(noegle => {
@@ -437,6 +523,13 @@ export function initialiserGitter() {
         if (hvedeCount > boenneCount) felt.afgroede = 'hvede';
         else if (boenneCount > hvedeCount) felt.afgroede = 'boenner';
         else felt.afgroede = Math.random() < 0.5 ? 'hvede' : 'boenner';
+    }
+
+    plantSkat(nytGitter);
+
+    for (let i = 0; i < antal; i++) {
+        nytGitter[i].grundBiome = nytGitter[i].biome;
+        nytGitter[i].grundEvent = nytGitter[i].eventID;
     }
 
     spilTilstand.gitter = nytGitter;
@@ -566,6 +659,8 @@ export function bygOgHopGennemPortal() {
 }
 
 export async function udloesNaturkatastrofe(centerIndex: number) {
+    rystSkaerm(1200);
+
     const felter = spilTilstand.gitter;
     const paavirkede = new Set<number>();
 
@@ -622,6 +717,127 @@ export async function udloesNaturkatastrofe(centerIndex: number) {
     syncTilDb(true);
 }
 
+export async function udloesJordskaelv(centerIndex: number) {
+    rystSkaerm(2000);
+
+    const felter = spilTilstand.gitter;
+    const paavirkede = new Set<number>();
+
+    paavirkede.add(centerIndex);
+
+    const ring1 = hentNaboIndices(centerIndex);
+    for (const r1 of ring1) {
+        if (Math.random() < 0.70) paavirkede.add(r1);
+    }
+
+    const lukkedeFelter = new Set([centerIndex, ...ring1]);
+    const inficeredeRing1 = Array.from(paavirkede).filter(i => i !== centerIndex);
+
+    for (const inficeret of inficeredeRing1) {
+        const ring2 = hentNaboIndices(inficeret);
+        for (const r2 of ring2) {
+            if (!lukkedeFelter.has(r2) && Math.random() < 0.40) {
+                paavirkede.add(r2);
+            }
+        }
+    }
+
+    const paavirkedeArray = Array.from(paavirkede);
+
+    for (const idx of paavirkedeArray) {
+        if (felter[idx].biome === 'hav') continue; 
+        
+        felter[idx].biome = Math.random() < 0.2 ? 'ruin' : 'bjerg';
+        felter[idx].hasGoldmine = false;
+        felter[idx].hasBoat = false;
+        felter[idx].afgroede = undefined;
+        felter[idx].shopItems = undefined;
+        felter[idx].eventID = undefined;
+
+        if (!spilTilstand.mineKendteFelter.includes(idx)) {
+            spilTilstand.mineKendteFelter.push(idx);
+        }
+    }
+
+    spilTilstand.gitter = [...felter];
+
+    if (spilTilstand.rumKode) {
+        await supabase.channel(spilTilstand.rumKode).send({
+            type: 'broadcast',
+            event: 'rystelse',
+            payload: { varighed: 2000 }
+        });
+    }
+
+    if (paavirkedeArray.includes(spilTilstand.spillerIndex)) {
+        tagSkadeOgTjekDød(40, "Jorden brød op under dig.", "Klipperne skyder op fra undergrunden og knuser dig mod bjergvæggen.");
+    }
+
+    syncTilDb(true);
+}
+
+export async function udloesOversvoemmelse(centerIndex: number) {
+    rystSkaerm(1500);
+
+    const felter = spilTilstand.gitter;
+    const paavirkede = new Set<number>();
+
+    paavirkede.add(centerIndex);
+
+    const ring1 = hentNaboIndices(centerIndex);
+    for (const r1 of ring1) {
+        if (Math.random() < 0.85) paavirkede.add(r1);
+    }
+
+    const lukkedeFelter = new Set([centerIndex, ...ring1]);
+    const inficeredeRing1 = Array.from(paavirkede).filter(i => i !== centerIndex);
+
+    for (const inficeret of inficeredeRing1) {
+        const ring2 = hentNaboIndices(inficeret);
+        for (const r2 of ring2) {
+            if (!lukkedeFelter.has(r2) && Math.random() < 0.50) {
+                paavirkede.add(r2);
+            }
+        }
+    }
+
+    const paavirkedeArray = Array.from(paavirkede);
+
+    for (const idx of paavirkedeArray) {
+        felter[idx].biome = 'hav';
+        felter[idx].hasGoldmine = false;
+        felter[idx].hasBoat = false;
+        felter[idx].afgroede = undefined;
+        felter[idx].shopItems = undefined;
+        felter[idx].eventID = undefined;
+
+        if (!spilTilstand.mineKendteFelter.includes(idx)) {
+            spilTilstand.mineKendteFelter.push(idx);
+        }
+    }
+
+    spilTilstand.gitter = [...felter];
+
+    if (spilTilstand.rumKode) {
+        await supabase.channel(spilTilstand.rumKode).send({
+            type: 'broadcast',
+            event: 'rystelse',
+            payload: { varighed: 1500 }
+        });
+    }
+
+    if (paavirkedeArray.includes(spilTilstand.spillerIndex)) {
+        const harRustning = spilTilstand.mitUdstyr.some(t => t.id === 'rustning');
+        if (harRustning) {
+            tagSkadeOgTjekDød(80, "Din tunge rustning trak dig mod bunden.", "Vandet sluger landskabet. Du trækkes under af dit udstyr og drukner.");
+        } else {
+            tagSkadeOgTjekDød(30, "En flodbølge skyllede dig brutalt ned af klipperne.", "Masserne flænser landskabet, og du skylles i døden.");
+        }
+    }
+
+    syncTilDb(true);
+}
+
 export function udvindMeteorSkat(metode: string): { logBesked: string; hpNed?: number; guldOp?: number; itemUd?: string } {
     const pris = spilTilstand.valgtKarakter ? spilTilstand.valgtKarakter.baseEnergi * 2 : 10;
     spilTilstand.nuvaerendeEnergi -= pris;
@@ -642,4 +858,29 @@ export function udvindMeteorSkat(metode: string): { logBesked: string; hpNed?: n
             itemUd: 'diamant' 
         };
     }
+}
+
+export function nulstilKort() {
+    spilTilstand.gitter.forEach(felt => {
+        felt.gravet = false;
+        felt.eventFuldført = false;
+        felt.hasBoat = false;
+        felt.smadretFremTilBlok = undefined;
+        felt.hoestetFremTilBlok = undefined;
+        felt.mineOwner = undefined;
+        felt.hasMeteorStone = false;
+
+        if (felt.grundBiome) {
+            felt.biome = felt.grundBiome;
+            felt.eventID = felt.grundEvent;
+            
+            const hemmeligheder = genererUndergrund(felt.grundBiome as string);
+            felt.skjultGuld = hemmeligheder.skjultGuld;
+            felt.skjultLiv = hemmeligheder.skjultLiv;
+            felt.skjultFaelde = hemmeligheder.skjultFaelde;
+            felt.skjultLoot = hemmeligheder.skjultLoot;
+        }
+    });
+
+    plantSkat(spilTilstand.gitter);
 }

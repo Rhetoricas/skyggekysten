@@ -3,7 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
     import { grav } from '$lib/undergrund.svelte';
-    import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal } from '$lib/spilmotor';
+    import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal, aktiverHemmelighed } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
 
     let aktueltFelt = $derived(
@@ -17,7 +17,6 @@
     let visLog = $state(false);
     let logContainerRef = $state<HTMLDivElement | null>(null);
 
-    // KORREKTE UDSREGNINGER (Karakter + Rygsæk)
     let totalMove = $derived((spilTilstand.valgtKarakter?.moveCost ?? 1) + spilTilstand.rygsækEffekt.move);
     let totalArmor = $derived(100 - Math.round(((spilTilstand.valgtKarakter?.dmgMod ?? 1.0) + spilTilstand.rygsækEffekt.dmg) * 100));
     let totalGoldMod = $derived(Math.round(((spilTilstand.valgtKarakter?.goldMod ?? 1.0) + spilTilstand.rygsækEffekt.gold) * 100));
@@ -71,6 +70,8 @@
             udfoerTeleport();
         } else if (vareId === 'fakkel') {
             taendBaal();
+        } else if (vareId === 'hemmelighed') {
+            aktiverHemmelighed();
         }
     }
 </script>
@@ -175,7 +176,9 @@
                 {@const dbInfo = itemDB[vare.id]}
                 {#if dbInfo}
                     <div 
-                        class="inventory-item {(vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) || (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi) || (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi)) || (vare.id === 'stav') || (vare.id === 'fakkel') ? 'klikbar' : ''}" 
+                        class="inventory-item {(vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) ||
+(vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi) ||
+(vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi)) || (vare.id === 'stav') || (vare.id === 'fakkel') || (vare.id === 'hemmelighed') ? 'klikbar' : ''}" 
                         onclick={() => {
                             if (vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) {
                                 haandterInventoryKlik(vare.id);
@@ -186,6 +189,8 @@
                             } else if (vare.id === 'stav') {
                                 haandterInventoryKlik(vare.id);
                             } else if (vare.id === 'fakkel') {
+                                haandterInventoryKlik(vare.id);
+                            } else if (vare.id === 'hemmelighed') {
                                 haandterInventoryKlik(vare.id);
                             }
                         }}
@@ -200,6 +205,8 @@
                                 } else if (vare.id === 'stav') {
                                     haandterInventoryKlik(vare.id);
                                 } else if (vare.id === 'fakkel') {
+                                    haandterInventoryKlik(vare.id);
+                                } else if (vare.id === 'hemmelighed') {
                                     haandterInventoryKlik(vare.id);
                                 }
                             }
@@ -244,6 +251,19 @@
         display: flex;
         flex-direction: column;
     }
+
+    .ui::before {
+        content: '';
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        height: 35vh;
+        background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.15) 30%, rgba(0, 0, 0, 0.4) 100%);
+        z-index: -1;
+        pointer-events: none;
+    }
+
     .island-overskrift {
         text-align: center;
         width: 100%;
@@ -448,9 +468,10 @@
         display: flex; justify-content: space-between; padding: 15px 20px;
         border-bottom: 1px solid #333;
     }
-    .log-header h2 { color: #ffcc00; font-family: 'Cinzel', serif; margin: 0; }
+    .log-header h2 { color: #ffcc00; font-family: 'Cinzel', serif; margin: 0;
+    }
     .log-liste { padding: 20px; overflow-y: auto; flex-grow: 1; }
     .log-post { color: #aaa;
         border-left: 2px solid #333; padding-left: 12px; margin-bottom: 10px; }
     .log-post.nyeste { color: white; border-left-color: #ffcc00; }
-</style> 
+</style>
