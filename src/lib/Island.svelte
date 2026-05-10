@@ -395,19 +395,22 @@ function håndterTastatur(ev: KeyboardEvent) {
         if (alarmKanal) supabase.removeChannel(alarmKanal);
     });
 
-    async function opdaterOgGemHighscore() {
-        const winBonus = spilTilstand.gameState === 'win' ? 1000 : 0;
-        const fremdriftPoint = spilTilstand.maxKolonne * 1;
+async function opdaterOgGemHighscore() {
+    const winBonus = spilTilstand.gameState === 'win' ? 1000 : 0;
+    const fremdriftPoint = spilTilstand.maxKolonne * 1;
+    
+    const udforskningPoint = spilTilstand.mineKendteFelter.length * 2;
+    const minePoint = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length * 100;
 
-        spilTilstand.samletScore = Math.floor(
-            (spilTilstand.guldTotal + fremdriftPoint + winBonus) *
-                (1 + Math.max(0, spilTilstand.livspoint) / 1000)
-        );
-        
-        await gemHighscore();
-        lokaleScores = await hentHighscores();
-        globaleScores = await hentGlobalTopTi();
-    }
+    spilTilstand.samletScore = Math.floor(
+        (spilTilstand.guldTotal + fremdriftPoint + udforskningPoint + minePoint + winBonus) *
+            (1 + Math.max(0, spilTilstand.livspoint) / 1000)
+    );
+    
+    await gemHighscore();
+    lokaleScores = await hentHighscores();
+    globaleScores = await hentGlobalTopTi();
+}
 
     async function bekræftValg(karakter: Karakter) {
         spilTilstand.valgtKarakter = karakter;
