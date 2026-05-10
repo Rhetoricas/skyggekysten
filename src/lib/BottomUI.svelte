@@ -258,7 +258,7 @@
         bottom: 0;
         left: 0;
         width: 100vw;
-        height: 35vh;
+        height: 20vh;
         background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.15) 30%, rgba(0, 0, 0, 0.4) 100%);
         z-index: -1;
         pointer-events: none;
