@@ -7,8 +7,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi } from '$lib/netvaerk';
-    import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, tjekMiljoeSlitage, udfoerPortalTeleport, nulstilKort, rystSkaerm } from '$lib/spilmotor';
-    import { grav } from '$lib/undergrund.svelte';
+import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, tjekMiljoeSlitage, udfoerPortalTeleport, nulstilKort, rystSkaerm, udloesOversvoemmelse, udloesJordskaelv } from '$lib/spilmotor';    import { grav } from '$lib/undergrund.svelte';
     import { fremrykTid, erSpillerITaagen, tagSkadeOgTjekDød } from '$lib/overlevelse.svelte';    
     import { eventState, startEvent, lukEvent as motorLukEvent } from '$lib/eventMotor.svelte';
     import {
@@ -204,34 +203,36 @@
         });
     }
 
-    function håndterTastatur(ev: KeyboardEvent) {
-        if (ev.repeat || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
-        if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+function håndterTastatur(ev: KeyboardEvent) {
+    if (ev.repeat || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
+    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
 
-        const tast = ev.key.toLowerCase();
-        if (tast === 'g') grav();
-        else if (tast === 'h') hvil();
-        else if (tast === 'f') {
-            langsomtKamera = false;
-            cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
-        }
-        else if (tast === 'q') flytHex('NW');
-        else if (tast === 'e') flytHex('NE');
-        else if (tast === 'a') flytHex('W');
-        else if (tast === 'd') flytHex('E');
-        else if (tast === 'z') flytHex('SW');
-        else if (tast === 'c') flytHex('SE');
-        else if (tast === 'm') {
-            const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-            if (felt.eventID === 'meteor_skat' && !felt.eventFuldført) {
-                startEvent('meteor_skat');
-            } else {
-                felt.eventID = 'stjernekald';
-                felt.eventFuldført = false;
-                startEvent('stjernekald');
-            }
+    const tast = ev.key.toLowerCase();
+    if (tast === 'g') grav();
+    else if (tast === 'h') hvil();
+    else if (tast === 'f') {
+        langsomtKamera = false;
+        cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
+    }
+    else if (tast === 'q') flytHex('NW');
+    else if (tast === 'e') flytHex('NE');
+    else if (tast === 'a') flytHex('W');
+    else if (tast === 'd') flytHex('E');
+    else if (tast === 'z') flytHex('SW');
+    else if (tast === 'c') flytHex('SE');
+    else if (tast === 'o') udloesOversvoemmelse(spilTilstand.spillerIndex);
+    else if (tast === 'j') udloesJordskaelv(spilTilstand.spillerIndex);
+    else if (tast === 'm') {
+        const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
+        if (felt.eventID === 'meteor_skat' && !felt.eventFuldført) {
+            startEvent('meteor_skat');
+        } else {
+            felt.eventID = 'stjernekald';
+            felt.eventFuldført = false;
+            startEvent('stjernekald');
         }
     }
+}
 
     async function genstartBane() {
         const timeoutGraense = Date.now() - (5 * 60 * 1000);
