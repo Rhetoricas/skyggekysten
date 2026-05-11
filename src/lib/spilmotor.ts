@@ -1,5 +1,5 @@
 import { spilTilstand } from '$lib/spilTilstand.svelte';
-import { syncTilDb } from '$lib/netvaerk';
+import { syncTilDb, broadcastFelt } from '$lib/netvaerk';
 import { BREDDE, HOEJDE, biomeVægte, itemDB, markedVarePool } from '$lib/spildata';
 import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
@@ -7,6 +7,7 @@ import { genererUndergrund } from '$lib/undergrund.svelte';
 import { fremrykTid, fremtvingKollaps, tagSkadeOgTjekDød } from '$lib/overlevelse.svelte';
 import type { Felt, RygsækTing } from '$lib/types';
 import { delNyeKort } from '$lib/ventespil.svelte';
+import { startEvent } from '$lib/eventMotor.svelte';
 
 const RETNINGER = {
     'NE': [[0, -1], [1, -1]],
@@ -157,6 +158,123 @@ export function afslørOmraade(centerIndex: number, radius: number = 1) {
     });
 }
 
+export function haandterFeltInteraktion(nytIndeks: number, teleportKilde: 'stav' | 'portal' | 'byg_portal') {
+    const felt = spilTilstand.gitter[nytIndeks];
+    let ekstraLog = "";
+
+    const nulHp = ['mark', 'by', 'eng', 'marked', 'hoejland', 'skov'];
+    const toHp = ['bjerg', 'hule'];
+    let hpStraf = 0;
+    
+    if (nulHp.includes(felt.biome as string)) hpStraf = 0;
+    else if (toHp.includes(felt.biome as string)) hpStraf = 3;
+
+    if (hpStraf > 0) {
+        hpStraf = spilTilstand.beregnSkade(hpStraf);
+        spilTilstand.livspoint -= hpStraf;
+        ekstraLog += ` Landingen var hård. (-${hpStraf} HP)`;
+    }
+
+    if (felt.skjultFaelde && !felt.gravet) {
+        const faeldeSkade = spilTilstand.beregnSkade(15);
+        spilTilstand.livspoint -= faeldeSkade;
+        felt.skjultFaelde = false;
+        felt.gravet = true;
+        ekstraLog += ` KLIK! Du lander direkte oven i en skjult fælde! (-${faeldeSkade} HP)`;
+        broadcastFelt(nytIndeks, felt);
+    }
+
+    const nuBlok = Math.ceil((spilTilstand.dag || 1) / 5);
+    const erHvedeTid = nuBlok % 2 !== 0; 
+    const erSmadret = felt.smadretFremTilBlok !== undefined && nuBlok <= felt.smadretFremTilBlok;
+    const erHoestet = felt.hoestetFremTilBlok !== undefined && nuBlok <= felt.hoestetFremTilBlok;
+    
+    if (felt.biome === 'mark' && felt.afgroede && !erSmadret && !erHoestet) {
+        const erModen = (felt.afgroede === 'hvede' && erHvedeTid) || (felt.afgroede === 'boenner' && !erHvedeTid);
+        if (erModen) {
+            spilTilstand.livspoint += 3;
+            felt.hoestetFremTilBlok = nuBlok;
+        } else {
+            felt.smadretFremTilBlok = nuBlok + 1;
+        }
+        broadcastFelt(nytIndeks, felt);
+    }
+
+    if (felt.biome === 'hav') {
+        tagSkadeOgTjekDød(30, `Du blev kastet over åbent vand og styrtede i havet!`, "De kolde bølger trak dig under. Du er død.");
+        if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'dead') {
+            return false;
+        }
+    }
+
+    if (felt.hasGoldmine) {
+        const spiller = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
+        if (!spiller.besoegteMiner) spiller.besoegteMiner = [];
+        
+        const varEjer = felt.mineOwner === spilTilstand.spillerNavn;
+        const harBesoegt = spiller.besoegteMiner.includes(nytIndeks);
+        
+        if (!varEjer) {
+            if (felt.mineLocked) {
+                ekstraLog += " Minen er spærret med en massiv hængelås. Ejeren har sikret den for evigt.";
+            } else {
+                const ejedeMiner = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
+                felt.mineOwner = spilTilstand.spillerNavn;
+                
+                if (!harBesoegt) {
+                    spiller.besoegteMiner.push(nytIndeks);
+                    const basisGuld = 100 + (ejedeMiner * 50);
+                    const faktiskGuld = spilTilstand.beregnGuldIndkomst ? spilTilstand.beregnGuldIndkomst(basisGuld) : basisGuld;
+                    spilTilstand.guldTotal += faktiskGuld;
+                    ekstraLog += ` Du overtager minen og udbetaler ${faktiskGuld} guld.`;
+                } else {
+                    felt.mineLocked = true;
+                    ekstraLog += ` Du flår skødet tilbage og låser minen for evigt!`;
+                }
+                spilTilstand.gitter[nytIndeks] = { ...felt };
+                broadcastFelt(nytIndeks, spilTilstand.gitter[nytIndeks]);
+            }
+        }
+    }
+
+    const slidLog = tjekMiljoeSlitage(felt.biome as string);
+    const startLog = teleportKilde === 'stav' 
+        ? "Rummet folder sig sammen. Du kastes blindt mod øst." 
+        : "Portalens sug flår dig afsted mod øst.";
+    
+    spilTilstand.logBesked = `${startLog}${ekstraLog}${slidLog}`;
+
+    fremrykTid();
+    
+    if (felt.hasBoat) {
+        felt.hasBoat = false;
+        if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].isWinner = true;
+        }
+        spilTilstand.logBesked = "Du mærker bådens ru træ under dine støvler. Havet åbner sig. Du har overlevet øen og kan trække vejret frit.";
+        broadcastFelt(nytIndeks, felt);
+        setTimeout(() => {
+            spilTilstand.gameState = 'win_map';
+            syncTilDb(true); 
+        }, 3000);
+    } else {
+        if (felt.eventID && !felt.eventFuldført) {
+            felt.eventFuldført = true;
+            broadcastFelt(nytIndeks, felt);
+            startEvent(felt.eventID);
+        }
+        else if (felt.shopItems && felt.shopItems.length > 0) spilTilstand.aktivShop = felt.shopItems;
+    }
+
+    spilTilstand.gitter = [...spilTilstand.gitter];
+    syncTilDb(true);
+
+    if (spilTilstand.livspoint <= 0 && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map') {
+        fremtvingKollaps("Kræfterne rev din sidste livsgnist væk.");
+    }
+    return true;
+}
+
 function udfoerKerneTeleport(kilde: 'stav' | 'portal') {
     if (spilTilstand.erBevidstløs || !spilTilstand.valgtKarakter) return;
 
@@ -166,7 +284,6 @@ function udfoerKerneTeleport(kilde: 'stav' | 'portal') {
     }
 
     const pris = spilTilstand.valgtKarakter.baseEnergi;
-
     spilTilstand.nuvaerendeEnergi -= pris;
 
     const gammeltIndeks = spilTilstand.spillerIndex;
@@ -177,46 +294,16 @@ function udfoerKerneTeleport(kilde: 'stav' | 'portal') {
     const nytIndeks = raekke * BREDDE + nyKolonne;
 
     spilTilstand.spillerIndex = nytIndeks;
+    if (!spilTilstand.historik) spilTilstand.historik = [];
+    spilTilstand.historik.push(nytIndeks);
+    
     afslørOmraade(nytIndeks, Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn));
 
     if (nyKolonne > spilTilstand.maxKolonne) {
         spilTilstand.maxKolonne = nyKolonne;
     }
 
-    const felt = spilTilstand.gitter[nytIndeks];
-    let ekstraLog = "";
-
-    if (felt) {
-        if (felt.biome === 'hav') {
-            const skade = spilTilstand.beregnSkade(30);
-            spilTilstand.livspoint -= skade;
-            ekstraLog = ` Du ${kilde === 'stav' ? 'materialiserer dig' : 'spyttes ud'} over åbent vand og styrter i havet! (-${skade} HP)`;
-        } else if (felt.biome === 'bjerg') {
-            const skade = spilTilstand.beregnSkade(15);
-            spilTilstand.livspoint -= skade;
-            ekstraLog = ` Du lander brutalt i de takkede klipper! (-${skade} HP)`;
-        } else if (felt.skjultFaelde && !felt.gravet) {
-            const faeldeSkade = spilTilstand.beregnSkade(15);
-            spilTilstand.livspoint -= faeldeSkade;
-            felt.skjultFaelde = false;
-            felt.gravet = true;
-            ekstraLog = ` KLIK! Du lander direkte oven i en skjult fælde! (-${faeldeSkade} HP)`;
-        }
-    }
-
-    const slidLog = tjekMiljoeSlitage(felt.biome as string);
-    const startLog = kilde === 'stav' 
-        ? "Rummet folder sig sammen. Du kastes blindt mod øst." 
-        : "Portalens sug flår dig afsted mod øst.";
-    
-    spilTilstand.logBesked = `${startLog}${ekstraLog}${slidLog}`;
-    
-    fremrykTid();
-    syncTilDb(true);
-
-    if (spilTilstand.livspoint <= 0) {
-        fremtvingKollaps(kilde === 'stav' ? "Landingen slog luften ud af dig." : "Portalens voldsomme kræfter rev din sidste livsgnist væk.");
-    }
+    haandterFeltInteraktion(nytIndeks, kilde);
 }
 
 export function udfoerTeleport() {
@@ -275,8 +362,6 @@ export function aktiverHemmelighed() {
         klynge.forEach(idx => nyeFelter.add(idx));
         spilTilstand.mineKendteFelter = Array.from(nyeFelter);
 
-        // HACK: Vi smider et usynligt skattekort_aabent item i rygsækken
-        // Databasen synkroniserer rygsækken perfekt, så Svelte aldrig glemmer det
         tilfoejTilRygsæk('skattekort_aabent', 1);
         
         spilTilstand.kameraFokus = klynge[Math.floor(klynge.length / 2)];
@@ -646,8 +731,11 @@ export function bygOgHopGennemPortal() {
     const hopIndeks = raekke * BREDDE + nyKolonne;
     
     spilTilstand.gitter[gammeltIndeks].hasPortal = true;
+    broadcastFelt(gammeltIndeks, spilTilstand.gitter[gammeltIndeks]);
     
     spilTilstand.spillerIndex = hopIndeks;
+    if (!spilTilstand.historik) spilTilstand.historik = [];
+    spilTilstand.historik.push(hopIndeks);
 
     if (nyKolonne > spilTilstand.maxKolonne) {
         spilTilstand.maxKolonne = nyKolonne;
@@ -655,6 +743,7 @@ export function bygOgHopGennemPortal() {
     
     afslørOmraade(hopIndeks, Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn));
     
+    haandterFeltInteraktion(hopIndeks, 'byg_portal');
     return true;
 }
 
@@ -844,6 +933,7 @@ export function udvindMeteorSkat(metode: string): { logBesked: string; hpNed?: n
     
     const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
     felt.hasMeteorStone = false;
+    broadcastFelt(spilTilstand.spillerIndex, felt);
     
     if (metode === 'haender') {
         return {
@@ -868,6 +958,7 @@ export function nulstilKort() {
         felt.smadretFremTilBlok = undefined;
         felt.hoestetFremTilBlok = undefined;
         felt.mineOwner = undefined;
+        felt.mineLocked = undefined;
         felt.hasMeteorStone = false;
 
         if (felt.grundBiome) {

@@ -70,14 +70,16 @@ export function skabKamera() {
         y = raekke * rowH + (rowH / 2);
     }
 
-    function foelgSpiller(index: number, bredde: number, hexW: number, rowH: number) {
+function foelgSpiller(index: number, bredde: number, hexW: number, rowH: number) {
         const raekke = Math.floor(index / bredde);
         const kolonne = index % bredde;
         const px = kolonne * hexW + (raekke % 2 !== 0 ? hexW / 2 : 0) + (hexW / 2);
         const py = raekke * rowH + (rowH / 2);
 
-        const deadzoneX = window.innerWidth * 0.25; 
-        const deadzoneY = window.innerHeight * 0.25;
+        // Stardew Valley effekt: En kæmpe dødzone. 
+        // Du skal næsten helt ud til kanten (40% fra midten på X, 35% på Y) før kameraet rykker sig.
+        const deadzoneX = window.innerWidth * 0.40; 
+        const deadzoneY = window.innerHeight * 0.35;
 
         if (px > x + deadzoneX) x = px - deadzoneX;
         else if (px < x - deadzoneX) x = px + deadzoneX;

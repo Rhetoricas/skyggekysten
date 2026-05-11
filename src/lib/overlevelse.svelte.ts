@@ -1,6 +1,6 @@
 import { spilTilstand } from './spilTilstand.svelte';
-import { syncTilDb } from './netvaerk';
-import { BREDDE, HEX_W } from './spildata';
+import { syncTilDb, broadcastFelt } from './netvaerk';
+import { BREDDE, HEX_W, HOEJDE } from './spildata';
 import { brugFraRygsæk } from './spilmotor';
 
 export function erSpillerITaagen() {
@@ -121,7 +121,29 @@ export function fremrykTid() {
         let samletLog = "";
 
         if (nyDag === 2) {
-            samletLog += "Du kan nu overskue omgivelserne og zoome ud og ind.";
+            samletLog += "Du kan nu overskue omgivelserne og zoome ud og ind. ";
+        }
+        
+        // NYT: Generer både på østkysten, når solen står op på dag 6
+        if (nyDag === 6 && gammelDag < 6) {
+            const kystFelter = [];
+            for (let r = 1; r < HOEJDE - 1; r++) {
+                const indeks = r * BREDDE + (BREDDE - 2);
+                if (spilTilstand.gitter[indeks] && spilTilstand.gitter[indeks].biome !== 'hav') {
+                    kystFelter.push(indeks);
+                }
+            }
+            
+            kystFelter.sort(() => Math.random() - 0.5);
+            const antalBaade = Math.min(antalLevende, kystFelter.length);
+            
+            for (let i = 0; i < antalBaade; i++) {
+                spilTilstand.gitter[kystFelter[i]].hasBoat = true;
+                broadcastFelt(kystFelter[i], spilTilstand.gitter[kystFelter[i]]);
+            }
+            
+            samletLog += "Et fjernt horn gjalder gennem tågen. Flugtbådene er ankommet til den østlige kyst!";
+            spilTilstand.gitter = [...spilTilstand.gitter];
         }
 
         if (samletLog.trim() !== "") {

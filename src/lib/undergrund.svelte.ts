@@ -1,5 +1,5 @@
 import { spilTilstand } from './spilTilstand.svelte';
-import { syncTilDb } from './netvaerk';
+import { syncTilDb, broadcastFelt } from './netvaerk';
 import { fremtvingKollaps, fremrykTid } from '$lib/overlevelse.svelte';
 import { afslørOmraade, tilfoejTilRygsæk } from '$lib/spilmotor';
 import type { Biome } from './types';
@@ -76,6 +76,10 @@ export function grav() {
     graverNu = true;
     felt.gravet = true;
     spilTilstand.gitter[spilTilstand.spillerIndex] = felt;
+    
+    // NYT: Skyd ændringen ud på lyn-kanalen omgående for at spærre feltet for andre
+    broadcastFelt(spilTilstand.spillerIndex, felt);
+    
     spilTilstand.gitter = [...spilTilstand.gitter];
 
     const baseGravePris = spilTilstand.valgtKarakter.digCost || 3;

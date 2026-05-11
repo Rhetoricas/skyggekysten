@@ -52,6 +52,7 @@ export interface SpillerData {
     ikon?: string;
     mitUdstyr?: RygsækTing[];
     kendteFelter?: number[];
+    historik?: number[];
     energi?: number;
     turNummer: number;
     dag?: number;
@@ -101,6 +102,7 @@ export interface Felt {
 
     hasGoldmine?: boolean;
     mineOwner?: string;
+    mineLocked?: boolean;
     hasMeteorStone?: boolean;
 
     grundBiome?: string | Biome;

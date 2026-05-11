@@ -6,8 +6,9 @@
     import type { RealtimeChannel } from '@supabase/supabase-js';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi } from '$lib/netvaerk';
-import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, tjekMiljoeSlitage, udfoerPortalTeleport, nulstilKort, rystSkaerm, udloesOversvoemmelse, udloesJordskaelv } from '$lib/spilmotor';    import { grav } from '$lib/undergrund.svelte';
+    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi, broadcastFelt } from '$lib/netvaerk';
+    import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, tjekMiljoeSlitage, udfoerPortalTeleport, nulstilKort, rystSkaerm, udloesOversvoemmelse, udloesJordskaelv } from '$lib/spilmotor';
+    import { grav } from '$lib/undergrund.svelte';
     import { fremrykTid, erSpillerITaagen, tagSkadeOgTjekDød } from '$lib/overlevelse.svelte';    
     import { eventState, startEvent, lukEvent as motorLukEvent } from '$lib/eventMotor.svelte';
     import {
@@ -65,7 +66,7 @@ import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRyg
                 bgMusik.play().catch(() => {});
             } else {
                 bgMusik.pause();
-                if (spilTilstand.gameState === 'win' || spilTilstand.gameState === 'dead') {
+                if (spilTilstand.gameState === 'win' || spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'win_map' || spilTilstand.gameState === 'dead_map') {
                     bgMusik.currentTime = 0;
                 }
             }
@@ -78,7 +79,7 @@ import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRyg
         untrack(() => {
             if (state === 'play') {
                 scoreErGemt = false;
-            } else if ((state === 'win' || state === 'dead') && !scoreErGemt) {
+            } else if ((state === 'win' || state === 'dead' || state === 'win_map' || state === 'dead_map') && !scoreErGemt) {
                 scoreErGemt = true;
                 opdaterOgGemHighscore();
             }
@@ -110,7 +111,16 @@ import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRyg
                     } else {
                         langsomtKamera = false;
                     }
-                }, 5000);
+                }, 3000); // Sat ned til 3 sekunder
+            });
+        }
+    });
+
+    $effect(() => {
+        const aktueltIndex = spilTilstand.spillerIndex;
+        if (spilTilstand.gameState === 'play' && spilTilstand.kameraFokus === null && !langsomtKamera) {
+            untrack(() => {
+                cam.foelgSpiller(aktueltIndex, BREDDE, HEX_W, ROW_H);
             });
         }
     });
@@ -203,47 +213,49 @@ import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRyg
         });
     }
 
-function håndterTastatur(ev: KeyboardEvent) {
-    if (ev.repeat || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
-    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+    function håndterTastatur(ev: KeyboardEvent) {
+        if (ev.repeat || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
+        if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
 
-    const tast = ev.key.toLowerCase();
-    if (tast === 'g') grav();
-    else if (tast === 'h') hvil();
-    else if (tast === 'f') {
-        langsomtKamera = false;
-        cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
-    }
-    else if (tast === 'q') flytHex('NW');
-    else if (tast === 'e') flytHex('NE');
-    else if (tast === 'a') flytHex('W');
-    else if (tast === 'd') flytHex('E');
-    else if (tast === 'z') flytHex('SW');
-    else if (tast === 'c') flytHex('SE');
-    else if (tast === 'o') udloesOversvoemmelse(spilTilstand.spillerIndex);
-    else if (tast === 'j') udloesJordskaelv(spilTilstand.spillerIndex);
-    else if (tast === 'm') {
-        const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-        if (felt.eventID === 'meteor_skat' && !felt.eventFuldført) {
-            startEvent('meteor_skat');
-        } else {
-            felt.eventID = 'stjernekald';
-            felt.eventFuldført = false;
-            startEvent('stjernekald');
+        const tast = ev.key.toLowerCase();
+        if (tast === 'g') {
+            grav();
+        }
+        else if (tast === 'h') hvil();
+        else if (tast === 'f') {
+            langsomtKamera = false;
+            cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
+        }
+        else if (tast === 'q') flytHex('NW');
+        else if (tast === 'e') flytHex('NE');
+        else if (tast === 'a') flytHex('W');
+        else if (tast === 'd') flytHex('E');
+        else if (tast === 'z') flytHex('SW');
+        else if (tast === 'c') flytHex('SE');
+        else if (tast === 'o') udloesOversvoemmelse(spilTilstand.spillerIndex);
+        else if (tast === 'j') udloesJordskaelv(spilTilstand.spillerIndex);
+        else if (tast === 'm') {
+            const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
+            if (felt.eventID === 'meteor_skat' && !felt.eventFuldført) {
+                startEvent('meteor_skat');
+            } else {
+                felt.eventID = 'stjernekald';
+                felt.eventFuldført = false;
+                startEvent('stjernekald');
+            }
         }
     }
-}
 
     async function genstartBane() {
         const timeoutGraense = Date.now() - (5 * 60 * 1000);
         const aktiveSpillere = Object.values(spilTilstand.alleSpillere).filter((s: SpillerData) => {
             if (s.isDead || s.isWinner) return false;
-            if (s.sidstAktiv && s.sidstAktiv < timeoutGraense) return false;
-            return true;
+            if (s.sidstAktiv && s.sidstAktiv > timeoutGraense) return true;
+            return false;
         });
 
         if (aktiveSpillere.length > 0 && spilTilstand.rumKode) {
-            alert('Du kan ikke genstarte øen for alle, mens der stadig er andre aktive spillere derude.');
+            alert('Du kan ikke genstarte øen for alle, mens der stadig er andre aktive spillere ude i tågen.');
             return;
         }
 
@@ -301,8 +313,17 @@ function håndterTastatur(ev: KeyboardEvent) {
                 afslørOmraade(payload.centerIndex, payload.radius);
                 syncTilDb(true);
             })
-            .on('broadcast', { event: 'meteor' }, () => {
+            .on('broadcast', { event: 'meteor' }, ({ payload }) => {
                 rystSkaerm(1200);
+                payload.ramteFelter.forEach((idx: number) => {
+                    spilTilstand.gitter[idx] = {
+                        ...spilTilstand.gitter[idx],
+                        biome: 'meteor',
+                        hasMeteorStone: true,
+                        eventID: 'meteor_skat'
+                    };
+                });
+                spilTilstand.gitter = [...spilTilstand.gitter];
             })
             .on('broadcast', { event: 'rystelse' }, ({ payload }) => {
                 rystSkaerm(payload.varighed || 1500);
@@ -352,8 +373,8 @@ function håndterTastatur(ev: KeyboardEvent) {
                     startRealtime();
                     
                     if (eksisterende.isDead || eksisterende.isWinner) {
-                        spilTilstand.gameState = eksisterende.isWinner ? 'win' : 'dead';
-                        spilTilstand.statusBesked = eksisterende.isWinner ? 'Du er allerede sluppet væk.' : 'Du er død på øen.';
+                        spilTilstand.gameState = eksisterende.isWinner ? 'win_map' : 'dead_map';
+                        spilTilstand.statusBesked = eksisterende.isWinner ? 'Du overlevede rædslen.' : 'Du bukkede under for tågen.';
                     } else {
                         spilTilstand.gameState = 'play';
                         cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
@@ -395,22 +416,22 @@ function håndterTastatur(ev: KeyboardEvent) {
         if (alarmKanal) supabase.removeChannel(alarmKanal);
     });
 
-async function opdaterOgGemHighscore() {
-    const winBonus = spilTilstand.gameState === 'win' ? 1000 : 0;
-    const fremdriftPoint = spilTilstand.maxKolonne * 1;
-    
-    const udforskningPoint = spilTilstand.mineKendteFelter.length * 2;
-    const minePoint = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length * 100;
+    async function opdaterOgGemHighscore() {
+        const winBonus = (spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map') ? 1000 : 0;
+        const fremdriftPoint = spilTilstand.maxKolonne * 1;
+        
+        const udforskningPoint = spilTilstand.mineKendteFelter.length * 2;
+        const minePoint = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length * 100;
 
-    spilTilstand.samletScore = Math.floor(
-        (spilTilstand.guldTotal + fremdriftPoint + udforskningPoint + minePoint + winBonus) *
-            (1 + Math.max(0, spilTilstand.livspoint) / 1000)
-    );
-    
-    await gemHighscore();
-    lokaleScores = await hentHighscores();
-    globaleScores = await hentGlobalTopTi();
-}
+        spilTilstand.samletScore = Math.floor(
+            (spilTilstand.guldTotal + fremdriftPoint + udforskningPoint + minePoint + winBonus) *
+                (1 + Math.max(0, spilTilstand.livspoint) / 1000)
+        );
+        
+        await gemHighscore();
+        lokaleScores = await hentHighscores();
+        globaleScores = await hentGlobalTopTi();
+    }
 
     async function bekræftValg(karakter: Karakter) {
         spilTilstand.valgtKarakter = karakter;
@@ -450,20 +471,10 @@ async function opdaterOgGemHighscore() {
         spilTilstand.retning = 'E';
         for (const itemId of karakter.startUdstyr) { tilfoejTilRygsæk(itemId, 1); }
         
+        if (!spilTilstand.historik) spilTilstand.historik = [];
+        spilTilstand.historik.push(spilTilstand.spillerIndex);
+
         afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
-        
-        const muligeBaadFelter = [];
-        for (let raekke = 1; raekke < HOEJDE - 1; raekke++) {
-            const indeks = raekke * BREDDE + (BREDDE - 2);
-            if (!spilTilstand.gitter[indeks].hasBoat && spilTilstand.gitter[indeks].biome !== 'hav') {
-                muligeBaadFelter.push(indeks);
-            }
-        }
-        
-        if (muligeBaadFelter.length > 0) {
-            const baadIndeks = muligeBaadFelter[Math.floor(Math.random() * muligeBaadFelter.length)];
-            spilTilstand.gitter[baadIndeks].hasBoat = true;
-        }
         
         if (spilTilstand.erHost) {
             const { data } = await supabase.from('spil_sessioner').select('rum_kode').eq('rum_kode', spilTilstand.rumKode).maybeSingle();
@@ -579,6 +590,7 @@ async function opdaterOgGemHighscore() {
         } else {
             felt.smadretFremTilBlok = nuBlok + 1;
         }
+        broadcastFelt(nytIndeks, felt);
     }
 
     if (spilTilstand.livspoint <= 0) {
@@ -604,7 +616,9 @@ async function opdaterOgGemHighscore() {
     }
 
     spilTilstand.spillerIndex = nytIndeks;
-    cam.foelgSpiller(nytIndeks, BREDDE, HEX_W, ROW_H);
+    if (!spilTilstand.historik) spilTilstand.historik = [];
+    spilTilstand.historik.push(nytIndeks);
+
     afslørOmraade(nytIndeks, Math.max(felt.biome === 'bjerg' ? 2 : 1, aktuelSynsRadius));
     if ((nytIndeks % BREDDE) > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nytIndeks % BREDDE;
     
@@ -634,19 +648,28 @@ async function opdaterOgGemHighscore() {
         const harBesoegt = spiller.besoegteMiner.includes(nytIndeks);
         
         if (!varEjer) {
-            const ejedeMiner = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
-            felt.mineOwner = spilTilstand.spillerNavn;
-            
-            if (!harBesoegt) {
-                spiller.besoegteMiner.push(nytIndeks);
-                const basisGuld = 100 + (ejedeMiner * 50);
-                const faktiskGuld = spilTilstand.beregnGuldIndkomst(basisGuld);
-                spilTilstand.guldTotal += faktiskGuld;
-                specialLog += specialLog ?
-                    ` Du overtager minen og sikrer dig ${faktiskGuld} guld.` : `Du overtager minen og sikrer dig ${faktiskGuld} guld.`;
+            if (felt.mineLocked) {
+                specialLog = specialLog ? 
+                    `${specialLog} Minen er spærret med en massiv hængelås. Ejeren har sikret den for evigt.` : "Minen er spærret med en massiv hængelås. Ejeren har sikret den for evigt.";
             } else {
-                specialLog += specialLog ?
-                    ` Du flår skødet tilbage og generobrer din mine.` : `Du flår skødet tilbage og generobrer din mine.`;
+                const ejedeMiner = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
+                felt.mineOwner = spilTilstand.spillerNavn;
+                
+                if (!harBesoegt) {
+                    spiller.besoegteMiner.push(nytIndeks);
+                    const basisGuld = 100 + (ejedeMiner * 50);
+                    const faktiskGuld = spilTilstand.beregnGuldIndkomst ? spilTilstand.beregnGuldIndkomst(basisGuld) : basisGuld;
+                    spilTilstand.guldTotal += faktiskGuld;
+                    specialLog += specialLog ?
+                        ` Du overtager minen og udbetaler ${faktiskGuld} guld.` : `Du overtager minen og udbetaler ${faktiskGuld} guld.`;
+                } else {
+                    felt.mineLocked = true;
+                    specialLog += specialLog ?
+                        ` Du flår skødet tilbage og låser minen for evigt!` : `Du flår skødet tilbage og låser minen for evigt!`;
+                }
+                // Tvinger Svelte til at opdatere lokalt ved at erstatte objektet i gitteret
+                spilTilstand.gitter[nytIndeks] = { ...felt };
+                broadcastFelt(nytIndeks, spilTilstand.gitter[nytIndeks]);
             }
         }
     }
@@ -682,6 +705,9 @@ async function opdaterOgGemHighscore() {
         }
         
         spilTilstand.logBesked = "Du mærker bådens ru træ under dine støvler. Havet åbner sig. Du har overlevet øen og kan trække vejret frit.";
+        
+        broadcastFelt(nytIndeks, felt);
+
         setTimeout(() => {
             spilTilstand.gameState = 'win_map';
             syncTilDb(true); 
@@ -689,6 +715,7 @@ async function opdaterOgGemHighscore() {
     } else {
         if (felt.eventID && !felt.eventFuldført) {
             felt.eventFuldført = true;
+            broadcastFelt(nytIndeks, felt);
             startEvent(felt.eventID);
         }
         else if (felt.shopItems && felt.shopItems.length > 0) spilTilstand.aktivShop = felt.shopItems;
@@ -700,7 +727,7 @@ async function opdaterOgGemHighscore() {
 }
 
     function flytHex(retning: string) {
-        if (spilTilstand.erBevidstløs || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.gameState !== 'play') return;
+        if (spilTilstand.erBevidstløs || eventState.aktivt || spilTilstand.aktivShop || (spilTilstand.gameState !== 'play' && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map')) return;
         const raekke = Math.floor(spilTilstand.spillerIndex / BREDDE);
         const kolonne = spilTilstand.spillerIndex % BREDDE;
         const forskudt = raekke % 2 !== 0;
@@ -720,8 +747,8 @@ async function opdaterOgGemHighscore() {
     }
 
     function klikPåHex(nytIndeks: number) {
-        if (spilTilstand.erBevidstløs || cam.harTrukket || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.gameState !== 'play') return;
-        if (hentNaboIndices(spilTilstand.spillerIndex).includes(nytIndeks)) udførBevægelse(nytIndeks);
+        if (spilTilstand.erBevidstløs || cam.harTrukket || eventState.aktivt || spilTilstand.aktivShop || (spilTilstand.gameState !== 'play' && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map')) return;
+        if (spilTilstand.gameState === 'play' && hentNaboIndices(spilTilstand.spillerIndex).includes(nytIndeks)) udførBevægelse(nytIndeks);
     }
 </script>
 
@@ -818,7 +845,12 @@ async function opdaterOgGemHighscore() {
                             <div class="goldmine-container">
                                 <img src="/tiles/goldmine.webp" alt="Guldmine" class="goldmine-icon" />
                                 {#if felt.mineOwner}
-                                    <img src={felt.mineOwner === spilTilstand.spillerNavn ? spilTilstand.valgtKarakter?.ikon : (spilTilstand.alleSpillere[felt.mineOwner]?.ikon || '/tiles/player.webp')} alt="Ejer" class="mine-owner-portrait" />
+                                    <div class="owner-badge" class:locked={felt.mineLocked}>
+                                        <img src={felt.mineOwner === spilTilstand.spillerNavn ? spilTilstand.valgtKarakter?.ikon : (spilTilstand.alleSpillere[felt.mineOwner]?.ikon || '/tiles/player.webp')} alt="Ejer" class="mine-owner-portrait" />
+                                        {#if felt.mineLocked}
+                                            <span class="lock-icon">🔒</span>
+                                        {/if}
+                                    </div>
                                 {/if}
                             </div>
                         {/if}
@@ -861,7 +893,7 @@ async function opdaterOgGemHighscore() {
                             {/if}
                         {/each}
 
-                        {#if spilTilstand.spillerIndex === i && sejlendeBaadIndex !== i && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map' && spilTilstand.gameState !== 'dead'}
+                        {#if spilTilstand.spillerIndex === i && sejlendeBaadIndex !== i && spilTilstand.gameState !== 'dead' && spilTilstand.gameState !== 'win'}
                             <span class="player-icon" style="position: relative; display: inline-flex; justify-content: center; z-index: 20;">
                                 <img src={spilTilstand.valgtKarakter?.ikon} alt="" style="height: 58px;" />
                             </span>
@@ -884,6 +916,55 @@ async function opdaterOgGemHighscore() {
                     </div>
                 {/if}
             {/each}
+
+            {#if spilTilstand.gameState === 'win_map' || spilTilstand.gameState === 'dead_map'}
+                <svg class="rute-canvas">
+                    {#each Object.entries(spilTilstand.alleSpillere) as [navn, data] (navn)}
+                        {#if data.historik && data.historik.length > 1}
+                            {@const pointsArray = data.historik.map((idx: number) => {
+                                const raekke = Math.floor(idx / BREDDE);
+                                const kolonne = idx % BREDDE;
+                                const posX = kolonne * HEX_W + (raekke % 2 !== 0 ? HEX_W / 2 : 0) + (HEX_W / 2);
+                                const posY = raekke * ROW_H + 55;
+                                return {x: posX, y: posY};
+                            })}
+                            {@const points = pointsArray.map(p => `${p.x},${p.y}`).join(' ')}
+                            {@const startPoint = pointsArray[0]}
+                            {@const endPoint = pointsArray[pointsArray.length - 1]}
+                            {@const erMig = navn === spilTilstand.spillerNavn}
+                            
+                            <polyline 
+                                points={points} 
+                                fill="none" 
+                                stroke={erMig ? '#ffffff' : 'rgba(200, 200, 200, 0.4)'} 
+                                stroke-width={erMig ? "6" : "4"} 
+                                stroke-dasharray="12, 12"
+                                class="flugtrute"
+                            />
+                            
+                            <image 
+                                href={data.ikon || '/tiles/player.webp'} 
+                                x={startPoint.x - 20} 
+                                y={startPoint.y - 20} 
+                                width="40" 
+                                height="40" 
+                                class="rute-start-icon" 
+                                opacity={erMig ? "1" : "0.5"}
+                            />
+
+                            <image 
+                                href={data.ikon || '/tiles/player.webp'} 
+                                x={endPoint.x - 25} 
+                                y={endPoint.y - 25} 
+                                width="50" 
+                                height="50" 
+                                class="rute-end-icon" 
+                                opacity={erMig ? "1" : "0.8"}
+                            />
+                        {/if}
+                    {/each}
+                </svg>
+            {/if}
         </div>
     </div>
 </div>
@@ -893,16 +974,36 @@ async function opdaterOgGemHighscore() {
 {#if spilTilstand.venteSpilAktiv} <VenteModal kanSpilleIgen={spilTilstand.dag >= hentLangsomsteDag() + MAX_DAGE_FORAN} /> {/if}
 
 {#if spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'win_map'}
-    <div class="slut-banner" class:vundet={spilTilstand.gameState === 'win_map'}>
-        <p>{spilTilstand.logBesked}</p>
-        <div class="slut-knapper">
-            <button class="log-ikon-btn" onclick={() => visDoedsLog = true} title="Læs din log">
-                <img src="/ui/log_ikon.webp" alt="Log" />
-            </button>
-            <button class="accepter-slut-btn" onclick={() => spilTilstand.gameState = spilTilstand.gameState === 'win_map' ? 'win' : 'dead'}>
-                {spilTilstand.gameState === 'win_map' ? 'Forlad Øen' : 'Accepter din skæbne'}
-            </button>
+    <div class="slut-panel" class:vundet={spilTilstand.gameState === 'win_map'}>
+        <div class="slut-header">
+            <h2>{spilTilstand.gameState === 'win_map' ? 'Du undslap' : 'Øen tog dig'}</h2>
+            <p>{spilTilstand.logBesked}</p>
         </div>
+        
+        <div class="rangliste">
+            {#each Object.entries(spilTilstand.alleSpillere).sort((a, b) => (b[1].score || 0) - (a[1].score || 0)) as [navn, data] (navn)}
+                <div class="raekke" class:mig={navn === spilTilstand.spillerNavn}>
+                    <img src={data.ikon || '/tiles/player.webp'} alt="" />
+                    <div class="info">
+                        <strong>{navn}</strong>
+                        <span>{data.isWinner ? 'Sluppet væk' : (data.isDead ? 'Bukkede under' : 'I tågen')}</span>
+                    </div>
+                    <div class="stats">
+                        <span title="Guld">🪙 {data.guld}</span>
+                    </div>
+                </div>
+            {/each}
+        </div>
+
+        <button class="log-ikon-btn" onclick={() => visDoedsLog = true} title="Læs din fulde log">
+            <img src="/ui/log_ikon.webp" alt="Log" />
+            <span>Min Logbog</span>
+        </button>
+
+        <button class="se-resultat-btn" onclick={() => spilTilstand.gameState = spilTilstand.gameState === 'win_map' ? 'win' : 'dead'}>
+            Se point-fordeling
+        </button>
+
     </div>
 {/if}
 
@@ -939,14 +1040,8 @@ async function opdaterOgGemHighscore() {
     .crop-icon.moden { width: 40px; bottom: 20px; right: 15px; z-index: 12; }
     
     .meteor-stone-icon {
-        position: absolute;
-        bottom: 38%;
-        left: 50%;
-        transform: translateX(-50%);
-        height: 50px;
-        z-index: 13;
-        pointer-events: none;
-        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+        position: absolute; bottom: 38%; left: 50%; transform: translateX(-50%);
+        height: 50px; z-index: 13; pointer-events: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
     }
     
     .sailing-container {
@@ -959,10 +1054,10 @@ async function opdaterOgGemHighscore() {
         0% { transform: translateX(0) scale(1); opacity: 1; }
         100% { transform: translateX(300px) scale(0.5); opacity: 0; }
     }
+    
     .escape-boat {
         position: absolute; width: 75px; height: auto; top: 50%; left: 50%;
-        transform: translate(-50%, -50%); pointer-events: none; z-index: 15;
-        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+        transform: translate(-50%, -50%); pointer-events: none; z-index: 15; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
     }
     .sejr-lys {
         position: absolute; width: 100%; height: 100%;
@@ -979,22 +1074,17 @@ async function opdaterOgGemHighscore() {
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
         pointer-events: none; width: 50px; z-index: 12;
     }
-
     .treasure-mark-icon {
         position: absolute; width: 35px; height: auto; top: 65%; left: 50%;
-        transform: translate(-50%, -50%); pointer-events: none; z-index: 13;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+        transform: translate(-50%, -50%); pointer-events: none; z-index: 13; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
     }
-
     .dug-image {
         position: absolute; width: 90px; height: 52px; top: 58%; left: 50%;
         transform: translate(-50%, -50%); pointer-events: none; z-index: 10;
     }
-
     .empty-treasure-icon {
         position: absolute; width: 70px; height: auto; top: 38%; left: 50%;
-        transform: translate(-50%, -50%); pointer-events: none; z-index: 11;
-        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+        transform: translate(-50%, -50%); pointer-events: none; z-index: 11; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
     }
     
     .goldmine-container {
@@ -1002,17 +1092,32 @@ async function opdaterOgGemHighscore() {
         width: 80px; z-index: 12; pointer-events: none; display: flex; justify-content: center; align-items: center;
     }
     .goldmine-icon { width: 100%; height: auto; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
-    .mine-owner-portrait {
-        position: absolute; width: 34px; height: 34px; bottom: 0px; right: -5px;
-        border-radius: 50%; border: 2px solid #ffcc00; background: #111; object-fit: cover;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.9);
+    .owner-badge { position: absolute; bottom: -5px; right: -5px; z-index: 13; }
+    .owner-badge .mine-owner-portrait {
+        width: 34px; height: 34px; border-radius: 50%; border: 2px solid #ffcc00; 
+        background: #111; object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.9);
     }
+    .owner-badge.locked .mine-owner-portrait { border-color: #ff4444; }
+    .lock-icon { position: absolute; bottom: -5px; left: -10px; font-size: 18px; filter: drop-shadow(0 2px 2px black); }
+
+    .rute-canvas {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; z-index: 18; overflow: visible;
+    }
+    .flugtrute { animation: tegnRute 3s linear forwards; }
+    @keyframes tegnRute { from { stroke-dashoffset: 2000; } to { stroke-dashoffset: 0; } }
     
-    .event-crystal { height: 60px; animation: float 3s infinite ease-in-out; z-index: 15; position: relative; }
-    .campfire-icon {
-        position: absolute; width: 80px; height: 80px; top: 50%; left: 50%;
-        transform: translate(-50%, -50%); pointer-events: none; z-index: 14;
+    .rute-end-icon {
+        animation: fadeInIcon 0.5s 2.5s both;
+        filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.9));
     }
+    @keyframes fadeInIcon {
+        from { opacity: 0; transform: scale(0); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .event-crystal { height: 60px; animation: float 3s infinite ease-in-out; z-index: 15; position: relative; }
+    .campfire-icon { position: absolute; width: 80px; height: 80px; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 14; }
     .portal-icon {
         position: absolute; width: 65px; height: 65px; z-index: 9; pointer-events: none;
         animation: portalPuls 2.5s infinite alternate ease-in-out;
@@ -1021,16 +1126,12 @@ async function opdaterOgGemHighscore() {
         0% { transform: scale(0.95); filter: drop-shadow(0 0 5px rgba(0, 150, 255, 0.6)); }
         100% { transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(0, 220, 255, 1)) brightness(1.2); }
     }
-    
     .shop-icon {
         position: absolute; width: 80px; height: 80px; top: 55%; left: 50%;
         transform: translate(-50%, -50%); pointer-events: none; z-index: 14;
         filter: drop-shadow(0 0 15px rgba(255, 165, 0, 0.9)) drop-shadow(0 4px 6px rgba(0,0,0,0.8));
     }
-    @keyframes float { 
-        0%, 100% { transform: translateY(0); } 
-        50% { transform: translateY(-5px); } 
-    }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     
     .modstander-icon { position: absolute; top: 10px; z-index: 16; display: flex; justify-content: center; width: 100%; }
     .gravsten-container {
@@ -1055,69 +1156,60 @@ async function opdaterOgGemHighscore() {
         position: absolute; bottom: 50px; font-family: serif; font-weight: bold;
         animation: rise 2.5s forwards; pointer-events: none; z-index: 100;
     }
-    @keyframes rise { 
-        0% { opacity: 0; transform: translateY(0); } 
-        20% { opacity: 1; } 
-        100% { opacity: 0; transform: translateY(-30px); } 
-    }
+    @keyframes rise { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-30px); } }
     .opslugt { opacity: 0.8; filter: grayscale(0.8) brightness(0.6); }
+
+    .slut-panel {
+        position: fixed; bottom: 20px; right: 20px; width: 350px; max-width: 90vw;
+        background: rgba(20, 0, 0, 0.95); border: 2px solid #ff4444; border-radius: 8px;
+        padding: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8); pointer-events: auto;
+    }
+    .slut-panel.vundet { background: rgba(30, 25, 0, 0.95); border-color: #ffcc00; }
+    .slut-header { text-align: center; border-bottom: 1px solid #ff4444; padding-bottom: 15px; }
+    .slut-panel.vundet .slut-header { border-color: #ffcc00; }
+    .slut-header h2 { margin: 0 0 5px 0; color: #ff4444; font-family: 'Cinzel', serif; }
+    .slut-panel.vundet .slut-header h2 { color: #ffcc00; }
+    .slut-header p { margin: 0; color: #ddd; font-size: 0.9rem; line-height: 1.4; }
+
+    .rute-start-icon {
+        animation: fadeInIcon 0.5s 0.5s both;
+        filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.9));
+    }
+
+    .se-resultat-btn {
+        background: #ffcc00; color: #000; border: none; border-radius: 4px;
+        padding: 12px; font-family: 'Cinzel', serif; font-weight: bold;
+        text-transform: uppercase; cursor: pointer; margin-top: 5px; transition: 0.2s;
+    }
+    .se-resultat-btn:hover { transform: scale(1.02); filter: brightness(1.1); }
     
-    .slut-banner {
-        position: fixed; bottom: 0; left: 0; width: 100vw;
-        background: linear-gradient(to top, rgba(50, 0, 0, 1), rgba(20, 0, 0, 0.9));
-        border-top: 2px solid #ff4444; padding: 30px; text-align: center;
-        z-index: 2000; display: flex; flex-direction: column; align-items: center; gap: 15px;
+    .rangliste { display: flex; flex-direction: column; gap: 10px; max-height: 40vh; overflow-y: auto; }
+    .raekke { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; }
+    .raekke.mig { border: 1px solid #777; background: rgba(255,255,255,0.1); }
+    .raekke img { width: 40px; height: 40px; object-fit: contain; }
+    .raekke .info { flex-grow: 1; display: flex; flex-direction: column; }
+    .raekke .info strong { color: white; font-size: 1.1rem; }
+    .raekke .info span { color: #aaa; font-size: 0.8rem; text-transform: uppercase; }
+    .raekke .stats { color: #ffcc00; font-weight: bold; font-family: monospace; font-size: 1.1rem; }
+
+    .log-ikon-btn {
+        background: transparent; border: 1px solid #555; border-radius: 6px; cursor: pointer;
+        transition: 0.2s; padding: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;
+        color: white; font-family: 'Cinzel', serif; font-size: 1rem; text-transform: uppercase; margin-top: 10px;
     }
-    .slut-banner.vundet {
-        background: linear-gradient(to top, rgba(40, 30, 0, 1), rgba(20, 15, 0, 0.9)); border-top: 2px solid #ffcc00;
-    }
-    .slut-banner p { color: #ffcccc; font-size: 1.2rem; margin: 0; font-family: 'Cinzel', serif; }
-    .slut-banner.vundet p { color: #ffeeaa; }
-    .slut-knapper { display: flex; gap: 20px; align-items: center; margin-top: 10px; }
-    
-    .log-ikon-btn { background: transparent; border: none; cursor: pointer; transition: transform 0.2s; padding: 0; }
-    .log-ikon-btn:hover { transform: scale(1.1); }
-    .log-ikon-btn img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(255, 68, 68, 0.5)); }
-    .slut-banner.vundet .log-ikon-btn img { filter: drop-shadow(0 0 5px rgba(255, 204, 0, 0.5)); }
-    
-    .accepter-slut-btn {
-        background: #220000; border: 1px solid #ff4444; color: #ff4444;
-        padding: 15px 30px; font-size: 1rem; text-transform: uppercase; cursor: pointer; transition: 0.2s;
-    }
-    .accepter-slut-btn:hover { background: #ff4444; color: black; }
-    .slut-banner.vundet .accepter-slut-btn { background: #221a00; border-color: #ffcc00; color: #ffcc00; }
-    .slut-banner.vundet .accepter-slut-btn:hover { background: #ffcc00; color: black; }
-    
-    .log-modal-overlay {
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 3000;
-    }
-    .log-modal {
-        background: #111; border: 2px solid #555; border-radius: 8px; width: 600px;
-        max-width: 90%; max-height: 80vh; display: flex; flex-direction: column; padding: 20px;
-    }
+    .log-ikon-btn:hover { background: rgba(255,255,255,0.1); border-color: white; }
+    .log-ikon-btn img { width: 30px; height: 30px; }
+
+    .log-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 3000; }
+    .log-modal { background: #111; border: 2px solid #555; border-radius: 8px; width: 600px; max-width: 90%; max-height: 80vh; display: flex; flex-direction: column; padding: 20px; }
     .log-modal h3 { color: #ffcc00; margin-top: 0; font-family: 'Cinzel', serif; text-align: center; }
-    .log-liste {
-        flex-grow: 1; overflow-y: auto; margin: 15px 0; padding-right: 10px;
-        display: flex; flex-direction: column; gap: 10px;
-    }
+    .log-liste { flex-grow: 1; overflow-y: auto; margin: 15px 0; padding-right: 10px; display: flex; flex-direction: column; gap: 10px; }
     .log-liste p { color: #ddd; margin: 0; line-height: 1.4; border-bottom: 1px solid #333; padding-bottom: 10px; }
     .log-liste p:last-child { border-bottom: none; }
-    .luk-log-btn {
-        background: #333; color: white; border: 1px solid #777; padding: 10px;
-        cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.2s;
-    }
+    .luk-log-btn { background: #333; color: white; border: 1px solid #777; padding: 10px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.2s; }
     .luk-log-btn:hover { background: #555; }
 
-    /* KATASTROFE RYSTELSE */
-    :global(body.jordskaelv) {
-        animation: rystelse 1.2s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-        overflow: hidden;
-    }
-
-    @keyframes rystelse {
-        0%, 100% { transform: translate(0, 0) rotate(0deg); }
-        10%, 30%, 50%, 70%, 90% { transform: translate(-12px, 8px) rotate(-1.5deg); }
-        20%, 40%, 60%, 80% { transform: translate(12px, -8px) rotate(1.5deg); }
-    }
+    :global(body.jordskaelv) { animation: rystelse 1.2s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; overflow: hidden; }
+    @keyframes rystelse { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 10%, 30%, 50%, 70%, 90% { transform: translate(-12px, 8px) rotate(-1.5deg); } 20%, 40%, 60%, 80% { transform: translate(12px, -8px) rotate(1.5deg); } }
 </style>

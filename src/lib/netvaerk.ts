@@ -10,7 +10,6 @@ let dbSaveKoe: ReturnType<typeof setTimeout> | null = null;
 export async function syncTilDb(opdaterKort = false) {
     if (!spilTilstand.rumKode || !spilTilstand.spillerNavn) return;
 
-    // 1. Byg spillerobjektet med det samme
     const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isDead ?? false);
     const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isWinner ?? false);
 
@@ -26,6 +25,7 @@ export async function syncTilDb(opdaterKort = false) {
         energi: spilTilstand.nuvaerendeEnergi,
         mitUdstyr: spilTilstand.mitUdstyr,
         kendteFelter: spilTilstand.mineKendteFelter,
+        historik: spilTilstand.historik || [],
         isDead: isDead,
         isWinner: isWinner,
         sidstAktiv: Date.now(), 
@@ -35,11 +35,9 @@ export async function syncTilDb(opdaterKort = false) {
         harSkattekort: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.harSkattekort || false
     };
 
-    // Opdater lokalt
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     spilTilstand.alleSpillere[spilTilstand.spillerNavn] = mig as any;
 
-    // 2. BROADCAST LYNHURTIGT TIL ANDRE (Koster ingen database-writes)
     if (sub) {
         sub.send({
             type: 'broadcast',
@@ -52,11 +50,9 @@ export async function syncTilDb(opdaterKort = false) {
 
     if (syncKoe) return;
 
-    // 3. DATABASE UPLOAD KONTROL
     syncKoe = setTimeout(async () => {
         syncKoe = null;
         
-        // Hvis kortet IKKE er ændret, venter vi 10 sekunder med at stresse databasen
         if (!kortSkalOpdateres) {
             if (!dbSaveKoe) {
                 dbSaveKoe = setTimeout(async () => {
@@ -67,7 +63,6 @@ export async function syncTilDb(opdaterKort = false) {
             return;
         }
 
-        // Hvis kortet HAR ændret sig, flår vi timeouten i stykker og uploader omgående
         if (dbSaveKoe) {
             clearTimeout(dbSaveKoe);
             dbSaveKoe = null;
@@ -78,6 +73,17 @@ export async function syncTilDb(opdaterKort = false) {
         await udfoerDbUpload(sendKort);
         
     }, 1000); 
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function broadcastFelt(index: number, feltData: any) {
+    if (sub) {
+        sub.send({
+            type: 'broadcast',
+            event: 'felt_sync',
+            payload: { index, feltData }
+        });
+    }
 }
 
 async function udfoerDbUpload(sendKort: boolean) {
@@ -157,7 +163,6 @@ export function startRealtime() {
     if (!spilTilstand.rumKode || sub) return;
     sub = supabase
         .channel(`room:${spilTilstand.rumKode}`)
-        // Lytter til den billige broadcast kanal for andre spilleres lynhurtige træk
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .on('broadcast', { event: 'spiller_sync' }, (payload: any) => {
             const data = payload.payload;
@@ -168,7 +173,14 @@ export function startRealtime() {
                 }
             }
         })
-        // Lytter til den tunge database kun når landkortet (eller timer-backup) ændres
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .on('broadcast', { event: 'felt_sync' }, (payload: any) => {
+            const data = payload.payload;
+            if (spilTilstand.gitter[data.index]) {
+                spilTilstand.gitter[data.index] = data.feltData;
+                spilTilstand.gitter = [...spilTilstand.gitter];
+            }
+        })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'spil_sessioner', filter: `rum_kode=eq.${spilTilstand.rumKode}` }, (payload: any) => {
             const nyData = payload.new;
