@@ -527,7 +527,7 @@
         return Math.min(...aktive.map((s: SpillerData) => s.dag || 1));
     }
 
-   function udførBevægelse(nytIndeks: number) {
+function udførBevægelse(nytIndeks: number) {
     if (flytterNu || !spilTilstand.valgtKarakter) return;
 
     const mig = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
@@ -539,12 +539,13 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = true;
         }
         spilTilstand.logBesked = "Du vågner fra din dvale, men det er for sent. Tågen har allerede fortrukket alt liv fra dine knogler.";
-        syncTilDb(true);
+        syncTilDb(true); // Her er du død, så vi gemmer kortets tilstand permanent.
         setTimeout(() => flytterNu = false, 200);
         return;
     }
 
     flytterNu = true;
+    let mapAendret = false; // Vores nye vagthund mod datablødning
     
     if (spilTilstand.dag >= hentLangsomsteDag() + MAX_DAGE_FORAN) {
         spilTilstand.logBesked = 'Du må vente på de andre spillere.';
@@ -591,6 +592,7 @@
             felt.smadretFremTilBlok = nuBlok + 1;
         }
         broadcastFelt(nytIndeks, felt);
+        mapAendret = true; // Her ændres marken globalt
     }
 
     if (spilTilstand.livspoint <= 0) {
@@ -619,6 +621,7 @@
     if (!spilTilstand.historik) spilTilstand.historik = [];
     spilTilstand.historik.push(nytIndeks);
 
+    cam.foelgSpiller(nytIndeks, BREDDE, HEX_W, ROW_H);
     afslørOmraade(nytIndeks, Math.max(felt.biome === 'bjerg' ? 2 : 1, aktuelSynsRadius));
     if ((nytIndeks % BREDDE) > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nytIndeks % BREDDE;
     
@@ -667,9 +670,9 @@
                     specialLog += specialLog ?
                         ` Du flår skødet tilbage og låser minen for evigt!` : `Du flår skødet tilbage og låser minen for evigt!`;
                 }
-                // Tvinger Svelte til at opdatere lokalt ved at erstatte objektet i gitteret
                 spilTilstand.gitter[nytIndeks] = { ...felt };
                 broadcastFelt(nytIndeks, spilTilstand.gitter[nytIndeks]);
+                mapAendret = true; // Her rykker vi ved ejerskab globalt
             }
         }
     }
@@ -689,7 +692,7 @@
     if (felt.hasPortal) {
         udfoerPortalTeleport();
         spilTilstand.gitter = [...spilTilstand.gitter];
-        syncTilDb(true);
+        syncTilDb(); // Teleportering håndterer sit eget gem-kald hvis nødvendigt
         setTimeout(() => flytterNu = false, 200);
         return;
     }
@@ -707,6 +710,7 @@
         spilTilstand.logBesked = "Du mærker bådens ru træ under dine støvler. Havet åbner sig. Du har overlevet øen og kan trække vejret frit.";
         
         broadcastFelt(nytIndeks, felt);
+        mapAendret = true; // Båden er fjernet globalt
 
         setTimeout(() => {
             spilTilstand.gameState = 'win_map';
@@ -717,12 +721,13 @@
             felt.eventFuldført = true;
             broadcastFelt(nytIndeks, felt);
             startEvent(felt.eventID);
+            mapAendret = true; // Eventet er forbrugt
         }
         else if (felt.shopItems && felt.shopItems.length > 0) spilTilstand.aktivShop = felt.shopItems;
     }
 
     spilTilstand.gitter = [...spilTilstand.gitter];
-    syncTilDb(true);
+    syncTilDb(mapAendret); // Her smækker vi foden i jorden. Uploader KUN kortet hvis mapAendret er true.
     setTimeout(() => flytterNu = false, 200);
 }
 

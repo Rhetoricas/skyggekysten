@@ -109,7 +109,7 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
     }
     
     spilTilstand.mitUdstyr = [...spilTilstand.mitUdstyr];
-    syncTilDb();
+    syncTilDb(); // Ingen `true` her. Rygsæk er personlig.
 }
 
 export function brugFraRygsæk(genstandId: string, brugtMaengde: number = 1) {
@@ -124,7 +124,7 @@ export function brugFraRygsæk(genstandId: string, brugtMaengde: number = 1) {
     }
     
     spilTilstand.mitUdstyr = [...spilTilstand.mitUdstyr];
-    syncTilDb();
+    syncTilDb(); // Ingen `true` her.
 }
 
 export function afslørOmraade(centerIndex: number, radius: number = 1) {
@@ -161,6 +161,7 @@ export function afslørOmraade(centerIndex: number, radius: number = 1) {
 export function haandterFeltInteraktion(nytIndeks: number, teleportKilde: 'stav' | 'portal' | 'byg_portal') {
     const felt = spilTilstand.gitter[nytIndeks];
     let ekstraLog = "";
+    let mapAendret = false;
 
     const nulHp = ['mark', 'by', 'eng', 'marked', 'hoejland', 'skov'];
     const toHp = ['bjerg', 'hule'];
@@ -182,6 +183,7 @@ export function haandterFeltInteraktion(nytIndeks: number, teleportKilde: 'stav'
         felt.gravet = true;
         ekstraLog += ` KLIK! Du lander direkte oven i en skjult fælde! (-${faeldeSkade} HP)`;
         broadcastFelt(nytIndeks, felt);
+        mapAendret = true;
     }
 
     const nuBlok = Math.ceil((spilTilstand.dag || 1) / 5);
@@ -198,6 +200,7 @@ export function haandterFeltInteraktion(nytIndeks: number, teleportKilde: 'stav'
             felt.smadretFremTilBlok = nuBlok + 1;
         }
         broadcastFelt(nytIndeks, felt);
+        mapAendret = true;
     }
 
     if (felt.biome === 'hav') {
@@ -233,6 +236,7 @@ export function haandterFeltInteraktion(nytIndeks: number, teleportKilde: 'stav'
                 }
                 spilTilstand.gitter[nytIndeks] = { ...felt };
                 broadcastFelt(nytIndeks, spilTilstand.gitter[nytIndeks]);
+                mapAendret = true;
             }
         }
     }
@@ -253,6 +257,7 @@ export function haandterFeltInteraktion(nytIndeks: number, teleportKilde: 'stav'
         }
         spilTilstand.logBesked = "Du mærker bådens ru træ under dine støvler. Havet åbner sig. Du har overlevet øen og kan trække vejret frit.";
         broadcastFelt(nytIndeks, felt);
+        mapAendret = true;
         setTimeout(() => {
             spilTilstand.gameState = 'win_map';
             syncTilDb(true); 
@@ -262,12 +267,13 @@ export function haandterFeltInteraktion(nytIndeks: number, teleportKilde: 'stav'
             felt.eventFuldført = true;
             broadcastFelt(nytIndeks, felt);
             startEvent(felt.eventID);
+            mapAendret = true;
         }
         else if (felt.shopItems && felt.shopItems.length > 0) spilTilstand.aktivShop = felt.shopItems;
     }
 
     spilTilstand.gitter = [...spilTilstand.gitter];
-    syncTilDb(true);
+    syncTilDb(mapAendret); // Uploades kun hvis nødvendigt
 
     if (spilTilstand.livspoint <= 0 && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map') {
         fremtvingKollaps("Kræfterne rev din sidste livsgnist væk.");
@@ -343,7 +349,7 @@ export function hvil() {
     spilTilstand.logBesked = "Du pakker dig ind i soveposen. Sår lukkes, mens tågen æder dit forspring.";
     
     fremrykTid();
-    syncTilDb(true);
+    syncTilDb(); // Soveposen ændrer intet i landskabet. Drop (true).
 }
 
 export function aktiverHemmelighed() {
@@ -372,7 +378,7 @@ export function aktiverHemmelighed() {
     }
     
     spilTilstand.gitter = [...spilTilstand.gitter];
-    syncTilDb(true);
+    syncTilDb(); // Du ruller et kort ud. Kun dig og din rygsæk er involveret. Drop (true).
 }
 
 export function plantSkat(gitter: Felt[]) {
@@ -719,7 +725,7 @@ export function taendBaal() {
     
     sendBaalSignal(spilTilstand.spillerIndex, radius);
     fremrykTid();
-    syncTilDb(true);
+    syncTilDb(); // Tænder bål og rykker tid. Gør intet ved grundkortet. Drop (true).
 }
 
 export function bygOgHopGennemPortal() {
@@ -803,7 +809,7 @@ export async function udloesNaturkatastrofe(centerIndex: number) {
         tagSkadeOgTjekDød(30, "Et øredøvende brag flænger himlen. Meteoren knuser jorden under dig.", "Du bliver slemt forbrændt i krateret.");
     }
 
-    syncTilDb(true);
+    syncTilDb(true); // Massiv meteor der smadrer tyve felter permanent. Her skal databasen æde det hele.
 }
 
 export async function udloesJordskaelv(centerIndex: number) {
@@ -862,7 +868,7 @@ export async function udloesJordskaelv(centerIndex: number) {
         tagSkadeOgTjekDød(40, "Jorden brød op under dig.", "Klipperne skyder op fra undergrunden og knuser dig mod bjergvæggen.");
     }
 
-    syncTilDb(true);
+    syncTilDb(true); // Landskab skifter fuldstændig. Æd data.
 }
 
 export async function udloesOversvoemmelse(centerIndex: number) {
@@ -924,7 +930,7 @@ export async function udloesOversvoemmelse(centerIndex: number) {
         }
     }
 
-    syncTilDb(true);
+    syncTilDb(true); // Bjerge ændres til hav. Enorm opdatering.
 }
 
 export function udvindMeteorSkat(metode: string): { logBesked: string; hpNed?: number; guldOp?: number; itemUd?: string } {
