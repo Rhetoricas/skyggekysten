@@ -15,6 +15,8 @@
     });
 
     let dageForan = $derived(Math.max(0, (spilTilstand.dag || 1) - langsomsteDag));
+    let naesteRundeErGratis = $derived(spilTilstand.venteRunde === 0);
+    let kanBetaleNaesteRunde = $derived(naesteRundeErGratis || spilTilstand.guldTotal + spilTilstand.ventePuljeGuld >= 5);
 </script>
 
 <div class="vente-overlay">
@@ -23,7 +25,7 @@
         <p class="vente-desc">
             Du har slået lejr <strong style="color: gold;">{dageForan} {dageForan === 1 ? 'dag' : 'dage'}</strong> foran den langsomste på øen. 
             En imp dukker pludselig op med et magisk kortspil. <br><br>
-            <strong>Regler:</strong> Betal 5 guld for at spille. Træk kort for at vinde guld eller helbred. Trækker du kraniet, mister du alt det, du har vundet i <em>denne</em> runde. Du kan stoppe når som helst og sikre din pulje til næste runde.
+            <strong>Regler:</strong> Første runde er gratis. Derefter koster en ny runde 5 guld. Træk kort for at vinde guld eller helbred. Trækker du kraniet, mister du alt det, du har vundet i <em>denne</em> runde. Du kan stoppe når som helst og sikre din pulje til næste runde.
         </p>
 
         <div class="vente-board">
@@ -69,13 +71,12 @@
                 <button class="vente-btn forlad-btn" onclick={lukVenteSpil}>Forlad bordet</button>
 
                 {#if kanSpilleIgen}
-                    {@const totalFormue = spilTilstand.guldTotal + spilTilstand.ventePuljeGuld}
                     <button
                         class="vente-btn spil-igen-btn"
-                        disabled={totalFormue < 5}
+                        disabled={!kanBetaleNaesteRunde}
                         onclick={() => startVenteSpil(true)}
                     >
-                        Start ny runde (Koster 5 Guld)
+                        {naesteRundeErGratis ? 'Start første runde (Gratis)' : 'Start ny runde (Koster 5 Guld)'}
                     </button>
                 {:else}
                     <button class="vente-btn udsolgt-btn" disabled>

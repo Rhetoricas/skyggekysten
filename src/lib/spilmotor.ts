@@ -7,7 +7,7 @@ import { genererUndergrund } from '$lib/undergrund.svelte';
 import { fremrykTid, fremtvingKollaps, tagSkadeOgTjekDød } from '$lib/overlevelse.svelte';
 import { erAfgroedeModen, erHvedeBlok, erInsektPlageAktiv, hentAfgroedeBlok } from '$lib/afgroeder';
 import type { Biome, Felt, RygsækTing } from '$lib/types';
-import { delNyeKort } from '$lib/ventespil.svelte';
+import { delNyeKort, startVenteSpil } from '$lib/ventespil.svelte';
 import { startEvent } from '$lib/eventMotor.svelte';
 
 const RETNINGER = {
@@ -381,7 +381,7 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
 
     if (spilTilstand.dag >= options.langsomsteDag + options.maxDageForan) {
         spilTilstand.logBesked = 'Du må vente på de andre spillere.';
-        spilTilstand.venteSpilAktiv = true;
+        startVenteSpil(false);
         return false;
     }
 
@@ -402,10 +402,12 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     afslørOmraade(nytIndeks, Math.max(felt.biome === 'bjerg' ? 2 : 1, options.synsRadius));
     if ((nytIndeks % BREDDE) > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nytIndeks % BREDDE;
 
-    return haandterAnkomstPaaFelt(nytIndeks, 'gang', {
+    const ankomstResultat = haandterAnkomstPaaFelt(nytIndeks, 'gang', {
         startLog: "",
         onBaadStart: options.onBaadStart
     });
+    tjekAutoTracker();
+    return ankomstResultat;
 }
 
 function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, options: AnkomstOptions = {}) {
@@ -612,6 +614,7 @@ export function udfoerTeleportMedOptions(options: TeleportOptions) {
     haandterAnkomstPaaFelt(maal.indeks, options.kilde, {
         startLog: options.startLog
     });
+    tjekAutoTracker();
     return true;
 }
 
@@ -716,7 +719,7 @@ function erHunter() {
     return id === 'hunter_m' || id === 'hunter_f';
 }
 
-export function hentMuligeTrackerMaal() {
+function hentMuligeTrackerMaal() {
     if (!erHunter() || spilTilstand.gameState !== 'play') return [] as string[];
 
     const mig = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
@@ -739,7 +742,7 @@ export function erTrackerAktivPaa(navn: string) {
     return !!tracker && tracker.targetNavn === navn && tracker.slutterDag >= spilTilstand.dag;
 }
 
-export function saetTracker(targetNavn: string) {
+function saetTracker(targetNavn: string, visLog = true) {
     if (!erHunter()) {
         spilTilstand.logBesked = 'Kun jægere kan sætte en tracker.';
         return;
@@ -782,8 +785,18 @@ export function saetTracker(targetNavn: string) {
     };
 
     opdaterTrackerSyn();
-    spilTilstand.logBesked = `Du sætter en tracker på ${targetNavn}. I ti dage kan du følge sporene.`;
+    if (visLog) {
+        spilTilstand.logBesked = `Du følger ${targetNavn}s spor. I ti dage ser du de felter, spilleren ser.`;
+    }
     syncTilDb();
+}
+
+export function tjekAutoTracker() {
+    const maal = hentMuligeTrackerMaal();
+    if (maal.length === 0) return false;
+
+    saetTracker(maal[0], true);
+    return true;
 }
 
 export function opdaterTrackerSyn() {

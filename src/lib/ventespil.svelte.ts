@@ -32,7 +32,10 @@ export function delNyeKort() {
 }
 
 export function startVenteSpil(kosterPenge: boolean = false) {
-    if (kosterPenge) {
+    const foersteRunde = spilTilstand.venteRunde === 0;
+    const skalBetale = kosterPenge && !foersteRunde;
+
+    if (skalBetale) {
         const totalGuld = spilTilstand.guldTotal + spilTilstand.ventePuljeGuld;
         if (totalGuld < 5) return;
 
@@ -45,7 +48,9 @@ export function startVenteSpil(kosterPenge: boolean = false) {
         }
         spilTilstand.logBesked = "Du lægger 5 guld på bordet. Impen blander kortene.";
     } else {
-        spilTilstand.logBesked = "Impen blander kortene til første runde.";
+        spilTilstand.logBesked = foersteRunde
+            ? "Impen blander kortene til første runde. Den er gratis."
+            : "Impen blander kortene.";
     }
     
     spilTilstand.venteSpilAktiv = true;

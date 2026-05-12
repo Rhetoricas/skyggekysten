@@ -10,7 +10,7 @@
     import { M10_SCORE, beregnFremdriftPoint, beregnMinePoint, taelScoreSpillere } from '$lib/score';
     import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi, hentGlobalTopScore, flushVentendeSync } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
-    import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, anvendFaellesEventEffekt } from '$lib/spilmotor';
+    import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
     import { erSpillerITaagen } from '$lib/overlevelse.svelte';    
     import { eventState, startEvent, lukEvent as motorLukEvent } from '$lib/eventMotor.svelte';
@@ -162,6 +162,7 @@
         untrack(() => {
             if (state === 'play') {
                 opdaterTrackerSyn();
+                tjekAutoTracker();
             }
         });
     });
@@ -490,6 +491,31 @@
             } else {
                 spilTilstand.erHost = true;
                 initialiserGitter();
+                const { error: insertError } = await medTimeout(supabase.from('spil_sessioner').insert([{
+                    rum_kode: spilTilstand.rumKode,
+                    kort: spilTilstand.gitter,
+                    start_index: spilTilstand.spillerIndex,
+                    spillere: {},
+                    fog_x: 0
+                }]));
+
+                if (insertError) {
+                    const { data: eksisterendeSession, error: hentEfterInsertError } = await medTimeout(
+                        supabase.from('spil_sessioner').select('*').eq('rum_kode', spilTilstand.rumKode).maybeSingle()
+                    );
+
+                    if (hentEfterInsertError || !eksisterendeSession) {
+                        spilTilstand.statusBesked = `Øen kunne ikke oprettes: ${insertError.message}`;
+                        spilTilstand.gameState = 'start';
+                        return;
+                    }
+
+                    spilTilstand.gitter = eksisterendeSession.kort;
+                    spilTilstand.alleSpillere = eksisterendeSession.spillere || {};
+                    spilTilstand.fogX = eksisterendeSession.fog_x || 0;
+                    spilTilstand.erHost = false;
+                }
+
                 startRealtime();
                 spilTilstand.gameState = 'select';
             }
@@ -1103,7 +1129,7 @@ function udførBevægelse(nytIndeks: number) {
                                 {@const tracket = erTrackerAktivPaa(navn)}
                                 {@const synlig = afstand <= aktuelSynsRadius || tracket}
                                 <span class="modstander-icon" class:alarm-aktiv={mod.activeAlarm && !synlig} class:skjult-lyd={!synlig && !mod.activeAlarm} class:tracker-aktiv={tracket}>
-                                    <img src={synlig ? (mod.ikon || '/tiles/player.webp') : '/tiles/player.webp'} alt="" style="width: {synlig ? '45px' : '70px'};" />
+                                    <img src={synlig ? (mod.ikon || '/tiles/player.webp') : '/tiles/player.webp'} alt="" style="height: {synlig ? '58px' : '70px'};" />
                                 </span>
                             {/if}
                         {/each}
