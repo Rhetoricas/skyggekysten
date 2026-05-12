@@ -19,7 +19,7 @@ export async function tjekOfflineAppKlar() {
         const registration = await navigator.serviceWorker.ready;
         offlineAppState.klar = !!registration.active;
         offlineAppState.besked = offlineAppState.klar
-            ? 'Appen er fly-klar på denne enhed.'
+            ? 'Spillet er klar på denne enhed'
             : 'Offline-cache er ikke klar endnu.';
         return offlineAppState.klar;
     } catch {
@@ -45,7 +45,7 @@ export async function goerOfflineAppKlar() {
         const registration = await navigator.serviceWorker.ready;
         if (registration.waiting) registration.waiting.postMessage({ type: 'SKIP_WAITING' });
         offlineAppState.klar = !!registration.active;
-        offlineAppState.besked = 'Appen er fly-klar på denne enhed.';
+        offlineAppState.besked = 'Spillet er klar på denne enhed';
         return true;
     } catch {
         offlineAppState.klar = false;

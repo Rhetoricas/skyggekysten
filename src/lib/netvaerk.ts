@@ -52,6 +52,7 @@ export async function flushVentendeSync() {
         gemOfflineSpil();
         return true;
     }
+    if (spilTilstand.soloMode) return true;
 
     const harVentendeSync = syncKoe || dbSaveKoe || kortSaveKoe || kortSkalOpdateres;
     if (!harVentendeSync) return true;
@@ -119,6 +120,7 @@ export async function syncTilDb(opdaterKort = false) {
         gemOfflineSpil();
         return;
     }
+    if (spilTilstand.soloMode) return;
 
     if (sub) {
         sub.send({
@@ -165,7 +167,7 @@ export async function syncTilDb(opdaterKort = false) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function broadcastFelt(index: number, feltData: any) {
-    if (spilTilstand.offlineMode) return;
+    if (spilTilstand.offlineMode || spilTilstand.soloMode) return;
 
     if (sub) {
         sub.send({
@@ -178,7 +180,7 @@ export function broadcastFelt(index: number, feltData: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function broadcastFelter(felter: Array<{ index: number; feltData: any }>) {
-    if (spilTilstand.offlineMode) return;
+    if (spilTilstand.offlineMode || spilTilstand.soloMode) return;
 
     if (sub && felter.length > 0) {
         sub.send({
@@ -199,6 +201,7 @@ async function udfoerDbUpload(sendKort: boolean) {
         gemOfflineSpil();
         return true;
     }
+    if (spilTilstand.soloMode) return true;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const opdatering: any = {
@@ -370,7 +373,7 @@ export async function hentGlobalTopScore() {
 
 let sub: RealtimeChannel | null = null;
 export function startRealtime() {
-    if (spilTilstand.offlineMode) return;
+    if (spilTilstand.offlineMode || spilTilstand.soloMode) return;
     if (!spilTilstand.rumKode || sub) return;
     sub = supabase
         .channel(`room:${spilTilstand.rumKode}`)

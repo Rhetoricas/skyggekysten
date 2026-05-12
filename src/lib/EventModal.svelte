@@ -38,8 +38,8 @@
     <div class="stun-overlay"></div>
 {/if}
 
-<div class="event-overlay" role="presentation" onclick={() => eventState.valgLåst && haandterKlikVidere()}>
-    <div class="event-boks" class:klik-klar={eventState.valgLåst}>
+<div class="event-overlay" role="presentation">
+    <div class="event-boks">
         <img
             src={eventState.aktivt.billede || `/events/ev_${grundBiome}.webp`}
             alt="Event baggrund"
@@ -80,6 +80,16 @@
                                 {#if valg.kraeverItem && itemDB[valg.kraeverItem]}
                                     <img src={itemDB[valg.kraeverItem].billede} alt="Mangler genstand" class="mangel-ikon" title="Du mangler dette" />
                                 {/if}
+                                {#if valg.kraeverEtAfItems?.length}
+                                    <span class="mangel-guld">Kræver våben</span>
+                                    <div class="mangel-ikon-raekke">
+                                        {#each valg.kraeverEtAfItems.slice(0, 3) as itemId (itemId)}
+                                            {#if itemDB[itemId]}
+                                                <img src={itemDB[itemId].billede} alt="Muligt våben" class="mangel-ikon lille-mangel-ikon" title="Du mangler et våben" />
+                                            {/if}
+                                        {/each}
+                                    </div>
+                                {/if}
                                 {#if valg.kosterItem && itemDB[valg.kosterItem]}
                                     <img src={itemDB[valg.kosterItem].billede} alt="Koster genstand" class="mangel-ikon koster-mangel" title="Du skal betale med dette" />
                                 {/if}
@@ -98,7 +108,9 @@
                     <button class="valg-btn ulåst flygt-btn" onclick={(e) => { e.stopPropagation(); lukEvent(); }}>Flygt fra faren!</button>
                 {/if}
             {:else}
-                <p class="klik-videre-tekst">Klik for at fortsætte...</p>
+                <button class="fortsaet-btn" onclick={(e) => { e.stopPropagation(); haandterKlikVidere(); }}>
+                    Fortsæt
+                </button>
             {/if}
         </div>
     </div>
@@ -133,15 +145,6 @@
         flex-direction: column; gap: 15px; border-radius: 8px;
     }
 
-    .klik-klar {
-        cursor: pointer;
-        transition: border-color 0.3s;
-    }
-
-    .klik-klar:hover {
-        border-color: #777;
-    }
-    
     .event-boks img { 
         width: 100%;
         height: 200px; object-fit: cover; border-bottom: 2px solid #333; border-radius: 4px;
@@ -213,6 +216,19 @@
         display: block;
     }
 
+    .mangel-ikon-raekke {
+        display: flex;
+        gap: 2px;
+        justify-content: center;
+    }
+
+    .lille-mangel-ikon {
+        width: 18px !important;
+        height: 18px !important;
+        max-width: 18px !important;
+        max-height: 18px !important;
+    }
+
     .karakter-mangel {
         background: url('/tiles/player.webp') center/contain no-repeat;
     }
@@ -238,18 +254,23 @@
         color: #ffcccc;
     }
 
-    .klik-videre-tekst {
-        text-align: center;
-        color: #888;
-        font-style: italic;
-        animation: tekstPuls 2s infinite;
-        margin-top: 10px;
-        user-select: none;
+    .fortsaet-btn {
+        align-self: center;
+        min-width: 180px;
+        padding: 12px 20px;
+        background: #2a2a2a;
+        color: #eee;
+        border: 1px solid #666;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-family: system-ui, -apple-system, sans-serif;
+        transition: 0.2s;
     }
-    
-    @keyframes tekstPuls {
-        0%, 100% { opacity: 0.5; }
-        50% { opacity: 1; }
+
+    .fortsaet-btn:hover {
+        background: #3a3a3a;
+        border-color: #888;
     }
 
     @media (max-width: 700px) {

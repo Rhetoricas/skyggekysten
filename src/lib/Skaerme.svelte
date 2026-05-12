@@ -7,11 +7,13 @@
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
+    import LydKnap from '$lib/LydKnap.svelte';
+    import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import type { Karakter } from '$lib/types';
 
     let {
         opretEllerDeltag,
-        startOfflineSolo,
+        startSolo,
         fortsaetOfflineSolo,
         bekræftValg,
         genstartBane,
@@ -26,7 +28,7 @@
         scoreGemningFejlet
     } = $props<{
         opretEllerDeltag: () => void;
-        startOfflineSolo: () => void;
+        startSolo: () => void;
         fortsaetOfflineSolo: () => void;
         bekræftValg: (k: Karakter) => void;
         genstartBane: () => void;
@@ -44,14 +46,11 @@
     let lydStart: HTMLAudioElement | null = null;
     let lydDoed: HTMLAudioElement | null = null;
     let lydSejr: HTMLAudioElement | null = null;
-    type LydNiveau = 'fuld' | 'lav' | 'slukket';
-    
     let udvalgteSkæbner = $state<Karakter[]>([]);
     let forrigeState = spilTilstand.gameState;
     let spilletSlutLyd = false;
     let visProfil = $state(false);
     let profilNavnInput = $state('');
-    let lydNiveau = $state<LydNiveau>('fuld');
 
     function blandKarakterer() {
         const blandet = [...tilgaengeligeKarakterer].sort(() => Math.random() - 0.5);
@@ -130,13 +129,13 @@
         opretEllerDeltag();
     }
 
-    function startOfflineMedLyd() {
+    function startSoloMedLyd() {
         if (spilTilstand.musikTaendt && lydStart) {
             lydStart.currentTime = 0;
             lydStart.volume = hentLydVolumen();
             lydStart.play().catch(() => {});
         }
-        startOfflineSolo();
+        startSolo();
     }
 
     function fortsaetOfflineMedLyd() {
@@ -148,39 +147,24 @@
         fortsaetOfflineSolo();
     }
 
-    function hentLydVolumen() {
-        if (lydNiveau === 'slukket') return 0;
-        if (lydNiveau === 'lav') return 0.25;
-        return 0.8;
-    }
-
     function anvendLydNiveau() {
         const volumen = hentLydVolumen();
-        spilTilstand.musikTaendt = lydNiveau !== 'slukket';
+        spilTilstand.musikTaendt = lydKontrol.niveau !== 'slukket';
 
         for (const lyd of [lydStart, lydDoed, lydSejr]) {
             if (!lyd) continue;
             lyd.volume = volumen;
-            if (lydNiveau === 'slukket') lyd.pause();
+            if (lydKontrol.niveau === 'slukket') lyd.pause();
         }
 
-        if (lydNiveau === 'slukket') spilletSlutLyd = false;
+        if (lydKontrol.niveau === 'slukket') spilletSlutLyd = false;
     }
 
-    function skiftLydNiveau() {
-        lydNiveau = lydNiveau === 'fuld' ? 'lav' : lydNiveau === 'lav' ? 'slukket' : 'fuld';
+    $effect(() => {
+        const niveau = lydKontrol.niveau;
+        void niveau;
         anvendLydNiveau();
-    }
-
-    function lydTitel() {
-        if (lydNiveau === 'fuld') return 'Fuld lyd';
-        if (lydNiveau === 'lav') return 'Dæmpet lyd';
-        return 'Lyd slukket';
-    }
-
-    function lydIkon() {
-        return lydNiveau === 'slukket' ? '/screens/musicoff.webp' : '/screens/musicon.webp';
-    }
+    });
 
     $effect(() => {
         if (authState.profil?.display_name) {
@@ -367,19 +351,6 @@
     {/if}
 {/snippet}
 
-{#snippet lydKnap()}
-    <button
-        class="musik-toggle-btn screen-sound-btn"
-        class:lyd-lav={lydNiveau === 'lav'}
-        class:lyd-slukket={lydNiveau === 'slukket'}
-        onclick={skiftLydNiveau}
-        title={`${lydTitel()} - klik for næste niveau`}
-        aria-label={`${lydTitel()} - klik for næste niveau`}
-    >
-        <img src={lydIkon()} alt="" />
-    </button>
-{/snippet}
-
 {#snippet scoreGemStatus()}
     {#if scoreGemmer || scoreGemningFejlet}
         <div class="score-save-status" class:fejl={scoreGemningFejlet}>
@@ -396,7 +367,7 @@
 {#snippet topKnapper()}
     <div class="screen-top-actions">
         <Regelbog />
-        {@render lydKnap()}
+        <LydKnap knapClass="screen-sound-btn" />
     </div>
 {/snippet}
 
@@ -412,46 +383,37 @@
             <h1>Tågeøerne</h1>
             <p>Alle der skriver samme ø-navn, spiller på samme ø, hvis de går i land inden for de fem første dage.</p>
 
-            {@render kontoPanel()}
-            
-            <input 
-                type="text" 
-                bind:value={spilTilstand.spillerNavn} 
-                maxlength="15" 
-                placeholder="Spillernavn" 
-                class="large-input" 
-                onkeydown={trykEnter}
-            />
-            
-            <input 
-                type="text" 
-                bind:value={spilTilstand.rumKode} 
-                maxlength="10" 
-                placeholder="Øens navn" 
-                class="large-input" 
-                onkeydown={trykEnter}
-            />
-            
-            <button type="button" class="spil-knap login-boat-btn" onclick={(e) => { e.preventDefault(); startSpilMedLyd(); }}>
-                <span class="knap-tekst">Online</span>
-            </button>
-            <button type="button" class="spil-knap login-boat-btn offline-btn" onclick={(e) => { e.preventDefault(); startOfflineMedLyd(); }}>
-                <span class="knap-tekst">Solo offline</span>
-            </button>
-            {#if harGemtOfflineSpil}
-                <button type="button" class="offline-continue" onclick={(e) => { e.preventDefault(); fortsaetOfflineMedLyd(); }}>
-                    Fortsæt offline{offlineSpilInfo ? `: ${formaterNavn(offlineSpilInfo.rumKode)} dag ${offlineSpilInfo.dag}` : ''}
-                </button>
-            {/if}
-            <div class="offline-cache-panel" class:klar={offlineAppState.klar}>
-                <span>{offlineAppState.klar ? 'Fly-klar på denne enhed' : 'Gør spillet klar til flytilstand'}</span>
-                <button type="button" onclick={goerOfflineAppKlar} disabled={offlineAppState.arbejder || offlineAppState.klar}>
-                    {offlineAppState.arbejder ? 'Downloader...' : offlineAppState.klar ? 'Klar' : 'Download'}
-                </button>
-                {#if offlineAppState.besked}
-                    <p>{offlineAppState.besked}</p>
-                {/if}
+            <div class="login-main">
+                {@render kontoPanel()}
+                
+                <input 
+                    type="text" 
+                    bind:value={spilTilstand.spillerNavn} 
+                    maxlength="15" 
+                    placeholder="Spillernavn" 
+                    class="large-input" 
+                    onkeydown={trykEnter}
+                />
+                
+                <input 
+                    type="text" 
+                    bind:value={spilTilstand.rumKode} 
+                    maxlength="10" 
+                    placeholder="Øens navn" 
+                    class="large-input" 
+                    onkeydown={trykEnter}
+                />
+                
+                <div class="start-knap-raekke">
+                    <button type="button" class="spil-knap login-boat-btn" onclick={(e) => { e.preventDefault(); startSpilMedLyd(); }}>
+                        <span class="knap-tekst">START</span>
+                    </button>
+                    <button type="button" class="spil-knap login-boat-btn" onclick={(e) => { e.preventDefault(); startSoloMedLyd(); }}>
+                        <span class="knap-tekst">Solo</span>
+                    </button>
+                </div>
             </div>
+
             <p class="status larger-status">{spilTilstand.statusBesked}</p>
             
             <div class="tavle start-tavle">
@@ -475,6 +437,33 @@
                     {/if}
                 </div>
             </div>
+
+            <div class="offline-bottom">
+                <button
+                    type="button"
+                    class="ballon-download"
+                    class:klar={offlineAppState.klar}
+                    onclick={goerOfflineAppKlar}
+                    disabled={offlineAppState.arbejder || offlineAppState.klar}
+                    title="Offline / Flightmode"
+                    aria-label="Offline / Flightmode"
+                >
+                    <img src="/ui/flight.webp" alt="" class="flight-ikon" />
+                    <span>{offlineAppState.arbejder ? 'Downloader...' : 'Offline / Flightmode'}</span>
+                </button>
+                {#if !offlineAppState.klar}
+                    <p class="fly-hint">tryk inden du går offline</p>
+                {/if}
+                {#if offlineAppState.besked}
+                    <p class="offline-besked">{offlineAppState.besked}</p>
+                {/if}
+
+                {#if harGemtOfflineSpil}
+                    <button type="button" class="offline-continue" onclick={(e) => { e.preventDefault(); fortsaetOfflineMedLyd(); }}>
+                        Fortsæt offline{offlineSpilInfo ? `: ${formaterNavn(offlineSpilInfo.rumKode)} dag ${offlineSpilInfo.dag}` : ''}
+                    </button>
+                {/if}
+            </div>
         </div>
     </div>
 
@@ -484,7 +473,7 @@
             {@render topKnapper()}
             <h2>Vælg karakter</h2>
             <p class="instruktion">
-                {spilTilstand.offlineMode ? 'Solo offline. Spillet gemmes lokalt i denne browser.' : 'Du har fået otte muligheder. Vælg hvem du vil være.'}
+                {spilTilstand.offlineMode ? 'Solo offline. Spillet gemmes lokalt i denne browser.' : spilTilstand.soloMode ? 'Solo. Øen er kun din. Vælg hvem du vil være.' : 'Du har fået otte muligheder. Vælg hvem du vil være.'}
             </p>
             
             <div class="character-gallery">
@@ -683,9 +672,10 @@
 {@render profilModal()}
 
 <style>
-    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; font-family: system-ui, -apple-system, sans-serif; }
-    .combined-box { max-height: 90vh; overflow-y: auto; }
-    .login-box { position: relative; background: #1a1a1a; padding: 38px 40px 40px; border-radius: 12px; border: 1px solid #333; text-align: center; max-width: 560px; width: 90%; display: flex; flex-direction: column; align-items: center; }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; display: flex; align-items: center; justify-content: center; z-index: 1000; font-family: system-ui, -apple-system, sans-serif; }
+    .combined-box { max-height: none; overflow: visible; }
+    .login-box { position: relative; background: transparent; padding: 38px 40px 40px; border-radius: 0; border: none; text-align: center; max-width: 900px; width: 90%; display: flex; flex-direction: column; align-items: center; }
+    .login-main { width: min(100%, 560px); display: flex; flex-direction: column; align-items: center; }
     
     .boat-btn-wrapper { background: none; border: none; padding: 0; margin: 0; cursor: pointer; outline: none; }
     .launch-image { width: clamp(260px, 72%, 380px); max-width: 100%; height: auto; border-radius: 4px; transition: 0.2s; }
@@ -699,8 +689,8 @@
     
     .spil-knap { background: url('/screens/button.webp') no-repeat center; background-size: contain; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; width: 220px; height: 65px; }
     .knap-tekst { color: #fcebd5; font-weight: bold; font-size: 1.1rem; padding-bottom: 2px; pointer-events: none; font-family: 'Cinzel', serif; }
+    .start-knap-raekke { display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap; }
     .login-boat-btn { width: 220px; height: 65px; margin-top: 10px; }
-    .offline-btn { filter: saturate(0.75) hue-rotate(18deg); }
     .offline-continue {
         margin-top: 8px;
         background: rgba(255, 255, 255, 0.06);
@@ -714,46 +704,31 @@
         background: rgba(255, 255, 255, 0.1);
         border-color: #666;
     }
-    .offline-cache-panel {
-        width: 100%;
-        margin-top: 12px;
-        padding: 10px;
-        box-sizing: border-box;
-        border: 1px solid #333;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.04);
-        color: #ccc;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 8px;
+    .offline-bottom { width: min(100%, 560px); margin-top: 28px; display: flex; flex-direction: column; align-items: center; }
+    .ballon-download {
+        width: 150px;
+        min-height: 82px;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        color: #eee;
+        display: flex;
+        flex-direction: column;
         align-items: center;
-        text-align: left;
-    }
-    .offline-cache-panel.klar {
-        border-color: #4d6a4d;
-        background: rgba(70, 120, 70, 0.12);
-    }
-    .offline-cache-panel button {
-        background: #2d2d2d;
-        color: white;
-        border: 1px solid #555;
-        border-radius: 5px;
-        padding: 8px 10px;
+        justify-content: center;
+        gap: 4px;
         cursor: pointer;
+        font-size: 0.78rem;
     }
-    .offline-cache-panel button:disabled {
-        opacity: 0.65;
-        cursor: default;
-    }
-    .offline-cache-panel p {
-        grid-column: 1 / -1;
-        margin: 0;
-        font-size: 0.82rem;
-        color: #aaa;
-    }
+    .ballon-download:hover { background: transparent; filter: brightness(1.12); }
+    .ballon-download:disabled { opacity: 0.75; cursor: default; }
+    .ballon-download.klar { background: transparent; color: #d7ead7; }
+    .flight-ikon { width: 150px; height: auto; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35)); }
+    .fly-hint { width: 150px; margin: 2px 0 14px; color: #bbb; font-size: 0.82rem; letter-spacing: 0.04em; text-transform: uppercase; text-align: center; }
+    .offline-besked { max-width: 440px; margin: 8px 0 14px; color: #bbb; font-size: 0.82rem; line-height: 1.45; }
     .slut-knap-styled { width: 220px; height: 65px; }
 
-    .start-tavle { margin-top: 30px; width: 100%; max-width: 320px; }
+    .start-tavle { margin-top: 30px; width: 100%; max-width: 340px; }
     .global-note { color: #aaa; font-size: 0.78rem; margin: -4px 0 6px; }
 
     .konto-panel {
@@ -1005,10 +980,6 @@
     .karakter-navn { color: #9aa69d; font-size: 0.75rem; }
     .status { color: #ccc; margin-top: 15px; }
 
-    .musik-toggle-btn { background: rgba(255, 255, 255, 0.06); border: 1px solid #3a3a3a; border-radius: 8px; cursor: pointer; padding: 9px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background 0.2s, border-color 0.2s; }
-    .musik-toggle-btn img { height: 54px; width: auto; opacity: 0.86; }
-    .musik-toggle-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: #666; transform: scale(1.04); }
-    .musik-toggle-btn:hover img { opacity: 1; }
     .screen-top-actions {
         position: fixed;
         top: calc(env(safe-area-inset-top, 0px) + 14px);
@@ -1018,8 +989,6 @@
         align-items: center;
         gap: 10px;
     }
-    .musik-toggle-btn.lyd-lav img { opacity: 0.55; }
-    .musik-toggle-btn.lyd-slukket { background: rgba(0, 0, 0, 0.22); }
 
     @media (max-width: 700px) {
         .overlay {
@@ -1032,13 +1001,20 @@
             overflow: hidden;
         }
 
-        .combined-box,
-        .login-box,
         .character-select {
             width: 100%;
             max-width: none;
             max-height: 100%;
             overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .combined-box,
+        .login-box {
+            width: 100%;
+            max-width: none;
+            max-height: none;
+            overflow: visible;
             box-sizing: border-box;
         }
 
@@ -1133,18 +1109,11 @@
             margin: 2px 0;
         }
 
-        .musik-toggle-btn img {
-            height: 42px;
-        }
-
         .screen-top-actions {
             top: 10px;
             right: 10px;
             gap: 8px;
         }
 
-        .screen-sound-btn {
-            padding: 6px;
-        }
     }
 </style>

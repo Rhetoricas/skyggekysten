@@ -21,10 +21,10 @@ export const biomeTerraenCost: Record<Biome, number> = {
 
 export const markedVarePool = ['skovl', 'livseliksir', 'klude', 'kniv', 'metaldetektor', 'soegekvist', 'fakkel', 'sovepose', 'mad', 'hemmelighed'];
 
-export const itemDB: Record<string, { id: string; navn: string; type: ItemType; billede: string; pris: number; moveMod?: number; dmgMod?: number; synsMod?: number; energiMod?: number; goldMod?: number; beskrivelse?: string }> = {
+export const itemDB: Record<string, { id: string; navn: string; type: ItemType; billede: string; pris: number; kanKoebes?: boolean; moveMod?: number; dmgMod?: number; synsMod?: number; energiMod?: number; goldMod?: number; beskrivelse?: string }> = {
     'klude': { id: 'klude', navn: 'Klude', type: 'tøj', billede: '/inventory/klude.webp', pris: 10, dmgMod: -0.05, beskrivelse: "Giver en smule beskyttelse. Du tager 5% mindre skade." },
     'rustning': { id: 'rustning', navn: 'Rustning', type: 'tøj', billede: '/inventory/rustning.webp', pris: 150, moveMod: 1, dmgMod: -0.50, beskrivelse: "Halverer al skade, men den tunge vægt koster dig 1 energi pr. skridt. Synker til bunds og forsvinder, hvis du går i vandet." },
-    'rustning_elver': { id: 'rustning_elver', navn: 'Elverrustning', type: 'tøj', billede: '/inventory/rustning_elver.webp', pris: 900, dmgMod: -0.50, beskrivelse: "Halverer al skade som almindelig rustning, men vejer ingenting. Kan ikke købes." },
+    'rustning_elver': { id: 'rustning_elver', navn: 'Elverrustning', type: 'tøj', billede: '/inventory/rustning_elver.webp', pris: 900, kanKoebes: false, dmgMod: -0.50, beskrivelse: "Halverer al skade som almindelig rustning, men vejer ingenting. Kan ikke købes." },
     'flot_toej': { id: 'flot_toej', navn: 'Fint tøj', type: 'tøj', billede: '/inventory/flot_toej.webp', pris: 120, dmgMod: -0.05, goldMod: 0.15, beskrivelse: "Øger al guldindkomst med 15%. Kan blive ødelagt i huler og blodskov." },
     'kniv': { id: 'kniv', navn: 'Kniv', type: 'våben', billede: '/inventory/kniv.webp', pris: 40, beskrivelse: "Et simpelt våben. Bruges også i enkelte events." },
     'dirk': { id: 'dirk', navn: 'Dirk', type: 'værktøj', billede: '/inventory/dirk.webp', pris: 0, beskrivelse: "Tyveværktøj. Kan bruges til indbrud på tomme byfelter." },

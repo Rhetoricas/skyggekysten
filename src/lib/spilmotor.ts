@@ -1,6 +1,6 @@
 import { spilTilstand } from '$lib/spilTilstand.svelte';
 import { syncTilDb, broadcastFelt, broadcastFelter, syncKortTilDbSenere } from '$lib/netvaerk';
-import { BREDDE, HOEJDE, biomeVægte, biomeTerraenCost, itemDB, markedVarePool } from '$lib/spildata';
+import { BREDDE, HOEJDE, HEX_W, biomeVægte, biomeTerraenCost, itemDB, markedVarePool } from '$lib/spildata';
 import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
@@ -18,6 +18,13 @@ const RETNINGER = {
     'W':  [[-1, 0], [-1, 0]],
     'NW': [[-1, -1], [0, -1]]
 } as const;
+
+interface FaellesEventEffekt {
+    senderNavn: string;
+    besked: string;
+    guldAendring?: number;
+    skade?: number;
+}
 
 let katastrofeVisuelId = 0;
 
@@ -134,7 +141,7 @@ export function regnHexAfstand(indexEn: number, indexTo: number, bredde: number)
 }
 
 export async function sendAnonymAlarm() {
-    if (spilTilstand.offlineMode) return;
+    if (spilTilstand.offlineMode || spilTilstand.soloMode) return;
     if (!spilTilstand.spillerNavn || !spilTilstand.rumKode) return;
 
     const besked = {
@@ -147,6 +154,57 @@ export async function sendAnonymAlarm() {
         event: 'alarm',
         payload: besked
     }).catch((error) => console.warn('Alarm kunne ikke sendes', error));
+}
+
+export function anvendFaellesEventEffekt(payload: FaellesEventEffekt) {
+    if (!payload || payload.senderNavn === spilTilstand.spillerNavn) return;
+    if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'win_map') return;
+
+    if (payload.guldAendring) {
+        spilTilstand.guldTotal += payload.guldAendring;
+    }
+
+    if (payload.skade && payload.skade > 0) {
+        tagSkadeOgTjekDød(payload.skade, payload.besked);
+    } else {
+        spilTilstand.logBesked = payload.besked;
+    }
+
+    syncTilDb();
+}
+
+export function udloesFaellesEventEffekt(effekt: Omit<FaellesEventEffekt, 'senderNavn'>) {
+    const senderNavn = spilTilstand.spillerNavn || 'En spiller';
+    const payload: FaellesEventEffekt = { ...effekt, senderNavn };
+
+    if (payload.guldAendring) {
+        spilTilstand.guldTotal += payload.guldAendring;
+    }
+    if (payload.skade && payload.skade > 0) {
+        tagSkadeOgTjekDød(payload.skade, payload.besked);
+    } else {
+        spilTilstand.logBesked = payload.besked;
+    }
+
+    if (!spilTilstand.offlineMode && !spilTilstand.soloMode && spilTilstand.rumKode) {
+        void supabase.channel(spilTilstand.rumKode).send({
+            type: 'broadcast',
+            event: 'faelles_event',
+            payload
+        }).catch((error) => console.warn('Fælles event kunne ikke sendes', error));
+    }
+
+    syncTilDb();
+}
+
+export function rykTaagenTilbage(antalFelter: number = 2) {
+    const afstand = Math.max(1, antalFelter) * HEX_W;
+    if (spilTilstand.fogX < 0) {
+        spilTilstand.fogX = Math.min(-1, spilTilstand.fogX + afstand);
+    } else {
+        spilTilstand.fogX = Math.max(0, spilTilstand.fogX - afstand);
+    }
+    syncTilDb();
 }
 
 export function hentNaboIndices(index: number) {
@@ -1129,7 +1187,7 @@ export function initialiserGitter() {
                 const antalVarer = felt.biome === 'by' ? 2 : 1;
                 const pulje = felt.biome === 'marked' 
                     ? markedVarePool 
-                    : Object.keys(itemDB).filter(k => itemDB[k].pris > 0 && itemDB[k].type !== 'forbandelse' && itemDB[k].type !== 'skat');                
+                    : Object.keys(itemDB).filter(k => itemDB[k].pris > 0 && itemDB[k].kanKoebes !== false && itemDB[k].type !== 'forbandelse' && itemDB[k].type !== 'skat');                
                 const valgte: string[] = [];
                 for(let j=0; j < antalVarer; j++) {
                     const vare = pulje[Math.floor(Math.random() * pulje.length)];
@@ -1245,7 +1303,7 @@ export function tjekMiljoeSlitage(biome: string): string {
 }
 
 export async function sendBaalSignal(centerIndex: number, radius: number) {
-    if (spilTilstand.offlineMode) return;
+    if (spilTilstand.offlineMode || spilTilstand.soloMode) return;
     if (!spilTilstand.rumKode) return;
     void supabase.channel(spilTilstand.rumKode).send({
         type: 'broadcast',

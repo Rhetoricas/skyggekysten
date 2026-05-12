@@ -3,6 +3,7 @@ import { blodskovensHjerteEvents } from './event_blodskov';
 import { naturkatastrofeEvents } from './event_naturkatastrofer';
 import { metaEvents } from './event_meta';
 import { vaabenEvents } from './event_vaaben';
+import { specialItemEvents } from './event_specialitems';
 import type { Biome } from './types';
 
 export interface Udfald {
@@ -19,6 +20,7 @@ export interface Udfald {
 export interface Valg {
     tekst: string;
     kraeverItem?: string;     
+    kraeverEtAfItems?: string[];
     kosterItem?: string;
     kosterEnergi?: number;    
     kraeverKarakter?: string; 
@@ -63,6 +65,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
     ...naturkatastrofeEvents,
     ...metaEvents,
     ...vaabenEvents,
+    ...specialItemEvents,
 
     'campfire': {
         id: 'campfire',

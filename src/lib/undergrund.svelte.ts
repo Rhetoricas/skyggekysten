@@ -30,28 +30,28 @@ export function genererUndergrund(biome: Biome | string) {
     if (biome === 'bandit') {
         if (terningKast < 50) {
             feltData.skjultGuld = tilfaeldigtTal(50, 100); 
-        } else if (terningKast < 90) {
+        } else if (terningKast < 75) {
             feltData.skjultFaelde = true; 
         }
     } else if (biome === 'mark' || biome === 'eng') {
         if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(10, 20);
         else if (terningKast < 35) feltData.skjultLiv = tilfaeldigtTal(10, 20);
-        else if (terningKast < 40) feltData.skjultFaelde = true;
+        else if (terningKast < 38) feltData.skjultFaelde = true;
         else if (terningKast < 42) feltData.skjultLoot = 'fakkel';
     } else if (biome === 'skov') {
         if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(10, 15);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(20, 40);
-        else if (terningKast < 60) feltData.skjultFaelde = true;
+        else if (terningKast < 58) feltData.skjultFaelde = true;
         else if (terningKast < 63) feltData.skjultLoot = 'livseliksir';
     } else if (biome === 'bjerg') {
         if (terningKast < 50) feltData.skjultGuld = tilfaeldigtTal(15, 40);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(5, 10);
-        else if (terningKast < 70) feltData.skjultFaelde = true;
+        else if (terningKast < 63) feltData.skjultFaelde = true;
         else if (terningKast < 74) feltData.skjultLoot = 'fakkel';
     } else if (farlige.includes(biome)) {
         if (terningKast < 45) feltData.skjultGuld = tilfaeldigtTal(25, 50);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(10, 20);
-        else if (terningKast < 90) feltData.skjultFaelde = true;
+        else if (terningKast < 73) feltData.skjultFaelde = true;
         else if (terningKast < 95) feltData.skjultLoot = 'livseliksir';
     }
 
@@ -132,7 +132,7 @@ export function grav() {
         const foerGuld = spilTilstand.guldTotal;
         spilTilstand.guldTotal += maengde;
         const faktiskGuld = spilTilstand.guldTotal - foerGuld;
-        fundLog = `Mudderet gemte på ${faktiskGuld} Guld.`;
+        fundLog = `Jorden gemte på ${faktiskGuld} Guld.`;
     } else if (livVaerdi > 0) {
         const aktuelHp = spilTilstand.livspoint;
         spilTilstand.livspoint += livVaerdi; 

@@ -58,6 +58,14 @@ export function kanViseValg(valg: Valg) {
         if (!harTing || harTing.maengde <= 0) return false;
     }
 
+    if (valg.kraeverEtAfItems?.length) {
+        const harEtAfDem = valg.kraeverEtAfItems.some(itemId => {
+            const ting = spilTilstand.mitUdstyr?.find(i => i.id === itemId);
+            return !!ting && ting.maengde > 0;
+        });
+        if (!harEtAfDem) return false;
+    }
+
     if (valg.kosterItem) {
         const harTing = spilTilstand.mitUdstyr?.find(i => i.id === valg.kosterItem);
         if (!harTing || harTing.maengde <= 0) return false;

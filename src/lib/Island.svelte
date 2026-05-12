@@ -10,7 +10,7 @@
     import { M10_SCORE, beregnFremdriftPoint, beregnMinePoint, taelScoreSpillere } from '$lib/score';
     import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi, hentGlobalTopScore, flushVentendeSync } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
-    import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn } from '$lib/spilmotor';
+    import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, anvendFaellesEventEffekt } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
     import { erSpillerITaagen } from '$lib/overlevelse.svelte';    
     import { eventState, startEvent, lukEvent as motorLukEvent } from '$lib/eventMotor.svelte';
@@ -33,6 +33,7 @@
     import VenteModal from '$lib/VenteModal.svelte';
     import BottomUI from './BottomUI.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
+    import LydKnap from '$lib/LydKnap.svelte';
 
     const cam = skabKamera();
     const MAX_DAGE_FORAN = 5;
@@ -379,11 +380,12 @@
 
     async function opretEllerDeltag() {
         spilTilstand.offlineMode = false;
+        spilTilstand.soloMode = false;
         let rentNavn = (spilTilstand.spillerNavn || '').replace(/[^a-zA-Z0-9æøåÆØÅ ]/g, '').trim().substring(0, 15);
         let renKode = (spilTilstand.rumKode || '').replace(/[^a-zA-Z0-9æøåÆØÅ]/g, '').toLowerCase().substring(0, 20);
 
         if (rentNavn === '' || renKode === '') {
-            spilTilstand.statusBesked = 'Udfyld navn og kode.';
+            spilTilstand.statusBesked = 'Udfyld både dit kaldenavn og dit ø-navn.';
             return;
         }
 
@@ -409,6 +411,9 @@
             .on('broadcast', { event: 'baal' }, ({ payload }) => {
                 afslørOmraade(payload.centerIndex, payload.radius);
                 syncTilDb();
+            })
+            .on('broadcast', { event: 'faelles_event' }, ({ payload }) => {
+                anvendFaellesEventEffekt(payload);
             })
             .subscribe();
 
@@ -496,9 +501,14 @@
         }
     }
 
-    async function startOfflineSolo() {
-        const rentNavn = (spilTilstand.spillerNavn || 'Spiller').replace(/[^a-zA-Z0-9æøåÆØÅ ]/g, '').trim().substring(0, 15) || 'Spiller';
-        const renKode = (spilTilstand.rumKode || 'solo').replace(/[^a-zA-Z0-9æøåÆØÅ]/g, '').toLowerCase().substring(0, 20) || 'solo';
+    async function startSolo() {
+        const rentNavn = (spilTilstand.spillerNavn || '').replace(/[^a-zA-Z0-9æøåÆØÅ ]/g, '').trim().substring(0, 15);
+        const renKode = (spilTilstand.rumKode || '').replace(/[^a-zA-Z0-9æøåÆØÅ]/g, '').toLowerCase().substring(0, 20);
+
+        if (rentNavn === '' || renKode === '') {
+            spilTilstand.statusBesked = 'Udfyld både dit kaldenavn og dit ø-navn.';
+            return;
+        }
 
         stopRealtime();
         if (alarmKanal) {
@@ -506,10 +516,11 @@
             alarmKanal = null;
         }
 
-        spilTilstand.offlineMode = true;
+        spilTilstand.offlineMode = false;
+        spilTilstand.soloMode = true;
         spilTilstand.spillerNavn = rentNavn;
         spilTilstand.rumKode = renKode;
-        spilTilstand.statusBesked = 'Solo offline.';
+        spilTilstand.statusBesked = authState.user ? 'Solo.' : 'Solo. Log ind for at gemme officiel score.';
         spilTilstand.erHost = true;
         spilTilstand.alleSpillere = {};
         spilTilstand.fogX = 0;
@@ -522,8 +533,6 @@
         initialiserGitter();
         spilTilstand.gameState = 'select';
         await syncTilDb(true);
-        harGemtOfflineSpil = harOfflineSpil();
-        offlineSpilInfo = hentOfflineSpilInfo();
     }
 
     function fortsaetOfflineSolo() {
@@ -533,6 +542,7 @@
             offlineSpilInfo = null;
             return;
         }
+        spilTilstand.soloMode = false;
 
         stopRealtime();
         if (alarmKanal) {
@@ -564,7 +574,7 @@
         preloadFiler();
         let genopretterForbindelse = false;
 
-        const erAktivtOnlinespil = () => spilTilstand.gameState === 'play' && !spilTilstand.offlineMode;
+        const erAktivtOnlinespil = () => spilTilstand.gameState === 'play' && !spilTilstand.offlineMode && !spilTilstand.soloMode;
 
         const heartbeat = async () => {
             if (spilTilstand.offlineMode && spilTilstand.gameState === 'play') {
@@ -724,7 +734,7 @@
     }
 
     async function bekræftValg(karakter: Karakter) {
-        const aktivSammeBruger = spilTilstand.offlineMode ? null : findAktivSpillerForBruger();
+        const aktivSammeBruger = (spilTilstand.offlineMode || spilTilstand.soloMode) ? null : findAktivSpillerForBruger();
         if (aktivSammeBruger && aktivSammeBruger.navn !== spilTilstand.spillerNavn) {
             spilTilstand.statusBesked = `Du spiller allerede på denne ø som ${aktivSammeBruger.navn}.`;
             spilTilstand.gameState = 'start';
@@ -816,6 +826,9 @@
 
     function afslutIntro() {
         introAktiv = false;
+        requestAnimationFrame(() => {
+            cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
+        });
     }
 
     function formaterOeNavn() {
@@ -928,8 +941,8 @@ function udførBevægelse(nytIndeks: number) {
 {/if}
 
 <Skaerme 
-    {opretEllerDeltag} 
-    {startOfflineSolo}
+    {opretEllerDeltag}
+    {startSolo}
     {fortsaetOfflineSolo}
     {bekræftValg} 
     {genstartBane} 
@@ -947,6 +960,7 @@ function udførBevægelse(nytIndeks: number) {
 {#if spilTilstand.gameState === 'play'}
     <div class="game-help-actions">
         <Regelbog />
+        <LydKnap />
     </div>
 {/if}
 
@@ -1298,6 +1312,9 @@ function udførBevægelse(nytIndeks: number) {
         right: 14px;
         z-index: 2100;
         pointer-events: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
     .camera { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
     .map { position: absolute; top: 0; left: 0; }

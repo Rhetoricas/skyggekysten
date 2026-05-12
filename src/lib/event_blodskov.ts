@@ -24,10 +24,20 @@ Lederen råber, at træets kerne kan betale mændenes gæld. Den gamle mand spyt
       },
       {
         tekst: 'Træk dit våben og hjælp med at fælde træet.',
+        kraeverEtAfItems: ['svaerd', 'sabel', 'oekse', 'kniv'],
         udfaldListe: [
           { log: `Barken flænges under jeres fælles angreb. Den gamle mand skriger, og jorden ryster voldsomt under jer.`, naesteTrin: 'blodskov_angrebet' },
           { log: `En gren pisker ned fra trækronen og slår dig til jorden. Du mister pusten totalt.`, hpAendring: -18, naesteTrin: 'blodskov_angrebet' },
           { log: `Du rammer et blødt punkt i stammen. En enorm mængde rød saft flyder ud og tvinger rødderne tilbage.`, guldAendring: 40, maxHpAendring: 5, naesteTrin: 'blodskov_saften' }
+        ]
+      },
+      {
+        tekst: 'Grav rødderne fri med skovlen.',
+        kraeverItem: 'skovl',
+        udfaldListe: [
+          { log: `Skovlen får fat under de øverste rødder. Du løsner dem nok til, at lederen sænker øksen og lytter.`, maxHpAendring: 4, naesteTrin: 'blodskov_roedderne' },
+          { log: `Du rammer en blodfyldt rod. Saften sprøjter op, og træet svarer ved at slå hårdt ned omkring dig.`, hpAendring: -10, naesteTrin: 'blodskov_vaegtskaalen' },
+          { log: `Jorden åbner et lille hulrum ved stammen. Det er ikke kernen, men der ligger gamle mønter i det mørke.`, guldAendring: 60, naesteTrin: 'blodskov_kernen' }
         ]
       },
       {
@@ -109,6 +119,15 @@ De fastklemte skovhuggere stønner. Træet strammer langsomt grebet igen. Her er
         ]
       },
       {
+        tekst: 'Grav rundt om mandens binding med skovlen.',
+        kraeverItem: 'skovl',
+        udfaldListe: [
+          { log: `Du løsner jorden omkring håret og finder den knude, der holder manden fast. Rødderne slipper kort efter.`, maxHpAendring: 5, naesteTrin: 'blodskov_roedderne' },
+          { log: `Skovlen rammer en skjult jernring under mudderet. Den er gammel, men stadig penge værd.`, guldAendring: 70, naesteTrin: 'blodskov_kernen' },
+          { log: `Roden slår tilbage gennem skaftet. Smerten går op gennem armen, før du når væk.`, hpAendring: -10, naesteTrin: 'blodskov_angrebet' }
+        ]
+      },
+      {
         tekst: 'Kast dit flotte tøj over mandens hoved for at blænde hans kontrol.',
         kosterItem: 'flot_toej',
         udfaldListe: [
@@ -158,7 +177,7 @@ Gennem såret i stammen lyser træets indre svagt rødt. Lederen gør klar til a
         ]
       },
       {
-        tekst: 'Afbryd dit angreb og prøv at hive folkene op fra hullerne.',
+        tekst: 'Prøv at hive folkene op fra hullerne.',
         udfaldListe: [
           { log: `Du får fat i to af dem. De hoster jord op og takker dig med det guld, de har tilbage i lommerne.`, guldAendring: 140, maxHpAendring: 6, naesteTrin: 'blodskov_roedderne' },
           { log: `Rødderne er for stærke. De trækker dem under, mens tornene river huden af dine underarme.`, hpAendring: -22, naesteTrin: 'blodskov_efterspillet' },
@@ -213,6 +232,15 @@ Den gamle mand styrer tydeligvis røddernes greb. Han lader skovhuggerne lide me
           { log: `Kniven arbejder hurtigt og præcist. Du løsner båndene og sikrer dig arbejdernes guld som tak.`, guldAendring: 180, maxHpAendring: 6, naesteTrin: 'blodskov_efterspillet' },
           { log: `Klingen smutter på den hårde bark og skærer dybt i din håndflade. De kommer fri, men det kostede.`, hpAendring: -12, guldAendring: 100, naesteTrin: 'blodskov_efterspillet' },
           { log: `Træet afgiver en sort gas fra snittene. Du hoster og mister pusten, mens de stikker af.`, hpAendring: -16, naesteTrin: 'blodskov_efterspillet' }
+        ]
+      },
+      {
+        tekst: 'Grav de fastklemte fri med skovlen.',
+        kraeverItem: 'skovl',
+        udfaldListe: [
+          { log: `Du skærer ikke rødderne over, men fjerner jorden omkring dem. Det tager tid, men mændene kommer fri.`, guldAendring: 90, maxHpAendring: 5, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du graver for tæt på en levende rod. Den slår op gennem mudderet og rammer dig hårdt i siden.`, hpAendring: -12, naesteTrin: 'blodskov_saften' },
+          { log: `Skovlen rammer et gammelt skjul under en rod. Der ligger mad og mønter fra folk, der ikke slap ud.`, givItem: 'mad', guldAendring: 70, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
