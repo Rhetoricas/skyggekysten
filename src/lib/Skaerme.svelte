@@ -513,12 +513,8 @@
             <div class="medalje-sektion">
                 <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" />
             </div>
-            <img src="/screens/death.webp" alt="Døden" class="doeds-symbol" />
             
-            <h1 class="doeds-titel">Døde på {formaterNavn(spilTilstand.rumKode)}</h1>
-            <p class="beskrivelse">
-                {spilTilstand.logBesked} {hentMinHistorie(false)}
-            </p>
+            <h1 class="doeds-titel">{formaterNavn(spilTilstand.spillerNavn)}, du døde på {formaterNavn(spilTilstand.rumKode)}</h1>
             
             <div class="score-container">
                 <img src="/screens/pergament.webp" alt="Pergament" class="pergament-billede" />
@@ -526,6 +522,12 @@
                     <span class="lille-score">Score:</span> {spilTilstand.samletScore}
                 </h2>
             </div>
+
+            <img src="/screens/death.webp" alt="Døden" class="doeds-symbol" />
+
+            <p class="beskrivelse">
+                {spilTilstand.logBesked} {hentMinHistorie(false)}
+            </p>
 
             <div class="spec-paneler">
                 {@render pointSpecifikation()}
@@ -915,7 +917,7 @@
     .slut-scroll { overflow-y: auto; height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; padding: 0 20px 40px 20px; }
     .medalje-sektion { margin: 0; padding: 0; width: 100%; display: flex; justify-content: center; }
     .stor-medalje { height: 260px; filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.15)); margin: 0 0 10px 0; display: block; }
-    .doeds-symbol { width: min(210px, 48vw); height: auto; margin: -28px 0 4px; opacity: 0.92; filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.45)); }
+    .doeds-symbol { width: min(210px, 48vw); height: auto; margin: -8px 0 10px; opacity: 0.92; filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.45)); }
     
     .doeds-titel { font-size: 2.5rem; margin: 1rem 0; font-family: 'Cinzel', serif; color: #fff; }
     .sejr-titel { font-size: 2.5rem; margin: 1rem 0; font-family: 'Cinzel', serif; color: #fff; }

@@ -104,6 +104,11 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
     if (spilTilstand.livspoint <= 0) {
         const erHavet = besked.includes("havet") || besked.includes("saltvand") || besked.includes("hav");
 
+        if (erHavet) {
+            druknSpiller(doedsBesked || beskedMedTal);
+            return;
+        }
+
         if (!erHavet && !erSpillerITaagen()) {
             fremtvingKollaps(doedsBesked || beskedMedTal);
             return;
@@ -132,6 +137,25 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
         spilTilstand.logBesked = beskedMedTal;
         syncTilDb();
     }
+}
+
+function druknSpiller(besked: string) {
+    spilTilstand.gameState = 'dead_map';
+    spilTilstand.erBevidstløs = false;
+    spilTilstand.livspoint = 0;
+
+    if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
+        spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = true;
+    }
+
+    const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
+    if (aktueltFelt && spilTilstand.valgtKarakter) {
+        aktueltFelt.gravstenIkon = spilTilstand.valgtKarakter.ikon;
+        broadcastFelt(spilTilstand.spillerIndex, aktueltFelt);
+    }
+
+    spilTilstand.logBesked = besked;
+    syncTilDb(true);
 }
 
 export function tjekOverlevelse() {
@@ -260,6 +284,11 @@ export function udfoerBlodofring() {
 
 export function fremtvingKollaps(brugerdefineretAarsag?: string) {
     if (spilTilstand.gameState !== 'play' || spilTilstand.erBevidstløs) return;
+
+    if (spilTilstand.gitter[spilTilstand.spillerIndex]?.biome === 'hav') {
+        druknSpiller(brugerdefineretAarsag || "Du mistede bevidstheden i vandet og druknede.");
+        return;
+    }
 
     if (brugEliksir()) {
         const aarsag = brugerdefineretAarsag ? `${brugerdefineretAarsag} ` : "Du var ved at kollapse. ";
