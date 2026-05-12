@@ -3,7 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
     import { grav } from '$lib/undergrund.svelte';
-    import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal, aktiverHemmelighed, begaaIndbrud, kanBegaaIndbrudPaaFelt } from '$lib/spilmotor';
+    import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal, aktiverHemmelighed, begaaIndbrud, kanBegaaIndbrudPaaFelt, hentMuligeTrackerMaal, saetTracker } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
 
     let aktueltFelt = $derived(
@@ -14,6 +14,10 @@
 
     let kanGrave = $derived(aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves);
     let kanBegaaIndbrud = $derived(kanBegaaIndbrudPaaFelt(aktueltFelt));
+    let trackerMaal = $derived(hentMuligeTrackerMaal());
+    let aktivTracker = $derived(spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.aktivTracker);
+    let aktivTrackerSpiller = $derived(aktivTracker ? spilTilstand.alleSpillere[aktivTracker.targetNavn] : null);
+    let trackerDageTilbage = $derived(aktivTracker ? Math.max(0, aktivTracker.slutterDag - spilTilstand.dag + 1) : 0);
     let harSkovl = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'skovl' && ting.maengde > 0) ?? false);
     let graveIkon = $derived(harSkovl ? '/inventory/skovl.webp' : '/ui/haandgrav.webp');
     let graveAlt = $derived(kanGrave ? (harSkovl ? 'Grav med skovl' : 'Grav med hænderne') : 'Her kan ikke graves');
@@ -128,6 +132,24 @@
     </div>
 
     <div class="instrument-braet">
+        {#if trackerMaal.length > 0}
+            <div class="tracker-panel">
+                {#each trackerMaal as navn (navn)}
+                    <button type="button" class="tracker-knap" onclick={() => saetTracker(navn)}>
+                        Spor {navn}
+                    </button>
+                {/each}
+            </div>
+        {/if}
+
+        {#if aktivTracker && aktivTrackerSpiller && trackerDageTilbage > 0}
+            <div class="tracker-status" title="Du ser de felter, denne spiller ser.">
+                <img src={aktivTrackerSpiller.ikon || '/tiles/player.webp'} alt="" />
+                <span>{aktivTracker.targetNavn}</span>
+                <small>{trackerDageTilbage} dage</small>
+            </div>
+        {/if}
+
         {#if totalMove !== 1}
             <span class="mod-badge move {totalMove > 1 ? 'negativ' : ''}">
                 <img src="/ui/stat_move.webp" alt="" />
@@ -304,8 +326,62 @@
         width: 100%;
         display: flex;
         justify-content: center;
+        align-items: center;
         gap: 12px;
         margin-bottom: 12px;
+        pointer-events: auto;
+        flex-wrap: wrap;
+    }
+    .tracker-panel {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+    }
+    .tracker-knap {
+        border: 1px solid rgba(156, 216, 255, 0.6);
+        border-radius: 6px;
+        background: rgba(10, 20, 26, 0.78);
+        color: #e9f7ff;
+        padding: 0.35rem 0.7rem;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        font-size: 0.9rem;
+        letter-spacing: 0;
+        box-shadow: 0 0 12px rgba(89, 185, 255, 0.18);
+        cursor: pointer;
+    }
+    .tracker-knap:hover,
+    .tracker-knap:focus-visible {
+        background: rgba(25, 44, 55, 0.9);
+        outline: none;
+        box-shadow: 0 0 16px rgba(121, 210, 255, 0.36);
+    }
+    .tracker-status {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 34px;
+        padding: 0.2rem 0.55rem 0.2rem 0.3rem;
+        border-radius: 999px;
+        background: rgba(8, 18, 24, 0.68);
+        color: #e9f7ff;
+        font-family: 'Cinzel', serif;
+        font-size: 0.9rem;
+        box-shadow: 0 0 14px rgba(126, 214, 255, 0.22);
+    }
+    .tracker-status img {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+        border-radius: 50%;
+        filter: drop-shadow(0 0 5px rgba(126, 214, 255, 0.8));
+    }
+    .tracker-status small {
+        color: #9fd7f4;
+        font-family: system-ui, sans-serif;
+        font-size: 0.72rem;
+        white-space: nowrap;
     }
     .mod-badge {
         background: transparent;

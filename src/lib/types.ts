@@ -64,6 +64,11 @@ export interface SpillerData {
     browserId?: string | null;
     userId?: string | null;
     harSkattekort?: boolean;
+    aktivTracker?: {
+        targetNavn: string;
+        slutterDag: number;
+    } | null;
+    trackedeSpillere?: string[];
 }
 
 export interface Felt {
@@ -73,6 +78,7 @@ export interface Felt {
     x?: number;
     y?: number;
     hasBoat?: boolean;
+    boatCount?: number;
     hasPortal?: boolean;
     
     guld: number;
@@ -113,4 +119,7 @@ export interface Felt {
 
     grundBiome?: string | Biome;
     grundEvent?: string;
+    katastrofeFraBiome?: string | Biome;
+    katastrofeVisuelAktiv?: boolean;
+    katastrofeVisuelId?: number;
 }

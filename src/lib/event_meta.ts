@@ -94,7 +94,7 @@ export const metaEvents: Record<string, SpilEvent> = {
         tekst: 'En dommer sidder ved en bro, der ikke fører nogen steder hen. På bordet ligger en vægt, en våd logbog og et kort over din rute. Han spørger ikke, hvad du har gjort. Han ved det allerede.',
         biome: ['ruin', 'by', 'ritual', 'slagmark'],
         billede: '/events/ev_ruin.webp',
-        unik: true,
+        unik: false,
         minKolonnePct: 0.60,
         valg: [
             {

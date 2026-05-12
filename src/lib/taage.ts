@@ -17,5 +17,11 @@ export function erFeltITaagen(gitter: Felt[], index: number, fogX: number) {
     const kolonne = index % BREDDE;
     const posX = kolonne * HEX_W + (raekke % 2 !== 0 ? HEX_W / 2 : 0);
 
+    if (fogX < 0) {
+        const kortBredde = BREDDE * HEX_W;
+        const frontFraOest = kortBredde - Math.abs(fogX);
+        return posX >= frontFraOest;
+    }
+
     return posX <= fogX && !erBeskyttetAfTaageblokker(gitter, index);
 }

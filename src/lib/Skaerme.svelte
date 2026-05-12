@@ -508,21 +508,22 @@
     </div>
 
 {:else if spilTilstand.gameState === 'dead'}
-    <div class="overlay death-screen">
+    <div class="slutskærm death-screen">
         <div class="slut-scroll">
             <div class="medalje-sektion">
                 <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" />
             </div>
+            <img src="/screens/death.webp" alt="Døden" class="doeds-symbol" />
             
-            <h1 class="doeds-titel">Du døde på Tågeøen {formaterNavn(spilTilstand.rumKode)}</h1>
+            <h1 class="doeds-titel">Døde på {formaterNavn(spilTilstand.rumKode)}</h1>
             <p class="beskrivelse">
                 {spilTilstand.logBesked} {hentMinHistorie(false)}
             </p>
             
             <div class="score-container">
-                <img src="/screens/death.webp" alt="Døden" class="pergament-billede" />
-                <h2 class="score-tekst-doed">
-                    <span class="lille-score-doed">Score:</span> {spilTilstand.samletScore}
+                <img src="/screens/pergament.webp" alt="Pergament" class="pergament-billede" />
+                <h2 class="score-tekst">
+                    <span class="lille-score">Score:</span> {spilTilstand.samletScore}
                 </h2>
             </div>
 
@@ -593,12 +594,12 @@
     </div>
 
 {:else if spilTilstand.gameState === 'win'}
-    <div class="sejrsskaerm">
+    <div class="slutskærm sejrsskaerm">
         <div class="slut-scroll">
             <div class="medalje-sektion">
                 <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" />
             </div>
-            <h1 class="sejr-titel">Du slap væk fra Tågeøen {formaterNavn(spilTilstand.rumKode)}</h1>
+            <h1 class="sejr-titel">Slap væk fra {formaterNavn(spilTilstand.rumKode)}</h1>
             <p class="beskrivelse">
                 {hentMinHistorie(true)}
             </p>
@@ -907,12 +908,14 @@
     .positive { color: #ccc; }
     .negative { color: #888; }
 
-    .death-screen { flex-direction: column; text-align: center; background: rgba(40, 0, 0, 0.95); overflow-y: auto; justify-content: flex-start; }
-    .sejrsskaerm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #053315; display: flex; flex-direction: column; align-items: center; color: #ffffff; box-sizing: border-box; overflow-y: auto; z-index: 1000; font-family: system-ui, -apple-system, sans-serif; }
+    .slutskærm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; color: #ffffff; box-sizing: border-box; overflow-y: auto; z-index: 1000; font-family: system-ui, -apple-system, sans-serif; text-align: center; }
+    .death-screen { background: #3a0505; }
+    .sejrsskaerm { background-color: #053315; }
     
     .slut-scroll { overflow-y: auto; height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; padding: 0 20px 40px 20px; }
     .medalje-sektion { margin: 0; padding: 0; width: 100%; display: flex; justify-content: center; }
     .stor-medalje { height: 260px; filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.15)); margin: 0 0 10px 0; display: block; }
+    .doeds-symbol { width: min(210px, 48vw); height: auto; margin: -28px 0 4px; opacity: 0.92; filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.45)); }
     
     .doeds-titel { font-size: 2.5rem; margin: 1rem 0; font-family: 'Cinzel', serif; color: #fff; }
     .sejr-titel { font-size: 2.5rem; margin: 1rem 0; font-family: 'Cinzel', serif; color: #fff; }
@@ -920,23 +923,36 @@
     
     .score-container { position: relative; width: 100%; max-width: 400px; margin: 1.5rem 0; }
     .pergament-billede { width: 100%; height: auto; }
-    .score-tekst-doed { position: absolute; top: 18%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 2.4rem; font-family: 'Cinzel', serif; font-weight: bold; text-shadow: 2px 2px 5px black; text-align: center; width: 100%; line-height: 1; margin: 0; }
-    .lille-score-doed { font-size: 1.2rem; color: #ccc; letter-spacing: 1px; margin-right: 10px; }
     .score-tekst { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); color: #222; font-size: 2.4rem; font-family: 'Cinzel', serif; font-weight: bold; text-align: center; line-height: 1; width: 100%; margin: 0; }
     .lille-score { font-size: 1.2rem; color: #555; letter-spacing: 2px; margin-right: 10px; }
 
-    .spec-paneler { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 1100px; margin: 20px 0; }
-    .point-kvittering { background: rgba(0, 0, 0, 0.5); border: 1px dashed #555; padding: 20px; width: 380px; font-family: monospace; text-align: left; }
-    .point-kvittering h4 { margin: 0 0 15px 0; text-align: center; color: #fff; border-bottom: 1px solid #444; padding-bottom: 10px; font-family: 'Cinzel', serif; font-size: 1.2rem; }
+    .spec-paneler {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 42px;
+        width: 100%;
+        max-width: 900px;
+        margin: 22px 0;
+        align-items: start;
+    }
+    .point-kvittering {
+        background: transparent;
+        border: none;
+        padding: 0;
+        width: 100%;
+        font-family: monospace;
+        text-align: left;
+    }
+    .point-kvittering h4 { margin: 0 0 15px 0; text-align: center; color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.22); padding-bottom: 10px; font-family: 'Cinzel', serif; font-size: 1.2rem; }
     .kvittering-linje { display: flex; justify-content: space-between; color: #ccc; margin: 8px 0; font-size: 1rem; }
     .kvittering-linje.mult { color: #bbb; font-style: italic; }
-    .kvittering-skiller { border-top: 1px solid #444; margin: 10px 0; }
-    .kvittering-total { display: flex; justify-content: space-between; font-size: 1.6rem; color: #fff; border-top: 1px solid #666; padding-top: 10px; margin-top: 10px; font-weight: bold; }
+    .kvittering-skiller { border-top: 1px solid rgba(255, 255, 255, 0.18); margin: 10px 0; }
+    .kvittering-total { display: flex; justify-content: space-between; font-size: 1.6rem; color: #fff; border-top: 1px solid rgba(255, 255, 255, 0.28); padding-top: 10px; margin-top: 10px; font-weight: bold; }
     
-    .session-tavle { background: rgba(0, 0, 0, 0.5); border: 1px solid #444; padding: 20px; width: 480px; }
-    .session-tavle h3 { color: #fff; margin-top: 0; border-bottom: 1px solid #555; padding-bottom: 10px; font-family: 'Cinzel', serif; font-size: 1.2rem; }
-    .session-raekke { display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(255, 255, 255, 0.05); margin-bottom: 10px; border-radius: 4px; border: 1px solid transparent; }
-    .aktiv-mig { border: 1px solid #aaa; background: rgba(255, 255, 255, 0.1); }
+    .session-tavle { background: transparent; border: none; padding: 0; width: 100%; }
+    .session-tavle h3 { color: #fff; margin-top: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.22); padding-bottom: 10px; font-family: 'Cinzel', serif; font-size: 1.2rem; }
+    .session-raekke { display: flex; align-items: center; gap: 12px; padding: 10px 0; background: transparent; margin-bottom: 6px; border-radius: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+    .aktiv-mig { border-color: rgba(255, 255, 255, 0.28); background: transparent; }
     .session-ikon { height: 45px; }
     .session-info { flex-grow: 1; text-align: left; }
     .session-navn { display: block; color: #fff; font-weight: bold; font-size: 1.1rem; }
@@ -944,7 +960,7 @@
     .session-status { font-size: 0.85rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
     .vinder { color: #ddd; } .doed { color: #666; }
     
-    .slut-knapper { display: flex; gap: 20px; margin-top: 40px; padding-bottom: 60px; }
+    .slut-knapper { display: flex; gap: 20px; margin-top: 40px; padding-bottom: 60px; justify-content: center; width: 100%; max-width: 900px; }
     .highscore-container { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; width: 100%; max-width: 900px; margin-top: 20px; }
     .score-save-status {
         width: 100%;
@@ -1081,6 +1097,19 @@
         .character-gallery {
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 8px;
+        }
+
+        .spec-paneler {
+            grid-template-columns: 1fr;
+            gap: 26px;
+            max-width: 100%;
+        }
+
+        .slut-knapper {
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 32px;
         }
 
         .char-card {

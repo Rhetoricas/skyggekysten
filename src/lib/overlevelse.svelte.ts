@@ -10,6 +10,71 @@ export function erSpillerITaagen() {
 
 let sidstBrugtEliksir = 0;
 
+function hentMuligeFlugtbaadFelter() {
+    const kystFelter: number[] = [];
+    const landmasse = hentSpillerensLandmasse();
+    const tilfoejKystFelt = (indeks: number) => {
+        if (!kystFelter.includes(indeks)) kystFelter.push(indeks);
+    };
+
+    for (let r = 1; r < HOEJDE - 1; r++) {
+        const landIndeks = r * BREDDE + (BREDDE - 2);
+        const vandIndeks = r * BREDDE + (BREDDE - 1);
+        if (
+            landmasse.includes(landIndeks) &&
+            spilTilstand.gitter[vandIndeks]?.biome === 'hav'
+        ) {
+            tilfoejKystFelt(vandIndeks);
+        }
+    }
+
+    if (kystFelter.length === 0) {
+        for (let indeks = 0; indeks < spilTilstand.gitter.length; indeks++) {
+            const felt = spilTilstand.gitter[indeks];
+            const kolonne = indeks % BREDDE;
+            if (kolonne < BREDDE * 0.75 || felt?.biome !== 'hav') continue;
+
+            const naboLand = hentNaboIndicesLokal(indeks).some((naboIndeks) => landmasse.includes(naboIndeks));
+            if (naboLand) tilfoejKystFelt(indeks);
+        }
+    }
+
+    return kystFelter;
+}
+
+function hentSpillerensLandmasse() {
+    const start = spilTilstand.spillerIndex;
+    if (spilTilstand.gitter[start]?.biome === 'hav') return [];
+
+    const landmasse: number[] = [];
+    const aabne = [start];
+
+    while (aabne.length > 0) {
+        const indeks = aabne.pop()!;
+        if (landmasse.includes(indeks)) continue;
+        if (spilTilstand.gitter[indeks]?.biome === 'hav') continue;
+
+        landmasse.push(indeks);
+        for (const nabo of hentNaboIndicesLokal(indeks)) {
+            if (!landmasse.includes(nabo) && spilTilstand.gitter[nabo]?.biome !== 'hav') {
+                aabne.push(nabo);
+            }
+        }
+    }
+
+    return landmasse;
+}
+
+function hentNaboIndicesLokal(index: number) {
+    const raekke = Math.floor(index / BREDDE);
+    const forskudt = raekke % 2 !== 0;
+    const afstande = forskudt
+        ? [-BREDDE, -BREDDE + 1, -1, 1, BREDDE, BREDDE + 1]
+        : [-BREDDE - 1, -BREDDE, -1, 1, BREDDE - 1, BREDDE];
+
+    return afstande.map((offset) => index + offset).filter((i) => i >= 0 && i < BREDDE * HOEJDE);
+}
+
 function brugEliksir() {
     const nu = Date.now();
     
@@ -105,15 +170,31 @@ export function fremrykTid() {
     const antalLevende = Object.values(spilTilstand.alleSpillere).filter((s: any) => !s.isDead && !s.isWinner).length || 1;
     
     const gammelDag = spilTilstand.dag || 1;
+    let taagenVendte = false;
 
     while (spilTilstand.nuvaerendeEnergi <= 0) {
         spilTilstand.dag++;
         spilTilstand.nuvaerendeEnergi += spilTilstand.valgtKarakter.baseEnergi;        
         
-        const taagenHoldtTilDag = Math.max(0, ...spilTilstand.gitter.map((felt) => felt.taagenHoldtTilDag || 0));
+        const taagenGaarModOest = spilTilstand.fogX >= 0;
+        const taagenHoldtTilDag = taagenGaarModOest ? Math.max(0, ...spilTilstand.gitter.map((felt) => felt.taagenHoldtTilDag || 0)) : 0;
         if (spilTilstand.dag > 5 && spilTilstand.dag > taagenHoldtTilDag) {
             const dynamiskFart = 0.5 + Math.pow(spilTilstand.dag / 100, 2);
-            spilTilstand.fogX += (HEX_W * dynamiskFart) / antalLevende;        
+            const fremrykning = (HEX_W * dynamiskFart) / antalLevende;
+            const oestkant = BREDDE * HEX_W;
+
+            if (spilTilstand.fogX >= oestkant) {
+                spilTilstand.fogX = -fremrykning;
+                taagenVendte = true;
+            } else if (spilTilstand.fogX < 0) {
+                spilTilstand.fogX -= fremrykning;
+            } else {
+                spilTilstand.fogX += fremrykning;
+                if (spilTilstand.fogX >= oestkant) {
+                    spilTilstand.fogX = -1;
+                    taagenVendte = true;
+                }
+            }
         }
     }
 
@@ -125,25 +206,18 @@ export function fremrykTid() {
 
         // NYT: Generer både på østkysten, når solen står op på dag 6
         if (nyDag === 6 && gammelDag < 6) {
-            const kystFelter = [];
-            for (let r = 1; r < HOEJDE - 1; r++) {
-                const landIndeks = r * BREDDE + (BREDDE - 2);
-                const vandIndeks = r * BREDDE + (BREDDE - 1);
-                if (
-                    spilTilstand.gitter[landIndeks]?.biome !== 'hav' &&
-                    spilTilstand.gitter[vandIndeks]?.biome === 'hav'
-                ) {
-                    kystFelter.push(vandIndeks);
-                }
-            }
-            
+            const kystFelter = hentMuligeFlugtbaadFelter();
             kystFelter.sort(() => Math.random() - 0.5);
-            const antalBaade = Math.min(antalLevende, kystFelter.length);
+            const antalBaade = antalLevende;
             
-            for (let i = 0; i < antalBaade; i++) {
-                spilTilstand.gitter[kystFelter[i]].hasBoat = true;
-                broadcastFelt(kystFelter[i], spilTilstand.gitter[kystFelter[i]]);
-                kortAendret = true;
+            if (kystFelter.length > 0) {
+                for (let i = 0; i < antalBaade; i++) {
+                    const baadFelt = kystFelter[i % kystFelter.length];
+                    spilTilstand.gitter[baadFelt].hasBoat = true;
+                    spilTilstand.gitter[baadFelt].boatCount = (spilTilstand.gitter[baadFelt].boatCount || 0) + 1;
+                    broadcastFelt(baadFelt, spilTilstand.gitter[baadFelt]);
+                    kortAendret = true;
+                }
             }
             
             samletLog += "Et horn lyder mod øst. Flugtbådene er ankommet.";
@@ -152,6 +226,10 @@ export function fremrykTid() {
 
         if (samletLog.trim() !== "") {
             spilTilstand.logBesked = samletLog.trim();
+        }
+
+        if (taagenVendte) {
+            spilTilstand.logBesked = "Vinden vender ved østkysten. Tågen begynder at æde øen fra den anden side.";
         }
     }
 

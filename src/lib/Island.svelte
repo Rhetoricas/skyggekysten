@@ -10,7 +10,7 @@
     import { M10_SCORE, beregnFremdriftPoint, beregnMinePoint, taelScoreSpillere } from '$lib/score';
     import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi, hentGlobalTopScore, flushVentendeSync } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
-    import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, rystSkaerm, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse } from '$lib/spilmotor';
+    import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
     import { erSpillerITaagen } from '$lib/overlevelse.svelte';    
     import { eventState, startEvent, lukEvent as motorLukEvent } from '$lib/eventMotor.svelte';
@@ -145,6 +145,24 @@
                 cam.foelgSpiller(aktueltIndex, BREDDE, HEX_W, ROW_H);
             });
         }
+    });
+
+    $effect(() => {
+        const state = spilTilstand.gameState;
+        const dag = spilTilstand.dag;
+        const tracker = spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.aktivTracker;
+        const target = tracker ? spilTilstand.alleSpillere[tracker.targetNavn] : null;
+        const targetIndex = target?.index;
+        const targetSyn = target?.kendteFelter?.length || 0;
+        void dag;
+        void targetIndex;
+        void targetSyn;
+
+        untrack(() => {
+            if (state === 'play') {
+                opdaterTrackerSyn();
+            }
+        });
     });
 
     $effect(() => {
@@ -345,6 +363,8 @@
             spilTilstand.alleSpillere[navn].isWinner = false;
             spilTilstand.alleSpillere[navn].dag = 1;
             spilTilstand.alleSpillere[navn].harSkattekort = false;
+            spilTilstand.alleSpillere[navn].aktivTracker = null;
+            spilTilstand.alleSpillere[navn].trackedeSpillere = [];
         });
 
         spilTilstand.fogX = 0;
@@ -389,21 +409,6 @@
             .on('broadcast', { event: 'baal' }, ({ payload }) => {
                 afslørOmraade(payload.centerIndex, payload.radius);
                 syncTilDb();
-            })
-            .on('broadcast', { event: 'meteor' }, ({ payload }) => {
-                rystSkaerm(1200);
-                payload.ramteFelter.forEach((idx: number) => {
-                    spilTilstand.gitter[idx] = {
-                        ...spilTilstand.gitter[idx],
-                        biome: 'meteor',
-                        hasMeteorStone: true,
-                        eventID: 'meteor_skat'
-                    };
-                });
-                spilTilstand.gitter = [...spilTilstand.gitter];
-            })
-            .on('broadcast', { event: 'rystelse' }, ({ payload }) => {
-                rystSkaerm(payload.varighed || 1500);
             })
             .subscribe();
 
@@ -684,25 +689,31 @@
                 (1 + Math.max(0, spilTilstand.livspoint) / 1000)
         );
 
-        await syncTilDb(true);
-        const sessionGemt = await flushVentendeSync();
-        if (!sessionGemt) {
-            scoreGemningFejlet = true;
-            scoreGemmer = false;
-            return;
-        }
-        
-        const globalTopScore = !spilTilstand.offlineMode && authState.user ? await hentGlobalTopScore() : 0;
-        nyGlobalRekord = !spilTilstand.offlineMode && !!authState.user && spilTilstand.samletScore >= M10_SCORE && spilTilstand.samletScore > globalTopScore;
+        try {
+            await syncTilDb(true);
+            const sessionGemt = await flushVentendeSync();
+            if (!sessionGemt) {
+                scoreGemningFejlet = true;
+                return;
+            }
+            
+            const globalTopScore = !spilTilstand.offlineMode && authState.user ? await hentGlobalTopScore() : 0;
+            nyGlobalRekord = !spilTilstand.offlineMode && !!authState.user && spilTilstand.samletScore >= M10_SCORE && spilTilstand.samletScore > globalTopScore;
 
-        const highscoreGemt = await gemHighscore();
-        lokaleScores = await hentHighscores();
-        globaleScores = spilTilstand.offlineMode ? [] : await hentGlobalTopTi();
-        harGemtOfflineSpil = harOfflineSpil();
-        offlineSpilInfo = hentOfflineSpilInfo();
-        scoreErGemt = highscoreGemt;
-        scoreGemningFejlet = !highscoreGemt;
-        scoreGemmer = false;
+            const highscoreGemt = await gemHighscore();
+            lokaleScores = await hentHighscores();
+            globaleScores = spilTilstand.offlineMode ? [] : await hentGlobalTopTi();
+            harGemtOfflineSpil = harOfflineSpil();
+            offlineSpilInfo = hentOfflineSpilInfo();
+            scoreErGemt = highscoreGemt;
+            scoreGemningFejlet = !highscoreGemt;
+        } catch (error) {
+            console.error('Score-flowet fejlede', error);
+            spilTilstand.statusBesked = error instanceof Error ? error.message : 'Scoren kunne ikke gemmes.';
+            scoreGemningFejlet = true;
+        } finally {
+            scoreGemmer = false;
+        }
     }
 
     function gemScoreIgen() {
@@ -744,6 +755,8 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].dag = 1; 
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].besoegteMiner = [];
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].harSkattekort = false;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].aktivTracker = null;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].trackedeSpillere = [];
         }
 
         const muligeStartFelter = [];
@@ -953,9 +966,11 @@ function udførBevægelse(nytIndeks: number) {
                 {@const posY = raekke * ROW_H}
                 {@const erUdforsket = spilTilstand.mineKendteFelter.includes(i)}
                 {@const erOpslugt = erFeltITaagen(spilTilstand.gitter, i, spilTilstand.fogX)}
-                {@const baggrund = !erUdforsket ? 'none' : erOpslugt ? `url('/tiles/${felt.biome}_taage.webp')` : `url('/tiles/${felt.biome}.webp')`}
+                {@const vistBiome = felt.katastrofeVisuelAktiv && felt.katastrofeFraBiome ? felt.katastrofeFraBiome : felt.biome}
+                {@const baggrund = !erUdforsket ? 'none' : erOpslugt ? `url('/tiles/${vistBiome}_taage.webp')` : `url('/tiles/${vistBiome}.webp')`}
 
                 <div class="hex" class:active={spilTilstand.spillerIndex === i} class:unexplored={!erUdforsket}
+                    class:katastrofe-venter={!!felt.katastrofeVisuelAktiv}
                     onclick={() => klikPåHex(i)}
                     onkeydown={(e) => { if (e.key === 'Enter') klikPåHex(i); }}
                     role="button" tabindex="0"
@@ -966,7 +981,12 @@ function udførBevægelse(nytIndeks: number) {
                             {#if !erOpslugt}
                                 <div class="sejr-lys"></div>
                             {/if}
-                            <img src="/tiles/baad.webp" alt="Flugtbåd" class="escape-boat" />
+                            {#each Array.from({ length: Math.min(felt.boatCount || 1, 4) }, (_ignore, index) => index) as baadNr (baadNr)}
+                                <img src="/tiles/baad.webp" alt="Flugtbåd" class="escape-boat boat-{baadNr}" />
+                            {/each}
+                            {#if (felt.boatCount || 1) > 4}
+                                <span class="boat-count">×{felt.boatCount}</span>
+                            {/if}
                         {/if}
 
                         {#if erUdforsket && !erOpslugt && felt.afgroede && felt.biome === 'mark'}                            
@@ -992,7 +1012,7 @@ function udførBevægelse(nytIndeks: number) {
                         {/if}
 
                         {#if erUdforsket && !erOpslugt && felt.taageBlokker}
-                            <img src="/tiles/blokker.webp" class="taageblokker-icon" alt="Tågeblokker" />
+                            <img src="/tiles/blokker.webp" class="taageblokker-icon" class:taageblokker-inaktiv={spilTilstand.fogX < 0} alt="Tågeblokker" />
                         {/if}
 
                         {#if erUdforsket && !felt.gravet}
@@ -1066,8 +1086,9 @@ function udførBevægelse(nytIndeks: number) {
                         {#each Object.entries(spilTilstand.alleSpillere) as [navn, mod] (navn)}
                             {#if navn !== spilTilstand.spillerNavn && mod.index === i && !mod.isDead}
                                 {@const afstand = regnHexAfstand(spilTilstand.spillerIndex, mod.index, BREDDE)}
-                                {@const synlig = afstand <= aktuelSynsRadius}
-                                <span class="modstander-icon" class:alarm-aktiv={mod.activeAlarm && !synlig} class:skjult-lyd={!synlig && !mod.activeAlarm}>
+                                {@const tracket = erTrackerAktivPaa(navn)}
+                                {@const synlig = afstand <= aktuelSynsRadius || tracket}
+                                <span class="modstander-icon" class:alarm-aktiv={mod.activeAlarm && !synlig} class:skjult-lyd={!synlig && !mod.activeAlarm} class:tracker-aktiv={tracket}>
                                     <img src={synlig ? (mod.ikon || '/tiles/player.webp') : '/tiles/player.webp'} alt="" style="width: {synlig ? '45px' : '70px'};" />
                                 </span>
                             {/if}
@@ -1365,6 +1386,18 @@ function udførBevægelse(nytIndeks: number) {
         clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); 
         background-size: cover;
     }
+    .hex.katastrofe-venter {
+        filter: brightness(0.9) saturate(0.85);
+    }
+    .hex.katastrofe-venter::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 30;
+        pointer-events: none;
+        background: radial-gradient(circle at 50% 50%, rgba(255, 240, 180, 0.18), rgba(0, 0, 0, 0) 62%);
+        animation: feltVenterKatastrofe 0.9s ease-in-out infinite alternate;
+    }
     .hex.unexplored { background-color: #000; }
     .inner { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
     
@@ -1390,6 +1423,10 @@ function udførBevægelse(nytIndeks: number) {
         filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8)) saturate(0.8);
         opacity: 0.92;
     }
+    .taageblokker-icon.taageblokker-inaktiv {
+        filter: grayscale(1) brightness(0.65) drop-shadow(0 3px 6px rgba(0,0,0,0.8));
+        opacity: 0.55;
+    }
     
     .sailing-container {
         position: absolute; width: 96px; height: 110px; z-index: 100; display: flex;
@@ -1405,6 +1442,21 @@ function udførBevægelse(nytIndeks: number) {
     .escape-boat {
         position: absolute; width: 75px; height: auto; top: 50%; left: 50%;
         transform: translate(-50%, -50%); pointer-events: none; z-index: 15; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+    }
+    .escape-boat.boat-1 { transform: translate(-68%, -54%) scale(0.88) rotate(-7deg); z-index: 14; }
+    .escape-boat.boat-2 { transform: translate(-32%, -47%) scale(0.88) rotate(7deg); z-index: 16; }
+    .escape-boat.boat-3 { transform: translate(-50%, -28%) scale(0.78) rotate(2deg); z-index: 13; }
+    .boat-count {
+        position: absolute;
+        left: 57%;
+        top: 62%;
+        z-index: 17;
+        color: #fff6d8;
+        font-family: 'Cinzel', serif;
+        font-weight: 800;
+        font-size: 1rem;
+        text-shadow: 0 2px 5px #000, 0 0 8px #000;
+        pointer-events: none;
     }
     .sejr-lys {
         position: absolute; width: 100%; height: 100%;
@@ -1516,6 +1568,9 @@ function udførBevægelse(nytIndeks: number) {
     
     .skjult-lyd img { opacity: 1; animation: whisper 2s infinite alternate; }
     .alarm-aktiv img { animation: alarmPuls 0.8s infinite alternate ease-in-out; }
+    .tracker-aktiv img {
+        filter: drop-shadow(0 0 8px rgba(126, 214, 255, 0.95)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.9));
+    }
     @keyframes alarmPuls {
         0% { transform: scale(1); filter: drop-shadow(0 0 2px white); }
         100% { transform: scale(1.1); filter: drop-shadow(0 0 10px orange) brightness(1.2); }
@@ -1581,5 +1636,18 @@ function udførBevægelse(nytIndeks: number) {
     .luk-log-btn:hover { background: #555; }
 
     :global(body.jordskaelv) { animation: rystelse 1.2s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; overflow: hidden; }
+    :global(body.katastrofe-lys)::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: 6000;
+        pointer-events: none;
+        background:
+            radial-gradient(circle at 50% 45%, rgba(255, 245, 205, 0.22), rgba(255, 245, 205, 0) 34%),
+            rgba(255, 255, 255, 0.08);
+        animation: katastrofeGlimt 0.55s ease-out both;
+    }
     @keyframes rystelse { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 10%, 30%, 50%, 70%, 90% { transform: translate(-12px, 8px) rotate(-1.5deg); } 20%, 40%, 60%, 80% { transform: translate(12px, -8px) rotate(1.5deg); } }
+    @keyframes katastrofeGlimt { 0% { opacity: 0; } 12% { opacity: 1; } 100% { opacity: 0; } }
+    @keyframes feltVenterKatastrofe { from { opacity: 0.18; } to { opacity: 0.65; } }
 </style>

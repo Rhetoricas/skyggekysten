@@ -3,11 +3,40 @@ import { spilTilstand } from './spilTilstand.svelte';
 import { authState } from './auth.svelte';
 import { gemOfflineScore, gemOfflineSpil, hentOfflineScores } from './offlineStorage';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import type { Felt } from './types';
 
 let syncKoe: ReturnType<typeof setTimeout> | null = null;
 let kortSkalOpdateres = false;
 let dbSaveKoe: ReturnType<typeof setTimeout> | null = null;
 let kortSaveKoe: ReturnType<typeof setTimeout> | null = null;
+
+function medTimeout<T>(promise: PromiseLike<T>, ms: number, label: string): Promise<T> {
+    return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error(`${label} tog for lang tid.`)), ms);
+        Promise.resolve(promise)
+            .then(resolve, reject)
+            .finally(() => clearTimeout(timer));
+    });
+}
+
+function rensVisuelleFeltData(felt: Felt) {
+    const renset = { ...felt };
+    delete renset.katastrofeFraBiome;
+    delete renset.katastrofeVisuelAktiv;
+    delete renset.katastrofeVisuelId;
+    return renset;
+}
+
+function rensKortTilSync(kort: Felt[]) {
+    return kort.map((felt) => rensVisuelleFeltData(felt));
+}
+
+function erTaageLaengereFremme(nyFogX: number, gammelFogX: number) {
+    if (nyFogX < 0 && gammelFogX >= 0) return true;
+    if (nyFogX >= 0 && gammelFogX < 0) return false;
+    if (nyFogX < 0 && gammelFogX < 0) return Math.abs(nyFogX) > Math.abs(gammelFogX);
+    return nyFogX > gammelFogX;
+}
 
 export function syncKortTilDbSenere(delayMs = 45000) {
     if (kortSaveKoe) return;
@@ -44,7 +73,11 @@ export async function flushVentendeSync() {
     }
 
     kortSkalOpdateres = false;
-    return await udfoerDbUpload(sendKort);
+    return await medTimeout(udfoerDbUpload(sendKort), 12000, 'Gemning af øen').catch((error) => {
+        console.error('Kunne ikke gemme ventende sync', error);
+        spilTilstand.statusBesked = error instanceof Error ? error.message : 'Øen kunne ikke gemmes.';
+        return false;
+    });
 }
 
 export async function syncTilDb(opdaterKort = false) {
@@ -74,7 +107,9 @@ export async function syncTilDb(opdaterKort = false) {
         browserId: localStorage.getItem('taage_browser_id'),
         userId: authState.user?.id ?? null,
         besoegteMiner: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.besoegteMiner || [],
-        harSkattekort: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.harSkattekort || false
+        harSkattekort: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.harSkattekort || false,
+        aktivTracker: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.aktivTracker || null,
+        trackedeSpillere: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.trackedeSpillere || []
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -136,7 +171,7 @@ export function broadcastFelt(index: number, feltData: any) {
         sub.send({
             type: 'broadcast',
             event: 'felt_sync',
-            payload: { index, feltData }
+            payload: { index, feltData: rensVisuelleFeltData(feltData) }
         });
     }
 }
@@ -149,7 +184,12 @@ export function broadcastFelter(felter: Array<{ index: number; feltData: any }>)
         sub.send({
             type: 'broadcast',
             event: 'felter_sync',
-            payload: { felter }
+            payload: {
+                felter: felter.map(({ index, feltData }) => ({
+                    index,
+                    feltData: rensVisuelleFeltData(feltData)
+                }))
+            }
         });
     }
 }
@@ -167,13 +207,17 @@ async function udfoerDbUpload(sendKort: boolean) {
     };
 
     if (sendKort) {
-        opdatering['kort'] = spilTilstand.gitter;
+        opdatering['kort'] = rensKortTilSync(spilTilstand.gitter);
     }
 
-    const { error, count } = await supabase
-        .from('spil_sessioner')
-        .update(opdatering, { count: 'exact' })
-        .eq('rum_kode', spilTilstand.rumKode);
+    const { error, count } = await medTimeout(
+        supabase
+            .from('spil_sessioner')
+            .update(opdatering, { count: 'exact' })
+            .eq('rum_kode', spilTilstand.rumKode),
+        12000,
+        'Gemning af øen'
+    );
 
     if (error) {
         console.error('Kunne ikke gemme spil-session', error);
@@ -202,21 +246,25 @@ export async function gemHighscore() {
     const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
     const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map';
 
-    const { error } = await supabase.from('game_results').insert([{
-        user_id: authState.user.id,
-        player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
-        room_code: spilTilstand.rumKode,
-        score: spilTilstand.samletScore,
-        character: spilTilstand.valgtKarakter?.navn,
-        is_winner: isWinner,
-        is_dead: isDead,
-        days: spilTilstand.dag,
-        gold: spilTilstand.guldTotal,
-        max_column: spilTilstand.maxKolonne,
-        known_fields_count: spilTilstand.mineKendteFelter?.length || 0,
-        mines_owned: minePoint,
-        final_log: spilTilstand.logBesked
-    }]);
+    const { error } = await medTimeout(
+        supabase.from('game_results').insert([{
+            user_id: authState.user.id,
+            player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
+            room_code: spilTilstand.rumKode,
+            score: spilTilstand.samletScore,
+            character: spilTilstand.valgtKarakter?.navn,
+            is_winner: isWinner,
+            is_dead: isDead,
+            days: spilTilstand.dag,
+            gold: spilTilstand.guldTotal,
+            max_column: spilTilstand.maxKolonne,
+            known_fields_count: spilTilstand.mineKendteFelter?.length || 0,
+            mines_owned: minePoint,
+            final_log: spilTilstand.logBesked
+        }]),
+        12000,
+        'Gemning af score'
+    );
 
     if (error) {
         console.error('Kunne ikke gemme highscore', error);
@@ -236,12 +284,19 @@ export async function hentHighscores() {
         }));
     }
 
-    const { data } = await supabase
-        .from('game_results')
-        .select('player_name, score, character')
-        .eq('room_code', spilTilstand.rumKode)
-        .order('score', { ascending: false })
-        .limit(30);
+    const { data } = await medTimeout(
+        supabase
+            .from('game_results')
+            .select('player_name, score, character')
+            .eq('room_code', spilTilstand.rumKode)
+            .order('score', { ascending: false })
+            .limit(30),
+        8000,
+        'Hentning af ø-score'
+    ).catch((error) => {
+        console.warn('Kunne ikke hente highscores', error);
+        return { data: [] };
+    });
 
     const unikke = [];
     const fundne = new Set();
@@ -263,11 +318,18 @@ export async function hentHighscores() {
 export async function hentGlobalTopTi() {
     if (spilTilstand.offlineMode) return [];
 
-    const { data } = await supabase
-        .from('game_results')
-        .select('player_name, room_code, score, character')
-        .order('score', { ascending: false })
-        .limit(30);
+    const { data } = await medTimeout(
+        supabase
+            .from('game_results')
+            .select('player_name, room_code, score, character')
+            .order('score', { ascending: false })
+            .limit(30),
+        8000,
+        'Hentning af global score'
+    ).catch((error) => {
+        console.warn('Kunne ikke hente global top 10', error);
+        return { data: [] };
+    });
 
     const unikke = [];
     const fundne = new Set();
@@ -290,11 +352,18 @@ export async function hentGlobalTopTi() {
 export async function hentGlobalTopScore() {
     if (spilTilstand.offlineMode) return 0;
 
-    const { data } = await supabase
-        .from('game_results')
-        .select('score')
-        .order('score', { ascending: false })
-        .limit(1);
+    const { data } = await medTimeout(
+        supabase
+            .from('game_results')
+            .select('score')
+            .order('score', { ascending: false })
+            .limit(1),
+        8000,
+        'Hentning af global rekord'
+    ).catch((error) => {
+        console.warn('Kunne ikke hente global topscore', error);
+        return { data: [] };
+    });
 
     return data?.[0]?.score ?? 0;
 }
@@ -310,7 +379,7 @@ export function startRealtime() {
             const data = payload.payload;
             if (data.navn !== spilTilstand.spillerNavn) {
                 spilTilstand.alleSpillere[data.navn] = data.data;
-                if (data.fogX !== undefined && data.fogX > spilTilstand.fogX) {
+                if (data.fogX !== undefined && erTaageLaengereFremme(data.fogX, spilTilstand.fogX)) {
                     spilTilstand.fogX = data.fogX;
                 }
             }
