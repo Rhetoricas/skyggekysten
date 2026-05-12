@@ -32,6 +32,7 @@
     import EventModal from '$lib/EventModal.svelte';
     import VenteModal from '$lib/VenteModal.svelte';
     import BottomUI from './BottomUI.svelte';
+    import Regelbog from '$lib/Regelbog.svelte';
 
     const cam = skabKamera();
     const MAX_DAGE_FORAN = 5;
@@ -832,6 +833,12 @@ function udførBevægelse(nytIndeks: number) {
     {offlineSpilInfo}
 />
 
+{#if spilTilstand.gameState === 'play'}
+    <div class="game-help-actions">
+        <Regelbog />
+    </div>
+{/if}
+
 <div class="game-container">
     <div class="camera" role="presentation"
         onwheel={(e) => cam.håndterZoom(e, !!eventState.aktivt || !!spilTilstand.aktivShop)}
@@ -1156,9 +1163,21 @@ function udførBevægelse(nytIndeks: number) {
         .intro-box p {
             font-size: 0.95rem;
         }
+
+        .game-help-actions {
+            top: 10px;
+            right: 10px;
+        }
     }
 
     .game-container { position: fixed; inset: 0; width: 100vw; height: 100dvh; overflow: hidden; background: #000; }
+    .game-help-actions {
+        position: fixed;
+        top: calc(env(safe-area-inset-top, 0px) + 14px);
+        right: 14px;
+        z-index: 2100;
+        pointer-events: auto;
+    }
     .camera { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
     .map { position: absolute; top: 0; left: 0; }
 

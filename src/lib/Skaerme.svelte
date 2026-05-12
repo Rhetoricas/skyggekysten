@@ -6,6 +6,7 @@
     import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
+    import Regelbog from '$lib/Regelbog.svelte';
     import type { Karakter } from '$lib/types';
 
     let {
@@ -373,10 +374,17 @@
     </button>
 {/snippet}
 
+{#snippet topKnapper()}
+    <div class="screen-top-actions">
+        <Regelbog />
+        {@render lydKnap()}
+    </div>
+{/snippet}
+
 {#if spilTilstand.gameState === 'start'}
     <div class="overlay">
         <div class="login-box combined-box">
-            {@render lydKnap()}
+            {@render topKnapper()}
 
             <button type="button" class="boat-btn-wrapper" onclick={(e) => { e.preventDefault(); startSpilMedLyd(); }}>
                 <img src="/events/launch.webp" alt="Båd" class="launch-image top-image clickable-boat" />
@@ -413,7 +421,7 @@
             </button>
             {#if harGemtOfflineSpil}
                 <button type="button" class="offline-continue" onclick={(e) => { e.preventDefault(); fortsaetOfflineMedLyd(); }}>
-                    FortsÃ¦t offline{offlineSpilInfo ? `: ${formaterNavn(offlineSpilInfo.rumKode)} dag ${offlineSpilInfo.dag}` : ''}
+                    Fortsæt offline{offlineSpilInfo ? `: ${formaterNavn(offlineSpilInfo.rumKode)} dag ${offlineSpilInfo.dag}` : ''}
                 </button>
             {/if}
             <div class="offline-cache-panel" class:klar={offlineAppState.klar}>
@@ -454,7 +462,7 @@
 {:else if spilTilstand.gameState === 'select'}
     <div class="overlay">
         <div class="character-select">
-            {@render lydKnap()}
+            {@render topKnapper()}
             <h2>Vælg karakter</h2>
             <p class="instruktion">
                 {spilTilstand.offlineMode ? 'Solo offline. Spillet gemmes lokalt i denne browser.' : 'Du har fået otte muligheder. Vælg hvem du vil være.'}
@@ -931,11 +939,14 @@
     .musik-toggle-btn img { height: 54px; width: auto; opacity: 0.86; }
     .musik-toggle-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: #666; transform: scale(1.04); }
     .musik-toggle-btn:hover img { opacity: 1; }
-    .screen-sound-btn {
+    .screen-top-actions {
         position: fixed;
         top: calc(env(safe-area-inset-top, 0px) + 14px);
         right: 14px;
         z-index: 1200;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
     .musik-toggle-btn.lyd-lav img { opacity: 0.55; }
     .musik-toggle-btn.lyd-slukket { background: rgba(0, 0, 0, 0.22); }
@@ -1043,9 +1054,13 @@
             height: 42px;
         }
 
-        .screen-sound-btn {
+        .screen-top-actions {
             top: 10px;
             right: 10px;
+            gap: 8px;
+        }
+
+        .screen-sound-btn {
             padding: 6px;
         }
     }
