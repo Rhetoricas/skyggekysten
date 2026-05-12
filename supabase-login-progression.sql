@@ -4,9 +4,14 @@
 create table if not exists public.profiles (
     id uuid primary key references auth.users(id) on delete cascade,
     display_name text,
+    sound_level text not null default 'fuld' check (sound_level in ('fuld', 'lav', 'slukket')),
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
+
+alter table public.profiles
+add column if not exists sound_level text not null default 'fuld'
+check (sound_level in ('fuld', 'lav', 'slukket'));
 
 create table if not exists public.game_results (
     id bigint generated always as identity primary key,

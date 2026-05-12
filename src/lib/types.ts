@@ -69,6 +69,7 @@ export interface SpillerData {
         slutterDag: number;
     } | null;
     trackedeSpillere?: string[];
+    venteGratisFeltBrugt?: number | null;
 }
 
 export interface Felt {

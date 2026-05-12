@@ -1,8 +1,10 @@
 import { supabase } from './supabaseClient';
+import { type LydNiveau, lydKontrol, saetLydNiveau } from './lydKontrol.svelte';
 
 export interface Profil {
     id: string;
     display_name: string | null;
+    sound_level?: LydNiveau | null;
     created_at?: string;
     updated_at?: string;
 }
@@ -87,20 +89,21 @@ export async function hentEllerOpretProfil() {
 
     const { data } = await supabase
         .from('profiles')
-        .select('id, display_name, created_at, updated_at')
+        .select('id, display_name, sound_level, created_at, updated_at')
         .eq('id', authState.user.id)
         .maybeSingle();
 
     if (data) {
         authState.profil = data;
+        if (data.sound_level) saetLydNiveau(data.sound_level);
         return data;
     }
 
     const fallbackNavn = authState.user.email?.split('@')[0]?.slice(0, 15) || 'Spiller';
     const { data: oprettet } = await supabase
         .from('profiles')
-        .insert([{ id: authState.user.id, display_name: fallbackNavn }])
-        .select('id, display_name, created_at, updated_at')
+        .insert([{ id: authState.user.id, display_name: fallbackNavn, sound_level: lydKontrol.niveau }])
+        .select('id, display_name, sound_level, created_at, updated_at')
         .single();
 
     authState.profil = oprettet ?? null;
@@ -122,7 +125,7 @@ export async function gemProfilNavn(navn: string) {
     const { data, error } = await supabase
         .from('profiles')
         .upsert({ id: authState.user.id, display_name: rentNavn, updated_at: opdateretTidspunkt })
-        .select('id, display_name, created_at, updated_at')
+        .select('id, display_name, sound_level, created_at, updated_at')
         .single();
 
     if (!error && data) {
@@ -131,6 +134,20 @@ export async function gemProfilNavn(navn: string) {
     } else {
         authState.besked = 'Profilnavnet kunne ikke gemmes.';
     }
+}
+
+export async function gemProfilLydNiveau(niveau: LydNiveau) {
+    if (!authState.user) return;
+
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
+    const opdateretTidspunkt = new Date().toISOString();
+    const { data, error } = await supabase
+        .from('profiles')
+        .upsert({ id: authState.user.id, sound_level: niveau, updated_at: opdateretTidspunkt })
+        .select('id, display_name, sound_level, created_at, updated_at')
+        .single();
+
+    if (!error && data) authState.profil = data;
 }
 
 export async function hentProfilStats() {

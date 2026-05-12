@@ -34,6 +34,7 @@
     import BottomUI from './BottomUI.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
     import LydKnap from '$lib/LydKnap.svelte';
+    import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
 
     const cam = skabKamera();
     const MAX_DAGE_FORAN = 5;
@@ -76,6 +77,7 @@
 
     $effect(() => {
         if (bgMusik) {
+            bgMusik.volume = Math.min(0.3, hentLydVolumen());
             if (spilTilstand.musikTaendt && spilTilstand.gameState === 'play') {
                 bgMusik.play().catch(() => {});
             } else {
@@ -85,6 +87,12 @@
                 }
             }
         }
+    });
+
+    $effect(() => {
+        const niveau = lydKontrol.niveau;
+        if (bgMusik) bgMusik.volume = Math.min(0.3, hentLydVolumen());
+        void niveau;
     });
 
     $effect(() => {
@@ -382,6 +390,12 @@
     async function opretEllerDeltag() {
         spilTilstand.offlineMode = false;
         spilTilstand.soloMode = false;
+
+        if (browser && !navigator.onLine) {
+            spilTilstand.statusBesked = 'Du er offline. Spil offline ved at trykke på Solo.';
+            return;
+        }
+
         let rentNavn = (spilTilstand.spillerNavn || '').replace(/[^a-zA-Z0-9æøåÆØÅ ]/g, '').trim().substring(0, 15);
         let renKode = (spilTilstand.rumKode || '').replace(/[^a-zA-Z0-9æøåÆØÅ]/g, '').toLowerCase().substring(0, 20);
 
@@ -459,6 +473,7 @@
                     spilTilstand.mitUdstyr = eksisterende.mitUdstyr || [];
                     spilTilstand.mineKendteFelter = eksisterende.kendteFelter || [];
                     spilTilstand.historik = eksisterende.historik || [];
+                    spilTilstand.venteGratisFeltBrugt = eksisterende.venteGratisFeltBrugt ?? null;
 
                     afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
                     startRealtime();
@@ -793,6 +808,7 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].harSkattekort = false;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].aktivTracker = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].trackedeSpillere = [];
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].venteGratisFeltBrugt = null;
         }
 
         const muligeStartFelter = [];
@@ -813,6 +829,7 @@
         
         spilTilstand.historik = [];
         spilTilstand.historik.push(spilTilstand.spillerIndex);
+        spilTilstand.venteGratisFeltBrugt = null;
 
         afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
         

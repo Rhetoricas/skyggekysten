@@ -31,8 +31,12 @@ export function delNyeKort() {
     });
 }
 
+export function erNaesteVenteRundeGratis() {
+    return spilTilstand.venteGratisFeltBrugt !== spilTilstand.spillerIndex;
+}
+
 export function startVenteSpil(kosterPenge: boolean = false) {
-    const foersteRunde = spilTilstand.venteRunde === 0;
+    const foersteRunde = erNaesteVenteRundeGratis();
     const skalBetale = kosterPenge && !foersteRunde;
 
     if (skalBetale) {
@@ -57,11 +61,13 @@ export function startVenteSpil(kosterPenge: boolean = false) {
     spilTilstand.venteFase = 'spiller';
     spilTilstand.sidsteVenteDag = spilTilstand.dag;
     spilTilstand.venteRunde++;
+    if (foersteRunde) spilTilstand.venteGratisFeltBrugt = spilTilstand.spillerIndex;
 
     rundeGuld = 0;
     rundeLiv = 0;
 
     delNyeKort();
+    syncTilDb();
 }
 
 export function vendKort(indeks: number) {

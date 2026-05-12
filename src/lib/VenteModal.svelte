@@ -1,21 +1,26 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
-    import { startVenteSpil, vendKort, stopVenteSpil, lukVenteSpil } from '$lib/ventespil.svelte';
+    import { startVenteSpil, vendKort, stopVenteSpil, lukVenteSpil, erNaesteVenteRundeGratis } from '$lib/ventespil.svelte';
     
     let { kanSpilleIgen } = $props<{ kanSpilleIgen: boolean }>();
 
     let langsomsteDag = $derived.by(() => {
         const spillere = Object.values(spilTilstand.alleSpillere);
         if (spillere.length <= 1) return spilTilstand.dag;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const aktive = spillere.filter((s: any) => !s.isDead && !s.isWinner);
+
+        const timeoutGraense = Date.now() - (5 * 60 * 1000);
+        const aktive = spillere.filter((s) => {
+            if (s.isDead || s.isWinner) return false;
+            if (s.sidstAktiv && s.sidstAktiv < timeoutGraense) return false;
+            return true;
+        });
+
         if (aktive.length === 0) return spilTilstand.dag;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return Math.min(...aktive.map((s: any) => s.dag || 1));
+        return Math.min(...aktive.map((s) => s.dag || 1));
     });
 
     let dageForan = $derived(Math.max(0, (spilTilstand.dag || 1) - langsomsteDag));
-    let naesteRundeErGratis = $derived(spilTilstand.venteRunde === 0);
+    let naesteRundeErGratis = $derived(erNaesteVenteRundeGratis());
     let kanBetaleNaesteRunde = $derived(naesteRundeErGratis || spilTilstand.guldTotal + spilTilstand.ventePuljeGuld >= 5);
 </script>
 

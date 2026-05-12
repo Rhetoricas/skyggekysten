@@ -110,7 +110,8 @@ export async function syncTilDb(opdaterKort = false) {
         besoegteMiner: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.besoegteMiner || [],
         harSkattekort: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.harSkattekort || false,
         aktivTracker: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.aktivTracker || null,
-        trackedeSpillere: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.trackedeSpillere || []
+        trackedeSpillere: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.trackedeSpillere || [],
+        venteGratisFeltBrugt: spilTilstand.venteGratisFeltBrugt
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

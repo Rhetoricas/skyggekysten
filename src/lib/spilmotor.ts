@@ -381,7 +381,7 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
 
     if (spilTilstand.dag >= options.langsomsteDag + options.maxDageForan) {
         spilTilstand.logBesked = 'Du må vente på de andre spillere.';
-        startVenteSpil(false);
+        startVenteSpil(true);
         return false;
     }
 
@@ -429,13 +429,6 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         hpStraf = spilTilstand.beregnSkade(hpStraf);
         spilTilstand.livspoint -= hpStraf;
         ekstraLog += ` Terrænet slider på dig. (-${hpStraf} HP)`;
-    }
-
-    if (spilTilstand.livspoint <= 0 && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map') {
-        fremtvingKollaps("Terrænet tog dine sidste kræfter.");
-        spilTilstand.gitter = [...spilTilstand.gitter];
-        syncTilDb(true);
-        return false;
     }
 
     const nuBlok = hentAfgroedeBlok(spilTilstand.dag);
@@ -512,6 +505,13 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
                 mapAendret = true;
             }
         }
+    }
+
+    if (spilTilstand.livspoint <= 0 && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map') {
+        fremtvingKollaps(ekstraLog.trim() || "Terrænet tog dine sidste kræfter.");
+        spilTilstand.gitter = [...spilTilstand.gitter];
+        syncTilDb(mapAendret);
+        return false;
     }
 
     const startLog = options.startLog ?? (

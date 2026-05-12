@@ -1,14 +1,20 @@
 <script lang="ts">
     import { lydIkon, lydKontrol, lydTitel, skiftLydNiveau } from '$lib/lydKontrol.svelte';
+    import { gemProfilLydNiveau } from '$lib/auth.svelte';
 
     let { knapClass = '' } = $props<{ knapClass?: string }>();
+
+    function skiftOgGemLyd() {
+        skiftLydNiveau();
+        void gemProfilLydNiveau(lydKontrol.niveau);
+    }
 </script>
 
 <button
     class="musik-toggle-btn {knapClass}"
     class:lyd-lav={lydKontrol.niveau === 'lav'}
     class:lyd-slukket={lydKontrol.niveau === 'slukket'}
-    onclick={skiftLydNiveau}
+    onclick={skiftOgGemLyd}
     title={`${lydTitel()} - klik for næste niveau`}
     aria-label={`${lydTitel()} - klik for næste niveau`}
 >

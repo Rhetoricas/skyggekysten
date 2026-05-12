@@ -120,7 +120,16 @@
         return `${synligStart}${navn.length > 2 ? '...' : ''}@${domaene}`;
     }
 
+    function erBrowserOffline() {
+        return typeof navigator !== 'undefined' && !navigator.onLine;
+    }
+
     function startSpilMedLyd() {
+        if (erBrowserOffline()) {
+            spilTilstand.statusBesked = 'Du er offline. Spil offline ved at trykke på Solo.';
+            return;
+        }
+
         if (spilTilstand.musikTaendt && lydStart) {
             lydStart.currentTime = 0;
             lydStart.volume = hentLydVolumen();
