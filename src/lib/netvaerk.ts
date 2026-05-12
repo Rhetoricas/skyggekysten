@@ -21,11 +21,11 @@ export function syncKortTilDbSenere(delayMs = 45000) {
 export async function flushVentendeSync() {
     if (spilTilstand.offlineMode) {
         gemOfflineSpil();
-        return;
+        return true;
     }
 
     const harVentendeSync = syncKoe || dbSaveKoe || kortSaveKoe || kortSkalOpdateres;
-    if (!harVentendeSync) return;
+    if (!harVentendeSync) return true;
 
     if (syncKoe) {
         clearTimeout(syncKoe);
@@ -44,7 +44,7 @@ export async function flushVentendeSync() {
     }
 
     kortSkalOpdateres = false;
-    await udfoerDbUpload(sendKort);
+    return await udfoerDbUpload(sendKort);
 }
 
 export async function syncTilDb(opdaterKort = false) {
@@ -157,7 +157,7 @@ export function broadcastFelter(felter: Array<{ index: number; feltData: any }>)
 async function udfoerDbUpload(sendKort: boolean) {
     if (spilTilstand.offlineMode) {
         gemOfflineSpil();
-        return;
+        return true;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -170,22 +170,39 @@ async function udfoerDbUpload(sendKort: boolean) {
         opdatering['kort'] = spilTilstand.gitter;
     }
 
-    await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', spilTilstand.rumKode);
+    const { error, count } = await supabase
+        .from('spil_sessioner')
+        .update(opdatering, { count: 'exact' })
+        .eq('rum_kode', spilTilstand.rumKode);
+
+    if (error) {
+        console.error('Kunne ikke gemme spil-session', error);
+        spilTilstand.statusBesked = `Øen kunne ikke gemmes: ${error.message}`;
+        return false;
+    }
+
+    if (count === 0) {
+        console.error('Kunne ikke gemme spil-session: ingen række matchede ø-navnet', spilTilstand.rumKode);
+        spilTilstand.statusBesked = 'Øen kunne ikke gemmes: ingen session matchede ø-navnet.';
+        return false;
+    }
+
+    return true;
 }
 
 export async function gemHighscore() {
-    if (!spilTilstand.spillerNavn || !spilTilstand.rumKode || spilTilstand.samletScore <= 0) return;
+    if (!spilTilstand.spillerNavn || !spilTilstand.rumKode || spilTilstand.samletScore <= 0) return false;
     if (spilTilstand.offlineMode) {
         gemOfflineScore();
-        return;
+        return true;
     }
-    if (!authState.user) return;
+    if (!authState.user) return false;
 
     const minePoint = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
     const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
     const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map';
 
-    await supabase.from('game_results').insert([{
+    const { error } = await supabase.from('game_results').insert([{
         user_id: authState.user.id,
         player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
         room_code: spilTilstand.rumKode,
@@ -200,6 +217,14 @@ export async function gemHighscore() {
         mines_owned: minePoint,
         final_log: spilTilstand.logBesked
     }]);
+
+    if (error) {
+        console.error('Kunne ikke gemme highscore', error);
+        spilTilstand.statusBesked = `Scoren kunne ikke gemmes: ${error.message}`;
+        return false;
+    }
+
+    return true;
 }
 
 export async function hentHighscores() {

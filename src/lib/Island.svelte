@@ -58,7 +58,9 @@
     
     let glHp = $state(0);
     let glGuld = $state(0);
-    let scoreErGemt = false;
+    let scoreErGemt = $state(false);
+    let scoreGemmer = $state(false);
+    let scoreGemningFejlet = $state(false);
     let nyGlobalRekord = $state(false);
     let harGemtOfflineSpil = $state(false);
     let offlineSpilInfo = $state<ReturnType<typeof hentOfflineSpilInfo>>(null);
@@ -86,14 +88,22 @@
 
     $effect(() => {
         const state = spilTilstand.gameState;
+        const brugerId = authState.user?.id;
         
         untrack(() => {
             if (state === 'play') {
                 scoreErGemt = false;
+                scoreGemmer = false;
+                scoreGemningFejlet = false;
                 nyGlobalRekord = false;
-            } else if ((state === 'win' || state === 'dead' || state === 'win_map' || state === 'dead_map') && !scoreErGemt) {
-                scoreErGemt = true;
-                opdaterOgGemHighscore();
+            } else if (
+                (state === 'win' || state === 'dead' || state === 'win_map' || state === 'dead_map') &&
+                !scoreErGemt &&
+                !scoreGemmer &&
+                !scoreGemningFejlet &&
+                (spilTilstand.offlineMode || !!brugerId)
+            ) {
+                gemScoreIgen();
             }
         });
     });
@@ -547,14 +557,77 @@
     onMount(() => {
         initAuth();
         preloadFiler();
+        let genopretterForbindelse = false;
+
+        const erAktivtOnlinespil = () => spilTilstand.gameState === 'play' && !spilTilstand.offlineMode;
+
+        const heartbeat = async () => {
+            if (spilTilstand.offlineMode && spilTilstand.gameState === 'play') {
+                await flushVentendeSync();
+                return;
+            }
+
+            if (!erAktivtOnlinespil()) return;
+
+            if (browser && !navigator.onLine) {
+                spilTilstand.statusBesked = 'Forbindelsen er afbrudt. Spillet fortsætter lokalt indtil videre.';
+                return;
+            }
+
+            await syncTilDb(false);
+            const gemt = await flushVentendeSync();
+            if (!gemt) {
+                spilTilstand.statusBesked = spilTilstand.statusBesked || 'Forbindelsen til øen driller. Spillet prøver igen.';
+            }
+        };
+
+        const genopretForbindelse = async () => {
+            if (genopretterForbindelse) return;
+
+            if (spilTilstand.offlineMode) {
+                await flushVentendeSync();
+                return;
+            }
+
+            if (!erAktivtOnlinespil()) return;
+
+            genopretterForbindelse = true;
+            try {
+                stopRealtime();
+                startRealtime();
+                await heartbeat();
+            } finally {
+                genopretterForbindelse = false;
+            }
+        };
+
         const gemHvisSidenForsvinder = () => {
             void flushVentendeSync();
         };
         const gemHvisSkjult = () => {
-            if (document.hidden) gemHvisSidenForsvinder();
+            if (document.hidden) {
+                gemHvisSidenForsvinder();
+            } else {
+                void genopretForbindelse();
+            }
+        };
+        const haandterOnline = () => {
+            void genopretForbindelse();
+        };
+        const haandterOffline = () => {
+            if (erAktivtOnlinespil()) {
+                spilTilstand.statusBesked = 'Forbindelsen er afbrudt. Spillet fortsætter lokalt indtil videre.';
+            }
         };
 
+        const heartbeatTimer = window.setInterval(() => {
+            void heartbeat();
+        }, 60 * 1000);
+
         document.addEventListener('visibilitychange', gemHvisSkjult);
+        window.addEventListener('focus', haandterOnline);
+        window.addEventListener('online', haandterOnline);
+        window.addEventListener('offline', haandterOffline);
         window.addEventListener('pagehide', gemHvisSidenForsvinder);
         window.addEventListener('beforeunload', gemHvisSidenForsvinder);
 
@@ -566,7 +639,11 @@
         })();
 
         return () => {
+            window.clearInterval(heartbeatTimer);
             document.removeEventListener('visibilitychange', gemHvisSkjult);
+            window.removeEventListener('focus', haandterOnline);
+            window.removeEventListener('online', haandterOnline);
+            window.removeEventListener('offline', haandterOffline);
             window.removeEventListener('pagehide', gemHvisSidenForsvinder);
             window.removeEventListener('beforeunload', gemHvisSidenForsvinder);
         };
@@ -606,15 +683,33 @@
             (spilTilstand.guldTotal + fremdriftPoint + udforskningPoint + minePoint) *
                 (1 + Math.max(0, spilTilstand.livspoint) / 1000)
         );
+
+        await syncTilDb(true);
+        const sessionGemt = await flushVentendeSync();
+        if (!sessionGemt) {
+            scoreGemningFejlet = true;
+            scoreGemmer = false;
+            return;
+        }
         
         const globalTopScore = !spilTilstand.offlineMode && authState.user ? await hentGlobalTopScore() : 0;
         nyGlobalRekord = !spilTilstand.offlineMode && !!authState.user && spilTilstand.samletScore >= M10_SCORE && spilTilstand.samletScore > globalTopScore;
 
-        await gemHighscore();
+        const highscoreGemt = await gemHighscore();
         lokaleScores = await hentHighscores();
         globaleScores = spilTilstand.offlineMode ? [] : await hentGlobalTopTi();
         harGemtOfflineSpil = harOfflineSpil();
         offlineSpilInfo = hentOfflineSpilInfo();
+        scoreErGemt = highscoreGemt;
+        scoreGemningFejlet = !highscoreGemt;
+        scoreGemmer = false;
+    }
+
+    function gemScoreIgen() {
+        if (scoreGemmer) return;
+        scoreGemningFejlet = false;
+        scoreGemmer = true;
+        opdaterOgGemHighscore();
     }
 
     async function bekræftValg(karakter: Karakter) {
@@ -831,6 +926,9 @@ function udførBevægelse(nytIndeks: number) {
     {nyGlobalRekord}
     {harGemtOfflineSpil}
     {offlineSpilInfo}
+    {gemScoreIgen}
+    {scoreGemmer}
+    {scoreGemningFejlet}
 />
 
 {#if spilTilstand.gameState === 'play'}
@@ -953,7 +1051,9 @@ function udførBevægelse(nytIndeks: number) {
                         {/if}
 
                         {#if erUdforsket && !erOpslugt && felt.indbrudt}
-                            <img src="/tiles/openlock.webp" alt="Indbrudt" class="indbrud-icon" />
+                            <span class="indbrud-marker" aria-label="Indbrudt">
+                                <img src="/tiles/openlock.webp" alt="" class="indbrud-icon" />
+                            </span>
                         {/if}
 
                         {#if erUdforsket && felt.gravstenIkon}
@@ -1379,17 +1479,27 @@ function udførBevægelse(nytIndeks: number) {
         transform: translate(-50%, -50%); pointer-events: none; z-index: 14;
         filter: drop-shadow(0 0 15px rgba(255, 165, 0, 0.9)) drop-shadow(0 4px 6px rgba(0,0,0,0.8));
     }
-    .indbrud-icon {
+    .indbrud-marker {
         position: absolute;
-        width: 34px;
-        height: 34px;
-        right: 18px;
-        bottom: 18px;
-        z-index: 13;
-        opacity: 0.72;
+        width: 74px;
+        height: 74px;
+        left: 50%;
+        top: 64%;
+        z-index: 17;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         pointer-events: none;
-        filter: grayscale(35%) drop-shadow(0 3px 4px rgba(0,0,0,0.95));
-        transform: rotate(-18deg);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 239, 176, 0.72) 0%, rgba(255, 191, 74, 0.34) 48%, rgba(0, 0, 0, 0) 72%);
+        filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 10px rgba(255, 220, 130, 0.7));
+        transform: translate(-50%, -50%) rotate(-10deg);
+    }
+    .indbrud-icon {
+        width: 58px;
+        height: 58px;
+        opacity: 0.98;
+        filter: brightness(1.18) contrast(1.18);
     }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     

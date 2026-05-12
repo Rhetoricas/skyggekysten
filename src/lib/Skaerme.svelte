@@ -20,7 +20,10 @@
         globaleScores,
         nyGlobalRekord,
         harGemtOfflineSpil,
-        offlineSpilInfo
+        offlineSpilInfo,
+        gemScoreIgen,
+        scoreGemmer,
+        scoreGemningFejlet
     } = $props<{
         opretEllerDeltag: () => void;
         startOfflineSolo: () => void;
@@ -33,6 +36,9 @@
         nyGlobalRekord: boolean;
         harGemtOfflineSpil: boolean;
         offlineSpilInfo: { spillerNavn: string; rumKode: string; gameState: string; dag: number; savedAt: string } | null;
+        gemScoreIgen: () => void;
+        scoreGemmer: boolean;
+        scoreGemningFejlet: boolean;
     }>();
 
     let lydStart: HTMLAudioElement | null = null;
@@ -374,6 +380,19 @@
     </button>
 {/snippet}
 
+{#snippet scoreGemStatus()}
+    {#if scoreGemmer || scoreGemningFejlet}
+        <div class="score-save-status" class:fejl={scoreGemningFejlet}>
+            {#if scoreGemmer}
+                <span>Gemmer score...</span>
+            {:else}
+                <span>{spilTilstand.statusBesked || 'Scoren blev ikke gemt.'}</span>
+                <button type="button" onclick={gemScoreIgen}>Prøv igen</button>
+            {/if}
+        </div>
+    {/if}
+{/snippet}
+
 {#snippet topKnapper()}
     <div class="screen-top-actions">
         <Regelbog />
@@ -522,6 +541,7 @@
             </div>
             
             <div class="highscore-container">
+                {@render scoreGemStatus()}
                 <div class="tavle">
                     <img src="/screens/boardlocal.webp" alt="Lokal tavle" class="tavle-billede" />
                     <div class="tavle-indhold lokal-indhold">
@@ -605,6 +625,7 @@
             </div>
             
             <div class="highscore-container">
+                {@render scoreGemStatus()}
                 <div class="tavle">
                     <img src="/screens/boardlocal.webp" alt="Lokal tavle" class="tavle-billede" />
                     <div class="tavle-indhold lokal-indhold">
@@ -925,6 +946,37 @@
     
     .slut-knapper { display: flex; gap: 20px; margin-top: 40px; padding-bottom: 60px; }
     .highscore-container { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; width: 100%; max-width: 900px; margin-top: 20px; }
+    .score-save-status {
+        width: 100%;
+        border: 1px solid #555;
+        background: rgba(255, 255, 255, 0.06);
+        color: #ddd;
+        padding: 12px 16px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        font-size: 0.95rem;
+    }
+    .score-save-status.fejl {
+        border-color: #a66;
+        background: rgba(80, 20, 20, 0.45);
+        color: #f0d0d0;
+    }
+    .score-save-status button {
+        border: 1px solid #888;
+        background: #222;
+        color: #fff;
+        padding: 7px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 700;
+    }
+    .score-save-status button:hover {
+        background: #333;
+        border-color: #bbb;
+    }
 
     .tavle { position: relative; width: 320px; }
     .tavle-billede { width: 100%; }
