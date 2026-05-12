@@ -15,11 +15,11 @@
             spilTilstand.guldTotal -= vareData.pris;
             tilfoejTilRygsæk(id, 1);
             spilTilstand.logBesked = `Du købte ${vareData.navn}.`;
-            syncTilDb(true);
+            syncTilDb();
         } else {
             spilTilstand.livspoint -= 2;
             spilTilstand.logBesked = `Købmanden smider dig ud for at røre ved noget du ikke har råd til.`;
-            syncTilDb(true);
+            syncTilDb();
             lukShop();
             if (spilTilstand.livspoint <= 0) fremtvingKollaps();
         }
@@ -33,7 +33,7 @@
         spilTilstand.guldTotal += salgspris;
         brugFraRygsæk(id, 1);
         spilTilstand.logBesked = `Du solgte ${vareData.navn} for ${salgspris} guld.`;
-        syncTilDb(true);
+        syncTilDb();
     }
 </script>
 
@@ -90,7 +90,7 @@
 
 <style>
     .shop-overlay { 
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; 
         background: rgba(0,0,0,0.85); z-index: 200; display: flex; 
         align-items: center; justify-content: center;
     }
@@ -147,4 +147,54 @@
         border-radius: 4px; transition: 0.2s;
     }
     .forlad-btn:hover { background: #333; color: white; }
+
+    @media (max-width: 700px) {
+        .shop-overlay {
+            align-items: stretch;
+            padding: calc(env(safe-area-inset-top, 0px) + 8px) 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
+            box-sizing: border-box;
+        }
+
+        .shop-content {
+            width: 100%;
+            max-width: none;
+            max-height: 100%;
+            overflow-y: auto;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            margin-bottom: 14px;
+            font-size: 1.25rem;
+        }
+
+        .shop-grid {
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .vare-kort {
+            width: calc(50% - 8px);
+            min-width: 130px;
+            padding: 8px;
+            gap: 5px;
+        }
+
+        .vare-ikon {
+            height: 54px;
+        }
+
+        .vare-navn {
+            font-size: 0.92rem;
+        }
+
+        .vare-regler {
+            font-size: 0.76rem;
+        }
+
+        .forlad-btn {
+            margin-top: 18px;
+        }
+    }
 </style>

@@ -1,6 +1,9 @@
-import { spilTilstand } from '$lib/spilTilstand.svelte';
-import { syncTilDb } from './netvaerk';
-import { bygOgHopGennemPortal, udvindMeteorSkat, udloesNaturkatastrofe, udloesOversvoemmelse, udloesJordskaelv } from './spilmotor';import type { Biome } from './types';
+import { bygOgHopGennemPortal } from './spilmotor';
+import { blodskovensHjerteEvents } from './event_blodskov';
+import { naturkatastrofeEvents } from './event_naturkatastrofer';
+import { metaEvents } from './event_meta';
+import { vaabenEvents } from './event_vaaben';
+import type { Biome } from './types';
 
 export interface Udfald {
     log: string; 
@@ -47,6 +50,8 @@ export interface SpilEvent {
     billede?: string;         
     vaegt?: number;           
     kravDag?: number;         
+    minKolonnePct?: number;
+    maxKolonnePct?: number;
     unik?: boolean;           
     sfx?: string;             
     erSubTrin?: boolean;      
@@ -54,20 +59,24 @@ export interface SpilEvent {
 }
 
 export const eventBibliotek: Record<string, SpilEvent> = {
+    ...blodskovensHjerteEvents,
+    ...naturkatastrofeEvents,
+    ...metaEvents,
+    ...vaabenEvents,
 
     'campfire': {
         id: 'campfire',
         titel: "Fremmed Lejr",
-        tekst: "En flok vejrbidte rejsende sidder ved et knitrende bål. De stirrer stift på dig. Lederen nikker og tilbyder dig en plads i nærheden af bålet",
+        tekst: "En gruppe rejsende sidder tæt omkring et bål. De følger dig med øjnene. Lederen nikker mod en ledig plads ved kanten af lyset.",
         biome: ['eng', 'skov', 'mark', 'bjerg', 'hoejland'],
         billede: '/events/ev_campfire.webp', 
         unik: false,
         valg: [
             {
-                tekst: "Køb dig til en bedre plads tættere ved ilden",
+                tekst: "Betal 10 guld for en plads tættere på ilden",
                 puljeVaerdi: 10,
                 udfaldListe: [
-                    { log: "De gør plads. Varmen og sikkerheden er vidunderlig.", hpAendring: 50 }
+                    { log: "De gør plads. Varmen hjælper. Du hviler bedre, end du havde ventet.", hpAendring: 50 }
                 ]
             },
             {
@@ -75,7 +84,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 kosterItem: 'livseliksir',
                 udfaldListe: [
                     { 
-                        log: "Du varmer eliksiren over bålet og deler med dem. De giver dig en pose guld som tak og holder vagt, mens du sover og genvinder dine kræfter og mere til.", 
+                        log: "Du deler eliksiren med lejren. De betaler dig og holder vagt, mens du sover.", 
                         hpAendring: 100, 
                         maxHpAendring: 10,
                         guldAendring: 50 
@@ -84,7 +93,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
             },
             {
                 tekst: "Læg dig i yderkanten af lejren",
-                udfaldListe: [{ log: "Du sover uroligt i græsset. Det er koldt på afstand af ilden, men du får hvilet benene.", hpAendring: 20 }]
+                udfaldListe: [{ log: "Du sover uroligt i græsset. Det er koldt, men du får hvilet benene.", hpAendring: 20 }]
             }
         ]
     },
@@ -95,13 +104,13 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         biome: ['ruin', 'bjerg', 'by'],
         unik: true,
         billede: '/events/ev_kikkert.webp',
-        tekst: "En tung messingkikkert er støbt fast i en sten. En mekanisme klapper stramt om dit håndled, og du er tvunget til at se igennem kikkerten for at komme fri.",
+        tekst: "En tung messingkikkert sidder fast i en sten. Da du rører den, låser en mekanisme sig om dit håndled. Du må se gennem en af linserne for at komme fri.",
         valg: [
             { 
                 tekst: "Kig igennem okularet", 
                 effekt: () => {
                     return { 
-                        logBesked: "Du føler et sug udad og ser øen længere væk.", 
+                        logBesked: "Synsfeltet trækker sig udad. Øen virker længere væk.", 
                         hpNed: 5,
                         itemUd: 'kikkert_45'
                     };
@@ -111,7 +120,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 tekst: "Kig igennem objektivet", 
                 effekt: () => {
                     return { 
-                        logBesked: "Du føler et sug indad og ser øen tættere på.", 
+                        logBesked: "Synsfeltet trækker sig indad. Øen virker alt for tæt på.", 
                         hpNed: 5,
                         itemUd: 'kikkert_250'
                     };
@@ -122,7 +131,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 kraeverItem: 'kniv', 
                 effekt: () => {
                     return { 
-                        logBesked: "Klingen glider ind i mekanismen og vender sig, så du er nødt til at se igennem objektivet", 
+                        logBesked: "Kniven løsner grebet, men mekanismen drejer kikkerten mod objektivet.", 
                         itemUd: 'kikkert_250'
                     };
                 } 
@@ -132,7 +141,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 kosterItem: 'livseliksir',
                 effekt: () => {
                     return { 
-                        logBesked: "Den kraftige væske ætser messingrøret væk. Mekanismen falder fra hinanden, og du opdager, at begge linser er lavet af diamanter.",
+                        logBesked: "Eliksiren ætser messingrøret op. Mekanismen falder fra hinanden. Linserne viser sig at være diamanter.",
                         itemUd: 'diamant, diamant' 
                     };
                 }
@@ -146,59 +155,59 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         biome: ['ritual', 'blodskov', 'eng'],
         unik: false,
         billede: '/events/ev_portal.webp',
-        tekst: "Luften flimrer over jorden som en varmedis. Revnen lugter skarpt af ozon og spytter små gnister ud i græsset.",
+        tekst: "Luften flimrer lavt over jorden. Der er en smal revne i synsfeltet, og græsset omkring den er svedet.",
         valg: [
             { 
-                tekst: "Kast dig ind i det magiske felt", 
+                tekst: "Træd ind i flimmeret", 
                 effekt: () => {
                     const rul = Math.random();
                     if (rul < 0.50) {
                         bygOgHopGennemPortal();
-                        return { logBesked: "Magien materialiserer en portal. Du bliver kastet fremad over øen." };
+                        return { logBesked: "Flimmeret samler sig til en portal. Du flyttes mod øst." };
                     } else if (rul < 0.75) {
                         const guld = Math.floor(Math.random() * 11) + 10;
-                        return { logBesked: "Revnen afviser dig, men spytter nogle mønter ud i græsset.", guldOp: guld };
+                        return { logBesked: "Revnen lukker sig brat. Nogle mønter ligger tilbage i græsset.", guldOp: guld };
                     } else {
-                        return { logBesked: "Magien kollapser under dig, og du lander hårdt mod jorden.", hpNed: 8 };
+                        return { logBesked: "Flimmeret slipper dig for tidligt. Du falder hårdt.", hpNed: 8 };
                     }
                 } 
             },
             { 
-                tekst: "Brug dit sværd som anker mod magien", 
+                tekst: "Hold sværdet ind i flimmeret", 
                 kraeverItem: 'svaerd', 
                 effekt: () => {
                     const rul = Math.random();
                     if (rul < 0.50) {
                         bygOgHopGennemPortal();
-                        return { logBesked: "Magien forankres i jorden bag dig som en permanent portal og du flyver selv igennem." };
+                        return { logBesked: "Flimmeret fæstner sig i jorden som en portal. Du ryger igennem." };
                     } else if (rul < 0.75) {
                         const guld = Math.floor(Math.random() * 11) + 10;
-                        return { logBesked: "Revnen vibrerer og kaster pludselig mønter ud til dig.", guldOp: guld };
+                        return { logBesked: "Revnen ryster og efterlader mønter ved dine fødder.", guldOp: guld };
                     } else {
-                        return { logBesked: "Revnen lukker sig om klingen og forsvinder. Du trækker våbnet til dig uden at tage skade." };
+                        return { logBesked: "Revnen lukker sig omkring klingen og forsvinder. Sværdet er uskadt." };
                     }
                 } 
             },
             { 
-                tekst: "Smid 20 guld ind i revnen", 
+                tekst: "Kast 20 guld ind i revnen", 
                 puljeVaerdi: 20,
                 effekt: () => {
                     const rul = Math.random();
                     if (rul < 0.50) {
                         bygOgHopGennemPortal();
-                        return { logBesked: "Mønterne forsvinder og lyset bliver til en portal, der flytter dig længere mod øst." };
+                        return { logBesked: "Mønterne forsvinder. Revnen åbner som en portal mod øst." };
                     } else if (rul < 0.75) {
                         const guld = Math.floor(Math.random() * 51) + 100; 
-                        return { logBesked: "Revnen åbner sig og smider guld ud fra andre eventyrere.", guldOp: guld };
+                        return { logBesked: "Revnen åbner kort og skubber mere guld ud.", guldOp: guld };
                     } else {
-                        return { logBesked: "Revnen sluger dine penge og lukker sig med et mærkbart smæld." };
+                        return { logBesked: "Revnen tager guldet og lukker sig med et tørt smæld." };
                     }
                 } 
             },
             {
-                tekst: "Vend ryggen til den ustabile magi",
+                tekst: "Hold afstand",
                 effekt: () => {
-                    return { logBesked: "Du ignorerer flimmeret og fortsætter til fods uden at tage chancer." };
+                    return { logBesked: "Du holder afstand og fortsætter til fods." };
                 }
             }
         ]
@@ -210,14 +219,14 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         biome: ['bjerg', 'skov', 'hoejland'],
         unik: false,
         billede: '/events/ev_kilde.webp',
-        tekst: "En lille gejser skyder damp op fra undergrunden. Gassen river i lungerne, men får samtidig dit hjerte til at hamre overnaturligt hurtigt.",
+        tekst: "En lille gejser sender varm damp op gennem jorden. Luften svier i halsen, men kroppen reagerer med et uroligt overskud.",
         valg: [
             { 
-                tekst: "Træk dampen direkte ned i lungerne", 
+                tekst: "Indånd dampen direkte", 
                 effekt: () => {
                     const energi = Math.floor(Math.random() * 3) + 3;
                     return { 
-                        logBesked: "Du fylder brystet med jordgas. Det ætser dit indre, men musklerne spændes med overskudskraft.", 
+                        logBesked: "Dampen svier i brystet. Du får energi, men det koster liv.", 
                         hpNed: 5,
                         energiOp: energi
                     };
@@ -229,26 +238,26 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 effekt: () => {
                     const energi = Math.floor(Math.random() * 3) + 3;
                     return { 
-                        logBesked: "Stoffet tager den giftige kant. Du suger ren kraft ind uden at hoste blod.", 
+                        logBesked: "Kludene tager noget af giften. Du får energi uden at tage skade.", 
                         energiOp: energi
                     };
                 } 
             },
             { 
-                tekst: "Drik det svovlholdige vand fra pølen", 
+                tekst: "Drik vandet fra pølen", 
                 effekt: () => {
                     const energi = Math.floor(Math.random() * 3) + 3;
                     return { 
-                        logBesked: "Vandet smager af kobber. Det rammer dig med massiv energi, men forgifter din krop permanent.", 
+                        logBesked: "Vandet smager af metal. Du får energi, men kroppen tager varig skade.", 
                         energiOp: energi,
                         maxHpAendring: -2
                     };
                 } 
             },
             {
-                tekst: "Gå en stor bue uden om gejseren",
+                tekst: "Gå uden om gejseren",
                 effekt: () => {
-                    return { logBesked: "Du vil ikke risikere forgiftning. Du lader dampen slippe ud i ingenting." };
+                    return { logBesked: "Du holder afstand fra dampen." };
                 }
             }
         ]
@@ -260,7 +269,7 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         biome: ['slagmark', 'mark', 'eng'],
         unik: false,
         billede: '/events/ev_lig.webp',
-        tekst: "En uheldig stakkel ligger halvt begravet i mudderet. Andre forbipasserende har for længst flænset tøjet for alt synligt af værdi.",
+        tekst: "Et lig ligger halvt begravet i mudderet. Tøjet er allerede gennemrodet, men noget kan være sunket længere ned.",
         valg: [
             { 
                 tekst: "Grav i mudderet med de bare næver", 
@@ -275,157 +284,32 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 } 
             },
             { 
-                tekst: "Grav ham fri af jorden", 
+                tekst: "Grav omkring kroppen med skovlen", 
                 kraeverItem: 'skovl', 
                 effekt: () => {
                     if (Math.random() < 0.50) {
                         const guld = Math.floor(Math.random() * 31) + 20;
                         return { logBesked: "Du finder glemte mønter ved hans støvler.", guldOp: guld };
                     } else {
-                        return { logBesked: "Du skovler mudderet væk, men han var fuldstændig plyndret." };
+                        return { logBesked: "Du skovler mudderet væk. Der er ikke noget tilbage." };
                     }
                 } 
             },
             { 
-                tekst: "Spark liget rundt og om på ryggen", 
+                tekst: "Vend kroppen om med foden", 
                 effekt: () => {
                     const guld = Math.floor(Math.random() * 31) + 20;
                     return { 
-                        logBesked: "En sky af forrådnelse stiger op. Du indånder det og tager skade, men hans pung falder ud fra inderlommen.", 
+                        logBesked: "En tung lugt stiger op fra mudderet. Du tager skade, men en pung falder fri.", 
                         hpNed: 6,
                         guldOp: guld
                     };
                 } 
             },
             {
-                tekst: "Lad ham ligge i fred",
+                tekst: "Lad kroppen ligge",
                 effekt: () => {
-                    return { logBesked: "Du roder ikke ved de døde. Du går videre ud." };
-                }
-            }
-        ]
-    },
-
-'stjernekald': {
-        id: 'stjernekald',
-        titel: 'Stjernekaldet',
-        tekst: 'Et massivt alter af obsidian tårner sig op foran dig. Inskriptionerne lover stor rigdom trukket direkte ud af himmelrummet. De advarer dog også om, at stjernernes vrede vil knuse jorden og brænde kødet af den, der tør kalde.',
-        biome: 'ritual',
-        billede: '/events/ev_ritual.webp',
-        unik: false,
-        valg: [
-            {
-                tekst: 'Læs ritualet højt og træk himlen ned',
-                effekt: () => {
-                    udloesNaturkatastrofe(spilTilstand.spillerIndex);
-                    return { logBesked: "Du læser de ukendte ord højt. En massiv skygge kastes pludselig over øen." };
-                }
-            },
-            {
-                tekst: 'Vend ryggen til galskaben',
-                effekt: () => {
-                    const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-                    if (felt) felt.eventFuldført = false; 
-                    syncTilDb(true);
-                    return { logBesked: "Du ryster på hovedet og lader alteret stå urørt." };
-                }
-            }
-        ]
-    },
-    'meteor_skat': {
-        id: 'meteor_skat',
-        titel: 'Det Glødende Krater',
-        tekst: 'Klippen pulserer af en næsten overnaturlig varme. I midten af krateret ligger en kugle af sten, guld og sammenpresset kulstof. Du kan forsøge at åbne den nu, før klippen størkner. Varmen er utålelig.',
-        biome: 'meteor',
-        billede: '/events/meteor.webp',
-        unik: false,
-        valg: [
-            {
-                tekst: 'Grav med skovlen',
-                kosterItem: 'skovl',
-                effekt: () => { return udvindMeteorSkat('skovl'); }
-            },
-            {
-                tekst: 'Flæk stenen med øksen',
-                kosterItem: 'oekse',
-                effekt: () => { return udvindMeteorSkat('oekse'); }
-            },
-            {
-                tekst: 'Brug sværdet som brækjern',
-                kosterItem: 'svaerd',
-                effekt: () => { return udvindMeteorSkat('svaerd'); }
-            },
-            {
-                tekst: 'Hæld livseliksir over stenen for at køle den',
-                kosterItem: 'livseliksir',
-                effekt: () => { return udvindMeteorSkat('livseliksir'); }
-            },
-            {
-                tekst: 'Grav denfri med hænderne>',
-                effekt: () => { return udvindMeteorSkat('haender'); }
-            },
-            {
-                tekst: 'Varmen er for intens. Opgiv det.',
-                effekt: () => {
-                    const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-                    if (felt) felt.eventFuldført = false; 
-                    syncTilDb(true);
-                    return { logBesked: "Du skåner dig selv og dit udstyr og lader stenen ligge." };
-                }
-            }
-        ]
-    },
-
-    'jordens_hjerte': {
-        id: 'jordens_hjerte',
-        titel: 'Sprækken i Dybet',
-        tekst: 'Du ser en smal revne i jorden foran dig. Der stiger en dyb brummen op nede fra mørket, som om selve øen ligger og knurrer.',
-        biome: ['bjerg', 'hule', 'hoejland'],
-        billede: '/events/ev_bjerg.webp',
-        unik: false,
-        valg: [
-            {
-                tekst: 'Kast en fakkel ned i dybet',
-                kosterItem: 'fakkel',
-                effekt: () => {
-                    udloesJordskaelv(spilTilstand.spillerIndex);
-                    return { logBesked: "Faklen forsvinder i mørket. Et øjeblik efter rejser landskabet sig og gammle klipper, jord og ruiner stiger op. En nedgravet kiste flækker og drysser sit indhold ud.", guldOp: 160  };
-                }
-            },
-            {
-                tekst: 'Træd forsigtigt tilbage',
-                effekt: () => {
-                    const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-                    if (felt) felt.eventFuldført = false;
-                    syncTilDb(true);
-                    return { logBesked: "Du lader kløften være og trækker dig tilbage i sikkerhed." };
-                }
-            }
-        ]
-    },
-
-    'havets_alter': {
-        id: 'havets_alter',
-        titel: 'Det Sunkne Alter',
-        tekst: 'Et slimet alter af drivtømmer og muslingeskaller står plantet i jorden. En mørk diamant står på en guldfod og pulserer i midten. Du har på fornemmelsen, at noget er galt.',
-        biome: ['eng', 'mark', 'by', 'ruin'],
-        billede: '/events/ev_hav.webp',
-        unik: false,
-        valg: [
-            {
-                tekst: 'Tag diamanten fra alteret',
-                effekt: () => {
-                    udloesOversvoemmelse(spilTilstand.spillerIndex);
-                    return { logBesked: "Du river diamanten til dig! Sekundet efter rejser en massiv, sort mur af vand sig ude i horisonten.", guldOp: 10, itemUd: 'diamant' };
-                }
-            },
-            {
-                tekst: 'Lad offergaven ligge',
-                effekt: () => {
-                    const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-                    if (felt) felt.eventFuldført = false;
-                    syncTilDb(true);
-                    return { logBesked: "Du lytter til din sunde fornuft og lader diamanten være." };
+                    return { logBesked: "Du lader kroppen ligge og går videre." };
                 }
             }
         ]

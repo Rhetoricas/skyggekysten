@@ -1,4 +1,6 @@
-export const blodskovensHjerteEvents = {
+import type { SpilEvent } from './eventBibliotek';
+
+export const blodskovensHjerteEvents: Record<string, SpilEvent> = {
   blodskovens_hjerte: {
     id: 'blodskovens_hjerte',
     titel: 'Træets blødende rod',

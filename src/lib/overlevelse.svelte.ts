@@ -2,11 +2,10 @@ import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb, broadcastFelt } from './netvaerk';
 import { BREDDE, HEX_W, HOEJDE } from './spildata';
 import { brugFraRygsæk } from './spilmotor';
+import { erFeltITaagen } from './taage';
 
 export function erSpillerITaagen() {
-    const r = Math.floor(spilTilstand.spillerIndex / BREDDE);
-    const k = spilTilstand.spillerIndex % BREDDE;
-    return (k * HEX_W + (r % 2 !== 0 ? HEX_W / 2 : 0)) < spilTilstand.fogX;
+    return erFeltITaagen(spilTilstand.gitter, spilTilstand.spillerIndex, spilTilstand.fogX);
 }
 
 let sidstBrugtEliksir = 0;
@@ -46,8 +45,8 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
         }
 
         if (brugEliksir()) {
-            spilTilstand.logBesked = `Du gik i brædderne. ${beskedMedTal} Eliksiren gav livet tilbage i din krop.`;
-            syncTilDb(true);
+            spilTilstand.logBesked = `Du faldt om. ${beskedMedTal} Eliksiren redder dig.`;
+            syncTilDb();
             return;
         }
         
@@ -59,13 +58,14 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
         const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
         if (aktueltFelt && spilTilstand.valgtKarakter) {
             aktueltFelt.gravstenIkon = spilTilstand.valgtKarakter.ikon;
+            broadcastFelt(spilTilstand.spillerIndex, aktueltFelt);
         }
         
-        spilTilstand.logBesked = doedsBesked || `${beskedMedTal} Din krop gav op.`;
+        spilTilstand.logBesked = doedsBesked || `${beskedMedTal} Du døde.`;
         syncTilDb(true);
     } else {
         spilTilstand.logBesked = beskedMedTal;
-        syncTilDb(true);
+        syncTilDb();
     }
 }
 
@@ -74,8 +74,8 @@ export function tjekOverlevelse() {
 
     if (erSpillerITaagen()) {
         if (brugEliksir()) {
-            spilTilstand.logBesked = "Du var ved at kollapse, men din livseliksir redder dig og giver liv tilbage i din krop.";
-            syncTilDb(true);
+            spilTilstand.logBesked = "Du var ved at kollapse, men livseliksiren redder dig.";
+            syncTilDb();
             return;
         }
 
@@ -87,9 +87,10 @@ export function tjekOverlevelse() {
         const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
         if (aktueltFelt && spilTilstand.valgtKarakter) {
             aktueltFelt.gravstenIkon = spilTilstand.valgtKarakter.ikon;
+            broadcastFelt(spilTilstand.spillerIndex, aktueltFelt);
         }
 
-        spilTilstand.logBesked = "Tågen omslutter dig helt og trækker det sidste liv ud af din krop.";
+        spilTilstand.logBesked = "Tågen lukker sig om dig. Du mister resten af dit liv.";
         syncTilDb(true);
         return;
     }
@@ -109,28 +110,30 @@ export function fremrykTid() {
         spilTilstand.dag++;
         spilTilstand.nuvaerendeEnergi += spilTilstand.valgtKarakter.baseEnergi;        
         
-        if (spilTilstand.dag > 5) {
+        const taagenHoldtTilDag = Math.max(0, ...spilTilstand.gitter.map((felt) => felt.taagenHoldtTilDag || 0));
+        if (spilTilstand.dag > 5 && spilTilstand.dag > taagenHoldtTilDag) {
             const dynamiskFart = 0.5 + Math.pow(spilTilstand.dag / 100, 2);
             spilTilstand.fogX += (HEX_W * dynamiskFart) / antalLevende;        
         }
     }
 
     const nyDag = spilTilstand.dag || 1;
+    let kortAendret = false;
 
     if (nyDag > gammelDag) {
         let samletLog = "";
 
-        if (nyDag === 2) {
-            samletLog += "Du kan nu overskue omgivelserne og zoome ud og ind. ";
-        }
-        
         // NYT: Generer både på østkysten, når solen står op på dag 6
         if (nyDag === 6 && gammelDag < 6) {
             const kystFelter = [];
             for (let r = 1; r < HOEJDE - 1; r++) {
-                const indeks = r * BREDDE + (BREDDE - 2);
-                if (spilTilstand.gitter[indeks] && spilTilstand.gitter[indeks].biome !== 'hav') {
-                    kystFelter.push(indeks);
+                const landIndeks = r * BREDDE + (BREDDE - 2);
+                const vandIndeks = r * BREDDE + (BREDDE - 1);
+                if (
+                    spilTilstand.gitter[landIndeks]?.biome !== 'hav' &&
+                    spilTilstand.gitter[vandIndeks]?.biome === 'hav'
+                ) {
+                    kystFelter.push(vandIndeks);
                 }
             }
             
@@ -140,9 +143,10 @@ export function fremrykTid() {
             for (let i = 0; i < antalBaade; i++) {
                 spilTilstand.gitter[kystFelter[i]].hasBoat = true;
                 broadcastFelt(kystFelter[i], spilTilstand.gitter[kystFelter[i]]);
+                kortAendret = true;
             }
             
-            samletLog += "Et fjernt horn gjalder gennem tågen. Flugtbådene er ankommet til den østlige kyst!";
+            samletLog += "Et horn lyder mod øst. Flugtbådene er ankommet.";
             spilTilstand.gitter = [...spilTilstand.gitter];
         }
 
@@ -154,7 +158,7 @@ export function fremrykTid() {
     if (erSpillerITaagen()) {
         tagSkadeOgTjekDød(50, "Tågens syre ætsede dine lunger."); 
     } else {
-        syncTilDb(true);
+        syncTilDb(kortAendret);
     }
 }
 
@@ -164,16 +168,16 @@ export function udfoerBlodofring() {
         return;
     }
     if (spilTilstand.maxLivspoint <= 10) {
-        spilTilstand.logBesked = "Din krop kan ikke tage flere permanente ar.";
+        spilTilstand.logBesked = "Du kan ikke sænke Max HP mere.";
         return;
     }
     
     spilTilstand.maxLivspoint -= 10;
     spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 50);
     
-    spilTilstand.logBesked = `Du ofrer din sundhed for at overleve i tågen. (-10 Max HP, +50 HP)`;
+    spilTilstand.logBesked = `Du bruger blodofferet. (-10 Max HP, +50 HP)`;
     
-    syncTilDb(true);
+    syncTilDb();
 }
 
 export function fremtvingKollaps(brugerdefineretAarsag?: string) {
@@ -181,8 +185,8 @@ export function fremtvingKollaps(brugerdefineretAarsag?: string) {
 
     if (brugEliksir()) {
         const aarsag = brugerdefineretAarsag ? `${brugerdefineretAarsag} ` : "Du var ved at kollapse. ";
-        spilTilstand.logBesked = `${aarsag}Eliksiren pumpede nyt liv i dine årer.`;
-        syncTilDb(true);
+        spilTilstand.logBesked = `${aarsag}Eliksiren redder dig.`;
+        syncTilDb();
         return; 
     }
 
@@ -194,8 +198,8 @@ export function fremtvingKollaps(brugerdefineretAarsag?: string) {
     spilTilstand.guldTotal -= mistetGuld;
 
     const basisKollaps = mistetGuld > 0 
-        ? `Du kollapser. Mens du ligger bevidstløs, forsvinder ${mistetGuld} guld fra dine lommer.` 
-        : "Du kollapser af udmattelse. Tiden går. Tågen kryber tættere på.";
+        ? `Du kollapser. Da du vågner, mangler du ${mistetGuld} guld.` 
+        : "Du kollapser af udmattelse. Tiden går, og tågen rykker frem.";
 
     spilTilstand.logBesked = brugerdefineretAarsag ? `${brugerdefineretAarsag} ${basisKollaps}` : basisKollaps;
     
@@ -207,8 +211,8 @@ export function fremtvingKollaps(brugerdefineretAarsag?: string) {
             spilTilstand.erBevidstløs = false;
             spilTilstand.logBesked = mistetGuld > 0 
                 ? `Du vågner med 10 HP. Du mangler ${mistetGuld} guld. Tågen er rykket frem.`
-                : "Du vågner med buldrende hovedpine. Tågen er rykket frem.";
-            syncTilDb(true);
+                : "Du vågner med 10 HP. Tågen er rykket frem.";
+            syncTilDb();
         }
     }, 2000);
 }

@@ -1,29 +1,40 @@
 <script lang="ts">
     import favicon from '$lib/assets/favicon.svg';
-    import BottomUI from '$lib/BottomUI.svelte';
-    import { spilTilstand } from '$lib/spilTilstand.svelte';
 
     let { children } = $props();
 </script>
 
 <svelte:head>
     <link rel="icon" href={favicon} />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#0a0a0a" />
 </svelte:head>
 
 {@render children()}
 
-{#if spilTilstand.gameState === 'play'}
-    <BottomUI />
-{/if}
-
 <style>
+    :global(html) {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        overscroll-behavior: none;
+        background: #0a0a0a;
+    }
+
     :global(body) {
         margin: 0;
         padding: 0;
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100dvh;
         background: #0a0a0a;
         color: white;
         font-family: 'Lato', sans-serif;
         overflow: hidden;
+        overscroll-behavior: none;
     }
 
     :global(h1), :global(h2), :global(h3) {

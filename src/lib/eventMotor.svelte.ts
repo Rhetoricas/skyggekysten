@@ -1,7 +1,7 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { eventBibliotek } from './eventBibliotek';
 import { tilfoejTilRygsæk, brugFraRygsæk } from './spilmotor';
-import { syncTilDb } from './netvaerk';
+import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremrykTid } from './overlevelse.svelte';
 import type { Valg } from './eventBibliotek';
 
@@ -12,12 +12,19 @@ export const eventState = $state({
     valgLåst: false,
     naesteTrin: null as string | null,
     erFaerdig: false,
-    afventerKollaps: false
+    afventerKollaps: false,
+    rootEventId: null as string | null,
+    rootFeltIndex: null as number | null
 });
 
 export function startEvent(eventID: string) {
     const evt = eventBibliotek[eventID];
     if (!evt) return;
+
+    if (!evt.erSubTrin || !eventState.rootEventId) {
+        eventState.rootEventId = eventID;
+        eventState.rootFeltIndex = spilTilstand.spillerIndex;
+    }
     
     eventState.aktivt = evt;
     eventState.log = [evt.tekst];
@@ -38,6 +45,8 @@ export function lukEvent() {
     eventState.naesteTrin = null;
     eventState.erFaerdig = false;
     eventState.afventerKollaps = false;
+    eventState.rootEventId = null;
+    eventState.rootFeltIndex = null;
 }
 
 export function kanViseValg(valg: Valg) {
@@ -61,6 +70,8 @@ export function kanViseValg(valg: Valg) {
 
 export function tagValg(valg: Valg) {
     if (eventState.valgLåst) return;
+    const afsluttetEventId = eventState.rootEventId ?? eventState.aktivt?.id;
+    const afsluttetFeltIndex = eventState.rootFeltIndex ?? spilTilstand.spillerIndex;
 
     if (!kanViseValg(valg)) {
         eventState.log = [...eventState.log, "Du har ikke det nødvendige udstyr eller guld."];
@@ -180,7 +191,7 @@ export function tagValg(valg: Valg) {
     eventState.log = [...eventState.log, fuldBesked];
     spilTilstand.logBesked = fuldBesked;
 
-    syncTilDb(true);
+    syncTilDb();
 
     if (spilTilstand.livspoint <= 0) {
         eventState.afventerKollaps = true;
@@ -188,10 +199,14 @@ export function tagValg(valg: Valg) {
     }
 
     if (!eventState.naesteTrin) {
-        const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-        if (felt) felt.eventFuldført = true;
+        const felt = spilTilstand.gitter[afsluttetFeltIndex];
+        if (felt && felt.eventID === afsluttetEventId) {
+            felt.eventFuldført = true;
+            broadcastFelt(afsluttetFeltIndex, felt);
+        }
         fremrykTid();
         eventState.erFaerdig = true;
-        syncTilDb(true);
+        syncTilDb();
+        syncKortTilDbSenere();
     }
 }

@@ -53,6 +53,7 @@ export interface SpillerData {
     mitUdstyr?: RygsækTing[];
     kendteFelter?: number[];
     historik?: number[];
+    tidligereHistorik?: number[][];
     energi?: number;
     turNummer: number;
     dag?: number;
@@ -61,6 +62,7 @@ export interface SpillerData {
     retning: string;
     besoegteMiner?: number[];
     browserId?: string | null;
+    userId?: string | null;
     harSkattekort?: boolean;
 }
 
@@ -82,6 +84,7 @@ export interface Felt {
     isCampfire?: boolean;
     eventID?: string;
     shopItems?: string[]; 
+    indbrudt?: boolean;
     
     type?: string;
     opdaget?: boolean;
@@ -99,11 +102,14 @@ export interface Felt {
     afgroede?: 'hvede' | 'boenner';
     smadretFremTilBlok?: number;
     hoestetFremTilBlok?: number;
+    insektPlageBlok?: number;
 
     hasGoldmine?: boolean;
     mineOwner?: string;
     mineLocked?: boolean;
     hasMeteorStone?: boolean;
+    taagenHoldtTilDag?: number;
+    taageBlokker?: boolean;
 
     grundBiome?: string | Biome;
     grundEvent?: string;

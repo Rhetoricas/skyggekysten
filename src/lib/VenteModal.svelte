@@ -89,7 +89,7 @@
 
 <style>
     .vente-overlay { 
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; 
         background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); 
         display: flex; align-items: center; justify-content: center; z-index: 1000; 
     }
@@ -135,4 +135,57 @@
     .spil-igen-btn:hover:not(:disabled) { background: #a67c00; }
     .spil-igen-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .udsolgt-btn { background: #444; color: #888; cursor: not-allowed; }
+
+    @media (max-width: 700px) {
+        .vente-overlay {
+            align-items: stretch;
+            padding: calc(env(safe-area-inset-top, 0px) + 8px) 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
+            box-sizing: border-box;
+        }
+
+        .vente-content {
+            width: 100%;
+            max-width: none;
+            max-height: 100%;
+            overflow-y: auto;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .vente-desc {
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .vente-board {
+            gap: 10px;
+            margin: 18px 0;
+        }
+
+        .vente-kort {
+            width: 92px;
+            height: 129px;
+        }
+
+        .kort-vaerdi {
+            font-size: 32px;
+            padding: 6px 14px;
+        }
+
+        .pulje-sektion {
+            margin: 14px 0;
+            gap: 10px;
+            font-size: 18px;
+        }
+
+        .handling-sektion {
+            gap: 10px;
+        }
+
+        .vente-btn {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 0.92rem;
+        }
+    }
 </style>

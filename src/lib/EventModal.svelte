@@ -119,7 +119,7 @@
     
     .event-overlay { 
         position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
+        top: 0; left: 0; width: 100vw; height: 100dvh;
         background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center;
         z-index: 1000;
         font-family: system-ui, -apple-system, sans-serif;
@@ -250,5 +250,45 @@
     @keyframes tekstPuls {
         0%, 100% { opacity: 0.5; }
         50% { opacity: 1; }
+    }
+
+    @media (max-width: 700px) {
+        .event-overlay {
+            align-items: stretch;
+            padding: calc(env(safe-area-inset-top, 0px) + 8px) 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
+            box-sizing: border-box;
+        }
+
+        .event-boks {
+            width: 100%;
+            max-width: none;
+            min-height: 0;
+            max-height: 100%;
+            padding: 12px;
+            gap: 8px;
+            box-sizing: border-box;
+        }
+
+        .event-boks img {
+            height: 120px;
+        }
+
+        .event-boks h2 {
+            font-size: 1.25rem;
+        }
+
+        .log-container p {
+            font-size: 0.92rem;
+            line-height: 1.35;
+        }
+
+        .valg-btn {
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
+        .knap-panel {
+            gap: 7px;
+        }
     }
 </style>

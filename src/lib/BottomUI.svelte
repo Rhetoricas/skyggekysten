@@ -3,7 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
     import { grav } from '$lib/undergrund.svelte';
-    import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal, aktiverHemmelighed } from '$lib/spilmotor';
+    import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal, aktiverHemmelighed, begaaIndbrud, kanBegaaIndbrudPaaFelt } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
 
     let aktueltFelt = $derived(
@@ -13,6 +13,10 @@
     );
 
     let kanGrave = $derived(aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves);
+    let kanBegaaIndbrud = $derived(kanBegaaIndbrudPaaFelt(aktueltFelt));
+    let harSkovl = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'skovl' && ting.maengde > 0) ?? false);
+    let graveIkon = $derived(harSkovl ? '/inventory/skovl.webp' : '/ui/haandgrav.webp');
+    let graveAlt = $derived(kanGrave ? (harSkovl ? 'Grav med skovl' : 'Grav med hænderne') : 'Her kan ikke graves');
 
     let visLog = $state(false);
     let logContainerRef = $state<HTMLDivElement | null>(null);
@@ -56,7 +60,7 @@
         spilTilstand.livspoint += 10;
         spilTilstand.nuvaerendeEnergi += 1;
         spilTilstand.logBesked = "Du spiser din madration. (+10 HP, +1 Energi)";
-        syncTilDb(true);
+        syncTilDb();
     }
 
     function haandterInventoryKlik(vareId: string) {
@@ -72,7 +76,21 @@
             taendBaal();
         } else if (vareId === 'hemmelighed') {
             aktiverHemmelighed();
+        } else if (vareId === 'dirk') {
+            begaaIndbrud();
         }
+    }
+
+    function kanBrugeInventoryVare(vareId: string) {
+        if (vareId === 'skovl') return !!(aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves);
+        if (vareId === 'sovepose') return aktueltFelt?.biome !== 'hav' && spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi;
+        if (vareId === 'mad') return spilTilstand.livspoint < spilTilstand.maxLivspoint || spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi;
+        if (vareId === 'dirk') return !!kanBegaaIndbrud;
+        return vareId === 'stav' || vareId === 'fakkel' || vareId === 'hemmelighed';
+    }
+
+    function erSituationsVare(vareId: string) {
+        return vareId === 'skovl' || vareId === 'sovepose' || vareId === 'mad' || vareId === 'dirk';
     }
 </script>
 
@@ -152,7 +170,10 @@
                 <div class="energi-container">
                     <div class="energi-grid">
                         {#each Array(9) as tomPlads, i (i)}
-                            <div data-dummy={tomPlads} class="lysprik {i < (spilTilstand.nuvaerendeEnergi || 0) ? 'taendt' : ''}"></div>
+                            <div
+                                data-dummy={tomPlads}
+                                class="lysprik {i >= spilTilstand.maxEnergi ? 'inaktiv' : i < (spilTilstand.nuvaerendeEnergi || 0) ? 'taendt' : ''}"
+                            ></div>
                         {/each}
                     </div>
                 </div>
@@ -168,57 +189,35 @@
                 onkeydown={(e) => { if (kanGrave && (e.key === 'Enter' || e.key === ' ')) grav(); }}
             >
                 <div class="ikon-container">
-                    <img src="/screens/gravhaand.webp" alt="Grav" class="inventory-icon {kanGrave ? '' : 'deaktiveret'}" />
+                    <img src={graveIkon} alt={graveAlt} class="inventory-icon grave-icon {kanGrave ? '' : 'deaktiveret'}" />
                 </div>
             </div>
 
             {#each spilTilstand.mitUdstyr as vare (vare.id)}
                 {@const dbInfo = itemDB[vare.id]}
-                {#if dbInfo}
+                {#if dbInfo && vare.id !== 'skovl'}
                     <div 
-                        class="inventory-item {(vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) ||
-(vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi) ||
-(vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi)) || (vare.id === 'stav') || (vare.id === 'fakkel') || (vare.id === 'hemmelighed') ? 'klikbar' : ''}" 
+                        class="inventory-item {kanBrugeInventoryVare(vare.id) ? 'klikbar' : ''}" 
                         onclick={() => {
-                            if (vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) {
-                                haandterInventoryKlik(vare.id);
-                            } else if (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi) {
-                                haandterInventoryKlik(vare.id);
-                            } else if (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi)) {
-                                haandterInventoryKlik(vare.id);
-                            } else if (vare.id === 'stav') {
-                                haandterInventoryKlik(vare.id);
-                            } else if (vare.id === 'fakkel') {
-                                haandterInventoryKlik(vare.id);
-                            } else if (vare.id === 'hemmelighed') {
+                            if (kanBrugeInventoryVare(vare.id)) {
                                 haandterInventoryKlik(vare.id);
                             }
                         }}
                         onkeydown={(e) => { 
                             if (e.key === 'Enter' || e.key === ' ') {
-                                if (vare.id === 'skovl' && aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves) {
-                                    haandterInventoryKlik(vare.id);
-                                } else if (vare.id === 'sovepose' && aktueltFelt?.biome !== 'hav' && spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi) {
-                                    haandterInventoryKlik(vare.id);
-                                } else if (vare.id === 'mad' && (spilTilstand.livspoint < spilTilstand.maxLivspoint || spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi)) {
-                                    haandterInventoryKlik(vare.id);
-                                } else if (vare.id === 'stav') {
-                                    haandterInventoryKlik(vare.id);
-                                } else if (vare.id === 'fakkel') {
-                                    haandterInventoryKlik(vare.id);
-                                } else if (vare.id === 'hemmelighed') {
+                                if (kanBrugeInventoryVare(vare.id)) {
                                     haandterInventoryKlik(vare.id);
                                 }
                             }
                         }}
                         role="button"
-                        tabindex="0"
+                        tabindex={kanBrugeInventoryVare(vare.id) ? 0 : -1}
                     >
                         <div class="ikon-container">
                             <img 
                                 src={dbInfo.billede} 
                                 alt={dbInfo.navn} 
-                                class="inventory-icon {(vare.id === 'skovl' && aktueltFelt && (aktueltFelt.gravet || !aktueltFelt.kanGraves)) || (vare.id === 'sovepose' && (aktueltFelt?.biome === 'hav' || spilTilstand.nuvaerendeEnergi >= spilTilstand.maxEnergi)) || (vare.id === 'mad' && spilTilstand.livspoint >= spilTilstand.maxLivspoint && spilTilstand.nuvaerendeEnergi >= spilTilstand.maxEnergi) ? 'deaktiveret' : ''}" 
+                                class="inventory-icon {erSituationsVare(vare.id) && !kanBrugeInventoryVare(vare.id) ? 'deaktiveret' : ''}" 
                             />
                             {#if vare.maengde > 1}
                                 <span class="maengde-badge">{vare.maengde}</span>
@@ -228,12 +227,6 @@
                 {/if}
             {/each}
 
-            <button 
-                class="musik-toggle-btn lille" 
-                onclick={() => spilTilstand.musikTaendt = !spilTilstand.musikTaendt} 
-            >
-                <img src={spilTilstand.musikTaendt ? '/screens/musicon.webp' : '/screens/musicoff.webp'} alt="Lyd" />
-            </button>
         </div>
     </div>
 </footer>
@@ -393,6 +386,9 @@
         width: auto;
         filter: drop-shadow(0 2px 5px rgba(0,0,0,0.9));
     }
+    .grave-icon {
+        object-fit: contain;
+    }
     .inventory-icon.deaktiveret {
         filter: grayscale(100%) opacity(50%);
     }
@@ -427,28 +423,12 @@
     .lysprik.taendt {
         background-image: url('/tiles/energi_taendt.webp');
     }
+    .lysprik.inaktiv {
+        background-image: url('/tiles/energi_slukket.webp');
+        filter: grayscale(100%) opacity(24%);
+        transform: scale(0.82);
+    }
 
-    .musik-toggle-btn.lille {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        background: transparent;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        z-index: 100;
-    }
-    .musik-toggle-btn.lille img {
-        height: 30px;
-        width: auto;
-        opacity: 0.5;
-        transition: transform 0.2s, opacity 0.2s;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
-    }
-    .musik-toggle-btn.lille:hover img {
-        opacity: 1;
-        transform: scale(1.1);
-    }
     .log-modal-overlay {
         position: fixed;
         top: 0; left: 0;
@@ -474,4 +454,127 @@
     .log-post { color: #aaa;
         border-left: 2px solid #333; padding-left: 12px; margin-bottom: 10px; }
     .log-post.nyeste { color: white; border-left-color: #ffcc00; }
+
+    @media (max-width: 700px) {
+        .ui {
+            padding: 0 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
+            gap: 4px;
+        }
+
+        .ui::before {
+            height: 34dvh;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.45) 35%, rgba(0, 0, 0, 0.9) 100%);
+        }
+
+        .island-overskrift {
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+
+        .log-container {
+            margin-bottom: 4px;
+        }
+
+        .log-line {
+            max-width: 96vw;
+        }
+
+        .log-line.aktuel {
+            font-size: 0.82rem;
+            min-height: 1rem;
+        }
+
+        .log-line.forrige {
+            display: none;
+        }
+
+        .instrument-braet {
+            gap: 4px;
+            margin-bottom: 4px;
+            min-height: 18px;
+        }
+
+        .mod-badge {
+            font-size: 0.75rem;
+            padding: 0 2px;
+        }
+
+        .mod-badge img {
+            width: 16px;
+        }
+
+        .ui-content {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            align-items: end;
+            gap: 8px;
+            padding: 0;
+        }
+
+        .status-row {
+            gap: 8px;
+            margin-right: 0;
+        }
+
+        .status-item {
+            font-size: 0.82rem;
+        }
+
+        .status-icon {
+            height: 30px;
+        }
+
+        .energi-container {
+            margin: 0;
+        }
+
+        .energi-grid {
+            grid-template-columns: repeat(3, 12px);
+            gap: 2px;
+        }
+
+        .lysprik {
+            width: 12px;
+            height: 12px;
+        }
+
+        .inventory-row {
+            gap: 7px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 2px 36px 2px 0;
+            scrollbar-width: none;
+        }
+
+        .inventory-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .inventory-item {
+            flex: 0 0 auto;
+        }
+
+        .inventory-icon {
+            height: 43px;
+        }
+
+        .maengde-badge {
+            bottom: 2px;
+            right: 2px;
+            font-size: 0.68rem;
+            padding: 1px 4px;
+        }
+
+        .log-modal-overlay {
+            align-items: stretch;
+            padding: 12px;
+            box-sizing: border-box;
+        }
+
+        .log-modal-content {
+            width: 100%;
+            height: auto;
+            max-height: calc(100dvh - 24px);
+        }
+    }
 </style>

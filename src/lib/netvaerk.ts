@@ -1,11 +1,51 @@
 import { supabase } from './supabaseClient';
 import { spilTilstand } from './spilTilstand.svelte';
+import { authState } from './auth.svelte';
+import { gemOfflineScore, gemOfflineSpil, hentOfflineScores } from './offlineStorage';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 let syncKoe: ReturnType<typeof setTimeout> | null = null;
 let kortSkalOpdateres = false;
-let lokalUploadTid = 0;
 let dbSaveKoe: ReturnType<typeof setTimeout> | null = null;
+let kortSaveKoe: ReturnType<typeof setTimeout> | null = null;
+
+export function syncKortTilDbSenere(delayMs = 45000) {
+    if (kortSaveKoe) return;
+
+    kortSaveKoe = setTimeout(() => {
+        kortSaveKoe = null;
+        syncTilDb(true);
+    }, delayMs);
+}
+
+export async function flushVentendeSync() {
+    if (spilTilstand.offlineMode) {
+        gemOfflineSpil();
+        return;
+    }
+
+    const harVentendeSync = syncKoe || dbSaveKoe || kortSaveKoe || kortSkalOpdateres;
+    if (!harVentendeSync) return;
+
+    if (syncKoe) {
+        clearTimeout(syncKoe);
+        syncKoe = null;
+    }
+
+    if (dbSaveKoe) {
+        clearTimeout(dbSaveKoe);
+        dbSaveKoe = null;
+    }
+
+    const sendKort = kortSkalOpdateres || !!kortSaveKoe;
+    if (kortSaveKoe) {
+        clearTimeout(kortSaveKoe);
+        kortSaveKoe = null;
+    }
+
+    kortSkalOpdateres = false;
+    await udfoerDbUpload(sendKort);
+}
 
 export async function syncTilDb(opdaterKort = false) {
     if (!spilTilstand.rumKode || !spilTilstand.spillerNavn) return;
@@ -26,17 +66,24 @@ export async function syncTilDb(opdaterKort = false) {
         mitUdstyr: spilTilstand.mitUdstyr,
         kendteFelter: spilTilstand.mineKendteFelter,
         historik: spilTilstand.historik || [],
+        tidligereHistorik: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.tidligereHistorik || [],
         isDead: isDead,
         isWinner: isWinner,
         sidstAktiv: Date.now(), 
         activeAlarm: false,
         browserId: localStorage.getItem('taage_browser_id'),
+        userId: authState.user?.id ?? null,
         besoegteMiner: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.besoegteMiner || [],
         harSkattekort: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.harSkattekort || false
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     spilTilstand.alleSpillere[spilTilstand.spillerNavn] = mig as any;
+
+    if (spilTilstand.offlineMode) {
+        gemOfflineSpil();
+        return;
+    }
 
     if (sub) {
         sub.send({
@@ -46,7 +93,13 @@ export async function syncTilDb(opdaterKort = false) {
         });
     }
 
-    if (opdaterKort) kortSkalOpdateres = true;
+    if (opdaterKort) {
+        kortSkalOpdateres = true;
+        if (kortSaveKoe) {
+            clearTimeout(kortSaveKoe);
+            kortSaveKoe = null;
+        }
+    }
 
     if (syncKoe) return;
 
@@ -77,6 +130,8 @@ export async function syncTilDb(opdaterKort = false) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function broadcastFelt(index: number, feltData: any) {
+    if (spilTilstand.offlineMode) return;
+
     if (sub) {
         sub.send({
             type: 'broadcast',
@@ -86,7 +141,25 @@ export function broadcastFelt(index: number, feltData: any) {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function broadcastFelter(felter: Array<{ index: number; feltData: any }>) {
+    if (spilTilstand.offlineMode) return;
+
+    if (sub && felter.length > 0) {
+        sub.send({
+            type: 'broadcast',
+            event: 'felter_sync',
+            payload: { felter }
+        });
+    }
+}
+
 async function udfoerDbUpload(sendKort: boolean) {
+    if (spilTilstand.offlineMode) {
+        gemOfflineSpil();
+        return;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const opdatering: any = {
         spillere: spilTilstand.alleSpillere,
@@ -97,60 +170,64 @@ async function udfoerDbUpload(sendKort: boolean) {
         opdatering['kort'] = spilTilstand.gitter;
     }
 
-    lokalUploadTid = Date.now();
     await supabase.from('spil_sessioner').update(opdatering).eq('rum_kode', spilTilstand.rumKode);
 }
 
 export async function gemHighscore() {
     if (!spilTilstand.spillerNavn || !spilTilstand.rumKode || spilTilstand.samletScore <= 0) return;
+    if (spilTilstand.offlineMode) {
+        gemOfflineScore();
+        return;
+    }
+    if (!authState.user) return;
 
-    await supabase.from('highscores').insert([{
-        navn: spilTilstand.spillerNavn,
-        rum_kode: spilTilstand.rumKode,
+    const minePoint = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
+    const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
+    const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map';
+
+    await supabase.from('game_results').insert([{
+        user_id: authState.user.id,
+        player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
+        room_code: spilTilstand.rumKode,
         score: spilTilstand.samletScore,
-        karakter: spilTilstand.valgtKarakter?.navn
+        character: spilTilstand.valgtKarakter?.navn,
+        is_winner: isWinner,
+        is_dead: isDead,
+        days: spilTilstand.dag,
+        gold: spilTilstand.guldTotal,
+        max_column: spilTilstand.maxKolonne,
+        known_fields_count: spilTilstand.mineKendteFelter?.length || 0,
+        mines_owned: minePoint,
+        final_log: spilTilstand.logBesked
     }]);
 }
 
 export async function hentHighscores() {
-    const { data } = await supabase
-        .from('highscores')
-        .select('navn, score, karakter')
-        .eq('rum_kode', spilTilstand.rumKode)
-        .order('score', { ascending: false })
-        .limit(30);
-
-    const unikke = [];
-    const fundne = new Set();
-    for (const raekke of data || []) {
-        const noegle = `${raekke.navn}-${raekke.score}-${raekke.karakter}`;
-        if (!fundne.has(noegle)) {
-            fundne.add(noegle);
-            unikke.push(raekke);
-            if (unikke.length === 10) break;
-        }
+    if (spilTilstand.offlineMode) {
+        return hentOfflineScores(spilTilstand.rumKode).slice(0, 10).map((score) => ({
+            navn: score.navn,
+            score: score.score,
+            karakter: score.karakter
+        }));
     }
-    return unikke;
-}
 
-export async function hentGlobalTopTi() {
     const { data } = await supabase
-        .from('highscores')
-        .select('navn, rum_kode, score, karakter')
+        .from('game_results')
+        .select('player_name, score, character')
+        .eq('room_code', spilTilstand.rumKode)
         .order('score', { ascending: false })
         .limit(30);
 
     const unikke = [];
     const fundne = new Set();
     for (const raekke of data || []) {
-        const noegle = `${raekke.navn}-${raekke.score}-${raekke.rum_kode}-${raekke.karakter}`;
+        const noegle = `${raekke.player_name}-${raekke.score}-${raekke.character}`;
         if (!fundne.has(noegle)) {
             fundne.add(noegle);
             unikke.push({
-                spillerNavn: raekke.navn,
-                oeNavn: raekke.rum_kode,
-                point: raekke.score,
-                karakter: raekke.karakter
+                navn: raekke.player_name,
+                score: raekke.score,
+                karakter: raekke.character
             });
             if (unikke.length === 10) break;
         }
@@ -158,8 +235,48 @@ export async function hentGlobalTopTi() {
     return unikke;
 }
 
+export async function hentGlobalTopTi() {
+    if (spilTilstand.offlineMode) return [];
+
+    const { data } = await supabase
+        .from('game_results')
+        .select('player_name, room_code, score, character')
+        .order('score', { ascending: false })
+        .limit(30);
+
+    const unikke = [];
+    const fundne = new Set();
+    for (const raekke of data || []) {
+        const noegle = `${raekke.player_name}-${raekke.score}-${raekke.room_code}-${raekke.character}`;
+        if (!fundne.has(noegle)) {
+            fundne.add(noegle);
+            unikke.push({
+                spillerNavn: raekke.player_name,
+                oeNavn: raekke.room_code,
+                point: raekke.score,
+                karakter: raekke.character
+            });
+            if (unikke.length === 10) break;
+        }
+    }
+    return unikke;
+}
+
+export async function hentGlobalTopScore() {
+    if (spilTilstand.offlineMode) return 0;
+
+    const { data } = await supabase
+        .from('game_results')
+        .select('score')
+        .order('score', { ascending: false })
+        .limit(1);
+
+    return data?.[0]?.score ?? 0;
+}
+
 let sub: RealtimeChannel | null = null;
 export function startRealtime() {
+    if (spilTilstand.offlineMode) return;
     if (!spilTilstand.rumKode || sub) return;
     sub = supabase
         .channel(`room:${spilTilstand.rumKode}`)
@@ -182,22 +299,16 @@ export function startRealtime() {
             }
         })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'spil_sessioner', filter: `rum_kode=eq.${spilTilstand.rumKode}` }, (payload: any) => {
-            const nyData = payload.new;
-            
-            if (Date.now() - lokalUploadTid > 2000) {
-                if (nyData.kort) spilTilstand.gitter = nyData.kort;
+        .on('broadcast', { event: 'felter_sync' }, (payload: any) => {
+            const data = payload.payload;
+            let aendret = false;
+            for (const opdatering of data.felter || []) {
+                if (spilTilstand.gitter[opdatering.index]) {
+                    spilTilstand.gitter[opdatering.index] = opdatering.feltData;
+                    aendret = true;
+                }
             }
-            
-            if (nyData.fog_x !== undefined && nyData.fog_x > spilTilstand.fogX) spilTilstand.fogX = nyData.fog_x;
-            
-            if (nyData.spillere) {
-                Object.keys(nyData.spillere).forEach(navn => {
-                    if (navn !== spilTilstand.spillerNavn) {
-                        spilTilstand.alleSpillere[navn] = nyData.spillere[navn];
-                    }
-                });
-            }
+            if (aendret) spilTilstand.gitter = [...spilTilstand.gitter];
         })
         .subscribe();
 }

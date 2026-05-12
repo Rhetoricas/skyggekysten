@@ -1,5 +1,5 @@
 import { spilTilstand } from './spilTilstand.svelte';
-import { syncTilDb, broadcastFelt } from './netvaerk';
+import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremtvingKollaps, fremrykTid } from '$lib/overlevelse.svelte';
 import { afslørOmraade, tilfoejTilRygsæk } from '$lib/spilmotor';
 import type { Biome } from './types';
@@ -94,7 +94,7 @@ export function grav() {
     if (!harSkovl) {
         const skade = spilTilstand.beregnSkade(4);
         spilTilstand.livspoint -= skade;
-        udstyrsLog = ` Du graver i jorden med bare næver. Du mister ${skade} HP og ${faktiskEnergiPris} Energi.`;
+        udstyrsLog = ` Du graver uden skovl. Du mister ${skade} HP og ${faktiskEnergiPris} Energi.`;
     }
 
     const guldVaerdi = felt.skjultGuld ?? 0;
@@ -115,7 +115,7 @@ export function grav() {
     
     afslørOmraade(spilTilstand.spillerIndex, 1);    
 
-    let fundLog = "Du finder kun sten og orme.";
+    let fundLog = "Du finder ikke noget brugbart.";
 
     if (faelde) {
         const faeldeSkade = spilTilstand.beregnSkade(10);
@@ -125,7 +125,7 @@ export function grav() {
         spilTilstand.guldTotal += 500;
         tilfoejTilRygsæk('diamant', 1);
         felt.tomSkattekiste = true;
-        fundLog = `Spadens stål rammer hårdt træ. Du flår kisten åben og finder en massiv formue! (+500 Guld, +Diamant)`;
+        fundLog = `Skovlen rammer træ. Du åbner en kiste. (+500 Guld, +Diamant)`;
     } else if (guldVaerdi > 0) {
         let maengde = Math.floor(guldVaerdi * spilTilstand.valgtKarakter.goldMod);
         maengde = spilTilstand.beregnGuldIndkomst(maengde);
@@ -139,21 +139,23 @@ export function grav() {
         const faktiskHeling = spilTilstand.livspoint - aktuelHp;
         
         if (faktiskHeling > 0) {
-            fundLog = `Du graver en saftig rod frem og spiser den. Du heler ${faktiskHeling} HP.`;
+            fundLog = `Du finder en spiselig rod. Du heler ${faktiskHeling} HP.`;
         } else {
-            fundLog = `Du graver en rod frem, men du er allerede mæt.`;
+            fundLog = `Du finder en rod, men du har ikke brug for mere liv lige nu.`;
         }
     } else if (fundetLoot) {
         tilfoejTilRygsæk(fundetLoot, 1);
-        fundLog = `Spadens blad rammer noget klangfuldt. Du har gravet en ${fundetLoot} frem.`;
+        fundLog = `Du graver en ${fundetLoot} frem.`;
     }
 
     spilTilstand.logBesked = fundLog + udstyrsLog;
-    syncTilDb(true);
+    broadcastFelt(spilTilstand.spillerIndex, felt);
+    syncTilDb();
+    syncKortTilDbSenere();
 
     if (spilTilstand.livspoint <= 0) {
         spilTilstand.livspoint = 1; 
-        spilTilstand.logBesked += " Smerten er for overvældende. Alt går i sort.";
+        spilTilstand.logBesked += " Du kollapser.";
         fremtvingKollaps();
     } else {
         fremrykTid();

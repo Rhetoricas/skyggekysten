@@ -74,7 +74,7 @@ export function vendKort(indeks: number) {
         
         rundeGuld = 0;
         rundeLiv = 0;
-        syncTilDb(true);
+        syncTilDb();
 
         setTimeout(() => {
             if (spilTilstand.venteSpilAktiv) {
@@ -94,7 +94,7 @@ export function vendKort(indeks: number) {
         }
 
         spilTilstand.venteFase = 'viser_gevinst';
-        syncTilDb(true);
+        syncTilDb();
 
         setTimeout(() => {
             if (spilTilstand.venteSpilAktiv && spilTilstand.venteFase === 'viser_gevinst') {
@@ -125,14 +125,14 @@ function udbetalPulje() {
         
         spilTilstand.ventePuljeLiv = 0;
         spilTilstand.ventePuljeGuld = 0;
-        syncTilDb(true);
+        syncTilDb();
     }
 }
 
 export function stopVenteSpil() {
     spilTilstand.logBesked = "Du låser puljen på bordet. Den tåler nu kraniets bid.";
     spilTilstand.venteFase = 'vundet';
-    syncTilDb(true);
+    syncTilDb();
 }
 
 export function lukVenteSpil() {
@@ -141,5 +141,5 @@ export function lukVenteSpil() {
     spilTilstand.venteSpilAktiv = false;
     spilTilstand.venteRunde = 0;
     spilTilstand.venteFase = 'venter';
-    syncTilDb(true);
+    syncTilDb();
 }
