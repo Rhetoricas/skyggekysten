@@ -8,7 +8,7 @@
     import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { M10_SCORE, beregnFremdriftPoint, beregnMinePoint, taelScoreSpillere } from '$lib/score';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi, hentGlobalTopScore, hentSoloTopTi, flushVentendeSync } from '$lib/netvaerk';
+    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi, hentGlobalTopScore, flushVentendeSync } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
     import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
@@ -755,14 +755,14 @@
                 return;
             }
             
-            const kanTjekkeGlobalRekord = spilTilstand.gameMode === 'open' && authState.user;
+            const kanTjekkeGlobalRekord = spilTilstand.gameMode !== 'offline' && authState.user;
             const globalTopScore = kanTjekkeGlobalRekord ? await hentGlobalTopScore() : 0;
             nyGlobalRekord = !!kanTjekkeGlobalRekord && spilTilstand.samletScore >= M10_SCORE && spilTilstand.samletScore > globalTopScore;
 
             const highscoreGemt = await gemHighscore();
             lokaleScores = await hentHighscores();
             if (spilTilstand.gameMode !== 'offline') {
-                globaleScores = spilTilstand.gameMode === 'solo' ? await hentSoloTopTi() : await hentGlobalTopTi();
+                globaleScores = await hentGlobalTopTi();
             }
             harGemtOfflineSpil = harOfflineSpil();
             offlineSpilInfo = hentOfflineSpilInfo();

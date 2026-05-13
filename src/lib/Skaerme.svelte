@@ -570,7 +570,7 @@
                     <div class="tavle">
                         <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
                         <div class="tavle-indhold global-indhold">
-                            <h3>{spilTilstand.gameMode === 'solo' ? 'Top 10 solo' : 'Top 10 global'}</h3>
+                            <h3>Top 10 global</h3>
                             {#if !authState.user}
                                 <p class="global-note">Kræver login.</p>
                             {/if}
@@ -654,7 +654,7 @@
                     <div class="tavle">
                         <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
                         <div class="tavle-indhold global-indhold">
-                            <h3>{spilTilstand.gameMode === 'solo' ? 'Top 10 solo' : 'Top 10 global'}</h3>
+                            <h3>Top 10 global</h3>
                             {#if !authState.user}
                                 <p class="global-note">Kræver login.</p>
                             {/if}

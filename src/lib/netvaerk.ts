@@ -365,33 +365,12 @@ export async function hentGlobalTopTi() {
         supabase
             .from('game_results')
             .select('player_name, room_code, score, character')
-            .eq('game_mode', 'open')
             .order('score', { ascending: false })
             .limit(30),
         8000,
         'Hentning af global score'
     ).catch((error) => {
         console.warn('Kunne ikke hente global top 10', error);
-        return { data: [] };
-    });
-
-    return formaterTopTi(data);
-}
-
-export async function hentSoloTopTi() {
-    if (spilTilstand.offlineMode) return [];
-
-    const { data } = await medTimeout(
-        supabase
-            .from('game_results')
-            .select('player_name, room_code, score, character')
-            .eq('game_mode', 'solo')
-            .order('score', { ascending: false })
-            .limit(30),
-        8000,
-        'Hentning af solo-score'
-    ).catch((error) => {
-        console.warn('Kunne ikke hente solo top 10', error);
         return { data: [] };
     });
 
@@ -405,7 +384,6 @@ export async function hentGlobalTopScore() {
         supabase
             .from('game_results')
             .select('score')
-            .eq('game_mode', 'open')
             .order('score', { ascending: false })
             .limit(1),
         8000,
