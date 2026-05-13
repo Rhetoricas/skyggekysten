@@ -557,11 +557,15 @@
             alarmKanal = null;
         }
 
-        spilTilstand.offlineMode = false;
-        spilTilstand.soloMode = true;
+        const starterOffline = browser && !navigator.onLine;
+
+        spilTilstand.offlineMode = starterOffline;
+        spilTilstand.soloMode = !starterOffline;
         spilTilstand.spillerNavn = rentNavn;
         spilTilstand.rumKode = renKode;
-        spilTilstand.statusBesked = authState.user ? 'Solo.' : 'Solo. Log ind for at gemme officiel score.';
+        spilTilstand.statusBesked = starterOffline
+            ? 'Solo offline. Spillet gemmes lokalt på denne enhed.'
+            : authState.user ? 'Solo.' : 'Solo. Log ind for at gemme officiel score.';
         spilTilstand.erHost = true;
         spilTilstand.alleSpillere = {};
         spilTilstand.fogX = 0;
