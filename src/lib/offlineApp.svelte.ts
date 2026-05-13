@@ -6,7 +6,7 @@ export const offlineAppState = $state({
 });
 
 const SERVICE_WORKER_URL = '/service-worker.js';
-const OFFLINE_TIMEOUT_MS = 15000;
+const OFFLINE_TIMEOUT_MS = 45000;
 
 function medTimeout<T>(promise: PromiseLike<T>, ms = OFFLINE_TIMEOUT_MS): Promise<T> {
     let timer: ReturnType<typeof setTimeout>;
@@ -26,7 +26,35 @@ async function hentServiceWorkerRegistration() {
     }
 
     if (registration.waiting) registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-    return await medTimeout(navigator.serviceWorker.ready);
+    return await ventPaaAktivServiceWorker(registration);
+}
+
+async function ventPaaAktivServiceWorker(registration: ServiceWorkerRegistration) {
+    if (registration.active) return registration;
+
+    const worker = registration.installing || registration.waiting;
+    if (!worker) return await medTimeout(navigator.serviceWorker.ready);
+
+    const aktivering = new Promise<ServiceWorkerRegistration>((resolve, reject) => {
+        const tjekState = () => {
+            if (worker.state === 'installed' && registration.waiting) {
+                registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
+            if (worker.state === 'activated' || registration.active) {
+                worker.removeEventListener('statechange', tjekState);
+                resolve(registration);
+            }
+            if (worker.state === 'redundant') {
+                worker.removeEventListener('statechange', tjekState);
+                reject(new Error('redundant'));
+            }
+        };
+
+        worker.addEventListener('statechange', tjekState);
+        tjekState();
+    });
+
+    return await medTimeout(aktivering);
 }
 
 export async function tjekOfflineAppKlar() {
@@ -40,8 +68,8 @@ export async function tjekOfflineAppKlar() {
     offlineAppState.understottet = true;
 
     try {
-        const registration = await medTimeout(navigator.serviceWorker.ready, 5000);
-        offlineAppState.klar = !!registration.active;
+        const registration = await navigator.serviceWorker.getRegistration();
+        offlineAppState.klar = !!registration?.active;
         offlineAppState.besked = offlineAppState.klar
             ? 'Spillet er klar på denne enhed'
             : 'Offline-cache er ikke klar endnu.';
@@ -64,6 +92,11 @@ export async function goerOfflineAppKlar() {
     offlineAppState.understottet = true;
     offlineAppState.arbejder = true;
     offlineAppState.besked = 'Downloader spillet til offline brug...';
+    const langsomBesked = setTimeout(() => {
+        if (offlineAppState.arbejder) {
+            offlineAppState.besked = 'Downloader stadig. Firefox kan være lidt langsom første gang...';
+        }
+    }, 8000);
 
     try {
         const registration = await hentServiceWorkerRegistration();
@@ -77,6 +110,7 @@ export async function goerOfflineAppKlar() {
             : 'Offline-cache kunne ikke gøres klar. Genindlæs siden online og prøv igen.';
         return false;
     } finally {
+        clearTimeout(langsomBesked);
         offlineAppState.arbejder = false;
     }
 }
