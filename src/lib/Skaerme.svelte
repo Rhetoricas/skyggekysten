@@ -534,7 +534,7 @@
             
             <div class="slut-knapper">
                 <button class="spil-knap slut-knap-styled" onclick={genstartBane}>
-                    <span class="knap-tekst">Prøv samme ø igen</span>
+                    <span class="knap-tekst">Samme ø igen</span>
                 </button>
                 <button class="spil-knap slut-knap-styled" onclick={nulstilHukommelse}>
                     <span class="knap-tekst">Prøv en anden ø</span>
@@ -618,7 +618,7 @@
             
             <div class="slut-knapper">
                 <button class="spil-knap slut-knap-styled" onclick={genstartBane}>
-                    <span class="knap-tekst">Prøv samme ø igen</span>
+                    <span class="knap-tekst">Samme ø igen</span>
                 </button>
                 <button class="spil-knap slut-knap-styled" onclick={nulstilHukommelse}>
                     <span class="knap-tekst">Prøv en anden ø</span>
@@ -1092,6 +1092,28 @@
             grid-template-columns: 1fr;
             gap: 26px;
             max-width: 100%;
+        }
+
+        .slut-scroll {
+            width: 100%;
+            padding: 0 18px 40px;
+            box-sizing: border-box;
+        }
+
+        .beskrivelse,
+        .score-container,
+        .spec-paneler,
+        .slut-knapper,
+        .highscore-container {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .point-kvittering,
+        .session-tavle,
+        .score-save-status {
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .slut-knapper {
