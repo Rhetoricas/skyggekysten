@@ -482,7 +482,7 @@
             {@render topKnapper()}
             <h2>Vælg karakter</h2>
             <p class="instruktion">
-                {spilTilstand.offlineMode ? 'Solo offline. Spillet gemmes lokalt i denne browser.' : spilTilstand.soloMode ? 'Solo. Øen er kun din. Vælg hvem du vil være.' : 'Du har fået otte muligheder. Vælg hvem du vil være.'}
+                {spilTilstand.gameMode === 'offline' ? 'Solo offline. Spillet gemmes lokalt i denne browser.' : spilTilstand.gameMode === 'solo' ? 'Solo. Øen er kun din. Vælg hvem du vil være.' : 'Du har fået otte muligheder. Vælg hvem du vil være.'}
             </p>
             
             <div class="character-gallery">
@@ -570,7 +570,7 @@
                     <div class="tavle">
                         <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
                         <div class="tavle-indhold global-indhold">
-                            <h3>Top 10 global</h3>
+                            <h3>{spilTilstand.gameMode === 'solo' ? 'Top 10 solo' : 'Top 10 global'}</h3>
                             {#if !authState.user}
                                 <p class="global-note">Kræver login.</p>
                             {/if}
@@ -654,7 +654,7 @@
                     <div class="tavle">
                         <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
                         <div class="tavle-indhold global-indhold">
-                            <h3>Top 10 global</h3>
+                            <h3>{spilTilstand.gameMode === 'solo' ? 'Top 10 solo' : 'Top 10 global'}</h3>
                             {#if !authState.user}
                                 <p class="global-note">Kræver login.</p>
                             {/if}

@@ -28,11 +28,17 @@ create table if not exists public.game_results (
     known_fields_count integer not null default 0,
     mines_owned integer not null default 0,
     final_log text,
+    game_mode text not null default 'open' check (game_mode in ('open', 'solo', 'offline')),
     created_at timestamptz not null default now()
 );
 
+alter table public.game_results
+add column if not exists game_mode text not null default 'open'
+check (game_mode in ('open', 'solo', 'offline'));
+
 create index if not exists game_results_score_idx on public.game_results (score desc);
 create index if not exists game_results_user_idx on public.game_results (user_id, created_at desc);
+create index if not exists game_results_mode_score_idx on public.game_results (game_mode, score desc);
 
 alter table public.profiles enable row level security;
 alter table public.game_results enable row level security;

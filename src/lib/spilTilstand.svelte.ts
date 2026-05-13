@@ -13,6 +13,7 @@ interface FlydendeTal {
 export const spilTilstand = $state({
     spillerNavn: '',
     rumKode: '',
+    gameMode: 'open' as 'open' | 'solo' | 'offline',
     offlineMode: false,
     soloMode: false,
     erHost: false,

@@ -87,11 +87,22 @@ export async function logUd() {
 export async function hentEllerOpretProfil() {
     if (!authState.user) return null;
 
-    const { data } = await supabase
+    const profilResultat = await supabase
         .from('profiles')
         .select('id, display_name, sound_level, created_at, updated_at')
         .eq('id', authState.user.id)
         .maybeSingle();
+    let data = profilResultat.data;
+
+    if (profilResultat.error) {
+        const fallback = await supabase
+            .from('profiles')
+            .select('id, display_name, created_at, updated_at')
+            .eq('id', authState.user.id)
+            .maybeSingle();
+
+        data = fallback.data ? { ...fallback.data, sound_level: null } : null;
+    }
 
     if (data) {
         authState.profil = data;
@@ -100,11 +111,22 @@ export async function hentEllerOpretProfil() {
     }
 
     const fallbackNavn = authState.user.email?.split('@')[0]?.slice(0, 15) || 'Spiller';
-    const { data: oprettet } = await supabase
+    const opretResultat = await supabase
         .from('profiles')
         .insert([{ id: authState.user.id, display_name: fallbackNavn, sound_level: lydKontrol.niveau }])
         .select('id, display_name, sound_level, created_at, updated_at')
         .single();
+    let oprettet = opretResultat.data;
+
+    if (opretResultat.error) {
+        const fallback = await supabase
+            .from('profiles')
+            .insert([{ id: authState.user.id, display_name: fallbackNavn }])
+            .select('id, display_name, created_at, updated_at')
+            .single();
+
+        oprettet = fallback.data ? { ...fallback.data, sound_level: null } : null;
+    }
 
     authState.profil = oprettet ?? null;
     return authState.profil;
@@ -122,11 +144,22 @@ export async function gemProfilNavn(navn: string) {
     // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const opdateretTidspunkt = new Date().toISOString();
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
         .from('profiles')
         .upsert({ id: authState.user.id, display_name: rentNavn, updated_at: opdateretTidspunkt })
         .select('id, display_name, sound_level, created_at, updated_at')
         .single();
+
+    if (error) {
+        const fallback = await supabase
+            .from('profiles')
+            .upsert({ id: authState.user.id, display_name: rentNavn, updated_at: opdateretTidspunkt })
+            .select('id, display_name, created_at, updated_at')
+            .single();
+
+        data = fallback.data ? { ...fallback.data, sound_level: authState.profil?.sound_level ?? null } : null;
+        error = fallback.error;
+    }
 
     if (!error && data) {
         authState.profil = data;

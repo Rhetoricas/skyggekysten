@@ -10,6 +10,13 @@ let kortSkalOpdateres = false;
 let dbSaveKoe: ReturnType<typeof setTimeout> | null = null;
 let kortSaveKoe: ReturnType<typeof setTimeout> | null = null;
 
+type ScoreRaekke = {
+    player_name: string;
+    room_code?: string;
+    score: number;
+    character?: string;
+};
+
 function medTimeout<T>(promise: PromiseLike<T>, ms: number, label: string): Promise<T> {
     return new Promise((resolve, reject) => {
         const timer = setTimeout(() => reject(new Error(`${label} tog for lang tid.`)), ms);
@@ -249,26 +256,39 @@ export async function gemHighscore() {
     const minePoint = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
     const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
     const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map';
+    const payload = {
+        user_id: authState.user.id,
+        player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
+        room_code: spilTilstand.rumKode,
+        score: spilTilstand.samletScore,
+        character: spilTilstand.valgtKarakter?.navn,
+        is_winner: isWinner,
+        is_dead: isDead,
+        days: spilTilstand.dag,
+        gold: spilTilstand.guldTotal,
+        max_column: spilTilstand.maxKolonne,
+        known_fields_count: spilTilstand.mineKendteFelter?.length || 0,
+        mines_owned: minePoint,
+        final_log: spilTilstand.logBesked,
+        game_mode: spilTilstand.gameMode === 'offline' ? 'offline' : spilTilstand.gameMode === 'solo' ? 'solo' : 'open'
+    };
 
-    const { error } = await medTimeout(
-        supabase.from('game_results').insert([{
-            user_id: authState.user.id,
-            player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
-            room_code: spilTilstand.rumKode,
-            score: spilTilstand.samletScore,
-            character: spilTilstand.valgtKarakter?.navn,
-            is_winner: isWinner,
-            is_dead: isDead,
-            days: spilTilstand.dag,
-            gold: spilTilstand.guldTotal,
-            max_column: spilTilstand.maxKolonne,
-            known_fields_count: spilTilstand.mineKendteFelter?.length || 0,
-            mines_owned: minePoint,
-            final_log: spilTilstand.logBesked
-        }]),
+    let { error } = await medTimeout(
+        supabase.from('game_results').insert([payload]),
         12000,
         'Gemning af score'
     );
+
+    if (error && error.message?.includes('game_mode')) {
+        const { game_mode, ...fallbackPayload } = payload;
+        void game_mode;
+        const fallback = await medTimeout(
+            supabase.from('game_results').insert([fallbackPayload]),
+            12000,
+            'Gemning af score'
+        );
+        error = fallback.error;
+    }
 
     if (error) {
         console.error('Kunne ikke gemme highscore', error);
@@ -277,6 +297,25 @@ export async function gemHighscore() {
     }
 
     return true;
+}
+
+function formaterTopTi(data: ScoreRaekke[] | null | undefined) {
+    const unikke = [];
+    const fundne = new Set();
+    for (const raekke of data || []) {
+        const noegle = `${raekke.player_name}-${raekke.score}-${raekke.room_code || ''}-${raekke.character}`;
+        if (!fundne.has(noegle)) {
+            fundne.add(noegle);
+            unikke.push({
+                spillerNavn: raekke.player_name,
+                oeNavn: raekke.room_code || '',
+                point: raekke.score,
+                karakter: raekke.character
+            });
+            if (unikke.length === 10) break;
+        }
+    }
+    return unikke;
 }
 
 export async function hentHighscores() {
@@ -326,6 +365,7 @@ export async function hentGlobalTopTi() {
         supabase
             .from('game_results')
             .select('player_name, room_code, score, character')
+            .eq('game_mode', 'open')
             .order('score', { ascending: false })
             .limit(30),
         8000,
@@ -335,22 +375,27 @@ export async function hentGlobalTopTi() {
         return { data: [] };
     });
 
-    const unikke = [];
-    const fundne = new Set();
-    for (const raekke of data || []) {
-        const noegle = `${raekke.player_name}-${raekke.score}-${raekke.room_code}-${raekke.character}`;
-        if (!fundne.has(noegle)) {
-            fundne.add(noegle);
-            unikke.push({
-                spillerNavn: raekke.player_name,
-                oeNavn: raekke.room_code,
-                point: raekke.score,
-                karakter: raekke.character
-            });
-            if (unikke.length === 10) break;
-        }
-    }
-    return unikke;
+    return formaterTopTi(data);
+}
+
+export async function hentSoloTopTi() {
+    if (spilTilstand.offlineMode) return [];
+
+    const { data } = await medTimeout(
+        supabase
+            .from('game_results')
+            .select('player_name, room_code, score, character')
+            .eq('game_mode', 'solo')
+            .order('score', { ascending: false })
+            .limit(30),
+        8000,
+        'Hentning af solo-score'
+    ).catch((error) => {
+        console.warn('Kunne ikke hente solo top 10', error);
+        return { data: [] };
+    });
+
+    return formaterTopTi(data);
 }
 
 export async function hentGlobalTopScore() {
@@ -360,6 +405,7 @@ export async function hentGlobalTopScore() {
         supabase
             .from('game_results')
             .select('score')
+            .eq('game_mode', 'open')
             .order('score', { ascending: false })
             .limit(1),
         8000,

@@ -17,6 +17,7 @@ interface OfflineSnapshot {
     savedAt: string;
     spillerNavn: string;
     rumKode: string;
+    gameMode?: typeof spilTilstand.gameMode;
     erHost: boolean;
     gameState: typeof spilTilstand.gameState;
     gitter: typeof spilTilstand.gitter;
@@ -76,6 +77,7 @@ export function gemOfflineSpil() {
         savedAt: new Date().toISOString(),
         spillerNavn: spilTilstand.spillerNavn,
         rumKode: spilTilstand.rumKode,
+        gameMode: spilTilstand.gameMode,
         erHost: spilTilstand.erHost,
         gameState: spilTilstand.gameState,
         gitter: spilTilstand.gitter,
@@ -110,6 +112,7 @@ export function indlaesOfflineSpil() {
         const data = JSON.parse(gemt) as OfflineSnapshot;
 
         spilTilstand.offlineMode = true;
+        spilTilstand.gameMode = data.gameMode || 'offline';
         spilTilstand.spillerNavn = data.spillerNavn || 'Spiller';
         spilTilstand.rumKode = data.rumKode || 'solo';
         spilTilstand.erHost = data.erHost;
