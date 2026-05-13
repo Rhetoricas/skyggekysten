@@ -8,7 +8,7 @@
     import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { M10_SCORE, beregnFremdriftPoint, beregnMinePoint, taelScoreSpillere } from '$lib/score';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi, hentGlobalTopScore, flushVentendeSync } from '$lib/netvaerk';
+    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi, hentGlobalTopScore, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
     import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
@@ -38,6 +38,7 @@
 
     const cam = skabKamera();
     const MAX_DAGE_FORAN = 5;
+    const SESSION_TIMEOUT_MS = 5 * 60 * 1000;
 
     let lokaleScores = $state<Array<{ navn: string; score: number; karakter?: string }>>([]);
     let globaleScores = $state<Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);    
@@ -404,6 +405,13 @@
             return;
         }
 
+        stopRealtime();
+        annullerVentendeNetvaerkSync();
+        if (alarmKanal) {
+            supabase.removeChannel(alarmKanal);
+            alarmKanal = null;
+        }
+
         let mitBrowserId = localStorage.getItem('taage_browser_id');
         if (!mitBrowserId) {
             mitBrowserId = Math.random().toString(36).substring(2);
@@ -414,20 +422,25 @@
         spilTilstand.rumKode = renKode;
         spilTilstand.statusBesked = 'Forbinder dig til øen...';
         
-        if (alarmKanal) supabase.removeChannel(alarmKanal);
+        const aktivRumKode = renKode;
+        const aktivKanalNoegle = realtimeRumNoegle(aktivRumKode);
+
         alarmKanal = supabase
-            .channel(spilTilstand.rumKode)
+            .channel(`room:${aktivKanalNoegle}:events`)
             .on('broadcast', { event: 'alarm' }, ({ payload }) => {
+                if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
                 if (payload.senderNavn === spilTilstand.spillerNavn) return;
                 if (spilTilstand.alleSpillere[payload.senderNavn]) {
                     spilTilstand.alleSpillere[payload.senderNavn].activeAlarm = true;
                 }
             })
             .on('broadcast', { event: 'baal' }, ({ payload }) => {
+                if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
                 afslørOmraade(payload.centerIndex, payload.radius);
                 syncTilDb();
             })
             .on('broadcast', { event: 'faelles_event' }, ({ payload }) => {
+                if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
                 anvendFaellesEventEffekt(payload);
             })
             .subscribe();
@@ -444,7 +457,7 @@
 
             if (data) {
                 spilTilstand.gitter = data.kort;
-                spilTilstand.alleSpillere = data.spillere || {};
+                spilTilstand.alleSpillere = filtrerSpillereTilKanal(data.spillere || {}, aktivKanalNoegle);
                 spilTilstand.fogX = data.fog_x || 0;
                 spilTilstand.erHost = false;
                 
@@ -495,11 +508,32 @@
                     }
 
                     const spillereArr = Object.values(spilTilstand.alleSpillere);
-                    const maxDag = spillereArr.length > 0 ? Math.max(...spillereArr.map((s: SpillerData) => s.dag || 1)) : 1;
+                    const aktiveSpillere = spillereArr.filter(erAktivSessionSpiller);
+                    const maxAktivDag = aktiveSpillere.length > 0 ? Math.max(...aktiveSpillere.map((s: SpillerData) => s.dag || 1)) : 1;
+                    const maxDag = maxAktivDag;
 
-                    if (maxDag > 5) {
+                    if (maxAktivDag > 5) {
                         spilTilstand.statusBesked = `Du er for sent på den. Tågen har nået kysten (Dag ${maxDag}).`;
                         return;
+                    }
+
+                    if (spillereArr.length > 0 && aktiveSpillere.length === 0) {
+                        spilTilstand.erHost = true;
+                        spilTilstand.alleSpillere = {};
+                        spilTilstand.fogX = 0;
+                        initialiserGitter();
+
+                        const { error: resetError } = await medTimeout(supabase.from('spil_sessioner').update({
+                            kort: spilTilstand.gitter,
+                            start_index: spilTilstand.spillerIndex,
+                            spillere: {},
+                            fog_x: 0
+                        }).eq('rum_kode', spilTilstand.rumKode));
+
+                        if (resetError) {
+                            spilTilstand.statusBesked = `Oen kunne ikke nulstilles: ${resetError.message}`;
+                            return;
+                        }
                     }
 
                     spilTilstand.gameState = 'select';
@@ -507,6 +541,16 @@
                 }
             } else {
                 spilTilstand.erHost = true;
+                spilTilstand.alleSpillere = {};
+                spilTilstand.fogX = 0;
+                spilTilstand.dag = 1;
+                spilTilstand.historik = [];
+                spilTilstand.logHistorik = [];
+                spilTilstand.venteGratisFeltBrugt = null;
+                spilTilstand.venteSpilAktiv = false;
+                spilTilstand.ventePuljeGuld = 0;
+                spilTilstand.ventePuljeLiv = 0;
+                spilTilstand.venteRunde = 0;
                 initialiserGitter();
                 const { error: insertError } = await medTimeout(supabase.from('spil_sessioner').insert([{
                     rum_kode: spilTilstand.rumKode,
@@ -528,7 +572,7 @@
                     }
 
                     spilTilstand.gitter = eksisterendeSession.kort;
-                    spilTilstand.alleSpillere = eksisterendeSession.spillere || {};
+                    spilTilstand.alleSpillere = filtrerSpillereTilKanal(eksisterendeSession.spillere || {}, aktivKanalNoegle);
                     spilTilstand.fogX = eksisterendeSession.fog_x || 0;
                     spilTilstand.erHost = false;
                 }
@@ -906,15 +950,28 @@
         const spillere = Object.values(spilTilstand.alleSpillere);
         if (spillere.length <= 1) return spilTilstand.dag;
         
-        const timeoutGraense = Date.now() - (5 * 60 * 1000);
         const aktive = spillere.filter((s: SpillerData) => {
-            if (s.isDead || s.isWinner) return false;
-            if (s.sidstAktiv && s.sidstAktiv < timeoutGraense) return false;
-            return true;
+            return erAktivSessionSpiller(s);
         });
         
         if (aktive.length === 0) return spilTilstand.dag;
         return Math.min(...aktive.map((s: SpillerData) => s.dag || 1));
+    }
+
+    function erAktivSessionSpiller(spiller: SpillerData) {
+        if (spiller.isDead || spiller.isWinner) return false;
+        if (!spiller.sidstAktiv) return false;
+        return spiller.sidstAktiv >= Date.now() - SESSION_TIMEOUT_MS;
+    }
+
+    function filtrerSpillereTilKanal(spillere: Record<string, SpillerData>, kanalNoegle: string) {
+        return Object.fromEntries(
+            Object.entries(spillere).filter(([, spiller]) => {
+                if (spiller.kanalNoegle) return spiller.kanalNoegle === kanalNoegle;
+                if (spiller.rumKode) return spiller.rumKode === spilTilstand.rumKode;
+                return true;
+            })
+        );
     }
 
     function findAktivSpillerForBruger() {

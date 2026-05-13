@@ -3,12 +3,26 @@ import { spilTilstand } from './spilTilstand.svelte';
 import { authState } from './auth.svelte';
 import { gemOfflineScore, gemOfflineSpil, hentOfflineScores } from './offlineStorage';
 import type { RealtimeChannel } from '@supabase/supabase-js';
-import type { Felt } from './types';
+import type { Felt, SpillerData } from './types';
 
 let syncKoe: ReturnType<typeof setTimeout> | null = null;
 let kortSkalOpdateres = false;
 let dbSaveKoe: ReturnType<typeof setTimeout> | null = null;
 let kortSaveKoe: ReturnType<typeof setTimeout> | null = null;
+let subRumKode = '';
+
+export function realtimeRumNoegle(rumKode: string) {
+    const normaliseret = (rumKode || '').trim().toLowerCase();
+    let hash = 2166136261;
+
+    for (let i = 0; i < normaliseret.length; i++) {
+        hash ^= normaliseret.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+    }
+
+    const laesbarDel = normaliseret.replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '').slice(0, 24) || 'oe';
+    return `${laesbarDel}_${(hash >>> 0).toString(36)}`;
+}
 
 type ScoreRaekke = {
     player_name: string;
@@ -61,6 +75,16 @@ function erTaageLaengereFremme(nyFogX: number, gammelFogX: number) {
     return nyFogX > gammelFogX;
 }
 
+function filtrerSpillereTilKanal(spillere: Record<string, SpillerData> = {}, kanalNoegle: string, rumKode: string) {
+    return Object.fromEntries(
+        Object.entries(spillere).filter(([, spiller]) => {
+            if (spiller.kanalNoegle) return spiller.kanalNoegle === kanalNoegle;
+            if (spiller.rumKode) return spiller.rumKode === rumKode;
+            return true;
+        })
+    );
+}
+
 export function syncKortTilDbSenere(delayMs = 45000) {
     if (kortSaveKoe) return;
 
@@ -105,6 +129,8 @@ export async function flushVentendeSync() {
 
 export async function syncTilDb(opdaterKort = false) {
     if (!spilTilstand.rumKode || !spilTilstand.spillerNavn) return;
+    const aktivRumKode = spilTilstand.rumKode;
+    const aktivKanalNoegle = realtimeRumNoegle(aktivRumKode);
 
     const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isDead ?? false);
     const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isWinner ?? false);
@@ -129,6 +155,8 @@ export async function syncTilDb(opdaterKort = false) {
         activeAlarm: false,
         browserId: localStorage.getItem('taage_browser_id'),
         userId: authState.user?.id ?? null,
+        rumKode: aktivRumKode,
+        kanalNoegle: aktivKanalNoegle,
         besoegteMiner: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.besoegteMiner || [],
         harSkattekort: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.harSkattekort || false,
         aktivTracker: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.aktivTracker || null,
@@ -148,7 +176,7 @@ export async function syncTilDb(opdaterKort = false) {
         sub.send({
             type: 'broadcast',
             event: 'spiller_sync',
-            payload: { navn: spilTilstand.spillerNavn, data: mig, fogX: spilTilstand.fogX }
+            payload: { kanalNoegle: aktivKanalNoegle, rumKode: aktivRumKode, navn: spilTilstand.spillerNavn, data: mig, fogX: spilTilstand.fogX }
         });
     }
 
@@ -190,12 +218,14 @@ export async function syncTilDb(opdaterKort = false) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function broadcastFelt(index: number, feltData: any) {
     if (spilTilstand.offlineMode) return;
+    const aktivRumKode = spilTilstand.rumKode;
+    const aktivKanalNoegle = realtimeRumNoegle(aktivRumKode);
 
     if (sub) {
         sub.send({
             type: 'broadcast',
             event: 'felt_sync',
-            payload: { index, feltData: rensVisuelleFeltData(feltData) }
+            payload: { kanalNoegle: aktivKanalNoegle, rumKode: aktivRumKode, index, feltData: rensVisuelleFeltData(feltData) }
         });
     }
 }
@@ -203,12 +233,16 @@ export function broadcastFelt(index: number, feltData: any) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function broadcastFelter(felter: Array<{ index: number; feltData: any }>) {
     if (spilTilstand.offlineMode) return;
+    const aktivRumKode = spilTilstand.rumKode;
+    const aktivKanalNoegle = realtimeRumNoegle(aktivRumKode);
 
     if (sub && felter.length > 0) {
         sub.send({
             type: 'broadcast',
             event: 'felter_sync',
             payload: {
+                kanalNoegle: aktivKanalNoegle,
+                rumKode: aktivRumKode,
                 felter: felter.map(({ index, feltData }) => ({
                     index,
                     feltData: rensVisuelleFeltData(feltData)
@@ -223,10 +257,37 @@ async function udfoerDbUpload(sendKort: boolean) {
         gemOfflineSpil();
         return true;
     }
+    const aktivRumKode = spilTilstand.rumKode;
+    const aktivKanalNoegle = realtimeRumNoegle(aktivRumKode);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: aktuelSession, error: hentError } = await medTimeout(
+        supabase
+            .from('spil_sessioner')
+            .select('spillere')
+            .eq('rum_kode', aktivRumKode)
+            .maybeSingle(),
+        12000,
+        'Hentning af aktuel spillerliste'
+    );
+
+    if (hentError) {
+        console.error('Kunne ikke hente aktuel spillerliste', hentError);
+        spilTilstand.statusBesked = `Øen kunne ikke gemmes: ${hentError.message}`;
+        return false;
+    }
+
+    const serverSpillere = filtrerSpillereTilKanal((aktuelSession?.spillere || {}) as Record<string, SpillerData>, aktivKanalNoegle, aktivRumKode);
+    const lokaleSpillere = filtrerSpillereTilKanal(spilTilstand.alleSpillere, aktivKanalNoegle, aktivRumKode);
+    const minSpiller = lokaleSpillere[spilTilstand.spillerNavn];
+    const spillereTilUpload = {
+        ...serverSpillere,
+        ...Object.fromEntries(Object.entries(lokaleSpillere).filter(([navn]) => !serverSpillere[navn])),
+        ...(minSpiller ? { [spilTilstand.spillerNavn]: minSpiller } : {})
+    };
+
     const opdatering: any = {
-        spillere: spilTilstand.alleSpillere,
+        spillere: spillereTilUpload,
         fog_x: Math.round(spilTilstand.fogX)
     };
 
@@ -238,7 +299,7 @@ async function udfoerDbUpload(sendKort: boolean) {
         supabase
             .from('spil_sessioner')
             .update(opdatering, { count: 'exact' })
-            .eq('rum_kode', spilTilstand.rumKode),
+            .eq('rum_kode', aktivRumKode),
         12000,
         'Gemning af øen'
     );
@@ -406,12 +467,20 @@ export async function hentGlobalTopScore() {
 let sub: RealtimeChannel | null = null;
 export function startRealtime() {
     if (spilTilstand.offlineMode) return;
-    if (!spilTilstand.rumKode || sub) return;
+    if (!spilTilstand.rumKode) return;
+    const aktivRumKode = spilTilstand.rumKode;
+    const aktivKanalNoegle = realtimeRumNoegle(aktivRumKode);
+
+    if (sub && subRumKode === aktivKanalNoegle) return;
+    if (sub) stopRealtime();
+
+    subRumKode = aktivKanalNoegle;
     sub = supabase
-        .channel(`room:${spilTilstand.rumKode}`)
+        .channel(`room:${aktivKanalNoegle}`)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .on('broadcast', { event: 'spiller_sync' }, (payload: any) => {
             const data = payload.payload;
+            if (data.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
             if (data.navn !== spilTilstand.spillerNavn) {
                 spilTilstand.alleSpillere[data.navn] = data.data;
                 if (data.fogX !== undefined && erTaageLaengereFremme(data.fogX, spilTilstand.fogX)) {
@@ -422,6 +491,7 @@ export function startRealtime() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .on('broadcast', { event: 'felt_sync' }, (payload: any) => {
             const data = payload.payload;
+            if (data.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
             if (spilTilstand.gitter[data.index]) {
                 spilTilstand.gitter[data.index] = data.feltData;
                 spilTilstand.gitter = [...spilTilstand.gitter];
@@ -430,6 +500,7 @@ export function startRealtime() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .on('broadcast', { event: 'felter_sync' }, (payload: any) => {
             const data = payload.payload;
+            if (data.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
             let aendret = false;
             for (const opdatering of data.felter || []) {
                 if (spilTilstand.gitter[opdatering.index]) {
@@ -447,4 +518,16 @@ export function stopRealtime() {
         supabase.removeChannel(sub);
         sub = null;
     }
+    subRumKode = '';
+}
+
+export function annullerVentendeNetvaerkSync() {
+    if (syncKoe) clearTimeout(syncKoe);
+    if (dbSaveKoe) clearTimeout(dbSaveKoe);
+    if (kortSaveKoe) clearTimeout(kortSaveKoe);
+
+    syncKoe = null;
+    dbSaveKoe = null;
+    kortSaveKoe = null;
+    kortSkalOpdateres = false;
 }

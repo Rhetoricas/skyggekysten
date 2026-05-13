@@ -63,6 +63,8 @@ export interface SpillerData {
     besoegteMiner?: number[];
     browserId?: string | null;
     userId?: string | null;
+    rumKode?: string;
+    kanalNoegle?: string;
     harSkattekort?: boolean;
     aktivTracker?: {
         targetNavn: string;

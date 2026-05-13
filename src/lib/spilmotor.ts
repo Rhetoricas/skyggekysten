@@ -1,5 +1,5 @@
 import { spilTilstand } from '$lib/spilTilstand.svelte';
-import { syncTilDb, broadcastFelt, broadcastFelter, syncKortTilDbSenere } from '$lib/netvaerk';
+import { syncTilDb, broadcastFelt, broadcastFelter, syncKortTilDbSenere, realtimeRumNoegle } from '$lib/netvaerk';
 import { BREDDE, HOEJDE, HEX_W, biomeVægte, biomeTerraenCost, itemDB, markedVarePool } from '$lib/spildata';
 import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
@@ -9,6 +9,17 @@ import { erAfgroedeModen, erHvedeBlok, erInsektPlageAktiv, hentAfgroedeBlok } fr
 import type { Biome, Felt, RygsækTing } from '$lib/types';
 import { delNyeKort, startVenteSpil } from '$lib/ventespil.svelte';
 import { startEvent } from '$lib/eventMotor.svelte';
+
+function eventKanalNavn() {
+    return `room:${realtimeRumNoegle(spilTilstand.rumKode)}:events`;
+}
+
+function eventKanalPayload() {
+    return {
+        kanalNoegle: realtimeRumNoegle(spilTilstand.rumKode),
+        rumKode: spilTilstand.rumKode
+    };
+}
 
 const RETNINGER = {
     'NE': [[0, -1], [1, -1]],
@@ -146,10 +157,11 @@ export async function sendAnonymAlarm() {
 
     const besked = {
         type: 'anonym_alarm',
+        ...eventKanalPayload(),
         senderNavn: spilTilstand.spillerNavn 
     };
 
-    void supabase.channel(spilTilstand.rumKode).send({
+    void supabase.channel(eventKanalNavn()).send({
         type: 'broadcast',
         event: 'alarm',
         payload: besked
@@ -187,10 +199,10 @@ export function udloesFaellesEventEffekt(effekt: Omit<FaellesEventEffekt, 'sende
     }
 
     if (!spilTilstand.offlineMode && spilTilstand.rumKode) {
-        void supabase.channel(spilTilstand.rumKode).send({
+        void supabase.channel(eventKanalNavn()).send({
             type: 'broadcast',
             event: 'faelles_event',
-            payload
+            payload: { ...payload, ...eventKanalPayload() }
         }).catch((error) => console.warn('Fælles event kunne ikke sendes', error));
     }
 
@@ -1318,10 +1330,10 @@ export function tjekMiljoeSlitage(biome: string): string {
 export async function sendBaalSignal(centerIndex: number, radius: number) {
     if (spilTilstand.offlineMode) return;
     if (!spilTilstand.rumKode) return;
-    void supabase.channel(spilTilstand.rumKode).send({
+    void supabase.channel(eventKanalNavn()).send({
         type: 'broadcast',
         event: 'baal',
-        payload: { centerIndex, radius }
+        payload: { ...eventKanalPayload(), centerIndex, radius }
     }).catch((error) => console.warn('Bålsignal kunne ikke sendes', error));
 }
 
