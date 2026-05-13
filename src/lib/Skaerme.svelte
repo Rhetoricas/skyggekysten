@@ -1007,7 +1007,8 @@
             justify-content: center;
             padding: calc(env(safe-area-inset-top, 0px) + 10px) 10px calc(env(safe-area-inset-bottom, 0px) + 10px);
             box-sizing: border-box;
-            overflow: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .character-select {
@@ -1029,6 +1030,7 @@
 
         .login-box {
             padding: 18px;
+            min-height: max-content;
         }
 
         .launch-image {
