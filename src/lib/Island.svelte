@@ -837,7 +837,7 @@
 
         afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
         
-        if (spilTilstand.erHost && !spilTilstand.offlineMode) {
+        if (spilTilstand.erHost && !spilTilstand.offlineMode && !spilTilstand.soloMode) {
             const { data, error } = await medTimeout(
                 supabase.from('spil_sessioner').select('rum_kode').eq('rum_kode', spilTilstand.rumKode).maybeSingle()
             );
