@@ -112,9 +112,9 @@ export function indlaesOfflineSpil() {
         const data = JSON.parse(gemt) as OfflineSnapshot;
 
         spilTilstand.offlineMode = true;
-        spilTilstand.gameMode = data.gameMode || 'offline';
+        spilTilstand.gameMode = data.gameMode === 'open' ? 'open' : 'offline';
         spilTilstand.spillerNavn = data.spillerNavn || 'Spiller';
-        spilTilstand.rumKode = data.rumKode || 'solo';
+        spilTilstand.rumKode = data.rumKode || 'offline';
         spilTilstand.erHost = data.erHost;
         spilTilstand.gameState = data.gameState || 'start';
         spilTilstand.gitter = data.gitter || [];

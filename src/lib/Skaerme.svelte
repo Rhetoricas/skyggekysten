@@ -13,8 +13,8 @@
 
     let {
         opretEllerDeltag,
-        startSolo,
-        fortsaetOfflineSolo,
+        startOfflineSpil,
+        fortsaetOfflineSpil,
         bekræftValg,
         genstartBane,
         nulstilHukommelse,
@@ -28,8 +28,8 @@
         scoreGemningFejlet
     } = $props<{
         opretEllerDeltag: () => void;
-        startSolo: () => void;
-        fortsaetOfflineSolo: () => void;
+        startOfflineSpil: () => void;
+        fortsaetOfflineSpil: () => void;
         bekræftValg: (k: Karakter) => void;
         genstartBane: () => void;
         nulstilHukommelse: () => void;
@@ -125,26 +125,16 @@
     }
 
     function startSpilMedLyd() {
+        if (spilTilstand.musikTaendt && lydStart) {
+            lydStart.currentTime = 0;
+            lydStart.volume = hentLydVolumen();
+            lydStart.play().catch(() => {});
+        }
         if (erBrowserOffline()) {
-            spilTilstand.statusBesked = 'Du er offline. Spil offline ved at trykke på Solo.';
+            startOfflineSpil();
             return;
         }
-
-        if (spilTilstand.musikTaendt && lydStart) {
-            lydStart.currentTime = 0;
-            lydStart.volume = hentLydVolumen();
-            lydStart.play().catch(() => {});
-        }
         opretEllerDeltag();
-    }
-
-    function startSoloMedLyd() {
-        if (spilTilstand.musikTaendt && lydStart) {
-            lydStart.currentTime = 0;
-            lydStart.volume = hentLydVolumen();
-            lydStart.play().catch(() => {});
-        }
-        startSolo();
     }
 
     function fortsaetOfflineMedLyd() {
@@ -153,7 +143,7 @@
             lydStart.volume = hentLydVolumen();
             lydStart.play().catch(() => {});
         }
-        fortsaetOfflineSolo();
+        fortsaetOfflineSpil();
     }
 
     function anvendLydNiveau() {
@@ -417,9 +407,6 @@
                     <button type="button" class="spil-knap login-boat-btn" onclick={(e) => { e.preventDefault(); startSpilMedLyd(); }}>
                         <span class="knap-tekst">START</span>
                     </button>
-                    <button type="button" class="spil-knap login-boat-btn" onclick={(e) => { e.preventDefault(); startSoloMedLyd(); }}>
-                        <span class="knap-tekst">Solo</span>
-                    </button>
                 </div>
             </div>
 
@@ -482,7 +469,7 @@
             {@render topKnapper()}
             <h2>Vælg karakter</h2>
             <p class="instruktion">
-                {spilTilstand.gameMode === 'offline' ? 'Solo offline. Spillet gemmes lokalt i denne browser.' : spilTilstand.gameMode === 'solo' ? 'Solo. Øen er kun din. Vælg hvem du vil være.' : 'Du har fået otte muligheder. Vælg hvem du vil være.'}
+                {spilTilstand.gameMode === 'offline' ? 'Offline. Spillet gemmes lokalt i denne browser.' : 'Du har fået otte muligheder. Vælg hvem du vil være.'}
             </p>
             
             <div class="character-gallery">

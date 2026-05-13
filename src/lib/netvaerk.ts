@@ -17,6 +17,22 @@ type ScoreRaekke = {
     character?: string;
 };
 
+type HighscorePayload = {
+    user_id: string;
+    player_name: string;
+    room_code: string;
+    score: number;
+    character?: string;
+    is_winner: boolean;
+    is_dead: boolean;
+    days: number;
+    gold: number;
+    max_column: number;
+    known_fields_count: number;
+    mines_owned: number;
+    final_log: string;
+};
+
 function medTimeout<T>(promise: PromiseLike<T>, ms: number, label: string): Promise<T> {
     return new Promise((resolve, reject) => {
         const timer = setTimeout(() => reject(new Error(`${label} tog for lang tid.`)), ms);
@@ -59,7 +75,6 @@ export async function flushVentendeSync() {
         gemOfflineSpil();
         return true;
     }
-    if (spilTilstand.soloMode) return true;
 
     const harVentendeSync = syncKoe || dbSaveKoe || kortSaveKoe || kortSkalOpdateres;
     if (!harVentendeSync) return true;
@@ -128,7 +143,6 @@ export async function syncTilDb(opdaterKort = false) {
         gemOfflineSpil();
         return;
     }
-    if (spilTilstand.soloMode) return;
 
     if (sub) {
         sub.send({
@@ -175,7 +189,7 @@ export async function syncTilDb(opdaterKort = false) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function broadcastFelt(index: number, feltData: any) {
-    if (spilTilstand.offlineMode || spilTilstand.soloMode) return;
+    if (spilTilstand.offlineMode) return;
 
     if (sub) {
         sub.send({
@@ -188,7 +202,7 @@ export function broadcastFelt(index: number, feltData: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function broadcastFelter(felter: Array<{ index: number; feltData: any }>) {
-    if (spilTilstand.offlineMode || spilTilstand.soloMode) return;
+    if (spilTilstand.offlineMode) return;
 
     if (sub && felter.length > 0) {
         sub.send({
@@ -209,7 +223,6 @@ async function udfoerDbUpload(sendKort: boolean) {
         gemOfflineSpil();
         return true;
     }
-    if (spilTilstand.soloMode) return true;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const opdatering: any = {
@@ -256,7 +269,7 @@ export async function gemHighscore() {
     const minePoint = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
     const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
     const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map';
-    const payload = {
+    const payload: HighscorePayload = {
         user_id: authState.user.id,
         player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
         room_code: spilTilstand.rumKode,
@@ -269,26 +282,10 @@ export async function gemHighscore() {
         max_column: spilTilstand.maxKolonne,
         known_fields_count: spilTilstand.mineKendteFelter?.length || 0,
         mines_owned: minePoint,
-        final_log: spilTilstand.logBesked,
-        game_mode: spilTilstand.gameMode === 'offline' ? 'offline' : spilTilstand.gameMode === 'solo' ? 'solo' : 'open'
+        final_log: spilTilstand.logBesked
     };
 
-    let { error } = await medTimeout(
-        supabase.from('game_results').insert([payload]),
-        12000,
-        'Gemning af score'
-    );
-
-    if (error && error.message?.includes('game_mode')) {
-        const { game_mode, ...fallbackPayload } = payload;
-        void game_mode;
-        const fallback = await medTimeout(
-            supabase.from('game_results').insert([fallbackPayload]),
-            12000,
-            'Gemning af score'
-        );
-        error = fallback.error;
-    }
+    const error = await sendHighscorePayload(payload);
 
     if (error) {
         console.error('Kunne ikke gemme highscore', error);
@@ -297,6 +294,16 @@ export async function gemHighscore() {
     }
 
     return true;
+}
+
+async function sendHighscorePayload(payload: HighscorePayload) {
+    const { error } = await medTimeout(
+        supabase.from('game_results').insert([payload]).select('id').single(),
+        12000,
+        'Gemning af score'
+    );
+
+    return error;
 }
 
 function formaterTopTi(data: ScoreRaekke[] | null | undefined) {
@@ -398,7 +405,7 @@ export async function hentGlobalTopScore() {
 
 let sub: RealtimeChannel | null = null;
 export function startRealtime() {
-    if (spilTilstand.offlineMode || spilTilstand.soloMode) return;
+    if (spilTilstand.offlineMode) return;
     if (!spilTilstand.rumKode || sub) return;
     sub = supabase
         .channel(`room:${spilTilstand.rumKode}`)

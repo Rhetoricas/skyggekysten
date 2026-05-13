@@ -13,9 +13,8 @@ interface FlydendeTal {
 export const spilTilstand = $state({
     spillerNavn: '',
     rumKode: '',
-    gameMode: 'open' as 'open' | 'solo' | 'offline',
+    gameMode: 'open' as 'open' | 'offline',
     offlineMode: false,
-    soloMode: false,
     erHost: false,
     gameState: 'start' as 'start' | 'select' | 'play' | 'dead' | 'dead_map' | 'win' | 'win_map',
     gitter: [] as Felt[],

@@ -390,10 +390,9 @@
     async function opretEllerDeltag() {
         spilTilstand.gameMode = 'open';
         spilTilstand.offlineMode = false;
-        spilTilstand.soloMode = false;
 
         if (browser && !navigator.onLine) {
-            spilTilstand.statusBesked = 'Du er offline. Spil offline ved at trykke på Solo.';
+            spilTilstand.statusBesked = 'Du er offline. Tryk START for at spille lokalt på denne enhed.';
             return;
         }
 
@@ -453,8 +452,10 @@
 
                 if (fundetNavn) {
                     const eksisterende = spilTilstand.alleSpillere[fundetNavn];
+                    const sammeLogin = !!eksisterende.userId && !!authState.user?.id && eksisterende.userId === authState.user.id;
+                    const sammeBrowser = !!eksisterende.browserId && eksisterende.browserId === mitBrowserId;
                     
-                    if (!eksisterende.isDead && !eksisterende.isWinner && eksisterende.browserId && eksisterende.browserId !== mitBrowserId) {
+                    if (!eksisterende.isDead && !eksisterende.isWinner && !sammeLogin && !sammeBrowser) {
                         spilTilstand.statusBesked = `Navnet '${fundetNavn}' er allerede i brug af en anden rejsende.`;
                         return;
                     }
@@ -543,7 +544,7 @@
         }
     }
 
-    async function startSolo() {
+    async function startOfflineSpil() {
         const rentNavn = (spilTilstand.spillerNavn || '').replace(/[^a-zA-Z0-9æøåÆØÅ ]/g, '').trim().substring(0, 15);
         const renKode = (spilTilstand.rumKode || '').replace(/[^a-zA-Z0-9æøåÆØÅ]/g, '').toLowerCase().substring(0, 20);
 
@@ -558,16 +559,11 @@
             alarmKanal = null;
         }
 
-        const starterOffline = browser && !navigator.onLine;
-
-        spilTilstand.offlineMode = starterOffline;
-        spilTilstand.soloMode = !starterOffline;
-        spilTilstand.gameMode = starterOffline ? 'offline' : 'solo';
+        spilTilstand.offlineMode = true;
+        spilTilstand.gameMode = 'offline';
         spilTilstand.spillerNavn = rentNavn;
         spilTilstand.rumKode = renKode;
-        spilTilstand.statusBesked = starterOffline
-            ? 'Solo offline. Spillet gemmes lokalt på denne enhed.'
-            : authState.user ? 'Solo.' : 'Solo. Log ind for at gemme officiel score.';
+        spilTilstand.statusBesked = 'Offline. Spillet gemmes lokalt på denne enhed.';
         spilTilstand.erHost = true;
         spilTilstand.alleSpillere = {};
         spilTilstand.fogX = 0;
@@ -582,7 +578,7 @@
         await syncTilDb(true);
     }
 
-    function fortsaetOfflineSolo() {
+    function fortsaetOfflineSpil() {
         if (!indlaesOfflineSpil()) {
             spilTilstand.statusBesked = 'Der blev ikke fundet et offline-spil.';
             harGemtOfflineSpil = false;
@@ -590,7 +586,6 @@
             return;
         }
         spilTilstand.gameMode = 'offline';
-        spilTilstand.soloMode = false;
 
         stopRealtime();
         if (alarmKanal) {
@@ -622,7 +617,7 @@
         preloadFiler();
         let genopretterForbindelse = false;
 
-        const erAktivtOnlinespil = () => spilTilstand.gameState === 'play' && !spilTilstand.offlineMode && !spilTilstand.soloMode;
+        const erAktivtOnlinespil = () => spilTilstand.gameState === 'play' && !spilTilstand.offlineMode;
 
         const heartbeat = async () => {
             if (spilTilstand.offlineMode && spilTilstand.gameState === 'play') {
@@ -755,11 +750,11 @@
                 return;
             }
             
-            const kanTjekkeGlobalRekord = spilTilstand.gameMode !== 'offline' && authState.user;
-            const globalTopScore = kanTjekkeGlobalRekord ? await hentGlobalTopScore() : 0;
-            nyGlobalRekord = !!kanTjekkeGlobalRekord && spilTilstand.samletScore >= M10_SCORE && spilTilstand.samletScore > globalTopScore;
-
             const highscoreGemt = await gemHighscore();
+            const kanTjekkeGlobalRekord = highscoreGemt && spilTilstand.gameMode !== 'offline' && authState.user;
+            const globalTopScore = kanTjekkeGlobalRekord ? await hentGlobalTopScore() : 0;
+            nyGlobalRekord = !!kanTjekkeGlobalRekord && spilTilstand.samletScore >= M10_SCORE && spilTilstand.samletScore >= globalTopScore;
+
             lokaleScores = await hentHighscores();
             if (spilTilstand.gameMode !== 'offline') {
                 globaleScores = await hentGlobalTopTi();
@@ -785,7 +780,7 @@
     }
 
     async function bekræftValg(karakter: Karakter) {
-        const aktivSammeBruger = (spilTilstand.offlineMode || spilTilstand.soloMode) ? null : findAktivSpillerForBruger();
+        const aktivSammeBruger = spilTilstand.offlineMode ? null : findAktivSpillerForBruger();
         if (aktivSammeBruger && aktivSammeBruger.navn !== spilTilstand.spillerNavn) {
             spilTilstand.statusBesked = `Du spiller allerede på denne ø som ${aktivSammeBruger.navn}.`;
             spilTilstand.gameState = 'start';
@@ -843,7 +838,7 @@
 
         afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
         
-        if (spilTilstand.erHost && !spilTilstand.offlineMode && !spilTilstand.soloMode) {
+        if (spilTilstand.erHost && !spilTilstand.offlineMode) {
             const { data, error } = await medTimeout(
                 supabase.from('spil_sessioner').select('rum_kode').eq('rum_kode', spilTilstand.rumKode).maybeSingle()
             );
@@ -995,8 +990,8 @@ function udførBevægelse(nytIndeks: number) {
 
 <Skaerme 
     {opretEllerDeltag}
-    {startSolo}
-    {fortsaetOfflineSolo}
+    {startOfflineSpil}
+    {fortsaetOfflineSpil}
     {bekræftValg} 
     {genstartBane} 
     {nulstilHukommelse}

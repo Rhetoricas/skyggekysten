@@ -28,13 +28,32 @@ create table if not exists public.game_results (
     known_fields_count integer not null default 0,
     mines_owned integer not null default 0,
     final_log text,
-    game_mode text not null default 'open' check (game_mode in ('open', 'solo', 'offline')),
+    game_mode text not null default 'open' check (game_mode in ('open', 'offline')),
     created_at timestamptz not null default now()
 );
 
 alter table public.game_results
 add column if not exists game_mode text not null default 'open'
-check (game_mode in ('open', 'solo', 'offline'));
+check (game_mode in ('open', 'offline'));
+
+do $$
+declare
+    constraint_name text;
+begin
+    for constraint_name in
+        select conname
+        from pg_constraint
+        where conrelid = 'public.game_results'::regclass
+          and contype = 'c'
+          and pg_get_constraintdef(oid) like '%game_mode%'
+    loop
+        execute format('alter table public.game_results drop constraint if exists %I', constraint_name);
+    end loop;
+
+    alter table public.game_results
+    add constraint game_results_game_mode_check
+    check (game_mode in ('open', 'offline'));
+end $$;
 
 create index if not exists game_results_score_idx on public.game_results (score desc);
 create index if not exists game_results_user_idx on public.game_results (user_id, created_at desc);

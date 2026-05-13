@@ -56,7 +56,7 @@
 
                 <section>
                     <h3>Start og ø-navn</h3>
-                    <p>Alle der skriver samme ø-navn, spiller på samme ø, hvis de går i land inden for de første fem dage. I solo offline spiller du alene, og spillet gemmes kun i browseren på den enhed.</p>
+                    <p>Alle der skriver samme ø-navn, spiller på samme ø, hvis de går i land inden for de første fem dage. Offline-spil gemmes kun i browseren på den enhed.</p>
                 </section>
 
                 <section>
@@ -149,14 +149,14 @@
                     <ul>
                         <li>Score bygger på guld, udforskning, miner, fremdrift og HP.</li>
                         <li>Hvis du slipper væk, byttes fremdrift ud med en overlevelsesbonus.</li>
-                        <li>Global highscore kræver login. Solo offline-score gemmes kun lokalt.</li>
+                        <li>Global highscore kræver login. Offline-score gemmes kun lokalt.</li>
                         <li>En særlig medalje kan gives ved ny global rekord, men kun hvis scoren også er høj nok.</li>
                     </ul>
                 </section>
 
                 <section>
                     <h3>Offline</h3>
-                    <p>For at spille i et fly skal spillet først gøres fly-klar på samme enhed og i samme browser. Åbn spillet online, tryk Download, start eller fortsæt et solo offline-spil, og test derefter kort i flytilstand.</p>
+                    <p>For at spille i et fly skal spillet først gøres fly-klar på samme enhed og i samme browser. Åbn spillet online, tryk Download, start eller fortsæt et offline-spil, og test derefter kort i flytilstand.</p>
                 </section>
             </div>
         </div>

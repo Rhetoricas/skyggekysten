@@ -141,7 +141,7 @@ export function regnHexAfstand(indexEn: number, indexTo: number, bredde: number)
 }
 
 export async function sendAnonymAlarm() {
-    if (spilTilstand.offlineMode || spilTilstand.soloMode) return;
+    if (spilTilstand.offlineMode) return;
     if (!spilTilstand.spillerNavn || !spilTilstand.rumKode) return;
 
     const besked = {
@@ -186,7 +186,7 @@ export function udloesFaellesEventEffekt(effekt: Omit<FaellesEventEffekt, 'sende
         spilTilstand.logBesked = payload.besked;
     }
 
-    if (!spilTilstand.offlineMode && !spilTilstand.soloMode && spilTilstand.rumKode) {
+    if (!spilTilstand.offlineMode && spilTilstand.rumKode) {
         void supabase.channel(spilTilstand.rumKode).send({
             type: 'broadcast',
             event: 'faelles_event',
@@ -1316,7 +1316,7 @@ export function tjekMiljoeSlitage(biome: string): string {
 }
 
 export async function sendBaalSignal(centerIndex: number, radius: number) {
-    if (spilTilstand.offlineMode || spilTilstand.soloMode) return;
+    if (spilTilstand.offlineMode) return;
     if (!spilTilstand.rumKode) return;
     void supabase.channel(spilTilstand.rumKode).send({
         type: 'broadcast',
