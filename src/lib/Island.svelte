@@ -1748,9 +1748,8 @@ function udførBevægelse(nytIndeks: number) {
     .inspect-knap {
         width: 48px;
         height: 48px;
-        border-radius: 8px;
-        border: 1px solid #3a3a3a;
-        background: rgba(255, 255, 255, 0.06);
+        border: none;
+        background: transparent;
         color: #f4f4f4;
         font-family: 'Cinzel', Georgia, serif;
         font-size: 1.8rem;
@@ -1760,14 +1759,14 @@ function udførBevægelse(nytIndeks: number) {
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: transform 0.2s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
+        transition: transform 0.2s, color 0.2s, text-shadow 0.2s;
     }
     .inspect-knap:hover,
     .inspect-knap.aktiv {
-        background: rgba(255, 255, 255, 0.14);
-        border-color: #ddd;
+        color: #fff;
         transform: scale(1.04);
-        box-shadow: 0 0 14px rgba(255, 255, 255, 0.22);
+        text-shadow: 0 0 14px rgba(255, 255, 255, 0.45), 0 2px 8px rgba(0, 0, 0, 0.95);
     }
     .inspect-hint {
         position: fixed;

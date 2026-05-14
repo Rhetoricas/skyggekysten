@@ -23,15 +23,14 @@
 
 <style>
     .musik-toggle-btn {
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid #3a3a3a;
-        border-radius: 8px;
+        background: transparent;
+        border: none;
         cursor: pointer;
         padding: 9px;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: transform 0.2s, background 0.2s, border-color 0.2s;
+        transition: transform 0.2s, filter 0.2s;
     }
 
     .musik-toggle-btn img {
@@ -41,9 +40,8 @@
     }
 
     .musik-toggle-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: #666;
         transform: scale(1.04);
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35));
     }
 
     .musik-toggle-btn:hover img {
@@ -55,7 +53,7 @@
     }
 
     .musik-toggle-btn.lyd-slukket {
-        background: rgba(0, 0, 0, 0.22);
+        opacity: 0.72;
     }
 
     @media (max-width: 700px) {
