@@ -84,7 +84,8 @@
                     <ul>
                         <li>HP er dit helbred. Når HP når 0, dør du.</li>
                         <li>Rustning mindsker skade. Elverrustning beskytter som almindelig rustning, men er ikke tung. Ridder med rustning tager ingen skade fra nedgravede fælder.</li>
-                        <li>Mad giver HP og energi. Sovepose og lejrbål kan bruges til hvile.</li>
+                        <li>Mad giver HP og gør næste bevægelse gratis. Sovepose og lejrbål kan bruges til hvile.</li>
+                        <li>Viking og valkyrie går automatisk bersærk første gang pr. dag, de tager mindst 5 skade. Næste bevægelse koster 0 energi.</li>
                         <li>Oversvømmelse kan slukke fakler og få tung rustning til at gå tabt.</li>
                     </ul>
                 </section>

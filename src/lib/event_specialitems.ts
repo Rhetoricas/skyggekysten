@@ -6,10 +6,8 @@ function spillerNavn() {
     return spilTilstand.spillerNavn || 'En spiller';
 }
 
-function afslørNaboerOgLog(logBesked: string) {
-    const kendte = new Set(spilTilstand.mineKendteFelter);
-    for (const index of hentNaboIndices(spilTilstand.spillerIndex)) kendte.add(index);
-    spilTilstand.mineKendteFelter = Array.from(kendte);
+function afslørRadiusOgLog(logBesked: string, radius: number) {
+    afslørOmraade(spilTilstand.spillerIndex, radius);
     return { logBesked };
 }
 
@@ -135,7 +133,7 @@ export const specialItemEvents: Record<string, SpilEvent> = {
             },
             {
                 tekst: 'Gå gennem ringen',
-                effekt: () => afslørNaboerOgLog('Dyrene træder til side. Da du er igennem, er alle nabofelter blevet lettere at læse.')
+                effekt: () => afslørRadiusOgLog('Dyrene træder til side. Da du er igennem, forstår du landskabet bedre. Et større område omkring dig bliver synligt.', 3)
             }
         ]
     },

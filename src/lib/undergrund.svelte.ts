@@ -1,6 +1,6 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
-import { fremtvingKollaps, fremrykTid } from '$lib/overlevelse.svelte';
+import { fremtvingKollaps, fremrykTid, udloesBersaerkHvisRelevant } from '$lib/overlevelse.svelte';
 import { afslørOmraade, tilfoejTilRygsæk } from '$lib/spilmotor';
 import type { Biome } from './types';
 
@@ -106,7 +106,7 @@ export function grav() {
     if (!harSkovl) {
         const skade = spilTilstand.beregnSkade(4);
         spilTilstand.livspoint -= skade;
-        udstyrsLog = ` Du graver uden skovl. Du mister ${skade} HP og ${faktiskEnergiPris} Energi.`;
+        udstyrsLog = ` Du graver uden skovl. Du mister ${skade} HP og ${faktiskEnergiPris} Energi.${udloesBersaerkHvisRelevant(skade)}`;
     }
 
     const guldVaerdi = felt.skjultGuld ?? 0;
@@ -134,7 +134,7 @@ export function grav() {
     } else if (faelde) {
         const faeldeSkade = spilTilstand.beregnSkade(10);
         spilTilstand.livspoint -= faeldeSkade;
-        fundLog = `KLIK. En nedgravet fælde bider sig fast i dit ben (-${faeldeSkade} HP)`;
+        fundLog = `KLIK. En nedgravet fælde bider sig fast i dit ben (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`;
     } else if (fundetLoot === 'skattekiste') {
         spilTilstand.guldTotal += 500;
         tilfoejTilRygsæk('diamant', 1);

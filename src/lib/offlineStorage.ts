@@ -38,6 +38,8 @@ interface OfflineSnapshot {
     historik: number[];
     nuvaerendeEnergi: number;
     gratisNaesteBevaegelse?: boolean;
+    gratisBevaegelseKilde?: '' | 'mad' | 'bersaerk';
+    sidsteBersaerkDag?: number;
     musikTaendt: boolean;
 }
 
@@ -99,6 +101,8 @@ export function gemOfflineSpil() {
         historik: spilTilstand.historik,
         nuvaerendeEnergi: spilTilstand.nuvaerendeEnergi,
         gratisNaesteBevaegelse: spilTilstand.gratisNaesteBevaegelse,
+        gratisBevaegelseKilde: spilTilstand.gratisBevaegelseKilde,
+        sidsteBersaerkDag: spilTilstand.sidsteBersaerkDag,
         musikTaendt: spilTilstand.musikTaendt
     };
 
@@ -137,6 +141,8 @@ export function indlaesOfflineSpil() {
         spilTilstand.historik = data.historik || [];
         spilTilstand.nuvaerendeEnergi = data.nuvaerendeEnergi ?? data.valgtKarakter?.baseEnergi ?? 10;
         spilTilstand.gratisNaesteBevaegelse = data.gratisNaesteBevaegelse ?? false;
+        spilTilstand.gratisBevaegelseKilde = data.gratisBevaegelseKilde ?? '';
+        spilTilstand.sidsteBersaerkDag = data.sidsteBersaerkDag ?? 0;
         spilTilstand.musikTaendt = data.musikTaendt ?? true;
         spilTilstand.statusBesked = 'Offline-spil indlæst.';
 
@@ -151,8 +157,8 @@ export function sletOfflineSpil() {
     localStorage.removeItem(OFFLINE_GAME_KEY);
 }
 
-export function gemOfflineScore() {
-    if (!harLocalStorage() || !spilTilstand.offlineMode || spilTilstand.samletScore <= 0) return;
+export function gemOfflineScore(force = false) {
+    if (!harLocalStorage() || (!force && !spilTilstand.offlineMode) || spilTilstand.samletScore <= 0) return;
 
     const scores = hentOfflineScores();
     const score: OfflineScore = {

@@ -9,6 +9,25 @@ export function erSpillerITaagen() {
 }
 
 let sidstBrugtEliksir = 0;
+const BERSAERK_MIN_HP_TAB = 5;
+
+export function udloesBersaerkHvisRelevant(faktiskSkade: number) {
+    const karakterId = spilTilstand.valgtKarakter?.id;
+    const erViking = karakterId === 'viking_m' || karakterId === 'viking_f';
+
+    if (!erViking) return '';
+    if (faktiskSkade < BERSAERK_MIN_HP_TAB) return '';
+    if (spilTilstand.sidsteBersaerkDag === spilTilstand.dag) return '';
+
+    if (spilTilstand.gratisNaesteBevaegelse) {
+        return '';
+    }
+
+    spilTilstand.sidsteBersaerkDag = spilTilstand.dag;
+    spilTilstand.gratisNaesteBevaegelse = true;
+    spilTilstand.gratisBevaegelseKilde = 'bersaerk';
+    return ' Smerten vækker bersærkergangen. Næste bevægelse koster 0 energi.';
+}
 
 function hentMuligeFlugtbaadFelter() {
     const kystFelter: number[] = [];
@@ -98,8 +117,9 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
     
     const faktiskSkade = spilTilstand.beregnSkade(skade);
     spilTilstand.livspoint -= faktiskSkade;
+    const bersaerkLog = udloesBersaerkHvisRelevant(faktiskSkade);
     
-    const beskedMedTal = faktiskSkade > 0 ? `${besked} (-${faktiskSkade} HP)` : besked;
+    const beskedMedTal = faktiskSkade > 0 ? `${besked} (-${faktiskSkade} HP)${bersaerkLog}` : besked;
 
     if (spilTilstand.livspoint <= 0) {
         const erHavet = besked.includes("havet") || besked.includes("saltvand") || besked.includes("hav");

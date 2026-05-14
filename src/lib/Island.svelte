@@ -39,6 +39,7 @@
     const cam = skabKamera();
     const MAX_DAGE_FORAN = 5;
     const SESSION_TIMEOUT_MS = 5 * 60 * 1000;
+    const SESSION_SELECT = 'rum_kode,kort,start_index,spillere,fog_x';
 
     let lokaleScores = $state<Array<{ navn: string; score: number; karakter?: string }>>([]);
     let globaleScores = $state<Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);    
@@ -401,12 +402,16 @@
             spilTilstand.alleSpillere[navn].escapeIndex = null;
             spilTilstand.alleSpillere[navn].escapeIcon = null;
             spilTilstand.alleSpillere[navn].gratisNaesteBevaegelse = false;
+            spilTilstand.alleSpillere[navn].gratisBevaegelseKilde = '';
+            spilTilstand.alleSpillere[navn].sidsteBersaerkDag = 0;
         });
 
         spilTilstand.fogX = 0;
         spilTilstand.dag = 1;
         spilTilstand.historik = [];
         spilTilstand.gratisNaesteBevaegelse = false;
+        spilTilstand.gratisBevaegelseKilde = '';
+        spilTilstand.sidsteBersaerkDag = 0;
         
         nulstilKort();
 
@@ -472,9 +477,7 @@
             .subscribe();
 
         try {
-            const { data, error } = await medTimeout(
-                supabase.from('spil_sessioner').select('*').eq('rum_kode', spilTilstand.rumKode).maybeSingle()
-            );
+            const { data, error } = await hentSpilSession(spilTilstand.rumKode);
             if (error) {
                 console.error("Netværksfejl:", error);
                 spilTilstand.statusBesked = `Kunne ikke forbinde til øen: ${error.message}`;
@@ -499,6 +502,70 @@
                         return;
                     }
 
+                    if (eksisterende.isDead || eksisterende.isWinner) {
+                        const spillereArr = Object.values(spilTilstand.alleSpillere);
+                        const aktiveSpillere = spillereArr.filter(erAktivSessionSpiller);
+                        const maxAktivDag = aktiveSpillere.length > 0 ? Math.max(...aktiveSpillere.map((s: SpillerData) => s.dag || 1)) : 1;
+
+                        if (aktiveSpillere.length > 0 && maxAktivDag > 5) {
+                            spilTilstand.statusBesked = `Du er for sent på den. Tågen har nået kysten (Dag ${maxAktivDag}).`;
+                            return;
+                        }
+
+                        if (aktiveSpillere.length === 0) {
+                            spilTilstand.erHost = true;
+                            spilTilstand.alleSpillere = {};
+                            spilTilstand.fogX = 0;
+                            spilTilstand.dag = 1;
+                            spilTilstand.historik = [];
+                            spilTilstand.logHistorik = [];
+                            spilTilstand.venteGratisFeltBrugt = null;
+                            spilTilstand.gratisNaesteBevaegelse = false;
+                            spilTilstand.gratisBevaegelseKilde = '';
+                            spilTilstand.sidsteBersaerkDag = 0;
+                            spilTilstand.venteSpilAktiv = false;
+                            spilTilstand.ventePuljeGuld = 0;
+                            spilTilstand.ventePuljeLiv = 0;
+                            spilTilstand.venteRunde = 0;
+                            initialiserGitter();
+
+                            const { error: resetError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
+                                kort: spilTilstand.gitter,
+                                start_index: spilTilstand.spillerIndex,
+                                spillere: {},
+                                fog_x: 0
+                            }).eq('rum_kode', spilTilstand.rumKode)));
+
+                            if (resetError) {
+                                spilTilstand.statusBesked = `Øen kunne ikke nulstilles: ${resetError.message}`;
+                                return;
+                            }
+                        }
+
+                        spilTilstand.spillerNavn = fundetNavn;
+                        spilTilstand.valgtKarakter = null;
+                        spilTilstand.maxLivspoint = 100;
+                        spilTilstand.livspoint = 100;
+                        spilTilstand.guldTotal = 0;
+                        spilTilstand.maxKolonne = 0;
+                        spilTilstand.dag = 1;
+                        spilTilstand.nuvaerendeEnergi = 0;
+                        spilTilstand.mitUdstyr = [];
+                        spilTilstand.mineKendteFelter = [];
+                        spilTilstand.historik = [];
+                        spilTilstand.logHistorik = [];
+                        spilTilstand.venteGratisFeltBrugt = null;
+                        spilTilstand.gratisNaesteBevaegelse = false;
+                        spilTilstand.gratisBevaegelseKilde = '';
+                        spilTilstand.sidsteBersaerkDag = 0;
+                        spilTilstand.gameState = 'select';
+                        spilTilstand.statusBesked = eksisterende.isWinner
+                            ? 'Den gamle tur var afsluttet. Vælg karakter for at starte rent.'
+                            : 'Den gamle tur var død. Vælg karakter for at starte rent.';
+                        startRealtime();
+                        return;
+                    }
+
                     spilTilstand.spillerNavn = fundetNavn;
                     spilTilstand.spillerIndex = eksisterende.index;
                     
@@ -516,6 +583,8 @@
                     spilTilstand.historik = eksisterende.historik || [];
                     spilTilstand.venteGratisFeltBrugt = eksisterende.venteGratisFeltBrugt ?? null;
                     spilTilstand.gratisNaesteBevaegelse = eksisterende.gratisNaesteBevaegelse ?? false;
+                    spilTilstand.gratisBevaegelseKilde = eksisterende.gratisBevaegelseKilde ?? '';
+                    spilTilstand.sidsteBersaerkDag = eksisterende.sidsteBersaerkDag ?? 0;
 
                     afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
                     startRealtime();
@@ -550,12 +619,12 @@
                         spilTilstand.fogX = 0;
                         initialiserGitter();
 
-                        const { error: resetError } = await medTimeout(supabase.from('spil_sessioner').update({
+                        const { error: resetError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
                             kort: spilTilstand.gitter,
                             start_index: spilTilstand.spillerIndex,
                             spillere: {},
                             fog_x: 0
-                        }).eq('rum_kode', spilTilstand.rumKode));
+                        }).eq('rum_kode', spilTilstand.rumKode)));
 
                         if (resetError) {
                             spilTilstand.statusBesked = `Oen kunne ikke nulstilles: ${resetError.message}`;
@@ -579,18 +648,16 @@
                 spilTilstand.ventePuljeLiv = 0;
                 spilTilstand.venteRunde = 0;
                 initialiserGitter();
-                const { error: insertError } = await medTimeout(supabase.from('spil_sessioner').insert([{
+                const { error: insertError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').insert([{
                     rum_kode: spilTilstand.rumKode,
                     kort: spilTilstand.gitter,
                     start_index: spilTilstand.spillerIndex,
                     spillere: {},
                     fog_x: 0
-                }]));
+                }])));
 
                 if (insertError) {
-                    const { data: eksisterendeSession, error: hentEfterInsertError } = await medTimeout(
-                        supabase.from('spil_sessioner').select('*').eq('rum_kode', spilTilstand.rumKode).maybeSingle()
-                    );
+                    const { data: eksisterendeSession, error: hentEfterInsertError } = await hentSpilSession(spilTilstand.rumKode);
 
                     if (hentEfterInsertError || !eksisterendeSession) {
                         spilTilstand.statusBesked = `Øen kunne ikke oprettes: ${insertError.message}`;
@@ -869,6 +936,8 @@
         spilTilstand.mitUdstyr = [];
         spilTilstand.mineKendteFelter = [];
         spilTilstand.gratisNaesteBevaegelse = false;
+        spilTilstand.gratisBevaegelseKilde = '';
+        spilTilstand.sidsteBersaerkDag = 0;
         
         spilTilstand.logHistorik = []; 
 
@@ -889,6 +958,8 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIndex = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIcon = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisNaesteBevaegelse = false;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisBevaegelseKilde = '';
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].sidsteBersaerkDag = 0;
         }
 
         const muligeStartFelter = [];
@@ -924,13 +995,13 @@
             }
 
             if (!data) {
-                const { error: insertError } = await medTimeout(supabase.from('spil_sessioner').insert([{
+                const { error: insertError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').insert([{
                     rum_kode: spilTilstand.rumKode,
                     kort: spilTilstand.gitter,
                     start_index: spilTilstand.spillerIndex,
                     spillere: {},
                     fog_x: 0
-                }]));
+                }])));
 
                 if (insertError) {
                     spilTilstand.statusBesked = `Øen kunne ikke oprettes: ${insertError.message}`;
@@ -1140,13 +1211,44 @@
         sidstePinchAfstand = 0;
     }
 
-    async function medTimeout<T>(kald: PromiseLike<T>, ms = 12000): Promise<T> {
+    async function medTimeout<T>(kald: PromiseLike<T>, ms = 25000): Promise<T> {
         let timer: ReturnType<typeof setTimeout>;
         const timeout = new Promise<never>((_, reject) => {
             timer = setTimeout(() => reject(new Error('timeout')), ms);
         });
 
         return Promise.race([kald, timeout]).finally(() => clearTimeout(timer));
+    }
+
+    function vent(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function medRetry<T>(kald: () => PromiseLike<T>, antalForsoeg = 2): Promise<T> {
+        let sidsteFejl: unknown;
+
+        for (let forsoeg = 1; forsoeg <= antalForsoeg; forsoeg++) {
+            try {
+                return await kald();
+            } catch (error) {
+                sidsteFejl = error;
+                if (!(error instanceof Error) || error.message !== 'timeout' || forsoeg === antalForsoeg) break;
+                spilTilstand.statusBesked = 'Øen svarer langsomt. Prøver igen...';
+                await vent(800);
+            }
+        }
+
+        throw sidsteFejl;
+    }
+
+    function hentSpilSession(rumKode: string) {
+        return medRetry(() => medTimeout(
+            supabase
+                .from('spil_sessioner')
+                .select(SESSION_SELECT)
+                .eq('rum_kode', rumKode)
+                .maybeSingle()
+        ), 2);
     }
 
 function udførBevægelse(nytIndeks: number) {

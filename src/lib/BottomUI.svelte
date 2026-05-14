@@ -64,6 +64,7 @@
         brugFraRygsæk('mad', 1);
         spilTilstand.livspoint += 20;
         spilTilstand.gratisNaesteBevaegelse = true;
+        spilTilstand.gratisBevaegelseKilde = 'mad';
         const faktiskHeling = spilTilstand.livspoint - foerHp;
         spilTilstand.logBesked = `Du spiser din madration. (+${faktiskHeling} HP, næste bevægelse koster 0 energi)`;
         syncTilDb();
@@ -202,7 +203,7 @@
                 <span class="status-value">{spilTilstand.guldTotal}</span>
             </div>
         
-            <div class="energi-sektion" data-help-title="Energi" data-help-body={spilTilstand.gratisNaesteBevaegelse ? 'Din næste bevægelse koster 0 energi på grund af mad.' : 'Energi bruges på bevægelse, gravning og visse handlinger. Når energien løber tør, går der en ny dag.'}>
+            <div class="energi-sektion" data-help-title="Energi" data-help-body={spilTilstand.gratisNaesteBevaegelse ? (spilTilstand.gratisBevaegelseKilde === 'bersaerk' ? 'Din næste bevægelse koster 0 energi på grund af bersærkergang.' : 'Din næste bevægelse koster 0 energi på grund af mad.') : 'Energi bruges på bevægelse, gravning og visse handlinger. Når energien løber tør, går der en ny dag.'}>
                 <div class="energi-container">
                     <div class="energi-grid">
                         {#each Array(9) as tomPlads, i (i)}

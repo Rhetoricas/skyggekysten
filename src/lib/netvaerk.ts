@@ -164,7 +164,9 @@ export async function syncTilDb(opdaterKort = false) {
         aktivTracker: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.aktivTracker || null,
         trackedeSpillere: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.trackedeSpillere || [],
         venteGratisFeltBrugt: spilTilstand.venteGratisFeltBrugt,
-        gratisNaesteBevaegelse: spilTilstand.gratisNaesteBevaegelse
+        gratisNaesteBevaegelse: spilTilstand.gratisNaesteBevaegelse,
+        gratisBevaegelseKilde: spilTilstand.gratisBevaegelseKilde,
+        sidsteBersaerkDag: spilTilstand.sidsteBersaerkDag
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -328,13 +330,22 @@ export async function gemHighscore() {
         gemOfflineScore();
         return true;
     }
-    if (!authState.user) return false;
+    const sessionResultat = await medTimeout(supabase.auth.getSession(), 12000, 'Login-tjek').catch((error) => {
+        console.error('Kunne ikke tjekke login før scoregemning', error);
+        return null;
+    });
+    const sessionUser = sessionResultat?.data.session?.user ?? authState.user;
+    if (!sessionUser) {
+        gemOfflineScore(true);
+        spilTilstand.statusBesked = 'Login mangler eller er udløbet. Log ind igen og prøv at gemme scoren.';
+        return false;
+    }
 
     const minePoint = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
     const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
     const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map';
     const payload: HighscorePayload = {
-        user_id: authState.user.id,
+        user_id: sessionUser.id,
         player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
         room_code: spilTilstand.rumKode,
         score: spilTilstand.samletScore,
@@ -353,7 +364,8 @@ export async function gemHighscore() {
 
     if (error) {
         console.error('Kunne ikke gemme highscore', error);
-        spilTilstand.statusBesked = `Scoren kunne ikke gemmes: ${error.message}`;
+        gemOfflineScore(true);
+        spilTilstand.statusBesked = `Scoren kunne ikke gemmes globalt: ${error.message} Den er gemt lokalt i browseren.`;
         return false;
     }
 
@@ -361,13 +373,62 @@ export async function gemHighscore() {
 }
 
 async function sendHighscorePayload(payload: HighscorePayload) {
-    const { error } = await medTimeout(
-        supabase.from('game_results').insert([payload]).select('id').single(),
+    const sessionResultat = await medTimeout(supabase.auth.getSession(), 12000, 'Login-tjek').catch((error) => {
+        console.error('Kunne ikke tjekke login før scoregemning', error);
+        return null;
+    });
+
+    if (!sessionResultat?.data.session?.user) {
+        return new Error('Du er ikke logget ind længere. Log ind igen og prøv at gemme scoren.');
+    }
+
+    let sidsteFejl: Error | null = null;
+
+    for (let forsoeg = 1; forsoeg <= 3; forsoeg++) {
+        const findesAllerede = await highscoreFindes(payload).catch(() => false);
+        if (findesAllerede) return null;
+
+        try {
+            const { error } = await medTimeout(
+                supabase.from('game_results').insert([payload]),
+                20000,
+                'Gemning af score'
+            );
+
+            if (!error) return null;
+            sidsteFejl = error;
+        } catch (error) {
+            sidsteFejl = error instanceof Error ? error : new Error('Gemning af score fejlede.');
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 900 * forsoeg));
+    }
+
+    if (await highscoreFindes(payload).catch(() => false)) return null;
+
+    return sidsteFejl ?? new Error('Scoren kunne ikke gemmes.');
+}
+
+async function highscoreFindes(payload: HighscorePayload) {
+    const { data, error } = await medTimeout(
+        supabase
+            .from('game_results')
+            .select('id')
+            .eq('user_id', payload.user_id)
+            .eq('room_code', payload.room_code)
+            .eq('score', payload.score)
+            .eq('days', payload.days)
+            .eq('gold', payload.gold)
+            .eq('max_column', payload.max_column)
+            .eq('is_winner', payload.is_winner)
+            .eq('is_dead', payload.is_dead)
+            .limit(1),
         12000,
-        'Gemning af score'
+        'Tjek af score'
     );
 
-    return error;
+    if (error) return false;
+    return !!data?.length;
 }
 
 function formaterTopTi(data: ScoreRaekke[] | null | undefined) {

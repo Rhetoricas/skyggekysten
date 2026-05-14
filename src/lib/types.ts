@@ -75,6 +75,8 @@ export interface SpillerData {
     trackedeSpillere?: string[];
     venteGratisFeltBrugt?: number | null;
     gratisNaesteBevaegelse?: boolean;
+    gratisBevaegelseKilde?: '' | 'mad' | 'bersaerk';
+    sidsteBersaerkDag?: number;
 }
 
 export interface Felt {

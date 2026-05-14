@@ -2,7 +2,7 @@ import { spilTilstand } from './spilTilstand.svelte';
 import { eventBibliotek } from './eventBibliotek';
 import { tilfoejTilRygsæk, brugFraRygsæk } from './spilmotor';
 import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
-import { fremrykTid } from './overlevelse.svelte';
+import { fremrykTid, udloesBersaerkHvisRelevant } from './overlevelse.svelte';
 import type { Valg } from './eventBibliotek';
 
 export const eventState = $state({
@@ -115,6 +115,7 @@ export function tagValg(valg: Valg) {
             spilTilstand.livspoint += endeligHp;
             const faktiskAendring = spilTilstand.livspoint - foerHp;
             if (faktiskAendring !== 0) kvittering += ` (${faktiskAendring > 0 ? '+' : ''}${faktiskAendring} HP)`;
+            if (faktiskAendring < 0) kvittering += udloesBersaerkHvisRelevant(Math.abs(faktiskAendring));
         }
 
         if (resultat.guldAendring) {
@@ -165,7 +166,7 @@ export function tagValg(valg: Valg) {
         if (resultat.hpNed) {
             const skade = spilTilstand.beregnSkade(resultat.hpNed);
             spilTilstand.livspoint -= skade;
-            kvittering += ` (-${skade} HP)`;
+            kvittering += ` (-${skade} HP)${udloesBersaerkHvisRelevant(skade)}`;
         }
         if (resultat.guldOp) {
             const indkomst = spilTilstand.beregnGuldIndkomst(resultat.guldOp);

@@ -4,7 +4,7 @@ import { BREDDE, HOEJDE, HEX_W, biomeVægte, biomeTerraenCost, itemDB, markedVar
 import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
-import { fremrykTid, fremtvingKollaps, tagSkadeOgTjekDød } from '$lib/overlevelse.svelte';
+import { fremrykTid, fremtvingKollaps, tagSkadeOgTjekDød, udloesBersaerkHvisRelevant } from '$lib/overlevelse.svelte';
 import { erAfgroedeModen, erHvedeBlok, erInsektPlageAktiv, hentAfgroedeBlok } from '$lib/afgroeder';
 import type { Biome, Felt, RygsækTing } from '$lib/types';
 import { delNyeKort, startVenteSpil } from '$lib/ventespil.svelte';
@@ -405,8 +405,12 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     const pris = Math.max(1, spilTilstand.valgtKarakter.moveCost + spilTilstand.rygsækEffekt.move + grundPris + biomeRabat);
 
     const gratisBevaegelse = spilTilstand.gratisNaesteBevaegelse;
+    const gratisBevaegelseKilde = spilTilstand.gratisBevaegelseKilde;
     spilTilstand.nuvaerendeEnergi -= gratisBevaegelse ? 0 : (options.erITaagen ? pris + 2 : pris);
-    if (gratisBevaegelse) spilTilstand.gratisNaesteBevaegelse = false;
+    if (gratisBevaegelse) {
+        spilTilstand.gratisNaesteBevaegelse = false;
+        spilTilstand.gratisBevaegelseKilde = '';
+    }
 
     spilTilstand.spillerIndex = nytIndeks;
     if (!spilTilstand.historik) spilTilstand.historik = [];
@@ -417,7 +421,7 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     if ((nytIndeks % BREDDE) > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nytIndeks % BREDDE;
 
     const ankomstResultat = haandterAnkomstPaaFelt(nytIndeks, 'gang', {
-        startLog: gratisBevaegelse ? "Maden holder dig i gang. Bevægelsen koster 0 energi." : "",
+        startLog: gratisBevaegelse ? (gratisBevaegelseKilde === 'bersaerk' ? "Bersærkergangen bærer dig frem. Bevægelsen koster 0 energi." : "Maden holder dig i gang. Bevægelsen koster 0 energi.") : "",
         onBaadStart: options.onBaadStart
     });
     tjekAutoTracker();
@@ -442,7 +446,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
     if (hpStraf > 0) {
         hpStraf = spilTilstand.beregnSkade(hpStraf);
         spilTilstand.livspoint -= hpStraf;
-        ekstraLog += ` Terrænet slider på dig. (-${hpStraf} HP)`;
+        ekstraLog += ` Terrænet slider på dig. (-${hpStraf} HP)${udloesBersaerkHvisRelevant(hpStraf)}`;
     }
 
     const nuBlok = hentAfgroedeBlok(spilTilstand.dag);
