@@ -345,8 +345,7 @@
         }
         else if (tast === 'h') hvil();
         else if (tast === 'f') {
-            langsomtKamera = false;
-            cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
+            fokuserPaaSpiller();
         }
         else if (tast === 'q') flytHex('NW');
         else if (tast === 'e') flytHex('NE');
@@ -366,6 +365,12 @@
                 startEvent('stjernekald');
             }
         }
+    }
+
+    function fokuserPaaSpiller() {
+        if (introAktiv || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
+        langsomtKamera = false;
+        cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
     }
 
     async function genstartBane() {
@@ -1322,7 +1327,16 @@ function udførBevægelse(nytIndeks: number) {
     <div class="game-help-actions">
         <button
             type="button"
-            class="inspect-knap"
+            class="top-ikon-knap fokus-knap"
+            onclick={fokuserPaaSpiller}
+            title="Fokuser på dig"
+            aria-label="Fokuser på dig"
+        >
+            ⌖
+        </button>
+        <button
+            type="button"
+            class="top-ikon-knap inspect-knap"
             class:aktiv={inspectAktiv}
             onclick={startInspect}
             title="Forklar næste tryk"
@@ -1727,7 +1741,7 @@ function udførBevægelse(nytIndeks: number) {
             right: 10px;
         }
 
-        .inspect-knap {
+        .top-ikon-knap {
             width: 42px;
             height: 42px;
             font-size: 1.55rem;
@@ -1745,7 +1759,7 @@ function udførBevægelse(nytIndeks: number) {
         align-items: center;
         gap: 10px;
     }
-    .inspect-knap {
+    .top-ikon-knap {
         width: 48px;
         height: 48px;
         border: none;
@@ -1762,11 +1776,14 @@ function udførBevægelse(nytIndeks: number) {
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
         transition: transform 0.2s, color 0.2s, text-shadow 0.2s;
     }
-    .inspect-knap:hover,
-    .inspect-knap.aktiv {
+    .top-ikon-knap:hover,
+    .top-ikon-knap.aktiv {
         color: #fff;
         transform: scale(1.04);
         text-shadow: 0 0 14px rgba(255, 255, 255, 0.45), 0 2px 8px rgba(0, 0, 0, 0.95);
+    }
+    .fokus-knap {
+        font-size: 1.95rem;
     }
     .inspect-hint {
         position: fixed;

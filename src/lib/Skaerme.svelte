@@ -496,7 +496,13 @@
     <div class="slutskærm death-screen">
         <div class="slut-scroll">
             <div class="medalje-sektion">
-                <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" />
+                {#if authState.user}
+                    <button type="button" class="medalje-profil-knap" onclick={aabnProfil} aria-label="Åbn din profil">
+                        <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" draggable="false" />
+                    </button>
+                {:else}
+                    <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" draggable="false" />
+                {/if}
             </div>
             
             <h1 class="doeds-titel">{formaterNavn(spilTilstand.spillerNavn)}, du døde på {formaterNavn(spilTilstand.rumKode)}</h1>
@@ -584,7 +590,13 @@
     <div class="slutskærm sejrsskaerm">
         <div class="slut-scroll">
             <div class="medalje-sektion">
-                <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" />
+                {#if authState.user}
+                    <button type="button" class="medalje-profil-knap" onclick={aabnProfil} aria-label="Åbn din profil">
+                        <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" draggable="false" />
+                    </button>
+                {:else}
+                    <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" draggable="false" />
+                {/if}
             </div>
             <h1 class="sejr-titel">Slap væk fra {formaterNavn(spilTilstand.rumKode)}</h1>
             <p class="beskrivelse">
@@ -887,6 +899,8 @@
     
     .slut-scroll { overflow-y: auto; height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; padding: 0 20px 40px 20px; }
     .medalje-sektion { margin: 0; padding: 0; width: 100%; display: flex; justify-content: center; }
+    .medalje-profil-knap { margin: 0; padding: 0; border: none; background: transparent; cursor: pointer; display: flex; justify-content: center; }
+    .medalje-profil-knap:hover .stor-medalje { filter: drop-shadow(0 0 28px rgba(255, 255, 255, 0.28)); transform: scale(1.015); }
     .stor-medalje { height: 260px; filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.15)); margin: 0 0 10px 0; display: block; }
     .doeds-symbol { width: min(210px, 48vw); height: auto; margin: -8px 0 10px; opacity: 0.92; filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.45)); }
     
