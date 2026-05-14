@@ -39,7 +39,7 @@ export const itemDB: Record<string, { id: string; navn: string; type: ItemType; 
     'livseliksir': { id: 'livseliksir', navn: 'Livseliksir', type: 'forbrug', billede: '/inventory/livseliksir.webp', pris: 500, beskrivelse: "Drikkes automatisk, hvis du får dødelig skade. Heler dig maksimalt tilbage til 90 HP." },
     'fakkel': { id: 'fakkel', navn: 'Fakkel', type: 'værktøj', billede: '/inventory/fakkel.webp', pris: 150, synsMod: 1, beskrivelse: "Udvider dit synsfelt med +1. Kan bruges til store lejrbål, som alle kan se. Går tabt i vandet." },
     'sovepose': { id: 'sovepose', navn: 'Sovepose', type: 'værktøj', billede: '/inventory/sovepose.webp', pris: 80, beskrivelse: "Slå lejr i vildmarken og få 20 HP (koster resten af din energi). Fugt i huler får den til at rådne med det samme." },
-    'mad': { id: 'mad', navn: 'Madration', type: 'forbrug', billede: '/inventory/food.webp', pris: 30, beskrivelse: "Giver +10 HP og +1 Energi. Kan gå tabt i ruiner." },
+    'mad': { id: 'mad', navn: 'Madration', type: 'forbrug', billede: '/inventory/food.webp', pris: 30, beskrivelse: "Giver +20 HP, og din næste bevægelse koster 0 energi. Kan gå tabt i ruiner." },
     'kikkert_250': { id: 'kikkert_250', navn: 'Gylden Kikkert', type: 'forbandelse', billede: '/inventory/kikkert.webp', pris: 100, beskrivelse: "Går i stykker på krystal-felter." },
     'kikkert_45': { id: 'kikkert_45', navn: 'Gylden Kikkert', type: 'forbandelse', billede: '/inventory/kikkert.webp', pris: 100, beskrivelse: "Går i stykker på krystal-felter." },
     'diamant': { id: 'diamant', navn: 'Diamant', type: 'skat', billede: '/inventory/diamant.webp', pris: 500, beskrivelse: "En sjælden og værdifuld ædelsten, der nemt kan sælges." },

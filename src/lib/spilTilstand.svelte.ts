@@ -110,6 +110,7 @@ export const spilTilstand = $state({
     venteRunde: 0,
     venteGratisFeltBrugt: null as number | null,
     venteKort: [] as Array<{ type: string; vaerdi: number; afsloeret: boolean }>,
+    gratisNaesteBevaegelse: false,
     
     erBevidstløs: false,
     aktiveTal: [] as FlydendeTal[],

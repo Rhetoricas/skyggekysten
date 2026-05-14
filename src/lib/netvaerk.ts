@@ -163,7 +163,8 @@ export async function syncTilDb(opdaterKort = false) {
         harSkattekort: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.harSkattekort || false,
         aktivTracker: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.aktivTracker || null,
         trackedeSpillere: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.trackedeSpillere || [],
-        venteGratisFeltBrugt: spilTilstand.venteGratisFeltBrugt
+        venteGratisFeltBrugt: spilTilstand.venteGratisFeltBrugt,
+        gratisNaesteBevaegelse: spilTilstand.gratisNaesteBevaegelse
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

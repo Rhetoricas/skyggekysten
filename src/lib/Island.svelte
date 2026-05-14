@@ -74,7 +74,7 @@
         hoejland: 'Højland er åbent terræn. Gravning kan give guld, rod, en lille fælderisiko eller fakkel.',
         blodskov: 'Blodskov er farligt og uroligt. Gravefund ligner andre farlige biomer: guld, rod, fælder og livseliksir.',
         by: 'Byer kan have butikker og indbrudsmuligheder. Du kan normalt ikke grave her.',
-        hav: 'Hav er farligt uden båd. Hvis du kollapser i vandet, drukner du, medmindre en livseliksir redder dig først.',
+        hav: 'Hav er farligt uden båd. Du tager skade i åbent vand, og tung rustning, fakler og flere skrøbelige ting kan gå tabt i vandet. Hvis du kollapser i vandet, drukner du, medmindre en livseliksir redder dig først.',
         krystal: 'Krystalfelter er farlige og sjældne. Gravning kan give stærke fund, men også fælder.',
         marked: 'Markeder kan have butikker. Du kan normalt ikke grave her.',
         slagmark: 'Slagmark er et farligt gravefelt med guld, rødder, fælder og livseliksir.',
@@ -400,11 +400,13 @@
             spilTilstand.alleSpillere[navn].trackedeSpillere = [];
             spilTilstand.alleSpillere[navn].escapeIndex = null;
             spilTilstand.alleSpillere[navn].escapeIcon = null;
+            spilTilstand.alleSpillere[navn].gratisNaesteBevaegelse = false;
         });
 
         spilTilstand.fogX = 0;
         spilTilstand.dag = 1;
         spilTilstand.historik = [];
+        spilTilstand.gratisNaesteBevaegelse = false;
         
         nulstilKort();
 
@@ -513,6 +515,7 @@
                     spilTilstand.mineKendteFelter = eksisterende.kendteFelter || [];
                     spilTilstand.historik = eksisterende.historik || [];
                     spilTilstand.venteGratisFeltBrugt = eksisterende.venteGratisFeltBrugt ?? null;
+                    spilTilstand.gratisNaesteBevaegelse = eksisterende.gratisNaesteBevaegelse ?? false;
 
                     afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
                     startRealtime();
@@ -865,6 +868,7 @@
         spilTilstand.nuvaerendeEnergi = karakter.baseEnergi;
         spilTilstand.mitUdstyr = [];
         spilTilstand.mineKendteFelter = [];
+        spilTilstand.gratisNaesteBevaegelse = false;
         
         spilTilstand.logHistorik = []; 
 
@@ -884,6 +888,7 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].venteGratisFeltBrugt = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIndex = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIcon = null;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisNaesteBevaegelse = false;
         }
 
         const muligeStartFelter = [];
@@ -1038,6 +1043,11 @@
         const dele: string[] = [biomeForklaringer[biome] || 'Et udforsket felt på øen.'];
 
         if (erOpslugt) dele.push('Tågen har taget feltet. Det er farligt at stå her.');
+        if (biome === 'hav') dele.push('Hav kan sluge tung rustning og fakler, og uden båd risikerer du drukning.');
+        if (biome === 'hule') dele.push('Huler kan ødelægge soveposer og fint tøj.');
+        if (biome === 'ruin') dele.push('Ruiner kan koste madrationer.');
+        if (biome === 'krystal') dele.push('Krystaller kan ødelægge metaldetektor og gylden kikkert.');
+        if (biome === 'ritual') dele.push('Ritualfelter kan ødelægge søgekvist.');
         if (felt.hasBoat) dele.push(`Der ${felt.boatCount && felt.boatCount > 1 ? `ligger ${felt.boatCount} både` : 'ligger en flugtbåd'} her.`);
         if (felt.eventID && !felt.eventFuldført) dele.push('Feltet har et event, som starter når du går ind på det.');
         if (felt.shopItems?.length) dele.push('Feltet har en butik.');
@@ -1266,7 +1276,7 @@ function udførBevægelse(nytIndeks: number) {
                                 <div class="sejr-lys"></div>
                             {/if}
                             {#each Array.from({ length: Math.min(felt.boatCount || 1, 4) }, (_ignore, index) => index) as baadNr (baadNr)}
-                                <img src="/tiles/baad.webp" alt="Flugtbåd" class="escape-boat boat-{baadNr}" />
+                                <img src="/tiles/baad.webp" alt="Flugtbåd" class="escape-boat boat-{baadNr}" data-help-title="Flugtbåd" data-help-body="Gå ind på bådfeltet for at forlade øen. Antallet af både afgør hvor mange spillere der kan slippe væk herfra." />
                             {/each}
                             {#if (felt.boatCount || 1) > 4}
                                 <span class="boat-count">×{felt.boatCount}</span>
@@ -1281,52 +1291,52 @@ function udførBevægelse(nytIndeks: number) {
                             {@const erHoestet = felt.hoestetFremTilBlok !== undefined && nuBlok <= felt.hoestetFremTilBlok}
 
                             {#if erSmadret}
-                                <img src="/tiles/{felt.afgroede === 'hvede' ? 'brokenwheat.webp' : 'brokenbean.webp'}" class="crop-icon" alt="" />
+                                <img src="/tiles/{felt.afgroede === 'hvede' ? 'brokenwheat.webp' : 'brokenbean.webp'}" class="crop-icon" alt="" data-help-title="Ødelagt afgrøde" data-help-body="Afgrøden er ødelagt og giver ikke længere mad eller heling." />
                             {:else if !erHoestet && !erPlageramt}
                                 {#if erModen}
-                                    <img src="/tiles/{felt.afgroede === 'hvede' ? 'wheat.webp' : 'beans.webp'}" class="crop-icon moden" alt="" />
+                                    <img src="/tiles/{felt.afgroede === 'hvede' ? 'wheat.webp' : 'beans.webp'}" class="crop-icon moden" alt="" data-help-title="Moden afgrøde" data-help-body="En moden afgrøde. Når du går ind på feltet, kan den give lidt HP, medmindre en insektplage rammer." />
                                 {:else}
-                                    <img src="/tiles/{felt.afgroede === 'hvede' ? 'growingwheat.webp' : 'growingbean.webp'}" class="crop-icon" alt="" />
+                                    <img src="/tiles/{felt.afgroede === 'hvede' ? 'growingwheat.webp' : 'growingbean.webp'}" class="crop-icon" alt="" data-help-title="Voksende afgrøde" data-help-body="Afgrøden er ikke moden endnu. Hvis du tramper gennem den for tidligt, bliver den skadet." />
                                 {/if}
                             {/if}
                         {/if}
 
                         {#if erUdforsket && !erOpslugt && felt.biome === 'meteor' && felt.hasMeteorStone}
-                            <img src="/tiles/meteorsten.webp" class="meteor-stone-icon" alt="" />
+                            <img src="/tiles/meteorsten.webp" class="meteor-stone-icon" alt="" data-help-title="Meteorsten" data-help-body="Meteorstenen markerer et meteor-event. Feltet styres af meteorens egen belønning og fare." />
                         {/if}
 
                         {#if erUdforsket && !erOpslugt && felt.taageBlokker}
-                            <img src="/tiles/blokker.webp" class="taageblokker-icon" class:taageblokker-inaktiv={spilTilstand.fogX < 0} alt="Tågeblokker" />
+                            <img src="/tiles/blokker.webp" class="taageblokker-icon" class:taageblokker-inaktiv={spilTilstand.fogX < 0} alt="Tågeblokker" data-help-title="Tågeblokker" data-help-body="Holder tågen tilbage fra venstre side. Når tågen vender fra højre, beskytter blokkeren ikke længere." />
                         {/if}
 
                         {#if erUdforsket && !felt.gravet}
                             {#if felt.isSkatteKlynge && harSkattekortAktivt}
-                                <img src="/tiles/treasuremark.webp" alt="Mulig skat" class="treasure-mark-icon" />
+                                <img src="/tiles/treasuremark.webp" alt="Mulig skat" class="treasure-mark-icon" data-help-title="Mulig skat" data-help-body="Skattekortet peger på dette felt som mulig skatteklynge. Grav for at afsløre om der er noget." />
                             {/if}
                             {#if harDetektor && (felt.skjultGuld ?? 0) > 0}
-                                <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 80});" />
+                                <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" data-help-title="Guldspor" data-help-body="Din metaldetektor mærker skjult guld under jorden. Grav feltet for at få det frem." style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 80});" />
                             {/if}
                             {#if harKvist && (felt.skjultLiv ?? 0) > 0}
-                                <img src="/tiles/livtaage.webp" alt="" class="mist-icon" style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultLiv ?? 0) / 40});" />
+                                <img src="/tiles/livtaage.webp" alt="" class="mist-icon" data-help-title="Rodspor" data-help-body="Søgekvisten mærker helende rødder under jorden. Grav feltet for at finde dem." style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultLiv ?? 0) / 40});" />
                             {/if}
                         {/if}
                         
                         {#if erUdforsket && felt.gravet}
-                            <img src="/tiles/udgravning.webp" alt="" class="dug-image" />
+                            <img src="/tiles/udgravning.webp" alt="" class="dug-image" data-help-title="Udgravning" data-help-body="Feltet er allerede gravet op. Skjulte fund og fælder her er brugt." />
                         {/if}
 
                         {#if erUdforsket && felt.tomSkattekiste}
-                            <img src="/tiles/empty_treasure.webp" alt="Tom skattekiste" class="empty-treasure-icon" />
+                            <img src="/tiles/empty_treasure.webp" alt="Tom skattekiste" class="empty-treasure-icon" data-help-title="Tom skattekiste" data-help-body="Skatten er taget. Kisten bliver liggende som spor, men giver ikke mere." />
                         {/if}
                         
                         {#if erUdforsket && felt.hasGoldmine}
-                            <div class="goldmine-container">
+                            <div class="goldmine-container" data-help-title="Guldmine" data-help-body={felt.mineOwner ? `Guldminen ejes af ${felt.mineOwner}. Ejeren får score, og andre kan forsøge at overtage den, hvis den ikke er låst.` : 'Guldmine giver guld og score, når du overtager den. Besøg den igen for at låse den.'}>
                                 <img src="/tiles/goldmine.webp" alt="Guldmine" class="goldmine-icon" />
                                 {#if felt.mineOwner}
                                     <div class="owner-badge" class:locked={felt.mineLocked}>
-                                        <img src={felt.mineOwner === spilTilstand.spillerNavn ? spilTilstand.valgtKarakter?.ikon : (spilTilstand.alleSpillere[felt.mineOwner]?.ikon || '/tiles/player.webp')} alt="Ejer" class="mine-owner-portrait" />
+                                        <img src={felt.mineOwner === spilTilstand.spillerNavn ? spilTilstand.valgtKarakter?.ikon : (spilTilstand.alleSpillere[felt.mineOwner]?.ikon || '/tiles/player.webp')} alt="Ejer" class="mine-owner-portrait" data-help-title="Mine-ejer" data-help-body={`Denne spiller ejer minen: ${felt.mineOwner}.`} />
                                         {#if felt.mineLocked}
-                                            <span class="lock-icon">🔒</span>
+                                            <span class="lock-icon" data-help-title="Låst mine" data-help-body="Minen er låst af ejeren og kan ikke overtages lige nu.">🔒</span>
                                         {/if}
                                     </div>
                                 {/if}
@@ -1335,14 +1345,14 @@ function udførBevægelse(nytIndeks: number) {
 
                         {#if erUdforsket && felt.eventID && !felt.eventFuldført}
                             {#if felt.eventID === 'campfire'}
-                                <img src="/tiles/campfire.webp" alt="" class="campfire-icon" />
+                                <img src="/tiles/campfire.webp" alt="" class="campfire-icon" data-help-title="Lejrbål" data-help-body="Lejrbålet er et event eller hvilepunkt. Gå ind på feltet for at aktivere det." />
                             {:else if felt.eventID !== 'meteor_skat'}
-                                <img src="/tiles/event.png" alt="" class="event-crystal" />
+                                <img src="/tiles/event.png" alt="" class="event-crystal" data-help-title="Event" data-help-body="Feltet har et event. Når du går ind på feltet, åbner et valg eller en situation." />
                             {/if}
                         {/if}
 
                         {#if erUdforsket && felt.hasPortal}
-                            <img src="/tiles/portal.webp" alt="Portal" class="portal-icon" />
+                            <img src="/tiles/portal.webp" alt="Portal" class="portal-icon" data-help-title="Portal" data-help-body="Portalen flytter dig mod øst. Landingsfeltet aktiveres som et normalt felt." />
                         {/if}
 
                         {#if erUdforsket && felt.shopItems && felt.shopItems.length > 0}
@@ -1350,18 +1360,20 @@ function udførBevægelse(nytIndeks: number) {
                                 src="/tiles/{felt.biome === 'by' ? 'byshop.webp' : 'markedshop.webp'}" 
                                 alt="" 
                                 class="shop-icon" 
+                                data-help-title={felt.biome === 'by' ? 'Bybutik' : 'Marked'}
+                                data-help-body="Butikken sælger varer for guld. Vareudvalget ligger på feltet og deles af spillerne på øen."
                                 onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')} 
                             />
                         {/if}
 
                         {#if erUdforsket && !erOpslugt && felt.indbrudt}
-                            <span class="indbrud-marker" aria-label="Indbrudt">
+                            <span class="indbrud-marker" aria-label="Indbrudt" data-help-title="Indbrudt" data-help-body="Byfeltet er allerede brudt op med dirk. Det markerer et brugt indbrudssted.">
                                 <img src="/tiles/openlock.webp" alt="" class="indbrud-icon" />
                             </span>
                         {/if}
 
                         {#if erUdforsket && felt.gravstenIkon}
-                            <div class="gravsten-container">
+                            <div class="gravsten-container" data-help-title="Gravsten" data-help-body="En spiller døde på dette felt. Gravstenen bliver liggende som et permanent spor på øen.">
                                 <img src="/tiles/gravsted.webp" alt="Død" class="gravsten-ikon" />
                                 <img src={felt.gravstenIkon} alt="Faldet" class="gravsten-portraet" />
                             </div>
@@ -1372,7 +1384,7 @@ function udførBevægelse(nytIndeks: number) {
                             {#if farvelBaade.length > 0}
                                 <div class="farvel-baade-container">
                                     {#each farvelBaade as farvel, farvelNr (farvel.navn)}
-                                        <span class="farvel-baad" style="--farvel-offset: {(farvelNr - (farvelBaade.length - 1) / 2) * 18}px;">
+                                    <span class="farvel-baad" data-help-title="Farvelbåd" data-help-body={`${farvel.navn} slap væk fra øen her. Ikonet er kun minde/pynt og forsvinder ved game reset.`} style="--farvel-offset: {(farvelNr - (farvelBaade.length - 1) / 2) * 18}px;">
                                             <img src="/tiles/baad.webp" alt="" class="farvel-baad-ikon" />
                                             <img src={farvel.ikon} alt="Sluppet vÃ¦k" class="farvel-baad-portraet" />
                                         </span>
@@ -1386,14 +1398,14 @@ function udførBevægelse(nytIndeks: number) {
                                 {@const afstand = regnHexAfstand(spilTilstand.spillerIndex, mod.index, BREDDE)}
                                 {@const tracket = erTrackerAktivPaa(navn)}
                                 {@const synlig = afstand <= aktuelSynsRadius || tracket}
-                                <span class="modstander-icon" class:alarm-aktiv={mod.activeAlarm && !synlig} class:skjult-lyd={!synlig && !mod.activeAlarm} class:tracker-aktiv={tracket}>
+                                <span class="modstander-icon" data-help-title={synlig ? navn : 'Ukendt spiller'} data-help-body={synlig ? `${navn} står på dette felt.` : (mod.activeAlarm ? 'Du kan høre alarm/lyd fra en spiller her, men kan ikke se hvem det er.' : 'En spiller er tæt på, men uden for dit syn.')} class:alarm-aktiv={mod.activeAlarm && !synlig} class:skjult-lyd={!synlig && !mod.activeAlarm} class:tracker-aktiv={tracket}>
                                     <img src={synlig ? (mod.ikon || '/tiles/player.webp') : '/tiles/player.webp'} alt="" style="height: {synlig ? '58px' : '70px'};" />
                                 </span>
                             {/if}
                         {/each}
 
                         {#if spilTilstand.spillerIndex === i && sejlendeBaadIndex !== i && spilTilstand.gameState !== 'dead' && spilTilstand.gameState !== 'win'}
-                            <span class="player-icon" style="position: relative; display: inline-flex; justify-content: center; z-index: 20;">
+                            <span class="player-icon" data-help-title="Dig" data-help-body="Din karakter står her. Tryk på nabofelter for at bevæge dig." style="position: relative; display: inline-flex; justify-content: center; z-index: 20;">
                                 <img src={spilTilstand.valgtKarakter?.ikon} alt="" style="height: 58px;" />
                             </span>
                         {/if}
@@ -1409,7 +1421,7 @@ function udførBevægelse(nytIndeks: number) {
                 </div>
 
                 {#if sejlendeBaadIndex === i}
-                    <div class="sailing-container" style="left: {posX}px; top: {posY}px;">
+                    <div class="sailing-container" data-help-title="Afrejse" data-help-body="Du er på vej væk i båden. Om lidt vises slutkortet." style="left: {posX}px; top: {posY}px;">
                         <img src="/tiles/baad.webp" alt="Flugtbåd" class="escape-boat" />
                         <img src={spilTilstand.valgtKarakter?.ikon} alt="" class="sejler-ikon" />
                     </div>

@@ -53,17 +53,19 @@
 
     function spisMad() {
         const fuldHp = spilTilstand.livspoint >= spilTilstand.maxLivspoint;
-        const fuldEnergi = spilTilstand.nuvaerendeEnergi >= spilTilstand.maxEnergi;
+        const harGratisBevaegelse = spilTilstand.gratisNaesteBevaegelse;
 
-        if (fuldHp && fuldEnergi) {
+        if (fuldHp && harGratisBevaegelse) {
             spilTilstand.logBesked = "Du er allerede mæt og fuldt udhvilet.";
             return;
         }
 
+        const foerHp = spilTilstand.livspoint;
         brugFraRygsæk('mad', 1);
-        spilTilstand.livspoint += 10;
-        spilTilstand.nuvaerendeEnergi += 1;
-        spilTilstand.logBesked = "Du spiser din madration. (+10 HP, +1 Energi)";
+        spilTilstand.livspoint += 20;
+        spilTilstand.gratisNaesteBevaegelse = true;
+        const faktiskHeling = spilTilstand.livspoint - foerHp;
+        spilTilstand.logBesked = `Du spiser din madration. (+${faktiskHeling} HP, næste bevægelse koster 0 energi)`;
         syncTilDb();
     }
 
@@ -95,7 +97,7 @@
                 spilTilstand.nuvaerendeEnergi < spilTilstand.valgtKarakter.baseEnergi
             );
         }
-        if (vareId === 'mad') return spilTilstand.livspoint < spilTilstand.maxLivspoint || spilTilstand.nuvaerendeEnergi < spilTilstand.maxEnergi;
+        if (vareId === 'mad') return spilTilstand.livspoint < spilTilstand.maxLivspoint || !spilTilstand.gratisNaesteBevaegelse;
         if (vareId === 'dirk') return !!kanBegaaIndbrud;
         return vareId === 'stav' || vareId === 'fakkel' || vareId === 'hemmelighed';
     }
@@ -123,7 +125,7 @@
         <div class="log-modal-content" onclick={(e) => e.stopPropagation()} role="presentation">
             <div class="log-header">
                 <h2>Logbog</h2>
-                <button class="luk-btn" onclick={() => visLog = false}>✕</button>
+                <button class="luk-btn" onclick={() => visLog = false} aria-label="Luk logbog">×</button>
             </div>
             
             <div class="log-liste" bind:this={logContainerRef}>
@@ -190,17 +192,17 @@
 
     <div class="ui-content">
         <div class="status-row">
-            <div class="status-item" class:kritisk={spilTilstand.livspoint < 30}>
+            <div class="status-item" class:kritisk={spilTilstand.livspoint < 30} data-help-title="HP" data-help-body="Dit helbred. Når HP når 0, dør du eller reddes af en livseliksir, hvis du har en. Mad giver nu +20 HP.">
                 <img src="/inventory/hp.webp" alt="Liv" class="status-icon" />
                 <span class="status-value">{spilTilstand.livspoint}</span>
             </div>
             
-            <div class="status-item">
+            <div class="status-item" data-help-title="Guld" data-help-body="Guld bruges i butikker og tæller med i score. Nogle karakterer tjener mere eller mindre guld.">
                 <img src="/inventory/guld.webp" alt="Guld" class="status-icon" />
                 <span class="status-value">{spilTilstand.guldTotal}</span>
             </div>
         
-            <div class="energi-sektion">
+            <div class="energi-sektion" data-help-title="Energi" data-help-body={spilTilstand.gratisNaesteBevaegelse ? 'Din næste bevægelse koster 0 energi på grund af mad.' : 'Energi bruges på bevægelse, gravning og visse handlinger. Når energien løber tør, går der en ny dag.'}>
                 <div class="energi-container">
                     <div class="energi-grid">
                         {#each Array(9) as tomPlads, i (i)}
@@ -225,7 +227,7 @@
                 onkeydown={(e) => { if (kanGrave && (e.key === 'Enter' || e.key === ' ')) grav(); }}
             >
                 <div class="ikon-container">
-                    <img src={graveIkon} alt={graveAlt} class="inventory-icon grave-icon {kanGrave ? '' : 'deaktiveret'}" />
+                    <img src={graveIkon} alt={graveAlt} class="inventory-icon grave-icon {kanGrave ? '' : 'deaktiveret'}" data-help-title={harSkovl ? 'Skovl' : 'Grav med hænderne'} data-help-body={kanGrave ? (harSkovl ? 'Graver feltet med lavere energipris. Nedgravede fælder udløses ved gravning.' : 'Graver feltet uden skovl. Det koster ekstra energi og HP, og nedgravede fælder kan udløses.') : 'Du kan ikke grave på dette felt lige nu.'} />
                 </div>
             </div>
 
@@ -256,6 +258,8 @@
                                 src={dbInfo.billede} 
                                 alt={dbInfo.navn} 
                                 class="inventory-icon {erSituationsVare(vare.id) && !kanBrugeInventoryVare(vare.id) ? 'deaktiveret' : ''}" 
+                                data-help-title={dbInfo.navn}
+                                data-help-body={forklaringForVare(vare.id, kanBrugeInventoryVare(vare.id))}
                             />
                             {#if vare.maengde > 1}
                                 <span class="maengde-badge">{vare.maengde}</span>
@@ -533,6 +537,21 @@
     }
     .log-header h2 { color: #ffcc00; font-family: 'Cinzel', serif; margin: 0;
     }
+    .luk-btn {
+        width: 42px;
+        height: 42px;
+        border: 1px solid #666;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        font-size: 1.6rem;
+        line-height: 1;
+        cursor: pointer;
+        flex: 0 0 auto;
+    }
+    .luk-btn:hover {
+        background: rgba(255, 255, 255, 0.16);
+    }
     .log-liste { padding: 20px; overflow-y: auto; flex-grow: 1; }
     .log-post { color: #aaa;
         border-left: 2px solid #333; padding-left: 12px; margin-bottom: 10px; }
@@ -658,9 +677,24 @@
         }
 
         .log-modal-content {
+            position: relative;
             width: 100%;
             height: auto;
             max-height: calc(100dvh - 24px);
+        }
+
+        .log-header {
+            padding: 12px 64px 12px 14px;
+        }
+
+        .luk-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 48px;
+            height: 48px;
+            font-size: 1.9rem;
+            z-index: 2;
         }
     }
 </style>

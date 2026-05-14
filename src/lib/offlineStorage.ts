@@ -37,6 +37,7 @@ interface OfflineSnapshot {
     mineKendteFelter: number[];
     historik: number[];
     nuvaerendeEnergi: number;
+    gratisNaesteBevaegelse?: boolean;
     musikTaendt: boolean;
 }
 
@@ -97,6 +98,7 @@ export function gemOfflineSpil() {
         mineKendteFelter: spilTilstand.mineKendteFelter,
         historik: spilTilstand.historik,
         nuvaerendeEnergi: spilTilstand.nuvaerendeEnergi,
+        gratisNaesteBevaegelse: spilTilstand.gratisNaesteBevaegelse,
         musikTaendt: spilTilstand.musikTaendt
     };
 
@@ -134,6 +136,7 @@ export function indlaesOfflineSpil() {
         spilTilstand.mineKendteFelter = data.mineKendteFelter || [];
         spilTilstand.historik = data.historik || [];
         spilTilstand.nuvaerendeEnergi = data.nuvaerendeEnergi ?? data.valgtKarakter?.baseEnergi ?? 10;
+        spilTilstand.gratisNaesteBevaegelse = data.gratisNaesteBevaegelse ?? false;
         spilTilstand.musikTaendt = data.musikTaendt ?? true;
         spilTilstand.statusBesked = 'Offline-spil indlæst.';
 

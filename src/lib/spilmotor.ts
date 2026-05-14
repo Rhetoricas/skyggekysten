@@ -404,7 +404,9 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     const biomeRabat = spilTilstand.valgtKarakter.biomeMod?.[felt.biome as string] || 0;
     const pris = Math.max(1, spilTilstand.valgtKarakter.moveCost + spilTilstand.rygsækEffekt.move + grundPris + biomeRabat);
 
-    spilTilstand.nuvaerendeEnergi -= options.erITaagen ? pris + 2 : pris;
+    const gratisBevaegelse = spilTilstand.gratisNaesteBevaegelse;
+    spilTilstand.nuvaerendeEnergi -= gratisBevaegelse ? 0 : (options.erITaagen ? pris + 2 : pris);
+    if (gratisBevaegelse) spilTilstand.gratisNaesteBevaegelse = false;
 
     spilTilstand.spillerIndex = nytIndeks;
     if (!spilTilstand.historik) spilTilstand.historik = [];
@@ -415,7 +417,7 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     if ((nytIndeks % BREDDE) > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nytIndeks % BREDDE;
 
     const ankomstResultat = haandterAnkomstPaaFelt(nytIndeks, 'gang', {
-        startLog: "",
+        startLog: gratisBevaegelse ? "Maden holder dig i gang. Bevægelsen koster 0 energi." : "",
         onBaadStart: options.onBaadStart
     });
     tjekAutoTracker();

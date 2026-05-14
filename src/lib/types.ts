@@ -74,6 +74,7 @@ export interface SpillerData {
     } | null;
     trackedeSpillere?: string[];
     venteGratisFeltBrugt?: number | null;
+    gratisNaesteBevaegelse?: boolean;
 }
 
 export interface Felt {
