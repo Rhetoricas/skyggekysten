@@ -48,6 +48,8 @@ export interface SpillerData {
     guld: number;
     isDead: boolean;
     isWinner: boolean;
+    escapeIndex?: number | null;
+    escapeIcon?: string | null;
     score: number;
     ikon?: string;
     mitUdstyr?: RygsækTing[];

@@ -151,6 +151,8 @@ export async function syncTilDb(opdaterKort = false) {
         tidligereHistorik: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.tidligereHistorik || [],
         isDead: isDead,
         isWinner: isWinner,
+        escapeIndex: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.escapeIndex ?? null,
+        escapeIcon: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.escapeIcon ?? spilTilstand.valgtKarakter?.ikon ?? null,
         sidstAktiv: Date.now(), 
         activeAlarm: false,
         browserId: localStorage.getItem('taage_browser_id'),

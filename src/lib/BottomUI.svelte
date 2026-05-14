@@ -103,6 +103,19 @@
     function erSituationsVare(vareId: string) {
         return vareId === 'skovl' || vareId === 'sovepose' || vareId === 'mad' || vareId === 'dirk';
     }
+
+    function forklaringForVare(vareId: string, aktiv: boolean) {
+        const info = itemDB[vareId];
+        if (!info) return 'Ukendt genstand.';
+
+        const status = aktiv
+            ? 'Den kan bruges lige nu.'
+            : erSituationsVare(vareId)
+                ? 'Den kan ikke bruges i den nuværende situation.'
+                : 'Den kan normalt bruges fra inventory.';
+
+        return `${info.beskrivelse} ${status}`;
+    }
 </script>
 
 {#if visLog}
@@ -131,6 +144,8 @@
         class="log-container klikbar" 
         onclick={() => visLog = true}
         onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') visLog = true; }}
+        data-help-title="Logbog"
+        data-help-body="Her ser du de seneste beskeder. Tryk på loggen for at åbne hele logbogen."
         role="button"
         tabindex="0"
     >
@@ -204,6 +219,8 @@
                 class="grav-knap inventory-item {kanGrave ? 'klikbar' : ''}"
                 role="button"
                 tabindex={kanGrave ? 0 : -1}
+                data-help-title={harSkovl ? 'Skovl' : 'Grav med hænderne'}
+                data-help-body={kanGrave ? (harSkovl ? 'Graver feltet med lavere energipris.' : 'Graver feltet uden skovl. Det koster ekstra energi og HP.') : 'Du kan ikke grave på dette felt lige nu.'}
                 onclick={() => { if (kanGrave) grav(); }}
                 onkeydown={(e) => { if (kanGrave && (e.key === 'Enter' || e.key === ' ')) grav(); }}
             >
@@ -217,6 +234,8 @@
                 {#if dbInfo && vare.id !== 'skovl'}
                     <div 
                         class="inventory-item {kanBrugeInventoryVare(vare.id) ? 'klikbar' : ''}" 
+                        data-help-title={dbInfo.navn}
+                        data-help-body={forklaringForVare(vare.id, kanBrugeInventoryVare(vare.id))}
                         onclick={() => {
                             if (kanBrugeInventoryVare(vare.id)) {
                                 haandterInventoryKlik(vare.id);
@@ -262,6 +281,9 @@
         pointer-events: none;
         display: flex;
         flex-direction: column;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
     }
 
     .ui::before {
@@ -296,6 +318,7 @@
     .log-container.klikbar {
         pointer-events: auto;
         cursor: pointer;
+        touch-action: manipulation;
     }
     .log-line {
         text-align: center;
@@ -328,6 +351,8 @@
         margin-bottom: 12px;
         pointer-events: auto;
         flex-wrap: wrap;
+        user-select: none;
+        -webkit-user-select: none;
     }
     .tracker-status {
         display: flex;
@@ -415,6 +440,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
     }
     .inventory-item.klikbar {
         cursor: pointer;
@@ -427,12 +455,19 @@
         display: flex;
         align-items: flex-start;
         gap: 14px;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        touch-action: pan-x;
     }
 
     .inventory-icon {
         height: 68px;
         width: auto;
         filter: drop-shadow(0 2px 5px rgba(0,0,0,0.9));
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-user-drag: none;
     }
     .grave-icon {
         object-fit: contain;
@@ -592,6 +627,9 @@
             overflow-y: hidden;
             padding: 2px 36px 2px 0;
             scrollbar-width: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
 
         .inventory-row::-webkit-scrollbar {

@@ -35,6 +35,15 @@ export const authState = $state({
 
 let authStartet = false;
 
+function loginFejlBesked(message: string) {
+    const lavere = message.toLowerCase();
+    if (lavere.includes('rate') || lavere.includes('security') || lavere.includes('limit') || lavere.includes('seconds') || lavere.includes('minute')) {
+        return 'Supabase holder en kort pause på nye login-mails til den email. Du kan stadig spille offline imens og prøve login igen lidt senere.';
+    }
+
+    return `Login-linket kunne ikke sendes: ${message}`;
+}
+
 export async function initAuth() {
     if (authStartet) return;
     authStartet = true;
@@ -73,11 +82,11 @@ export async function sendLoginLink(email: string) {
 
     if (error) {
         console.error('Login-link kunne ikke sendes:', error);
-        authState.besked = `Login-linket kunne ikke sendes: ${error.message}`;
+        authState.besked = loginFejlBesked(error.message);
         return;
     }
 
-    authState.besked = 'Vi har sendt et login-link til din email.';
+    authState.besked = 'Vi har sendt et login-link til din email. Hvis du allerede har bedt om et link, kan Supabase kræve en kort pause før næste mail.';
 }
 
 export async function logUd() {

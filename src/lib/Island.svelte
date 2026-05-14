@@ -22,7 +22,7 @@
         tilgaengeligeKarakterer,
         itemDB
     } from '$lib/spildata';
-    import type { Karakter, SpillerData } from '$lib/types';
+    import type { Felt, Karakter, SpillerData } from '$lib/types';
     import { eventBibliotek } from '$lib/eventBibliotek';
     import { erAfgroedeModen, hentAfgroedeBlok, hentInsektPlageBlok } from '$lib/afgroeder';
     import { erFeltITaagen } from '$lib/taage';
@@ -49,6 +49,9 @@
     let langsomtKamera = $state(false);
     let ruteOverblikState = '';
     let introAktiv = $state(false);
+    let sidstePinchAfstand = 0;
+    let inspectAktiv = $state(false);
+    let inspectBoble = $state<{ titel: string; tekst: string; x: number; y: number } | null>(null);
     
     let harDetektor = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'metaldetektor') ?? false);
     let harKvist = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'soegekvist') ?? false);
@@ -58,6 +61,25 @@
     let aktivInsektPlageBlok = $derived(hentInsektPlageBlok(spilTilstand.gitter));
 
     let harSkattekortAktivt = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'skattekort_aabent') ?? false);
+
+    const biomeForklaringer: Record<string, string> = {
+        mark: 'Mark kan graves og kan senere have afgroeder. Gravefund er ofte små: lidt guld, rod, sjælden fælde eller fakkel.',
+        eng: 'Eng er et let naturfelt. Det kan graves og har små chancer for guld, rod, fælde eller fakkel.',
+        skov: 'Skov kan give gode helende rødder ved gravning og har en lille chance for livseliksir.',
+        bjerg: 'Bjerg er tungt terræn for mange karakterer. Ved gravning finder du ofte guld, men også fælder og fakler.',
+        hule: 'Hule er farligt terræn. Gravefund kan være værdifulde, men fælder og livseliksir er også i puljen.',
+        ritual: 'Ritualfelt er farligt og event-tungt. Gravning kan give guld, rod, fælde eller livseliksir.',
+        ruin: 'Ruin er farligt, men rigt. Gravning kan give mere guld og har også risiko for fælder.',
+        bandit: 'Banditlejr er risikabel. Gravning giver ofte guld, men der er også stor fælderisiko.',
+        hoejland: 'Højland er åbent terræn. Gravning kan give guld, rod, en lille fælderisiko eller fakkel.',
+        blodskov: 'Blodskov er farligt og uroligt. Gravefund ligner andre farlige biomer: guld, rod, fælder og livseliksir.',
+        by: 'Byer kan have butikker og indbrudsmuligheder. Du kan normalt ikke grave her.',
+        hav: 'Hav er farligt uden båd. Hvis du kollapser i vandet, drukner du, medmindre en livseliksir redder dig først.',
+        krystal: 'Krystalfelter er farlige og sjældne. Gravning kan give stærke fund, men også fælder.',
+        marked: 'Markeder kan have butikker. Du kan normalt ikke grave her.',
+        slagmark: 'Slagmark er et farligt gravefelt med guld, rødder, fælder og livseliksir.',
+        meteor: 'Meteor-felter styres af meteor-eventet. Kig efter meteorstenen og eventet på feltet.'
+    };
     
     let glHp = $state(0);
     let glGuld = $state(0);
@@ -376,6 +398,8 @@
             spilTilstand.alleSpillere[navn].harSkattekort = false;
             spilTilstand.alleSpillere[navn].aktivTracker = null;
             spilTilstand.alleSpillere[navn].trackedeSpillere = [];
+            spilTilstand.alleSpillere[navn].escapeIndex = null;
+            spilTilstand.alleSpillere[navn].escapeIcon = null;
         });
 
         spilTilstand.fogX = 0;
@@ -858,6 +882,8 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].aktivTracker = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].trackedeSpillere = [];
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].venteGratisFeltBrugt = null;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIndex = null;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIcon = null;
         }
 
         const muligeStartFelter = [];
@@ -986,6 +1012,124 @@
         return fundet ? { navn: fundet[0], spiller: fundet[1] } : null;
     }
 
+    function farvelBaadeForFelt(index: number) {
+        return Object.entries(spilTilstand.alleSpillere)
+            .filter(([, spiller]) => spiller?.isWinner && spiller.escapeIndex === index)
+            .map(([navn, spiller]) => ({
+                navn,
+                ikon: spiller.escapeIcon || spiller.ikon || '/tiles/player.webp'
+            }));
+    }
+
+    function formaterBiomeNavn(biome: string | undefined) {
+        if (!biome) return 'felt';
+        return biome.replace('hoejland', 'højland');
+    }
+
+    function forklaringForFelt(felt: Felt, index: number, erUdforsket: boolean, erOpslugt: boolean) {
+        if (!erUdforsket) {
+            return {
+                titel: 'Ukendt felt',
+                tekst: 'Du har ikke udforsket feltet endnu. Bevæg dig tættere på eller brug lys/udsyn for at afsløre det.'
+            };
+        }
+
+        const biome = String(felt.biome || 'felt');
+        const dele: string[] = [biomeForklaringer[biome] || 'Et udforsket felt på øen.'];
+
+        if (erOpslugt) dele.push('Tågen har taget feltet. Det er farligt at stå her.');
+        if (felt.hasBoat) dele.push(`Der ${felt.boatCount && felt.boatCount > 1 ? `ligger ${felt.boatCount} både` : 'ligger en flugtbåd'} her.`);
+        if (felt.eventID && !felt.eventFuldført) dele.push('Feltet har et event, som starter når du går ind på det.');
+        if (felt.shopItems?.length) dele.push('Feltet har en butik.');
+        if (felt.hasGoldmine) dele.push(felt.mineOwner ? `Guldminen ejes af ${felt.mineOwner}.` : 'Der er en guldmine her.');
+        if (felt.hasPortal) dele.push('Portalen kan flytte dig mod øst.');
+        if (felt.taageBlokker) dele.push('Tågeblokkeren kan holde tågen tilbage fra venstre, indtil tågen vender.');
+        if (felt.gravstenIkon) dele.push('Gravstenen viser, at en spiller døde her.');
+        if (farvelBaadeForFelt(index).length > 0) dele.push('Den grå farvelbåd viser, at en spiller slap væk fra dette felt.');
+        if (felt.gravet) dele.push('Feltet er allerede gravet op.');
+        else if (felt.kanGraves) dele.push('Feltet kan graves.');
+        else dele.push('Feltet kan ikke graves.');
+
+        return {
+            titel: formaterBiomeNavn(biome),
+            tekst: dele.join(' ')
+        };
+    }
+
+    function placerInspectBoble(clientX: number, clientY: number) {
+        const bredde = Math.min(280, Math.max(220, window.innerWidth - 24));
+        const hoejde = 170;
+        const margin = 12;
+        let x = clientX + 12;
+        let y = clientY + 12;
+
+        if (x + bredde > window.innerWidth - margin) x = clientX - bredde - 12;
+        if (y + hoejde > window.innerHeight - margin) y = clientY - hoejde - 12;
+
+        return {
+            x: Math.max(margin, Math.min(x, window.innerWidth - bredde - margin)),
+            y: Math.max(margin, Math.min(y, window.innerHeight - hoejde - margin))
+        };
+    }
+
+    function startInspect() {
+        inspectAktiv = true;
+        inspectBoble = null;
+    }
+
+    function lukInspect() {
+        inspectAktiv = false;
+        inspectBoble = null;
+    }
+
+    function haandterInspectKlik(e: MouseEvent) {
+        if (!inspectAktiv) return;
+
+        const target = e.target as HTMLElement | null;
+        const element = target?.closest('[data-help-title]') as HTMLElement | null;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const placering = placerInspectBoble(e.clientX, e.clientY);
+        inspectBoble = {
+            titel: element?.dataset.helpTitle || 'Hjælp',
+            tekst: element?.dataset.helpBody || 'Tryk på et felt, ikon eller en knap for at få en forklaring.',
+            ...placering
+        };
+        inspectAktiv = false;
+    }
+
+    function touchAfstand(touches: TouchList) {
+        if (touches.length < 2) return 0;
+        const dx = touches[0].clientX - touches[1].clientX;
+        const dy = touches[0].clientY - touches[1].clientY;
+        return Math.hypot(dx, dy);
+    }
+
+    function startTouchZoom(e: TouchEvent) {
+        if (eventState.aktivt || spilTilstand.aktivShop) return;
+        if (e.touches.length === 2) {
+            sidstePinchAfstand = touchAfstand(e.touches);
+            cam.stopTræk();
+            e.preventDefault();
+        }
+    }
+
+    function haandterTouchZoom(e: TouchEvent) {
+        if (eventState.aktivt || spilTilstand.aktivShop) return;
+        if (e.touches.length !== 2 || sidstePinchAfstand <= 0) return;
+
+        const nyAfstand = touchAfstand(e.touches);
+        cam.justerZoom((nyAfstand - sidstePinchAfstand) / 260, false);
+        sidstePinchAfstand = nyAfstand;
+        e.preventDefault();
+    }
+
+    function stopTouchZoom() {
+        sidstePinchAfstand = 0;
+    }
+
     async function medTimeout<T>(kald: PromiseLike<T>, ms = 12000): Promise<T> {
         let timer: ReturnType<typeof setTimeout>;
         const timeout = new Promise<never>((_, reject) => {
@@ -1039,7 +1183,7 @@ function udførBevægelse(nytIndeks: number) {
     }
 </script>
 
-<svelte:window onkeydown={håndterTastatur} />
+<svelte:window onkeydown={håndterTastatur} onclickcapture={haandterInspectKlik} />
 
 {#if spilTilstand.gameState === 'play'}
     <BottomUI />
@@ -1064,8 +1208,22 @@ function udførBevægelse(nytIndeks: number) {
 
 {#if spilTilstand.gameState === 'play'}
     <div class="game-help-actions">
+        <button
+            type="button"
+            class="inspect-knap"
+            class:aktiv={inspectAktiv}
+            onclick={startInspect}
+            title="Forklar næste tryk"
+            aria-label="Forklar næste tryk"
+        >
+            ?
+        </button>
         <Regelbog />
         <LydKnap />
+    </div>
+    <div class="zoom-actions" aria-label="Zoom">
+        <button type="button" onclick={() => cam.justerZoom(0.18, !!eventState.aktivt || !!spilTilstand.aktivShop)} aria-label="Zoom ind">+</button>
+        <button type="button" onclick={() => cam.justerZoom(-0.18, !!eventState.aktivt || !!spilTilstand.aktivShop)} aria-label="Zoom ud">-</button>
     </div>
 {/if}
 
@@ -1075,6 +1233,10 @@ function udførBevægelse(nytIndeks: number) {
         onpointerdown={(e) => cam.startTræk(e, !!eventState.aktivt || !!spilTilstand.aktivShop)}
         onpointermove={cam.træk}
         onpointerup={cam.stopTræk}
+        ontouchstart={startTouchZoom}
+        ontouchmove={haandterTouchZoom}
+        ontouchend={stopTouchZoom}
+        ontouchcancel={stopTouchZoom}
         style="cursor: {cam.isDragging ? 'grabbing' : 'grab'}; touch-action: none;"
     >
         <div class="map" style={kameraStyle}>
@@ -1087,11 +1249,14 @@ function udførBevægelse(nytIndeks: number) {
                 {@const erOpslugt = erFeltITaagen(spilTilstand.gitter, i, spilTilstand.fogX)}
                 {@const vistBiome = felt.katastrofeVisuelAktiv && felt.katastrofeFraBiome ? felt.katastrofeFraBiome : felt.biome}
                 {@const baggrund = !erUdforsket ? 'none' : erOpslugt ? `url('/tiles/${vistBiome}_taage.webp')` : `url('/tiles/${vistBiome}.webp')`}
+                {@const feltHjaelp = forklaringForFelt(felt, i, erUdforsket, erOpslugt)}
 
                 <div class="hex" class:active={spilTilstand.spillerIndex === i} class:unexplored={!erUdforsket}
                     class:katastrofe-venter={!!felt.katastrofeVisuelAktiv}
                     onclick={() => klikPåHex(i)}
                     onkeydown={(e) => { if (e.key === 'Enter') klikPåHex(i); }}
+                    data-help-title={feltHjaelp.titel}
+                    data-help-body={feltHjaelp.tekst}
                     role="button" tabindex="0"
                     style="background-image: {baggrund}; left: {posX}px; top: {posY}px;"
                 >
@@ -1202,8 +1367,22 @@ function udførBevægelse(nytIndeks: number) {
                             </div>
                         {/if}
                         
+                        {#if erUdforsket}
+                            {@const farvelBaade = farvelBaadeForFelt(i)}
+                            {#if farvelBaade.length > 0}
+                                <div class="farvel-baade-container">
+                                    {#each farvelBaade as farvel, farvelNr (farvel.navn)}
+                                        <span class="farvel-baad" style="--farvel-offset: {(farvelNr - (farvelBaade.length - 1) / 2) * 18}px;">
+                                            <img src="/tiles/baad.webp" alt="" class="farvel-baad-ikon" />
+                                            <img src={farvel.ikon} alt="Sluppet vÃ¦k" class="farvel-baad-portraet" />
+                                        </span>
+                                    {/each}
+                                </div>
+                            {/if}
+                        {/if}
+
                         {#each Object.entries(spilTilstand.alleSpillere) as [navn, mod] (navn)}
-                            {#if navn !== spilTilstand.spillerNavn && mod.index === i && !mod.isDead}
+                            {#if navn !== spilTilstand.spillerNavn && mod.index === i && !mod.isDead && !mod.isWinner}
                                 {@const afstand = regnHexAfstand(spilTilstand.spillerIndex, mod.index, BREDDE)}
                                 {@const tracket = erTrackerAktivPaa(navn)}
                                 {@const synlig = afstand <= aktuelSynsRadius || tracket}
@@ -1315,6 +1494,25 @@ function udførBevægelse(nytIndeks: number) {
     </div>
 </div>
 
+{#if inspectAktiv}
+    <div class="inspect-hint" role="status">
+        Tryk på et felt eller ikon
+    </div>
+{/if}
+
+{#if inspectBoble}
+    <div
+        class="inspect-boble"
+        style="left: {inspectBoble.x}px; top: {inspectBoble.y}px;"
+        role="dialog"
+        aria-live="polite"
+    >
+        <button type="button" class="inspect-luk" onclick={lukInspect} aria-label="Luk forklaring">×</button>
+        <h3>{inspectBoble.titel}</h3>
+        <p>{inspectBoble.tekst}</p>
+    </div>
+{/if}
+
 {#if introAktiv}
     <div class="intro-overlay">
         <div class="intro-box">
@@ -1408,9 +1606,21 @@ function udførBevægelse(nytIndeks: number) {
             top: 10px;
             right: 10px;
         }
+
+        .zoom-actions {
+            display: flex;
+            top: calc(env(safe-area-inset-top, 0px) + 64px);
+            right: 10px;
+        }
+
+        .inspect-knap {
+            width: 42px;
+            height: 42px;
+            font-size: 1.55rem;
+        }
     }
 
-    .game-container { position: fixed; inset: 0; width: 100vw; height: 100dvh; overflow: hidden; background: #000; }
+    .game-container { position: fixed; inset: 0; width: 100vw; height: 100dvh; overflow: hidden; background: #000; user-select: none; -webkit-user-select: none; }
     .game-help-actions {
         position: fixed;
         top: calc(env(safe-area-inset-top, 0px) + 14px);
@@ -1420,6 +1630,111 @@ function udførBevægelse(nytIndeks: number) {
         display: flex;
         align-items: center;
         gap: 10px;
+    }
+    .inspect-knap {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        border: 1px solid #3a3a3a;
+        background: rgba(255, 255, 255, 0.06);
+        color: #f4f4f4;
+        font-family: 'Cinzel', Georgia, serif;
+        font-size: 1.8rem;
+        line-height: 1;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .inspect-knap:hover,
+    .inspect-knap.aktiv {
+        background: rgba(255, 255, 255, 0.14);
+        border-color: #ddd;
+        transform: scale(1.04);
+        box-shadow: 0 0 14px rgba(255, 255, 255, 0.22);
+    }
+    .inspect-hint {
+        position: fixed;
+        left: 50%;
+        top: calc(env(safe-area-inset-top, 0px) + 18px);
+        transform: translateX(-50%);
+        z-index: 4200;
+        max-width: calc(100vw - 24px);
+        padding: 9px 13px;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 8px;
+        background: rgba(18, 18, 18, 0.88);
+        color: #f6f6f6;
+        font-size: 0.9rem;
+        font-weight: 700;
+        pointer-events: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    }
+    .inspect-boble {
+        position: fixed;
+        z-index: 4300;
+        width: min(280px, calc(100vw - 24px));
+        max-height: min(52dvh, 260px);
+        overflow-y: auto;
+        box-sizing: border-box;
+        padding: 14px 38px 14px 14px;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 8px;
+        background: rgba(20, 20, 20, 0.94);
+        color: #f2f2f2;
+        box-shadow: 0 18px 55px rgba(0,0,0,0.62);
+    }
+    .inspect-boble h3 {
+        margin: 0 0 7px;
+        font-family: 'Cinzel', Georgia, serif;
+        font-size: 1.05rem;
+        letter-spacing: 0;
+    }
+    .inspect-boble p {
+        margin: 0;
+        color: #d9d9d9;
+        font-size: 0.92rem;
+        line-height: 1.4;
+    }
+    .inspect-luk {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        width: 26px;
+        height: 26px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        font-size: 1.2rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+    .zoom-actions {
+        position: fixed;
+        right: 14px;
+        top: calc(env(safe-area-inset-top, 0px) + 72px);
+        z-index: 2100;
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        pointer-events: auto;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    .zoom-actions button {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        background: rgba(12, 14, 14, 0.78);
+        color: #fff;
+        font-size: 1.35rem;
+        font-weight: 800;
+        line-height: 1;
+        touch-action: manipulation;
     }
     .camera { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
     .map { position: absolute; top: 0; left: 0; }
@@ -1470,7 +1785,6 @@ function udførBevægelse(nytIndeks: number) {
         background:
             linear-gradient(90deg, rgba(176, 205, 186, 0.25), transparent 35%, rgba(19, 24, 22, 0.75)),
             radial-gradient(circle at 15% 45%, rgba(195, 230, 208, 0.38), transparent 32%);
-        animation: introTaage 5s ease-in-out infinite alternate;
         pointer-events: none;
     }
     .intro-box h2 {
@@ -1499,10 +1813,6 @@ function udførBevægelse(nytIndeks: number) {
         background: #383838;
     }
 
-    @keyframes introTaage {
-        from { opacity: 0.45; transform: translateX(-7%); }
-        to { opacity: 0.85; transform: translateX(7%); }
-    }
     .hex { 
         position: absolute; width: 96px; height: 110px;
         clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); 
@@ -1686,6 +1996,43 @@ function udførBevægelse(nytIndeks: number) {
     .gravsten-portraet {
         position: relative; z-index: 2; width: 38px; margin-top: -8px;
         filter: grayscale(100%) sepia(10%) brightness(0.6) contrast(1.2); opacity: 0.85;
+    }
+
+    .farvel-baade-container {
+        position: absolute;
+        left: 50%;
+        bottom: 8px;
+        width: 0;
+        height: 42px;
+        z-index: 12;
+        pointer-events: none;
+    }
+    .farvel-baad {
+        position: absolute;
+        left: var(--farvel-offset, 0px);
+        bottom: 0;
+        width: 46px;
+        height: 38px;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+    }
+    .farvel-baad-ikon {
+        position: absolute;
+        bottom: 0;
+        width: 48px;
+        height: auto;
+        filter: grayscale(100%) brightness(0.55) contrast(1.15) drop-shadow(0 3px 5px rgba(0,0,0,0.8));
+        opacity: 0.62;
+    }
+    .farvel-baad-portraet {
+        position: relative;
+        z-index: 2;
+        width: 25px;
+        margin-bottom: 7px;
+        filter: grayscale(100%) sepia(10%) brightness(0.62) contrast(1.18);
+        opacity: 0.78;
     }
     
     .skjult-lyd img { opacity: 1; animation: whisper 2s infinite alternate; }

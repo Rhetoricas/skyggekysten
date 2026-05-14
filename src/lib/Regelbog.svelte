@@ -1,5 +1,5 @@
 <script lang="ts">
-    let { knapClass = '' } = $props<{ knapClass?: string }>();
+    let { knapClass = '', knapTekst = '☰' } = $props<{ knapClass?: string; knapTekst?: string }>();
 
     let visRegler = $state(false);
 
@@ -26,7 +26,7 @@
     title="Regelbog"
     aria-label="Åbn regelbog"
 >
-    ?
+    {knapTekst}
 </button>
 
 {#if visRegler}
@@ -83,7 +83,7 @@
                     <h3>HP, skade og hvile</h3>
                     <ul>
                         <li>HP er dit helbred. Når HP når 0, dør du.</li>
-                        <li>Rustning mindsker skade. Elverrustning beskytter som almindelig rustning, men er ikke tung.</li>
+                        <li>Rustning mindsker skade. Elverrustning beskytter som almindelig rustning, men er ikke tung. Ridder med rustning tager ingen skade fra nedgravede fælder.</li>
                         <li>Mad giver HP og energi. Sovepose og lejrbål kan bruges til hvile.</li>
                         <li>Oversvømmelse kan slukke fakler og få tung rustning til at gå tabt.</li>
                     </ul>

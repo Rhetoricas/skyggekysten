@@ -104,6 +104,12 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
     if (spilTilstand.livspoint <= 0) {
         const erHavet = besked.includes("havet") || besked.includes("saltvand") || besked.includes("hav");
 
+        if (brugEliksir()) {
+            spilTilstand.logBesked = `Du faldt om. ${beskedMedTal} Eliksiren redder dig.`;
+            syncTilDb();
+            return;
+        }
+
         if (erHavet) {
             druknSpiller(doedsBesked || beskedMedTal);
             return;
@@ -114,12 +120,6 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
             return;
         }
 
-        if (brugEliksir()) {
-            spilTilstand.logBesked = `Du faldt om. ${beskedMedTal} Eliksiren redder dig.`;
-            syncTilDb();
-            return;
-        }
-        
         spilTilstand.gameState = 'dead_map';
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = true;

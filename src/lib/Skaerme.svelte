@@ -668,7 +668,7 @@
 {@render profilModal()}
 
 <style>
-    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; display: flex; align-items: center; justify-content: center; z-index: 1000; font-family: system-ui, -apple-system, sans-serif; }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: #1a1a1a; display: flex; align-items: flex-start; justify-content: center; z-index: 1000; font-family: system-ui, -apple-system, sans-serif; overflow-y: auto; padding: calc(env(safe-area-inset-top, 0px) + 18px) 18px calc(env(safe-area-inset-bottom, 0px) + 18px); box-sizing: border-box; -webkit-overflow-scrolling: touch; }
     .combined-box { max-height: none; overflow: visible; }
     .login-box { position: relative; background: transparent; padding: 38px 40px 40px; border-radius: 0; border: none; text-align: center; max-width: 900px; width: 90%; display: flex; flex-direction: column; align-items: center; }
     .login-main { width: min(100%, 560px); display: flex; flex-direction: column; align-items: center; }
@@ -870,7 +870,7 @@
         padding: 8px 0;
     }
 
-    .character-select { position: relative; background: #1a1a1a; padding: 30px; border-radius: 12px; border: 1px solid #333; max-width: 1100px; width: 95%; max-height: 90vh; overflow-y: auto; text-align: center; }
+    .character-select { position: relative; background: #1a1a1a; padding: 30px; border-radius: 12px; border: 1px solid #333; max-width: 1100px; width: 95%; max-height: none; overflow: visible; text-align: center; }
     .character-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
     .char-card { background: #222; border: 2px solid #444; padding: 20px; text-align: center; cursor: pointer; border-radius: 8px; transition: 0.2s; display: flex; flex-direction: column; align-items: center; }
     .char-card:hover { border-color: #fff; transform: scale(1.02); }

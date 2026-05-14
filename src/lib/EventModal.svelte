@@ -135,14 +135,17 @@
         background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center;
         z-index: 1000;
         font-family: system-ui, -apple-system, sans-serif;
+        padding: calc(env(safe-area-inset-top, 0px) + 12px) 12px calc(env(safe-area-inset-bottom, 0px) + 12px);
+        box-sizing: border-box;
     }
     
     .event-boks { 
         background: #1a1a1a;
-        color: #e0e0e0; border: 2px solid #4a4a4a; padding: 20px; width: 600px; max-width: 90%;
-        min-height: 650px;
-        max-height: 90vh; overflow-y: auto; display: flex;
+        color: #e0e0e0; border: 2px solid #4a4a4a; padding: 20px; width: 600px; max-width: 100%;
+        min-height: 0;
+        max-height: 100%; overflow: hidden; display: flex;
         flex-direction: column; gap: 15px; border-radius: 8px;
+        box-sizing: border-box;
     }
 
     .event-boks img { 
@@ -156,8 +159,10 @@
     }
     
     .log-container {
-        flex-grow: 1;
+        flex: 1 1 180px;
+        min-height: 150px;
         overflow-y: auto;
+        padding-right: 6px;
     }
     
     .log-container p { 
@@ -168,6 +173,10 @@
     .knap-panel { 
         display: flex;
         flex-direction: column; gap: 10px; margin-top: auto;
+        flex: 0 1 auto;
+        max-height: min(42dvh, 330px);
+        overflow-y: auto;
+        padding-right: 4px;
     }
     
     .valg-btn { 
@@ -291,7 +300,7 @@
         }
 
         .event-boks img {
-            height: 120px;
+            height: clamp(90px, 20dvh, 120px);
         }
 
         .event-boks h2 {
@@ -301,6 +310,15 @@
         .log-container p {
             font-size: 0.92rem;
             line-height: 1.35;
+        }
+
+        .log-container {
+            flex-basis: 150px;
+            min-height: 130px;
+        }
+
+        .knap-panel {
+            max-height: 38dvh;
         }
 
         .valg-btn {

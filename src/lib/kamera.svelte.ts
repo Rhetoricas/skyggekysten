@@ -88,6 +88,18 @@ function foelgSpiller(index: number, bredde: number, hexW: number, rowH: number)
         else if (py < y - deadzoneY) y = py + deadzoneY;
     }
 
+    function justerZoom(delta: number, blokeret: boolean) {
+        const harForbandelse = spilTilstand.mitUdstyr?.some(i => i.id === 'kikkert_250' || i.id === 'kikkert_45');
+
+        if (harForbandelse) {
+            spilTilstand.logBesked = "Forbandelsen tvinger dit syn ud af fokus. Du kan ikke ændre afstanden.";
+            return;
+        }
+
+        if (blokeret) return;
+        baseZoom = Math.max(0.3, Math.min(baseZoom + delta, 3.0));
+    }
+
     function saetZoom(nyVaerdi: number) {
         baseZoom = nyVaerdi;
     }
@@ -111,6 +123,7 @@ function foelgSpiller(index: number, bredde: number, hexW: number, rowH: number)
         stopTræk,
         håndterZoom,
         centrerPåHex,
+        justerZoom,
         foelgSpiller,
         saetZoom,
         nulstil

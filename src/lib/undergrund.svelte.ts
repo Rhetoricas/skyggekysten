@@ -8,6 +8,13 @@ function tilfaeldigtTal(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function ridderPanserStopperNedgravetFaelde() {
+    const karakterId = spilTilstand.valgtKarakter?.id;
+    const erRidder = karakterId === 'knight_m' || karakterId === 'knight_f';
+    const harRustning = spilTilstand.mitUdstyr?.some((ting) => (ting.id === 'rustning' || ting.id === 'rustning_elver') && ting.maengde > 0);
+    return erRidder && harRustning;
+}
+
 export function genererUndergrund(biome: Biome | string) {
     const farlige = ['ruin', 'blodskov', 'hule', 'slagmark', 'ritual', 'krystal'];
     const civilisation = ['by', 'marked'];
@@ -48,11 +55,16 @@ export function genererUndergrund(biome: Biome | string) {
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(5, 10);
         else if (terningKast < 63) feltData.skjultFaelde = true;
         else if (terningKast < 74) feltData.skjultLoot = 'fakkel';
+    } else if (biome === 'hoejland') {
+        if (terningKast < 30) feltData.skjultGuld = tilfaeldigtTal(15, 30);
+        else if (terningKast < 45) feltData.skjultLiv = tilfaeldigtTal(10, 20);
+        else if (terningKast < 50) feltData.skjultFaelde = true;
+        else if (terningKast < 58) feltData.skjultLoot = 'fakkel';
     } else if (farlige.includes(biome)) {
         if (terningKast < 45) feltData.skjultGuld = tilfaeldigtTal(25, 50);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(10, 20);
         else if (terningKast < 73) feltData.skjultFaelde = true;
-        else if (terningKast < 95) feltData.skjultLoot = 'livseliksir';
+        else if (terningKast < 83) feltData.skjultLoot = 'livseliksir';
     }
 
     return feltData;
@@ -117,7 +129,9 @@ export function grav() {
 
     let fundLog = "Du finder ikke noget brugbart.";
 
-    if (faelde) {
+    if (faelde && ridderPanserStopperNedgravetFaelde()) {
+        fundLog = "KLIK. Den nedgravede fælde klapper om dit panser, men ridderens træning holder benet fri. (-0 HP)";
+    } else if (faelde) {
         const faeldeSkade = spilTilstand.beregnSkade(10);
         spilTilstand.livspoint -= faeldeSkade;
         fundLog = `KLIK. En nedgravet fælde bider sig fast i dit ben (-${faeldeSkade} HP)`;

@@ -30,7 +30,9 @@ export function erFeltITaagen(gitter: Felt[], index: number, fogX: number) {
     if (fogX < 0) {
         const kortBredde = BREDDE * HEX_W;
         const frontFraOest = kortBredde - Math.abs(fogX);
-        return posX >= frontFraOest;
+        const opslugtFraVest = posX <= kortBredde && !erBeskyttetAfTaageblokker(gitter, index);
+        const opslugtFraOest = posX >= frontFraOest;
+        return opslugtFraVest || opslugtFraOest;
     }
 
     return posX <= fogX && !erBeskyttetAfTaageblokker(gitter, index);

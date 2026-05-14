@@ -556,6 +556,8 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         options.onBaadStart?.(nytIndeks);
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isWinner = true;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIndex = nytIndeks;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIcon = spilTilstand.valgtKarakter?.ikon ?? null;
         }
         spilTilstand.logBesked = "Du går ombord i båden og forlader øen.";
         broadcastFelt(nytIndeks, felt);
