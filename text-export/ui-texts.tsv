@@ -1,0 +1,770 @@
+id	file	kind	context	original	updated
+src/lib/BottomUI.svelte:1352:1366:string:wqrry4	src/lib/BottomUI.svelte	string	string @ 22:53	Grav med skovl	
+src/lib/BottomUI.svelte:1371:1388:string:15b8dmd	src/lib/BottomUI.svelte	string	string @ 22:72	Grav med hænderne	
+src/lib/BottomUI.svelte:1394:1413:string:44etzc	src/lib/BottomUI.svelte	string	string @ 22:95	Her kan ikke graves	
+src/lib/BottomUI.svelte:3195:3232:string:17asdwk	src/lib/BottomUI.svelte	string	string @ 59:39	Du er allerede mæt og fuldt udhvilet.	
+src/lib/BottomUI.svelte:5269:5285:string:bxxjui	src/lib/BottomUI.svelte	string	string @ 112:28	Ukendt genstand.	
+src/lib/BottomUI.svelte:5333:5356:string:9eramg	src/lib/BottomUI.svelte	string	string @ 115:16	Den kan bruges lige nu.	
+src/lib/BottomUI.svelte:5416:5462:string:77ipbf	src/lib/BottomUI.svelte	string	string @ 117:20	Den kan ikke bruges i den nuværende situation.	
+src/lib/BottomUI.svelte:5483:5520:string:mkup1g	src/lib/BottomUI.svelte	string	string @ 118:20	Den kan normalt bruges fra inventory.	
+src/lib/BottomUI.svelte:5843:5849:text:1obkoi7	src/lib/BottomUI.svelte	text	markup @ 128:21	Logbog	
+src/lib/BottomUI.svelte:5938:5948:attribute:f22tq3	src/lib/BottomUI.svelte	attribute	aria-label @ 129:84	Luk logbog	
+src/lib/BottomUI.svelte:6624:6630:string:1obkoi7	src/lib/BottomUI.svelte	string	string @ 150:26	Logbog	
+src/lib/BottomUI.svelte:6656:6729:string:1uojvbu	src/lib/BottomUI.svelte	string	string @ 151:25	Her ser du de seneste beskeder. Tryk på loggen for at åbne hele logbogen.	
+src/lib/BottomUI.svelte:7086:7122:attribute:1k39pmy	src/lib/BottomUI.svelte	attribute	title @ 161:48	Du ser de felter, denne spiller ser.	
+src/lib/BottomUI.svelte:8452:8554:string:ty62wh	src/lib/BottomUI.svelte	string	string @ 196:119	Dit helbred. Når HP når 0, dør du eller reddes af en livseliksir, hvis du har en. Mad giver nu +20 HP.	
+src/lib/BottomUI.svelte:8608:8611:attribute:18mlmb4	src/lib/BottomUI.svelte	attribute	alt @ 197:52	Liv	
+src/lib/BottomUI.svelte:8819:8912:string:w9xjny	src/lib/BottomUI.svelte	string	string @ 201:77	Guld bruges i butikker og tæller med i score. Nogle karakterer tjener mere eller mindre guld.	
+src/lib/BottomUI.svelte:8968:8972:attribute:1qxrbj5	src/lib/BottomUI.svelte	attribute	alt @ 202:54	Guld	
+src/lib/BottomUI.svelte:9273:9335:string:33sxkm	src/lib/BottomUI.svelte	string	string @ 206:174	Din næste bevægelse koster 0 energi på grund af bersærkergang.	
+src/lib/BottomUI.svelte:9340:9392:string:13ghlgl	src/lib/BottomUI.svelte	string	string @ 206:241	Din næste bevægelse koster 0 energi på grund af mad.	
+src/lib/BottomUI.svelte:9398:9498:string:dlf5yb	src/lib/BottomUI.svelte	string	string @ 206:299	Energi bruges på bevægelse, gravning og visse handlinger. Når energien løber tør, går der en ny dag.	
+src/lib/BottomUI.svelte:9793:9833:text:ddcrfv	src/lib/BottomUI.svelte	text	markup @ 212:52	= spilTilstand.maxEnergi ? 'inaktiv' : i	
+src/lib/BottomUI.svelte:10302:10307:string:beisjq	src/lib/BottomUI.svelte	string	string @ 225:46	Skovl	
+src/lib/BottomUI.svelte:10312:10329:string:15b8dmd	src/lib/BottomUI.svelte	string	string @ 225:56	Grav med hænderne	
+src/lib/BottomUI.svelte:10388:10424:string:civj4t	src/lib/BottomUI.svelte	string	string @ 226:57	Graver feltet med lavere energipris.	
+src/lib/BottomUI.svelte:10429:10486:string:1yiafs2	src/lib/BottomUI.svelte	string	string @ 226:98	Graver feltet uden skovl. Det koster ekstra energi og HP.	
+src/lib/BottomUI.svelte:10492:10532:string:ms3hz3	src/lib/BottomUI.svelte	string	string @ 226:161	Du kan ikke grave på dette felt lige nu.	
+src/lib/BottomUI.svelte:10904:10909:string:beisjq	src/lib/BottomUI.svelte	string	string @ 231:152	Skovl	
+src/lib/BottomUI.svelte:10914:10931:string:15b8dmd	src/lib/BottomUI.svelte	string	string @ 231:162	Grav med hænderne	
+src/lib/BottomUI.svelte:10974:11050:string:1gpu22s	src/lib/BottomUI.svelte	string	string @ 231:222	Graver feltet med lavere energipris. Nedgravede fælder udløses ved gravning.	
+src/lib/BottomUI.svelte:11055:11146:string:19xq1ue	src/lib/BottomUI.svelte	string	string @ 231:303	Graver feltet uden skovl. Det koster ekstra energi og HP, og nedgravede fælder kan udløses.	
+src/lib/BottomUI.svelte:11152:11192:string:ms3hz3	src/lib/BottomUI.svelte	string	string @ 231:400	Du kan ikke grave på dette felt lige nu.	
+src/lib/BottomUI.svelte:14016:14022:string:xlvu1w	src/lib/BottomUI.svelte	string	string @ 309:23	Cinzel	
+src/lib/BottomUI.svelte:14596:14602:string:xlvu1w	src/lib/BottomUI.svelte	string	string @ 331:23	Cinzel	
+src/lib/BottomUI.svelte:15614:15620:string:xlvu1w	src/lib/BottomUI.svelte	string	string @ 371:23	Cinzel	
+src/lib/BottomUI.svelte:19948:19954:string:xlvu1w	src/lib/BottomUI.svelte	string	string @ 539:52	Cinzel	
+src/lib/EventModal.svelte:1587:1601:attribute:l7f5tp	src/lib/EventModal.svelte	attribute	alt @ 45:18	Event baggrund	
+src/lib/EventModal.svelte:2897:2917:attribute:1nfvoj4	src/lib/EventModal.svelte	attribute	title @ 78:86	Kræver specifik helt	
+src/lib/EventModal.svelte:3133:3149:attribute:prbvhb	src/lib/EventModal.svelte	attribute	alt @ 81:86	Mangler genstand	
+src/lib/EventModal.svelte:3178:3194:attribute:1f4p9jg	src/lib/EventModal.svelte	attribute	title @ 81:131	Du mangler dette	
+src/lib/EventModal.svelte:3367:3379:text:10k5119	src/lib/EventModal.svelte	text	markup @ 84:63	Kræver våben	
+src/lib/EventModal.svelte:3709:3721:attribute:1b2vsh1	src/lib/EventModal.svelte	attribute	alt @ 88:88	Muligt våben	
+src/lib/EventModal.svelte:3768:3787:attribute:5v60ix	src/lib/EventModal.svelte	attribute	title @ 88:147	Du mangler et våben	
+src/lib/EventModal.svelte:4136:4151:attribute:14ixfxv	src/lib/EventModal.svelte	attribute	alt @ 94:85	Koster genstand	
+src/lib/EventModal.svelte:4194:4218:attribute:1ony8ke	src/lib/EventModal.svelte	attribute	title @ 94:143	Du skal betale med dette	
+src/lib/EventModal.svelte:4985:5001:text:vwovof	src/lib/EventModal.svelte	text	markup @ 108:116	Flygt fra faren!	
+src/lib/EventModal.svelte:5183:5190:text:11inhvj	src/lib/EventModal.svelte	text	markup @ 112:21	Fortsæt	
+src/lib/EventModal.svelte:6621:6627:string:xlvu1w	src/lib/EventModal.svelte	string	string @ 158:39	Cinzel	
+src/lib/Island.svelte:2383:2423:string:pczp2n	src/lib/Island.svelte	string	string @ 42:29	rum_kode,kort,start_index,spillere,fog_x	
+src/lib/Island.svelte:3824:3936:string:l4fli6	src/lib/Island.svelte	string	string @ 67:16	Mark kan graves og kan senere have afgroeder. Gravefund er ofte små: lidt guld, rod, sjælden fælde eller fakkel.	
+src/lib/Island.svelte:3953:4046:string:taxvdn	src/lib/Island.svelte	string	string @ 68:15	Eng er et let naturfelt. Det kan graves og har små chancer for guld, rod, fælde eller fakkel.	
+src/lib/Island.svelte:4064:4150:string:d4x1wb	src/lib/Island.svelte	string	string @ 69:16	Skov kan give gode helende rødder ved gravning og har en lille chance for livseliksir.	
+src/lib/Island.svelte:4169:4273:string:tvpizy	src/lib/Island.svelte	string	string @ 70:17	Bjerg er tungt terræn for mange karakterer. Ved gravning finder du ofte guld, men også fælder og fakler.	
+src/lib/Island.svelte:4291:4389:string:b5d7ck	src/lib/Island.svelte	string	string @ 71:16	Hule er farligt terræn. Gravefund kan være værdifulde, men fælder og livseliksir er også i puljen.	
+src/lib/Island.svelte:4409:4500:string:nkfiiu	src/lib/Island.svelte	string	string @ 72:18	Ritualfelt er farligt og event-tungt. Gravning kan give guld, rod, fælde eller livseliksir.	
+src/lib/Island.svelte:4518:4603:string:1boih65	src/lib/Island.svelte	string	string @ 73:16	Ruin er farligt, men rigt. Gravning kan give mere guld og har også risiko for fælder.	
+src/lib/Island.svelte:4623:4707:string:hrqdgm	src/lib/Island.svelte	string	string @ 74:18	Banditlejr er risikabel. Gravning giver ofte guld, men der er også stor fælderisiko.	
+src/lib/Island.svelte:4729:4817:string:164s4lj	src/lib/Island.svelte	string	string @ 75:20	Højland er åbent terræn. Gravning kan give guld, rod, en lille fælderisiko eller fakkel.	
+src/lib/Island.svelte:4839:4943:string:flgb2x	src/lib/Island.svelte	string	string @ 76:20	Blodskov er farligt og uroligt. Gravefund ligner andre farlige biomer: guld, rod, fælder og livseliksir.	
+src/lib/Island.svelte:4959:5035:string:1cfgpy9	src/lib/Island.svelte	string	string @ 77:14	Byer kan have butikker og indbrudsmuligheder. Du kan normalt ikke grave her.	
+src/lib/Island.svelte:5052:5260:string:15j957d	src/lib/Island.svelte	string	string @ 78:15	Hav er farligt uden båd. Du tager skade i åbent vand, og tung rustning, fakler og flere skrøbelige ting kan gå tabt i vandet. Hvis du kollapser i vandet, drukner du, medmindre en livseliksir redder dig først.	
+src/lib/Island.svelte:5281:5365:string:kpin6k	src/lib/Island.svelte	string	string @ 79:19	Krystalfelter er farlige og sjældne. Gravning kan give stærke fund, men også fælder.	
+src/lib/Island.svelte:5385:5443:string:1xyeuij	src/lib/Island.svelte	string	string @ 80:18	Markeder kan have butikker. Du kan normalt ikke grave her.	
+src/lib/Island.svelte:5465:5538:string:1od4rxx	src/lib/Island.svelte	string	string @ 81:20	Slagmark er et farligt gravefelt med guld, rødder, fælder og livseliksir.	
+src/lib/Island.svelte:5558:5642:string:1887mg7	src/lib/Island.svelte	string	string @ 82:18	Meteor-felter styres af meteor-eventet. Kig efter meteorstenen og eventet på feltet.	
+src/lib/Island.svelte:17473:17562:string:1r5dh12	src/lib/Island.svelte	string	string @ 385:20	Du kan ikke genstarte øen for alle, mens der stadig er andre aktive spillere ude i tågen.	
+src/lib/Island.svelte:19377:19439:string:1l7g659	src/lib/Island.svelte	string	string @ 432:42	Du er offline. Tryk START for at spille lokalt på denne enhed.	
+src/lib/Island.svelte:19799:19839:string:11r4xkd	src/lib/Island.svelte	string	string @ 440:42	Udfyld både dit kaldenavn og dit ø-navn.	
+src/lib/Island.svelte:20420:20444:string:n3lu0g	src/lib/Island.svelte	string	string @ 459:38	Forbinder dig til øen...	
+src/lib/Island.svelte:21812:21825:string:vsxesz	src/lib/Island.svelte	string	string @ 487:32	Netværksfejl:	
+src/lib/Island.svelte:26428:26490:string:12m0euw	src/lib/Island.svelte	string	string @ 568:32	Den gamle tur var afsluttet. Vælg karakter for at starte rent.	
+src/lib/Island.svelte:26523:26579:string:4v4gvi	src/lib/Island.svelte	string	string @ 569:32	Den gamle tur var død. Vælg karakter for at starte rent.	
+src/lib/Island.svelte:28506:28526:string:9iqcx5	src/lib/Island.svelte	string	string @ 599:78	Du slap væk fra øen.	
+src/lib/Island.svelte:28531:28547:string:fxp3nh	src/lib/Island.svelte	string	string @ 599:103	Du døde i tågen.	
+src/lib/Island.svelte:32574:32584:string:11hcxfp	src/lib/Island.svelte	string	string @ 683:28	Motorfejl:	
+src/lib/Island.svelte:32702:32751:string:28nyfp	src/lib/Island.svelte	string	string @ 685:20	Forbindelsen til øen tog for lang tid. Prøv igen.	
+src/lib/Island.svelte:32772:32810:string:69yoe	src/lib/Island.svelte	string	string @ 686:20	Der opstod en fejl under forbindelsen.	
+src/lib/Island.svelte:33200:33240:string:11r4xkd	src/lib/Island.svelte	string	string @ 695:42	Udfyld både dit kaldenavn og dit ø-navn.	
+src/lib/Island.svelte:33620:33666:string:c7rklj	src/lib/Island.svelte	string	string @ 709:38	Offline. Spillet gemmes lokalt på denne enhed.	
+src/lib/Island.svelte:34205:34242:string:omaf86	src/lib/Island.svelte	string	string @ 726:42	Der blev ikke fundet et offline-spil.	
+src/lib/Island.svelte:35777:35842:string:uabl8v	src/lib/Island.svelte	string	string @ 774:46	Forbindelsen er afbrudt. Spillet fortsætter lokalt indtil videre.	
+src/lib/Island.svelte:36071:36121:string:19hen03	src/lib/Island.svelte	string	string @ 781:75	Forbindelsen til øen driller. Spillet prøver igen.	
+src/lib/Island.svelte:37198:37263:string:uabl8v	src/lib/Island.svelte	string	string @ 820:46	Forbindelsen er afbrudt. Spillet fortsætter lokalt indtil videre.	
+src/lib/Island.svelte:40938:40958:string:1mp28qk	src/lib/Island.svelte	string	string @ 910:28	Score-flowet fejlede	
+src/lib/Island.svelte:41051:41076:string:okujiq	src/lib/Island.svelte	string	string @ 911:83	Scoren kunne ikke gemmes.	
+src/lib/Island.svelte:46579:46582:string:j5c9h4	src/lib/Island.svelte	string	string @ 1034:47	øen	
+src/lib/Island.svelte:49303:49310:string:1r6ct1o	src/lib/Island.svelte	string	string @ 1107:43	højland	
+src/lib/Island.svelte:49496:49507:string:ewfzfn	src/lib/Island.svelte	string	string @ 1113:25	Ukendt felt	
+src/lib/Island.svelte:49534:49631:string:1uiirwx	src/lib/Island.svelte	string	string @ 1114:25	Du har ikke udforsket feltet endnu. Bevæg dig tættere på eller brug lys/udsyn for at afsløre det.	
+src/lib/Island.svelte:49772:49797:string:xzhqu6	src/lib/Island.svelte	string	string @ 1119:62	Et udforsket felt på øen.	
+src/lib/Island.svelte:49836:49886:string:1qck0ir	src/lib/Island.svelte	string	string @ 1121:35	Tågen har taget feltet. Det er farligt at stå her.	
+src/lib/Island.svelte:49930:50003:string:4j3341	src/lib/Island.svelte	string	string @ 1122:41	Hav kan sluge tung rustning og fakler, og uden båd risikerer du drukning.	
+src/lib/Island.svelte:50048:50089:string:1agce0u	src/lib/Island.svelte	string	string @ 1123:42	Huler kan ødelægge soveposer og fint tøj.	
+src/lib/Island.svelte:50134:50163:string:1pgcrju	src/lib/Island.svelte	string	string @ 1124:42	Ruiner kan koste madrationer.	
+src/lib/Island.svelte:50211:50267:string:1ijfk8n	src/lib/Island.svelte	string	string @ 1125:45	Krystaller kan ødelægge metaldetektor og gylden kikkert.	
+src/lib/Island.svelte:50314:50350:string:ajdb6g	src/lib/Island.svelte	string	string @ 1126:44	Ritualfelter kan ødelægge søgekvist.	
+src/lib/Island.svelte:50467:50496:string:4eqsdv	src/lib/Island.svelte	string	string @ 1127:114	 : 'ligger en flugtbåd'} her.	
+src/lib/Island.svelte:50560:50615:string:pdcyqu	src/lib/Island.svelte	string	string @ 1128:61	Feltet har et event, som starter når du går ind på det.	
+src/lib/Island.svelte:50666:50686:string:1iqzo7g	src/lib/Island.svelte	string	string @ 1129:48	Feltet har en butik.	
+src/lib/Island.svelte:50789:50812:string:163ge50	src/lib/Island.svelte	string	string @ 1130:100	Der er en guldmine her.	
+src/lib/Island.svelte:50855:50887:string:1j8v6jh	src/lib/Island.svelte	string	string @ 1131:40	Portalen kan flytte dig mod øst.	
+src/lib/Island.svelte:50933:51004:string:nyw6dx	src/lib/Island.svelte	string	string @ 1132:43	Tågeblokkeren kan holde tågen tilbage fra venstre, indtil tågen vender.	
+src/lib/Island.svelte:51050:51091:string:oxgodk	src/lib/Island.svelte	string	string @ 1133:43	Gravstenen viser, at en spiller døde her.	
+src/lib/Island.svelte:51156:51219:string:1wb05wu	src/lib/Island.svelte	string	string @ 1134:62	Den grå farvelbåd viser, at en spiller slap væk fra dette felt.	
+src/lib/Island.svelte:51259:51288:string:14vd33g	src/lib/Island.svelte	string	string @ 1135:37	Feltet er allerede gravet op.	
+src/lib/Island.svelte:51336:51354:string:14pqax7	src/lib/Island.svelte	string	string @ 1136:45	Feltet kan graves.	
+src/lib/Island.svelte:51382:51405:string:159q34d	src/lib/Island.svelte	string	string @ 1137:25	Feltet kan ikke graves.	
+src/lib/Island.svelte:52519:52536:string:102ooq4	src/lib/Island.svelte	string	string @ 1175:42	[data-help-title]	
+src/lib/Island.svelte:52764:52769:string:yjnlk7	src/lib/Island.svelte	string	string @ 1182:51	Hjælp	
+src/lib/Island.svelte:52821:52881:string:wel0ap	src/lib/Island.svelte	string	string @ 1183:50	Tryk på et felt, ikon eller en knap for at få en forklaring.	
+src/lib/Island.svelte:54883:54918:string:1kfnata	src/lib/Island.svelte	string	string @ 1241:46	Øen svarer langsomt. Prøver igen...	
+src/lib/Island.svelte:58241:58255:attribute:o0zsq3	src/lib/Island.svelte	attribute	title @ 1332:20	Fokuser på dig	
+src/lib/Island.svelte:58281:58295:attribute:o0zsq3	src/lib/Island.svelte	attribute	aria-label @ 1333:25	Fokuser på dig	
+src/lib/Island.svelte:58521:58539:attribute:bwcz5o	src/lib/Island.svelte	attribute	title @ 1342:20	Forklar næste tryk	
+src/lib/Island.svelte:58565:58583:attribute:bwcz5o	src/lib/Island.svelte	attribute	aria-label @ 1343:25	Forklar næste tryk	
+src/lib/Island.svelte:58721:58725:attribute:r953rm	src/lib/Island.svelte	attribute	aria-label @ 1350:43	Zoom	
+src/lib/Island.svelte:58856:58864:attribute:94g213	src/lib/Island.svelte	attribute	aria-label @ 1351:129	Zoom ind	
+src/lib/Island.svelte:59006:59013:attribute:1jshihz	src/lib/Island.svelte	attribute	aria-label @ 1352:130	Zoom ud	
+src/lib/Island.svelte:61542:61550:attribute:1g9a8ys	src/lib/Island.svelte	attribute	alt @ 1395:66	Flugtbåd	
+src/lib/Island.svelte:61603:61611:string:1g9a8ys	src/lib/Island.svelte	string	string @ 1395:127	Flugtbåd	
+src/lib/Island.svelte:61629:61738:string:1kgxf9a	src/lib/Island.svelte	string	string @ 1395:153	Gå ind på bådfeltet for at forlade øen. Antallet af både afgør hvor mange spillere der kan slippe væk herfra.	
+src/lib/Island.svelte:62818:62833:string:1jp9swl	src/lib/Island.svelte	string	string @ 1410:162	Ødelagt afgrøde	
+src/lib/Island.svelte:62851:62910:string:1twg1w5	src/lib/Island.svelte	string	string @ 1410:195	Afgrøden er ødelagt og giver ikke længere mad eller heling.	
+src/lib/Island.svelte:63187:63200:string:1hgaa4p	src/lib/Island.svelte	string	string @ 1413:161	Moden afgrøde	
+src/lib/Island.svelte:63218:63316:string:8xc7g8	src/lib/Island.svelte	string	string @ 1413:192	En moden afgrøde. Når du går ind på feltet, kan den give lidt HP, medmindre en insektplage rammer.	
+src/lib/Island.svelte:63528:63544:string:6ey38d	src/lib/Island.svelte	string	string @ 1415:168	Voksende afgrøde	
+src/lib/Island.svelte:63562:63650:string:1jix1u0	src/lib/Island.svelte	string	string @ 1415:202	Afgrøden er ikke moden endnu. Hvis du tramper gennem den for tidligt, bliver den skadet.	
+src/lib/Island.svelte:63976:63986:string:lra3st	src/lib/Island.svelte	string	string @ 1421:113	Meteorsten	
+src/lib/Island.svelte:64004:64093:string:waicdc	src/lib/Island.svelte	string	string @ 1421:141	Meteorstenen markerer et meteor-event. Feltet styres af meteorens egen belønning og fare.	
+src/lib/Island.svelte:64347:64358:attribute:8njl74	src/lib/Island.svelte	attribute	alt @ 1425:142	Tågeblokker	
+src/lib/Island.svelte:64377:64388:string:8njl74	src/lib/Island.svelte	string	string @ 1425:172	Tågeblokker	
+src/lib/Island.svelte:64406:64506:string:twyzvs	src/lib/Island.svelte	string	string @ 1425:201	Holder tågen tilbage fra venstre side. Når tågen vender fra højre, beskytter blokkeren ikke længere.	
+src/lib/Island.svelte:64750:64760:attribute:16d3o6g	src/lib/Island.svelte	attribute	alt @ 1430:74	Mulig skat	
+src/lib/Island.svelte:64806:64816:string:16d3o6g	src/lib/Island.svelte	string	string @ 1430:130	Mulig skat	
+src/lib/Island.svelte:64834:64927:string:lrx8i2	src/lib/Island.svelte	string	string @ 1430:158	Skattekortet peger på dette felt som mulig skatteklynge. Grav for at afsløre om der er noget.	
+src/lib/Island.svelte:65175:65257:string:9cxr6h	src/lib/Island.svelte	string	string @ 1433:134	Din metaldetektor mærker skjult guld under jorden. Grav feltet for at få det frem.	
+src/lib/Island.svelte:65584:65661:string:1axhib3	src/lib/Island.svelte	string	string @ 1436:132	Søgekvisten mærker helende rødder under jorden. Grav feltet for at finde dem.	
+src/lib/Island.svelte:66028:66094:string:j2r3lo	src/lib/Island.svelte	string	string @ 1441:133	Feltet er allerede gravet op. Skjulte fund og fælder her er brugt.	
+src/lib/Island.svelte:66266:66281:attribute:1sjt7wh	src/lib/Island.svelte	attribute	alt @ 1445:72	Tom skattekiste	
+src/lib/Island.svelte:66328:66343:string:1sjt7wh	src/lib/Island.svelte	string	string @ 1445:134	Tom skattekiste	
+src/lib/Island.svelte:66361:66432:string:yv8i95	src/lib/Island.svelte	string	string @ 1445:167	Skatten er taget. Kisten bliver liggende som spor, men giver ikke mere.	
+src/lib/Island.svelte:66631:66639:string:nrd0be	src/lib/Island.svelte	string	string @ 1449:78	Guldmine	
+src/lib/Island.svelte:66795:66878:string:1lj8f16	src/lib/Island.svelte	string	string @ 1449:242	Guldmine giver guld og score, når du overtager den. Besøg den igen for at låse den.	
+src/lib/Island.svelte:66951:66959:attribute:nrd0be	src/lib/Island.svelte	attribute	alt @ 1450:70	Guldmine	
+src/lib/Island.svelte:67343:67347:attribute:gbrtyh	src/lib/Island.svelte	attribute	alt @ 1453:212	Ejer	
+src/lib/Island.svelte:67394:67403:string:kag44l	src/lib/Island.svelte	string	string @ 1453:263	Mine-ejer	
+src/lib/Island.svelte:67646:67700:string:wczgt	src/lib/Island.svelte	string	string @ 1455:113	Minen er låst af ejeren og kan ikke overtages lige nu.	
+src/lib/Island.svelte:68183:68260:string:c7q53c	src/lib/Island.svelte	string	string @ 1464:136	Lejrbålet er et event eller hvilepunkt. Gå ind på feltet for at aktivere det.	
+src/lib/Island.svelte:68464:68544:string:1do8sq5	src/lib/Island.svelte	string	string @ 1466:130	Feltet har et event. Når du går ind på feltet, åbner et valg eller en situation.	
+src/lib/Island.svelte:68737:68743:attribute:1sof6az	src/lib/Island.svelte	attribute	alt @ 1471:64	Portal	
+src/lib/Island.svelte:68806:68881:string:10cq3kf	src/lib/Island.svelte	string	string @ 1471:133	Portalen flytter dig mod øst. Landingsfeltet aktiveres som et normalt felt.	
+src/lib/Island.svelte:69307:69314:string:1poa9xb	src/lib/Island.svelte	string	string @ 1479:73	Bybutik	
+src/lib/Island.svelte:69319:69325:string:1dr8mv5	src/lib/Island.svelte	string	string @ 1479:85	Marked	
+src/lib/Island.svelte:69376:69467:string:1gaw4bd	src/lib/Island.svelte	string	string @ 1480:49	Butikken sælger varer for guld. Vareudvalget ligger på feltet og deles af spillerne på øen.	
+src/lib/Island.svelte:69786:69794:attribute:9uu0d1	src/lib/Island.svelte	attribute	aria-label @ 1486:70	Indbrudt	
+src/lib/Island.svelte:69813:69821:string:9uu0d1	src/lib/Island.svelte	string	string @ 1486:97	Indbrudt	
+src/lib/Island.svelte:69839:69914:string:1g23dax	src/lib/Island.svelte	string	string @ 1486:123	Byfeltet er allerede brudt op med dirk. Det markerer et brugt indbrudssted.	
+src/lib/Island.svelte:70219:70227:string:whgpb3	src/lib/Island.svelte	string	string @ 1492:78	Gravsten	
+src/lib/Island.svelte:70245:70332:string:14itcqc	src/lib/Island.svelte	string	string @ 1492:104	En spiller døde på dette felt. Gravstenen bliver liggende som et permanent spor på øen.	
+src/lib/Island.svelte:70404:70407:attribute:ky5fgv	src/lib/Island.svelte	attribute	alt @ 1493:70	Død	
+src/lib/Island.svelte:70500:70506:attribute:b6r2dl	src/lib/Island.svelte	attribute	alt @ 1494:67	Faldet	
+src/lib/Island.svelte:71416:71428:attribute:1eilw8w	src/lib/Island.svelte	attribute	alt @ 1505:73	Sluppet vÃ¦k	
+src/lib/Island.svelte:72245:72259:string:1gu3ci7	src/lib/Island.svelte	string	string @ 1517:97	Ukendt spiller	
+src/lib/Island.svelte:72339:72409:string:mlfzeu	src/lib/Island.svelte	string	string @ 1517:191	Du kan høre alarm/lyd fra en spiller her, men kan ikke se hvem det er.	
+src/lib/Island.svelte:72414:72457:string:1bg248t	src/lib/Island.svelte	string	string @ 1517:266	En spiller er tæt på, men uden for dit syn.	
+src/lib/Island.svelte:73115:73175:string:1isf4o6	src/lib/Island.svelte	string	string @ 1524:93	Din karakter står her. Tryk på nabofelter for at bevæge dig.	
+src/lib/Island.svelte:74069:74076:string:2syeav	src/lib/Island.svelte	string	string @ 1540:69	Afrejse	
+src/lib/Island.svelte:74094:74145:string:gusvdl	src/lib/Island.svelte	string	string @ 1540:94	Du er på vej væk i båden. Om lidt vises slutkortet.	
+src/lib/Island.svelte:74244:74252:attribute:1g9a8ys	src/lib/Island.svelte	attribute	alt @ 1541:58	Flugtbåd	
+src/lib/Island.svelte:75777:75802:string:1odc3dk	src/lib/Island.svelte	string	string @ 1565:49	rgba(255, 255, 255, 0.22)	
+src/lib/Island.svelte:77308:77333:string:1sypa3f	src/lib/Island.svelte	string	string @ 1591:62	rgba(230, 230, 230, 0.55)	
+src/lib/Island.svelte:78741:78767:text:hzdqr1	src/lib/Island.svelte	text	markup @ 1627:9	Tryk på et felt eller ikon	
+src/lib/Island.svelte:79049:79063:attribute:712rdw	src/lib/Island.svelte	attribute	aria-label @ 1638:84	Luk forklaring	
+src/lib/Island.svelte:79386:79406:attribute:1cyhx4h	src/lib/Island.svelte	attribute	aria-label @ 1648:100	Båden synker i tågen	
+src/lib/Island.svelte:79471:79480:string:r4486o	src/lib/Island.svelte	string	string @ 1649:63	video/mp4	
+src/lib/Island.svelte:79544:79564:attribute:1cyhx4h	src/lib/Island.svelte	attribute	alt @ 1650:60	Båden synker i tågen	
+src/lib/Island.svelte:79677:79682:text:3fah14	src/lib/Island.svelte	text	markup @ 1654:17	Dag 1	
+src/lib/Island.svelte:79985:79994:text:13drgnf	src/lib/Island.svelte	text	markup @ 1659:76	Gå i land	
+src/lib/Island.svelte:80567:80578:string:1fns23x	src/lib/Island.svelte	string	string @ 1671:58	Du slap væk	
+src/lib/Island.svelte:80583:80590:string:6yv471	src/lib/Island.svelte	string	string @ 1671:74	Du døde	
+src/lib/Island.svelte:81130:81141:string:7zj9hd	src/lib/Island.svelte	string	string @ 1681:49	Sluppet væk	
+src/lib/Island.svelte:81161:81164:string:ky5fgv	src/lib/Island.svelte	string	string @ 1681:80	Død	
+src/lib/Island.svelte:81169:81176:string:ltt27n	src/lib/Island.svelte	string	string @ 1681:88	I tågen	
+src/lib/Island.svelte:81291:81295:attribute:1qxrbj5	src/lib/Island.svelte	attribute	title @ 1684:38	Guld	
+src/lib/Island.svelte:81484:81501:attribute:1vbiydp	src/lib/Island.svelte	attribute	title @ 1690:80	Læs din fulde log	
+src/lib/Island.svelte:81550:81553:attribute:18wtqlt	src/lib/Island.svelte	attribute	alt @ 1691:47	Log	
+src/lib/Island.svelte:81576:81582:text:1obkoi7	src/lib/Island.svelte	text	markup @ 1692:19	Logbog	
+src/lib/Island.svelte:81757:81775:text:82ku5y	src/lib/Island.svelte	text	markup @ 1696:13	Se point-fordeling	
+src/lib/Island.svelte:82028:82034:text:1obkoi7	src/lib/Island.svelte	text	markup @ 1705:17	Logbog	
+src/lib/Island.svelte:82295:82298:text:1ej2e9v	src/lib/Island.svelte	text	markup @ 1711:77	Luk	
+src/lib/Island.svelte:83643:83649:string:xlvu1w	src/lib/Island.svelte	string	string @ 1768:23	Cinzel	
+src/lib/Island.svelte:85293:85299:string:xlvu1w	src/lib/Island.svelte	string	string @ 1821:23	Cinzel	
+src/lib/Island.svelte:88085:88091:string:xlvu1w	src/lib/Island.svelte	string	string @ 1922:23	Cinzel	
+src/lib/Island.svelte:91538:91544:string:xlvu1w	src/lib/Island.svelte	string	string @ 2017:23	Cinzel	
+src/lib/Island.svelte:99582:99588:string:xlvu1w	src/lib/Island.svelte	string	string @ 2195:72	Cinzel	
+src/lib/Island.svelte:100013:100019:string:xlvu1w	src/lib/Island.svelte	string	string @ 2206:38	Cinzel	
+src/lib/Island.svelte:101199:101205:string:xlvu1w	src/lib/Island.svelte	string	string @ 2223:37	Cinzel	
+src/lib/Island.svelte:101868:101874:string:xlvu1w	src/lib/Island.svelte	string	string @ 2230:66	Cinzel	
+src/lib/ShopModal.svelte:801:867:string:1qxa8gp	src/lib/ShopModal.svelte	string	string @ 21:39	Købmanden smider dig ud for at røre ved noget du ikke har råd til.	
+src/lib/ShopModal.svelte:1508:1519:string:nxtb73	src/lib/ShopModal.svelte	string	string @ 42:80	Byens Butik	
+src/lib/ShopModal.svelte:1524:1532:string:1savnuw	src/lib/ShopModal.svelte	string	string @ 42:96	Markedet	
+src/lib/ShopModal.svelte:2485:2515:text:zwhd02	src/lib/ShopModal.svelte	text	markup @ 64:16	Dine ting (klik for at sælge):	
+src/lib/ShopModal.svelte:2636:2646:attribute:1wm6u5g	src/lib/ShopModal.svelte	attribute	title @ 67:58	Din formue	
+src/lib/ShopModal.svelte:2706:2710:attribute:1qxrbj5	src/lib/ShopModal.svelte	attribute	alt @ 68:58	Guld	
+src/lib/ShopModal.svelte:3551:3564:text:1qrdaic	src/lib/ShopModal.svelte	text	markup @ 87:54	Forlad stedet	
+src/lib/Skaerme.svelte:8276:8285:text:zzkq54	src/lib/Skaerme.svelte	text	markup @ 226:13	Opgørelse	
+src/lib/Skaerme.svelte:8335:8350:text:1oqcxr4	src/lib/Skaerme.svelte	text	markup @ 227:45	Indsamlet guld:	
+src/lib/Skaerme.svelte:8488:8506:string:4sfyx6	src/lib/Skaerme.svelte	string	string @ 229:48	Overlevelses-bonus	
+src/lib/Skaerme.svelte:8511:8520:string:elwjuu	src/lib/Skaerme.svelte	string	string @ 229:71	Fremdrift	
+src/lib/Skaerme.svelte:8648:8660:text:8cnabv	src/lib/Skaerme.svelte	text	markup @ 232:45	Udforskning:	
+src/lib/Skaerme.svelte:9043:9063:text:1gswjjd	src/lib/Skaerme.svelte	text	markup @ 238:50	Helbreds-bonus (HP):	
+src/lib/Skaerme.svelte:9172:9184:text:856v0z	src/lib/Skaerme.svelte	text	markup @ 239:45	Total Score:	
+src/lib/Skaerme.svelte:9331:9346:text:dba8tj	src/lib/Skaerme.svelte	text	markup @ 245:13	Alle karakterer	
+src/lib/Skaerme.svelte:9935:9946:string:7zj9hd	src/lib/Skaerme.svelte	string	string @ 253:47	Sluppet væk	
+src/lib/Skaerme.svelte:9966:9969:string:ky5fgv	src/lib/Skaerme.svelte	string	string @ 253:78	Død	
+src/lib/Skaerme.svelte:9974:9981:string:ltt27n	src/lib/Skaerme.svelte	string	string @ 253:86	I tågen	
+src/lib/Skaerme.svelte:10129:10134:attribute:x9tsfp	src/lib/Skaerme.svelte	attribute	title @ 257:38	Score	
+src/lib/Skaerme.svelte:10488:10498:string:oqce4a	src/lib/Skaerme.svelte	string	string @ 270:65	Logget ind	
+src/lib/Skaerme.svelte:10536:10546:text:oqce4a	src/lib/Skaerme.svelte	text	markup @ 271:27	Logget ind	
+src/lib/Skaerme.svelte:10684:10690:text:12khfa7	src/lib/Skaerme.svelte	text	markup @ 274:64	Profil	
+src/lib/Skaerme.svelte:10758:10764:text:7v5ys2	src/lib/Skaerme.svelte	text	markup @ 275:59	Log ud	
+src/lib/Skaerme.svelte:10850:10885:text:5vc7z1	src/lib/Skaerme.svelte	text	markup @ 278:35	Din score og statistik bliver gemt.	
+src/lib/Skaerme.svelte:10940:11011:text:9dwcel	src/lib/Skaerme.svelte	text	markup @ 280:35	Login er valgfrit. Uden login spiller du kun med på den ø, du åbner nu.	
+src/lib/Skaerme.svelte:11192:11197:attribute:inbfc7	src/lib/Skaerme.svelte	attribute	placeholder @ 285:34	Email	
+src/lib/Skaerme.svelte:11471:11480:string:1gxet22	src/lib/Skaerme.svelte	string	string @ 289:42	Sender...	
+src/lib/Skaerme.svelte:11485:11492:string:1ewpn6k	src/lib/Skaerme.svelte	string	string @ 289:56	Log ind	
+src/lib/Skaerme.svelte:12029:12039:text:xysw8y	src/lib/Skaerme.svelte	text	markup @ 305:29	Din profil	
+src/lib/Skaerme.svelte:12317:12320:text:1ej2e9v	src/lib/Skaerme.svelte	text	markup @ 310:77	Luk	
+src/lib/Skaerme.svelte:12424:12435:text:x2l2cz	src/lib/Skaerme.svelte	text	markup @ 314:27	Spillernavn	
+src/lib/Skaerme.svelte:12613:12616:text:1glrrp8	src/lib/Skaerme.svelte	text	markup @ 317:67	Gem	
+src/lib/Skaerme.svelte:12837:12841:text:127rswj	src/lib/Skaerme.svelte	text	markup @ 323:75	Spil	
+src/lib/Skaerme.svelte:12930:12935:text:llq6w8	src/lib/Skaerme.svelte	text	markup @ 324:76	Sejre	
+src/lib/Skaerme.svelte:13028:13036:text:14pcgwd	src/lib/Skaerme.svelte	text	markup @ 325:80	Dødsfald	
+src/lib/Skaerme.svelte:13131:13143:text:1f7anq4	src/lib/Skaerme.svelte	text	markup @ 326:82	Bedste score	
+src/lib/Skaerme.svelte:13242:13252:text:1rrd157	src/lib/Skaerme.svelte	text	markup @ 327:86	Gns. score	
+src/lib/Skaerme.svelte:13346:13357:text:1f7uclv	src/lib/Skaerme.svelte	text	markup @ 328:81	Samlet guld	
+src/lib/Skaerme.svelte:13450:13462:text:1kunwcw	src/lib/Skaerme.svelte	text	markup @ 329:80	Længste spil	
+src/lib/Skaerme.svelte:13557:13569:text:1ypdsax	src/lib/Skaerme.svelte	text	markup @ 330:82	Flest felter	
+src/lib/Skaerme.svelte:13663:13674:text:hsz3dq	src/lib/Skaerme.svelte	text	markup @ 331:81	Flest miner	
+src/lib/Skaerme.svelte:13773:13785:text:ux7zwf	src/lib/Skaerme.svelte	text	markup @ 332:86	Mest spillet	
+src/lib/Skaerme.svelte:13902:13920:text:1p5qym5	src/lib/Skaerme.svelte	text	markup @ 336:29	Sejre pr. karakter	
+src/lib/Skaerme.svelte:14030:14048:text:1473u2b	src/lib/Skaerme.svelte	text	markup @ 338:32	Ingen sejre endnu.	
+src/lib/Skaerme.svelte:14439:14491:text:1lgo39t	src/lib/Skaerme.svelte	text	markup @ 346:43	Ingen statistik endnu. Loggede spil bliver gemt her.	
+src/lib/Skaerme.svelte:14770:14785:text:1uf469s	src/lib/Skaerme.svelte	text	markup @ 357:23	Gemmer score...	
+src/lib/Skaerme.svelte:14866:14888:string:52r6lb	src/lib/Skaerme.svelte	string	string @ 359:54	Scoren blev ikke gemt.	
+src/lib/Skaerme.svelte:14959:14968:text:1ia72p8	src/lib/Skaerme.svelte	text	markup @ 360:62	Prøv igen	
+src/lib/Skaerme.svelte:15507:15510:attribute:1e2krnw	src/lib/Skaerme.svelte	attribute	alt @ 379:53	Båd	
+src/lib/Skaerme.svelte:15600:15609:text:1q5q03g	src/lib/Skaerme.svelte	text	markup @ 382:17	Tågeøerne	
+src/lib/Skaerme.svelte:15630:15729:text:13h5z1g	src/lib/Skaerme.svelte	text	markup @ 383:16	Alle der skriver samme ø-navn, spiller på samme ø, hvis de går i land inden for de fem første dage.	
+src/lib/Skaerme.svelte:16013:16024:attribute:x2l2cz	src/lib/Skaerme.svelte	attribute	placeholder @ 392:34	Spillernavn	
+src/lib/Skaerme.svelte:16327:16336:attribute:1ofwchi	src/lib/Skaerme.svelte	attribute	placeholder @ 401:34	Øens navn	
+src/lib/Skaerme.svelte:16968:16980:attribute:1ohzw1m	src/lib/Skaerme.svelte	attribute	alt @ 416:59	Global tavle	
+src/lib/Skaerme.svelte:17090:17103:text:16hy34s	src/lib/Skaerme.svelte	text	markup @ 418:25	Top 10 global	
+src/lib/Skaerme.svelte:17198:17211:text:e22s0	src/lib/Skaerme.svelte	text	markup @ 420:48	Kræver login.	
+src/lib/Skaerme.svelte:17340:17356:text:olh2cw	src/lib/Skaerme.svelte	text	markup @ 423:46	Ingen data endnu	
+src/lib/Skaerme.svelte:17659:17665:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 428:139	Ukendt	
+src/lib/Skaerme.svelte:18316:18336:attribute:ua2p8i	src/lib/Skaerme.svelte	attribute	title @ 444:28	Offline / Flightmode	
+src/lib/Skaerme.svelte:18370:18390:attribute:ua2p8i	src/lib/Skaerme.svelte	attribute	aria-label @ 445:33	Offline / Flightmode	
+src/lib/Skaerme.svelte:18542:18555:string:qfn28w	src/lib/Skaerme.svelte	string	string @ 448:56	Downloader...	
+src/lib/Skaerme.svelte:18560:18580:string:ua2p8i	src/lib/Skaerme.svelte	string	string @ 448:74	Offline / Flightmode	
+src/lib/Skaerme.svelte:18700:18725:text:1dme9cp	src/lib/Skaerme.svelte	text	markup @ 451:41	tryk inden du går offline	
+src/lib/Skaerme.svelte:19467:19480:text:kfccxt	src/lib/Skaerme.svelte	text	markup @ 470:17	Vælg karakter	
+src/lib/Skaerme.svelte:19578:19625:string:1jy39an	src/lib/Skaerme.svelte	string	string @ 472:57	Offline. Spillet gemmes lokalt i denne browser.	
+src/lib/Skaerme.svelte:19630:19681:string:1vzgrw9	src/lib/Skaerme.svelte	string	string @ 472:109	Du har fået otte muligheder. Vælg hvem du vil være.	
+src/lib/Skaerme.svelte:20860:20874:attribute:175pm4j	src/lib/Skaerme.svelte	attribute	aria-label @ 500:104	Åbn din profil	
+src/lib/Skaerme.svelte:20955:20962:attribute:1ot2045	src/lib/Skaerme.svelte	attribute	alt @ 501:79	Medalje	
+src/lib/Skaerme.svelte:21134:21141:attribute:1ot2045	src/lib/Skaerme.svelte	attribute	alt @ 504:75	Medalje	
+src/lib/Skaerme.svelte:21481:21490:attribute:1y01gn0	src/lib/Skaerme.svelte	attribute	alt @ 511:57	Pergament	
+src/lib/Skaerme.svelte:21608:21614:text:1nd4l99	src/lib/Skaerme.svelte	text	markup @ 513:47	Score:	
+src/lib/Skaerme.svelte:21739:21744:attribute:1bzexzk	src/lib/Skaerme.svelte	attribute	alt @ 517:49	Døden	
+src/lib/Skaerme.svelte:22217:22229:text:6e1emd	src/lib/Skaerme.svelte	text	markup @ 530:46	Samme ø igen	
+src/lib/Skaerme.svelte:22396:22411:text:2x17ga	src/lib/Skaerme.svelte	text	markup @ 533:46	Prøv en anden ø	
+src/lib/Skaerme.svelte:22663:22674:attribute:psdig8	src/lib/Skaerme.svelte	attribute	alt @ 540:62	Lokal tavle	
+src/lib/Skaerme.svelte:22949:22973:text:6p3m1p	src/lib/Skaerme.svelte	text	markup @ 544:52	Gemt lokalt i browseren.	
+src/lib/Skaerme.svelte:23080:23112:text:1tglr34	src/lib/Skaerme.svelte	text	markup @ 546:52	Login kræves for at gemme score.	
+src/lib/Skaerme.svelte:23252:23274:text:bf79i3	src/lib/Skaerme.svelte	text	markup @ 549:50	Ingen resultater endnu	
+src/lib/Skaerme.svelte:24032:24044:attribute:1ohzw1m	src/lib/Skaerme.svelte	attribute	alt @ 564:67	Global tavle	
+src/lib/Skaerme.svelte:24170:24183:text:16hy34s	src/lib/Skaerme.svelte	text	markup @ 566:33	Top 10 global	
+src/lib/Skaerme.svelte:24294:24307:text:e22s0	src/lib/Skaerme.svelte	text	markup @ 568:56	Kræver login.	
+src/lib/Skaerme.svelte:24460:24476:text:olh2cw	src/lib/Skaerme.svelte	text	markup @ 571:54	Ingen data endnu	
+src/lib/Skaerme.svelte:24819:24825:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 576:147	Ukendt	
+src/lib/Skaerme.svelte:25546:25560:attribute:175pm4j	src/lib/Skaerme.svelte	attribute	aria-label @ 594:104	Åbn din profil	
+src/lib/Skaerme.svelte:25641:25648:attribute:1ot2045	src/lib/Skaerme.svelte	attribute	alt @ 595:79	Medalje	
+src/lib/Skaerme.svelte:25820:25827:attribute:1ot2045	src/lib/Skaerme.svelte	attribute	alt @ 598:75	Medalje	
+src/lib/Skaerme.svelte:26206:26215:attribute:1y01gn0	src/lib/Skaerme.svelte	attribute	alt @ 607:57	Pergament	
+src/lib/Skaerme.svelte:26333:26339:text:1nd4l99	src/lib/Skaerme.svelte	text	markup @ 609:47	Score:	
+src/lib/Skaerme.svelte:26742:26754:text:6e1emd	src/lib/Skaerme.svelte	text	markup @ 620:46	Samme ø igen	
+src/lib/Skaerme.svelte:26921:26936:text:2x17ga	src/lib/Skaerme.svelte	text	markup @ 623:46	Prøv en anden ø	
+src/lib/Skaerme.svelte:27188:27199:attribute:psdig8	src/lib/Skaerme.svelte	attribute	alt @ 630:62	Lokal tavle	
+src/lib/Skaerme.svelte:27474:27498:text:6p3m1p	src/lib/Skaerme.svelte	text	markup @ 634:52	Gemt lokalt i browseren.	
+src/lib/Skaerme.svelte:27605:27637:text:1tglr34	src/lib/Skaerme.svelte	text	markup @ 636:52	Login kræves for at gemme score.	
+src/lib/Skaerme.svelte:27777:27799:text:bf79i3	src/lib/Skaerme.svelte	text	markup @ 639:50	Ingen resultater endnu	
+src/lib/Skaerme.svelte:28557:28569:attribute:1ohzw1m	src/lib/Skaerme.svelte	attribute	alt @ 654:67	Global tavle	
+src/lib/Skaerme.svelte:28695:28708:text:16hy34s	src/lib/Skaerme.svelte	text	markup @ 656:33	Top 10 global	
+src/lib/Skaerme.svelte:28819:28832:text:e22s0	src/lib/Skaerme.svelte	text	markup @ 658:56	Kræver login.	
+src/lib/Skaerme.svelte:28985:29001:text:olh2cw	src/lib/Skaerme.svelte	text	markup @ 661:54	Ingen data endnu	
+src/lib/Skaerme.svelte:29344:29350:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 666:147	Ukendt	
+src/lib/Skaerme.svelte:31077:31083:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 693:100	Cinzel	
+src/lib/Skaerme.svelte:31760:31766:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 699:130	Cinzel	
+src/lib/Skaerme.svelte:35948:35954:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 838:23	Cinzel	
+src/lib/Skaerme.svelte:37661:37667:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 889:85	Cinzel	
+src/lib/Skaerme.svelte:39250:39256:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 907:69	Cinzel	
+src/lib/Skaerme.svelte:39348:39354:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 908:68	Cinzel	
+src/lib/Skaerme.svelte:39817:39823:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 913:141	Cinzel	
+src/lib/Skaerme.svelte:40590:40596:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 933:169	Cinzel	
+src/lib/Skaerme.svelte:41344:41350:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 940:141	Cinzel	
+src/lib/Skaerme.svelte:43458:43464:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 987:89	Cinzel	
+src/lib/VenteModal.svelte:1210:1227:text:1by14l0	src/lib/VenteModal.svelte	text	markup @ 29:13	Tiden står stille	
+src/lib/VenteModal.svelte:1276:1293:text:yn9l8h	src/lib/VenteModal.svelte	text	markup @ 31:13	Du har slået lejr	
+src/lib/VenteModal.svelte:1379:1471:text:1aw1ho1	src/lib/VenteModal.svelte	text	markup @ 31:116	foran den langsomste på øen. \n            En imp dukker pludselig op med et magisk kortspil.	
+src/lib/VenteModal.svelte:1501:1508:text:1qwcsbq	src/lib/VenteModal.svelte	text	markup @ 33:21	Regler:	
+src/lib/VenteModal.svelte:1518:1675:text:rvn8ax	src/lib/VenteModal.svelte	text	markup @ 33:38	Første runde er gratis. Derefter koster en ny runde 5 guld. Træk kort for at vinde guld eller helbred. Trækker du kraniet, mister du alt det, du har vundet i	
+src/lib/VenteModal.svelte:1691:1761:text:10lplad	src/lib/VenteModal.svelte	text	markup @ 33:211	runde. Du kan stoppe når som helst og sikre din pulje til næste runde.	
+src/lib/VenteModal.svelte:2834:2850:text:1tvp9s4	src/lib/VenteModal.svelte	text	markup @ 58:39	Pulje på bordet:	
+src/lib/VenteModal.svelte:3159:3163:attribute:1qxrbj5	src/lib/VenteModal.svelte	attribute	alt @ 65:54	Guld	
+src/lib/VenteModal.svelte:3557:3578:text:m4pk9z	src/lib/VenteModal.svelte	text	markup @ 73:80	Stop og behold puljen	
+src/lib/VenteModal.svelte:3861:3874:text:1h4xieb	src/lib/VenteModal.svelte	text	markup @ 76:77	Forlad bordet	
+src/lib/VenteModal.svelte:4193:4220:string:dh49lo	src/lib/VenteModal.svelte	string	string @ 84:49	Start første runde (Gratis)	
+src/lib/VenteModal.svelte:4225:4255:string:zq22c0	src/lib/VenteModal.svelte	string	string @ 84:81	Start ny runde (Koster 5 Guld)	
+src/lib/VenteModal.svelte:4404:4431:text:1lszqum	src/lib/VenteModal.svelte	text	markup @ 88:25	De andre har indhentet dig.	
+src/lib/auth.svelte.ts:1160:1291:string:11e4bng	src/lib/auth.svelte.ts	string	string @ 41:17	Supabase holder en kort pause på nye login-mails til den email. Du kan stadig spille offline imens og prøve login igen lidt senere.	
+src/lib/auth.svelte.ts:2071:2087:string:w8d5un	src/lib/auth.svelte.ts	string	string @ 70:29	Skriv din email.	
+src/lib/auth.svelte.ts:2386:2415:string:1ia3rey	src/lib/auth.svelte.ts	string	string @ 84:24	Login-link kunne ikke sendes:	
+src/lib/auth.svelte.ts:2532:2660:string:l307z0	src/lib/auth.svelte.ts	string	string @ 89:25	Vi har sendt et login-link til din email. Hvis du allerede har bedt om et link, kan Supabase kræve en kort pause før næste mail.	
+src/lib/auth.svelte.ts:2907:2960:string:16o2r37	src/lib/auth.svelte.ts	string	string @ 101:18	id, display_name, sound_level, created_at, updated_at	
+src/lib/auth.svelte.ts:3184:3224:string:slh9oh	src/lib/auth.svelte.ts	string	string @ 109:22	id, display_name, created_at, updated_at	
+src/lib/auth.svelte.ts:3602:3609:string:1yq7kke	src/lib/auth.svelte.ts	string	string @ 122:80	Spiller	
+src/lib/auth.svelte.ts:3801:3854:string:16o2r37	src/lib/auth.svelte.ts	string	string @ 126:18	id, display_name, sound_level, created_at, updated_at	
+src/lib/auth.svelte.ts:4115:4155:string:slh9oh	src/lib/auth.svelte.ts	string	string @ 134:22	id, display_name, created_at, updated_at	
+src/lib/auth.svelte.ts:4567:4592:string:1juhwlq	src/lib/auth.svelte.ts	string	string @ 149:29	Navnet må ikke være tomt.	
+src/lib/auth.svelte.ts:4923:4976:string:16o2r37	src/lib/auth.svelte.ts	string	string @ 159:18	id, display_name, sound_level, created_at, updated_at	
+src/lib/auth.svelte.ts:5210:5250:string:slh9oh	src/lib/auth.svelte.ts	string	string @ 166:22	id, display_name, created_at, updated_at	
+src/lib/auth.svelte.ts:5515:5536:string:klf39z	src/lib/auth.svelte.ts	string	string @ 175:29	Profilnavnet er gemt.	
+src/lib/auth.svelte.ts:5580:5611:string:kt4rtk	src/lib/auth.svelte.ts	string	string @ 177:29	Profilnavnet kunne ikke gemmes.	
+src/lib/auth.svelte.ts:6022:6075:string:16o2r37	src/lib/auth.svelte.ts	string	string @ 189:18	id, display_name, sound_level, created_at, updated_at	
+src/lib/auth.svelte.ts:6321:6405:string:1qr39vp	src/lib/auth.svelte.ts	string	string @ 200:18	score, is_winner, days, gold, max_column, known_fields_count, mines_owned, character	
+src/lib/auth.svelte.ts:6783:6841:text:81necw	src/lib/auth.svelte.ts	text	markup @ 212:48	sum + (r.gold || 0), 0);\n    const karakterTaeller: Record	
+src/lib/auth.svelte.ts:7008:7014:string:1itwhp2	src/lib/auth.svelte.ts	string	string @ 217:49	Ukendt	
+src/lib/auth.svelte.ts:7336:7347:string:xz4dm8	src/lib/auth.svelte.ts	string	string @ 225:81	Ingen endnu	
+src/lib/historieMotor.ts:121:127:string:pvj3gy	src/lib/historieMotor.ts	string	string @ 4:15	Væbner	
+src/lib/historieMotor.ts:131:140:string:px9p75	src/lib/historieMotor.ts	string	string @ 4:25	Fodsoldat	
+src/lib/historieMotor.ts:144:153:string:dr8ttf	src/lib/historieMotor.ts	string	string @ 4:38	Lejesvend	
+src/lib/historieMotor.ts:157:164:string:uo6t9w	src/lib/historieMotor.ts	string	string @ 4:51	Kaptajn	
+src/lib/historieMotor.ts:168:174:string:155afqj	src/lib/historieMotor.ts	string	string @ 4:62	Ridder	
+src/lib/historieMotor.ts:178:189:string:5suzsq	src/lib/historieMotor.ts	string	string @ 4:72	Bannerfører	
+src/lib/historieMotor.ts:193:201:string:1ksrtuu	src/lib/historieMotor.ts	string	string @ 4:87	Hærfører	
+src/lib/historieMotor.ts:205:215:string:18fcjqd	src/lib/historieMotor.ts	string	string @ 4:99	Krigsherre	
+src/lib/historieMotor.ts:219:226:string:sjn18c	src/lib/historieMotor.ts	string	string @ 4:113	Paladin	
+src/lib/historieMotor.ts:230:235:string:1pzqqqz	src/lib/historieMotor.ts	string	string @ 4:124	Konge	
+src/lib/historieMotor.ts:256:263:string:17v9s5z	src/lib/historieMotor.ts	string	string @ 5:17	Lærling	
+src/lib/historieMotor.ts:267:273:string:1g8lpq3	src/lib/historieMotor.ts	string	string @ 5:28	Novice	
+src/lib/historieMotor.ts:277:283:string:1rfly0b	src/lib/historieMotor.ts	string	string @ 5:38	Akolyt	
+src/lib/historieMotor.ts:287:298:string:b4bw8y	src/lib/historieMotor.ts	string	string @ 5:48	Illusionist	
+src/lib/historieMotor.ts:302:314:string:1c17whq	src/lib/historieMotor.ts	string	string @ 5:63	Elementalist	
+src/lib/historieMotor.ts:318:327:string:inv25p	src/lib/historieMotor.ts	string	string @ 5:79	Besværger	
+src/lib/historieMotor.ts:331:339:string:x7q1u7	src/lib/historieMotor.ts	string	string @ 5:92	Magister	
+src/lib/historieMotor.ts:343:354:string:3senjj	src/lib/historieMotor.ts	string	string @ 5:104	Ærkemagiker	
+src/lib/historieMotor.ts:358:368:string:vig8ev	src/lib/historieMotor.ts	string	string @ 5:119	Runemester	
+src/lib/historieMotor.ts:372:379:string:4qqn9s	src/lib/historieMotor.ts	string	string @ 5:133	Halvgud	
+src/lib/historieMotor.ts:397:405:string:1j1a1bk	src/lib/historieMotor.ts	string	string @ 6:14	Lommetyv	
+src/lib/historieMotor.ts:409:414:string:rejoeo	src/lib/historieMotor.ts	string	string @ 6:26	Røver	
+src/lib/historieMotor.ts:418:429:string:60obzv	src/lib/historieMotor.ts	string	string @ 6:35	Indbrudstyv	
+src/lib/historieMotor.ts:433:443:string:s8pv09	src/lib/historieMotor.ts	string	string @ 6:50	Snigmorder	
+src/lib/historieMotor.ts:447:453:string:gkykzv	src/lib/historieMotor.ts	string	string @ 6:64	Skygge	
+src/lib/historieMotor.ts:457:468:string:1l6irkh	src/lib/historieMotor.ts	string	string @ 6:74	Lurendrejer	
+src/lib/historieMotor.ts:472:482:string:1i2s81l	src/lib/historieMotor.ts	string	string @ 6:89	Bandeleder	
+src/lib/historieMotor.ts:486:498:string:fzyadn	src/lib/historieMotor.ts	string	string @ 6:103	Syndikatboss	
+src/lib/historieMotor.ts:502:508:string:1ocy3oe	src/lib/historieMotor.ts	string	string @ 6:119	Fantom	
+src/lib/historieMotor.ts:512:523:string:b8r9el	src/lib/historieMotor.ts	string	string @ 6:129	Skyggekonge	
+src/lib/historieMotor.ts:544:553:string:18xvaau	src/lib/historieMotor.ts	string	string @ 7:17	Vildfaren	
+src/lib/historieMotor.ts:557:564:string:rwq0kc	src/lib/historieMotor.ts	string	string @ 7:30	Spejder	
+src/lib/historieMotor.ts:568:577:string:cyqcnd	src/lib/historieMotor.ts	string	string @ 7:41	Stifinder	
+src/lib/historieMotor.ts:581:591:string:de19te	src/lib/historieMotor.ts	string	string @ 7:54	Kortlægger	
+src/lib/historieMotor.ts:595:602:string:189tolz	src/lib/historieMotor.ts	string	string @ 7:68	Vandrer	
+src/lib/historieMotor.ts:606:616:string:x9wycr	src/lib/historieMotor.ts	string	string @ 7:79	Banebryder	
+src/lib/historieMotor.ts:620:626:string:f5j5oo	src/lib/historieMotor.ts	string	string @ 7:93	Pioner	
+src/lib/historieMotor.ts:630:648:string:6nmtni	src/lib/historieMotor.ts	string	string @ 7:103	Opdagelsesrejsende	
+src/lib/historieMotor.ts:652:659:string:k4bcyw	src/lib/historieMotor.ts	string	string @ 7:125	Erobrer	
+src/lib/historieMotor.ts:663:670:string:y6e1ir	src/lib/historieMotor.ts	string	string @ 7:136	Legende	
+src/lib/historieMotor.ts:689:693:string:1wsod8p	src/lib/historieMotor.ts	string	string @ 8:15	Træl	
+src/lib/historieMotor.ts:697:705:string:dx6do9	src/lib/historieMotor.ts	string	string @ 8:23	Bådsmand	
+src/lib/historieMotor.ts:709:717:string:qt6j27	src/lib/historieMotor.ts	string	string @ 8:35	Plyndrer	
+src/lib/historieMotor.ts:721:730:string:8fqjzl	src/lib/historieMotor.ts	string	string @ 8:47	Øksebærer	
+src/lib/historieMotor.ts:734:741:string:9ivd40	src/lib/historieMotor.ts	string	string @ 8:60	Bersærk	
+src/lib/historieMotor.ts:745:757:string:18np90e	src/lib/historieMotor.ts	string	string @ 8:71	Skjoldbryder	
+src/lib/historieMotor.ts:761:768:string:6yijl5	src/lib/historieMotor.ts	string	string @ 8:87	Høvding	
+src/lib/historieMotor.ts:772:776:string:14iquwq	src/lib/historieMotor.ts	string	string @ 8:98	Jarl	
+src/lib/historieMotor.ts:780:787:string:1qfy9s6	src/lib/historieMotor.ts	string	string @ 8:106	Søkonge	
+src/lib/historieMotor.ts:791:800:string:i7woc3	src/lib/historieMotor.ts	string	string @ 8:117	Einherjer	
+src/lib/historieMotor.ts:818:824:string:fvonmc	src/lib/historieMotor.ts	string	string @ 9:14	Arving	
+src/lib/historieMotor.ts:828:835:string:g66qsl	src/lib/historieMotor.ts	string	string @ 9:24	Hofsnog	
+src/lib/historieMotor.ts:839:844:string:qmbpwz	src/lib/historieMotor.ts	string	string @ 9:35	Baron	
+src/lib/historieMotor.ts:848:853:string:19jt112	src/lib/historieMotor.ts	string	string @ 9:44	Greve	
+src/lib/historieMotor.ts:857:863:string:17dwlig	src/lib/historieMotor.ts	string	string @ 9:53	Markis	
+src/lib/historieMotor.ts:867:873:string:1kjr6n4	src/lib/historieMotor.ts	string	string @ 9:63	Hertug	
+src/lib/historieMotor.ts:877:887:string:18xq9gq	src/lib/historieMotor.ts	string	string @ 9:73	Storfyrste	
+src/lib/historieMotor.ts:891:900:string:dhqvyh	src/lib/historieMotor.ts	string	string @ 9:87	Kronprins	
+src/lib/historieMotor.ts:904:919:string:1ic9h3w	src/lib/historieMotor.ts	string	string @ 9:100	Enevældshersker	
+src/lib/historieMotor.ts:923:929:string:15s2qth	src/lib/historieMotor.ts	string	string @ 9:119	Kejser	
+src/lib/historieMotor.ts:948:958:string:1egji0f	src/lib/historieMotor.ts	string	string @ 10:15	Krybskytte	
+src/lib/historieMotor.ts:962:970:string:1qdlay6	src/lib/historieMotor.ts	string	string @ 10:29	Sporhund	
+src/lib/historieMotor.ts:974:979:string:63m1pl	src/lib/historieMotor.ts	string	string @ 10:41	Flåer	
+src/lib/historieMotor.ts:983:992:string:tdxwz7	src/lib/historieMotor.ts	string	string @ 10:50	Bueskytte	
+src/lib/historieMotor.ts:996:1001:string:1o61ith	src/lib/historieMotor.ts	string	string @ 10:63	Jæger	
+src/lib/historieMotor.ts:1005:1016:string:rbzn7w	src/lib/historieMotor.ts	string	string @ 10:72	Skarpskytte	
+src/lib/historieMotor.ts:1020:1028:string:1ep72qh	src/lib/historieMotor.ts	string	string @ 10:87	Falkeøje	
+src/lib/historieMotor.ts:1032:1046:string:d3uega	src/lib/historieMotor.ts	string	string @ 10:99	Udyrsbetvinger	
+src/lib/historieMotor.ts:1050:1059:string:1m7ry8v	src/lib/historieMotor.ts	string	string @ 10:117	Skovløber	
+src/lib/historieMotor.ts:1063:1073:string:1mhcu4x	src/lib/historieMotor.ts	string	string @ 10:130	Jagtmester	
+src/lib/historieMotor.ts:1092:1101:string:rmy99d	src/lib/historieMotor.ts	string	string @ 11:15	Dæksdreng	
+src/lib/historieMotor.ts:1105:1111:string:1rhfcvz	src/lib/historieMotor.ts	string	string @ 11:28	Matros	
+src/lib/historieMotor.ts:1115:1123:string:dx6do9	src/lib/historieMotor.ts	string	string @ 11:38	Bådsmand	
+src/lib/historieMotor.ts:1127:1133:string:1uaz6y1	src/lib/historieMotor.ts	string	string @ 11:50	Skytte	
+src/lib/historieMotor.ts:1137:1145:string:gyi54h	src/lib/historieMotor.ts	string	string @ 11:60	Rorsmand	
+src/lib/historieMotor.ts:1149:1157:string:1b82ch9	src/lib/historieMotor.ts	string	string @ 11:72	Styrmand	
+src/lib/historieMotor.ts:1161:1168:string:uo6t9w	src/lib/historieMotor.ts	string	string @ 11:84	Kaptajn	
+src/lib/historieMotor.ts:1172:1178:string:19qcedb	src/lib/historieMotor.ts	string	string @ 11:95	Korsar	
+src/lib/historieMotor.ts:1182:1192:string:1i2y6i3	src/lib/historieMotor.ts	string	string @ 11:105	Piratkonge	
+src/lib/historieMotor.ts:1196:1210:string:cvafa0	src/lib/historieMotor.ts	string	string @ 11:119	Havets Hersker	
+src/lib/historieMotor.ts:1228:1237:string:moy8u8	src/lib/historieMotor.ts	string	string @ 12:14	Støvbider	
+src/lib/historieMotor.ts:1241:1251:string:1xw3kar	src/lib/historieMotor.ts	string	string @ 12:27	Stenknuser	
+src/lib/historieMotor.ts:1255:1265:string:c2qlmc	src/lib/historieMotor.ts	string	string @ 12:41	Grubebisse	
+src/lib/historieMotor.ts:1269:1281:string:1om2l3y	src/lib/historieMotor.ts	string	string @ 12:55	Klippebryder	
+src/lib/historieMotor.ts:1285:1297:string:3vci9t	src/lib/historieMotor.ts	string	string @ 12:71	Smeltemester	
+src/lib/historieMotor.ts:1301:1312:string:17e6b83	src/lib/historieMotor.ts	string	string @ 12:87	Tunnelherre	
+src/lib/historieMotor.ts:1316:1325:string:tt0x2w	src/lib/historieMotor.ts	string	string @ 12:102	Malmbaron	
+src/lib/historieMotor.ts:1329:1338:string:1prvgep	src/lib/historieMotor.ts	string	string @ 12:115	Guldherre	
+src/lib/historieMotor.ts:1342:1352:string:y2asf1	src/lib/historieMotor.ts	string	string @ 12:128	Bjergkonge	
+src/lib/historieMotor.ts:1356:1371:string:14cvjy6	src/lib/historieMotor.ts	string	string @ 12:142	Dybdens Hersker	
+src/lib/historieMotor.ts:1387:1391:string:3finoz	src/lib/historieMotor.ts	string	string @ 13:12	Kryb	
+src/lib/historieMotor.ts:1395:1400:string:1jlxu3m	src/lib/historieMotor.ts	string	string @ 13:20	Pjalt	
+src/lib/historieMotor.ts:1404:1416:string:yk8unb	src/lib/historieMotor.ts	string	string @ 13:29	Grønskolling	
+src/lib/historieMotor.ts:1420:1426:string:15g5quj	src/lib/historieMotor.ts	string	string @ 13:45	Kriger	
+src/lib/historieMotor.ts:1430:1441:string:18o3sxi	src/lib/historieMotor.ts	string	string @ 13:55	Blodtørster	
+src/lib/historieMotor.ts:1445:1455:string:1yuqg7d	src/lib/historieMotor.ts	string	string @ 13:70	Krigsråber	
+src/lib/historieMotor.ts:1459:1468:string:qdvcl9	src/lib/historieMotor.ts	string	string @ 13:84	Klanleder	
+src/lib/historieMotor.ts:1472:1479:string:6yijl5	src/lib/historieMotor.ts	string	string @ 13:97	Høvding	
+src/lib/historieMotor.ts:1483:1493:string:18fcjqd	src/lib/historieMotor.ts	string	string @ 13:108	Krigsherre	
+src/lib/historieMotor.ts:1497:1506:string:1gsemjr	src/lib/historieMotor.ts	string	string @ 13:122	Ødelægger	
+src/lib/historieMotor.ts:1524:1527:string:wrq43q	src/lib/historieMotor.ts	string	string @ 14:14	Nar	
+src/lib/historieMotor.ts:1531:1537:string:n3jmi2	src/lib/historieMotor.ts	string	string @ 14:21	Gøgler	
+src/lib/historieMotor.ts:1541:1554:string:c71vfo	src/lib/historieMotor.ts	string	string @ 14:31	Taskenspiller	
+src/lib/historieMotor.ts:1558:1565:string:f2j7u1	src/lib/historieMotor.ts	string	string @ 14:48	Jonglør	
+src/lib/historieMotor.ts:1569:1578:string:96se8g	src/lib/historieMotor.ts	string	string @ 14:59	Trickster	
+src/lib/historieMotor.ts:1582:1593:string:b4bw8y	src/lib/historieMotor.ts	string	string @ 14:72	Illusionist	
+src/lib/historieMotor.ts:1597:1607:string:xey7fb	src/lib/historieMotor.ts	string	string @ 14:87	Lykkejæger	
+src/lib/historieMotor.ts:1611:1616:string:311867	src/lib/historieMotor.ts	string	string @ 14:101	Dæmon	
+src/lib/historieMotor.ts:1620:1630:string:1oyi5by	src/lib/historieMotor.ts	string	string @ 14:110	Kaosfyrste	
+src/lib/historieMotor.ts:1634:1645:string:jtte8y	src/lib/historieMotor.ts	string	string @ 14:124	Skæbnemager	
+src/lib/historieMotor.ts:3108:3169:string:mml7bg	src/lib/historieMotor.ts	string	string @ 49:22	En kølig, massiv diamant kaster et skarpt lys fra din lomme. 	
+src/lib/historieMotor.ts:3227:3295:string:1rkyfzs	src/lib/historieMotor.ts	string	string @ 51:22	Dit våben er hakket og sløvt af de brutale kampe, du tog undervejs. 	
+src/lib/historieMotor.ts:3352:3441:string:l6pos9	src/lib/historieMotor.ts	string	string @ 53:22	Dine hænder er dækket af tykt mudder fra de hemmeligheder, du flåede op af undergrunden. 	
+src/lib/historieMotor.ts:3484:3541:string:hdgoo2	src/lib/historieMotor.ts	string	string @ 55:22	Dine fingre er tomme, og rygsækken rasler hult i vinden. 	
+src/lib/historieMotor.ts:4357:4418:string:qxc1n9	src/lib/historieMotor.ts	string	string @ 73:22	Den massive diamant ligger nu ubrugelig og kold i din lomme. 	
+src/lib/historieMotor.ts:4476:4541:string:1dsz62j	src/lib/historieMotor.ts	string	string @ 75:22	Dit beskadigede våben ligger rustent i græsset ved siden af dig. 	
+src/lib/historieMotor.ts:4598:4670:string:14n8b0d	src/lib/historieMotor.ts	string	string @ 77:22	Dine stive fingre klamrer sig stadig fast til det mudder, du gravede i. 	
+src/lib/historieMotor.ts:4713:4763:string:czatzu	src/lib/historieMotor.ts	string	string @ 79:22	Dine tomme hænder griber krampagtigt ud i luften. 	
+src/lib/kamera.svelte.ts:1746:1816:string:tc37hm	src/lib/kamera.svelte.ts	string	string @ 55:39	Forbandelsen tvinger dit syn ud af fokus. Du kan ikke ændre afstanden.	
+src/lib/kamera.svelte.ts:2910:2964:text:154qz40	src/lib/kamera.svelte.ts	text	markup @ 84:18	x + deadzoneX) x = px - deadzoneX;\n        else if (px	
+src/lib/kamera.svelte.ts:3020:3074:text:1d9mims	src/lib/kamera.svelte.ts	text	markup @ 87:18	y + deadzoneY) y = py - deadzoneY;\n        else if (py	
+src/lib/kamera.svelte.ts:3363:3433:string:tc37hm	src/lib/kamera.svelte.ts	string	string @ 95:39	Forbandelsen tvinger dit syn ud af fokus. Du kan ikke ændre afstanden.	
+src/lib/lydKontrol.svelte.ts:1213:1221:string:1t1dkrh	src/lib/lydKontrol.svelte.ts	string	string @ 37:47	Fuld lyd	
+src/lib/lydKontrol.svelte.ts:1269:1279:string:cztwuq	src/lib/lydKontrol.svelte.ts	string	string @ 38:46	Dæmpet lyd	
+src/lib/lydKontrol.svelte.ts:1294:1305:string:k5yn4n	src/lib/lydKontrol.svelte.ts	string	string @ 39:13	Lyd slukket	
+src/lib/netvaerk.ts:385:456:text:17rgxku	src/lib/netvaerk.ts	text	markup @ 8:44	| null = null;\nlet kortSkalOpdateres = false;\nlet dbSaveKoe: ReturnType	
+src/lib/netvaerk.ts:476:518:text:1r3aaxo	src/lib/netvaerk.ts	text	markup @ 10:46	| null = null;\nlet kortSaveKoe: ReturnType	
+src/lib/netvaerk.ts:1518:1539:text:oapdt8	src/lib/netvaerk.ts	text	markup @ 50:23	(promise: PromiseLike	
+src/lib/netvaerk.ts:1542:1579:text:1ypy7lp	src/lib/netvaerk.ts	text	markup @ 50:47	, ms: number, label: string): Promise	
+src/lib/netvaerk.ts:2307:2324:text:dcqukz	src/lib/netvaerk.ts	text	markup @ 73:17	= 0 && gammelFogX	
+src/lib/netvaerk.ts:3734:3748:string:feerfa	src/lib/netvaerk.ts	string	string @ 123:63	Gemning af øen	
+src/lib/netvaerk.ts:3793:3823:string:1dv2m6b	src/lib/netvaerk.ts	string	string @ 124:24	Kunne ikke gemme ventende sync	
+src/lib/netvaerk.ts:3912:3934:string:73qsbt	src/lib/netvaerk.ts	string	string @ 125:79	Øen kunne ikke gemmes.	
+src/lib/netvaerk.ts:9459:9490:string:9j5waz	src/lib/netvaerk.ts	string	string @ 276:10	Hentning af aktuel spillerliste	
+src/lib/netvaerk.ts:9544:9580:string:6mu9bq	src/lib/netvaerk.ts	string	string @ 280:24	Kunne ikke hente aktuel spillerliste	
+src/lib/netvaerk.ts:10710:10724:string:feerfa	src/lib/netvaerk.ts	string	string @ 309:10	Gemning af øen	
+src/lib/netvaerk.ts:10774:10803:string:vnj2rc	src/lib/netvaerk.ts	string	string @ 313:24	Kunne ikke gemme spil-session	
+src/lib/netvaerk.ts:10968:11028:string:5zrdyu	src/lib/netvaerk.ts	string	string @ 319:24	Kunne ikke gemme spil-session: ingen række matchede ø-navnet	
+src/lib/netvaerk.ts:11091:11146:string:15tf8z6	src/lib/netvaerk.ts	string	string @ 320:38	Øen kunne ikke gemmes: ingen session matchede ø-navnet.	
+src/lib/netvaerk.ts:11515:11525:string:1nnl72z	src/lib/netvaerk.ts	string	string @ 333:82	Login-tjek	
+src/lib/netvaerk.ts:11570:11610:string:6n803q	src/lib/netvaerk.ts	string	string @ 334:24	Kunne ikke tjekke login før scoregemning	
+src/lib/netvaerk.ts:11821:11890:string:14dwmyz	src/lib/netvaerk.ts	string	string @ 340:38	Login mangler eller er udløbet. Log ind igen og prøv at gemme scoren.	
+src/lib/netvaerk.ts:12941:12967:string:15wv7wv	src/lib/netvaerk.ts	string	string @ 366:24	Kunne ikke gemme highscore	
+src/lib/netvaerk.ts:13326:13336:string:1nnl72z	src/lib/netvaerk.ts	string	string @ 376:82	Login-tjek	
+src/lib/netvaerk.ts:13381:13421:string:6n803q	src/lib/netvaerk.ts	string	string @ 377:24	Kunne ikke tjekke login før scoregemning	
+src/lib/netvaerk.ts:13536:13604:string:nie5qd	src/lib/netvaerk.ts	string	string @ 382:27	Du er ikke logget ind længere. Log ind igen og prøv at gemme scoren.	
+src/lib/netvaerk.ts:14001:14017:string:rlxtvz	src/lib/netvaerk.ts	string	string @ 395:18	Gemning af score	
+src/lib/netvaerk.ts:14199:14224:string:6cakuk	src/lib/netvaerk.ts	string	string @ 401:70	Gemning af score fejlede.	
+src/lib/netvaerk.ts:14429:14454:string:okujiq	src/lib/netvaerk.ts	string	string @ 409:37	Scoren kunne ikke gemmes.	
+src/lib/netvaerk.ts:15041:15054:string:6c1occ	src/lib/netvaerk.ts	string	string @ 427:10	Tjek af score	
+src/lib/netvaerk.ts:16152:16181:string:dtac3f	src/lib/netvaerk.ts	string	string @ 465:22	player_name, score, character	
+src/lib/netvaerk.ts:16332:16351:string:wzxiiu	src/lib/netvaerk.ts	string	string @ 470:10	Hentning af ø-score	
+src/lib/netvaerk.ts:16400:16427:string:d6ivlf	src/lib/netvaerk.ts	string	string @ 472:23	Kunne ikke hente highscores	
+src/lib/netvaerk.ts:17165:17205:string:iitdei	src/lib/netvaerk.ts	string	string @ 499:22	player_name, room_code, score, character	
+src/lib/netvaerk.ts:17305:17329:string:rc7sfm	src/lib/netvaerk.ts	string	string @ 503:10	Hentning af global score	
+src/lib/netvaerk.ts:17378:17408:string:seqkap	src/lib/netvaerk.ts	string	string @ 505:23	Kunne ikke hente global top 10	
+src/lib/netvaerk.ts:17797:17822:string:wwrg0d	src/lib/netvaerk.ts	string	string @ 522:10	Hentning af global rekord	
+src/lib/netvaerk.ts:17871:17903:string:1dq234q	src/lib/netvaerk.ts	string	string @ 524:23	Kunne ikke hente global topscore	
+src/lib/offlineApp.svelte.ts:229:250:text:oapdt8	src/lib/offlineApp.svelte.ts	text	markup @ 11:23	(promise: PromiseLike	
+src/lib/offlineApp.svelte.ts:253:288:text:m3uezk	src/lib/offlineApp.svelte.ts	text	markup @ 11:47	, ms = OFFLINE_TIMEOUT_MS): Promise	
+src/lib/offlineApp.svelte.ts:338:371:text:mvxqbw	src/lib/offlineApp.svelte.ts	text	markup @ 12:45	;\n    const timeout = new Promise	
+src/lib/offlineApp.svelte.ts:2172:2185:string:1jygpyi	src/lib/offlineApp.svelte.ts	string	string @ 61:48	serviceWorker	
+src/lib/offlineApp.svelte.ts:2322:2368:string:1bl14t1	src/lib/offlineApp.svelte.ts	string	string @ 64:35	Denne browser understøtter ikke offline-cache.	
+src/lib/offlineApp.svelte.ts:2654:2684:string:dh6b9a	src/lib/offlineApp.svelte.ts	string	string @ 74:16	Spillet er klar på denne enhed	
+src/lib/offlineApp.svelte.ts:2701:2734:string:1fmtugc	src/lib/offlineApp.svelte.ts	string	string @ 75:16	Offline-cache er ikke klar endnu.	
+src/lib/offlineApp.svelte.ts:2986:2999:string:1jygpyi	src/lib/offlineApp.svelte.ts	string	string @ 85:48	serviceWorker	
+src/lib/offlineApp.svelte.ts:3136:3182:string:1bl14t1	src/lib/offlineApp.svelte.ts	string	string @ 88:35	Denne browser understøtter ikke offline-cache.	
+src/lib/offlineApp.svelte.ts:3322:3360:string:kjqgjx	src/lib/offlineApp.svelte.ts	string	string @ 94:31	Downloader spillet til offline brug...	
+src/lib/offlineApp.svelte.ts:3486:3549:string:15z1z39	src/lib/offlineApp.svelte.ts	string	string @ 97:39	Downloader stadig. Firefox kan være lidt langsom første gang...	
+src/lib/offlineApp.svelte.ts:3743:3773:string:dh6b9a	src/lib/offlineApp.svelte.ts	string	string @ 104:35	Spillet er klar på denne enhed	
+src/lib/offlineApp.svelte.ts:3959:4027:string:1fdrxok	src/lib/offlineApp.svelte.ts	string	string @ 109:16	Offline-cache tog for lang tid. Genindlæs siden online og prøv igen.	
+src/lib/offlineApp.svelte.ts:4044:4117:string:r8gjj6	src/lib/offlineApp.svelte.ts	string	string @ 110:16	Offline-cache kunne ikke gøres klar. Genindlæs siden online og prøv igen.	
+src/lib/offlineStorage.ts:171:191:string:dk3ph1	src/lib/offlineStorage.ts	string	string @ 5:29	taage_offline_scores	
+src/lib/offlineStorage.ts:3887:3894:string:1yq7kke	src/lib/offlineStorage.ts	string	string @ 122:57	Spiller	
+src/lib/offlineStorage.ts:5400:5421:string:1r8y7g9	src/lib/offlineStorage.ts	string	string @ 147:38	Offline-spil indlæst.	
+src/lib/overlevelse.svelte.ts:1039:1104:string:x5gc2x	src/lib/overlevelse.svelte.ts	string	string @ 29:13	 Smerten vækker bersærkergangen. Næste bevægelse koster 0 energi.	
+src/lib/overlevelse.svelte.ts:3220:3228:text:1g8u9vj	src/lib/overlevelse.svelte.ts	text	markup @ 94:70	= 0 && i	
+src/lib/overlevelse.svelte.ts:6206:6259:string:wz3tum	src/lib/overlevelse.svelte.ts	string	string @ 186:39	Du var ved at kollapse, men livseliksiren redder dig.	
+src/lib/overlevelse.svelte.ts:6837:6890:string:18izmcy	src/lib/overlevelse.svelte.ts	string	string @ 202:35	Tågen lukker sig om dig. Du mister resten af dit liv.	
+src/lib/overlevelse.svelte.ts:7234:7394:text:1cx0wag	src/lib/overlevelse.svelte.ts	text	markup @ 214:86	!s.isDead && !s.isWinner).length || 1;\n    \n    const gammelDag = spilTilstand.dag || 1;\n    let taagenVendte = false;\n\n    while (spilTilstand.nuvaerendeEnergi	
+src/lib/overlevelse.svelte.ts:9437:9484:string:dxv14y	src/lib/overlevelse.svelte.ts	string	string @ 267:27	Et horn lyder mod øst. Flugtbådene er ankommet.	
+src/lib/overlevelse.svelte.ts:9729:9803:string:8v003q	src/lib/overlevelse.svelte.ts	string	string @ 276:39	Vinden vender ved østkysten. Tågen begynder at æde øen fra den anden side.	
+src/lib/overlevelse.svelte.ts:9884:9915:string:m6mv0w	src/lib/overlevelse.svelte.ts	string	string @ 281:32	Tågens syre ætsede dine lunger.	
+src/lib/overlevelse.svelte.ts:10076:10131:string:58dr0	src/lib/overlevelse.svelte.ts	string	string @ 289:35	Du kan kun drikke af dit blod, når tågen omslutter dig.	
+src/lib/overlevelse.svelte.ts:10233:10263:string:qao5ju	src/lib/overlevelse.svelte.ts	string	string @ 293:35	Du kan ikke sænke Max HP mere.	
+src/lib/overlevelse.svelte.ts:10460:10503:string:1sc1df8	src/lib/overlevelse.svelte.ts	string	string @ 300:31	Du bruger blodofferet. (-10 Max HP, +50 HP)	
+src/lib/overlevelse.svelte.ts:10801:10846:string:18gg0p1	src/lib/overlevelse.svelte.ts	string	string @ 309:48	Du mistede bevidstheden i vandet og druknede.	
+src/lib/overlevelse.svelte.ts:10976:11000:string:1avuopy	src/lib/overlevelse.svelte.ts	string	string @ 314:79	Du var ved at kollapse. 	
+src/lib/overlevelse.svelte.ts:11456:11516:string:1u6obfb	src/lib/overlevelse.svelte.ts	string	string @ 329:12	Du kollapser af udmattelse. Tiden går, og tågen rykker frem.	
+src/lib/overlevelse.svelte.ts:12023:12065:string:gd5dhu	src/lib/overlevelse.svelte.ts	string	string @ 341:20	Du vågner med 10 HP. Tågen er rykket frem.	
+src/lib/spilTilstand.svelte.ts:3458:3896:text:1lwxdtw	src/lib/spilTilstand.svelte.ts	text	markup @ 99:52	,\n    mitUdstyr: [] as RygsækTing[],\n    mineKendteFelter: [] as number[],\n    historik: [] as number[],\n    aktivShop: null as string[] | null,\n    \n    venteSpilAktiv: false,\n    ventePuljeGuld: 0,\n    ventePuljeLiv: 0,\n    venteFase: 'venter' as 'venter' | 'spiller' | 'viser_gevinst' | 'tabt' | 'vundet' | 'trukket',\n    sidsteVenteDag: 0,\n    venteRunde: 0,\n    venteGratisFeltBrugt: null as number | null,\n    venteKort: [] as Array	
+src/lib/spildata.ts:1318:1323:string:18x5f5u	src/lib/spildata.ts	string	string @ 25:36	Klude	
+src/lib/spildata.ts:1333:1336:string:16pyshd	src/lib/spildata.ts	string	string @ 25:51	tøj	
+src/lib/spildata.ts:1412:1465:string:1feyc8d	src/lib/spildata.ts	string	string @ 25:130	Giver en smule beskyttelse. Du tager 5% mindre skade.	
+src/lib/spildata.ts:1511:1519:string:jd27bh	src/lib/spildata.ts	string	string @ 26:42	Rustning	
+src/lib/spildata.ts:1529:1532:string:16pyshd	src/lib/spildata.ts	string	string @ 26:60	tøj	
+src/lib/spildata.ts:1624:1808:string:o6hioi	src/lib/spildata.ts	string	string @ 26:155	Halverer al skade, men den tunge vægt koster dig 1 energi pr. skridt. Ridder med rustning tager ingen skade fra nedgravede fælder. Synker til bunds og forsvinder, hvis du går i vandet.	
+src/lib/spildata.ts:1866:1879:string:10i27ep	src/lib/spildata.ts	string	string @ 27:54	Elverrustning	
+src/lib/spildata.ts:1889:1892:string:16pyshd	src/lib/spildata.ts	string	string @ 27:77	tøj	
+src/lib/spildata.ts:1996:2136:string:dqh3hf	src/lib/spildata.ts	string	string @ 27:184	Halverer al skade som almindelig rustning, men vejer ingenting. Ridder med rustning tager ingen skade fra nedgravede fælder. Kan ikke købes.	
+src/lib/spildata.ts:2184:2192:string:icc76w	src/lib/spildata.ts	string	string @ 28:44	Fint tøj	
+src/lib/spildata.ts:2202:2205:string:16pyshd	src/lib/spildata.ts	string	string @ 28:62	tøj	
+src/lib/spildata.ts:2301:2369:string:iq5p4i	src/lib/spildata.ts	string	string @ 28:161	Øger al guldindkomst med 15%. Kan blive ødelagt i huler og blodskov.	
+src/lib/spildata.ts:2407:2411:string:1cbwknf	src/lib/spildata.ts	string	string @ 29:34	Kniv	
+src/lib/spildata.ts:2421:2426:string:1vnzov5	src/lib/spildata.ts	string	string @ 29:48	våben	
+src/lib/spildata.ts:2486:2533:string:11xxgl2	src/lib/spildata.ts	string	string @ 29:113	Et simpelt våben. Bruges også i enkelte events.	
+src/lib/spildata.ts:2571:2575:string:1lcv3pp	src/lib/spildata.ts	string	string @ 30:34	Dirk	
+src/lib/spildata.ts:2585:2592:string:10d5ilo	src/lib/spildata.ts	string	string @ 30:48	værktøj	
+src/lib/spildata.ts:2651:2705:string:1v3mmcf	src/lib/spildata.ts	string	string @ 30:114	Tyveværktøj. Kan bruges til indbrud på tomme byfelter.	
+src/lib/spildata.ts:2743:2747:string:np2vod	src/lib/spildata.ts	string	string @ 31:34	Stav	
+src/lib/spildata.ts:2757:2762:string:1vnzov5	src/lib/spildata.ts	string	string @ 31:48	våben	
+src/lib/spildata.ts:2823:2910:string:b8ss3p	src/lib/spildata.ts	string	string @ 31:114	Kan teleportere dig 4 felter mod øst. Koster base-energi. Feltet aktiveres som normalt.	
+src/lib/spildata.ts:2946:2949:string:1nm435b	src/lib/spildata.ts	string	string @ 32:32	Bue	
+src/lib/spildata.ts:2959:2964:string:1vnzov5	src/lib/spildata.ts	string	string @ 32:45	våben	
+src/lib/spildata.ts:3023:3071:string:14qgey0	src/lib/spildata.ts	string	string @ 32:109	Et våben til events, hvor afstand betyder noget.	
+src/lib/spildata.ts:3111:3115:string:1vj3c8g	src/lib/spildata.ts	string	string @ 33:36	Økse	
+src/lib/spildata.ts:3125:3130:string:1vnzov5	src/lib/spildata.ts	string	string @ 33:50	våben	
+src/lib/spildata.ts:3191:3231:string:1y633os	src/lib/spildata.ts	string	string @ 33:116	Et tungt våben. Bruges i enkelte events.	
+src/lib/spildata.ts:3273:3278:string:j3hbf4	src/lib/spildata.ts	string	string @ 34:38	Sværd	
+src/lib/spildata.ts:3288:3293:string:1vnzov5	src/lib/spildata.ts	string	string @ 34:53	våben	
+src/lib/spildata.ts:3355:3396:string:1s30z7v	src/lib/spildata.ts	string	string @ 34:120	Et alsidigt våben. Bruges i flere events.	
+src/lib/spildata.ts:3436:3441:string:17n99j4	src/lib/spildata.ts	string	string @ 35:36	Sabel	
+src/lib/spildata.ts:3451:3456:string:1vnzov5	src/lib/spildata.ts	string	string @ 35:51	våben	
+src/lib/spildata.ts:3517:3555:string:19zi5q5	src/lib/spildata.ts	string	string @ 35:117	Et let våben. Bruges i enkelte events.	
+src/lib/spildata.ts:3595:3600:string:beisjq	src/lib/spildata.ts	string	string @ 36:36	Skovl	
+src/lib/spildata.ts:3610:3617:string:10d5ilo	src/lib/spildata.ts	string	string @ 36:51	værktøj	
+src/lib/spildata.ts:3678:3760:string:opuxeo	src/lib/spildata.ts	string	string @ 36:119	Lader dig grave guld og helende rødder op. Uden skovl kan det blive dyrt at grave.	
+src/lib/spildata.ts:3816:3824:string:1brjz6v	src/lib/spildata.ts	string	string @ 37:52	Detektor	
+src/lib/spildata.ts:3834:3841:string:10d5ilo	src/lib/spildata.ts	string	string @ 37:70	værktøj	
+src/lib/spildata.ts:3906:3999:string:1ihiglw	src/lib/spildata.ts	string	string @ 37:142	Viser hvor skjult guld ligger. Går du ind i et krystalfelt kortslutter den og bliver ødelagt.	
+src/lib/spildata.ts:4049:4058:string:ojyu45	src/lib/spildata.ts	string	string @ 38:46	Søgekvist	
+src/lib/spildata.ts:4068:4075:string:10d5ilo	src/lib/spildata.ts	string	string @ 38:65	værktøj	
+src/lib/spildata.ts:4143:4203:string:1k7ke8v	src/lib/spildata.ts	string	string @ 38:140	Viser hvor helende rødder ligger. Går tabt på ritual-felter.	
+src/lib/spildata.ts:4255:4266:string:y3soou	src/lib/spildata.ts	string	string @ 39:48	Livseliksir	
+src/lib/spildata.ts:4351:4436:string:1ao05w0	src/lib/spildata.ts	string	string @ 39:144	Drikkes automatisk, hvis du får dødelig skade. Heler dig maksimalt tilbage til 90 HP.	
+src/lib/spildata.ts:4478:4484:string:nfa7bz	src/lib/spildata.ts	string	string @ 40:38	Fakkel	
+src/lib/spildata.ts:4494:4501:string:10d5ilo	src/lib/spildata.ts	string	string @ 40:54	værktøj	
+src/lib/spildata.ts:4576:4670:string:1qi2bde	src/lib/spildata.ts	string	string @ 40:136	Udvider dit synsfelt med +1. Kan bruges til store lejrbål, som alle kan se. Går tabt i vandet.	
+src/lib/spildata.ts:4716:4724:string:ssv2g7	src/lib/spildata.ts	string	string @ 41:42	Sovepose	
+src/lib/spildata.ts:4734:4741:string:10d5ilo	src/lib/spildata.ts	string	string @ 41:60	værktøj	
+src/lib/spildata.ts:4805:4918:string:10v7wta	src/lib/spildata.ts	string	string @ 41:131	Slå lejr i vildmarken og få 20 HP (koster resten af din energi). Fugt i huler får den til at rådne med det samme.	
+src/lib/spildata.ts:4954:4963:string:18zqth2	src/lib/spildata.ts	string	string @ 42:32	Madration	
+src/lib/spildata.ts:5040:5115:string:1sehu5k	src/lib/spildata.ts	string	string @ 42:118	Giver +20 HP, og din næste bevægelse koster 0 energi. Kan gå tabt i ruiner.	
+src/lib/spildata.ts:5167:5181:string:z7nxkp	src/lib/spildata.ts	string	string @ 43:48	Gylden Kikkert	
+src/lib/spildata.ts:5266:5298:string:12khedj	src/lib/spildata.ts	string	string @ 43:147	Går i stykker på krystal-felter.	
+src/lib/spildata.ts:5348:5362:string:z7nxkp	src/lib/spildata.ts	string	string @ 44:46	Gylden Kikkert	
+src/lib/spildata.ts:5447:5479:string:12khedj	src/lib/spildata.ts	string	string @ 44:145	Går i stykker på krystal-felter.	
+src/lib/spildata.ts:5523:5530:string:1levxnd	src/lib/spildata.ts	string	string @ 45:40	Diamant	
+src/lib/spildata.ts:5608:5662:string:899emc	src/lib/spildata.ts	string	string @ 45:125	En sjælden og værdifuld ædelsten, der nemt kan sælges.	
+src/lib/spildata.ts:5714:5725:string:3tffdm	src/lib/spildata.ts	string	string @ 46:48	Hemmelighed	
+src/lib/spildata.ts:5810:5871:string:fz216z	src/lib/spildata.ts	string	string @ 46:144	Et skattekort. Brug det for at afsløre en mulig skatteklynge.	
+src/lib/spildata.ts:5960:5966:string:155afqj	src/lib/spildata.ts	string	string @ 50:30	Ridder	
+src/lib/spildata.ts:6015:6048:string:1uwdr2g	src/lib/spildata.ts	string	string @ 50:85	Rustningen tynger, men beskytter.	
+src/lib/spildata.ts:6189:6265:string:17u4wps	src/lib/spildata.ts	string	string @ 50:259	Starter med sværd og rustning. Ridder med rustning undgår nedgravede fælder.	
+src/lib/spildata.ts:6277:6306:string:21wygw	src/lib/spildata.ts	string	string @ 50:347	Tungt udstyr gør dig langsom.	
+src/lib/spildata.ts:6400:6408:string:cuucsp	src/lib/spildata.ts	string	string @ 51:30	Skjoldmø	
+src/lib/spildata.ts:6457:6490:string:1uwdr2g	src/lib/spildata.ts	string	string @ 51:87	Rustningen tynger, men beskytter.	
+src/lib/spildata.ts:6631:6707:string:17u4wps	src/lib/spildata.ts	string	string @ 51:261	Starter med sværd og rustning. Ridder med rustning undgår nedgravede fælder.	
+src/lib/spildata.ts:6719:6748:string:21wygw	src/lib/spildata.ts	string	string @ 51:349	Tungt udstyr gør dig langsom.	
+src/lib/spildata.ts:6844:6853:string:1ktws0c	src/lib/spildata.ts	string	string @ 52:32	Troldmand	
+src/lib/spildata.ts:6904:6935:string:19cgmuz	src/lib/spildata.ts	string	string @ 52:92	Magi beskytter ikke mod mudder.	
+src/lib/spildata.ts:7085:7123:string:1x9orvj	src/lib/spildata.ts	string	string @ 52:273	Starter med en livseliksir og en stav.	
+src/lib/spildata.ts:7135:7173:string:aylni	src/lib/spildata.ts	string	string @ 52:323	Starter uden guld og tager +50% skade.	
+src/lib/spildata.ts:7270:7281:string:zw195h	src/lib/spildata.ts	string	string @ 53:32	Troldkvinde	
+src/lib/spildata.ts:7332:7363:string:19cgmuz	src/lib/spildata.ts	string	string @ 53:94	Magi beskytter ikke mod mudder.	
+src/lib/spildata.ts:7513:7551:string:1x9orvj	src/lib/spildata.ts	string	string @ 53:275	Starter med en livseliksir og en stav.	
+src/lib/spildata.ts:7563:7601:string:aylni	src/lib/spildata.ts	string	string @ 53:325	Starter uden guld og tager +50% skade.	
+src/lib/spildata.ts:7693:7696:string:6l5p9k	src/lib/spildata.ts	string	string @ 54:29	Tyv	
+src/lib/spildata.ts:7744:7765:string:2khlyy	src/lib/spildata.ts	string	string @ 54:80	Hold dig i bevægelse.	
+src/lib/spildata.ts:7910:7946:string:6p0n66	src/lib/spildata.ts	string	string @ 54:246	Hurtig og udstyret med kniv og dirk.	
+src/lib/spildata.ts:7958:7975:string:1dxifl	src/lib/spildata.ts	string	string @ 54:294	Tager mere skade.	
+src/lib/spildata.ts:8066:8072:string:gkykzv	src/lib/spildata.ts	string	string @ 55:29	Skygge	
+src/lib/spildata.ts:8120:8141:string:2khlyy	src/lib/spildata.ts	string	string @ 55:83	Hold dig i bevægelse.	
+src/lib/spildata.ts:8286:8322:string:6p0n66	src/lib/spildata.ts	string	string @ 55:249	Hurtig og udstyret med kniv og dirk.	
+src/lib/spildata.ts:8334:8351:string:1dxifl	src/lib/spildata.ts	string	string @ 55:297	Tager mere skade.	
+src/lib/spildata.ts:8445:8454:string:8uhtvu	src/lib/spildata.ts	string	string @ 56:32	Udforsker	
+src/lib/spildata.ts:8505:8524:string:h5wbvn	src/lib/spildata.ts	string	string @ 56:92	Du kender terrænet.	
+src/lib/spildata.ts:8661:8698:string:11tdog2	src/lib/spildata.ts	string	string @ 56:248	Kan se langt og starter med en skovl.	
+src/lib/spildata.ts:8710:8734:string:1wf2v9w	src/lib/spildata.ts	string	string @ 56:297	Mangler våben fra start.	
+src/lib/spildata.ts:8838:8847:string:bb3w6v	src/lib/spildata.ts	string	string @ 57:32	Eventyrer	
+src/lib/spildata.ts:8898:8917:string:h5wbvn	src/lib/spildata.ts	string	string @ 57:92	Du kender terrænet.	
+src/lib/spildata.ts:9054:9091:string:11tdog2	src/lib/spildata.ts	string	string @ 57:248	Kan se langt og starter med en skovl.	
+src/lib/spildata.ts:9103:9127:string:1wf2v9w	src/lib/spildata.ts	string	string @ 57:297	Mangler våben fra start.	
+src/lib/spildata.ts:9229:9235:string:1es6hdb	src/lib/spildata.ts	string	string @ 58:30	Viking	
+src/lib/spildata.ts:9284:9321:string:10yi5dt	src/lib/spildata.ts	string	string @ 58:85	Du starter stærkt, men uden sovepose.	
+src/lib/spildata.ts:9448:9541:string:1r8aafw	src/lib/spildata.ts	string	string @ 58:249	Høj HP og økse. Første gang pr. dag du tager mindst 5 skade, koster næste bevægelse 0 energi.	
+src/lib/spildata.ts:9553:9575:string:19dkrm6	src/lib/spildata.ts	string	string @ 58:354	Starter uden sovepose.	
+src/lib/spildata.ts:9669:9677:string:kb1ri4	src/lib/spildata.ts	string	string @ 59:30	Valkyrie	
+src/lib/spildata.ts:9726:9763:string:10yi5dt	src/lib/spildata.ts	string	string @ 59:87	Du starter stærkt, men uden sovepose.	
+src/lib/spildata.ts:9890:9983:string:1r8aafw	src/lib/spildata.ts	string	string @ 59:251	Høj HP og økse. Første gang pr. dag du tager mindst 5 skade, koster næste bevægelse 0 energi.	
+src/lib/spildata.ts:9995:10017:string:19dkrm6	src/lib/spildata.ts	string	string @ 59:356	Starter uden sovepose.	
+src/lib/spildata.ts:10110:10116:string:1kjr6n4	src/lib/spildata.ts	string	string @ 60:29	Hertug	
+src/lib/spildata.ts:10164:10206:string:d8fqim	src/lib/spildata.ts	string	string @ 60:83	Du starter med mange penge og intet våben.	
+src/lib/spildata.ts:10341:10364:string:1f01a8q	src/lib/spildata.ts	string	string @ 60:260	Meget guld og fint tøj.	
+src/lib/spildata.ts:10376:10413:string:1li1plk	src/lib/spildata.ts	string	string @ 60:295	Intet våben. Gravning koster mere HP.	
+src/lib/spildata.ts:10476:10486:string:qefbg	src/lib/spildata.ts	string	string @ 61:29	Hertuginde	
+src/lib/spildata.ts:10534:10576:string:d8fqim	src/lib/spildata.ts	string	string @ 61:87	Du starter med mange penge og intet våben.	
+src/lib/spildata.ts:10711:10734:string:1f01a8q	src/lib/spildata.ts	string	string @ 61:264	Meget guld og fint tøj.	
+src/lib/spildata.ts:10746:10783:string:1li1plk	src/lib/spildata.ts	string	string @ 61:299	Intet våben. Gravning koster mere HP.	
+src/lib/spildata.ts:10847:10852:string:1o61ith	src/lib/spildata.ts	string	string @ 62:30	Jæger	
+src/lib/spildata.ts:10901:10925:string:5eehae	src/lib/spildata.ts	string	string @ 62:84	Hold afstand til byttet.	
+src/lib/spildata.ts:11060:11088:string:dntk46	src/lib/spildata.ts	string	string @ 62:243	Starter med bue og højt syn.	
+src/lib/spildata.ts:11100:11113:string:yzzucv	src/lib/spildata.ts	string	string @ 62:283	Lav start-HP.	
+src/lib/spildata.ts:11219:11225:string:1uaz6y1	src/lib/spildata.ts	string	string @ 63:30	Skytte	
+src/lib/spildata.ts:11274:11298:string:5eehae	src/lib/spildata.ts	string	string @ 63:85	Hold afstand til byttet.	
+src/lib/spildata.ts:11433:11461:string:dntk46	src/lib/spildata.ts	string	string @ 63:244	Starter med bue og højt syn.	
+src/lib/spildata.ts:11473:11486:string:yzzucv	src/lib/spildata.ts	string	string @ 63:284	Lav start-HP.	
+src/lib/spildata.ts:11592:11599:string:uo6t9w	src/lib/spildata.ts	string	string @ 64:30	Kaptajn	
+src/lib/spildata.ts:11648:11668:string:14vpr72	src/lib/spildata.ts	string	string @ 64:86	Havet tog alt andet.	
+src/lib/spildata.ts:11810:11850:string:jjht2l	src/lib/spildata.ts	string	string @ 64:248	Høj kapital, sabel og et hemmeligt kort.	
+src/lib/spildata.ts:11862:11877:string:1gwsw0o	src/lib/spildata.ts	string	string @ 64:300	Ingen sovepose.	
+src/lib/spildata.ts:11966:11972:string:19qcedb	src/lib/spildata.ts	string	string @ 65:30	Korsar	
+src/lib/spildata.ts:12021:12041:string:14vpr72	src/lib/spildata.ts	string	string @ 65:85	Havet tog alt andet.	
+src/lib/spildata.ts:12183:12223:string:jjht2l	src/lib/spildata.ts	string	string @ 65:247	Høj kapital, sabel og et hemmeligt kort.	
+src/lib/spildata.ts:12235:12250:string:1gwsw0o	src/lib/spildata.ts	string	string @ 65:299	Ingen sovepose.	
+src/lib/spildata.ts:12338:12343:string:u9as90	src/lib/spildata.ts	string	string @ 66:29	Dværg	
+src/lib/spildata.ts:12391:12437:string:fjmklx	src/lib/spildata.ts	string	string @ 66:82	Du graver effektivt, men bevæger dig langsomt.	
+src/lib/spildata.ts:12574:12605:string:6g3n5g	src/lib/spildata.ts	string	string @ 66:265	God til at grave og tjene guld.	
+src/lib/spildata.ts:12617:12635:string:k1uemh	src/lib/spildata.ts	string	string @ 66:308	Langsom at flytte.	
+src/lib/spildata.ts:12740:12750:string:wh9zvr	src/lib/spildata.ts	string	string @ 67:29	Minegraver	
+src/lib/spildata.ts:12798:12844:string:fjmklx	src/lib/spildata.ts	string	string @ 67:87	Du graver effektivt, men bevæger dig langsomt.	
+src/lib/spildata.ts:12981:13012:string:6g3n5g	src/lib/spildata.ts	string	string @ 67:270	God til at grave og tjene guld.	
+src/lib/spildata.ts:13024:13042:string:k1uemh	src/lib/spildata.ts	string	string @ 67:313	Langsom at flytte.	
+src/lib/spildata.ts:13145:13148:string:2ygrtp	src/lib/spildata.ts	string	string @ 68:27	Ork	
+src/lib/spildata.ts:13194:13238:string:13qvth1	src/lib/spildata.ts	string	string @ 68:76	Du starter med meget HP og lav guldindkomst.	
+src/lib/spildata.ts:13364:13386:string:zb14r8	src/lib/spildata.ts	string	string @ 68:246	Meget HP og lav skade.	
+src/lib/spildata.ts:13398:13421:string:ozzj9z	src/lib/spildata.ts	string	string @ 68:280	Dårligere guldindkomst.	
+src/lib/spildata.ts:13512:13521:string:qdvcl9	src/lib/spildata.ts	string	string @ 69:27	Klanleder	
+src/lib/spildata.ts:13567:13611:string:13qvth1	src/lib/spildata.ts	string	string @ 69:82	Du starter med meget HP og lav guldindkomst.	
+src/lib/spildata.ts:13737:13759:string:zb14r8	src/lib/spildata.ts	string	string @ 69:252	Meget HP og lav skade.	
+src/lib/spildata.ts:13771:13794:string:ozzj9z	src/lib/spildata.ts	string	string @ 69:286	Dårligere guldindkomst.	
+src/lib/spildata.ts:13887:13892:string:175i9a4	src/lib/spildata.ts	string	string @ 70:29	Joker	
+src/lib/spildata.ts:13940:13960:string:feu0mh	src/lib/spildata.ts	string	string @ 70:82	Held er en strategi.	
+src/lib/spildata.ts:14074:14096:string:wwr8ho	src/lib/spildata.ts	string	string @ 70:216	Guldbonus og godt syn.	
+src/lib/spildata.ts:14108:14145:string:1kqj8zr	src/lib/spildata.ts	string	string @ 70:250	Tyndt helbred og tager dobbelt skade.	
+src/lib/spildata.ts:14208:14216:string:b0rhpz	src/lib/spildata.ts	string	string @ 71:29	Harlekin	
+src/lib/spildata.ts:14264:14284:string:feu0mh	src/lib/spildata.ts	string	string @ 71:85	Held er en strategi.	
+src/lib/spildata.ts:14398:14420:string:wwr8ho	src/lib/spildata.ts	string	string @ 71:219	Guldbonus og godt syn.	
+src/lib/spildata.ts:14432:14469:string:1kqj8zr	src/lib/spildata.ts	string	string @ 71:253	Tyndt helbred og tager dobbelt skade.	
+src/lib/spilmotor.ts:4697:4717:text:5z55qi	src/lib/spilmotor.ts	text	markup @ 124:37	= bredde || nyRaekke	
+src/lib/spilmotor.ts:6071:6094:string:1gssnhz	src/lib/spilmotor.ts	string	string @ 168:39	Alarm kunne ikke sendes	
+src/lib/spilmotor.ts:6717:6727:string:14sifgd	src/lib/spilmotor.ts	string	string @ 188:76	senderNavn	
+src/lib/spilmotor.ts:6785:6795:string:1fb4bd7	src/lib/spilmotor.ts	string	string @ 189:53	En spiller	
+src/lib/spilmotor.ts:7418:7448:string:1htbv78	src/lib/spilmotor.ts	string	string @ 206:43	Fælles event kunne ikke sendes	
+src/lib/spilmotor.ts:8157:8165:text:1g8u9vj	src/lib/spilmotor.ts	text	markup @ 228:56	= 0 && i	
+src/lib/spilmotor.ts:8956:9125:text:b1vwgn	src/lib/spilmotor.ts	text	markup @ 251:61	ting.id === genstandId);\n    \n    if (indeks === -1) return;\n\n    spilTilstand.mitUdstyr[indeks].maengde -= brugtMaengde;\n\n    if (spilTilstand.mitUdstyr[indeks].maengde	
+src/lib/spilmotor.ts:9699:9992:text:1h3h6dx	src/lib/spilmotor.ts	text	markup @ 273:36	();\n\n    const raekkeMin = Math.max(0, centerRaekke - radius);\n    const raekkeMax = Math.min(maxRaekker - 1, centerRaekke + radius);\n    const kolonneMin = Math.max(0, centerKolonne - radius);\n    const kolonneMax = Math.min(BREDDE - 1, centerKolonne + radius);\n\n    for (let r = raekkeMin; r	
+src/lib/spilmotor.ts:10992:11011:text:1wmvqg5	src/lib/spilmotor.ts	text	markup @ 312:31	= HOEJDE || kolonne	
+src/lib/spilmotor.ts:13467:13519:string:rj5p2j	src/lib/spilmotor.ts	string	string @ 389:35	Du har været væk for længe. Tågen har indhentet dig.	
+src/lib/spilmotor.ts:13686:13719:string:d2wi46	src/lib/spilmotor.ts	string	string @ 395:35	Du må vente på de andre spillere.	
+src/lib/spilmotor.ts:15045:15104:string:zpk7i3	src/lib/spilmotor.ts	string	string @ 424:79	Bersærkergangen bærer dig frem. Bevægelsen koster 0 energi.	
+src/lib/spilmotor.ts:15109:15161:string:36lipd	src/lib/spilmotor.ts	string	string @ 424:143	Maden holder dig i gang. Bevægelsen koster 0 energi.	
+src/lib/spilmotor.ts:16753:16795:string:1ulpeuz	src/lib/spilmotor.ts	string	string @ 462:31	 Græshopperne har spist den modne afgrøde.	
+src/lib/spilmotor.ts:17159:17190:string:1o7ma03	src/lib/spilmotor.ts	string	string @ 475:32	Du ender i åbent vand. (-30 HP)	
+src/lib/spilmotor.ts:17194:17222:string:1qeqb45	src/lib/spilmotor.ts	string	string @ 475:67	Du druknede i det åbne vand.	
+src/lib/spilmotor.ts:17547:17577:string:setk1	src/lib/spilmotor.ts	string	string @ 485:23	 Du finder 5 guld i byens uro.	
+src/lib/spilmotor.ts:17723:17751:string:1sgkwhy	src/lib/spilmotor.ts	string	string @ 488:23	 Din optræden giver 10 guld.	
+src/lib/spilmotor.ts:17892:17925:string:1qvr0vx	src/lib/spilmotor.ts	string	string @ 491:23	 Du opkræver 5 guld i lokal skat.	
+src/lib/spilmotor.ts:18137:18167:string:1xg0dsd	src/lib/spilmotor.ts	string	string @ 494:23	 Ritualpladsen giver dig 5 HP.	
+src/lib/spilmotor.ts:18592:18617:string:pq5jpp	src/lib/spilmotor.ts	string	string @ 506:31	 Minen er låst af ejeren.	
+src/lib/spilmotor.ts:19403:19457:string:zdr9vs	src/lib/spilmotor.ts	string	string @ 519:35	 Du låser minen. Andre spillere kan ikke overtage den.	
+src/lib/spilmotor.ts:19846:19879:string:wt7s0p	src/lib/spilmotor.ts	string	string @ 529:47	Terrænet tog dine sidste kræfter.	
+src/lib/spilmotor.ts:20145:20184:string:1fy1si5	src/lib/spilmotor.ts	string	string @ 539:16	Staven flytter dig fire felter mod øst.	
+src/lib/spilmotor.ts:20202:20243:string:1q54ho3	src/lib/spilmotor.ts	string	string @ 540:16	Portalen flytter dig fire felter mod øst.	
+src/lib/spilmotor.ts:21403:21441:string:15a9ewq	src/lib/spilmotor.ts	string	string @ 568:35	Du går ombord i båden og forlader øen.	
+src/lib/spilmotor.ts:22228:22267:string:1becb32	src/lib/spilmotor.ts	string	string @ 589:27	Kræfterne rev din sidste livsgnist væk.	
+src/lib/spilmotor.ts:22852:22911:text:bg5xbn	src/lib/spilmotor.ts	text	markup @ 609:59	i.id === 'stav');\n        if (!stavItem || stavItem.maengde	
+src/lib/spilmotor.ts:24034:24073:string:1fy1si5	src/lib/spilmotor.ts	string	string @ 645:20	Staven flytter dig fire felter mod øst.	
+src/lib/spilmotor.ts:24209:24250:string:1q54ho3	src/lib/spilmotor.ts	string	string @ 652:20	Portalen flytter dig fire felter mod øst.	
+src/lib/spilmotor.ts:24596:24632:string:19gbfqp	src/lib/spilmotor.ts	string	string @ 663:35	Miljøet er uegnet til at slå lejr i.	
+src/lib/spilmotor.ts:24806:24845:string:1sa2k5y	src/lib/spilmotor.ts	string	string @ 669:35	Du mangler en sovepose for at slå lejr.	
+src/lib/spilmotor.ts:24994:25018:string:1vakcl8	src/lib/spilmotor.ts	string	string @ 674:35	Du er allerede udhvilet.	
+src/lib/spilmotor.ts:25219:25269:string:1ci6dfh	src/lib/spilmotor.ts	string	string @ 682:31	Du hviler i soveposen. Du får 20 HP, og tiden går.	
+src/lib/spilmotor.ts:25457:25511:text:2jm99e	src/lib/spilmotor.ts	text	markup @ 689:51	i.id === 'hemmelighed');\n    if (!kort || kort.maengde	
+src/lib/spilmotor.ts:26112:26166:string:1unx3zu	src/lib/spilmotor.ts	string	string @ 708:35	Du læser skattekortet. En klynge felter bliver synlig.	
+src/lib/spilmotor.ts:26216:26249:string:kc77at	src/lib/spilmotor.ts	string	string @ 710:35	Kortet viser ikke noget brugbart.	
+src/lib/spilmotor.ts:28307:28339:string:xsuyej	src/lib/spilmotor.ts	string	string @ 767:35	Kun jægere kan sætte en tracker.	
+src/lib/spilmotor.ts:28558:28622:string:1ymfr7i	src/lib/spilmotor.ts	string	string @ 773:35	Du skal stå på samme felt som spilleren for at sætte en tracker.	
+src/lib/spilmotor.ts:31306:31325:string:xo3emj	src/lib/spilmotor.ts	string	string @ 864:35	Du mangler en dirk.	
+src/lib/spilmotor.ts:31426:31466:string:n23egw	src/lib/spilmotor.ts	string	string @ 869:35	Dirken kan kun bruges på tomme byfelter.	
+src/lib/spilmotor.ts:32195:32219:string:46t3rc	src/lib/spilmotor.ts	string	string @ 888:14	Vagterne slog dig ihjel.	
+src/lib/spilmotor.ts:32773:32798:text:1xpa6js	src/lib/spilmotor.ts	text	markup @ 906:39	();\n    for (let r = 1; r	
+src/lib/spilmotor.ts:34692:34733:string:jrzmha	src/lib/spilmotor.ts	string	string @ 965:17	Lyset rammer havet, men finder ingen båd.	
+src/lib/spilmotor.ts:35357:35412:string:94zuep	src/lib/spilmotor.ts	string	string @ 984:13	Lyset finder en båd mod øst. Alle på øen kan se den nu.	
+src/lib/spilmotor.ts:36716:36731:text:1y1ts8w	src/lib/spilmotor.ts	text	markup @ 1023:18	= minKol && kol	
+src/lib/spilmotor.ts:39874:39885:text:u6xy8h	src/lib/spilmotor.ts	text	markup @ 1101:31	0 && bygget	
+src/lib/spilmotor.ts:41399:41497:text:1bs0mn8	src/lib/spilmotor.ts	text	markup @ 1145:71	!eventBibliotek[noegle].erSubTrin && noegle !== 'campfire');\n    \n    const eventForbrug = new Map	
+src/lib/spilmotor.ts:41547:41603:text:1my1kt4	src/lib/spilmotor.ts	text	markup @ 1148:31	eventForbrug.set(e, 0));\n\n    const eventChancer: Record	
+src/lib/spilmotor.ts:45082:45275:text:48w8uf	src/lib/spilmotor.ts	text	markup @ 1223:72	0 && itemDB[k].kanKoebes !== false && itemDB[k].type !== 'forbandelse' && itemDB[k].type !== 'skat');                \n                const valgte: string[] = [];\n                for(let j=0; j	
+src/lib/spilmotor.ts:46124:46205:text:131px5w	src/lib/spilmotor.ts	text	markup @ 1249:32	hvedeCount) felt.afgroede = 'boenner';\n        else felt.afgroede = Math.random()	
+src/lib/spilmotor.ts:47190:47237:string:v3vlit	src/lib/spilmotor.ts	string	string @ 1280:35	Rustningen er for tung i vandet. Du mister den.	
+src/lib/spilmotor.ts:47359:47385:string:1bkmdnf	src/lib/spilmotor.ts	string	string @ 1284:35	Vandet slukker din fakkel.	
+src/lib/spilmotor.ts:47597:47648:string:11a148v	src/lib/spilmotor.ts	string	string @ 1290:35	Hulen ødelægger dit fine tøj. Du får klude tilbage.	
+src/lib/spilmotor.ts:47772:47802:string:1q2frwj	src/lib/spilmotor.ts	string	string @ 1294:35	Fugten ødelægger din sovepose.	
+src/lib/spilmotor.ts:48018:48049:string:z3pmbn	src/lib/spilmotor.ts	string	string @ 1300:35	Tornene ødelægger dit fine tøj.	
+src/lib/spilmotor.ts:48220:48261:string:141nsy7	src/lib/spilmotor.ts	string	string @ 1305:35	Krystallerne ødelægger din metaldetektor.	
+src/lib/spilmotor.ts:48416:48457:string:jzqwjt	src/lib/spilmotor.ts	string	string @ 1309:35	Krystallerne ødelægger kikkertens linser.	
+src/lib/spilmotor.ts:48615:48652:string:1fmc4k1	src/lib/spilmotor.ts	string	string @ 1314:35	Skadedyrene i ruinen stjæler din mad.	
+src/lib/spilmotor.ts:48819:48857:string:6ncy5w	src/lib/spilmotor.ts	string	string @ 1319:35	Ritualpladsen ødelægger din søgekvist.	
+src/lib/spilmotor.ts:49666:49693:string:17w27r9	src/lib/spilmotor.ts	string	string @ 1345:39	Bålsignal kunne ikke sendes	
+src/lib/spilmotor.ts:49869:49922:text:1chy351	src/lib/spilmotor.ts	text	markup @ 1351:53	i.id === 'fakkel');\n    if (!fakkel || fakkel.maengde	
+src/lib/spilmotor.ts:50167:50235:string:ffitut	src/lib/spilmotor.ts	string	string @ 1359:31	Du tænder et stort bål. Området omkring dig bliver synligt for alle.	
+src/lib/spilmotor.ts:50567:50628:string:1y2i8yv	src/lib/spilmotor.ts	string	string @ 1370:20	Der opstår en portal bag dig. Du flyttes fire felter mod øst.	
+src/lib/spilmotor.ts:52376:52410:string:yb88lh	src/lib/spilmotor.ts	string	string @ 1424:32	Meteoren rammer dit felt. (-30 HP)	
+src/lib/spilmotor.ts:52414:52435:string:1knbpij	src/lib/spilmotor.ts	string	string @ 1424:70	Nedslaget dræbte dig.	
+src/lib/spilmotor.ts:54286:54320:string:1rpny2s	src/lib/spilmotor.ts	string	string @ 1480:32	Jorden brød op under dig. (-40 HP)	
+src/lib/spilmotor.ts:54324:54347:string:zjmq7y	src/lib/spilmotor.ts	string	string @ 1480:70	Jordskælvet dræbte dig.	
+src/lib/spilmotor.ts:56649:56675:string:1bkmdnf	src/lib/spilmotor.ts	string	string @ 1555:30	Vandet slukker din fakkel.	
+src/lib/spilmotor.ts:56714:56746:string:19fniya	src/lib/spilmotor.ts	string	string @ 1556:32	Du mister din rustning i vandet.	
+src/lib/spilmotor.ts:56914:56943:string:7usw7	src/lib/spilmotor.ts	string	string @ 1560:93	Du druknede i oversvømmelsen.	
+src/lib/spilmotor.ts:57055:57084:string:7usw7	src/lib/spilmotor.ts	string	string @ 1562:92	Du druknede i oversvømmelsen.	
+src/lib/spilmotor.ts:59895:59932:string:veurlz	src/lib/spilmotor.ts	string	string @ 1641:25	Du får noget af guldet fri af stenen.	
+src/lib/spilmotor.ts:60047:60091:string:15msgyj	src/lib/spilmotor.ts	string	string @ 1647:25	Værktøjet går tabt, men du får stenen åbnet.	
+src/lib/types.ts:207:210:string:16pyshd	src/lib/types.ts	string	string @ 2:25	tøj	
+src/lib/types.ts:215:220:string:1vnzov5	src/lib/types.ts	string	string @ 2:33	våben	
+src/lib/types.ts:225:232:string:10d5ilo	src/lib/types.ts	string	string @ 2:43	værktøj	
+src/lib/undergrund.svelte.ts:3669:3691:string:wsd2xo	src/lib/undergrund.svelte.ts	string	string @ 84:35	Du kan ikke grave her.	
+src/lib/undergrund.svelte.ts:5167:5197:string:alpwzg	src/lib/undergrund.svelte.ts	string	string @ 130:20	Du finder ikke noget brugbart.	
+src/lib/undergrund.svelte.ts:5278:5375:string:1c7edu7	src/lib/undergrund.svelte.ts	string	string @ 133:20	KLIK. Den nedgravede fælde klapper om dit panser, men ridderens træning holder benet fri. (-0 HP)	
+src/lib/undergrund.svelte.ts:5823:5883:string:xm6277	src/lib/undergrund.svelte.ts	string	string @ 142:20	Skovlen rammer træ. Du åbner en kiste. (+500 Guld, +Diamant)	
+src/lib/undergrund.svelte.ts:6631:6691:string:1a5yvwl	src/lib/undergrund.svelte.ts	string	string @ 158:24	Du finder en rod, men du har ikke brug for mere liv lige nu.	
+src/lib/undergrund.svelte.ts:7094:7108:string:fdlgfb	src/lib/undergrund.svelte.ts	string	string @ 172:36	 Du kollapser.	
+src/lib/ventespil.svelte.ts:229:297:text:8t4p6b	src/lib/ventespil.svelte.ts	text	markup @ 9:38	0.5 ? 2 : 1;\n    const antalGuld = 3 - antalLiv;\n\n    for(let i=0; i	
+src/lib/ventespil.svelte.ts:409:470:text:hcmklt	src/lib/ventespil.svelte.ts	text	markup @ 15:22	Math.random() - 0.5);\n\n    const jackpotIndex = Math.random()	
+src/lib/ventespil.svelte.ts:1698:1748:string:19m6dt6	src/lib/ventespil.svelte.ts	string	string @ 53:35	Du lægger 5 guld på bordet. Impen blander kortene.	
+src/lib/ventespil.svelte.ts:1825:1879:string:tkylpp	src/lib/ventespil.svelte.ts	string	string @ 56:16	Impen blander kortene til første runde. Den er gratis.	
+src/lib/ventespil.svelte.ts:1896:1918:string:1l4zk7i	src/lib/ventespil.svelte.ts	string	string @ 57:16	Impen blander kortene.	
+src/lib/ventespil.svelte.ts:3422:3466:string:fd0gcy	src/lib/ventespil.svelte.ts	string	string @ 104:64	Jackpot! Du fandt den legendariske guldskat.	
+src/lib/ventespil.svelte.ts:5036:5089:string:17daceo	src/lib/ventespil.svelte.ts	string	string @ 144:31	Du låser puljen på bordet. Den tåler nu kraniets bid.	
+src/routes/+layout.svelte:741:745:string:1x3hhfn	src/routes/+layout.svelte	string	string @ 35:23	Lato	
+src/routes/+layout.svelte:894:900:string:xlvu1w	src/routes/+layout.svelte	string	string @ 41:23	Cinzel	
