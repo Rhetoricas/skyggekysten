@@ -2,6 +2,7 @@ import { supabase } from './supabaseClient';
 import { spilTilstand } from './spilTilstand.svelte';
 import { authState } from './auth.svelte';
 import { gemOfflineScore, gemOfflineSpil, hentOfflineScores } from './offlineStorage';
+import { beregnSpillerScore } from './score';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Felt, SpillerData } from './types';
 
@@ -10,6 +11,7 @@ let kortSkalOpdateres = false;
 let dbSaveKoe: ReturnType<typeof setTimeout> | null = null;
 let kortSaveKoe: ReturnType<typeof setTimeout> | null = null;
 let subRumKode = '';
+const VENTENDE_HIGHSCORE_KEY = 'taage_pending_highscores';
 
 export function realtimeRumNoegle(rumKode: string) {
     const normaliseret = (rumKode || '').trim().toLowerCase();
@@ -47,6 +49,11 @@ type HighscorePayload = {
     final_log: string;
 };
 
+type VentendeHighscore = HighscorePayload & {
+    pending_id: string;
+    created_at: string;
+};
+
 function medTimeout<T>(promise: PromiseLike<T>, ms: number, label: string): Promise<T> {
     return new Promise((resolve, reject) => {
         const timer = setTimeout(() => reject(new Error(`${label} tog for lang tid.`)), ms);
@@ -54,6 +61,54 @@ function medTimeout<T>(promise: PromiseLike<T>, ms: number, label: string): Prom
             .then(resolve, reject)
             .finally(() => clearTimeout(timer));
     });
+}
+
+function harLocalStorage() {
+    return typeof localStorage !== 'undefined';
+}
+
+function highscorePendingId(payload: HighscorePayload) {
+    return [
+        payload.user_id,
+        payload.player_name,
+        payload.room_code,
+        payload.score,
+        payload.days,
+        payload.gold,
+        payload.max_column,
+        payload.known_fields_count,
+        payload.mines_owned,
+        payload.is_winner ? 'w' : 'nw',
+        payload.is_dead ? 'd' : 'nd'
+    ].join('|');
+}
+
+function hentVentendeHighscores() {
+    if (!harLocalStorage()) return [] as VentendeHighscore[];
+
+    try {
+        const gemt = localStorage.getItem(VENTENDE_HIGHSCORE_KEY);
+        return gemt ? JSON.parse(gemt) as VentendeHighscore[] : [];
+    } catch {
+        return [];
+    }
+}
+
+function gemVentendeHighscores(scores: VentendeHighscore[]) {
+    if (!harLocalStorage()) return;
+    localStorage.setItem(VENTENDE_HIGHSCORE_KEY, JSON.stringify(scores.slice(-20)));
+}
+
+function huskVentendeHighscore(payload: HighscorePayload) {
+    const pending_id = highscorePendingId(payload);
+    const scores = hentVentendeHighscores().filter((score) => score.pending_id !== pending_id);
+    scores.push({ ...payload, pending_id, created_at: new Date().toISOString() });
+    gemVentendeHighscores(scores);
+    return pending_id;
+}
+
+function fjernVentendeHighscore(pendingId: string) {
+    gemVentendeHighscores(hentVentendeHighscores().filter((score) => score.pending_id !== pendingId));
 }
 
 function rensVisuelleFeltData(felt: Felt) {
@@ -181,9 +236,14 @@ export async function syncTilDb(opdaterKort = false) {
         gratisBevaegelseKilde: spilTilstand.gratisBevaegelseKilde,
         sidsteBersaerkDag: spilTilstand.sidsteBersaerkDag
     };
+    const scoreData = {
+        ...mig,
+        kendteFelter: spilTilstand.mineKendteFelter
+    };
+    const score = beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, spilTilstand.spillerNavn, scoreData, isWinner);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    spilTilstand.alleSpillere[spilTilstand.spillerNavn] = mig as any;
+    spilTilstand.alleSpillere[spilTilstand.spillerNavn] = { ...mig, score } as any;
 
     if (spilTilstand.offlineMode) {
         gemOfflineSpil();
@@ -373,16 +433,41 @@ export async function gemHighscore() {
         final_log: spilTilstand.logBesked
     };
 
+    const pendingId = huskVentendeHighscore(payload);
     const error = await sendHighscorePayload(payload);
 
     if (error) {
         console.error('Kunne ikke gemme highscore', error);
         gemOfflineScore(true);
-        spilTilstand.statusBesked = `Scoren kunne ikke gemmes globalt: ${error.message} Den er gemt lokalt i browseren.`;
+        spilTilstand.statusBesked = `Scoren kunne ikke gemmes globalt: ${error.message} Den prøves igen automatisk fra denne browser.`;
         return false;
     }
 
+    fjernVentendeHighscore(pendingId);
     return true;
+}
+
+export async function retryVentendeHighscores() {
+    const brugerId = authState.user?.id;
+    if (!brugerId || spilTilstand.offlineMode) return 0;
+
+    const sessionResultat = await medTimeout(supabase.auth.getSession(), 12000, 'Login-tjek').catch(() => null);
+    if (sessionResultat?.data.session?.user?.id !== brugerId) return 0;
+
+    const ventende = hentVentendeHighscores().filter((score) => score.user_id === brugerId);
+    let gemt = 0;
+
+    for (const score of ventende) {
+        const { pending_id, created_at, ...payload } = score;
+        void created_at;
+        const error = await sendHighscorePayload(payload);
+        if (!error) {
+            fjernVentendeHighscore(pending_id);
+            gemt++;
+        }
+    }
+
+    return gemt;
 }
 
 async function sendHighscorePayload(payload: HighscorePayload) {

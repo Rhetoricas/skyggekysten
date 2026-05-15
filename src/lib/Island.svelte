@@ -7,8 +7,8 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
-    import { M10_SCORE, beregnFremdriftPoint, beregnMinePoint, taelScoreSpillere } from '$lib/score';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi, hentGlobalTopScore, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle } from '$lib/netvaerk';
+    import { M10_SCORE, beregnSpillerScore } from '$lib/score';
+    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi, hentGlobalTopScore, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
     import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
@@ -881,7 +881,16 @@
         const brugerId = authState.user?.id;
         if (brugerId) {
             (async () => {
+                const gemteVentende = await retryVentendeHighscores();
+                if (gemteVentende > 0) {
+                    scoreErGemt = true;
+                    scoreGemningFejlet = false;
+                    spilTilstand.statusBesked = gemteVentende === 1
+                        ? 'En ventende score blev gemt efter genoprettet forbindelse.'
+                        : `${gemteVentende} ventende scores blev gemt efter genoprettet forbindelse.`;
+                }
                 globaleScores = await hentGlobalTopTi();
+                lokaleScores = await hentHighscores();
             })();
         }
     });
@@ -894,15 +903,14 @@
 
     async function opdaterOgGemHighscore() {
         const erVinder = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
-        const fremdriftPoint = beregnFremdriftPoint(spilTilstand.maxKolonne, erVinder);
-        
-        const udforskningPoint = spilTilstand.mineKendteFelter.length * 2;
-        const minePoint = beregnMinePoint(spilTilstand.gitter, spilTilstand.spillerNavn, taelScoreSpillere(spilTilstand.alleSpillere));
 
-        spilTilstand.samletScore = Math.floor(
-            (spilTilstand.guldTotal + fremdriftPoint + udforskningPoint + minePoint) *
-                (1 + Math.max(0, spilTilstand.livspoint) / 1000)
-        );
+        spilTilstand.samletScore = beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, spilTilstand.spillerNavn, {
+            guld: spilTilstand.guldTotal,
+            hp: spilTilstand.livspoint,
+            kolonne: spilTilstand.maxKolonne,
+            kendteFelter: spilTilstand.mineKendteFelter,
+            isWinner: erVinder
+        }, erVinder);
 
         try {
             await syncTilDb(true);
@@ -1082,6 +1090,16 @@
         
         if (aktive.length === 0) return spilTilstand.dag;
         return Math.min(...aktive.map((s: SpillerData) => s.dag || 1));
+    }
+
+    function hentKortRangliste() {
+        return Object.entries(spilTilstand.alleSpillere)
+            .map(([navn, data]) => ({
+                navn,
+                data,
+                score: data.score || beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, navn, data, !!data.isWinner)
+            }))
+            .sort((a, b) => b.score - a.score);
     }
 
     function erAktivSessionSpiller(spiller: SpillerData) {
@@ -1746,7 +1764,7 @@ function udførBevægelse(nytIndeks: number) {
         </div>
         
         <div class="rangliste">
-            {#each Object.entries(spilTilstand.alleSpillere).sort((a, b) => (b[1].score || 0) - (a[1].score || 0)) as [navn, data] (navn)}
+            {#each hentKortRangliste() as { navn, data, score } (navn)}
                 <div class="raekke" class:mig={navn === spilTilstand.spillerNavn}>
                     <img src={data.ikon || '/tiles/player.webp'} alt="" />
                     <div class="info">
@@ -1754,6 +1772,7 @@ function udførBevægelse(nytIndeks: number) {
                         <span>{data.isWinner ? 'Sluppet væk' : (data.isDead ? 'Død' : 'I tågen')}</span>
                     </div>
                     <div class="stats">
+                        <span title="Score">{score}</span>
                         <span title="Guld">🪙 {data.guld}</span>
                     </div>
                 </div>

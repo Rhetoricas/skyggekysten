@@ -3,7 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { authState, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
     import { tilgaengeligeKarakterer } from '$lib/spildata';
-    import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
+    import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnSpillerScore, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
@@ -210,12 +210,8 @@
     }
 
     function hentSessionSpillere() {
-        const antalSpillere = taelScoreSpillere(spilTilstand.alleSpillere);
         return Object.entries(spilTilstand.alleSpillere).map(([navn, data]) => {
-            const udforskning = (data.kendteFelter?.length || 0) * 2;
-            const minePoint = beregnMinePoint(spilTilstand.gitter, navn, antalSpillere);
-            const fremdriftPoint = beregnFremdriftPoint(data.kolonne || 0, !!data.isWinner);
-            const score = Math.floor((data.guld + fremdriftPoint + udforskning + minePoint) * (1 + Math.max(0, data.hp) / 1000));
+            const score = beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, navn, data, !!data.isWinner);
             return { navn, data, score };
         }).sort((a, b) => b.score - a.score);
     }

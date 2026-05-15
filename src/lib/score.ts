@@ -24,6 +24,24 @@ export function beregnFremdriftPoint(maxKolonne: number, erVinder: boolean) {
     return erVinder ? 1000 : Math.max(0, maxKolonne) * 2;
 }
 
+export function beregnSpillerScore(
+    gitter: Felt[],
+    alleSpillere: Record<string, Partial<SpillerData>>,
+    spillerNavn: string,
+    data: Partial<SpillerData>,
+    erVinder = !!data.isWinner
+) {
+    const antalSpillere = taelScoreSpillere(alleSpillere);
+    const guld = data.guld || 0;
+    const hp = data.hp || 0;
+    const kolonne = data.kolonne || 0;
+    const udforskningPoint = (data.kendteFelter?.length || 0) * 2;
+    const minePoint = beregnMinePoint(gitter, spillerNavn, antalSpillere);
+    const fremdriftPoint = beregnFremdriftPoint(kolonne, erVinder);
+
+    return Math.floor((guld + fremdriftPoint + udforskningPoint + minePoint) * (1 + Math.max(0, hp) / 1000));
+}
+
 export function findMedaljeNiveau(score: number) {
     let niveau = 0;
     for (let i = 0; i < MEDALJE_GRAENSER.length; i++) {
