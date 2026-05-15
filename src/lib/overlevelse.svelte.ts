@@ -3,6 +3,7 @@ import { syncTilDb, broadcastFelt } from './netvaerk';
 import { BREDDE, HEX_W, HOEJDE } from './spildata';
 import { brugFraRygsæk } from './spilmotor';
 import { erFeltITaagen } from './taage';
+import type { Felt, GravstenMinde } from './types';
 
 export function erSpillerITaagen() {
     return erFeltITaagen(spilTilstand.gitter, spilTilstand.spillerIndex, spilTilstand.fogX);
@@ -27,6 +28,23 @@ export function udloesBersaerkHvisRelevant(faktiskSkade: number) {
     spilTilstand.gratisNaesteBevaegelse = true;
     spilTilstand.gratisBevaegelseKilde = 'bersaerk';
     return ' Smerten vækker bersærkergangen. Næste bevægelse koster 0 energi.';
+}
+
+function tilfoejGravsten(felt: Felt, tekst: string) {
+    if (!spilTilstand.valgtKarakter) return;
+
+    const eksisterende = felt.gravstenListe ?? (felt.gravstenIkon
+        ? [{ ikon: felt.gravstenIkon, navn: 'Ukendt', dag: 0 }]
+        : []);
+    const minde: GravstenMinde = {
+        ikon: spilTilstand.valgtKarakter.ikon,
+        navn: spilTilstand.spillerNavn || 'Ukendt',
+        dag: spilTilstand.dag || 1,
+        tekst
+    };
+
+    felt.gravstenListe = [...eksisterende, minde];
+    felt.gravstenIkon = minde.ikon;
 }
 
 function hentMuligeFlugtbaadFelter() {
@@ -59,6 +77,45 @@ function hentMuligeFlugtbaadFelter() {
     }
 
     return kystFelter;
+}
+
+function hashTekst(tekst: string) {
+    let hash = 2166136261;
+    for (let i = 0; i < tekst.length; i++) {
+        hash ^= tekst.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+}
+
+function sortDeterministiskBaadFelter(felter: number[]) {
+    const seed = spilTilstand.rumKode || 'taage';
+    return [...felter].sort((a, b) => hashTekst(`${seed}:${a}`) - hashTekst(`${seed}:${b}`));
+}
+
+function taelFlugtbaade() {
+    return spilTilstand.gitter.reduce((antal, felt) => {
+        if (!felt.hasBoat && !felt.boatCount) return antal;
+        return antal + Math.max(1, felt.boatCount || 1);
+    }, 0);
+}
+
+function placerManglendeFlugtbaade(kystFelter: number[], oensketAntal: number) {
+    const mangler = Math.max(0, oensketAntal - taelFlugtbaade());
+    if (mangler <= 0 || kystFelter.length === 0) return 0;
+
+    const fordelteFelter = sortDeterministiskBaadFelter(kystFelter);
+    let placeret = 0;
+
+    for (let i = 0; i < mangler; i++) {
+        const baadFelt = fordelteFelter[i % fordelteFelter.length];
+        spilTilstand.gitter[baadFelt].hasBoat = true;
+        spilTilstand.gitter[baadFelt].boatCount = Math.max(0, spilTilstand.gitter[baadFelt].boatCount || 0) + 1;
+        broadcastFelt(baadFelt, spilTilstand.gitter[baadFelt]);
+        placeret++;
+    }
+
+    return placeret;
 }
 
 function hentSpillerensLandmasse() {
@@ -147,7 +204,7 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
 
         const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
         if (aktueltFelt && spilTilstand.valgtKarakter) {
-            aktueltFelt.gravstenIkon = spilTilstand.valgtKarakter.ikon;
+            tilfoejGravsten(aktueltFelt, doedsBesked || `${beskedMedTal} Du døde.`);
             broadcastFelt(spilTilstand.spillerIndex, aktueltFelt);
         }
         
@@ -170,7 +227,7 @@ function druknSpiller(besked: string) {
 
     const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
     if (aktueltFelt && spilTilstand.valgtKarakter) {
-        aktueltFelt.gravstenIkon = spilTilstand.valgtKarakter.ikon;
+        tilfoejGravsten(aktueltFelt, besked);
         broadcastFelt(spilTilstand.spillerIndex, aktueltFelt);
     }
 
@@ -195,7 +252,7 @@ export function tjekOverlevelse() {
 
         const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
         if (aktueltFelt && spilTilstand.valgtKarakter) {
-            aktueltFelt.gravstenIkon = spilTilstand.valgtKarakter.ikon;
+            tilfoejGravsten(aktueltFelt, 'Tågen lukker sig om dig. Du mister resten af dit liv.');
             broadcastFelt(spilTilstand.spillerIndex, aktueltFelt);
         }
 
@@ -251,18 +308,9 @@ export function fremrykTid() {
         // NYT: Generer både på østkysten, når solen står op på dag 6
         if (nyDag === 6 && gammelDag < 6) {
             const kystFelter = hentMuligeFlugtbaadFelter();
-            kystFelter.sort(() => Math.random() - 0.5);
             const antalBaade = antalLevende;
-            
-            if (kystFelter.length > 0) {
-                for (let i = 0; i < antalBaade; i++) {
-                    const baadFelt = kystFelter[i % kystFelter.length];
-                    spilTilstand.gitter[baadFelt].hasBoat = true;
-                    spilTilstand.gitter[baadFelt].boatCount = (spilTilstand.gitter[baadFelt].boatCount || 0) + 1;
-                    broadcastFelt(baadFelt, spilTilstand.gitter[baadFelt]);
-                    kortAendret = true;
-                }
-            }
+            const placeret = placerManglendeFlugtbaade(kystFelter, antalBaade);
+            if (placeret > 0) kortAendret = true;
             
             samletLog += "Et horn lyder mod øst. Flugtbådene er ankommet.";
             spilTilstand.gitter = [...spilTilstand.gitter];

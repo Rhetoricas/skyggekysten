@@ -22,7 +22,7 @@
         tilgaengeligeKarakterer,
         itemDB
     } from '$lib/spildata';
-    import type { Felt, Karakter, SpillerData } from '$lib/types';
+    import type { Felt, GravstenMinde, Karakter, SpillerData } from '$lib/types';
     import { eventBibliotek } from '$lib/eventBibliotek';
     import { erAfgroedeModen, hentAfgroedeBlok, hentInsektPlageBlok } from '$lib/afgroeder';
     import { erFeltITaagen } from '$lib/taage';
@@ -166,7 +166,7 @@
                     } else {
                         langsomtKamera = false;
                     }
-                }, 3000); // Sat ned til 3 sekunder
+                }, 2000);
             });
         }
     });
@@ -392,28 +392,21 @@
         
         cam.nulstil();
 
-        Object.keys(spilTilstand.alleSpillere).forEach(navn => {
-            const spiller = spilTilstand.alleSpillere[navn];
-            if (spiller.historik && spiller.historik.length > 1) {
-                spiller.tidligereHistorik = [...(spiller.tidligereHistorik || []), spiller.historik];
-                spiller.historik = [];
-            }
-            spilTilstand.alleSpillere[navn].isDead = false;
-            spilTilstand.alleSpillere[navn].isWinner = false;
-            spilTilstand.alleSpillere[navn].dag = 1;
-            spilTilstand.alleSpillere[navn].harSkattekort = false;
-            spilTilstand.alleSpillere[navn].aktivTracker = null;
-            spilTilstand.alleSpillere[navn].trackedeSpillere = [];
-            spilTilstand.alleSpillere[navn].escapeIndex = null;
-            spilTilstand.alleSpillere[navn].escapeIcon = null;
-            spilTilstand.alleSpillere[navn].gratisNaesteBevaegelse = false;
-            spilTilstand.alleSpillere[navn].gratisBevaegelseKilde = '';
-            spilTilstand.alleSpillere[navn].sidsteBersaerkDag = 0;
-        });
+        spilTilstand.alleSpillere = {};
 
         spilTilstand.fogX = 0;
         spilTilstand.dag = 1;
         spilTilstand.historik = [];
+        spilTilstand.valgtKarakter = null;
+        spilTilstand.maxLivspoint = 100;
+        spilTilstand.livspoint = 100;
+        spilTilstand.guldTotal = 0;
+        spilTilstand.maxKolonne = 0;
+        spilTilstand.nuvaerendeEnergi = 0;
+        spilTilstand.mitUdstyr = [];
+        spilTilstand.mineKendteFelter = [];
+        spilTilstand.samletScore = 0;
+        spilTilstand.venteGratisFeltBrugt = null;
         spilTilstand.gratisNaesteBevaegelse = false;
         spilTilstand.gratisBevaegelseKilde = '';
         spilTilstand.sidsteBersaerkDag = 0;
@@ -421,7 +414,25 @@
         nulstilKort();
 
         spilTilstand.gameState = 'select';
-        await syncTilDb(true);
+        if (spilTilstand.offlineMode) {
+            await syncTilDb(true);
+            return;
+        }
+
+        const { error: resetError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
+            kort: spilTilstand.gitter,
+            start_index: spilTilstand.spillerIndex,
+            spillere: {},
+            fog_x: 0
+        }).eq('rum_kode', spilTilstand.rumKode)));
+
+        if (resetError) {
+            spilTilstand.statusBesked = `Øen kunne ikke nulstilles: ${resetError.message}`;
+            spilTilstand.gameState = 'start';
+            return;
+        }
+
+        startRealtime();
     }
 
     async function opretEllerDeltag() {
@@ -473,6 +484,14 @@
             .on('broadcast', { event: 'baal' }, ({ payload }) => {
                 if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
                 afslørOmraade(payload.centerIndex, payload.radius);
+                syncTilDb();
+            })
+            .on('broadcast', { event: 'syn_signal' }, ({ payload }) => {
+                if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
+                afslørOmraade(payload.centerIndex, payload.radius);
+                if (typeof payload.fokusIndex === 'number') {
+                    spilTilstand.kameraFokus = payload.fokusIndex;
+                }
                 syncTilDb();
             })
             .on('broadcast', { event: 'faelles_event' }, ({ payload }) => {
@@ -532,7 +551,7 @@
                             spilTilstand.ventePuljeGuld = 0;
                             spilTilstand.ventePuljeLiv = 0;
                             spilTilstand.venteRunde = 0;
-                            initialiserGitter();
+                            nulstilKort();
 
                             const { error: resetError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
                                 kort: spilTilstand.gitter,
@@ -622,7 +641,7 @@
                         spilTilstand.erHost = true;
                         spilTilstand.alleSpillere = {};
                         spilTilstand.fogX = 0;
-                        initialiserGitter();
+                        nulstilKort();
 
                         const { error: resetError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
                             kort: spilTilstand.gitter,
@@ -1102,6 +1121,45 @@
             }));
     }
 
+    function gravstenListeForFelt(felt: Felt): GravstenMinde[] {
+        if (felt.gravstenListe?.length) return felt.gravstenListe;
+        if (felt.gravstenIkon) return [{ ikon: felt.gravstenIkon, navn: 'Ukendt', dag: 0 }];
+        return [];
+    }
+
+    function nyesteGravsten(felt: Felt) {
+        const liste = gravstenListeForFelt(felt);
+        return liste[liste.length - 1] || null;
+    }
+
+    function gravstenHjaelpetekst(felt: Felt) {
+        const liste = gravstenListeForFelt(felt);
+        if (liste.length === 0) return 'Gravstenen bliver liggende som et permanent spor på øen.';
+
+        return [...liste]
+            .reverse()
+            .map((minde) => {
+                const dag = minde.dag > 0 ? `Dag ${minde.dag}` : 'Ukendt dag';
+                const tekst = minde.tekst ? ` - ${minde.tekst}` : '';
+                return `${dag}: ${minde.navn}${tekst}`;
+            })
+            .join('\n');
+    }
+
+    function visGravsten(e: MouseEvent, felt: Felt) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const liste = gravstenListeForFelt(felt);
+        const placering = placerInspectBoble(e.clientX, e.clientY);
+        inspectBoble = {
+            titel: liste.length > 1 ? `${liste.length} døde her` : 'Gravsten',
+            tekst: gravstenHjaelpetekst(felt),
+            ...placering
+        };
+        inspectAktiv = false;
+    }
+
     function formaterBiomeNavn(biome: string | undefined) {
         if (!biome) return 'felt';
         return biome.replace('hoejland', 'højland');
@@ -1130,7 +1188,9 @@
         if (felt.hasGoldmine) dele.push(felt.mineOwner ? `Guldminen ejes af ${felt.mineOwner}.` : 'Der er en guldmine her.');
         if (felt.hasPortal) dele.push('Portalen kan flytte dig mod øst.');
         if (felt.taageBlokker) dele.push('Tågeblokkeren kan holde tågen tilbage fra venstre, indtil tågen vender.');
-        if (felt.gravstenIkon) dele.push('Gravstenen viser, at en spiller døde her.');
+        const gravstenListe = gravstenListeForFelt(felt);
+        if (gravstenListe.length > 1) dele.push(`Gravstenen rummer ${gravstenListe.length} dødsfald på dette felt.`);
+        else if (gravstenListe.length === 1) dele.push('Gravstenen viser, at en spiller døde her.');
         if (farvelBaadeForFelt(index).length > 0) dele.push('Den grå farvelbåd viser, at en spiller slap væk fra dette felt.');
         if (felt.gravet) dele.push('Feltet er allerede gravet op.');
         else if (felt.kanGraves) dele.push('Feltet kan graves.');
@@ -1488,11 +1548,24 @@ function udførBevægelse(nytIndeks: number) {
                             </span>
                         {/if}
 
-                        {#if erUdforsket && felt.gravstenIkon}
-                            <div class="gravsten-container" data-help-title="Gravsten" data-help-body="En spiller døde på dette felt. Gravstenen bliver liggende som et permanent spor på øen.">
+                        {#if erUdforsket && gravstenListeForFelt(felt).length > 0}
+                            {@const gravstenListe = gravstenListeForFelt(felt)}
+                            {@const gravsten = nyesteGravsten(felt)}
+                            <button
+                                type="button"
+                                class="gravsten-container"
+                                data-help-title="Gravsten"
+                                data-help-body={gravstenHjaelpetekst(felt)}
+                                onclick={(e) => visGravsten(e, felt)}
+                            >
                                 <img src="/tiles/gravsted.webp" alt="Død" class="gravsten-ikon" />
-                                <img src={felt.gravstenIkon} alt="Faldet" class="gravsten-portraet" />
-                            </div>
+                                {#if gravsten}
+                                    <img src={gravsten.ikon} alt="Faldet" class="gravsten-portraet" />
+                                {/if}
+                                {#if gravstenListe.length > 1}
+                                    <span class="gravsten-count">{gravstenListe.length}</span>
+                                {/if}
+                            </button>
                         {/if}
                         
                         {#if erUdforsket}
@@ -1827,6 +1900,7 @@ function udførBevægelse(nytIndeks: number) {
         color: #d9d9d9;
         font-size: 0.92rem;
         line-height: 1.4;
+        white-space: pre-line;
     }
     .inspect-luk {
         position: absolute;
@@ -2120,12 +2194,21 @@ function udførBevægelse(nytIndeks: number) {
     .modstander-icon { position: absolute; top: 10px; z-index: 16; display: flex; justify-content: center; width: 100%; }
     .gravsten-container {
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; z-index: 13;
-        display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto;
+        height: 60px; border: 0; padding: 0; margin: 0; background: transparent; cursor: pointer;
     }
     .gravsten-ikon { position: absolute; width: 100%; height: auto; z-index: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
     .gravsten-portraet {
         position: relative; z-index: 2; width: 38px; margin-top: -8px;
         filter: grayscale(100%) sepia(10%) brightness(0.6) contrast(1.2); opacity: 0.85;
+    }
+    .gravsten-count {
+        position: absolute; right: 1px; bottom: 0; z-index: 3;
+        min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box;
+        display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 999px; background: rgba(20, 20, 20, 0.88); color: #f1f1f1;
+        font-size: 0.72rem; font-weight: 800; line-height: 1;
+        border: 1px solid rgba(255, 255, 255, 0.5);
     }
 
     .farvel-baade-container {

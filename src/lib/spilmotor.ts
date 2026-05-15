@@ -499,6 +499,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         if (!spiller.besoegteMiner) spiller.besoegteMiner = [];
         
         const varEjer = felt.mineOwner === spilTilstand.spillerNavn;
+        const tidligereEjer = felt.mineOwner;
         const harBesoegt = spiller.besoegteMiner.includes(nytIndeks);
         
         if (!varEjer) {
@@ -513,7 +514,9 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
                     const basisGuld = 100 + (ejedeMiner * 50);
                     const faktiskGuld = spilTilstand.beregnGuldIndkomst ? spilTilstand.beregnGuldIndkomst(basisGuld) : basisGuld;
                     spilTilstand.guldTotal += faktiskGuld;
-                    ekstraLog += ` Du overtager minen og udbetaler ${faktiskGuld} guld til dig selv.`;
+                    ekstraLog += tidligereEjer
+                        ? ` Du overtager ${tidligereEjer}s mine og udbetaler ${faktiskGuld} guld til dig selv.`
+                        : ` Du overtager minen og udbetaler ${faktiskGuld} guld til dig selv.`;
                 } else {
                     felt.mineLocked = true;
                     ekstraLog += ` Du låser minen. Andre spillere kan ikke overtage den.`;
@@ -938,9 +941,12 @@ function placerFlugtBaade(antalBaade = 3) {
         [kystFelter[i], kystFelter[j]] = [kystFelter[j], kystFelter[i]];
     }
 
-    const valgte = kystFelter.slice(0, Math.min(antalBaade, kystFelter.length));
-    for (const indeks of valgte) {
+    const valgte: number[] = [];
+    for (let i = 0; i < antalBaade; i++) {
+        const indeks = kystFelter[i % kystFelter.length];
         spilTilstand.gitter[indeks].hasBoat = true;
+        spilTilstand.gitter[indeks].boatCount = Math.max(0, spilTilstand.gitter[indeks].boatCount || 0) + 1;
+        valgte.push(indeks);
     }
 
     return valgte;
@@ -949,7 +955,8 @@ function placerFlugtBaade(antalBaade = 3) {
 function findEllerSkabBaad() {
     const eksisterendeBaade = spilTilstand.gitter
         .map((felt, index) => ({ felt, index }))
-        .filter(({ felt }) => felt.hasBoat);
+        .filter(({ felt }) => felt.hasBoat)
+        .flatMap(({ felt, index }) => Array.from({ length: Math.max(1, felt.boatCount || 1) }, () => ({ felt, index })));
 
     if (eksisterendeBaade.length > 0) {
         return eksisterendeBaade[Math.floor(Math.random() * eksisterendeBaade.length)].index;
@@ -978,6 +985,7 @@ export function lysBaadForAlle() {
     spilTilstand.kameraFokus = baadIndex;
     spilTilstand.gitter = [...spilTilstand.gitter];
     broadcastFelt(baadIndex, spilTilstand.gitter[baadIndex]);
+    sendSynSignal(baadIndex, 0, baadIndex);
     syncTilDb();
     syncKortTilDbSenere();
 
@@ -1345,6 +1353,16 @@ export async function sendBaalSignal(centerIndex: number, radius: number) {
     }).catch((error) => console.warn('Bålsignal kunne ikke sendes', error));
 }
 
+export async function sendSynSignal(centerIndex: number, radius: number, fokusIndex: number | null = null) {
+    if (spilTilstand.offlineMode) return;
+    if (!spilTilstand.rumKode) return;
+    void supabase.channel(eventKanalNavn()).send({
+        type: 'broadcast',
+        event: 'syn_signal',
+        payload: { ...eventKanalPayload(), centerIndex, radius, fokusIndex }
+    }).catch((error) => console.warn('Synssignal kunne ikke sendes', error));
+}
+
 export function taendBaal() {
     if (spilTilstand.erBevidstløs || !spilTilstand.valgtKarakter) return;
     
@@ -1355,8 +1373,10 @@ export function taendBaal() {
 
     const radius = Math.max(1, spilTilstand.valgtKarakter.synsRadius + spilTilstand.rygsækEffekt.syn) + 2;
     afslørOmraade(spilTilstand.spillerIndex, radius);
+    spilTilstand.livspoint = spilTilstand.maxLivspoint;
+    spilTilstand.guldTotal += 50;
     
-    spilTilstand.logBesked = "Du tænder et stort bål. Området omkring dig bliver synligt for alle.";
+    spilTilstand.logBesked = "Du tænder et stort bål. Området omkring dig bliver synligt for alle. Folk stimler sammen om lyset: Du får fuld HP og 50 guld.";
     
     sendBaalSignal(spilTilstand.spillerIndex, radius);
     fremrykTid();

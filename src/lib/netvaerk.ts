@@ -85,6 +85,19 @@ function filtrerSpillereTilKanal(spillere: Record<string, SpillerData> = {}, kan
     );
 }
 
+function logMineEjerskifte(index: number, nytFelt: Felt) {
+    const gammeltFelt = spilTilstand.gitter[index];
+    if (!gammeltFelt?.hasGoldmine || !nytFelt?.hasGoldmine) return;
+
+    const gammelEjer = gammeltFelt.mineOwner;
+    const nyEjer = nytFelt.mineOwner;
+    if (gammelEjer === nyEjer) return;
+
+    if (gammelEjer === spilTilstand.spillerNavn && nyEjer && nyEjer !== spilTilstand.spillerNavn) {
+        spilTilstand.logBesked = `Du mistede en guldmine til ${nyEjer}.`;
+    }
+}
+
 export function syncKortTilDbSenere(delayMs = 45000) {
     if (kortSaveKoe) return;
 
@@ -557,6 +570,7 @@ export function startRealtime() {
             const data = payload.payload;
             if (data.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
             if (spilTilstand.gitter[data.index]) {
+                logMineEjerskifte(data.index, data.feltData);
                 spilTilstand.gitter[data.index] = data.feltData;
                 spilTilstand.gitter = [...spilTilstand.gitter];
             }
@@ -568,6 +582,7 @@ export function startRealtime() {
             let aendret = false;
             for (const opdatering of data.felter || []) {
                 if (spilTilstand.gitter[opdatering.index]) {
+                    logMineEjerskifte(opdatering.index, opdatering.feltData);
                     spilTilstand.gitter[opdatering.index] = opdatering.feltData;
                     aendret = true;
                 }

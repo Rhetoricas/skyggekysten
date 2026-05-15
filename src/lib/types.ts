@@ -79,6 +79,13 @@ export interface SpillerData {
     sidsteBersaerkDag?: number;
 }
 
+export interface GravstenMinde {
+    ikon: string;
+    navn: string;
+    dag: number;
+    tekst?: string;
+}
+
 export interface Felt {
     id?: number; 
     kolonne?: number;
@@ -104,6 +111,7 @@ export interface Felt {
     opdaget?: boolean;
     billede?: string;
     gravstenIkon?: string;
+    gravstenListe?: GravstenMinde[];
 
     kanGraves?: boolean;
     skjultGuld?: number;

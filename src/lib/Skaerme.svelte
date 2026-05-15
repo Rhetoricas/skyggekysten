@@ -51,6 +51,14 @@
     let spilletSlutLyd = false;
     let visProfil = $state(false);
     let profilNavnInput = $state('');
+    const oeNavnForled = ['rav', 'mose', 'jern', 'taage', 'maan', 'ask', 'skum', 'sort'];
+    const oeNavnEfterled = ['holm', 'vig', 'oe', 'rev', 'naes', 'skov', 'dal', 'borg'];
+
+    function foreslaaOeNavn() {
+        const forled = oeNavnForled[Math.floor(Math.random() * oeNavnForled.length)];
+        const efterled = oeNavnEfterled[Math.floor(Math.random() * oeNavnEfterled.length)];
+        spilTilstand.rumKode = `${forled}${efterled}`;
+    }
 
     function blandKarakterer() {
         const blandet = [...tilgaengeligeKarakterer].sort(() => Math.random() - 0.5);
@@ -394,14 +402,17 @@
                     onkeydown={trykEnter}
                 />
                 
-                <input 
-                    type="text" 
-                    bind:value={spilTilstand.rumKode} 
-                    maxlength="10" 
-                    placeholder="Øens navn" 
-                    class="large-input" 
-                    onkeydown={trykEnter}
-                />
+                <div class="oe-input-wrap">
+                    <input 
+                        type="text" 
+                        bind:value={spilTilstand.rumKode} 
+                        maxlength="10" 
+                        placeholder="Øens navn" 
+                        class="large-input oe-input" 
+                        onkeydown={trykEnter}
+                    />
+                    <button type="button" class="autonavn-knap" onclick={foreslaaOeNavn} aria-label="Foreslå ønavn" title="Foreslå ønavn">↻</button>
+                </div>
                 
                 <div class="start-knap-raekke">
                     <button type="button" class="spil-knap login-boat-btn" onclick={(e) => { e.preventDefault(); startSpilMedLyd(); }}>
@@ -694,6 +705,17 @@
     .login-box p { color: #ccc; margin-bottom: 20px; line-height: 1.4; }
     
     .large-input { display: block; width: 100%; padding: 15px; margin-bottom: 20px; font-size: 1.2rem; background: #0d0d0d; color: white; border: 1px solid #444; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
+    .oe-input-wrap { position: relative; width: 100%; margin-bottom: 20px; }
+    .oe-input-wrap .large-input { margin-bottom: 0; padding-right: 56px; }
+    .autonavn-knap {
+        position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+        width: 38px; height: 38px; border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.08); color: #f5d071;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 1.25rem; line-height: 1; cursor: pointer;
+    }
+    .autonavn-knap:hover { background: rgba(255, 255, 255, 0.14); }
     
     .spil-knap { background: url('/screens/button.webp') no-repeat center; background-size: contain; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; width: 220px; height: 65px; }
     .knap-tekst { color: #fcebd5; font-weight: bold; font-size: 1.1rem; padding-bottom: 2px; pointer-events: none; font-family: 'Cinzel', serif; }
@@ -1056,6 +1078,20 @@
             padding: 11px;
             margin-bottom: 10px;
             font-size: 1rem;
+        }
+
+        .oe-input-wrap {
+            margin-bottom: 10px;
+        }
+
+        .oe-input-wrap .large-input {
+            padding-right: 48px;
+        }
+
+        .autonavn-knap {
+            width: 34px;
+            height: 34px;
+            right: 6px;
         }
 
         .login-boat-btn,
