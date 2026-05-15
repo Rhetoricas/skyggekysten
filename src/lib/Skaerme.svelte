@@ -57,7 +57,8 @@
     function foreslaaOeNavn() {
         const forled = oeNavnForled[Math.floor(Math.random() * oeNavnForled.length)];
         const efterled = oeNavnEfterled[Math.floor(Math.random() * oeNavnEfterled.length)];
-        spilTilstand.rumKode = `${forled}${efterled}`;
+        const oeNavn = `${forled}${efterled}`;
+        spilTilstand.rumKode = oeNavn.charAt(0).toUpperCase() + oeNavn.slice(1);
     }
 
     function blandKarakterer() {
@@ -119,6 +120,10 @@
     function formaterNavn(tekst: string) {
         if (!tekst) return '';
         return tekst.charAt(0).toUpperCase() + tekst.slice(1).toLowerCase();
+    }
+
+    function formaterHighscoreNavn(tekst: string) {
+        return formaterNavn(tekst).slice(0, 10);
     }
 
     function maskeretEmail(email?: string) {
@@ -432,7 +437,7 @@
                         <ol>
                             {#each globaleScores as score, i (i)}
                                 <li>
-                                    <span class="navn">{formaterNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {score.oeNavn.toUpperCase()})</span></span>
+                                    <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
                                     <span class="point">{score.point}</span>
                                 </li>
                             {/each}
@@ -558,7 +563,7 @@
                             <ol>
                                 {#each lokaleScores as hs, i (i)}
                                     <li>
-                                        <span class="navn">{formaterNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
+                                        <span class="navn">{formaterHighscoreNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
                                         <span class="point">{hs.score}</span>
                                     </li>
                                 {/each}
@@ -580,7 +585,7 @@
                                 <ol>
                                     {#each globaleScores as score, i (i)}
                                         <li>
-                                            <span class="navn">{formaterNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {score.oeNavn.toUpperCase()})</span></span>
+                                            <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
                                             <span class="point">{score.point}</span>
                                         </li>
                                     {/each}
@@ -648,7 +653,7 @@
                             <ol>
                                 {#each lokaleScores as hs, i (i)}
                                     <li>
-                                        <span class="navn">{formaterNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
+                                        <span class="navn">{formaterHighscoreNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
                                         <span class="point">{hs.score}</span>
                                     </li>
                                 {/each}
@@ -670,7 +675,7 @@
                                 <ol>
                                     {#each globaleScores as score, i (i)}
                                         <li>
-                                            <span class="navn">{formaterNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {score.oeNavn.toUpperCase()})</span></span>
+                                            <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
                                             <span class="point">{score.point}</span>
                                         </li>
                                     {/each}

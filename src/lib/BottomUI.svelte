@@ -107,6 +107,11 @@
         return vareId === 'skovl' || vareId === 'sovepose' || vareId === 'mad' || vareId === 'dirk';
     }
 
+    function formaterNavn(tekst: string) {
+        if (!tekst) return '';
+        return tekst.charAt(0).toUpperCase() + tekst.slice(1).toLowerCase();
+    }
+
     function forklaringForVare(vareId: string, aktiv: boolean) {
         const info = itemDB[vareId];
         if (!info) return 'Ukendt genstand.';
@@ -141,7 +146,7 @@
 {/if}
 
 <footer class="ui">
-    <div class="island-overskrift">{spilTilstand.rumKode}</div>
+    <div class="island-overskrift">{formaterNavn(spilTilstand.rumKode)}</div>
     
     <div 
         class="log-container klikbar" 
