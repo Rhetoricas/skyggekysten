@@ -51,92 +51,103 @@
             <div class="regelbog-indhold">
                 <section>
                     <h3>Målet</h3>
-                    <p>Du er drevet i land på en ø. Tågen kommer bagfra. Find en båd på den anden side af øen, før tågen omslutter dig eller du mister alle HP.</p>
-                    <p class="eksempel">Eksempel: Hvis du ser en båd langt mod øst, behøver du ikke udforske alt. Det vigtigste er at nå frem i live med nok HP til de sidste farlige felter.</p>
+                    <p>Du er drevet i land på en ø. Tågen kommer bagfra. Find en flugtbåd mod øst og gå ombord, før tågen lukker sig om dig.</p>
+                    <p class="eksempel">Eksempel: Hvis en båd bliver synlig langt mod øst, behøver du ikke udforske alt. Det vigtigste er at nå frem, før tågen eller havet gør turen umulig.</p>
                 </section>
 
                 <section>
                     <h3>Start og ø-navn</h3>
-                    <p>Alle der skriver samme ø-navn, spiller på samme ø, hvis de går i land inden for de første fem dage. Offline-spil gemmes kun i browseren på den enhed.</p>
-                    <p class="eksempel">Eksempel: Skriver I begge "Sortoe", lander I på samme ø. Skriver en anden spiller navnet første gang på dag 8, er det for sent at slutte sig til den tur.</p>
+                    <p>Alle der skriver samme ø-navn, spiller på samme ø. Nye spillere kan slutte sig til, så længe de aktive spillere ikke er kommet længere end dag 5. Offline-spil gemmes kun i browseren på den enhed.</p>
+                    <p class="eksempel">Eksempel: Skriver I begge "Sortoe", lander I på samme ø. Hvis de aktive spillere er nået til dag 6, er det for sent for en ny spiller at gå i land på den tur.</p>
                 </section>
 
                 <section>
                     <h3>Tur, energi og bevægelse</h3>
                     <ul>
-                        <li>Hver bevægelse koster energi. Når du løber tør, går der en ny dag.</li>
-                        <li>Terræn kan være tungt eller let afhængigt af din karakter.</li>
-                        <li>Energifelter du aldrig kan bruge med din nuværende baseenergi vises inaktive.</li>
-                        <li>Hvis du kommer for langt foran den langsomste spiller i multiplayer, må du vente. Du får én gratis ventespilsrunde pr. felt, og flere runder på samme felt skal købes.</li>
+                        <li>Hver bevægelse koster energi. Prisen afhænger af karakter, udstyr, terræn og eventuelle terrænfordele.</li>
+                        <li>Du kan godt bruge mere energi, end du har tilbage. Så går dagen videre efter handlingen, og du får ny energi.</li>
+                        <li>Bevægelse i tågen koster 2 ekstra energi.</li>
+                        <li>Mad og bersærkergang kan gøre næste bevægelse gratis.</li>
+                        <li>Hvis du kommer mindst 5 dage foran den langsomste aktive spiller i multiplayer, må du vente. Du får én gratis ventespilsrunde på det felt, du står på; flere runder på samme felt koster 5 guld.</li>
                     </ul>
-                    <p class="eksempel">Eksempel: Har du 3 energi tilbage, og et bjerg koster 4, kan du ikke gå derind nu. Gå et billigere sted hen, spis mad for gratis bevægelse, eller vent på en ny dag.</p>
+                    <p class="eksempel">Eksempel: Har du 3 energi tilbage, og et bjerg koster 6, kan du stadig gå derind. Du ender på negativ energi, feltet aktiveres, og bagefter går tiden videre til næste dag.</p>
                 </section>
 
                 <section>
                     <h3>Syn og tåge</h3>
                     <ul>
-                        <li>Du afslører felter omkring dig, når du bevæger dig.</li>
-                        <li>Bjerge blokerer udsyn. Du kan ikke bare se hen over dem fra lavere terræn.</li>
-                        <li>Tågen rykker frem over tid. Felter bag tågen er farlige eller utilgængelige.</li>
-                        <li>Nogle sjældne events kan holde tågen tilbage eller blokere den bag et bestemt felt.</li>
+                        <li>Du afslører felter omkring dig, når du bevæger dig. Din synsradius kommer fra karakteren og udstyr som fakkel.</li>
+                        <li>Bjerge blokerer udsyn, medmindre du selv står på et bjerg. Bjergfelter giver mindst radius 2, når du kommer derop.</li>
+                        <li>Tågen begynder at rykke efter dag 5. Hvis du står i tågen, når tiden går, tager du skade.</li>
+                        <li>I tågen kan du lave blodoffer: -10 Max HP for +50 HP.</li>
+                        <li>Nogle sjældne events kan holde tågen tilbage, blokere den bag et felt eller vise en båd for alle.</li>
                     </ul>
-                    <p class="eksempel">Eksempel: En spejder kan ofte planlægge ruten tidligere, fordi flere felter afsløres. Står der et bjerg imellem dig og kysten, kan ukendte farer stadig gemme sig bag det.</p>
+                    <p class="eksempel">Eksempel: En jæger eller udforsker ser længere end de fleste. Står der et bjerg imellem dig og kysten, kan ukendte farer stadig gemme sig bag det, indtil du får et bedre udsyn.</p>
                 </section>
 
                 <section>
                     <h3>HP, skade og hvile</h3>
                     <ul>
-                        <li>HP er dit helbred. Når HP når 0, dør du.</li>
+                        <li>HP er dit helbred. Når HP rammer 0 uden for tåge og hav, kollapser du normalt i stedet for at dø.</li>
+                        <li>Ved kollaps mister du halvdelen af dit guld, tiden går, og du vågner kort efter med 10 HP.</li>
+                        <li>Hvis HP rammer 0 i tågen eller i vand, dør du, medmindre en livseliksir redder dig først.</li>
+                        <li>Livseliksir bruges automatisk ved dødelig skade eller kollaps og sætter HP til 90.</li>
                         <li>Rustning mindsker skade. Elverrustning beskytter som almindelig rustning, men er ikke tung. Ridder med rustning tager ingen skade fra nedgravede fælder.</li>
-                        <li>Mad giver HP og gør næste bevægelse gratis. Sovepose og lejrbål kan bruges til hvile.</li>
+                        <li>Mad giver +20 HP og gør næste bevægelse gratis. Sovepose kan bruges i vildmarken og giver +20 HP, men bruger resten af dagen.</li>
+                        <li>Fakkel udvider synet med +1. Den kan også bruges til et stort bål, som afslører et område for alle, giver fuld HP og 50 guld, og bruger faklen.</li>
                         <li>Viking og valkyrie går automatisk bersærk første gang pr. dag, de tager mindst 5 skade. Næste bevægelse koster 0 energi.</li>
-                        <li>Oversvømmelse kan slukke fakler og få tung rustning til at gå tabt.</li>
+                        <li>Hav og oversvømmelse kan slukke fakler og få tung rustning til at gå tabt.</li>
                     </ul>
-                    <p class="eksempel">Eksempel: Hvis du har 12 HP og står foran et farligt felt, kan mad være bedre end at spare det. Du får HP nu og kan bruge den gratis bevægelse til at komme væk.</p>
+                    <p class="eksempel">Eksempel: Hvis du har 12 HP og står foran et farligt felt, kan mad være bedre end at spare det. Hvis du alligevel ryger i 0 HP på land, kollapser du; sker det i tågen eller vandet, er det langt farligere.</p>
                 </section>
 
                 <section>
                     <h3>Gravning</h3>
                     <ul>
                         <li>Hvis feltet kan graves, vises graveikonet aktivt i inventory-linjen.</li>
-                        <li>Har du en skovl, graves der med skovl. Ellers graver du med hænderne.</li>
+                        <li>Har du en skovl eller mesterskovl, graves der med den. Ellers graver du med hænderne og mister ekstra energi og HP.</li>
                         <li>En mesterskovl tæller som skovl, giver dobbelt guld ved gravning og finder nedgravede fælder uden at udløse dem.</li>
-                        <li>Skjulte fælder, guld og loot bliver først udløst, når du graver.</li>
+                        <li>Gylden Destillator er et sjældent relikvie. Den fordobler opgravet guld. Sammen med mesterskovl bliver graveguld tredoblet, ikke firedoblet.</li>
+                        <li>Skjulte fælder, guld, rødder og loot bliver først udløst, når du graver. Feltet bliver markeret som gravet med det samme.</li>
                         <li>Metaldetektor og søgekvist kan afsløre tegn på skjult guld eller liv på kendte felter inden for radius 3 af din karakter.</li>
-                        <li>Runekvisten er en opgraderet søgekvist. Når du mangler HP og går ind på et felt med skjult liv, trækker den rødderne op automatisk for 1 energi uden at grave feltet.</li>
+                        <li>Runekvisten er en opgraderet søgekvist. Når du mangler HP og går ind på et ugravet felt med skjult liv, trækker den rødderne op automatisk for 1 energi uden at markere feltet som gravet.</li>
+                        <li>Når runekvisten virker, tømmes feltets skjulte guld, loot, fælde og liv. Andre kan stadig grave feltet, men der er kun sten og orme tilbage.</li>
+                        <li>Rodhjertet er et sjældent relikvie. Det fordobler HP fra helende rødder, både ved gravning og Runekvist.</li>
                     </ul>
-                    <p class="eksempel">Eksempel: Viser metaldetektoren tegn på metal i en ruin, kan der være guld. Med almindelig skovl kan samme felt stadig klappe en fælde om benet på dig. Med mesterskovl får du guldet bedre frem og fælden bliver fundet uden skade. Med runekvist kan du derimod tage skjult liv uden at markere feltet som gravet.</p>
+                    <p class="eksempel">Eksempel: Viser metaldetektoren tegn på metal i en ruin, kan der være guld. Med almindelig skovl kan samme felt stadig klappe en fælde om benet på dig. Med mesterskovl får du mere ud af guldet, og fælden bliver fundet uden skade. Med runekvist kan du tage skjult liv på et felt, men så er feltets øvrige skjulte indhold også væk.</p>
                 </section>
 
                 <section>
                     <h3>Felter</h3>
                     <ul>
-                        <li>Byer og markeder kan have butikker. Byer kan også have værksteder eller brydes op med dirk, hvis feltet er tomt.</li>
-                        <li>Marker modner i blokke på ti dage. Modne afgrøder kan hjælpe dig, men naturkatastrofer kan ødelægge dem.</li>
+                        <li>Byer og markeder kan have butikker. Byer kan også have værksteder. Tomme byfelter kan brydes op med dirk.</li>
+                        <li>Marker modner i blokke på ti dage. Modne afgrøder giver lidt HP, men kan høstes én gang pr. blok eller ødelægges af græshopper og katastrofer.</li>
                         <li>Guldminer giver guld og point. En ulåst mine kan overtages af andre spillere.</li>
-                        <li>Besøg en mine du allerede ejer for at låse den. En låst mine kan ikke overtages, men den kan stadig blive ødelagt af katastrofer.</li>
-                        <li>Portaler og magiske felter flytter dig, men landingsfeltet behandles som et normalt felt.</li>
+                        <li>Første gang du overtager en mine, får du guld. Hvis du senere tager en tidligere besøgt mine tilbage, låses den.</li>
+                        <li>En låst mine kan ikke overtages, men den kan stadig blive ødelagt af katastrofer.</li>
+                        <li>Flugtbåde dukker normalt op på østkysten fra dag 6. Antallet følger de levende spillere. Hver båd kan bruges én gang.</li>
+                        <li>Portaler slynger dig 4, 5 eller 6 felter mod øst. Landingsfeltet behandles som et normalt felt.</li>
                     </ul>
-                    <p class="eksempel">Eksempel: Du overtager en neutral mine og får guld. Kommer en anden spiller senere forbi, kan de tage den, hvis du ikke har været tilbage og låst den. Rammer en meteor feltet, forsvinder minen uanset ejer.</p>
+                    <p class="eksempel">Eksempel: Du overtager en neutral mine og får guld. Kommer en anden spiller senere forbi, kan de tage den, hvis den ikke er låst. Hvis du tager den tilbage efter at have besøgt den før, låses den. Rammer en meteor feltet, forsvinder minen uanset ejer.</p>
                 </section>
 
                 <section>
                     <h3>Inventory og udstyr</h3>
                     <ul>
                         <li>Tryk på en genstand i bunden for at bruge den, hvis den er aktiv.</li>
-                        <li>Skovl, sovepose, mad og dirk er kun aktive, når de kan bruges på det aktuelle felt.</li>
+                        <li>Skovl, sovepose, mad og dirk er kun aktive, når de kan bruges i den aktuelle situation.</li>
                         <li>Kun mad og livseliksir kan stables i flere styk. Alle andre våben, værktøjer, tøj og særlige items findes kun én gang ad gangen.</li>
-                        <li>Store værktøjer findes kun i én version ad gangen. Køb ikke ekstra skovl eller stav; opgrader dem på et værksted.</li>
-                        <li>Fakkel kan lave bål. Staven kan teleportere. Hemmeligheder og særlige fund kan have egne effekter.</li>
-                        <li>Nogle ting kan købes, andre findes kun i events.</li>
+                        <li>Store værktøjer findes kun i én version ad gangen. Skovl/mesterskovl, stav/dragestav og søgekvist/runekvist tæller som samme type.</li>
+                        <li>Fakkel kan lave bål. Stav og dragestav kan teleportere. Hemmeligheder og særlige fund kan have egne effekter.</li>
+                        <li>Nogle ting kan købes, andre findes kun i events. Elverrustning, opgraderede items og relikvier kan ikke købes i almindelige butikker.</li>
                     </ul>
-                    <p class="eksempel">Eksempel: En sovepose hjælper ikke midt i en by, men kan være stærk på roligere naturfelter. En stav kan redde dig over et farligt område, men lander du på en portal eller et eventfelt, sker feltets normale effekt bagefter.</p>
+                    <p class="eksempel">Eksempel: En sovepose hjælper ikke midt i en by, men kan være stærk på roligere naturfelter. En almindelig stav flytter dig 4 felter mod øst. En dragestav flytter dig 5 felter, afslører ruten og kan redde dig fra åbent vand ved at blive nedgraderet til en almindelig stav.</p>
                 </section>
 
                 <section>
                     <h3>Værksteder</h3>
-                    <p>Værksteder findes i nogle byer. De sælger ikke almindelige varer, men bygger dit eksisterende udstyr om til en bedre version.</p>
-                    <p class="eksempel">Eksempel: Har du en skovl og 150 guld, kan værkstedet gøre den til en mesterskovl. Har du en stav og 200 guld, kan den blive til en dragestav. Har du en søgekvist og 175 guld, kan den blive til en runekvist, der suger skjult liv op og efterlader feltet værdiløst for andre.</p>
+                    <p>Værksteder findes i større byer. De sælger ikke almindelige varer, men bygger dit eksisterende udstyr om til en bedre version. Du beholder ikke den gamle genstand ved siden af den nye.</p>
+                    <p class="eksempel">Eksempel: Har du en skovl og 150 guld, kan værkstedet gøre den til en mesterskovl. Har du en stav og 200 guld, kan den blive til en dragestav. Har du en søgekvist og 175 guld, kan den blive til en runekvist.</p>
                 </section>
 
                 <section>
@@ -144,16 +155,19 @@
                     <p>Events er møder på øen. Nogle er små valg. Andre kan ændre store dele af kortet. Våben, klasse og udstyr kan åbne bedre eller farligere valg.</p>
                     <ul>
                         <li>Naturkatastrofer kan ændre terræn omkring dig og kan fjerne miner, både, afgrøder, butikker og events på de ramte felter.</li>
-                        <li>Nogle events er sjældne og kommer først senere på øen.</li>
+                        <li>Skade fra events kan normalt føre til kollaps, hvis du rammer 0 HP. Hav, oversvømmelse og tåge kan dog slå dig rigtigt ihjel.</li>
+                        <li>Nogle events er sjældne eller unikke. De kan give relikvier, som ikke kan købes i butikker.</li>
                         <li>Subevents er fortsættelser af samme event og bliver ikke trukket som almindelige events.</li>
+                        <li>Hvis et event kræver eller bruger en almindelig genstand, kan en opgraderet version ofte tælle som samme type. Betales den, ryger den opgraderede genstand også.</li>
+                        <li>Meteorstenen kan åbnes med hænderne eller med udstyr. Mesterskovlen giver 600 guld og en diamant, men skovlen går tabt i stenen.</li>
                     </ul>
-                    <p class="eksempel">Eksempel: Et jordskælv kan gøre en eng til bjerg eller ruin. Hvis der lå en guldmine på feltet, er den væk bagefter. Et eventvalg kan altså være godt for dig her og nu, men dyrt for kortet.</p>
+                    <p class="eksempel">Eksempel: Et jordskælv kan gøre en eng til bjerg eller ruin. Hvis der lå en guldmine, butik, båd eller et værksted på feltet, er det væk bagefter. Et eventvalg kan altså være godt for dig her og nu, men dyrt for kortet.</p>
                 </section>
 
                 <section>
                     <h3>Tyveri</h3>
-                    <p>Dirken kan bruges til indbrud på tomme byfelter. Det koster mindst halvdelen af din baseenergi. Udbyttet er moderat, og der er risiko for at blive opdaget og få tæv.</p>
-                    <p class="eksempel">Eksempel: Hvis du har nok energi og mangler lidt guld til en butik, kan indbrud være fristende. Hvis du er lav på HP, kan et mislykket indbrud være det, der knækker turen.</p>
+                    <p>Dirken kan bruges til indbrud på tomme byfelter uden butik. Det koster halvdelen af din baseenergi rundet op. Udbyttet er 35-50 guld, og der er risiko for at blive opdaget og få tæv.</p>
+                    <p class="eksempel">Eksempel: Hvis du mangler lidt guld til en opgradering, kan indbrud være fristende. Tyve bliver sjældnere opdaget end andre, mens tunge krigere larmer mere.</p>
                 </section>
 
                 <section>
@@ -162,7 +176,9 @@
                         <li>I ser samme ø og ændrer samme verden.</li>
                         <li>I ser ikke hinandens slutruter, før I selv er færdige.</li>
                         <li>Den samme loginbruger må ikke spille flere karakterer på samme ø samtidig.</li>
-                        <li>Guldminer giver mere score i multiplayer, fordi de er sværere at holde.</li>
+                        <li>Kun aktive spillere tæller som tempo-bremse. Hvis en spiller er død, sluppet væk eller inaktiv i flere minutter, holder de ikke de andre tilbage.</li>
+                        <li>Jægere kan sætte en tracker, hvis de står på samme felt som en anden aktiv spiller. I 10 dage ser de de felter, den spiller kender.</li>
+                        <li>Guldminer giver mere score i multiplayer, fordi de er sværere at holde. Minepoint stiger med antal spillere, op til en grænse.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Hvis din datter tager en mine, kan du se den skifte ejer på kortet. Hvis du senere går ind på den ulåste mine, overtager du den fra hende. Hvis hun har låst den, må du finde point et andet sted.</p>
                 </section>
@@ -170,12 +186,16 @@
                 <section>
                     <h3>Score</h3>
                     <ul>
-                        <li>Score bygger på guld, udforskning, miner, fremdrift og HP.</li>
-                        <li>Hvis du slipper væk, byttes fremdrift ud med en overlevelsesbonus.</li>
+                        <li>Score bygger på guld, udforskning, miner, fremdrift eller flugtbonus, og en HP-multiplikator.</li>
+                        <li>Udforskning giver 2 point pr. kendt felt.</li>
+                        <li>Fremdrift giver 2 point pr. kolonne mod øst. Hvis du slipper væk, får du 1000 point i stedet.</li>
+                        <li>Miner giver 100 point pr. mine ganget med multiplayer-modifieren.</li>
+                        <li>Til sidst ganges summen med 1 + HP/1000. Har du 100 HP, bliver summen ganget med 1,100.</li>
                         <li>Global highscore kræver login. Offline-score gemmes kun lokalt.</li>
+                        <li>Hvis forbindelsen svigter, forsøger spillet at gemme ventende scores igen senere.</li>
                         <li>En særlig medalje kan gives ved ny global rekord, men kun hvis scoren også er høj nok.</li>
                     </ul>
-                    <p class="eksempel">Eksempel: En spiller med mindre guld kan godt slå en rigere spiller, hvis de slipper væk, ejer flere miner og har mange HP tilbage. Omvendt kan en død spiller stadig få en hæderlig score, hvis turen var lang og rig.</p>
+                    <p class="eksempel">Eksempel: 1000 guld, 200 udforskningspoint, 300 minepoint og 1000 flugtpoint bliver 2500 før HP. Med 80 HP ender det på 2700 point.</p>
                 </section>
 
                 <section>

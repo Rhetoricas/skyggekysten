@@ -1,6 +1,6 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { eventBibliotek } from './eventBibliotek';
-import { tilfoejTilRygsæk, brugFraRygsæk, harRygsaekItem } from './spilmotor';
+import { tilfoejTilRygsæk, brugFraRygsæk, harRygsaekItem, findRygsaekItemTilKrav } from './spilmotor';
 import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremrykTid, udloesBersaerkHvisRelevant } from './overlevelse.svelte';
 import type { Valg } from './eventBibliotek';
@@ -63,8 +63,7 @@ export function kanViseValg(valg: Valg) {
     }
 
     if (valg.kosterItem) {
-        const harTing = spilTilstand.mitUdstyr?.find(i => i.id === valg.kosterItem);
-        if (!harTing || harTing.maengde <= 0) return false;
+        if (!findRygsaekItemTilKrav(valg.kosterItem)) return false;
     }
 
     if (valg.kosterEnergi && spilTilstand.nuvaerendeEnergi < valg.kosterEnergi) return false;
@@ -74,6 +73,7 @@ export function kanViseValg(valg: Valg) {
 
 export function tagValg(valg: Valg) {
     if (eventState.valgLåst) return;
+    const betaltItem = valg.kosterItem ? findRygsaekItemTilKrav(valg.kosterItem) : null;
     const afsluttetEventId = eventState.rootEventId ?? eventState.aktivt?.id;
     const afsluttetFeltIndex = eventState.rootFeltIndex ?? spilTilstand.spillerIndex;
 
@@ -82,7 +82,9 @@ export function tagValg(valg: Valg) {
         return;
     }
 
-    if (valg.kosterItem) brugFraRygsæk(valg.kosterItem, 1);
+    if (valg.kosterItem) {
+        if (betaltItem) brugFraRygsæk(betaltItem, 1);
+    }
     if (valg.puljeVaerdi) spilTilstand.guldTotal -= valg.puljeVaerdi;
     if (valg.kosterEnergi) spilTilstand.nuvaerendeEnergi -= valg.kosterEnergi;
 
@@ -145,7 +147,7 @@ export function tagValg(valg: Valg) {
     else if ('effekt' in valg) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const valgMedEffekt = valg as any;
-        const resultat = valgMedEffekt.effekt();
+        const resultat = valgMedEffekt.effekt(betaltItem);
         samletLogTekst = resultat.logBesked;
 
         if (resultat.maxHpAendring) {

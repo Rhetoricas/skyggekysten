@@ -46,6 +46,8 @@ export const itemDB: Record<string, { id: string; navn: string; type: ItemType; 
     'kikkert_250': { id: 'kikkert_250', navn: 'Gylden Kikkert', type: 'forbandelse', billede: '/inventory/kikkert.webp', pris: 100, beskrivelse: "Går i stykker på krystal-felter." },
     'kikkert_45': { id: 'kikkert_45', navn: 'Gylden Kikkert', type: 'forbandelse', billede: '/inventory/kikkert.webp', pris: 100, beskrivelse: "Går i stykker på krystal-felter." },
     'diamant': { id: 'diamant', navn: 'Diamant', type: 'skat', billede: '/inventory/diamant.webp', pris: 500, beskrivelse: "En sjælden og værdifuld ædelsten, der nemt kan sælges." },
+    'gylden_destillator': { id: 'gylden_destillator', navn: 'Gylden Destillator', type: 'skat', billede: '/inventory/goldenhance.webp', pris: 0, kanKoebes: false, beskrivelse: "Relikvie. Opgravet guld er dobbelt værd. Sammen med mesterskovl bliver graveguld tredoblet i stedet for firedoblet." },
+    'rodhjertet': { id: 'rodhjertet', navn: 'Rodhjertet', type: 'skat', billede: '/inventory/rootenhance.webp', pris: 0, kanKoebes: false, beskrivelse: "Relikvie. Helende rødder giver dobbelt HP, både ved gravning og når Runekvisten trækker dem op." },
     'hemmelighed': { id: 'hemmelighed', navn: 'Hemmelighed', type: 'forbrug', billede: '/inventory/treasuremap.webp', pris: 100, beskrivelse: "Et skattekort. Brug det for at afsløre en mulig skatteklynge." }
 }
 

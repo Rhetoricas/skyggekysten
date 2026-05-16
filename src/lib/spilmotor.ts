@@ -239,6 +239,17 @@ export function harRygsaekItem(genstandId: string) {
     return spilTilstand.mitUdstyr.some(ting => itemIds.includes(ting.id) && ting.maengde > 0);
 }
 
+export function findRygsaekItemTilKrav(genstandId: string) {
+    const itemIds = genstandId === 'skovl'
+        ? ['skovl', 'mesterskovl']
+        : genstandId === 'stav'
+            ? ['stav', 'dragestav']
+            : genstandId === 'soegekvist'
+                ? ['soegekvist', 'runekvist']
+                : [genstandId];
+    return spilTilstand.mitUdstyr.find(ting => itemIds.includes(ting.id) && ting.maengde > 0)?.id ?? null;
+}
+
 export function kanStackeItem(genstandId: string) {
     return genstandId === 'mad' || genstandId === 'livseliksir';
 }
@@ -554,10 +565,11 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
     }
 
     const harRunekvist = spilTilstand.mitUdstyr.some(ting => ting.id === 'runekvist' && ting.maengde > 0);
+    const harRodhjertet = spilTilstand.mitUdstyr.some(ting => ting.id === 'rodhjertet' && ting.maengde > 0);
     const skjultLiv = felt.skjultLiv ?? 0;
     if (harRunekvist && !felt.gravet && skjultLiv > 0 && spilTilstand.livspoint < spilTilstand.maxLivspoint) {
         const hpFoer = spilTilstand.livspoint;
-        spilTilstand.livspoint += skjultLiv;
+        spilTilstand.livspoint += harRodhjertet ? skjultLiv * 2 : skjultLiv;
         const faktiskHeling = spilTilstand.livspoint - hpFoer;
         spilTilstand.nuvaerendeEnergi -= 1;
         felt.skjultLiv = 0;
@@ -1875,7 +1887,7 @@ export function udvindMeteorSkat(metode: string): { logBesked: string; hpNed?: n
     } else {
         return {
             logBesked: `Værktøjet går tabt, men du får stenen åbnet.`,
-            guldOp: 300,
+            guldOp: metode === 'mesterskovl' ? 600 : 300,
             itemUd: 'diamant' 
         };
     }

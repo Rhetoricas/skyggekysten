@@ -130,7 +130,7 @@ export const naturkatastrofeEvents: Record<string, SpilEvent> = {
             {
                 tekst: 'Grav med skovlen',
                 kosterItem: 'skovl',
-                effekt: () => udvindMeteorSkat('skovl')
+                effekt: (betaltItem?: string | null) => udvindMeteorSkat(betaltItem === 'mesterskovl' ? 'mesterskovl' : 'skovl')
             },
             {
                 tekst: 'Flæk stenen med øksen',

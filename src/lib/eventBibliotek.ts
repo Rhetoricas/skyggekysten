@@ -101,12 +101,111 @@ function afslorNaermesteGuldminer(antal: number) {
         : `Dværgen hvisker to gamle mine-navne og ridser dem ind i din hukommelse. Guldminer bliver tydelige: ${retninger.join(' og ')}.`;
 }
 
+function alkymistForsog() {
+    if (Math.random() < 0.5) {
+        return {
+            logBesked: 'Alkymisten hælder guldet i maskinen. Rørene synger, og en ren gylden dråbe lukker kredsløbet. Han skubber destillatoren over til dig med rystende hænder.',
+            itemUd: 'gylden_destillator'
+        };
+    }
+
+    return {
+        logBesked: 'Maskinen hoster, sprutter og dør med et lille suk. Alkymisten fisker det meste af guldet op igen og undskylder uden at møde dit blik.',
+        guldOp: 40
+    };
+}
+
 export const eventBibliotek: Record<string, SpilEvent> = {
     ...blodskovensHjerteEvents,
     ...naturkatastrofeEvents,
     ...metaEvents,
     ...vaabenEvents,
     ...specialItemEvents,
+
+    'den_toerstige_alkymist': {
+        id: 'den_toerstige_alkymist',
+        titel: 'Den Tørstige Alkymist',
+        tekst: 'Ved en tør brønd står en alkymist med en høj, gylden maskine af rør og glas. Den kan destillere metal ud af jord, påstår han, men kredsløbet mangler noget levende at starte på.',
+        biome: ['ruin', 'hule', 'bjerg', 'marked'],
+        billede: '/events/ev_ruin.webp',
+        unik: true,
+        valg: [
+            {
+                tekst: 'Giv ham en livseliksir til kredsløbet.',
+                kosterItem: 'livseliksir',
+                udfaldListe: [
+                    {
+                        log: 'Eliksiren lyser gennem rørene. Maskinen vågner, og alkymisten ler, som om han lige har hørt jorden tale. Han giver dig den gyldne destillator.',
+                        givItem: 'gylden_destillator'
+                    }
+                ]
+            },
+            {
+                tekst: 'Betal 100 guld for et forsøg.',
+                puljeVaerdi: 100,
+                effekt: () => alkymistForsog()
+            },
+            {
+                tekst: 'Kalibrer maskinen med metaldetektoren.',
+                kraeverItem: 'metaldetektor',
+                effekt: () => ({
+                    logBesked: 'Detektoren finder den rette tone i rørene. Alkymisten får maskinen til at spytte mønter ud og deler udbyttet med dig.',
+                    guldOp: 120
+                })
+            },
+            {
+                tekst: 'Lad ham tørste videre.',
+                effekt: () => ({ logBesked: 'Du lader alkymisten stå ved sin tørre brønd. Maskinen tikker fornærmet bag dig.' })
+            }
+        ]
+    },
+
+    'traeet_med_den_aabne_puls': {
+        id: 'traeet_med_den_aabne_puls',
+        titel: 'Træet Med Den Åbne Puls',
+        tekst: 'Et gammelt træ står med stammen revnet op. Indeni slår noget grønt og levende, som om skoven har et hjerte. Rødderne omkring dig flytter sig væk fra dine fødder.',
+        biome: ['skov', 'blodskov', 'eng'],
+        billede: '/events/ev_skov.webp',
+        unik: true,
+        valg: [
+            {
+                tekst: 'Giv træet en madration.',
+                kosterItem: 'mad',
+                udfaldListe: [
+                    {
+                        log: 'Træet åbner sig uden smerte. Maden forsvinder mellem rødderne, og hjertet falder ned i dine hænder som en tung grøn frugt.',
+                        givItem: 'rodhjertet'
+                    }
+                ]
+            },
+            {
+                tekst: 'Før søgekvisten ind i revnen.',
+                kosterItem: 'soegekvist',
+                udfaldListe: [
+                    {
+                        log: 'Kvisten finder pulsen og knækker med et lykkeligt smæld. Da træet lukker sig, ligger Rodhjertet tilbage i græsset.',
+                        givItem: 'rodhjertet'
+                    }
+                ]
+            },
+            {
+                tekst: 'Skær hjertet fri med kniven.',
+                kraeverItem: 'kniv',
+                effekt: () => ({
+                    logBesked: 'Kniven får hjertet fri, men træet vrider sig om dit håndled. Du får Rodhjertet, og skoven husker lyden.',
+                    hpNed: 15,
+                    itemUd: 'rodhjertet'
+                })
+            },
+            {
+                tekst: 'Lad træet leve.',
+                effekt: () => ({
+                    logBesked: 'Du lægger hånden mod stammen og træder tilbage. Rødderne løsner jorden under dig og deler lidt af deres ro.',
+                    hpOp: 20
+                })
+            }
+        ]
+    },
 
     'campfire': {
         id: 'campfire',

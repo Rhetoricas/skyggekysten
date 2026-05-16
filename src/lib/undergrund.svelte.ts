@@ -98,6 +98,8 @@ export function grav() {
     const skovlItem = spilTilstand.mitUdstyr.find((i) => i.id === 'skovl' || i.id === 'mesterskovl');
     const harMesterskovl = skovlItem?.id === 'mesterskovl' && skovlItem.maengde > 0;
     const harSkovl = !!skovlItem && skovlItem.maengde > 0;
+    const harGyldenDestillator = spilTilstand.mitUdstyr.some((i) => i.id === 'gylden_destillator' && i.maengde > 0);
+    const harRodhjertet = spilTilstand.mitUdstyr.some((i) => i.id === 'rodhjertet' && i.maengde > 0);
     
     let udstyrsLog = ""; 
 
@@ -144,17 +146,22 @@ export function grav() {
         felt.tomSkattekiste = true;
         fundLog = `Skovlen rammer træ. Du åbner en kiste. (+500 Guld, +Diamant)`;
     } else if (guldVaerdi > 0) {
-        let maengde = Math.floor(guldVaerdi * (harMesterskovl ? 2 : 1) * spilTilstand.valgtKarakter.goldMod);
+        const graveGuldMultiplier = harMesterskovl && harGyldenDestillator ? 3 : (harMesterskovl || harGyldenDestillator) ? 2 : 1;
+        let maengde = Math.floor(guldVaerdi * graveGuldMultiplier * spilTilstand.valgtKarakter.goldMod);
         maengde = spilTilstand.beregnGuldIndkomst(maengde);
         const foerGuld = spilTilstand.guldTotal;
         spilTilstand.guldTotal += maengde;
         const faktiskGuld = spilTilstand.guldTotal - foerGuld;
-        fundLog = harMesterskovl
-            ? `Mesterskovlen åbner åren rent. Jorden gemte på ${faktiskGuld} Guld.`
-            : `Jorden gemte på ${faktiskGuld} Guld.`;
+        fundLog = harMesterskovl && harGyldenDestillator
+            ? `Mesterskovlen og den gyldne destillator presser åren ren. Jorden gemte på ${faktiskGuld} Guld.`
+            : harMesterskovl
+                ? `Mesterskovlen åbner åren rent. Jorden gemte på ${faktiskGuld} Guld.`
+                : harGyldenDestillator
+                    ? `Den gyldne destillator trækker ekstra glans ud af jorden. Du finder ${faktiskGuld} Guld.`
+                    : `Jorden gemte på ${faktiskGuld} Guld.`;
     } else if (livVaerdi > 0) {
         const aktuelHp = spilTilstand.livspoint;
-        spilTilstand.livspoint += livVaerdi; 
+        spilTilstand.livspoint += harRodhjertet ? livVaerdi * 2 : livVaerdi; 
         const faktiskHeling = spilTilstand.livspoint - aktuelHp;
         
         if (faktiskHeling > 0) {
