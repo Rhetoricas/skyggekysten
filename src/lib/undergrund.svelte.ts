@@ -49,7 +49,7 @@ export function genererUndergrund(biome: Biome | string) {
         if (terningKast < 20) feltData.skjultGuld = tilfaeldigtTal(10, 15);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(20, 40);
         else if (terningKast < 58) feltData.skjultFaelde = true;
-        else if (terningKast < 63) feltData.skjultLoot = 'livseliksir';
+        else if (terningKast < 62) feltData.skjultLoot = 'livseliksir';
     } else if (biome === 'bjerg') {
         if (terningKast < 50) feltData.skjultGuld = tilfaeldigtTal(15, 40);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(5, 10);
@@ -64,7 +64,7 @@ export function genererUndergrund(biome: Biome | string) {
         if (terningKast < 45) feltData.skjultGuld = tilfaeldigtTal(25, 50);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(10, 20);
         else if (terningKast < 73) feltData.skjultFaelde = true;
-        else if (terningKast < 83) feltData.skjultLoot = 'livseliksir';
+        else if (terningKast < 81) feltData.skjultLoot = 'livseliksir';
     }
 
     return feltData;
