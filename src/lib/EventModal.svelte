@@ -143,13 +143,16 @@
         background: #1a1a1a;
         color: #e0e0e0; border: 2px solid #4a4a4a; padding: 20px; width: 600px; max-width: 100%;
         min-height: 0;
-        max-height: 100%; overflow: hidden; display: flex;
+        max-height: 100%; overflow-y: auto; overflow-x: hidden; display: flex;
         flex-direction: column; gap: 15px; border-radius: 8px;
         box-sizing: border-box;
+        -webkit-overflow-scrolling: touch;
     }
 
     .event-boks img { 
         width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         height: 200px; object-fit: cover; border-bottom: 2px solid #333; border-radius: 4px;
     }
     
@@ -159,9 +162,12 @@
     }
     
     .log-container {
-        flex: 1 1 180px;
-        min-height: 150px;
-        overflow-y: auto;
+        width: 100%;
+        box-sizing: border-box;
+        flex: 0 0 auto;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: visible;
         padding-right: 6px;
     }
     
@@ -173,9 +179,12 @@
     .knap-panel { 
         display: flex;
         flex-direction: column; gap: 10px; margin-top: auto;
-        flex: 0 1 auto;
-        max-height: min(42dvh, 330px);
-        overflow-y: auto;
+        width: 100%;
+        box-sizing: border-box;
+        flex: 0 0 auto;
+        max-height: none;
+        overflow-x: hidden;
+        overflow-y: visible;
         padding-right: 4px;
     }
     
@@ -185,6 +194,9 @@
         text-align: left; border-radius: 4px; transition: 0.2s; font-size: 1rem;
         font-family: system-ui, -apple-system, sans-serif;
         display: flex; justify-content: space-between; align-items: center;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
     }
     
     .ulåst:hover { background: #3a3a3a; border-color: #777; transform: translateX(5px); }
@@ -198,8 +210,10 @@
     
     .valg-tekst {
         flex-grow: 1;
+        min-width: 0;
         padding-right: 15px;
         line-height: 1.3;
+        overflow-wrap: anywhere;
     }
 
     .manglende-betingelse {
@@ -212,6 +226,7 @@
         filter: grayscale(100%);
         min-width: 50px;
         max-width: 60px;
+        flex-shrink: 0;
         border-left: 1px solid #333;
         padding-left: 10px;
     }
@@ -313,12 +328,11 @@
         }
 
         .log-container {
-            flex-basis: 150px;
-            min-height: 130px;
+            min-height: 0;
         }
 
         .knap-panel {
-            max-height: 38dvh;
+            max-height: none;
         }
 
         .valg-btn {

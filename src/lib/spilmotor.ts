@@ -228,13 +228,62 @@ export function hentNaboIndices(index: number) {
     return afstande.map(o => index + o).filter(i => i >= 0 && i < BREDDE * HOEJDE);
 }
 
+export function harRygsaekItem(genstandId: string) {
+    const itemIds = genstandId === 'skovl'
+        ? ['skovl', 'mesterskovl']
+        : genstandId === 'stav'
+            ? ['stav', 'dragestav']
+            : genstandId === 'soegekvist'
+                ? ['soegekvist', 'runekvist']
+                : [genstandId];
+    return spilTilstand.mitUdstyr.some(ting => itemIds.includes(ting.id) && ting.maengde > 0);
+}
+
+export function kanStackeItem(genstandId: string) {
+    return genstandId === 'mad' || genstandId === 'livseliksir';
+}
+
+export function kanModtageItem(genstandId: string) {
+    if (kanStackeItem(genstandId)) return true;
+    if (genstandId === 'skovl' || genstandId === 'mesterskovl') return !harRygsaekItem('skovl');
+    if (genstandId === 'stav' || genstandId === 'dragestav') return !harRygsaekItem('stav');
+    if (genstandId === 'soegekvist' || genstandId === 'runekvist') return !harRygsaekItem('soegekvist');
+    return !spilTilstand.mitUdstyr.some(ting => ting.id === genstandId && ting.maengde > 0);
+}
+
 export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number = 1) {
-    const udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    let udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+
+    if (genstandId === 'mesterskovl') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'skovl');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'dragestav') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'stav');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'runekvist') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'soegekvist');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
     const fundetTing = udstyrListe.find(ting => ting.id === genstandId);
 
     if (fundetTing) {
-        fundetTing.maengde += tilfoejetMaengde;
+        if (kanStackeItem(genstandId)) {
+            fundetTing.maengde += tilfoejetMaengde;
+        } else {
+            spilTilstand.logBesked = `Du har allerede ${itemDB[genstandId]?.navn || 'den genstand'}.`;
+            return;
+        }
     } else {
+        if (!kanModtageItem(genstandId)) {
+            spilTilstand.logBesked = `Du har allerede ${itemDB[genstandId]?.navn || 'den type udstyr'}.`;
+            return;
+        }
+
         const nyTing: RygsækTing = {
             id: genstandId,
             maengde: tilfoejetMaengde,
@@ -376,6 +425,14 @@ interface AnkomstOptions {
     triggerPortal?: boolean;
 }
 
+function kanPlacerePortal(index: number) {
+    return index % BREDDE <= BREDDE - 5;
+}
+
+function hentKoebbareShopItems(shopItems: string[] | undefined) {
+    return (shopItems || []).filter((id) => itemDB[id]?.kanKoebes !== false);
+}
+
 export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) {
     if (!spilTilstand.valgtKarakter) return false;
 
@@ -393,7 +450,7 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
 
     if (spilTilstand.dag >= options.langsomsteDag + options.maxDageForan) {
         spilTilstand.logBesked = 'Du må vente på de andre spillere.';
-        startVenteSpil(true);
+        startVenteSpil(false);
         return false;
     }
 
@@ -412,7 +469,9 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
         spilTilstand.gratisBevaegelseKilde = '';
     }
 
+    const gammelIndex = spilTilstand.spillerIndex;
     spilTilstand.spillerIndex = nytIndeks;
+    if (nytIndeks !== gammelIndex) spilTilstand.venteGratisFeltBrugt = null;
     if (!spilTilstand.historik) spilTilstand.historik = [];
     spilTilstand.historik.push(nytIndeks);
 
@@ -494,6 +553,24 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         ekstraLog += " Ritualpladsen giver dig 5 HP.";
     }
 
+    const harRunekvist = spilTilstand.mitUdstyr.some(ting => ting.id === 'runekvist' && ting.maengde > 0);
+    const skjultLiv = felt.skjultLiv ?? 0;
+    if (harRunekvist && !felt.gravet && skjultLiv > 0 && spilTilstand.livspoint < spilTilstand.maxLivspoint) {
+        const hpFoer = spilTilstand.livspoint;
+        spilTilstand.livspoint += skjultLiv;
+        const faktiskHeling = spilTilstand.livspoint - hpFoer;
+        spilTilstand.nuvaerendeEnergi -= 1;
+        felt.skjultLiv = 0;
+        felt.skjultGuld = 0;
+        felt.skjultLoot = null;
+        felt.skjultFaelde = false;
+        ekstraLog += faktiskHeling > 0
+            ? ` Runekvisten trækker rødderne op uden at grave. Jorden falder sammen til sten og orme. (+${faktiskHeling} HP, -1 energi)`
+            : " Runekvisten trækker rødderne op uden at grave, men du kan ikke rumme mere liv. Jorden falder sammen til sten og orme. (-1 energi)";
+        broadcastFelt(nytIndeks, felt);
+        mapAendret = true;
+    }
+
     if (felt.hasGoldmine) {
         const spiller = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
         if (!spiller.besoegteMiner) spiller.besoegteMiner = [];
@@ -540,7 +617,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
             ? ""
             : ankomstKilde === 'stav' 
             ? "Staven flytter dig fire felter mod øst." 
-            : "Portalen flytter dig fire felter mod øst."
+            : "Portalen slynger dig mod øst."
     );
     const slidLog = felt.hasBoat ? "" : tjekMiljoeSlitage(felt.biome as string);
     const samletLog = `${startLog}${ekstraLog}${slidLog}`.trim();
@@ -549,7 +626,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         spilTilstand.logBesked = samletLog;
     }
 
-    if (options.triggerPortal !== false && felt.hasPortal && !(felt.shopItems && felt.shopItems.length > 0)) {
+    if (options.triggerPortal !== false && felt.hasPortal && hentKoebbareShopItems(felt.shopItems).length === 0 && !felt.hasWorkshop) {
         udfoerPortalTeleport();
         spilTilstand.gitter = [...spilTilstand.gitter];
         syncTilDb(mapAendret);
@@ -582,7 +659,11 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
             startEvent(felt.eventID);
             mapAendret = true;
         }
-        else if (felt.shopItems && felt.shopItems.length > 0) spilTilstand.aktivShop = felt.shopItems;
+        else if (felt.hasWorkshop) spilTilstand.aktivVaerksted = true;
+        else {
+            const koebbareShopItems = hentKoebbareShopItems(felt.shopItems);
+            if (koebbareShopItems.length > 0) spilTilstand.aktivShop = koebbareShopItems;
+        }
     }
 
     spilTilstand.gitter = [...spilTilstand.gitter];
@@ -605,11 +686,41 @@ function beregnTeleportMaal(startIndeks: number, afstand: number) {
     };
 }
 
+function beregnTeleportRuteModOest(startIndeks: number, afstand: number) {
+    const rute: number[] = [];
+    let nu = startIndeks;
+
+    for (let trin = 0; trin < afstand; trin++) {
+        const naeste = hentNaboIRetning(nu, 'E', BREDDE, BREDDE * HOEJDE);
+        if (naeste === null || naeste === nu) break;
+        rute.push(naeste);
+        nu = naeste;
+    }
+
+    return rute;
+}
+
+function nedgraderDragestav() {
+    spilTilstand.mitUdstyr = [
+        ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'dragestav' && ting.id !== 'stav'),
+        { id: 'stav', maengde: 1, anskaffetDag: spilTilstand.dag }
+    ];
+}
+
+function afslorTeleportRute(rute: number[]) {
+    const synsRadius = Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn);
+
+    for (const indeks of rute) {
+        const felt = spilTilstand.gitter[indeks];
+        afslørOmraade(indeks, Math.max(felt?.biome === 'bjerg' ? 2 : 1, synsRadius));
+    }
+}
+
 export function udfoerTeleportMedOptions(options: TeleportOptions) {
     if (spilTilstand.erBevidstløs || !spilTilstand.valgtKarakter) return;
 
     if (options.kraeverStav) {
-        const stavItem = spilTilstand.mitUdstyr.find(i => i.id === 'stav');
+        const stavItem = spilTilstand.mitUdstyr.find(i => i.id === 'stav' || i.id === 'dragestav');
         if (!stavItem || stavItem.maengde <= 0) return;
     }
 
@@ -619,12 +730,13 @@ export function udfoerTeleportMedOptions(options: TeleportOptions) {
     const gammeltIndeks = spilTilstand.spillerIndex;
     const maal = beregnTeleportMaal(gammeltIndeks, options.afstand ?? 4);
 
-    if (options.opretPortalVedStart) {
+    if (options.opretPortalVedStart && kanPlacerePortal(gammeltIndeks)) {
         spilTilstand.gitter[gammeltIndeks].hasPortal = true;
         broadcastFelt(gammeltIndeks, spilTilstand.gitter[gammeltIndeks]);
     }
 
     spilTilstand.spillerIndex = maal.indeks;
+    if (maal.indeks !== gammeltIndeks) spilTilstand.venteGratisFeltBrugt = null;
     if (!spilTilstand.historik) spilTilstand.historik = [];
     spilTilstand.historik.push(maal.indeks);
     
@@ -642,6 +754,9 @@ export function udfoerTeleportMedOptions(options: TeleportOptions) {
 }
 
 export function udfoerTeleport() {
+    const harDragestav = spilTilstand.mitUdstyr.some(i => i.id === 'dragestav' && i.maengde > 0);
+    if (harDragestav) return udfoerDrageTeleport();
+
     return udfoerTeleportMedOptions({
         kilde: 'stav',
         kraeverStav: true,
@@ -649,10 +764,61 @@ export function udfoerTeleport() {
     });
 }
 
+export function udfoerDrageTeleport() {
+    if (spilTilstand.erBevidstløs || !spilTilstand.valgtKarakter) return;
+
+    const dragestav = spilTilstand.mitUdstyr.find(i => i.id === 'dragestav');
+    if (!dragestav || dragestav.maengde <= 0) return;
+
+    const gammeltIndeks = spilTilstand.spillerIndex;
+    const rute = beregnTeleportRuteModOest(gammeltIndeks, 5);
+    if (rute.length === 0) return;
+
+    const planlagtMaal = rute[rute.length - 1];
+    const planlagtFelt = spilTilstand.gitter[planlagtMaal];
+    let maalIndeks = planlagtMaal;
+    let nedgraderet = false;
+
+    if (planlagtFelt?.biome === 'hav' && !planlagtFelt.hasBoat) {
+        const sikkertMaal = [...rute].reverse().find((indeks) => {
+            const felt = spilTilstand.gitter[indeks];
+            return felt && (felt.biome !== 'hav' || felt.hasBoat);
+        });
+
+        maalIndeks = sikkertMaal ?? gammeltIndeks;
+        nedgraderDragestav();
+        nedgraderet = true;
+    }
+
+    const pris = spilTilstand.valgtKarakter.baseEnergi;
+    spilTilstand.nuvaerendeEnergi -= pris;
+    spilTilstand.spillerIndex = maalIndeks;
+    if (maalIndeks !== gammeltIndeks) spilTilstand.venteGratisFeltBrugt = null;
+    if (!spilTilstand.historik) spilTilstand.historik = [];
+    spilTilstand.historik.push(maalIndeks);
+
+    afslorTeleportRute(rute);
+
+    const kolonne = maalIndeks % BREDDE;
+    if (kolonne > spilTilstand.maxKolonne) {
+        spilTilstand.maxKolonne = kolonne;
+    }
+
+    haandterAnkomstPaaFelt(maalIndeks, 'stav', {
+        startLog: nedgraderet
+            ? "Dragestaven kaster dig mod øst, men åbent vand svarer igen. Den redder dig til sidste sikre felt og brænder ned til en almindelig stav."
+            : "Dragestaven flytter dig fem felter mod øst og viser ruten imellem."
+    });
+    tjekAutoTracker();
+    return true;
+}
+
 export function udfoerPortalTeleport() {
+    const afstand = 4 + Math.floor(Math.random() * 3);
     return udfoerTeleportMedOptions({
         kilde: 'portal',
-        startLog: "Portalen flytter dig fire felter mod øst."
+        afstand,
+        startLog: `Portalen slynger dig ${afstand} felter mod øst.`
     });
 }
 
@@ -1064,6 +1230,45 @@ export function plantSkat(gitter: Felt[]) {
     }
 }
 
+function placerVaerksteder(gitter: Felt[]) {
+    const besoegte = new Set<number>();
+
+    for (let start = 0; start < gitter.length; start++) {
+        if (besoegte.has(start) || gitter[start]?.biome !== 'by') continue;
+
+        const koe = [start];
+        const byFelter: number[] = [];
+        besoegte.add(start);
+
+        while (koe.length > 0) {
+            const indeks = koe.shift()!;
+            byFelter.push(indeks);
+
+            for (const nabo of hentNaboIndices(indeks)) {
+                if (besoegte.has(nabo) || gitter[nabo]?.biome !== 'by') continue;
+                besoegte.add(nabo);
+                koe.push(nabo);
+            }
+        }
+
+        if (byFelter.length < 3) continue;
+
+        const centrum = byFelter
+            .map(index => ({
+                index,
+                naboer: hentNaboIndices(index).filter(nabo => gitter[nabo]?.biome === 'by').length
+            }))
+            .sort((a, b) => b.naboer - a.naboer || a.index - b.index)[0]?.index;
+
+        if (centrum === undefined) continue;
+        const felt = gitter[centrum];
+        felt.hasWorkshop = true;
+        felt.shopItems = undefined;
+        felt.eventID = undefined;
+        felt.hasPortal = false;
+    }
+}
+
 export function initialiserGitter() {
     const antal = BREDDE * HOEJDE;
     const totalVaegt = biomeVægte.reduce((sum, biome) => sum + biome.vaegt, 0);
@@ -1212,7 +1417,7 @@ export function initialiserGitter() {
     for (let indeks = 0; indeks < antal; indeks++) {
         const felt = nytGitter[indeks];
         
-        if (felt.biome !== 'hav' && felt.biome !== 'by' && felt.biome !== 'marked' && !felt.eventID && Math.random() < 0.005) {
+        if (felt.biome !== 'hav' && felt.biome !== 'by' && felt.biome !== 'marked' && !felt.eventID && kanPlacerePortal(indeks) && Math.random() < 0.005) {
             felt.hasPortal = true;
         }
 
@@ -1227,7 +1432,7 @@ export function initialiserGitter() {
             if (Math.random() < 0.6) {
                 const antalVarer = felt.biome === 'by' ? 2 : 1;
                 const pulje = felt.biome === 'marked' 
-                    ? markedVarePool 
+                    ? markedVarePool.filter(k => itemDB[k]?.kanKoebes !== false)
                     : Object.keys(itemDB).filter(k => itemDB[k].pris > 0 && itemDB[k].kanKoebes !== false && itemDB[k].type !== 'forbandelse' && itemDB[k].type !== 'skat');                
                 const valgte: string[] = [];
                 for(let j=0; j < antalVarer; j++) {
@@ -1238,6 +1443,8 @@ export function initialiserGitter() {
             }
         }
     }
+
+    placerVaerksteder(nytGitter);
 
     for (let indeks = 0; indeks < antal; indeks++) {
         const felt = nytGitter[indeks];
@@ -1427,6 +1634,7 @@ export async function udloesNaturkatastrofe(centerIndex: number) {
         felter[idx].boatCount = undefined;
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
+        felter[idx].hasWorkshop = false;
         felter[idx].eventID = 'meteor_skat';
         felter[idx].eventFuldført = false;
         felter[idx].hasMeteorStone = true;
@@ -1485,6 +1693,7 @@ export async function udloesJordskaelv(centerIndex: number) {
         felter[idx].boatCount = undefined;
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
+        felter[idx].hasWorkshop = false;
         felter[idx].eventID = undefined;
 
         if (!spilTilstand.mineKendteFelter.includes(idx)) {
@@ -1558,6 +1767,7 @@ export async function udloesOversvoemmelse(centerIndex: number) {
         felter[idx].boatCount = undefined;
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
+        felter[idx].hasWorkshop = false;
         felter[idx].eventID = undefined;
 
         if (!spilTilstand.mineKendteFelter.includes(idx)) {

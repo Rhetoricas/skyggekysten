@@ -30,7 +30,7 @@
         <p class="vente-desc">
             Du har slået lejr <strong style="color: gold;">{dageForan} {dageForan === 1 ? 'dag' : 'dage'}</strong> foran den langsomste på øen. 
             En imp dukker pludselig op med et magisk kortspil. <br><br>
-            <strong>Regler:</strong> Første runde er gratis. Derefter koster en ny runde 5 guld. Træk kort for at vinde guld eller helbred. Trækker du kraniet, mister du alt det, du har vundet i <em>denne</em> runde. Du kan stoppe når som helst og sikre din pulje til næste runde.
+            <strong>Regler:</strong> Du får én gratis runde pr. felt. Du kan først få en ny gratis runde, når du har flyttet dig. På samme felt kan du selv købe flere runder for 5 guld. Træk kort for at vinde guld eller helbred. Trækker du kraniet, mister du alt det, du har vundet i <em>denne</em> runde.
         </p>
 
         <div class="vente-board">
@@ -164,13 +164,18 @@
         }
 
         .vente-board {
-            gap: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: clamp(4px, 1.6vw, 10px);
             margin: 18px 0;
+            width: 100%;
         }
 
         .vente-kort {
-            width: 92px;
-            height: 129px;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 160 / 224;
+            min-width: 0;
         }
 
         .kort-vaerdi {

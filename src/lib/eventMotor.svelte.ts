@@ -1,6 +1,6 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { eventBibliotek } from './eventBibliotek';
-import { tilfoejTilRygsæk, brugFraRygsæk } from './spilmotor';
+import { tilfoejTilRygsæk, brugFraRygsæk, harRygsaekItem } from './spilmotor';
 import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremrykTid, udloesBersaerkHvisRelevant } from './overlevelse.svelte';
 import type { Valg } from './eventBibliotek';
@@ -54,15 +54,11 @@ export function kanViseValg(valg: Valg) {
     if (valg.puljeVaerdi && spilTilstand.guldTotal < valg.puljeVaerdi) return false;
 
     if (valg.kraeverItem) {
-        const harTing = spilTilstand.mitUdstyr?.find(i => i.id === valg.kraeverItem);
-        if (!harTing || harTing.maengde <= 0) return false;
+        if (!harRygsaekItem(valg.kraeverItem)) return false;
     }
 
     if (valg.kraeverEtAfItems?.length) {
-        const harEtAfDem = valg.kraeverEtAfItems.some(itemId => {
-            const ting = spilTilstand.mitUdstyr?.find(i => i.id === itemId);
-            return !!ting && ting.maengde > 0;
-        });
+        const harEtAfDem = valg.kraeverEtAfItems.some(itemId => harRygsaekItem(itemId));
         if (!harEtAfDem) return false;
     }
 

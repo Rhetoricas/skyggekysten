@@ -27,8 +27,8 @@ export function genererSlutHistorie(titel: string, niveau: number, oeNavn: strin
     const dag = spilTilstand.dag;
     const udstyr = spilTilstand.mitUdstyr || [];
 
-    const harSvaerd = udstyr.some(i => ['svaerd', 'oekse', 'sabel', 'bue'].includes(i.id));
-    const harSkovl = udstyr.some(i => ['skovl', 'metaldetektor'].includes(i.id));
+    const harSvaerd = udstyr.some(i => ['svaerd', 'oekse', 'sabel', 'bue', 'dragestav'].includes(i.id));
+    const harSkovl = udstyr.some(i => ['skovl', 'mesterskovl', 'metaldetektor'].includes(i.id));
     const harDiamant = udstyr.some(i => i.id === 'diamant');
 
     const oeNavnStort = oeNavn.toUpperCase();

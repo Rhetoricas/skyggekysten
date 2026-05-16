@@ -73,7 +73,6 @@ export interface SpillerData {
         slutterDag: number;
     } | null;
     trackedeSpillere?: string[];
-    venteGratisFeltBrugt?: number | null;
     gratisNaesteBevaegelse?: boolean;
     gratisBevaegelseKilde?: '' | 'mad' | 'bersaerk';
     sidsteBersaerkDag?: number;
@@ -95,6 +94,7 @@ export interface Felt {
     hasBoat?: boolean;
     boatCount?: number;
     hasPortal?: boolean;
+    hasWorkshop?: boolean;
     
     guld: number;
     gravet: boolean;

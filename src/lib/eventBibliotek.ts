@@ -1,4 +1,6 @@
-import { bygOgHopGennemPortal } from './spilmotor';
+import { BREDDE } from './spildata';
+import { spilTilstand } from './spilTilstand.svelte';
+import { bygOgHopGennemPortal, regnHexAfstand } from './spilmotor';
 import { blodskovensHjerteEvents } from './event_blodskov';
 import { naturkatastrofeEvents } from './event_naturkatastrofer';
 import { metaEvents } from './event_meta';
@@ -58,6 +60,45 @@ export interface SpilEvent {
     sfx?: string;             
     erSubTrin?: boolean;      
     valg: Valg[];
+}
+
+function retningTilFelt(fraIndex: number, tilIndex: number) {
+    const fraKolonne = fraIndex % BREDDE;
+    const fraRaekke = Math.floor(fraIndex / BREDDE);
+    const tilKolonne = tilIndex % BREDDE;
+    const tilRaekke = Math.floor(tilIndex / BREDDE);
+    const lodret = tilRaekke < fraRaekke ? 'nord' : tilRaekke > fraRaekke ? 'syd' : '';
+    const vandret = tilKolonne > fraKolonne ? 'øst' : tilKolonne < fraKolonne ? 'vest' : '';
+
+    if (lodret && vandret) return `${lodret}${vandret}`;
+    return lodret || vandret || 'her';
+}
+
+function afslorNaermesteGuldminer(antal: number) {
+    const start = spilTilstand.spillerIndex;
+    const spillerKolonne = start % BREDDE;
+    const kendte = new Set(spilTilstand.mineKendteFelter || []);
+    const miner = spilTilstand.gitter
+        .map((felt, index) => ({ felt, index }))
+        .filter(({ felt, index }) => felt.hasGoldmine && index % BREDDE >= spillerKolonne)
+        .sort((a, b) => regnHexAfstand(start, a.index, BREDDE) - regnHexAfstand(start, b.index, BREDDE))
+        .slice(0, antal);
+
+    if (miner.length === 0) {
+        return 'Dværgen lukker øjnene og snuser efter malm. "Ikke bagud," hvisker han. "Fremad er der intet guld, jeg tør love dig."';
+    }
+
+    for (const mine of miner) kendte.add(mine.index);
+    spilTilstand.mineKendteFelter = Array.from(kendte);
+
+    const retninger = miner.map((mine) => {
+        const afstand = regnHexAfstand(start, mine.index, BREDDE);
+        return `${retningTilFelt(start, mine.index)} (${afstand} felter)`;
+    });
+
+    return miner.length === 1
+        ? `Dværgen kradser et kort i jorden med en blodig finger. En guldmine bliver tydelig ${retninger[0]}.`
+        : `Dværgen hvisker to gamle mine-navne og ridser dem ind i din hukommelse. Guldminer bliver tydelige: ${retninger.join(' og ')}.`;
 }
 
 export const eventBibliotek: Record<string, SpilEvent> = {
@@ -261,6 +302,53 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 tekst: "Gå uden om gejseren",
                 effekt: () => {
                     return { logBesked: "Du holder afstand fra dampen." };
+                }
+            }
+        ]
+    },
+
+    'dvaergens_sidste_aare': {
+        id: 'dvaergens_sidste_aare',
+        titel: "Dværgens Sidste Åre",
+        biome: ['bjerg', 'hule', 'ruin'],
+        unik: true,
+        billede: '/events/ev_lig.webp',
+        tekst: "En dværg ligger klemt mellem to sprængte sten. Maven er flået op af en skarp malmkant, og hans skæg er stift af støv og blod. Alligevel holder han fast i en lille sort notesbog. \"Jeg holdt på dem for længe,\" hoster han. \"Guldårerne. Jeg lod ingen andre finde dem. Nu kan jeg ikke bære kortet længere.\"",
+        valg: [
+            {
+                tekst: "Støt hans hoved og bed ham nævne den nærmeste mine.",
+                effekt: () => {
+                    return {
+                        logBesked: afslorNaermesteGuldminer(1)
+                    };
+                }
+            },
+            {
+                tekst: "Giv ham mad og lad ham tale langsomt.",
+                kosterItem: 'mad',
+                effekt: () => {
+                    return {
+                        logBesked: `${afslorNaermesteGuldminer(2)} Maden giver ham kræfter nok til at advare dig: gå ikke vestpå efter hans fejl.`
+                    };
+                }
+            },
+            {
+                tekst: "Giv ham en livseliksir fra apoteket.",
+                kosterItem: 'livseliksir',
+                effekt: () => {
+                    return {
+                        logBesked: `${afslorNaermesteGuldminer(2)} Eliksiren lukker ikke såret, men hans øjne bliver klare et øjeblik. Han presser notesbogen mod din hånd og beder dig bruge guldet bedre, end han gjorde.`,
+                        maxHpAendring: 5
+                    };
+                }
+            },
+            {
+                tekst: "Tag notesbogen og lad ham ligge.",
+                effekt: () => {
+                    return {
+                        logBesked: "Du trækker notesbogen fri, men siderne er skrevet i kode og blod. Da dværgen ser det, bider han tænderne sammen og tier. Du får intet ud af ham.",
+                        hpNed: 4
+                    };
                 }
             }
         ]

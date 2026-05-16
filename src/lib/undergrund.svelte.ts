@@ -95,7 +95,8 @@ export function grav() {
     spilTilstand.gitter = [...spilTilstand.gitter];
 
     const baseGravePris = spilTilstand.valgtKarakter.digCost || 3;
-    const skovlItem = spilTilstand.mitUdstyr.find((i) => i.id === 'skovl');
+    const skovlItem = spilTilstand.mitUdstyr.find((i) => i.id === 'skovl' || i.id === 'mesterskovl');
+    const harMesterskovl = skovlItem?.id === 'mesterskovl' && skovlItem.maengde > 0;
     const harSkovl = !!skovlItem && skovlItem.maengde > 0;
     
     let udstyrsLog = ""; 
@@ -129,7 +130,9 @@ export function grav() {
 
     let fundLog = "Du finder ikke noget brugbart.";
 
-    if (faelde && ridderPanserStopperNedgravetFaelde()) {
+    if (faelde && harMesterskovl) {
+        fundLog = "Mesterskovlen finder fælden, før den klapper. Du får den gravet fri uden skade. (-0 HP)";
+    } else if (faelde && ridderPanserStopperNedgravetFaelde()) {
         fundLog = "KLIK. Den nedgravede fælde klapper om dit panser, men ridderens træning holder benet fri. (-0 HP)";
     } else if (faelde) {
         const faeldeSkade = spilTilstand.beregnSkade(10);
@@ -141,12 +144,14 @@ export function grav() {
         felt.tomSkattekiste = true;
         fundLog = `Skovlen rammer træ. Du åbner en kiste. (+500 Guld, +Diamant)`;
     } else if (guldVaerdi > 0) {
-        let maengde = Math.floor(guldVaerdi * spilTilstand.valgtKarakter.goldMod);
+        let maengde = Math.floor(guldVaerdi * (harMesterskovl ? 2 : 1) * spilTilstand.valgtKarakter.goldMod);
         maengde = spilTilstand.beregnGuldIndkomst(maengde);
         const foerGuld = spilTilstand.guldTotal;
         spilTilstand.guldTotal += maengde;
         const faktiskGuld = spilTilstand.guldTotal - foerGuld;
-        fundLog = `Jorden gemte på ${faktiskGuld} Guld.`;
+        fundLog = harMesterskovl
+            ? `Mesterskovlen åbner åren rent. Jorden gemte på ${faktiskGuld} Guld.`
+            : `Jorden gemte på ${faktiskGuld} Guld.`;
     } else if (livVaerdi > 0) {
         const aktuelHp = spilTilstand.livspoint;
         spilTilstand.livspoint += livVaerdi; 

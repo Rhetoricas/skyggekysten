@@ -29,6 +29,7 @@
 
     import Skaerme from './Skaerme.svelte';
     import ShopModal from '$lib/ShopModal.svelte';
+    import WorkshopModal from '$lib/WorkshopModal.svelte';
     import EventModal from '$lib/EventModal.svelte';
     import VenteModal from '$lib/VenteModal.svelte';
     import BottomUI from './BottomUI.svelte';
@@ -55,8 +56,10 @@
     let inspectBoble = $state<{ titel: string; tekst: string; x: number; y: number } | null>(null);
     
     let harDetektor = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'metaldetektor') ?? false);
-    let harKvist = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'soegekvist') ?? false);
+    let harRunekvist = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'runekvist') ?? false);
+    let harKvist = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'soegekvist' || ting.id === 'runekvist') ?? false);
     let aktuelSynsRadius = $derived(Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn));
+    let pejleRadius = $derived(3);
     let erITågen = $derived(erSpillerITaagen());
     let rensedeLogLinjer = $derived(spilTilstand.logHistorik.filter(linje => linje.includes(' - ')));
     let aktivInsektPlageBlok = $derived(hentInsektPlageBlok(spilTilstand.gitter));
@@ -74,7 +77,7 @@
         bandit: 'Banditlejr er risikabel. Gravning giver ofte guld, men der er også stor fælderisiko.',
         hoejland: 'Højland er åbent terræn. Gravning kan give guld, rod, en lille fælderisiko eller fakkel.',
         blodskov: 'Blodskov er farligt og uroligt. Gravefund ligner andre farlige biomer: guld, rod, fælder og livseliksir.',
-        by: 'Byer kan have butikker og indbrudsmuligheder. Du kan normalt ikke grave her.',
+        by: 'Byer kan have butikker, værksteder og indbrudsmuligheder. Du kan normalt ikke grave her.',
         hav: 'Hav er farligt uden båd. Du tager skade i åbent vand, og tung rustning, fakler og flere skrøbelige ting kan gå tabt i vandet. Hvis du kollapser i vandet, drukner du, medmindre en livseliksir redder dig først.',
         krystal: 'Krystalfelter er farlige og sjældne. Gravning kan give stærke fund, men også fælder.',
         marked: 'Markeder kan have butikker. Du kan normalt ikke grave her.',
@@ -316,7 +319,7 @@
         const billederTilPreload = [
             '/tiles/byshop.webp', '/tiles/markedshop.webp', '/tiles/udgravning.webp', '/tiles/empty_treasure.webp', '/tiles/treasuremark.webp',
             '/tiles/event.png', '/tiles/campfire.webp', '/events/ev_campfire.webp', '/tiles/guldtaage.webp', '/tiles/livtaage.webp',
-            '/inventory/hp.webp', '/inventory/guld.webp', '/tiles/player.webp', '/tiles/energi_slukket.webp', '/tiles/energi_taendt.webp', '/tiles/blodofring.webp', '/tiles/baad.webp', '/tiles/gravsted.webp',
+            '/inventory/hp.webp', '/inventory/guld.webp', '/tiles/player.webp', '/tiles/energi_slukket.webp', '/tiles/energi_taendt.webp', '/tiles/blodofring.webp', '/tiles/baad.webp', '/tiles/gravsted.webp', '/tiles/vaerksted.webp',
             '/tiles/wheat.webp', '/tiles/growingwheat.webp', '/tiles/brokenwheat.webp',
             '/tiles/beans.webp', '/tiles/growingbean.webp', '/tiles/brokenbean.webp', '/tiles/portal.webp', '/tiles/goldmine.webp',
             '/tiles/meteorsten.webp', '/tiles/openlock.webp'
@@ -336,7 +339,7 @@
     }
 
     function håndterTastatur(ev: KeyboardEvent) {
-        if (introAktiv || ev.repeat || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
+        if (introAktiv || ev.repeat || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.aktivVaerksted || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
         if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
 
         const tast = ev.key.toLowerCase();
@@ -368,7 +371,7 @@
     }
 
     function fokuserPaaSpiller() {
-        if (introAktiv || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
+        if (introAktiv || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.aktivVaerksted || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
         langsomtKamera = false;
         cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
     }
@@ -605,7 +608,7 @@
                     spilTilstand.mitUdstyr = eksisterende.mitUdstyr || [];
                     spilTilstand.mineKendteFelter = eksisterende.kendteFelter || [];
                     spilTilstand.historik = eksisterende.historik || [];
-                    spilTilstand.venteGratisFeltBrugt = eksisterende.venteGratisFeltBrugt ?? null;
+                    spilTilstand.venteGratisFeltBrugt = null;
                     spilTilstand.gratisNaesteBevaegelse = eksisterende.gratisNaesteBevaegelse ?? false;
                     spilTilstand.gratisBevaegelseKilde = eksisterende.gratisBevaegelseKilde ?? '';
                     spilTilstand.sidsteBersaerkDag = eksisterende.sidsteBersaerkDag ?? 0;
@@ -986,7 +989,6 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].harSkattekort = false;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].aktivTracker = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].trackedeSpillere = [];
-            spilTilstand.alleSpillere[spilTilstand.spillerNavn].venteGratisFeltBrugt = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIndex = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIcon = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisNaesteBevaegelse = false;
@@ -1064,7 +1066,7 @@
 
     function lukEventOgShop() {
         const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
-        const lukkedeShop = !!spilTilstand.aktivShop;
+        const lukkedeInteraktion = !!spilTilstand.aktivShop || spilTilstand.aktivVaerksted;
         
         if (felt && eventState.aktivt && felt.eventID !== 'campfire' && felt.eventID !== 'meteor_skat' && felt.eventID !== 'stjernekald') {
             felt.eventFuldført = true;
@@ -1072,11 +1074,12 @@
         
         motorLukEvent();
         spilTilstand.aktivShop = null;
+        spilTilstand.aktivVaerksted = false;
         
-        if (felt && felt.hasPortal && !lukkedeShop) {
+        if (felt && felt.hasPortal && !lukkedeInteraktion) {
             udfoerPortalTeleport();
         } else {
-            syncTilDb(!lukkedeShop);
+            syncTilDb(!lukkedeInteraktion);
         }
     }
 
@@ -1183,6 +1186,10 @@
         return biome.replace('hoejland', 'højland');
     }
 
+    function harKoebbarShop(felt: Felt) {
+        return (felt.shopItems || []).some((itemId) => itemDB[itemId]?.kanKoebes !== false);
+    }
+
     function forklaringForFelt(felt: Felt, index: number, erUdforsket: boolean, erOpslugt: boolean) {
         if (!erUdforsket) {
             return {
@@ -1202,7 +1209,8 @@
         if (biome === 'ritual') dele.push('Ritualfelter kan ødelægge søgekvist.');
         if (felt.hasBoat) dele.push(`Der ${felt.boatCount && felt.boatCount > 1 ? `ligger ${felt.boatCount} både` : 'ligger en flugtbåd'} her.`);
         if (felt.eventID && !felt.eventFuldført) dele.push('Feltet har et event, som starter når du går ind på det.');
-        if (felt.shopItems?.length) dele.push('Feltet har en butik.');
+        if (harKoebbarShop(felt)) dele.push('Feltet har en butik.');
+        if (felt.hasWorkshop) dele.push('Feltet har et værksted, hvor udstyr kan opgraderes.');
         if (felt.hasGoldmine) dele.push(felt.mineOwner ? `Guldminen ejes af ${felt.mineOwner}.` : 'Der er en guldmine her.');
         if (felt.hasPortal) dele.push('Portalen kan flytte dig mod øst.');
         if (felt.taageBlokker) dele.push('Tågeblokkeren kan holde tågen tilbage fra venstre, indtil tågen vender.');
@@ -1272,7 +1280,7 @@
     }
 
     function startTouchZoom(e: TouchEvent) {
-        if (eventState.aktivt || spilTilstand.aktivShop) return;
+        if (eventState.aktivt || spilTilstand.aktivShop || spilTilstand.aktivVaerksted) return;
         if (e.touches.length === 2) {
             sidstePinchAfstand = touchAfstand(e.touches);
             cam.stopTræk();
@@ -1281,7 +1289,7 @@
     }
 
     function haandterTouchZoom(e: TouchEvent) {
-        if (eventState.aktivt || spilTilstand.aktivShop) return;
+        if (eventState.aktivt || spilTilstand.aktivShop || spilTilstand.aktivVaerksted) return;
         if (e.touches.length !== 2 || sidstePinchAfstand <= 0) return;
 
         const nyAfstand = touchAfstand(e.touches);
@@ -1353,7 +1361,7 @@ function udførBevægelse(nytIndeks: number) {
 }
 
     function flytHex(retning: string) {
-        if (introAktiv || spilTilstand.erBevidstløs || eventState.aktivt || spilTilstand.aktivShop || (spilTilstand.gameState !== 'play' && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map')) return;
+        if (introAktiv || spilTilstand.erBevidstløs || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.aktivVaerksted || (spilTilstand.gameState !== 'play' && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map')) return;
         const raekke = Math.floor(spilTilstand.spillerIndex / BREDDE);
         const kolonne = spilTilstand.spillerIndex % BREDDE;
         const forskudt = raekke % 2 !== 0;
@@ -1373,7 +1381,7 @@ function udførBevægelse(nytIndeks: number) {
     }
 
     function klikPåHex(nytIndeks: number) {
-        if (introAktiv || spilTilstand.erBevidstløs || cam.harTrukket || eventState.aktivt || spilTilstand.aktivShop || (spilTilstand.gameState !== 'play' && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map')) return;
+        if (introAktiv || spilTilstand.erBevidstløs || cam.harTrukket || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.aktivVaerksted || (spilTilstand.gameState !== 'play' && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map')) return;
         if (spilTilstand.gameState === 'play' && hentNaboIndices(spilTilstand.spillerIndex).includes(nytIndeks)) udførBevægelse(nytIndeks);
     }
 </script>
@@ -1426,15 +1434,15 @@ function udførBevægelse(nytIndeks: number) {
         <LydKnap />
     </div>
     <div class="zoom-actions" aria-label="Zoom">
-        <button type="button" onclick={() => cam.justerZoom(0.18, !!eventState.aktivt || !!spilTilstand.aktivShop)} aria-label="Zoom ind">+</button>
-        <button type="button" onclick={() => cam.justerZoom(-0.18, !!eventState.aktivt || !!spilTilstand.aktivShop)} aria-label="Zoom ud">-</button>
+        <button type="button" onclick={() => cam.justerZoom(0.18, !!eventState.aktivt || !!spilTilstand.aktivShop || !!spilTilstand.aktivVaerksted)} aria-label="Zoom ind">+</button>
+        <button type="button" onclick={() => cam.justerZoom(-0.18, !!eventState.aktivt || !!spilTilstand.aktivShop || !!spilTilstand.aktivVaerksted)} aria-label="Zoom ud">-</button>
     </div>
 {/if}
 
 <div class="game-container">
     <div class="camera" role="presentation"
-        onwheel={(e) => cam.håndterZoom(e, !!eventState.aktivt || !!spilTilstand.aktivShop)}
-        onpointerdown={(e) => cam.startTræk(e, !!eventState.aktivt || !!spilTilstand.aktivShop)}
+        onwheel={(e) => cam.håndterZoom(e, !!eventState.aktivt || !!spilTilstand.aktivShop || !!spilTilstand.aktivVaerksted)}
+        onpointerdown={(e) => cam.startTræk(e, !!eventState.aktivt || !!spilTilstand.aktivShop || !!spilTilstand.aktivVaerksted)}
         onpointermove={cam.træk}
         onpointerup={cam.stopTræk}
         ontouchstart={startTouchZoom}
@@ -1504,14 +1512,15 @@ function udførBevægelse(nytIndeks: number) {
                         {/if}
 
                         {#if erUdforsket && !felt.gravet}
+                            {@const erIndenForPejling = regnHexAfstand(spilTilstand.spillerIndex, i, BREDDE) <= pejleRadius}
                             {#if felt.isSkatteKlynge && harSkattekortAktivt}
                                 <img src="/tiles/treasuremark.webp" alt="Mulig skat" class="treasure-mark-icon" data-help-title="Mulig skat" data-help-body="Skattekortet peger på dette felt som mulig skatteklynge. Grav for at afsløre om der er noget." />
                             {/if}
-                            {#if harDetektor && (felt.skjultGuld ?? 0) > 0}
-                                <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" data-help-title="Guldspor" data-help-body="Din metaldetektor mærker skjult guld under jorden. Grav feltet for at få det frem." style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 80});" />
+                            {#if harDetektor && erIndenForPejling && (felt.skjultGuld ?? 0) > 0}
+                                <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" data-help-title="Guldspor" data-help-body="Din metaldetektor mærker skjult guld på kendte felter inden for radius 3. Grav feltet for at få det frem." style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 80});" />
                             {/if}
-                            {#if harKvist && (felt.skjultLiv ?? 0) > 0}
-                                <img src="/tiles/livtaage.webp" alt="" class="mist-icon" data-help-title="Rodspor" data-help-body="Søgekvisten mærker helende rødder under jorden. Grav feltet for at finde dem." style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultLiv ?? 0) / 40});" />
+                            {#if harKvist && erIndenForPejling && (felt.skjultLiv ?? 0) > 0}
+                                <img src="/tiles/livtaage.webp" alt="" class="mist-icon" data-help-title="Rodspor" data-help-body={harRunekvist ? 'Runekvisten mærker helende rødder på kendte felter inden for radius 3. Hvis du mangler HP, trækkes de automatisk op, når du går ind på feltet.' : 'Søgekvisten mærker helende rødder på kendte felter inden for radius 3. Grav feltet for at finde dem.'} style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultLiv ?? 0) / 40});" />
                             {/if}
                         {/if}
                         
@@ -1546,10 +1555,10 @@ function udførBevægelse(nytIndeks: number) {
                         {/if}
 
                         {#if erUdforsket && felt.hasPortal}
-                            <img src="/tiles/portal.webp" alt="Portal" class="portal-icon" data-help-title="Portal" data-help-body="Portalen flytter dig mod øst. Landingsfeltet aktiveres som et normalt felt." />
+                            <img src="/tiles/portal.webp" alt="Portal" class="portal-icon" data-help-title="Portal" data-help-body="Portalen slynger dig 4, 5 eller 6 felter mod øst. Landingsfeltet aktiveres som et normalt felt." />
                         {/if}
 
-                        {#if erUdforsket && felt.shopItems && felt.shopItems.length > 0}
+                        {#if erUdforsket && harKoebbarShop(felt)}
                             <img 
                                 src="/tiles/{felt.biome === 'by' ? 'byshop.webp' : 'markedshop.webp'}" 
                                 alt="" 
@@ -1557,6 +1566,16 @@ function udførBevægelse(nytIndeks: number) {
                                 data-help-title={felt.biome === 'by' ? 'Bybutik' : 'Marked'}
                                 data-help-body="Butikken sælger varer for guld. Vareudvalget ligger på feltet og deles af spillerne på øen."
                                 onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')} 
+                            />
+                        {/if}
+
+                        {#if erUdforsket && felt.hasWorkshop}
+                            <img
+                                src="/tiles/vaerksted.webp"
+                                alt=""
+                                class="workshop-icon"
+                                data-help-title="Værksted"
+                                data-help-body="Værkstedet opgraderer udstyr: skovl til mesterskovl, stav til dragestav og søgekvist til runekvist."
                             />
                         {/if}
 
@@ -1715,7 +1734,7 @@ function udførBevægelse(nytIndeks: number) {
 
 {#if inspectAktiv}
     <div class="inspect-hint" role="status">
-        Tryk på et felt eller ikon
+        Tryk på et felt, ikon eller en knap
     </div>
 {/if}
 
@@ -1754,6 +1773,7 @@ function udførBevægelse(nytIndeks: number) {
 
 {#if eventState.aktivt} <EventModal lukEvent={lukEventOgShop} /> {/if}
 {#if spilTilstand.aktivShop} <ShopModal lukShop={lukEventOgShop} /> {/if}
+{#if spilTilstand.aktivVaerksted} <WorkshopModal lukVaerksted={lukEventOgShop} /> {/if}
 {#if spilTilstand.venteSpilAktiv} <VenteModal kanSpilleIgen={spilTilstand.dag >= hentLangsomsteDag() + MAX_DAGE_FORAN} /> {/if}
 
 {#if spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'win_map'}
@@ -2185,6 +2205,12 @@ function udførBevægelse(nytIndeks: number) {
         position: absolute; width: 80px; height: 80px; top: 55%; left: 50%;
         transform: translate(-50%, -50%); pointer-events: none; z-index: 14;
         filter: drop-shadow(0 0 15px rgba(255, 165, 0, 0.9)) drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+    }
+    .workshop-icon {
+        position: absolute; width: auto; height: 83px; top: calc(54% - 2px); left: 50%;
+        transform: translate(-50%, -50%); pointer-events: none; z-index: 15;
+        object-fit: contain;
+        filter: drop-shadow(0 0 12px rgba(255, 210, 90, 0.85)) drop-shadow(0 5px 7px rgba(0,0,0,0.9));
     }
     .indbrud-marker {
         position: absolute;

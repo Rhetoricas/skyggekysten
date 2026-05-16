@@ -101,6 +101,7 @@ export const spilTilstand = $state({
     mineKendteFelter: [] as number[],
     historik: [] as number[],
     aktivShop: null as string[] | null,
+    aktivVaerksted: false,
     
     venteSpilAktiv: false,
     ventePuljeGuld: 0,

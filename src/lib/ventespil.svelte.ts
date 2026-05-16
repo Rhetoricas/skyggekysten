@@ -37,7 +37,16 @@ export function erNaesteVenteRundeGratis() {
 
 export function startVenteSpil(kosterPenge: boolean = false) {
     const foersteRunde = erNaesteVenteRundeGratis();
-    const skalBetale = kosterPenge && !foersteRunde;
+    const skalBetale = !foersteRunde && kosterPenge;
+
+    if (!foersteRunde && !kosterPenge) {
+        spilTilstand.venteSpilAktiv = true;
+        spilTilstand.venteFase = 'venter';
+        spilTilstand.logBesked = "Du må vente på de andre spillere. Gratisrunden på dette felt er brugt, men du kan købe en ny runde for 5 guld.";
+        if (spilTilstand.venteKort.length === 0) delNyeKort();
+        syncTilDb();
+        return;
+    }
 
     if (skalBetale) {
         const totalGuld = spilTilstand.guldTotal + spilTilstand.ventePuljeGuld;

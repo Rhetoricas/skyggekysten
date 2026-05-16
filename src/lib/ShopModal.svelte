@@ -1,7 +1,7 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
-    import { tilfoejTilRygsæk, brugFraRygsæk } from '$lib/spilmotor';
+    import { tilfoejTilRygsæk, brugFraRygsæk, kanModtageItem } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
     import { fremtvingKollaps } from '$lib/overlevelse.svelte';
 
@@ -10,6 +10,24 @@
     function købVare(id: string) {
         const vareData = itemDB[id];
         if (!vareData) return;
+
+        if (vareData.kanKoebes === false) {
+            spilTilstand.logBesked = `${vareData.navn} kan ikke købes her.`;
+            syncTilDb();
+            return;
+        }
+
+        if (!kanModtageItem(id)) {
+            spilTilstand.logBesked = id === 'skovl' || id === 'mesterskovl'
+                ? "Du har allerede en skovl. Find et værksted, hvis den skal forbedres."
+                : id === 'stav' || id === 'dragestav'
+                    ? "Du har allerede en stav. Find et værksted, hvis den skal forbedres."
+                    : id === 'soegekvist' || id === 'runekvist'
+                        ? "Du har allerede en søgekvist. Find et værksted, hvis den skal forbedres."
+                        : `Du har allerede ${vareData.navn}.`;
+            syncTilDb();
+            return;
+        }
 
         if (spilTilstand.guldTotal >= vareData.pris) {
             spilTilstand.guldTotal -= vareData.pris;
@@ -44,7 +62,7 @@
         <div class="shop-grid">
             {#each spilTilstand.aktivShop || [] as itemId (itemId)}
                 {@const tilbud = itemDB[itemId]}
-                {#if tilbud}
+                {#if tilbud && tilbud.kanKoebes !== false}
                     <div class="vare-kort" 
                          onclick={() => købVare(itemId)} 
                          onkeydown={(e) => { if (e.key === 'Enter') købVare(itemId); }}

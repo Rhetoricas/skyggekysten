@@ -52,11 +52,13 @@
                 <section>
                     <h3>Målet</h3>
                     <p>Du er drevet i land på en ø. Tågen kommer bagfra. Find en båd på den anden side af øen, før tågen omslutter dig eller du mister alle HP.</p>
+                    <p class="eksempel">Eksempel: Hvis du ser en båd langt mod øst, behøver du ikke udforske alt. Det vigtigste er at nå frem i live med nok HP til de sidste farlige felter.</p>
                 </section>
 
                 <section>
                     <h3>Start og ø-navn</h3>
                     <p>Alle der skriver samme ø-navn, spiller på samme ø, hvis de går i land inden for de første fem dage. Offline-spil gemmes kun i browseren på den enhed.</p>
+                    <p class="eksempel">Eksempel: Skriver I begge "Sortoe", lander I på samme ø. Skriver en anden spiller navnet første gang på dag 8, er det for sent at slutte sig til den tur.</p>
                 </section>
 
                 <section>
@@ -65,8 +67,9 @@
                         <li>Hver bevægelse koster energi. Når du løber tør, går der en ny dag.</li>
                         <li>Terræn kan være tungt eller let afhængigt af din karakter.</li>
                         <li>Energifelter du aldrig kan bruge med din nuværende baseenergi vises inaktive.</li>
-                        <li>Hvis du kommer for langt foran den langsomste spiller i multiplayer, må du vente.</li>
+                        <li>Hvis du kommer for langt foran den langsomste spiller i multiplayer, må du vente. Du får én gratis ventespilsrunde pr. felt, og flere runder på samme felt skal købes.</li>
                     </ul>
+                    <p class="eksempel">Eksempel: Har du 3 energi tilbage, og et bjerg koster 4, kan du ikke gå derind nu. Gå et billigere sted hen, spis mad for gratis bevægelse, eller vent på en ny dag.</p>
                 </section>
 
                 <section>
@@ -77,6 +80,7 @@
                         <li>Tågen rykker frem over tid. Felter bag tågen er farlige eller utilgængelige.</li>
                         <li>Nogle sjældne events kan holde tågen tilbage eller blokere den bag et bestemt felt.</li>
                     </ul>
+                    <p class="eksempel">Eksempel: En spejder kan ofte planlægge ruten tidligere, fordi flere felter afsløres. Står der et bjerg imellem dig og kysten, kan ukendte farer stadig gemme sig bag det.</p>
                 </section>
 
                 <section>
@@ -88,6 +92,7 @@
                         <li>Viking og valkyrie går automatisk bersærk første gang pr. dag, de tager mindst 5 skade. Næste bevægelse koster 0 energi.</li>
                         <li>Oversvømmelse kan slukke fakler og få tung rustning til at gå tabt.</li>
                     </ul>
+                    <p class="eksempel">Eksempel: Hvis du har 12 HP og står foran et farligt felt, kan mad være bedre end at spare det. Du får HP nu og kan bruge den gratis bevægelse til at komme væk.</p>
                 </section>
 
                 <section>
@@ -95,19 +100,24 @@
                     <ul>
                         <li>Hvis feltet kan graves, vises graveikonet aktivt i inventory-linjen.</li>
                         <li>Har du en skovl, graves der med skovl. Ellers graver du med hænderne.</li>
+                        <li>En mesterskovl tæller som skovl, giver dobbelt guld ved gravning og finder nedgravede fælder uden at udløse dem.</li>
                         <li>Skjulte fælder, guld og loot bliver først udløst, når du graver.</li>
-                        <li>Metaldetektor og søgekvist kan afsløre tegn på skjult guld eller liv.</li>
+                        <li>Metaldetektor og søgekvist kan afsløre tegn på skjult guld eller liv på kendte felter inden for radius 3 af din karakter.</li>
+                        <li>Runekvisten er en opgraderet søgekvist. Når du mangler HP og går ind på et felt med skjult liv, trækker den rødderne op automatisk for 1 energi uden at grave feltet.</li>
                     </ul>
+                    <p class="eksempel">Eksempel: Viser metaldetektoren tegn på metal i en ruin, kan der være guld. Med almindelig skovl kan samme felt stadig klappe en fælde om benet på dig. Med mesterskovl får du guldet bedre frem og fælden bliver fundet uden skade. Med runekvist kan du derimod tage skjult liv uden at markere feltet som gravet.</p>
                 </section>
 
                 <section>
                     <h3>Felter</h3>
                     <ul>
-                        <li>Byer og markeder kan have butikker. Byer kan også brydes op med dirk, hvis feltet er tomt.</li>
+                        <li>Byer og markeder kan have butikker. Byer kan også have værksteder eller brydes op med dirk, hvis feltet er tomt.</li>
                         <li>Marker modner i blokke på ti dage. Modne afgrøder kan hjælpe dig, men naturkatastrofer kan ødelægge dem.</li>
-                        <li>Guldminer giver point og kan overtages af andre spillere.</li>
+                        <li>Guldminer giver guld og point. En ulåst mine kan overtages af andre spillere.</li>
+                        <li>Besøg en mine du allerede ejer for at låse den. En låst mine kan ikke overtages, men den kan stadig blive ødelagt af katastrofer.</li>
                         <li>Portaler og magiske felter flytter dig, men landingsfeltet behandles som et normalt felt.</li>
                     </ul>
+                    <p class="eksempel">Eksempel: Du overtager en neutral mine og får guld. Kommer en anden spiller senere forbi, kan de tage den, hvis du ikke har været tilbage og låst den. Rammer en meteor feltet, forsvinder minen uanset ejer.</p>
                 </section>
 
                 <section>
@@ -115,24 +125,35 @@
                     <ul>
                         <li>Tryk på en genstand i bunden for at bruge den, hvis den er aktiv.</li>
                         <li>Skovl, sovepose, mad og dirk er kun aktive, når de kan bruges på det aktuelle felt.</li>
+                        <li>Kun mad og livseliksir kan stables i flere styk. Alle andre våben, værktøjer, tøj og særlige items findes kun én gang ad gangen.</li>
+                        <li>Store værktøjer findes kun i én version ad gangen. Køb ikke ekstra skovl eller stav; opgrader dem på et værksted.</li>
                         <li>Fakkel kan lave bål. Staven kan teleportere. Hemmeligheder og særlige fund kan have egne effekter.</li>
                         <li>Nogle ting kan købes, andre findes kun i events.</li>
                     </ul>
+                    <p class="eksempel">Eksempel: En sovepose hjælper ikke midt i en by, men kan være stærk på roligere naturfelter. En stav kan redde dig over et farligt område, men lander du på en portal eller et eventfelt, sker feltets normale effekt bagefter.</p>
+                </section>
+
+                <section>
+                    <h3>Værksteder</h3>
+                    <p>Værksteder findes i nogle byer. De sælger ikke almindelige varer, men bygger dit eksisterende udstyr om til en bedre version.</p>
+                    <p class="eksempel">Eksempel: Har du en skovl og 150 guld, kan værkstedet gøre den til en mesterskovl. Har du en stav og 200 guld, kan den blive til en dragestav. Har du en søgekvist og 175 guld, kan den blive til en runekvist, der suger skjult liv op og efterlader feltet værdiløst for andre.</p>
                 </section>
 
                 <section>
                     <h3>Events</h3>
                     <p>Events er møder på øen. Nogle er små valg. Andre kan ændre store dele af kortet. Våben, klasse og udstyr kan åbne bedre eller farligere valg.</p>
                     <ul>
-                        <li>Naturkatastrofer kan ændre terræn omkring dig.</li>
+                        <li>Naturkatastrofer kan ændre terræn omkring dig og kan fjerne miner, både, afgrøder, butikker og events på de ramte felter.</li>
                         <li>Nogle events er sjældne og kommer først senere på øen.</li>
                         <li>Subevents er fortsættelser af samme event og bliver ikke trukket som almindelige events.</li>
                     </ul>
+                    <p class="eksempel">Eksempel: Et jordskælv kan gøre en eng til bjerg eller ruin. Hvis der lå en guldmine på feltet, er den væk bagefter. Et eventvalg kan altså være godt for dig her og nu, men dyrt for kortet.</p>
                 </section>
 
                 <section>
                     <h3>Tyveri</h3>
                     <p>Dirken kan bruges til indbrud på tomme byfelter. Det koster mindst halvdelen af din baseenergi. Udbyttet er moderat, og der er risiko for at blive opdaget og få tæv.</p>
+                    <p class="eksempel">Eksempel: Hvis du har nok energi og mangler lidt guld til en butik, kan indbrud være fristende. Hvis du er lav på HP, kan et mislykket indbrud være det, der knækker turen.</p>
                 </section>
 
                 <section>
@@ -143,6 +164,7 @@
                         <li>Den samme loginbruger må ikke spille flere karakterer på samme ø samtidig.</li>
                         <li>Guldminer giver mere score i multiplayer, fordi de er sværere at holde.</li>
                     </ul>
+                    <p class="eksempel">Eksempel: Hvis din datter tager en mine, kan du se den skifte ejer på kortet. Hvis du senere går ind på den ulåste mine, overtager du den fra hende. Hvis hun har låst den, må du finde point et andet sted.</p>
                 </section>
 
                 <section>
@@ -153,11 +175,13 @@
                         <li>Global highscore kræver login. Offline-score gemmes kun lokalt.</li>
                         <li>En særlig medalje kan gives ved ny global rekord, men kun hvis scoren også er høj nok.</li>
                     </ul>
+                    <p class="eksempel">Eksempel: En spiller med mindre guld kan godt slå en rigere spiller, hvis de slipper væk, ejer flere miner og har mange HP tilbage. Omvendt kan en død spiller stadig få en hæderlig score, hvis turen var lang og rig.</p>
                 </section>
 
                 <section>
                     <h3>Offline</h3>
                     <p>For at spille i et fly skal spillet først gøres fly-klar på samme enhed og i samme browser. Åbn spillet online, tryk Download, start eller fortsæt et offline-spil, og test derefter kort i flytilstand.</p>
+                    <p class="eksempel">Eksempel: Downloader du spillet i Chrome på en telefon, hjælper det ikke i Safari på samme telefon. Offline-gem og offline-score hører til den browser, de blev lavet i.</p>
                 </section>
             </div>
         </div>
@@ -292,6 +316,15 @@
 
     .regelbog-indhold p {
         margin: 0;
+    }
+
+    .regelbog-indhold .eksempel {
+        margin-top: 8px;
+        padding: 10px 12px;
+        color: #f1e7c8;
+        background: rgba(255, 204, 0, 0.08);
+        border-left: 3px solid rgba(255, 204, 0, 0.55);
+        border-radius: 4px;
     }
 
     .regelbog-indhold ul {

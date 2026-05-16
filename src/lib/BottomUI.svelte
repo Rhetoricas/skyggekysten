@@ -17,9 +17,11 @@
     let aktivTracker = $derived(spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.aktivTracker);
     let aktivTrackerSpiller = $derived(aktivTracker ? spilTilstand.alleSpillere[aktivTracker.targetNavn] : null);
     let trackerDageTilbage = $derived(aktivTracker ? Math.max(0, aktivTracker.slutterDag - spilTilstand.dag + 1) : 0);
-    let harSkovl = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'skovl' && ting.maengde > 0) ?? false);
-    let graveIkon = $derived(harSkovl ? '/inventory/skovl.webp' : '/ui/haandgrav.webp');
-    let graveAlt = $derived(kanGrave ? (harSkovl ? 'Grav med skovl' : 'Grav med hænderne') : 'Her kan ikke graves');
+    let harMesterskovl = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'mesterskovl' && ting.maengde > 0) ?? false);
+    let harSkovl = $derived(spilTilstand.mitUdstyr?.some((ting) => (ting.id === 'skovl' || ting.id === 'mesterskovl') && ting.maengde > 0) ?? false);
+    let graveIkon = $derived(harMesterskovl ? itemDB.mesterskovl.billede : harSkovl ? itemDB.skovl.billede : '/ui/haandgrav.webp');
+    let graveNavn = $derived(harMesterskovl ? 'Mesterskovl' : harSkovl ? 'Skovl' : 'Grav med hænderne');
+    let graveAlt = $derived(kanGrave ? (harSkovl ? `Grav med ${harMesterskovl ? 'mesterskovl' : 'skovl'}` : 'Grav med hænderne') : 'Her kan ikke graves');
     const hvileBiomer = ['eng', 'skov', 'mark', 'bjerg', 'hoejland'];
 
     let visLog = $state(false);
@@ -71,13 +73,13 @@
     }
 
     function haandterInventoryKlik(vareId: string) {
-        if (vareId === 'skovl') {
+        if (vareId === 'skovl' || vareId === 'mesterskovl') {
             grav();
         } else if (vareId === 'sovepose') {
             hvil();
         } else if (vareId === 'mad') {
             spisMad();
-        } else if (vareId === 'stav') {
+        } else if (vareId === 'stav' || vareId === 'dragestav') {
             udfoerTeleport();
         } else if (vareId === 'fakkel') {
             taendBaal();
@@ -89,7 +91,7 @@
     }
 
     function kanBrugeInventoryVare(vareId: string) {
-        if (vareId === 'skovl') return !!(aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves);
+        if (vareId === 'skovl' || vareId === 'mesterskovl') return !!(aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves);
         if (vareId === 'sovepose') {
             return !!(
                 aktueltFelt &&
@@ -100,11 +102,11 @@
         }
         if (vareId === 'mad') return spilTilstand.livspoint < spilTilstand.maxLivspoint || !spilTilstand.gratisNaesteBevaegelse;
         if (vareId === 'dirk') return !!kanBegaaIndbrud;
-        return vareId === 'stav' || vareId === 'fakkel' || vareId === 'hemmelighed';
+        return vareId === 'stav' || vareId === 'dragestav' || vareId === 'fakkel' || vareId === 'hemmelighed';
     }
 
     function erSituationsVare(vareId: string) {
-        return vareId === 'skovl' || vareId === 'sovepose' || vareId === 'mad' || vareId === 'dirk';
+        return vareId === 'skovl' || vareId === 'mesterskovl' || vareId === 'sovepose' || vareId === 'mad' || vareId === 'dirk' || vareId === 'soegekvist' || vareId === 'runekvist' || vareId === 'metaldetektor';
     }
 
     function formaterNavn(tekst: string) {
@@ -227,19 +229,19 @@
                 class="grav-knap inventory-item {kanGrave ? 'klikbar' : ''}"
                 role="button"
                 tabindex={kanGrave ? 0 : -1}
-                data-help-title={harSkovl ? 'Skovl' : 'Grav med hænderne'}
-                data-help-body={kanGrave ? (harSkovl ? 'Graver feltet med lavere energipris.' : 'Graver feltet uden skovl. Det koster ekstra energi og HP.') : 'Du kan ikke grave på dette felt lige nu.'}
+                data-help-title={graveNavn}
+                data-help-body={kanGrave ? (harMesterskovl ? 'Graver med lavere energipris, giver dobbelt guld og finder nedgravede fælder uden at udløse dem.' : harSkovl ? 'Graver feltet med lavere energipris.' : 'Graver feltet uden skovl. Det koster ekstra energi og HP.') : 'Du kan ikke grave på dette felt lige nu.'}
                 onclick={() => { if (kanGrave) grav(); }}
                 onkeydown={(e) => { if (kanGrave && (e.key === 'Enter' || e.key === ' ')) grav(); }}
             >
                 <div class="ikon-container">
-                    <img src={graveIkon} alt={graveAlt} class="inventory-icon grave-icon {kanGrave ? '' : 'deaktiveret'}" data-help-title={harSkovl ? 'Skovl' : 'Grav med hænderne'} data-help-body={kanGrave ? (harSkovl ? 'Graver feltet med lavere energipris. Nedgravede fælder udløses ved gravning.' : 'Graver feltet uden skovl. Det koster ekstra energi og HP, og nedgravede fælder kan udløses.') : 'Du kan ikke grave på dette felt lige nu.'} />
+                    <img src={graveIkon} alt={graveAlt} class="inventory-icon grave-icon {harMesterskovl ? 'opgraderet' : ''} {kanGrave ? '' : 'deaktiveret'}" data-help-title={graveNavn} data-help-body={kanGrave ? (harMesterskovl ? 'Graver med lavere energipris, giver dobbelt guld og finder nedgravede fælder uden at udløse dem.' : harSkovl ? 'Graver feltet med lavere energipris. Nedgravede fælder udløses ved gravning.' : 'Graver feltet uden skovl. Det koster ekstra energi og HP, og nedgravede fælder kan udløses.') : 'Du kan ikke grave på dette felt lige nu.'} />
                 </div>
             </div>
 
             {#each spilTilstand.mitUdstyr as vare (vare.id)}
                 {@const dbInfo = itemDB[vare.id]}
-                {#if dbInfo && vare.id !== 'skovl'}
+                {#if dbInfo && vare.id !== 'skovl' && vare.id !== 'mesterskovl'}
                     <div 
                         class="inventory-item {kanBrugeInventoryVare(vare.id) ? 'klikbar' : ''}" 
                         data-help-title={dbInfo.navn}
@@ -482,6 +484,9 @@
     .grave-icon {
         object-fit: contain;
     }
+    .inventory-icon.opgraderet {
+        filter: drop-shadow(0 0 10px rgba(255, 210, 90, 0.95)) drop-shadow(0 2px 5px rgba(0,0,0,0.9)) brightness(1.12);
+    }
     .inventory-icon.deaktiveret {
         filter: grayscale(100%) opacity(50%);
     }
@@ -527,7 +532,7 @@
         top: 0; left: 0;
         width: 100vw; height: 100dvh;
         background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
-        z-index: 1500; display: flex;
+        z-index: 5200; display: flex;
         align-items: center; justify-content: center;
         pointer-events: auto;
     }
