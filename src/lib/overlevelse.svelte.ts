@@ -1,12 +1,12 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb, broadcastFelt } from './netvaerk';
-import { BREDDE, HEX_W, HOEJDE } from './spildata';
-import { brugFraRygsæk } from './spilmotor';
+import { HEX_W } from './spildata';
+import { brugFraRygsæk, hentKortBredde, hentKortHoejde, hentNaboIRetning } from './spilmotor';
 import { erFeltITaagen } from './taage';
 import type { Felt, GravstenMinde } from './types';
 
 export function erSpillerITaagen() {
-    return erFeltITaagen(spilTilstand.gitter, spilTilstand.spillerIndex, spilTilstand.fogX);
+    return erFeltITaagen(spilTilstand.gitter, spilTilstand.spillerIndex, spilTilstand.fogX, hentKortBredde());
 }
 
 let sidstBrugtEliksir = 0;
@@ -48,15 +48,17 @@ function tilfoejGravsten(felt: Felt, tekst: string) {
 }
 
 function hentMuligeFlugtbaadFelter() {
+    const bredde = hentKortBredde();
+    const hoejde = hentKortHoejde();
     const kystFelter: number[] = [];
     const landmasse = hentSpillerensLandmasse();
     const tilfoejKystFelt = (indeks: number) => {
         if (!kystFelter.includes(indeks)) kystFelter.push(indeks);
     };
 
-    for (let r = 1; r < HOEJDE - 1; r++) {
-        const landIndeks = r * BREDDE + (BREDDE - 2);
-        const vandIndeks = r * BREDDE + (BREDDE - 1);
+    for (let r = 1; r < hoejde - 1; r++) {
+        const landIndeks = r * bredde + (bredde - 2);
+        const vandIndeks = r * bredde + (bredde - 1);
         if (
             landmasse.includes(landIndeks) &&
             spilTilstand.gitter[vandIndeks]?.biome === 'hav'
@@ -68,8 +70,8 @@ function hentMuligeFlugtbaadFelter() {
     if (kystFelter.length === 0) {
         for (let indeks = 0; indeks < spilTilstand.gitter.length; indeks++) {
             const felt = spilTilstand.gitter[indeks];
-            const kolonne = indeks % BREDDE;
-            if (kolonne < BREDDE * 0.75 || felt?.biome !== 'hav') continue;
+            const kolonne = indeks % bredde;
+            if (kolonne < bredde * 0.75 || felt?.biome !== 'hav') continue;
 
             const naboLand = hentNaboIndicesLokal(indeks).some((naboIndeks) => landmasse.includes(naboIndeks));
             if (naboLand) tilfoejKystFelt(indeks);
@@ -142,13 +144,11 @@ function hentSpillerensLandmasse() {
 }
 
 function hentNaboIndicesLokal(index: number) {
-    const raekke = Math.floor(index / BREDDE);
-    const forskudt = raekke % 2 !== 0;
-    const afstande = forskudt
-        ? [-BREDDE, -BREDDE + 1, -1, 1, BREDDE, BREDDE + 1]
-        : [-BREDDE - 1, -BREDDE, -1, 1, BREDDE - 1, BREDDE];
-
-    return afstande.map((offset) => index + offset).filter((i) => i >= 0 && i < BREDDE * HOEJDE);
+    const bredde = hentKortBredde();
+    const maxFelter = bredde * hentKortHoejde();
+    return (['NE', 'E', 'SE', 'SW', 'W', 'NW'] as const)
+        .map((retning) => hentNaboIRetning(index, retning, bredde, maxFelter))
+        .filter((i): i is number => i !== null);
 }
 
 function brugEliksir() {
@@ -282,7 +282,7 @@ export function fremrykTid() {
         if (spilTilstand.dag > 5 && spilTilstand.dag > taagenHoldtTilDag) {
             const dynamiskFart = 0.5 + Math.pow(spilTilstand.dag / 100, 2);
             const fremrykning = (HEX_W * dynamiskFart) / antalLevende;
-            const oestkant = BREDDE * HEX_W;
+            const oestkant = hentKortBredde() * HEX_W;
 
             if (spilTilstand.fogX >= oestkant) {
                 spilTilstand.fogX = -fremrykning;

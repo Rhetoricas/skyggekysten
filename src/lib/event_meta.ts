@@ -1,25 +1,26 @@
 import { spilTilstand } from './spilTilstand.svelte';
-import { beregnFremdriftPoint, beregnMinePoint, taelScoreSpillere } from './score';
+import { beregnSpillerScore } from './score';
 import { holdTaagenTilbage, lysBaadForAlle, opretTaageblokker } from './spilmotor';
 import type { SpilEvent } from './eventBibliotek';
 import type { SpillerData } from './types';
 
 function beregnLiveScore(navn: string, data: Partial<SpillerData>) {
-    const antalSpillere = taelScoreSpillere(spilTilstand.alleSpillere);
     const erMig = navn === spilTilstand.spillerNavn;
     const guld = erMig ? spilTilstand.guldTotal : (data.guld || 0);
     const hp = erMig ? spilTilstand.livspoint : (data.hp || 0);
     const kolonne = erMig ? spilTilstand.maxKolonne : (data.kolonne || 0);
-    const kendteFelter = erMig ? spilTilstand.mineKendteFelter.length : (data.kendteFelter?.length || 0);
     const erVinder = erMig
         ? spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map'
         : !!data.isWinner;
 
-    const fremdriftPoint = beregnFremdriftPoint(kolonne, erVinder);
-    const udforskningPoint = kendteFelter * 2;
-    const minePoint = beregnMinePoint(spilTilstand.gitter, navn, antalSpillere);
-
-    return Math.floor((guld + fremdriftPoint + udforskningPoint + minePoint) * (1 + Math.max(0, hp) / 1000));
+    return beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, navn, {
+        ...data,
+        guld,
+        hp,
+        kolonne,
+        kendteFelter: erMig ? spilTilstand.mineKendteFelter : data.kendteFelter,
+        isWinner: erVinder
+    }, erVinder, spilTilstand.kortBredde, spilTilstand.kortHoejde);
 }
 
 function hentScoreOversigt() {

@@ -1,9 +1,9 @@
 import type { Karakter, Biome, ItemType } from './types';
+import { HEX_W, ROW_H, STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 
-export const BREDDE = 100;
-export const HOEJDE = 20;
-export const HEX_W = 96;  
-export const ROW_H = 82; 
+export const BREDDE = STANDARD_KORT_BREDDE;
+export const HOEJDE = STANDARD_KORT_HOEJDE;
+export { HEX_W, ROW_H }; 
 
 export const biomeVægte: Array<{ id: Biome; vaegt: number }> = [
     { id: 'mark', vaegt: 20 }, { id: 'eng', vaegt: 20 }, { id: 'skov', vaegt: 20 }, { id: 'bjerg', vaegt: 20 },

@@ -1,4 +1,5 @@
 import { spilTilstand } from './spilTilstand.svelte';
+import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 import type { Karakter } from './types';
 
 const OFFLINE_GAME_KEY = 'taage_offline_spil';
@@ -13,7 +14,7 @@ export interface OfflineScore {
 }
 
 interface OfflineSnapshot {
-    version: 1;
+    version: 1 | 2;
     savedAt: string;
     spillerNavn: string;
     rumKode: string;
@@ -21,6 +22,8 @@ interface OfflineSnapshot {
     erHost: boolean;
     gameState: typeof spilTilstand.gameState;
     gitter: typeof spilTilstand.gitter;
+    kortBredde?: number;
+    kortHoejde?: number;
     spillerIndex: number;
     maxLivspoint: number;
     livspoint: number;
@@ -76,7 +79,7 @@ export function gemOfflineSpil() {
     if (!spilTilstand.spillerNavn || !spilTilstand.rumKode) return;
 
     const snapshot: OfflineSnapshot = {
-        version: 1,
+        version: 2,
         savedAt: new Date().toISOString(),
         spillerNavn: spilTilstand.spillerNavn,
         rumKode: spilTilstand.rumKode,
@@ -84,6 +87,8 @@ export function gemOfflineSpil() {
         erHost: spilTilstand.erHost,
         gameState: spilTilstand.gameState,
         gitter: spilTilstand.gitter,
+        kortBredde: spilTilstand.kortBredde,
+        kortHoejde: spilTilstand.kortHoejde,
         spillerIndex: spilTilstand.spillerIndex,
         maxLivspoint: spilTilstand.maxLivspoint,
         livspoint: spilTilstand.livspoint,
@@ -123,6 +128,8 @@ export function indlaesOfflineSpil() {
         spilTilstand.rumKode = data.rumKode || 'offline';
         spilTilstand.erHost = data.erHost;
         spilTilstand.gameState = data.gameState || 'start';
+        spilTilstand.kortBredde = data.kortBredde || STANDARD_KORT_BREDDE;
+        spilTilstand.kortHoejde = data.kortHoejde || STANDARD_KORT_HOEJDE;
         spilTilstand.gitter = data.gitter || [];
         spilTilstand.spillerIndex = data.spillerIndex || 0;
         spilTilstand.maxLivspoint = data.maxLivspoint || 100;

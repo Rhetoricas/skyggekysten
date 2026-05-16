@@ -1,4 +1,5 @@
 import type { Felt, SpillerData } from './types';
+import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 
 export const MEDALJE_GRAENSER = [0, 500, 1200, 2000, 3000, 4500, 6250, 8500, 11000, 14000] as const;
 export const M10_SCORE = MEDALJE_GRAENSER[MEDALJE_GRAENSER.length - 1];
@@ -20,8 +21,16 @@ export function beregnMinePoint(gitter: Felt[], spillerNavn: string, antalSpille
     return Math.floor(antalMiner * 100 * beregnMineScoreModifier(antalSpillere));
 }
 
-export function beregnFremdriftPoint(maxKolonne: number, erVinder: boolean) {
-    return erVinder ? 1000 : Math.max(0, maxKolonne) * 2;
+export function beregnFremdriftPoint(maxKolonne: number, erVinder: boolean, kortBredde = STANDARD_KORT_BREDDE) {
+    if (erVinder) return 1000;
+    const normaliseretKolonne = Math.round((Math.max(0, maxKolonne) / Math.max(1, kortBredde - 1)) * (STANDARD_KORT_BREDDE - 1));
+    return normaliseretKolonne * 2;
+}
+
+export function beregnKortStoerrelseScoreModifier(kortBredde = STANDARD_KORT_BREDDE, kortHoejde = STANDARD_KORT_HOEJDE) {
+    const breddeMod = Math.pow(STANDARD_KORT_BREDDE / Math.max(1, kortBredde), 0.68);
+    const hoejdeMod = Math.pow(STANDARD_KORT_HOEJDE / Math.max(1, kortHoejde), 0.15);
+    return breddeMod * hoejdeMod;
 }
 
 export function beregnSpillerScore(
@@ -29,7 +38,9 @@ export function beregnSpillerScore(
     alleSpillere: Record<string, Partial<SpillerData>>,
     spillerNavn: string,
     data: Partial<SpillerData>,
-    erVinder = !!data.isWinner
+    erVinder = !!data.isWinner,
+    kortBredde = STANDARD_KORT_BREDDE,
+    kortHoejde = STANDARD_KORT_HOEJDE
 ) {
     const antalSpillere = taelScoreSpillere(alleSpillere);
     const guld = data.guld || 0;
@@ -37,9 +48,10 @@ export function beregnSpillerScore(
     const kolonne = data.kolonne || 0;
     const udforskningPoint = (data.kendteFelter?.length || 0) * 2;
     const minePoint = beregnMinePoint(gitter, spillerNavn, antalSpillere);
-    const fremdriftPoint = beregnFremdriftPoint(kolonne, erVinder);
+    const fremdriftPoint = beregnFremdriftPoint(kolonne, erVinder, kortBredde);
+    const kortModifier = beregnKortStoerrelseScoreModifier(kortBredde, kortHoejde);
 
-    return Math.floor((guld + fremdriftPoint + udforskningPoint + minePoint) * (1 + Math.max(0, hp) / 1000));
+    return Math.floor((guld + fremdriftPoint + udforskningPoint + minePoint) * (1 + Math.max(0, hp) / 1000) * kortModifier);
 }
 
 export function findMedaljeNiveau(score: number) {

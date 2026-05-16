@@ -3,6 +3,7 @@ import { spilTilstand } from './spilTilstand.svelte';
 import { authState } from './auth.svelte';
 import { gemOfflineScore, gemOfflineSpil, hentOfflineScores } from './offlineStorage';
 import { beregnSpillerScore } from './score';
+import { KORT_VERSION } from './kortDimensioner';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Felt, SpillerData } from './types';
 
@@ -239,7 +240,7 @@ export async function syncTilDb(opdaterKort = false) {
         ...mig,
         kendteFelter: spilTilstand.mineKendteFelter
     };
-    const score = beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, spilTilstand.spillerNavn, scoreData, isWinner);
+    const score = beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, spilTilstand.spillerNavn, scoreData, isWinner, spilTilstand.kortBredde, spilTilstand.kortHoejde);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     spilTilstand.alleSpillere[spilTilstand.spillerNavn] = { ...mig, score } as any;
@@ -253,7 +254,15 @@ export async function syncTilDb(opdaterKort = false) {
         sub.send({
             type: 'broadcast',
             event: 'spiller_sync',
-            payload: { kanalNoegle: aktivKanalNoegle, rumKode: aktivRumKode, navn: spilTilstand.spillerNavn, data: mig, fogX: spilTilstand.fogX }
+            payload: {
+                kanalNoegle: aktivKanalNoegle,
+                rumKode: aktivRumKode,
+                navn: spilTilstand.spillerNavn,
+                data: mig,
+                fogX: spilTilstand.fogX,
+                kortBredde: spilTilstand.kortBredde,
+                kortHoejde: spilTilstand.kortHoejde
+            }
         });
     }
 
@@ -365,7 +374,10 @@ async function udfoerDbUpload(sendKort: boolean) {
 
     const opdatering: any = {
         spillere: spillereTilUpload,
-        fog_x: Math.round(spilTilstand.fogX)
+        fog_x: Math.round(spilTilstand.fogX),
+        kort_bredde: spilTilstand.kortBredde,
+        kort_hoejde: spilTilstand.kortHoejde,
+        kort_version: KORT_VERSION
     };
 
     if (sendKort) {
@@ -643,6 +655,8 @@ export function startRealtime() {
             const data = payload.payload;
             if (data.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
             if (data.navn !== spilTilstand.spillerNavn) {
+                if (typeof data.kortBredde === 'number') spilTilstand.kortBredde = data.kortBredde;
+                if (typeof data.kortHoejde === 'number') spilTilstand.kortHoejde = data.kortHoejde;
                 spilTilstand.alleSpillere[data.navn] = data.data;
                 if (data.fogX !== undefined && erTaageLaengereFremme(data.fogX, spilTilstand.fogX)) {
                     spilTilstand.fogX = data.fogX;

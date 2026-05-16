@@ -1,5 +1,6 @@
 import type { Felt, Karakter, SpillerData, RygsækTing } from './types';
 import { itemDB } from './spildata';
+import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 
 interface FlydendeTal {
     id: number;
@@ -18,6 +19,9 @@ export const spilTilstand = $state({
     erHost: false,
     gameState: 'start' as 'start' | 'select' | 'play' | 'dead' | 'dead_map' | 'win' | 'win_map',
     gitter: [] as Felt[],
+    kortBredde: STANDARD_KORT_BREDDE,
+    kortHoejde: STANDARD_KORT_HOEJDE,
+    devVisHeleKort: false,
     spillerIndex: 0,
     
     kameraFokus: null as number | null,

@@ -3,7 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { authState, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
     import { tilgaengeligeKarakterer } from '$lib/spildata';
-    import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnSpillerScore, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
+    import { beregnFremdriftPoint, beregnKortStoerrelseScoreModifier, beregnMinePoint, beregnMineScoreModifier, beregnSpillerScore, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
@@ -51,8 +51,14 @@
     let spilletSlutLyd = false;
     let visProfil = $state(false);
     let profilNavnInput = $state('');
+    let visLokaleTestKnapper = $state(false);
     const oeNavnForled = ['rav', 'mose', 'jern', 'taage', 'maan', 'ask', 'skum', 'sort'];
     const oeNavnEfterled = ['holm', 'vig', 'oe', 'rev', 'naes', 'skov', 'dal', 'borg'];
+    const lokaleKortPresets = [
+        { navn: '20 x 20', bredde: 20, hoejde: 20 },
+        { navn: '100 x 20', bredde: 100, hoejde: 20 },
+        { navn: '140 x 30', bredde: 140, hoejde: 30 }
+    ];
 
     function foreslaaOeNavn() {
         const forled = oeNavnForled[Math.floor(Math.random() * oeNavnForled.length)];
@@ -105,6 +111,8 @@
         });
         anvendLydNiveau();
         tjekOfflineAppKlar();
+        visLokaleTestKnapper = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+        spilTilstand.devVisHeleKort = false;
 
         blandKarakterer();
     });
@@ -203,20 +211,28 @@
         }
     }
 
+    function vaelgLokaltTestKort(bredde: number, hoejde: number) {
+        spilTilstand.kortBredde = bredde;
+        spilTilstand.kortHoejde = hoejde;
+        spilTilstand.devVisHeleKort = false;
+        spilTilstand.statusBesked = `Testkort valgt: ${bredde} x ${hoejde}.`;
+    }
+
     function hentPointSpec() {
         const udforskning = (spilTilstand.mineKendteFelter?.length || 0) * 2;
         const antalSpillere = taelScoreSpillere(spilTilstand.alleSpillere);
         const mineModifier = beregnMineScoreModifier(antalSpillere);
         const minePoint = beregnMinePoint(spilTilstand.gitter, spilTilstand.spillerNavn, antalSpillere);
         const erVinder = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
-        const fremdriftPoint = beregnFremdriftPoint(spilTilstand.maxKolonne, erVinder);
+        const fremdriftPoint = beregnFremdriftPoint(spilTilstand.maxKolonne, erVinder, spilTilstand.kortBredde);
         const hpMult = (1 + Math.max(0, spilTilstand.livspoint) / 1000);
-        return { udforskning, minePoint, mineModifier, fremdriftPoint, erVinder, hpMult };
+        const kortModifier = beregnKortStoerrelseScoreModifier(spilTilstand.kortBredde, spilTilstand.kortHoejde);
+        return { udforskning, minePoint, mineModifier, fremdriftPoint, erVinder, hpMult, kortModifier };
     }
 
     function hentSessionSpillere() {
         return Object.entries(spilTilstand.alleSpillere).map(([navn, data]) => {
-            const score = beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, navn, data, !!data.isWinner);
+            const score = beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, navn, data, !!data.isWinner, spilTilstand.kortBredde, spilTilstand.kortHoejde);
             return { navn, data, score };
         }).sort((a, b) => b.score - a.score);
     }
@@ -245,6 +261,7 @@
         </div>
         <div class="kvittering-skiller"></div>
         <div class="kvittering-linje mult"><span>Helbreds-bonus (HP):</span> <span>x {hentPointSpec().hpMult.toFixed(3)}</span></div>
+        <div class="kvittering-linje mult"><span>Ø-størrelse:</span> <span>x {hentPointSpec().kortModifier.toFixed(2)}</span></div>
         <div class="kvittering-total"><span>Total Score:</span> <span>{spilTilstand.samletScore}</span></div>
     </div>
 {/snippet}
@@ -420,6 +437,20 @@
                         <span class="knap-tekst">START</span>
                     </button>
                 </div>
+
+                {#if visLokaleTestKnapper}
+                    <div class="localhost-testkort" aria-label="Lokale korttest">
+                        {#each lokaleKortPresets as preset (preset.navn)}
+                            <button
+                                type="button"
+                                class:aktiv={spilTilstand.kortBredde === preset.bredde && spilTilstand.kortHoejde === preset.hoejde}
+                                onclick={() => vaelgLokaltTestKort(preset.bredde, preset.hoejde)}
+                            >
+                                {preset.navn}
+                            </button>
+                        {/each}
+                    </div>
+                {/if}
             </div>
 
             <p class="status larger-status">{spilTilstand.statusBesked}</p>
@@ -736,6 +767,20 @@
         border-color: #666;
     }
     .offline-bottom { width: min(100%, 560px); margin-top: 28px; display: flex; flex-direction: column; align-items: center; }
+    .localhost-testkort { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 10px; }
+    .localhost-testkort button {
+        border: 1px solid rgba(255, 215, 0, 0.45);
+        background: rgba(0, 0, 0, 0.48);
+        color: #f2e7b5;
+        font-family: inherit;
+        font-size: 0.78rem;
+        padding: 6px 9px;
+        cursor: pointer;
+    }
+    .localhost-testkort button.aktiv {
+        background: rgba(255, 215, 0, 0.18);
+        color: #ffd700;
+    }
     .ballon-download {
         width: 150px;
         min-height: 82px;

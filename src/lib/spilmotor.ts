@@ -1,6 +1,7 @@
 import { spilTilstand } from '$lib/spilTilstand.svelte';
 import { syncTilDb, broadcastFelt, broadcastFelter, syncKortTilDbSenere, realtimeRumNoegle } from '$lib/netvaerk';
-import { BREDDE, HOEJDE, HEX_W, biomeVægte, biomeTerraenCost, itemDB, markedVarePool } from '$lib/spildata';
+import { HEX_W, biomeVægte, biomeTerraenCost, itemDB, markedVarePool } from '$lib/spildata';
+import { KORT_VERSION, normaliserKortDimensioner, STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from '$lib/kortDimensioner';
 import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
@@ -30,6 +31,29 @@ const RETNINGER = {
     'NW': [[-1, -1], [0, -1]]
 } as const;
 
+export function hentKortBredde() {
+    return spilTilstand.kortBredde || STANDARD_KORT_BREDDE;
+}
+
+export function hentKortHoejde() {
+    return spilTilstand.kortHoejde || STANDARD_KORT_HOEJDE;
+}
+
+export function hentKortAntalFelter() {
+    return hentKortBredde() * hentKortHoejde();
+}
+
+export function saetKortDimensioner(bredde?: number | null, hoejde?: number | null) {
+    const dimensioner = normaliserKortDimensioner(bredde, hoejde);
+    spilTilstand.kortBredde = dimensioner.bredde;
+    spilTilstand.kortHoejde = dimensioner.hoejde;
+    return dimensioner;
+}
+
+export function aktivKortVersion() {
+    return KORT_VERSION;
+}
+
 interface FaellesEventEffekt {
     senderNavn: string;
     besked: string;
@@ -42,8 +66,9 @@ let katastrofeVisuelId = 0;
 function animerKatastrofeFelter(centerIndex: number, fraBiomer: Map<number, string | Biome>) {
     const id = ++katastrofeVisuelId;
     const felter = spilTilstand.gitter;
+    const bredde = hentKortBredde();
     const indices = Array.from(fraBiomer.keys()).sort((a, b) => {
-        const afstandDiff = regnHexAfstand(centerIndex, a, BREDDE) - regnHexAfstand(centerIndex, b, BREDDE);
+        const afstandDiff = regnHexAfstand(centerIndex, a, bredde) - regnHexAfstand(centerIndex, b, bredde);
         return afstandDiff !== 0 ? afstandDiff : a - b;
     });
 
@@ -107,7 +132,7 @@ export function rystSkaerm(varighed: number = 1200) {
     }
 }
 
-export function hentNaboIRetning(index: number, retning: keyof typeof RETNINGER, bredde: number, maxFelter: number): number | null {
+export function hentNaboIRetning(index: number, retning: keyof typeof RETNINGER, bredde = hentKortBredde(), maxFelter = hentKortAntalFelter()): number | null {
     const raekke = Math.floor(index / bredde);
     const kolonne = index % bredde;
     const forskudt = raekke % 2 !== 0 ? 1 : 0;
@@ -126,7 +151,7 @@ export function hentNaboIRetning(index: number, retning: keyof typeof RETNINGER,
     return nyRaekke * bredde + nyKolonne;
 }
 
-export function regnHexAfstand(indexEn: number, indexTo: number, bredde: number): number {
+export function regnHexAfstand(indexEn: number, indexTo: number, bredde = hentKortBredde()): number {
     if (indexEn === indexTo) return 0;
 
     const raekkeEn = Math.floor(indexEn / bredde);
@@ -220,12 +245,11 @@ export function rykTaagenTilbage(antalFelter: number = 2) {
 }
 
 export function hentNaboIndices(index: number) {
-    const raekke = Math.floor(index / BREDDE);
-    const forskudt = raekke % 2 !== 0;
-    const afstande = forskudt 
-        ? [-BREDDE, -BREDDE + 1, -1, 1, BREDDE, BREDDE + 1] 
-        : [-BREDDE - 1, -BREDDE, -1, 1, BREDDE - 1, BREDDE];
-    return afstande.map(o => index + o).filter(i => i >= 0 && i < BREDDE * HOEJDE);
+    const bredde = hentKortBredde();
+    const maxFelter = hentKortAntalFelter();
+    return (['NE', 'E', 'SE', 'SW', 'W', 'NW'] as const)
+        .map((retning) => hentNaboIRetning(index, retning, bredde, maxFelter))
+        .filter((i): i is number => i !== null);
 }
 
 export function harRygsaekItem(genstandId: string) {
@@ -323,11 +347,12 @@ export function brugFraRygsæk(genstandId: string, brugtMaengde: number = 1) {
 }
 
 export function afslørOmraade(centerIndex: number, radius: number = 1) {
+    const bredde = hentKortBredde();
     const totalFelter = spilTilstand.gitter.length;
-    const maxRaekker = Math.floor(totalFelter / BREDDE);
+    const maxRaekker = Math.floor(totalFelter / bredde);
 
-    const centerRaekke = Math.floor(centerIndex / BREDDE);
-    const centerKolonne = centerIndex % BREDDE;
+    const centerRaekke = Math.floor(centerIndex / bredde);
+    const centerKolonne = centerIndex % bredde;
     const staarPaaBjerg = spilTilstand.gitter[centerIndex]?.biome === 'bjerg';
 
     const synlige = new Set<number>();
@@ -335,14 +360,14 @@ export function afslørOmraade(centerIndex: number, radius: number = 1) {
     const raekkeMin = Math.max(0, centerRaekke - radius);
     const raekkeMax = Math.min(maxRaekker - 1, centerRaekke + radius);
     const kolonneMin = Math.max(0, centerKolonne - radius);
-    const kolonneMax = Math.min(BREDDE - 1, centerKolonne + radius);
+    const kolonneMax = Math.min(bredde - 1, centerKolonne + radius);
 
     for (let r = raekkeMin; r <= raekkeMax; r++) {
         for (let k = kolonneMin; k <= kolonneMax; k++) {
-            const indeks = r * BREDDE + k;
+            const indeks = r * bredde + k;
             
             if (
-                regnHexAfstand(centerIndex, indeks, BREDDE) <= radius &&
+                regnHexAfstand(centerIndex, indeks, bredde) <= radius &&
                 (staarPaaBjerg || !erSynBlokeretAfBjerg(centerIndex, indeks))
             ) {
                 synlige.add(indeks);
@@ -358,8 +383,9 @@ export function afslørOmraade(centerIndex: number, radius: number = 1) {
 }
 
 function indeksTilKube(index: number) {
-    const raekke = Math.floor(index / BREDDE);
-    const kolonne = index % BREDDE;
+    const bredde = hentKortBredde();
+    const raekke = Math.floor(index / bredde);
+    const kolonne = index % bredde;
     const x = kolonne - Math.floor(raekke / 2);
     const z = raekke;
     const y = -x - z;
@@ -367,10 +393,12 @@ function indeksTilKube(index: number) {
 }
 
 function kubeTilIndeks(kube: { x: number; z: number }) {
+    const bredde = hentKortBredde();
+    const hoejde = hentKortHoejde();
     const raekke = kube.z;
     const kolonne = kube.x + Math.floor(raekke / 2);
-    if (raekke < 0 || raekke >= HOEJDE || kolonne < 0 || kolonne >= BREDDE) return null;
-    return raekke * BREDDE + kolonne;
+    if (raekke < 0 || raekke >= hoejde || kolonne < 0 || kolonne >= bredde) return null;
+    return raekke * bredde + kolonne;
 }
 
 function afrundKube(kube: { x: number; y: number; z: number }) {
@@ -390,7 +418,7 @@ function afrundKube(kube: { x: number; y: number; z: number }) {
 }
 
 function erSynBlokeretAfBjerg(centerIndex: number, targetIndex: number) {
-    const afstand = regnHexAfstand(centerIndex, targetIndex, BREDDE);
+    const afstand = regnHexAfstand(centerIndex, targetIndex);
     if (afstand <= 1) return false;
 
     const start = indeksTilKube(centerIndex);
@@ -437,7 +465,8 @@ interface AnkomstOptions {
 }
 
 function kanPlacerePortal(index: number) {
-    return index % BREDDE <= BREDDE - 5;
+    const bredde = hentKortBredde();
+    return index % bredde <= bredde - 5;
 }
 
 function hentKoebbareShopItems(shopItems: string[] | undefined) {
@@ -488,7 +517,8 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
 
     options.onKameraFoelg?.(nytIndeks);
     afslørOmraade(nytIndeks, Math.max(felt.biome === 'bjerg' ? 2 : 1, options.synsRadius));
-    if ((nytIndeks % BREDDE) > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nytIndeks % BREDDE;
+    const nyKolonne = nytIndeks % hentKortBredde();
+    if (nyKolonne > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nyKolonne;
 
     const ankomstResultat = haandterAnkomstPaaFelt(nytIndeks, 'gang', {
         startLog: gratisBevaegelse ? (gratisBevaegelseKilde === 'bersaerk' ? "Bersærkergangen bærer dig frem. Bevægelsen koster 0 energi." : "Maden holder dig i gang. Bevægelsen koster 0 energi.") : "",
@@ -688,12 +718,13 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
 }
 
 function beregnTeleportMaal(startIndeks: number, afstand: number) {
-    const raekke = Math.floor(startIndeks / BREDDE);
-    const kolonne = startIndeks % BREDDE;
-    const nyKolonne = Math.min(kolonne + afstand, BREDDE - 1);
+    const bredde = hentKortBredde();
+    const raekke = Math.floor(startIndeks / bredde);
+    const kolonne = startIndeks % bredde;
+    const nyKolonne = Math.min(kolonne + afstand, bredde - 1);
 
     return {
-        indeks: raekke * BREDDE + nyKolonne,
+        indeks: raekke * bredde + nyKolonne,
         kolonne: nyKolonne
     };
 }
@@ -703,7 +734,7 @@ function beregnTeleportRuteModOest(startIndeks: number, afstand: number) {
     let nu = startIndeks;
 
     for (let trin = 0; trin < afstand; trin++) {
-        const naeste = hentNaboIRetning(nu, 'E', BREDDE, BREDDE * HOEJDE);
+        const naeste = hentNaboIRetning(nu, 'E');
         if (naeste === null || naeste === nu) break;
         rute.push(naeste);
         nu = naeste;
@@ -811,7 +842,7 @@ export function udfoerDrageTeleport() {
 
     afslorTeleportRute(rute);
 
-    const kolonne = maalIndeks % BREDDE;
+    const kolonne = maalIndeks % hentKortBredde();
     if (kolonne > spilTilstand.maxKolonne) {
         spilTilstand.maxKolonne = kolonne;
     }
@@ -1084,10 +1115,12 @@ export function begaaIndbrud() {
 }
 
 function findMuligeBaadFelter() {
+    const bredde = hentKortBredde();
+    const hoejde = hentKortHoejde();
     const kystFelter = new Set<number>();
-    for (let r = 1; r < HOEJDE - 1; r++) {
-        const landIndeks = r * BREDDE + (BREDDE - 2);
-        const vandIndeks = r * BREDDE + (BREDDE - 1);
+    for (let r = 1; r < hoejde - 1; r++) {
+        const landIndeks = r * bredde + (bredde - 2);
+        const vandIndeks = r * bredde + (bredde - 1);
         if (
             spilTilstand.gitter[landIndeks]?.biome !== 'hav' &&
             spilTilstand.gitter[vandIndeks]?.biome === 'hav'
@@ -1099,8 +1132,8 @@ function findMuligeBaadFelter() {
     if (kystFelter.size === 0) {
         for (let indeks = 0; indeks < spilTilstand.gitter.length; indeks++) {
             const felt = spilTilstand.gitter[indeks];
-            const kolonne = indeks % BREDDE;
-            if (kolonne < BREDDE * 0.75 || felt?.biome !== 'hav') continue;
+            const kolonne = indeks % bredde;
+            if (kolonne < bredde * 0.75 || felt?.biome !== 'hav') continue;
 
             const naboLand = hentNaboIndices(indeks).some((naboIndeks) => spilTilstand.gitter[naboIndeks]?.biome !== 'hav');
             if (naboLand) kystFelter.add(indeks);
@@ -1195,17 +1228,18 @@ export function opretTaageblokker() {
 }
 
 export function plantSkat(gitter: Felt[]) {
+    const bredde = hentKortBredde();
     gitter.forEach(f => {
         f.isSkatteKlynge = false;
         f.tomSkattekiste = false;
     });
 
     const muligeCentre: number[] = [];
-    const minKol = Math.floor(BREDDE * 0.50);
-    const maxKol = Math.floor(BREDDE * 0.75);
+    const minKol = Math.floor(bredde * 0.50);
+    const maxKol = Math.floor(bredde * 0.75);
 
     for (let i = 0; i < gitter.length; i++) {
-        const kol = i % BREDDE;
+        const kol = i % bredde;
         if (kol >= minKol && kol <= maxKol) {
             const naboer = hentNaboIndices(i);
             if (naboer.length === 6) {
@@ -1281,14 +1315,30 @@ function placerVaerksteder(gitter: Felt[]) {
     }
 }
 
-export function initialiserGitter() {
-    const antal = BREDDE * HOEJDE;
+function placerEkstraGuldmine(gitter: Felt[]) {
+    const muligeFelter = gitter
+        .map((felt, index) => ({ felt, index }))
+        .filter(({ felt }) =>
+            felt.biome === 'bjerg' &&
+            !felt.hasGoldmine &&
+            !felt.eventID &&
+            !felt.hasPortal &&
+            !felt.hasWorkshop
+        )
+        .sort(() => Math.random() - 0.5);
+
+    if (muligeFelter[0]) muligeFelter[0].felt.hasGoldmine = true;
+}
+
+export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: number | null) {
+    const { bredde, hoejde } = saetKortDimensioner(breddeInput ?? hentKortBredde(), hoejdeInput ?? hentKortHoejde());
+    const antal = bredde * hoejde;
     const totalVaegt = biomeVægte.reduce((sum, biome) => sum + biome.vaegt, 0);
 
     let raaKort = Array(antal).fill('').map((_, indeks) => {
-        const raekke = Math.floor(indeks / BREDDE);
-        const kolonne = indeks % BREDDE;
-        if (raekke === 0 || raekke === HOEJDE - 1 || kolonne === 0 || kolonne === BREDDE - 1) return 'hav';
+        const raekke = Math.floor(indeks / bredde);
+        const kolonne = indeks % bredde;
+        if (raekke === 0 || raekke === hoejde - 1 || kolonne === 0 || kolonne === bredde - 1) return 'hav';
         
         let terningKast = Math.random() * totalVaegt;
         for (const biome of biomeVægte) {
@@ -1301,9 +1351,9 @@ export function initialiserGitter() {
     for (let omgang = 0; omgang < 3; omgang++) {
         const nytKort = [...raaKort];
         for (let indeks = 0; indeks < antal; indeks++) {
-            const raekke = Math.floor(indeks / BREDDE);
-            const kolonne = indeks % BREDDE;
-            if (raekke === 0 || raekke === HOEJDE - 1 || kolonne === 0 || kolonne === BREDDE - 1) continue;
+            const raekke = Math.floor(indeks / bredde);
+            const kolonne = indeks % bredde;
+            if (raekke === 0 || raekke === hoejde - 1 || kolonne === 0 || kolonne === bredde - 1) continue;
             
             const naboer = hentNaboIndices(indeks);
             if (Math.random() < 0.7) {
@@ -1315,8 +1365,26 @@ export function initialiserGitter() {
         raaKort = nytKort;
     }
 
-    const bySementer = Math.floor(antal / 400);
-    const markedSementer = Math.floor(antal / 200);
+    const bySementer = Math.max(1, Math.round(antal / 333));
+    const markedSementer = Math.max(1, Math.round(antal / 300));
+
+    function findBygbareSeeds(undgaaBiomer: string[] = []) {
+        const seeds: number[] = [];
+        for (let indeks = 0; indeks < antal; indeks++) {
+            const raekke = Math.floor(indeks / bredde);
+            const kolonne = indeks % bredde;
+            if (raekke <= 0 || raekke >= hoejde - 1 || kolonne <= 0 || kolonne >= bredde - 1) continue;
+            if (raaKort[indeks] === 'hav' || undgaaBiomer.includes(raaKort[indeks])) continue;
+            seeds.push(indeks);
+        }
+        return seeds;
+    }
+
+    function findTilfaeldigBygbartSeed(undgaaBiomer: string[] = []) {
+        const seeds = findBygbareSeeds(undgaaBiomer);
+        if (seeds.length === 0) return Math.floor(antal / 2);
+        return seeds[Math.floor(Math.random() * seeds.length)];
+    }
 
     function spredBiome(startIndeks: number, type: 'by' | 'marked', maxStr: number) {
         const aabne = [startIndeks];
@@ -1328,10 +1396,10 @@ export function initialiserGitter() {
             if (lukkede.has(nu)) continue;
             lukkede.add(nu);
 
-            const raekke = Math.floor(nu / BREDDE);
-            const kolonne = nu % BREDDE;
+            const raekke = Math.floor(nu / bredde);
+            const kolonne = nu % bredde;
             
-            if (raekke === 0 || raekke === HOEJDE - 1 || kolonne === 0 || kolonne === BREDDE - 1) continue;
+            if (raekke === 0 || raekke === hoejde - 1 || kolonne === 0 || kolonne === bredde - 1) continue;
             if (raaKort[nu] === 'hav') continue;
 
             raaKort[nu] = type;
@@ -1343,13 +1411,13 @@ export function initialiserGitter() {
     }
 
     for (let i = 0; i < bySementer; i++) {
-        const seed = Math.floor(Math.random() * antal);
+        const seed = findTilfaeldigBygbartSeed();
         const tilfaeldigByStoerrelse = Math.floor(Math.random() * 6) + 5; 
         spredBiome(seed, 'by', tilfaeldigByStoerrelse);
     }
     
     for (let i = 0; i < markedSementer; i++) {
-        const seed = Math.floor(Math.random() * antal);
+        const seed = findTilfaeldigBygbartSeed(['by']);
         const tilfaeldigMarkedStoerrelse = Math.floor(Math.random() * 5) + 1; 
         spredBiome(seed, 'marked', tilfaeldigMarkedStoerrelse);
     }
@@ -1379,8 +1447,8 @@ export function initialiserGitter() {
     };
 
     const tilfaeldigeFelter = Array.from({length: antal}, (_, i) => i).sort((a, b) => {
-        const kolA = a % BREDDE;
-        const kolB = b % BREDDE;
+        const kolA = a % bredde;
+        const kolB = b % bredde;
         if (kolA !== kolB) return kolB - kolA;
         return Math.random() - 0.5;
     });
@@ -1395,8 +1463,8 @@ export function initialiserGitter() {
         if (Math.random() < chance) {
             const matchendeEvents = ledigeEvents.filter(noegle => {
                 const event = eventBibliotek[noegle];
-                const kolonne = indeks % BREDDE;
-                const kolonnePct = kolonne / Math.max(1, BREDDE - 1);
+                const kolonne = indeks % bredde;
+                const kolonnePct = kolonne / Math.max(1, bredde - 1);
 
                 if (event.minKolonnePct !== undefined && kolonnePct < event.minKolonnePct) return false;
                 if (event.maxKolonnePct !== undefined && kolonnePct > event.maxKolonnePct) return false;
@@ -1457,6 +1525,7 @@ export function initialiserGitter() {
     }
 
     placerVaerksteder(nytGitter);
+    placerEkstraGuldmine(nytGitter);
 
     for (let indeks = 0; indeks < antal; indeks++) {
         const felt = nytGitter[indeks];
@@ -1486,8 +1555,8 @@ export function initialiserGitter() {
 
     spilTilstand.gitter = nytGitter;
     const muligeStartFelter = [];
-    for (let raekke = 1; raekke < HOEJDE - 1; raekke++) {
-        if (spilTilstand.gitter[raekke * BREDDE + 1].biome !== 'hav') muligeStartFelter.push(raekke * BREDDE + 1);
+    for (let raekke = 1; raekke < hoejde - 1; raekke++) {
+        if (spilTilstand.gitter[raekke * bredde + 1].biome !== 'hav') muligeStartFelter.push(raekke * bredde + 1);
     }
     
     spilTilstand.retning = 'E';

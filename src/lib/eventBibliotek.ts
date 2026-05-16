@@ -1,6 +1,5 @@
-import { BREDDE } from './spildata';
 import { spilTilstand } from './spilTilstand.svelte';
-import { bygOgHopGennemPortal, regnHexAfstand } from './spilmotor';
+import { bygOgHopGennemPortal, hentKortBredde, regnHexAfstand } from './spilmotor';
 import { blodskovensHjerteEvents } from './event_blodskov';
 import { naturkatastrofeEvents } from './event_naturkatastrofer';
 import { metaEvents } from './event_meta';
@@ -63,10 +62,11 @@ export interface SpilEvent {
 }
 
 function retningTilFelt(fraIndex: number, tilIndex: number) {
-    const fraKolonne = fraIndex % BREDDE;
-    const fraRaekke = Math.floor(fraIndex / BREDDE);
-    const tilKolonne = tilIndex % BREDDE;
-    const tilRaekke = Math.floor(tilIndex / BREDDE);
+    const bredde = hentKortBredde();
+    const fraKolonne = fraIndex % bredde;
+    const fraRaekke = Math.floor(fraIndex / bredde);
+    const tilKolonne = tilIndex % bredde;
+    const tilRaekke = Math.floor(tilIndex / bredde);
     const lodret = tilRaekke < fraRaekke ? 'nord' : tilRaekke > fraRaekke ? 'syd' : '';
     const vandret = tilKolonne > fraKolonne ? 'øst' : tilKolonne < fraKolonne ? 'vest' : '';
 
@@ -76,12 +76,13 @@ function retningTilFelt(fraIndex: number, tilIndex: number) {
 
 function afslorNaermesteGuldminer(antal: number) {
     const start = spilTilstand.spillerIndex;
-    const spillerKolonne = start % BREDDE;
+    const bredde = hentKortBredde();
+    const spillerKolonne = start % bredde;
     const kendte = new Set(spilTilstand.mineKendteFelter || []);
     const miner = spilTilstand.gitter
         .map((felt, index) => ({ felt, index }))
-        .filter(({ felt, index }) => felt.hasGoldmine && index % BREDDE >= spillerKolonne)
-        .sort((a, b) => regnHexAfstand(start, a.index, BREDDE) - regnHexAfstand(start, b.index, BREDDE))
+        .filter(({ felt, index }) => felt.hasGoldmine && index % bredde >= spillerKolonne)
+        .sort((a, b) => regnHexAfstand(start, a.index, bredde) - regnHexAfstand(start, b.index, bredde))
         .slice(0, antal);
 
     if (miner.length === 0) {
@@ -92,7 +93,7 @@ function afslorNaermesteGuldminer(antal: number) {
     spilTilstand.mineKendteFelter = Array.from(kendte);
 
     const retninger = miner.map((mine) => {
-        const afstand = regnHexAfstand(start, mine.index, BREDDE);
+        const afstand = regnHexAfstand(start, mine.index, bredde);
         return `${retningTilFelt(start, mine.index)} (${afstand} felter)`;
     });
 

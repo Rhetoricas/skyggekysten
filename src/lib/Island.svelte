@@ -10,7 +10,7 @@
     import { M10_SCORE, beregnSpillerScore } from '$lib/score';
     import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi, hentGlobalTopScore, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
-    import { hvil, hentNaboIndices, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt } from '$lib/spilmotor';
+    import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
     import { erSpillerITaagen } from '$lib/overlevelse.svelte';    
     import { eventState, startEvent, lukEvent as motorLukEvent } from '$lib/eventMotor.svelte';
@@ -22,6 +22,7 @@
         tilgaengeligeKarakterer,
         itemDB
     } from '$lib/spildata';
+    import { KORT_VERSION, kortPixelBredde, kortPixelHoejde } from '$lib/kortDimensioner';
     import type { Felt, GravstenMinde, Karakter, SpillerData } from '$lib/types';
     import { eventBibliotek } from '$lib/eventBibliotek';
     import { erAfgroedeModen, hentAfgroedeBlok, hentInsektPlageBlok } from '$lib/afgroeder';
@@ -40,7 +41,7 @@
     const cam = skabKamera();
     const MAX_DAGE_FORAN = 5;
     const SESSION_TIMEOUT_MS = 5 * 60 * 1000;
-    const SESSION_SELECT = 'rum_kode,kort,start_index,spillere,fog_x';
+    const SESSION_SELECT = 'rum_kode,kort,start_index,spillere,fog_x,kort_bredde,kort_hoejde,kort_version';
 
     let lokaleScores = $state<Array<{ navn: string; score: number; karakter?: string }>>([]);
     let globaleScores = $state<Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);    
@@ -63,6 +64,8 @@
     let erITågen = $derived(erSpillerITaagen());
     let rensedeLogLinjer = $derived(spilTilstand.logHistorik.filter(linje => linje.includes(' - ')));
     let aktivInsektPlageBlok = $derived(hentInsektPlageBlok(spilTilstand.gitter));
+    let kortBredde = $derived(spilTilstand.kortBredde || BREDDE);
+    let kortHoejde = $derived(spilTilstand.kortHoejde || HOEJDE);
 
     let harSkattekortAktivt = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'skattekort_aabent') ?? false);
 
@@ -147,7 +150,7 @@
     $effect(() => {
         const tjekFokus = () => {
             if (!document.hidden && spilTilstand.gameState === 'play' && spilTilstand.kameraFokus === null) {
-                cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
+                cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
             }
         };
         document.addEventListener('visibilitychange', tjekFokus);
@@ -159,12 +162,12 @@
         if (fokus !== null) {
             untrack(() => {
                 langsomtKamera = true;
-                cam.centrerPåHex(fokus, BREDDE, HEX_W, ROW_H);
+                cam.centrerPåHex(fokus, kortBredde, HEX_W, ROW_H);
                 spilTilstand.kameraFokus = null;
                 
                 setTimeout(() => {
                     if (spilTilstand.gameState === 'play') {
-                        cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
+                        cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
                         setTimeout(() => langsomtKamera = false, 1500);
                     } else {
                         langsomtKamera = false;
@@ -178,7 +181,7 @@
         const aktueltIndex = spilTilstand.spillerIndex;
         if (spilTilstand.gameState === 'play' && spilTilstand.kameraFokus === null && !langsomtKamera) {
             untrack(() => {
-                cam.foelgSpiller(aktueltIndex, BREDDE, HEX_W, ROW_H);
+                cam.foelgSpiller(aktueltIndex, kortBredde, HEX_W, ROW_H);
             });
         }
     });
@@ -256,8 +259,8 @@
     }
 
     function hexCenter(index: number) {
-        const raekke = Math.floor(index / BREDDE);
-        const kolonne = index % BREDDE;
+        const raekke = Math.floor(index / kortBredde);
+        const kolonne = index % kortBredde;
         return {
             x: kolonne * HEX_W + (raekke % 2 !== 0 ? HEX_W / 2 : 0) + (HEX_W / 2),
             y: raekke * ROW_H + (ROW_H / 2)
@@ -270,7 +273,7 @@
             : (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.historik || []);
 
         if (!rute.length) {
-            cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
+            cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
             cam.saetZoom(window.innerWidth <= 700 ? 0.45 : 0.6);
             return;
         }
@@ -290,8 +293,8 @@
         transform-origin: ${cam.x}px ${cam.y}px;
         transform: translate(calc(50vw - ${cam.x}px), calc(var(--camera-center-y, 50dvh) - ${cam.y}px)) scale(${cam.zoomLevel});
         transition: ${cam.isDragging ? 'none' : (langsomtKamera ? 'transform 1.5s ease-in-out' : 'transform 0.3s ease-out')};
-        width: ${BREDDE * HEX_W + HEX_W}px;
-        height: ${HOEJDE * ROW_H + ROW_H}px;
+        width: ${kortPixelBredde(kortBredde)}px;
+        height: ${kortPixelHoejde(kortHoejde)}px;
     `);
 
     let alarmKanal: RealtimeChannel | null = null;
@@ -373,7 +376,7 @@
     function fokuserPaaSpiller() {
         if (introAktiv || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.aktivVaerksted || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
         langsomtKamera = false;
-        cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
+        cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
     }
 
     async function genstartBane() {
@@ -426,7 +429,8 @@
             kort: spilTilstand.gitter,
             start_index: spilTilstand.spillerIndex,
             spillere: {},
-            fog_x: 0
+            fog_x: 0,
+            ...kortSessionMeta()
         }).eq('rum_kode', spilTilstand.rumKode)));
 
         if (resetError) {
@@ -512,6 +516,7 @@
             }
 
             if (data) {
+                laesSessionDimensioner(data);
                 spilTilstand.gitter = data.kort;
                 spilTilstand.alleSpillere = filtrerSpillereTilKanal(data.spillere || {}, aktivKanalNoegle);
                 spilTilstand.fogX = data.fog_x || 0;
@@ -560,7 +565,8 @@
                                 kort: spilTilstand.gitter,
                                 start_index: spilTilstand.spillerIndex,
                                 spillere: {},
-                                fog_x: 0
+                                fog_x: 0,
+                                ...kortSessionMeta()
                             }).eq('rum_kode', spilTilstand.rumKode)));
 
                             if (resetError) {
@@ -621,7 +627,7 @@
                         spilTilstand.statusBesked = eksisterende.isWinner ? 'Du slap væk fra øen.' : 'Du døde i tågen.';
                     } else {
                         spilTilstand.gameState = 'play';
-                        cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
+                        cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
                     }
                 } else {
                     const aktivSammeBruger = findAktivSpillerForBruger();
@@ -650,7 +656,8 @@
                             kort: spilTilstand.gitter,
                             start_index: spilTilstand.spillerIndex,
                             spillere: {},
-                            fog_x: 0
+                            fog_x: 0,
+                            ...kortSessionMeta()
                         }).eq('rum_kode', spilTilstand.rumKode)));
 
                         if (resetError) {
@@ -674,13 +681,14 @@
                 spilTilstand.ventePuljeGuld = 0;
                 spilTilstand.ventePuljeLiv = 0;
                 spilTilstand.venteRunde = 0;
-                initialiserGitter();
+                initialiserGitter(spilTilstand.kortBredde, spilTilstand.kortHoejde);
                 const { error: insertError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').insert([{
                     rum_kode: spilTilstand.rumKode,
                     kort: spilTilstand.gitter,
                     start_index: spilTilstand.spillerIndex,
                     spillere: {},
-                    fog_x: 0
+                    fog_x: 0,
+                    ...kortSessionMeta()
                 }])));
 
                 if (insertError) {
@@ -692,6 +700,7 @@
                         return;
                     }
 
+                    laesSessionDimensioner(eksisterendeSession);
                     spilTilstand.gitter = eksisterendeSession.kort;
                     spilTilstand.alleSpillere = filtrerSpillereTilKanal(eksisterendeSession.spillere || {}, aktivKanalNoegle);
                     spilTilstand.fogX = eksisterendeSession.fog_x || 0;
@@ -738,7 +747,7 @@
         spilTilstand.samletScore = 0;
         scoreErGemt = false;
         nyGlobalRekord = false;
-        initialiserGitter();
+        initialiserGitter(spilTilstand.kortBredde, spilTilstand.kortHoejde);
         spilTilstand.gameState = 'select';
         await syncTilDb(true);
     }
@@ -761,7 +770,7 @@
         harGemtOfflineSpil = true;
         offlineSpilInfo = hentOfflineSpilInfo();
         if (spilTilstand.gameState === 'play') {
-            cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
+            cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
         }
         if (spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map') {
             scoreErGemt = true;
@@ -913,7 +922,7 @@
             kolonne: spilTilstand.maxKolonne,
             kendteFelter: spilTilstand.mineKendteFelter,
             isWinner: erVinder
-        }, erVinder);
+        }, erVinder, spilTilstand.kortBredde, spilTilstand.kortHoejde);
 
         try {
             await syncTilDb(true);
@@ -997,16 +1006,16 @@
         }
 
         const muligeStartFelter = [];
-        for (let raekke = 1; raekke < HOEJDE - 1; raekke++) {
-            if (spilTilstand.gitter[raekke * BREDDE + 1] && spilTilstand.gitter[raekke * BREDDE + 1].biome !== 'hav') {
-                muligeStartFelter.push(raekke * BREDDE + 1);
+        for (let raekke = 1; raekke < kortHoejde - 1; raekke++) {
+            if (spilTilstand.gitter[raekke * kortBredde + 1] && spilTilstand.gitter[raekke * kortBredde + 1].biome !== 'hav') {
+                muligeStartFelter.push(raekke * kortBredde + 1);
             }
         }
         
         if (muligeStartFelter.length > 0) {
             spilTilstand.spillerIndex = muligeStartFelter[Math.floor(Math.random() * muligeStartFelter.length)];
         } else {
-            spilTilstand.spillerIndex = BREDDE + 1;
+            spilTilstand.spillerIndex = kortBredde + 1;
         }
         
         spilTilstand.retning = 'E';
@@ -1034,7 +1043,8 @@
                     kort: spilTilstand.gitter,
                     start_index: spilTilstand.spillerIndex,
                     spillere: {},
-                    fog_x: 0
+                    fog_x: 0,
+                    ...kortSessionMeta()
                 }])));
 
                 if (insertError) {
@@ -1046,7 +1056,7 @@
         }
         
         await syncTilDb(true);
-        cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
+        cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
         spilTilstand.logBesked = `Du er drevet i land på kysten af ${formaterOeNavn()}. Tågen ligger bag dig og venter på at omslutte dig. Du må prøve at finde en båd på den anden side af ${formaterOeNavn()}.`;
         spilTilstand.gameState = 'play';
         introAktiv = true;
@@ -1055,7 +1065,7 @@
     function afslutIntro() {
         introAktiv = false;
         requestAnimationFrame(() => {
-            cam.centrerPåHex(spilTilstand.spillerIndex, BREDDE, HEX_W, ROW_H);
+            cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
         });
     }
 
@@ -1100,7 +1110,7 @@
             .map(([navn, data]) => ({
                 navn,
                 data,
-                score: data.score || beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, navn, data, !!data.isWinner)
+                score: data.score || beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, navn, data, !!data.isWinner, spilTilstand.kortBredde, spilTilstand.kortHoejde)
             }))
             .sort((a, b) => b.score - a.score);
     }
@@ -1315,6 +1325,18 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    function kortSessionMeta() {
+        return {
+            kort_bredde: spilTilstand.kortBredde,
+            kort_hoejde: spilTilstand.kortHoejde,
+            kort_version: KORT_VERSION
+        };
+    }
+
+    function laesSessionDimensioner(data: { kort_bredde?: number | null; kort_hoejde?: number | null } | null | undefined) {
+        saetKortDimensioner(data?.kort_bredde ?? BREDDE, data?.kort_hoejde ?? HOEJDE);
+    }
+
     async function medRetry<T>(kald: () => PromiseLike<T>, antalForsoeg = 2): Promise<T> {
         let sidsteFejl: unknown;
 
@@ -1351,7 +1373,7 @@ function udførBevægelse(nytIndeks: number) {
         langsomsteDag: hentLangsomsteDag(),
         maxDageForan: MAX_DAGE_FORAN,
         synsRadius: aktuelSynsRadius,
-        onKameraFoelg: (indeks) => cam.foelgSpiller(indeks, BREDDE, HEX_W, ROW_H),
+        onKameraFoelg: (indeks) => cam.foelgSpiller(indeks, kortBredde, HEX_W, ROW_H),
         onBaadStart: (indeks) => {
             sejlendeBaadIndex = indeks;
         }
@@ -1362,22 +1384,17 @@ function udførBevægelse(nytIndeks: number) {
 
     function flytHex(retning: string) {
         if (introAktiv || spilTilstand.erBevidstløs || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.aktivVaerksted || (spilTilstand.gameState !== 'play' && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map')) return;
-        const raekke = Math.floor(spilTilstand.spillerIndex / BREDDE);
-        const kolonne = spilTilstand.spillerIndex % BREDDE;
-        const forskudt = raekke % 2 !== 0;
-        let nytIndeks = spilTilstand.spillerIndex;
+        const gyldigeRetninger = ['NW', 'NE', 'W', 'E', 'SW', 'SE'] as const;
+        if (!gyldigeRetninger.includes(retning as typeof gyldigeRetninger[number])) return;
 
-        if (retning === 'NW') nytIndeks = forskudt ? nytIndeks - BREDDE : nytIndeks - BREDDE - 1;
-        else if (retning === 'NE') nytIndeks = forskudt ? nytIndeks - BREDDE + 1 : nytIndeks - BREDDE;
-        else if (retning === 'W') nytIndeks -= 1;
-        else if (retning === 'E') nytIndeks += 1;
-        else if (retning === 'SW') nytIndeks = forskudt ? nytIndeks + BREDDE : nytIndeks + BREDDE - 1;
-        else if (retning === 'SE') nytIndeks = forskudt ? nytIndeks + BREDDE + 1 : nytIndeks + BREDDE;
+        const nytIndeks = hentNaboIRetning(
+            spilTilstand.spillerIndex,
+            retning as typeof gyldigeRetninger[number],
+            kortBredde,
+            kortBredde * kortHoejde
+        );
 
-        const nyRaekke = Math.floor(nytIndeks / BREDDE);
-        const nyKolonne = nytIndeks % BREDDE;
-
-        if (nytIndeks >= 0 && nytIndeks < BREDDE * HOEJDE && Math.abs(kolonne - nyKolonne) <= 1 && Math.abs(raekke - nyRaekke) <= 1) udførBevægelse(nytIndeks);
+        if (nytIndeks !== null) udførBevægelse(nytIndeks);
     }
 
     function klikPåHex(nytIndeks: number) {
@@ -1453,12 +1470,12 @@ function udførBevægelse(nytIndeks: number) {
     >
         <div class="map" style={kameraStyle}>
             {#each spilTilstand.gitter as felt, i (i)}
-                {@const raekke = Math.floor(i / BREDDE)}
-                {@const kolonne = i % BREDDE}
+                {@const raekke = Math.floor(i / kortBredde)}
+                {@const kolonne = i % kortBredde}
                 {@const posX = kolonne * HEX_W + (raekke % 2 !== 0 ? HEX_W / 2 : 0)}
                 {@const posY = raekke * ROW_H}
-                {@const erUdforsket = spilTilstand.mineKendteFelter.includes(i)}
-                {@const erOpslugt = erFeltITaagen(spilTilstand.gitter, i, spilTilstand.fogX)}
+                {@const erUdforsket = spilTilstand.devVisHeleKort || spilTilstand.mineKendteFelter.includes(i)}
+                {@const erOpslugt = !spilTilstand.devVisHeleKort && erFeltITaagen(spilTilstand.gitter, i, spilTilstand.fogX, kortBredde)}
                 {@const vistBiome = felt.katastrofeVisuelAktiv && felt.katastrofeFraBiome ? felt.katastrofeFraBiome : felt.biome}
                 {@const baggrund = !erUdforsket ? 'none' : erOpslugt ? `url('/tiles/${vistBiome}_taage.webp')` : `url('/tiles/${vistBiome}.webp')`}
                 {@const feltHjaelp = forklaringForFelt(felt, i, erUdforsket, erOpslugt)}
@@ -1512,7 +1529,7 @@ function udførBevægelse(nytIndeks: number) {
                         {/if}
 
                         {#if erUdforsket && !felt.gravet}
-                            {@const erIndenForPejling = regnHexAfstand(spilTilstand.spillerIndex, i, BREDDE) <= pejleRadius}
+                            {@const erIndenForPejling = regnHexAfstand(spilTilstand.spillerIndex, i, kortBredde) <= pejleRadius}
                             {#if felt.isSkatteKlynge && harSkattekortAktivt}
                                 <img src="/tiles/treasuremark.webp" alt="Mulig skat" class="treasure-mark-icon" data-help-title="Mulig skat" data-help-body="Skattekortet peger på dette felt som mulig skatteklynge. Grav for at afsløre om der er noget." />
                             {/if}
@@ -1621,7 +1638,7 @@ function udførBevægelse(nytIndeks: number) {
 
                         {#each Object.entries(spilTilstand.alleSpillere) as [navn, mod] (navn)}
                             {#if navn !== spilTilstand.spillerNavn && mod.index === i && !mod.isDead && !mod.isWinner}
-                                {@const afstand = regnHexAfstand(spilTilstand.spillerIndex, mod.index, BREDDE)}
+                                {@const afstand = regnHexAfstand(spilTilstand.spillerIndex, mod.index, kortBredde)}
                                 {@const tracket = erTrackerAktivPaa(navn)}
                                 {@const synlig = afstand <= aktuelSynsRadius || tracket}
                                 <span class="modstander-icon" data-help-title={synlig ? navn : 'Ukendt spiller'} data-help-body={synlig ? `${navn} står på dette felt.` : (mod.activeAlarm ? 'Du kan høre alarm/lyd fra en spiller her, men kan ikke se hvem det er.' : 'En spiller er tæt på, men uden for dit syn.')} class:alarm-aktiv={mod.activeAlarm && !synlig} class:skjult-lyd={!synlig && !mod.activeAlarm} class:tracker-aktiv={tracket}>
@@ -1661,8 +1678,8 @@ function udførBevægelse(nytIndeks: number) {
                             {#each data.tidligereHistorik || [] as gammelRute, ruteIndex (`${navn}-${ruteIndex}`)}
                                 {#if gammelRute.length > 1}
                                     {@const oldPointsArray = gammelRute.map((idx: number) => {
-                                        const raekke = Math.floor(idx / BREDDE);
-                                        const kolonne = idx % BREDDE;
+                                        const raekke = Math.floor(idx / kortBredde);
+                                        const kolonne = idx % kortBredde;
                                         const posX = kolonne * HEX_W + (raekke % 2 !== 0 ? HEX_W / 2 : 0) + (HEX_W / 2);
                                         const posY = raekke * ROW_H + 55;
                                         return {x: posX, y: posY};
@@ -1684,8 +1701,8 @@ function udførBevægelse(nytIndeks: number) {
 
                         {#if data.historik && data.historik.length > 1}
                             {@const pointsArray = data.historik.map((idx: number) => {
-                                const raekke = Math.floor(idx / BREDDE);
-                                const kolonne = idx % BREDDE;
+                                const raekke = Math.floor(idx / kortBredde);
+                                const kolonne = idx % kortBredde;
                                 const posX = kolonne * HEX_W + (raekke % 2 !== 0 ? HEX_W / 2 : 0) + (HEX_W / 2);
                                 const posY = raekke * ROW_H + 55;
                                 return {x: posX, y: posY};
