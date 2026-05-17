@@ -81,11 +81,11 @@
             spisMad();
         } else if (vareId === 'stav' || vareId === 'dragestav') {
             udfoerTeleport();
-        } else if (vareId === 'fakkel') {
+        } else if (vareId === 'fakkel' || vareId === 'solfakkel') {
             taendBaal();
         } else if (vareId === 'hemmelighed') {
             aktiverHemmelighed();
-        } else if (vareId === 'dirk') {
+        } else if (vareId === 'dirk' || vareId === 'mesterdirk') {
             begaaIndbrud();
         }
     }
@@ -101,12 +101,12 @@
             );
         }
         if (vareId === 'mad') return spilTilstand.livspoint < spilTilstand.maxLivspoint || !spilTilstand.gratisNaesteBevaegelse;
-        if (vareId === 'dirk') return !!kanBegaaIndbrud;
-        return vareId === 'stav' || vareId === 'dragestav' || vareId === 'fakkel' || vareId === 'hemmelighed';
+        if (vareId === 'dirk' || vareId === 'mesterdirk') return !!kanBegaaIndbrud;
+        return vareId === 'stav' || vareId === 'dragestav' || vareId === 'fakkel' || vareId === 'solfakkel' || vareId === 'hemmelighed';
     }
 
     function erSituationsVare(vareId: string) {
-        return vareId === 'skovl' || vareId === 'mesterskovl' || vareId === 'sovepose' || vareId === 'mad' || vareId === 'dirk' || vareId === 'soegekvist' || vareId === 'runekvist' || vareId === 'metaldetektor';
+        return vareId === 'skovl' || vareId === 'mesterskovl' || vareId === 'sovepose' || vareId === 'mad' || vareId === 'dirk' || vareId === 'mesterdirk' || vareId === 'soegekvist' || vareId === 'runekvist' || vareId === 'metaldetektor' || vareId === 'malmviser';
     }
 
     function formaterNavn(tekst: string) {

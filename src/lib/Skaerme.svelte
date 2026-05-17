@@ -55,9 +55,9 @@
     const oeNavnForled = ['rav', 'mose', 'jern', 'taage', 'maan', 'ask', 'skum', 'sort'];
     const oeNavnEfterled = ['holm', 'vig', 'oe', 'rev', 'naes', 'skov', 'dal', 'borg'];
     const lokaleKortPresets = [
-        { navn: '20 x 20', bredde: 20, hoejde: 20 },
-        { navn: '100 x 20', bredde: 100, hoejde: 20 },
-        { navn: '140 x 30', bredde: 140, hoejde: 30 }
+        { label: '20 x 20', bredde: 20, hoejde: 20 },
+        { label: '50 x 20', bredde: 50, hoejde: 20 },
+        { label: '100 x 20', bredde: 100, hoejde: 20 }
     ];
 
     function foreslaaOeNavn() {
@@ -112,10 +112,18 @@
         anvendLydNiveau();
         tjekOfflineAppKlar();
         visLokaleTestKnapper = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-        spilTilstand.devVisHeleKort = false;
+        spilTilstand.devVisHeleKort = visLokaleTestKnapper;
 
         blandKarakterer();
     });
+
+    function vaelgLokaltTestKort(bredde: number, hoejde: number) {
+        if (!visLokaleTestKnapper) return;
+        spilTilstand.kortBredde = bredde;
+        spilTilstand.kortHoejde = hoejde;
+        spilTilstand.devVisHeleKort = true;
+        spilTilstand.statusBesked = `Testkort valgt: ${bredde} x ${hoejde}. Kun localhost viser hele øen.`;
+    }
 
     function findNiveau(score: number) {
         return findMedaljeNiveau(score);
@@ -209,13 +217,6 @@
             e.preventDefault();
             startSpilMedLyd();
         }
-    }
-
-    function vaelgLokaltTestKort(bredde: number, hoejde: number) {
-        spilTilstand.kortBredde = bredde;
-        spilTilstand.kortHoejde = hoejde;
-        spilTilstand.devVisHeleKort = false;
-        spilTilstand.statusBesked = `Testkort valgt: ${bredde} x ${hoejde}.`;
     }
 
     function hentPointSpec() {
@@ -439,18 +440,15 @@
                 </div>
 
                 {#if visLokaleTestKnapper}
-                    <div class="localhost-testkort" aria-label="Lokale korttest">
-                        {#each lokaleKortPresets as preset (preset.navn)}
-                            <button
-                                type="button"
-                                class:aktiv={spilTilstand.kortBredde === preset.bredde && spilTilstand.kortHoejde === preset.hoejde}
-                                onclick={() => vaelgLokaltTestKort(preset.bredde, preset.hoejde)}
-                            >
-                                {preset.navn}
+                    <div class="localhost-testkort" aria-label="Lokale testkort">
+                        {#each lokaleKortPresets as preset}
+                            <button type="button" onclick={() => vaelgLokaltTestKort(preset.bredde, preset.hoejde)}>
+                                {preset.label}
                             </button>
                         {/each}
                     </div>
                 {/if}
+
             </div>
 
             <p class="status larger-status">{spilTilstand.statusBesked}</p>
@@ -767,20 +765,6 @@
         border-color: #666;
     }
     .offline-bottom { width: min(100%, 560px); margin-top: 28px; display: flex; flex-direction: column; align-items: center; }
-    .localhost-testkort { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 10px; }
-    .localhost-testkort button {
-        border: 1px solid rgba(255, 215, 0, 0.45);
-        background: rgba(0, 0, 0, 0.48);
-        color: #f2e7b5;
-        font-family: inherit;
-        font-size: 0.78rem;
-        padding: 6px 9px;
-        cursor: pointer;
-    }
-    .localhost-testkort button.aktiv {
-        background: rgba(255, 215, 0, 0.18);
-        color: #ffd700;
-    }
     .ballon-download {
         width: 150px;
         min-height: 82px;
@@ -803,6 +787,26 @@
     .fly-hint { width: 150px; margin: 2px 0 14px; color: #bbb; font-size: 0.82rem; letter-spacing: 0.04em; text-transform: uppercase; text-align: center; }
     .offline-besked { max-width: 440px; margin: 8px 0 14px; color: #bbb; font-size: 0.82rem; line-height: 1.45; }
     .slut-knap-styled { width: 220px; height: 65px; }
+
+    .localhost-testkort {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+    .localhost-testkort button {
+        background: rgba(255, 255, 255, 0.08);
+        color: #f2f2f2;
+        border: 1px solid #555;
+        border-radius: 5px;
+        padding: 7px 10px;
+        cursor: pointer;
+        font-size: 0.82rem;
+    }
+    .localhost-testkort button:hover {
+        background: rgba(255, 255, 255, 0.16);
+    }
 
     .start-tavle { margin-top: 30px; width: 100%; max-width: 340px; }
     .global-note { color: #aaa; font-size: 0.78rem; margin: -4px 0 6px; }

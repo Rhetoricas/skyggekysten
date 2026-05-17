@@ -1,6 +1,6 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { eventBibliotek } from './eventBibliotek';
-import { tilfoejTilRygsæk, brugFraRygsæk, harRygsaekItem, findRygsaekItemTilKrav } from './spilmotor';
+import { afslørFalkebueSyn, tilfoejTilRygsæk, brugFraRygsæk, harRygsaekItem, findRygsaekItemTilKrav } from './spilmotor';
 import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremrykTid, udloesBersaerkHvisRelevant } from './overlevelse.svelte';
 import type { Valg } from './eventBibliotek';
@@ -71,9 +71,42 @@ export function kanViseValg(valg: Valg) {
     return true;
 }
 
+function valgBrugerKniv(valg: Valg) {
+    return valg.kraeverItem === 'kniv' ||
+        valg.kosterItem === 'kniv' ||
+        !!valg.kraeverEtAfItems?.includes('kniv');
+}
+
+function harMesterknivTilValg(valg: Valg) {
+    return valgBrugerKniv(valg) && harRygsaekItem('mesterkniv');
+}
+
+function valgBrugerOekse(valg: Valg) {
+    return valg.kraeverItem === 'oekse' ||
+        valg.kosterItem === 'oekse' ||
+        !!valg.kraeverEtAfItems?.includes('oekse');
+}
+
+function harStormoekseTilValg(valg: Valg) {
+    return valgBrugerOekse(valg) && harRygsaekItem('stormoekse');
+}
+
+function valgBrugerBue(valg: Valg) {
+    return valg.kraeverItem === 'bue' ||
+        valg.kosterItem === 'bue' ||
+        !!valg.kraeverEtAfItems?.includes('bue');
+}
+
+function harMesterbueTilValg(valg: Valg) {
+    return valgBrugerBue(valg) && harRygsaekItem('mesterbue');
+}
+
 export function tagValg(valg: Valg) {
     if (eventState.valgLåst) return;
     const betaltItem = valg.kosterItem ? findRygsaekItemTilKrav(valg.kosterItem) : null;
+    const brugerMesterkniv = harMesterknivTilValg(valg) || betaltItem === 'mesterkniv';
+    const brugerStormoekse = harStormoekseTilValg(valg) || betaltItem === 'stormoekse';
+    const brugerMesterbue = harMesterbueTilValg(valg) || betaltItem === 'mesterbue';
     const afsluttetEventId = eventState.rootEventId ?? eventState.aktivt?.id;
     const afsluttetFeltIndex = eventState.rootFeltIndex ?? spilTilstand.spillerIndex;
 
@@ -94,7 +127,31 @@ export function tagValg(valg: Valg) {
     let kvittering = "";
 
     if (valg.udfaldListe && valg.udfaldListe.length > 0) {
-        const resultat = valg.udfaldListe[Math.floor(Math.random() * valg.udfaldListe.length)];
+        const resultat = { ...valg.udfaldListe[Math.floor(Math.random() * valg.udfaldListe.length)] };
+        if (brugerMesterkniv) {
+            if (resultat.guldAendring && resultat.guldAendring > 0) {
+                resultat.guldAendring = Math.round(resultat.guldAendring * 1.5);
+            }
+            if (resultat.hpAendring && resultat.hpAendring < 0) {
+                resultat.hpAendring = Math.round(resultat.hpAendring * 0.75);
+            }
+        }
+        if (brugerStormoekse) {
+            if (resultat.guldAendring && resultat.guldAendring > 0) {
+                resultat.guldAendring = Math.round(resultat.guldAendring * 1.5);
+            }
+            if (resultat.hpAendring && resultat.hpAendring < 0) {
+                resultat.hpAendring = Math.round(resultat.hpAendring * 0.5);
+            }
+        }
+        if (brugerMesterbue) {
+            if (resultat.guldAendring && resultat.guldAendring > 0) {
+                resultat.guldAendring = Math.round(resultat.guldAendring * 1.25);
+            }
+            if (resultat.hpAendring && resultat.hpAendring < 0) {
+                resultat.hpAendring = Math.round(resultat.hpAendring * 0.5);
+            }
+        }
         samletLogTekst = resultat.log;
 
         if (resultat.maxHpAendring) {
@@ -135,8 +192,9 @@ export function tagValg(valg: Valg) {
         if (resultat.mistItem) {
             resultat.mistItem.split(',').forEach(item => {
                 const id = item.trim();
-                brugFraRygsæk(id, 1);
-                kvittering += ` (-${id})`;
+                const betaltId = findRygsaekItemTilKrav(id) ?? id;
+                brugFraRygsæk(betaltId, 1);
+                kvittering += ` (-${betaltId})`;
             });
         }
         
@@ -162,12 +220,18 @@ export function tagValg(valg: Valg) {
             kvittering += ` (+${spilTilstand.livspoint - foer} HP)`;
         }
         if (resultat.hpNed) {
-            const skade = spilTilstand.beregnSkade(resultat.hpNed);
+            let grundSkade = resultat.hpNed;
+            if (brugerMesterkniv) grundSkade = Math.round(grundSkade * 0.75);
+            if (brugerStormoekse || brugerMesterbue) grundSkade = Math.round(grundSkade * 0.5);
+            const skade = spilTilstand.beregnSkade(grundSkade);
             spilTilstand.livspoint -= skade;
             kvittering += ` (-${skade} HP)${udloesBersaerkHvisRelevant(skade)}`;
         }
         if (resultat.guldOp) {
-            const indkomst = spilTilstand.beregnGuldIndkomst(resultat.guldOp);
+            let grundIndkomst = resultat.guldOp;
+            if (brugerMesterkniv || brugerStormoekse) grundIndkomst = Math.round(grundIndkomst * 1.5);
+            if (brugerMesterbue) grundIndkomst = Math.round(grundIndkomst * 1.25);
+            const indkomst = spilTilstand.beregnGuldIndkomst(grundIndkomst);
             spilTilstand.guldTotal += indkomst;
             kvittering += ` (+${indkomst} Guld)`;
         }
@@ -192,6 +256,11 @@ export function tagValg(valg: Valg) {
         }
 
         if (resultat.naesteEvent) eventState.naesteTrin = resultat.naesteEvent;
+    }
+
+    if (brugerMesterbue) {
+        afslørFalkebueSyn(spilTilstand.spillerIndex);
+        kvittering += ` (Falkebuen afslører tre felter mod øst)`;
     }
 
     const fuldBesked = samletLogTekst + kvittering;

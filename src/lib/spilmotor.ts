@@ -259,7 +259,23 @@ export function harRygsaekItem(genstandId: string) {
             ? ['stav', 'dragestav']
             : genstandId === 'soegekvist'
                 ? ['soegekvist', 'runekvist']
-                : [genstandId];
+                : genstandId === 'dirk'
+                    ? ['dirk', 'mesterdirk']
+                    : genstandId === 'kniv'
+                        ? ['kniv', 'mesterkniv']
+                        : genstandId === 'rustning'
+                            ? ['rustning', 'kongepanser']
+                            : genstandId === 'oekse'
+                                ? ['oekse', 'stormoekse']
+                                : genstandId === 'bue'
+                                    ? ['bue', 'mesterbue']
+                                    : genstandId === 'flot_toej'
+                                        ? ['flot_toej', 'royalt_toej']
+                                    : genstandId === 'fakkel'
+                                        ? ['fakkel', 'solfakkel']
+                                        : genstandId === 'metaldetektor'
+                                            ? ['metaldetektor', 'malmviser']
+                                            : [genstandId];
     return spilTilstand.mitUdstyr.some(ting => itemIds.includes(ting.id) && ting.maengde > 0);
 }
 
@@ -270,7 +286,23 @@ export function findRygsaekItemTilKrav(genstandId: string) {
             ? ['stav', 'dragestav']
             : genstandId === 'soegekvist'
                 ? ['soegekvist', 'runekvist']
-                : [genstandId];
+                : genstandId === 'dirk'
+                    ? ['dirk', 'mesterdirk']
+                    : genstandId === 'kniv'
+                        ? ['kniv', 'mesterkniv']
+                        : genstandId === 'rustning'
+                            ? ['rustning', 'kongepanser']
+                            : genstandId === 'oekse'
+                                ? ['oekse', 'stormoekse']
+                                : genstandId === 'bue'
+                                    ? ['bue', 'mesterbue']
+                                    : genstandId === 'flot_toej'
+                                        ? ['flot_toej', 'royalt_toej']
+                                    : genstandId === 'fakkel'
+                                        ? ['fakkel', 'solfakkel']
+                                        : genstandId === 'metaldetektor'
+                                            ? ['metaldetektor', 'malmviser']
+                                            : [genstandId];
     return spilTilstand.mitUdstyr.find(ting => itemIds.includes(ting.id) && ting.maengde > 0)?.id ?? null;
 }
 
@@ -283,6 +315,16 @@ export function kanModtageItem(genstandId: string) {
     if (genstandId === 'skovl' || genstandId === 'mesterskovl') return !harRygsaekItem('skovl');
     if (genstandId === 'stav' || genstandId === 'dragestav') return !harRygsaekItem('stav');
     if (genstandId === 'soegekvist' || genstandId === 'runekvist') return !harRygsaekItem('soegekvist');
+    if (genstandId === 'dirk' || genstandId === 'mesterdirk') return !harRygsaekItem('dirk');
+    if (genstandId === 'kniv' || genstandId === 'mesterkniv') return !harRygsaekItem('kniv');
+    if (genstandId === 'rustning' || genstandId === 'kongepanser') return !harRygsaekItem('rustning');
+    if (genstandId === 'oekse' || genstandId === 'stormoekse') return !harRygsaekItem('oekse');
+    if (genstandId === 'bue' || genstandId === 'mesterbue') return !harRygsaekItem('bue');
+    if (genstandId === 'klude' || genstandId === 'flot_toej' || genstandId === 'royalt_toej') {
+        return !spilTilstand.mitUdstyr.some(ting => ['klude', 'flot_toej', 'royalt_toej'].includes(ting.id) && ting.maengde > 0);
+    }
+    if (genstandId === 'fakkel' || genstandId === 'solfakkel') return !harRygsaekItem('fakkel');
+    if (genstandId === 'metaldetektor' || genstandId === 'malmviser') return !harRygsaekItem('metaldetektor');
     return !spilTilstand.mitUdstyr.some(ting => ting.id === genstandId && ting.maengde > 0);
 }
 
@@ -301,6 +343,51 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
 
     if (genstandId === 'runekvist') {
         spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'soegekvist');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'mesterdirk') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'dirk');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'mesterkniv') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'kniv');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'kongepanser') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'rustning');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'stormoekse') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'oekse');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'mesterbue') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'bue');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'flot_toej') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'klude');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'royalt_toej') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'klude' && ting.id !== 'flot_toej');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'solfakkel') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'fakkel');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'malmviser') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'metaldetektor');
         udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
     }
 
@@ -380,6 +467,46 @@ export function afslørOmraade(centerIndex: number, radius: number = 1) {
             spilTilstand.mineKendteFelter.push(indeks);
         }
     });
+
+    if (centerIndex === spilTilstand.spillerIndex) {
+        afslørMalmviserMiner(centerIndex);
+    }
+}
+
+export function afslørMalmviserMiner(centerIndex: number = spilTilstand.spillerIndex) {
+    if (!harRygsaekItem('malmviser')) return false;
+
+    const kendte = new Set(spilTilstand.mineKendteFelter);
+    let aendret = false;
+
+    spilTilstand.gitter.forEach((felt, indeks) => {
+        if (!felt?.hasGoldmine) return;
+        if (regnHexAfstand(centerIndex, indeks) > 2) return;
+
+        if (!kendte.has(indeks)) {
+            kendte.add(indeks);
+            aendret = true;
+        }
+    });
+
+    if (aendret) {
+        spilTilstand.mineKendteFelter = Array.from(kendte);
+    }
+
+    return aendret;
+}
+
+export function afslørFalkebueSyn(centerIndex: number) {
+    let indeks: number | null = centerIndex;
+
+    for (let afstand = 1; afstand <= 3; afstand++) {
+        indeks = hentNaboIRetning(indeks, 'E');
+        if (indeks === null) break;
+
+        if (spilTilstand.gitter[indeks] && !spilTilstand.mineKendteFelter.includes(indeks)) {
+            spilTilstand.mineKendteFelter.push(indeks);
+        }
+    }
 }
 
 function indeksTilKube(index: number) {
@@ -927,7 +1054,7 @@ export function aktiverHemmelighed() {
 }
 
 function harUdstyr(genstandId: string) {
-    return spilTilstand.mitUdstyr?.some(ting => ting.id === genstandId && ting.maengde > 0) ?? false;
+    return harRygsaekItem(genstandId);
 }
 
 function erTyveklasse() {
@@ -1083,7 +1210,9 @@ export function begaaIndbrud() {
     }
 
     const energiPris = Math.ceil(spilTilstand.valgtKarakter.baseEnergi / 2);
-    const udbytte = 35 + Math.floor(Math.random() * 16);
+    const harMesterdirk = harRygsaekItem('mesterdirk');
+    const basisUdbytte = 35 + Math.floor(Math.random() * 16);
+    const udbytte = harMesterdirk ? basisUdbytte * 2 : basisUdbytte;
     const opdagelsesChance = erTyveklasse() ? 0.1 : erTungKrigerklasse() ? 0.45 : 0.25;
     const opdaget = Math.random() < opdagelsesChance;
 
@@ -1096,11 +1225,11 @@ export function begaaIndbrud() {
         const grundSkade = erTungKrigerklasse() ? 16 : 22;
         tagSkadeOgTjekDød(
             grundSkade,
-            `Du begår indbrud og finder ${udbytte} guld. Det koster ${energiPris} energi. Du bliver opdaget og får tæv.`,
+            `Du begår indbrud${harMesterdirk ? ' med mesterdirken' : ''} og finder ${udbytte} guld. Det koster ${energiPris} energi. Du bliver opdaget og får tæv.`,
             "Vagterne slog dig ihjel."
         );
     } else {
-        spilTilstand.logBesked = `Du begår indbrud og finder ${udbytte} guld. Det koster ${energiPris} energi. Ingen når at stoppe dig.`;
+        spilTilstand.logBesked = `Du begår indbrud${harMesterdirk ? ' med mesterdirken' : ''} og finder ${udbytte} guld. Det koster ${energiPris} energi. Ingen når at stoppe dig.`;
     }
 
     spilTilstand.gitter = [...spilTilstand.gitter];
@@ -1569,18 +1698,25 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
 export function tjekMiljoeSlitage(biome: string): string {
     const logBeskeder: string[] = [];
     let mistetFintToej = 0;
+    let nedgraderetRoyaltToej = 0;
+    let nedgraderetMalmviser = false;
 
     spilTilstand.mitUdstyr = spilTilstand.mitUdstyr.filter(vare => {
         if (biome === 'hav') {
-            if (vare.id === 'rustning') {
-                logBeskeder.push("Rustningen er for tung i vandet. Du mister den.");
+            if (vare.id === 'rustning' || vare.id === 'kongepanser') {
+                logBeskeder.push(vare.id === 'kongepanser' ? "Kongepanseret er for tungt i vandet. Du mister det." : "Rustningen er for tung i vandet. Du mister den.");
                 return false;
             }
-            if (vare.id === 'fakkel') {
-                logBeskeder.push("Vandet slukker din fakkel.");
+            if (vare.id === 'fakkel' || vare.id === 'solfakkel') {
+                logBeskeder.push(vare.id === 'solfakkel' ? "Vandet slukker din solfakkel." : "Vandet slukker din fakkel.");
                 return false;
             }
         } else if (biome === 'hule') {
+            if (vare.id === 'royalt_toej') {
+                nedgraderetRoyaltToej += vare.maengde;
+                logBeskeder.push("Hulen flænser dit royale tøj. Det kan stadig bruges som fint tøj.");
+                return false;
+            }
             if (vare.id === 'flot_toej') {
                 mistetFintToej += vare.maengde;
                 logBeskeder.push("Hulen ødelægger dit fine tøj. Du får klude tilbage.");
@@ -1591,12 +1727,22 @@ export function tjekMiljoeSlitage(biome: string): string {
                 return false;
             }
         } else if (biome === 'blodskov') {
+            if (vare.id === 'royalt_toej') {
+                nedgraderetRoyaltToej += vare.maengde;
+                logBeskeder.push("Tornene flænser dit royale tøj. Det bliver til almindeligt fint tøj.");
+                return false;
+            }
             if (vare.id === 'flot_toej') {
                 mistetFintToej += vare.maengde;
                 logBeskeder.push("Tornene ødelægger dit fine tøj.");
                 return false;
             }
         } else if (biome === 'krystal') {
+            if (vare.id === 'malmviser') {
+                logBeskeder.push("Krystallerne får Malmviseren til at hyle. Den kortslutter ned til en almindelig detektor.");
+                nedgraderetMalmviser = true;
+                return false;
+            }
             if (vare.id === 'metaldetektor') {
                 logBeskeder.push("Krystallerne ødelægger din metaldetektor.");
                 return false;
@@ -1628,6 +1774,14 @@ export function tjekMiljoeSlitage(biome: string): string {
         }
     }
 
+    if (nedgraderetRoyaltToej > 0) {
+        spilTilstand.mitUdstyr.push({ id: 'flot_toej', maengde: 1 });
+    }
+
+    if (nedgraderetMalmviser) {
+        spilTilstand.mitUdstyr.push({ id: 'metaldetektor', maengde: 1 });
+    }
+
     return logBeskeder.length > 0 ? " " + logBeskeder.join(" ") : "";
 }
 
@@ -1654,17 +1808,20 @@ export async function sendSynSignal(centerIndex: number, radius: number, fokusIn
 export function taendBaal() {
     if (spilTilstand.erBevidstløs || !spilTilstand.valgtKarakter) return;
     
-    const fakkel = spilTilstand.mitUdstyr.find(i => i.id === 'fakkel');
+    const fakkel = spilTilstand.mitUdstyr.find(i => i.id === 'fakkel' || i.id === 'solfakkel');
     if (!fakkel || fakkel.maengde <= 0) return;
 
-    brugFraRygsæk('fakkel', 1);
+    const erSolfakkel = fakkel.id === 'solfakkel';
+    brugFraRygsæk(fakkel.id, 1);
 
-    const radius = Math.max(1, spilTilstand.valgtKarakter.synsRadius + spilTilstand.rygsækEffekt.syn) + 2;
+    const radius = Math.max(1, spilTilstand.valgtKarakter.synsRadius + spilTilstand.rygsækEffekt.syn) + (erSolfakkel ? 4 : 2);
     afslørOmraade(spilTilstand.spillerIndex, radius);
     spilTilstand.livspoint = spilTilstand.maxLivspoint;
-    spilTilstand.guldTotal += 50;
+    spilTilstand.guldTotal += erSolfakkel ? 100 : 50;
     
-    spilTilstand.logBesked = "Du tænder et stort bål. Området omkring dig bliver synligt for alle. Folk stimler sammen om lyset: Du får fuld HP og 50 guld.";
+    spilTilstand.logBesked = erSolfakkel
+        ? "Du tænder et solbål. Lyset river tågen op i et stort område, som alle kan se. Folk stimler sammen om flammen: Du får fuld HP og 100 guld."
+        : "Du tænder et stort bål. Området omkring dig bliver synligt for alle. Folk stimler sammen om lyset: Du får fuld HP og 50 guld.";
     
     sendBaalSignal(spilTilstand.spillerIndex, radius);
     fremrykTid();
@@ -1798,11 +1955,11 @@ function fjernUdstyrVedOversvoemmelse() {
     let mistedeFakkel = false;
 
     spilTilstand.mitUdstyr = spilTilstand.mitUdstyr.filter((ting) => {
-        if (ting.id === 'rustning') {
+        if (ting.id === 'rustning' || ting.id === 'kongepanser') {
             mistedeRustning = true;
             return false;
         }
-        if (ting.id === 'fakkel') {
+        if (ting.id === 'fakkel' || ting.id === 'solfakkel') {
             mistedeFakkel = true;
             return false;
         }

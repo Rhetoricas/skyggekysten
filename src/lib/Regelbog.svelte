@@ -92,9 +92,9 @@
                         <li>Ved kollaps mister du halvdelen af dit guld, tiden går, og du vågner kort efter med 10 HP.</li>
                         <li>Hvis HP rammer 0 i tågen eller i vand, dør du, medmindre en livseliksir redder dig først.</li>
                         <li>Livseliksir bruges automatisk ved dødelig skade eller kollaps og sætter HP til 90.</li>
-                        <li>Rustning mindsker skade. Elverrustning beskytter som almindelig rustning, men er ikke tung. Ridder med rustning tager ingen skade fra nedgravede fælder.</li>
+                        <li>Rustning mindsker skade. Kongepanser mindsker skade med 70%, men er stadig tungt. Elverrustning beskytter som almindelig rustning, men er ikke tung. Ridder med rustning eller panser tager ingen skade fra nedgravede fælder.</li>
                         <li>Mad giver +20 HP og gør næste bevægelse gratis. Sovepose kan bruges i vildmarken og giver +20 HP, men bruger resten af dagen.</li>
-                        <li>Fakkel udvider synet med +1. Den kan også bruges til et stort bål, som afslører et område for alle, giver fuld HP og 50 guld, og bruger faklen.</li>
+                        <li>Fakkel udvider synet med +1. Solfakkel udvider synet med +2. Begge kan bruges til bål; solbålet afslører et større område og giver 100 guld i stedet for 50.</li>
                         <li>Viking og valkyrie går automatisk bersærk første gang pr. dag, de tager mindst 5 skade. Næste bevægelse koster 0 energi.</li>
                         <li>Hav og oversvømmelse kan slukke fakler og få tung rustning til at gå tabt.</li>
                     </ul>
@@ -109,7 +109,7 @@
                         <li>En mesterskovl tæller som skovl, giver dobbelt guld ved gravning og finder nedgravede fælder uden at udløse dem.</li>
                         <li>Gylden Destillator er et sjældent relikvie. Den fordobler opgravet guld. Sammen med mesterskovl bliver graveguld tredoblet, ikke firedoblet.</li>
                         <li>Skjulte fælder, guld, rødder og loot bliver først udløst, når du graver. Feltet bliver markeret som gravet med det samme.</li>
-                        <li>Metaldetektor og søgekvist kan afsløre tegn på skjult guld eller liv på kendte felter inden for radius 3 af din karakter.</li>
+                        <li>Metaldetektor og søgekvist kan afsløre tegn på skjult guld eller liv på kendte felter inden for radius 3 af din karakter. Malmviseren giver også 25% ekstra, når det skjulte guld graves frem, og guldminer inden for radius 2 bliver kendte felter, selv gennem bjerge.</li>
                         <li>Runekvisten er en opgraderet søgekvist. Når du mangler HP og går ind på et ugravet felt med skjult liv, trækker den rødderne op automatisk for 1 energi uden at markere feltet som gravet.</li>
                         <li>Når runekvisten virker, tømmes feltets skjulte guld, loot, fælde og liv. Andre kan stadig grave feltet, men der er kun sten og orme tilbage.</li>
                         <li>Rodhjertet er et sjældent relikvie. Det fordobler HP fra helende rødder, både ved gravning og Runekvist.</li>
@@ -137,8 +137,8 @@
                         <li>Tryk på en genstand i bunden for at bruge den, hvis den er aktiv.</li>
                         <li>Skovl, sovepose, mad og dirk er kun aktive, når de kan bruges i den aktuelle situation.</li>
                         <li>Kun mad og livseliksir kan stables i flere styk. Alle andre våben, værktøjer, tøj og særlige items findes kun én gang ad gangen.</li>
-                        <li>Store værktøjer findes kun i én version ad gangen. Skovl/mesterskovl, stav/dragestav og søgekvist/runekvist tæller som samme type.</li>
-                        <li>Fakkel kan lave bål. Stav og dragestav kan teleportere. Hemmeligheder og særlige fund kan have egne effekter.</li>
+                        <li>Store værktøjer, våben og tøj findes kun i én version ad gangen. Skovl/mesterskovl, stav/dragestav, søgekvist/runekvist, detektor/malmviser, dirk/mesterdirk, kniv/mesterkniv, rustning/kongepanser, økse/stormøkse, bue/falkebue, fakkel/solfakkel og klude/fint tøj/royalt tøj tæller som samme type.</li>
+                        <li>Fakkel og solfakkel kan lave bål. Stav og dragestav kan teleportere. Hemmeligheder og særlige fund kan have egne effekter.</li>
                         <li>Nogle ting kan købes, andre findes kun i events. Elverrustning, opgraderede items og relikvier kan ikke købes i almindelige butikker.</li>
                     </ul>
                     <p class="eksempel">Eksempel: En sovepose hjælper ikke midt i en by, men kan være stærk på roligere naturfelter. En almindelig stav flytter dig 4 felter mod øst. En dragestav flytter dig 5 felter, afslører ruten og kan redde dig fra åbent vand ved at blive nedgraderet til en almindelig stav.</p>
@@ -147,7 +147,7 @@
                 <section>
                     <h3>Værksteder</h3>
                     <p>Værksteder findes i større byer. De sælger ikke almindelige varer, men bygger dit eksisterende udstyr om til en bedre version. Du beholder ikke den gamle genstand ved siden af den nye.</p>
-                    <p class="eksempel">Eksempel: Har du en skovl og 150 guld, kan værkstedet gøre den til en mesterskovl. Har du en stav og 200 guld, kan den blive til en dragestav. Har du en søgekvist og 175 guld, kan den blive til en runekvist.</p>
+                    <p class="eksempel">Eksempel: Har du en skovl og 150 guld, kan værkstedet gøre den til en mesterskovl. Har du klude og 100 guld, kan de blive til fint tøj. Fint tøj kan for 500 guld blive til royalt tøj, som giver stor guldbonus, men bliver nedgraderet til fint tøj, hvis det flænses.</p>
                 </section>
 
                 <section>
@@ -159,6 +159,7 @@
                         <li>Nogle events er sjældne eller unikke. De kan give relikvier, som ikke kan købes i butikker.</li>
                         <li>Subevents er fortsættelser af samme event og bliver ikke trukket som almindelige events.</li>
                         <li>Hvis et event kræver eller bruger en almindelig genstand, kan en opgraderet version ofte tælle som samme type. Betales den, ryger den opgraderede genstand også.</li>
+                        <li>Stormøksen forbedrer øksevalg i events med mere guld og mindre skade. Falkebuen forbedrer buevalg og afslører tre felter mod øst efter skuddet.</li>
                         <li>Meteorstenen kan åbnes med hænderne eller med udstyr. Mesterskovlen giver 600 guld og en diamant, men skovlen går tabt i stenen.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Et jordskælv kan gøre en eng til bjerg eller ruin. Hvis der lå en guldmine, butik, båd eller et værksted på feltet, er det væk bagefter. Et eventvalg kan altså være godt for dig her og nu, men dyrt for kortet.</p>
@@ -166,7 +167,7 @@
 
                 <section>
                     <h3>Tyveri</h3>
-                    <p>Dirken kan bruges til indbrud på tomme byfelter uden butik. Det koster halvdelen af din baseenergi rundet op. Udbyttet er 35-50 guld, og der er risiko for at blive opdaget og få tæv.</p>
+                    <p>Dirken kan bruges til indbrud på tomme byfelter uden butik. Det koster halvdelen af din baseenergi rundet op. Udbyttet er 35-50 guld, og der er risiko for at blive opdaget og få tæv. Mesterdirken giver dobbelt udbytte, men gør ikke indbruddet sikrere.</p>
                     <p class="eksempel">Eksempel: Hvis du mangler lidt guld til en opgradering, kan indbrud være fristende. Tyve bliver sjældnere opdaget end andre, mens tunge krigere larmer mere.</p>
                 </section>
 

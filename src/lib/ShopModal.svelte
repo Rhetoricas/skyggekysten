@@ -24,7 +24,23 @@
                     ? "Du har allerede en stav. Find et værksted, hvis den skal forbedres."
                     : id === 'soegekvist' || id === 'runekvist'
                         ? "Du har allerede en søgekvist. Find et værksted, hvis den skal forbedres."
-                        : `Du har allerede ${vareData.navn}.`;
+                        : id === 'dirk' || id === 'mesterdirk'
+                            ? "Du har allerede en dirk. Find et værksted, hvis den skal forbedres."
+                            : id === 'kniv' || id === 'mesterkniv'
+                                ? "Du har allerede en kniv. Find et værksted, hvis den skal forbedres."
+                                : id === 'rustning' || id === 'kongepanser'
+                                    ? "Du har allerede en rustning. Find et værksted, hvis den skal forbedres."
+                                    : id === 'oekse' || id === 'stormoekse'
+                                        ? "Du har allerede en økse. Find et værksted, hvis den skal forbedres."
+                                        : id === 'bue' || id === 'mesterbue'
+                                            ? "Du har allerede en bue. Find et værksted, hvis den skal forbedres."
+                                            : id === 'klude' || id === 'flot_toej' || id === 'royalt_toej'
+                                                ? "Du har allerede tøj. Find et værksted, hvis det skal forbedres."
+                                                : id === 'fakkel' || id === 'solfakkel'
+                                                    ? "Du har allerede en fakkel. Find et værksted, hvis den skal forbedres."
+                                                    : id === 'metaldetektor' || id === 'malmviser'
+                                                        ? "Du har allerede en detektor. Find et værksted, hvis den skal forbedres."
+                                                        : `Du har allerede ${vareData.navn}.`;
             syncTilDb();
             return;
         }

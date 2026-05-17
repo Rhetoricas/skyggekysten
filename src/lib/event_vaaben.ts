@@ -3,7 +3,7 @@ import { spilTilstand } from './spilTilstand.svelte';
 
 function koebDirkAfTyv() {
     const karakterId = spilTilstand.valgtKarakter?.id;
-    const harDirk = spilTilstand.mitUdstyr.some(ting => ting.id === 'dirk' && ting.maengde > 0);
+    const harDirk = spilTilstand.mitUdstyr.some(ting => (ting.id === 'dirk' || ting.id === 'mesterdirk') && ting.maengde > 0);
 
     if (harDirk) {
         return {

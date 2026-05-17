@@ -19,7 +19,7 @@ function erKrigertype() {
 }
 
 function rydAndenRustning() {
-    spilTilstand.mitUdstyr = spilTilstand.mitUdstyr.filter((ting) => ting.id !== 'rustning' && ting.id !== 'rustning_elver');
+    spilTilstand.mitUdstyr = spilTilstand.mitUdstyr.filter((ting) => ting.id !== 'rustning' && ting.id !== 'kongepanser' && ting.id !== 'rustning_elver');
 }
 
 function vaekElverkongen(skade: number, logBesked: string) {

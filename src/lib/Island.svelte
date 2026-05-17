@@ -56,7 +56,7 @@
     let inspectAktiv = $state(false);
     let inspectBoble = $state<{ titel: string; tekst: string; x: number; y: number } | null>(null);
     
-    let harDetektor = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'metaldetektor') ?? false);
+    let harDetektor = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'metaldetektor' || ting.id === 'malmviser') ?? false);
     let harRunekvist = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'runekvist') ?? false);
     let harKvist = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'soegekvist' || ting.id === 'runekvist') ?? false);
     let aktuelSynsRadius = $derived(Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn));
@@ -1592,7 +1592,7 @@ function udførBevægelse(nytIndeks: number) {
                                 alt=""
                                 class="workshop-icon"
                                 data-help-title="Værksted"
-                                data-help-body="Værkstedet opgraderer udstyr: skovl til mesterskovl, stav til dragestav og søgekvist til runekvist."
+                                data-help-body="Værkstedet opgraderer udstyr: skovl, stav, søgekvist, dirk, kniv, rustning, økse, bue, tøj, fakkel og detektor kan blive til stærkere versioner."
                             />
                         {/if}
 

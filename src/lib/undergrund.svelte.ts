@@ -11,7 +11,7 @@ function tilfaeldigtTal(min: number, max: number) {
 function ridderPanserStopperNedgravetFaelde() {
     const karakterId = spilTilstand.valgtKarakter?.id;
     const erRidder = karakterId === 'knight_m' || karakterId === 'knight_f';
-    const harRustning = spilTilstand.mitUdstyr?.some((ting) => (ting.id === 'rustning' || ting.id === 'rustning_elver') && ting.maengde > 0);
+    const harRustning = spilTilstand.mitUdstyr?.some((ting) => (ting.id === 'rustning' || ting.id === 'kongepanser' || ting.id === 'rustning_elver') && ting.maengde > 0);
     return erRidder && harRustning;
 }
 
@@ -99,6 +99,7 @@ export function grav() {
     const harMesterskovl = skovlItem?.id === 'mesterskovl' && skovlItem.maengde > 0;
     const harSkovl = !!skovlItem && skovlItem.maengde > 0;
     const harGyldenDestillator = spilTilstand.mitUdstyr.some((i) => i.id === 'gylden_destillator' && i.maengde > 0);
+    const harMalmviser = spilTilstand.mitUdstyr.some((i) => i.id === 'malmviser' && i.maengde > 0);
     const harRodhjertet = spilTilstand.mitUdstyr.some((i) => i.id === 'rodhjertet' && i.maengde > 0);
     
     let udstyrsLog = ""; 
@@ -147,12 +148,15 @@ export function grav() {
         fundLog = `Skovlen rammer træ. Du åbner en kiste. (+500 Guld, +Diamant)`;
     } else if (guldVaerdi > 0) {
         const graveGuldMultiplier = harMesterskovl && harGyldenDestillator ? 3 : (harMesterskovl || harGyldenDestillator) ? 2 : 1;
-        let maengde = Math.floor(guldVaerdi * graveGuldMultiplier * spilTilstand.valgtKarakter.goldMod);
+        const malmviserMultiplier = harMalmviser ? 1.25 : 1;
+        let maengde = Math.floor(guldVaerdi * graveGuldMultiplier * malmviserMultiplier * spilTilstand.valgtKarakter.goldMod);
         maengde = spilTilstand.beregnGuldIndkomst(maengde);
         const foerGuld = spilTilstand.guldTotal;
         spilTilstand.guldTotal += maengde;
         const faktiskGuld = spilTilstand.guldTotal - foerGuld;
-        fundLog = harMesterskovl && harGyldenDestillator
+        fundLog = harMalmviser
+            ? `Malmviseren synger, mens du graver åren fri. Jorden gemte på ${faktiskGuld} Guld.`
+            : harMesterskovl && harGyldenDestillator
             ? `Mesterskovlen og den gyldne destillator presser åren ren. Jorden gemte på ${faktiskGuld} Guld.`
             : harMesterskovl
                 ? `Mesterskovlen åbner åren rent. Jorden gemte på ${faktiskGuld} Guld.`
