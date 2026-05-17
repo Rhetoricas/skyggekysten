@@ -75,7 +75,7 @@
     function haandterInventoryKlik(vareId: string) {
         if (vareId === 'skovl' || vareId === 'mesterskovl') {
             grav();
-        } else if (vareId === 'sovepose') {
+        } else if (vareId === 'sovepose' || vareId === 'silkesovepose') {
             hvil();
         } else if (vareId === 'mad') {
             spisMad();
@@ -92,7 +92,7 @@
 
     function kanBrugeInventoryVare(vareId: string) {
         if (vareId === 'skovl' || vareId === 'mesterskovl') return !!(aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves);
-        if (vareId === 'sovepose') {
+        if (vareId === 'sovepose' || vareId === 'silkesovepose') {
             return !!(
                 aktueltFelt &&
                 hvileBiomer.includes(aktueltFelt.biome as string) &&
@@ -106,7 +106,7 @@
     }
 
     function erSituationsVare(vareId: string) {
-        return vareId === 'skovl' || vareId === 'mesterskovl' || vareId === 'sovepose' || vareId === 'mad' || vareId === 'dirk' || vareId === 'mesterdirk' || vareId === 'soegekvist' || vareId === 'runekvist';
+        return vareId === 'skovl' || vareId === 'mesterskovl' || vareId === 'sovepose' || vareId === 'silkesovepose' || vareId === 'mad' || vareId === 'dirk' || vareId === 'mesterdirk' || vareId === 'soegekvist' || vareId === 'runekvist';
     }
 
     function formaterNavn(tekst: string) {

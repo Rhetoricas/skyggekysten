@@ -3,6 +3,7 @@ import { syncTilDb, broadcastFelt } from './netvaerk';
 import { HEX_W } from './spildata';
 import { brugFraRygsæk, hentKortBredde, hentKortHoejde, hentNaboIRetning } from './spilmotor';
 import { erFeltITaagen } from './taage';
+import { erFriskAktivSpiller } from './aktivSpiller';
 import type { Felt, GravstenMinde } from './types';
 
 export function erSpillerITaagen() {
@@ -267,8 +268,7 @@ export function tjekOverlevelse() {
 export function fremrykTid() {
     if (!spilTilstand.valgtKarakter || spilTilstand.nuvaerendeEnergi > 0) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const antalLevende = Object.values(spilTilstand.alleSpillere).filter((s: any) => !s.isDead && !s.isWinner).length || 1;
+    const antalLevende = Object.values(spilTilstand.alleSpillere).filter(erFriskAktivSpiller).length || 1;
     
     const gammelDag = spilTilstand.dag || 1;
     let taagenVendte = false;

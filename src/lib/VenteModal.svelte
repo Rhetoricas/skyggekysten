@@ -1,6 +1,7 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { startVenteSpil, vendKort, stopVenteSpil, lukVenteSpil, erNaesteVenteRundeGratis } from '$lib/ventespil.svelte';
+    import { erFriskAktivSpiller } from '$lib/aktivSpiller';
     
     let { kanSpilleIgen } = $props<{ kanSpilleIgen: boolean }>();
 
@@ -8,12 +9,7 @@
         const spillere = Object.values(spilTilstand.alleSpillere);
         if (spillere.length <= 1) return spilTilstand.dag;
 
-        const timeoutGraense = Date.now() - (5 * 60 * 1000);
-        const aktive = spillere.filter((s) => {
-            if (s.isDead || s.isWinner) return false;
-            if (s.sidstAktiv && s.sidstAktiv < timeoutGraense) return false;
-            return true;
-        });
+        const aktive = spillere.filter((s) => erFriskAktivSpiller(s));
 
         if (aktive.length === 0) return spilTilstand.dag;
         return Math.min(...aktive.map((s) => s.dag || 1));

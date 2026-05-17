@@ -14,6 +14,7 @@
     import { grav } from '$lib/undergrund.svelte';
     import { erSpillerITaagen } from '$lib/overlevelse.svelte';    
     import { eventState, startEvent, lukEvent as motorLukEvent } from '$lib/eventMotor.svelte';
+    import { erFriskAktivSpiller } from '$lib/aktivSpiller';
     import {
         BREDDE,
         HOEJDE,
@@ -22,7 +23,9 @@
         tilgaengeligeKarakterer,
         itemDB
     } from '$lib/spildata';
+    import { vaelgStandardKortDimensioner } from '$lib/kortDimensioner';
     import { KORT_VERSION, kortPixelBredde, kortPixelHoejde } from '$lib/kortDimensioner';
+    import { erStandardOeNavn } from '$lib/oeNavne';
     import type { Felt, GravstenMinde, Karakter, SpillerData } from '$lib/types';
     import { eventBibliotek } from '$lib/eventBibliotek';
     import { erAfgroedeModen, hentAfgroedeBlok, hentInsektPlageBlok } from '$lib/afgroeder';
@@ -40,7 +43,6 @@
 
     const cam = skabKamera();
     const MAX_DAGE_FORAN = 5;
-    const SESSION_TIMEOUT_MS = 5 * 60 * 1000;
     const SESSION_SELECT = 'rum_kode,kort,start_index,spillere,fog_x,kort_bredde,kort_hoejde,kort_version';
 
     let lokaleScores = $state<Array<{ navn: string; score: number; karakter?: string }>>([]);
@@ -66,8 +68,9 @@
     let aktivInsektPlageBlok = $derived(hentInsektPlageBlok(spilTilstand.gitter));
     let kortBredde = $derived(spilTilstand.kortBredde || BREDDE);
     let kortHoejde = $derived(spilTilstand.kortHoejde || HOEJDE);
+    const erLocalhost = () => browser && ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
-    let harSkattekortAktivt = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'skattekort_aabent') ?? false);
+    let harSkattekortAktivt = $derived((spilTilstand.mineSkattekortFelter?.length || 0) > 0);
     function hexMidtpunkt(index: number) {
         const raekke = Math.floor(index / kortBredde);
         const kolonne = index % kortBredde;
@@ -77,28 +80,123 @@
         };
     }
 
-    let skattekortLinje = $derived.by(() => {
-        if (!harSkattekortAktivt || spilTilstand.spillerIndex < 0) return null;
+    function findSkatteKlyngeCenter(klynge: number[]) {
+        const klyngeSet = new Set(klynge);
+        return klynge.find((index) => hentNaboIndices(index).filter((nabo) => klyngeSet.has(nabo)).length === 6)
+            ?? klynge[Math.floor(klynge.length / 2)];
+    }
 
-        const markeretFelt = spilTilstand.gitter
-            .map((felt, index) => ({ felt, index }))
-            .filter(({ felt, index }) =>
-                felt.isSkatteKlynge &&
-                !felt.gravet &&
-                (spilTilstand.devVisHeleKort || spilTilstand.mineKendteFelter.includes(index))
-            )
-            .sort((a, b) =>
-                regnHexAfstand(spilTilstand.spillerIndex, a.index, kortBredde) -
-                regnHexAfstand(spilTilstand.spillerIndex, b.index, kortBredde) ||
-                a.index - b.index
-            )[0];
+    function erSkatteKlyngeAfsluttet(klynge: number[]) {
+        return klynge.some((index) =>
+            (spilTilstand.devVisHeleKort || spilTilstand.mineKendteFelter.includes(index)) &&
+            !!spilTilstand.gitter[index]?.tomSkattekiste
+        );
+    }
 
-        if (!markeretFelt) return null;
+    function hentAktiveSkattekortKlynger() {
+        const felter = (spilTilstand.mineSkattekortFelter || [])
+            .filter((index) => spilTilstand.gitter[index]?.isSkatteKlynge);
+
+        const klynger = new Map<number, number[]>();
+        for (const index of felter) {
+            const id = spilTilstand.gitter[index]?.skatId ?? index;
+            klynger.set(id, [...(klynger.get(id) || []), index]);
+        }
+
+        return Array.from(klynger.entries())
+            .map(([id, klynge]) => ({
+                id,
+                klynge,
+                center: findSkatteKlyngeCenter(klynge)
+            }))
+            .filter(({ klynge }) => !erSkatteKlyngeAfsluttet(klynge));
+    }
+
+    let aktiveSkattekortFelter = $derived.by(() =>
+        hentAktiveSkattekortKlynger().flatMap(({ klynge }) => klynge)
+    );
+
+    function forskydPunktMod(
+        fra: { x: number; y: number },
+        til: { x: number; y: number },
+        afstand: number
+    ) {
+        const dx = til.x - fra.x;
+        const dy = til.y - fra.y;
+        const laengde = Math.hypot(dx, dy);
+        if (laengde <= afstand || laengde === 0) return fra;
+        return {
+            x: fra.x + (dx / laengde) * afstand,
+            y: fra.y + (dy / laengde) * afstand
+        };
+    }
+
+    function lavSkattekortLinje(fra: { x: number; y: number }, centerIndex: number, startForskydning = 0) {
+        const center = hexMidtpunkt(centerIndex);
+        const start = startForskydning > 0 ? forskydPunktMod(fra, center, startForskydning) : fra;
+        const centerKolonne = centerIndex % kortBredde;
+        const stopKolonne = center.x >= start.x
+            ? Math.max(0, centerKolonne - 2)
+            : Math.min(kortBredde - 1, centerKolonne + 2);
+        const stopX = center.x + ((stopKolonne - centerKolonne) * HEX_W);
+        const fremdrift = center.x === start.x
+            ? 0.82
+            : Math.max(0, Math.min(1, (stopX - start.x) / (center.x - start.x)));
 
         return {
-            fra: hexMidtpunkt(spilTilstand.spillerIndex),
-            til: hexMidtpunkt(markeretFelt.index)
+            fra: start,
+            til: {
+                x: start.x + (center.x - start.x) * fremdrift,
+                y: start.y + (center.y - start.y) * fremdrift
+            }
         };
+    }
+
+    let skattekortLinjer = $derived.by(() => {
+        if (!harSkattekortAktivt || spilTilstand.spillerIndex < 0) return [];
+
+        const klynger = [...hentAktiveSkattekortKlynger()];
+        const sorteret = [];
+        let kildeIndex = spilTilstand.spillerIndex;
+
+        while (klynger.length > 0) {
+            klynger.sort((a, b) =>
+                regnHexAfstand(kildeIndex, a.center, kortBredde) -
+                regnHexAfstand(kildeIndex, b.center, kortBredde)
+            );
+            const naeste = klynger.shift();
+            if (!naeste) break;
+            sorteret.push(naeste);
+            kildeIndex = naeste.center;
+        }
+
+        let fra = hexMidtpunkt(spilTilstand.spillerIndex);
+        return sorteret.map((klynge, index) => {
+            const linje = {
+                id: klynge.id,
+                ...lavSkattekortLinje(fra, klynge.center, index === 0 ? 34 : 0)
+            };
+            fra = linje.til;
+            return linje;
+        });
+    });
+
+    let baadLinjer = $derived.by(() => {
+        if (spilTilstand.spillerIndex < 0) return [];
+
+        const fra = hexMidtpunkt(spilTilstand.spillerIndex);
+        return spilTilstand.gitter
+            .map((felt, index) => ({ felt, index }))
+            .filter(({ felt, index }) =>
+                !!felt.hasBoat &&
+                (felt.boatCount || 1) > 0 &&
+                (spilTilstand.devVisHeleKort || spilTilstand.mineKendteFelter.includes(index))
+            )
+            .map(({ index }) => ({
+                id: index,
+                fra,
+                til: hexMidtpunkt(index)
+            }));
     });
 
     const biomeForklaringer: Record<string, string> = {
@@ -412,12 +510,7 @@
     }
 
     async function genstartBane() {
-        const timeoutGraense = Date.now() - (5 * 60 * 1000);
-        const aktiveSpillere = Object.values(spilTilstand.alleSpillere).filter((s: SpillerData) => {
-            if (s.isDead || s.isWinner) return false;
-            if (s.sidstAktiv && s.sidstAktiv > timeoutGraense) return true;
-            return false;
-        });
+        const aktiveSpillere = Object.values(spilTilstand.alleSpillere).filter(erAktivSessionSpiller);
 
         if (!spilTilstand.offlineMode && aktiveSpillere.length > 0 && spilTilstand.rumKode) {
             alert('Du kan ikke genstarte øen for alle, mens der stadig er andre aktive spillere ude i tågen.');
@@ -443,6 +536,7 @@
         spilTilstand.nuvaerendeEnergi = 0;
         spilTilstand.mitUdstyr = [];
         spilTilstand.mineKendteFelter = [];
+        spilTilstand.mineSkattekortFelter = [];
         spilTilstand.samletScore = 0;
         spilTilstand.venteGratisFeltBrugt = null;
         spilTilstand.gratisNaesteBevaegelse = false;
@@ -553,6 +647,9 @@
                 spilTilstand.alleSpillere = filtrerSpillereTilKanal(data.spillere || {}, aktivKanalNoegle);
                 spilTilstand.fogX = data.fog_x || 0;
                 spilTilstand.erHost = false;
+
+                const sessionKlar = await haandterUdloebneSpillereVedIndgang(rentNavn, mitBrowserId);
+                if (!sessionKlar) return;
                 
                 const fundetNavn = Object.keys(spilTilstand.alleSpillere).find(n => n.toLowerCase() === rentNavn.toLowerCase());
 
@@ -562,7 +659,15 @@
                     const sammeBrowser = !!eksisterende.browserId && eksisterende.browserId === mitBrowserId;
                     
                     if (!eksisterende.isDead && !eksisterende.isWinner && !sammeLogin && !sammeBrowser) {
-                        spilTilstand.statusBesked = `Navnet '${fundetNavn}' er allerede i brug af en anden rejsende.`;
+                        if (!erAktivSessionSpiller(eksisterende)) {
+                            delete spilTilstand.alleSpillere[fundetNavn];
+                            spilTilstand.gameState = 'select';
+                            spilTilstand.statusBesked = `Den gamle '${fundetNavn}' er udløbet af øen. Vælg karakter for at starte.`;
+                            startRealtime();
+                            return;
+                        }
+
+                        spilTilstand.statusBesked = `Navnet '${fundetNavn}' er allerede i brug af en anden aktiv rejsende.`;
                         return;
                     }
 
@@ -617,6 +722,7 @@
                         spilTilstand.nuvaerendeEnergi = 0;
                         spilTilstand.mitUdstyr = [];
                         spilTilstand.mineKendteFelter = [];
+                        spilTilstand.mineSkattekortFelter = [];
                         spilTilstand.historik = [];
                         spilTilstand.logHistorik = [];
                         spilTilstand.venteGratisFeltBrugt = null;
@@ -645,6 +751,7 @@
                     spilTilstand.nuvaerendeEnergi = eksisterende.energi ?? (spilTilstand.valgtKarakter?.baseEnergi || 0);
                     spilTilstand.mitUdstyr = eksisterende.mitUdstyr || [];
                     spilTilstand.mineKendteFelter = eksisterende.kendteFelter || [];
+                    spilTilstand.mineSkattekortFelter = eksisterende.skattekortFelter || [];
                     spilTilstand.historik = eksisterende.historik || [];
                     spilTilstand.venteGratisFeltBrugt = null;
                     spilTilstand.gratisNaesteBevaegelse = eksisterende.gratisNaesteBevaegelse ?? false;
@@ -713,6 +820,10 @@
                 spilTilstand.ventePuljeGuld = 0;
                 spilTilstand.ventePuljeLiv = 0;
                 spilTilstand.venteRunde = 0;
+                if (!erLocalhost()) {
+                    const dimensioner = vaelgStandardKortDimensioner();
+                    saetKortDimensioner(dimensioner.bredde, dimensioner.hoejde);
+                }
                 initialiserGitter(spilTilstand.kortBredde, spilTilstand.kortHoejde);
                 const { error: insertError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').insert([{
                     rum_kode: spilTilstand.rumKode,
@@ -960,8 +1071,7 @@
             await syncTilDb(true);
             const sessionGemt = await flushVentendeSync();
             if (!sessionGemt) {
-                scoreGemningFejlet = true;
-                return;
+                console.warn('Ø-sessionen blev ikke gemt før highscore. Forsøger stadig at gemme scoren.');
             }
             
             const highscoreGemt = await gemHighscore();
@@ -1011,6 +1121,7 @@
         spilTilstand.nuvaerendeEnergi = karakter.baseEnergi;
         spilTilstand.mitUdstyr = [];
         spilTilstand.mineKendteFelter = [];
+        spilTilstand.mineSkattekortFelter = [];
         spilTilstand.gratisNaesteBevaegelse = false;
         spilTilstand.gratisBevaegelseKilde = '';
         spilTilstand.sidsteBersaerkDag = 0;
@@ -1028,6 +1139,7 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].dag = 1; 
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].besoegteMiner = [];
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].harSkattekort = false;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].skattekortFelter = [];
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].aktivTracker = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].trackedeSpillere = [];
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIndex = null;
@@ -1148,9 +1260,87 @@
     }
 
     function erAktivSessionSpiller(spiller: SpillerData) {
+        return erFriskAktivSpiller(spiller);
+    }
+
+    function erSammeSpiller(spiller: SpillerData, browserId: string) {
+        const sammeLogin = !!spiller.userId && !!authState.user?.id && spiller.userId === authState.user.id;
+        const sammeBrowser = !!spiller.browserId && spiller.browserId === browserId;
+        return sammeLogin || sammeBrowser;
+    }
+
+    function kanGenoptagePrivatUdloebetSpil(spiller: SpillerData, navn: string, browserId: string, alleEntries: Array<[string, SpillerData]>) {
+        if (erStandardOeNavn(spilTilstand.rumKode)) return false;
         if (spiller.isDead || spiller.isWinner) return false;
-        if (!spiller.sidstAktiv) return false;
-        return spiller.sidstAktiv >= Date.now() - SESSION_TIMEOUT_MS;
+        if (erAktivSessionSpiller(spiller)) return false;
+        if (navn.toLowerCase() !== spilTilstand.spillerNavn.toLowerCase()) return false;
+        if (!erSammeSpiller(spiller, browserId)) return false;
+
+        return alleEntries.every(([andetNavn]) => andetNavn === navn);
+    }
+
+    async function haandterUdloebneSpillereVedIndgang(rentNavn: string, browserId: string) {
+        const alleEntries = Object.entries(spilTilstand.alleSpillere);
+        const uafsluttede = alleEntries.filter(([, spiller]) => !spiller.isDead && !spiller.isWinner);
+        if (uafsluttede.length === 0) return true;
+
+        const egetNavn = alleEntries.find(([navn]) => navn.toLowerCase() === rentNavn.toLowerCase())?.[0] ?? rentNavn;
+        const egenSpiller = spilTilstand.alleSpillere[egetNavn];
+        if (egenSpiller && kanGenoptagePrivatUdloebetSpil(egenSpiller, egetNavn, browserId, alleEntries)) {
+            return true;
+        }
+
+        const aktiveUafsluttede = uafsluttede.filter(([, spiller]) => erAktivSessionSpiller(spiller));
+
+        if (aktiveUafsluttede.length === 0) {
+            spilTilstand.erHost = true;
+            spilTilstand.alleSpillere = {};
+            spilTilstand.fogX = 0;
+            spilTilstand.dag = 1;
+            spilTilstand.historik = [];
+            spilTilstand.logHistorik = [];
+            spilTilstand.venteGratisFeltBrugt = null;
+            spilTilstand.gratisNaesteBevaegelse = false;
+            spilTilstand.gratisBevaegelseKilde = '';
+            spilTilstand.sidsteBersaerkDag = 0;
+            spilTilstand.venteSpilAktiv = false;
+            spilTilstand.ventePuljeGuld = 0;
+            spilTilstand.ventePuljeLiv = 0;
+            spilTilstand.venteRunde = 0;
+            nulstilKort();
+
+            const { error } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
+                kort: spilTilstand.gitter,
+                start_index: spilTilstand.spillerIndex,
+                spillere: {},
+                fog_x: 0,
+                ...kortSessionMeta()
+            }).eq('rum_kode', spilTilstand.rumKode), 8000));
+
+            if (error) {
+                spilTilstand.statusBesked = `Øen kunne ikke frigøres: ${error.message}`;
+                return false;
+            }
+
+            return true;
+        }
+
+        const rensede = Object.fromEntries(
+            alleEntries.filter(([, spiller]) => spiller.isDead || spiller.isWinner || erAktivSessionSpiller(spiller))
+        );
+        if (Object.keys(rensede).length === alleEntries.length) return true;
+
+        spilTilstand.alleSpillere = rensede;
+        const { error } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
+            spillere: rensede
+        }).eq('rum_kode', spilTilstand.rumKode), 8000));
+
+        if (error) {
+            spilTilstand.statusBesked = `Gamle spillere kunne ikke ryddes fra øen: ${error.message}`;
+            return false;
+        }
+
+        return true;
     }
 
     function filtrerSpillereTilKanal(spillere: Record<string, SpillerData>, kanalNoegle: string) {
@@ -1169,7 +1359,7 @@
         if (!brugerId) return null;
 
         const fundet = Object.entries(spilTilstand.alleSpillere).find(([, spiller]) => {
-            return spiller.userId === brugerId && !spiller.isDead && !spiller.isWinner;
+            return spiller.userId === brugerId && erAktivSessionSpiller(spiller);
         });
 
         return fundet ? { navn: fundet[0], spiller: fundet[1] } : null;
@@ -1232,7 +1422,14 @@
         return (felt.shopItems || []).some((itemId) => itemDB[itemId]?.kanKoebes !== false);
     }
 
-    function forklaringForFelt(felt: Felt, index: number, erUdforsket: boolean, erOpslugt: boolean) {
+    function forklaringForFelt(felt: Felt, index: number, erUdforsket: boolean, erOpslugt: boolean, erSkattekortRygte = false) {
+        if (erSkattekortRygte && !erUdforsket) {
+            return {
+                titel: 'Skattekortspor',
+                tekst: 'Et gammelt skattekort peger på dette område. Farven og krydset er kun et kortspor: feltet tæller ikke som udforsket, og kortet viser ikke, om kisten stadig er der.'
+            };
+        }
+
         if (!erUdforsket) {
             return {
                 titel: 'Ukendt felt',
@@ -1507,19 +1704,21 @@ function udførBevægelse(nytIndeks: number) {
                 {@const posX = kolonne * HEX_W + (raekke % 2 !== 0 ? HEX_W / 2 : 0)}
                 {@const posY = raekke * ROW_H}
                 {@const erUdforsket = spilTilstand.devVisHeleKort || spilTilstand.mineKendteFelter.includes(i)}
+                {@const erSkattekortRygte = !erUdforsket && aktiveSkattekortFelter.includes(i)}
                 {@const erOpslugt = !spilTilstand.devVisHeleKort && erFeltITaagen(spilTilstand.gitter, i, spilTilstand.fogX, kortBredde)}
                 {@const vistBiome = felt.katastrofeVisuelAktiv && felt.katastrofeFraBiome ? felt.katastrofeFraBiome : felt.biome}
-                {@const baggrund = !erUdforsket ? 'none' : erOpslugt ? `url('/tiles/${vistBiome}_taage.webp')` : `url('/tiles/${vistBiome}.webp')`}
-                {@const feltHjaelp = forklaringForFelt(felt, i, erUdforsket, erOpslugt)}
+                {@const baggrund = !erUdforsket && !erSkattekortRygte ? 'none' : erOpslugt ? `url('/tiles/${vistBiome}_taage.webp')` : `url('/tiles/${vistBiome}.webp')`}
+                {@const feltHjaelp = forklaringForFelt(felt, i, erUdforsket, erOpslugt, erSkattekortRygte)}
 
-                <div class="hex" class:active={spilTilstand.spillerIndex === i} class:unexplored={!erUdforsket}
+                <div class="hex" class:active={spilTilstand.spillerIndex === i} class:unexplored={!erUdforsket && !erSkattekortRygte}
+                    class:skattekort-rygte={erSkattekortRygte}
                     class:katastrofe-venter={!!felt.katastrofeVisuelAktiv}
                     onclick={() => klikPåHex(i)}
                     onkeydown={(e) => { if (e.key === 'Enter') klikPåHex(i); }}
                     data-help-title={feltHjaelp.titel}
                     data-help-body={feltHjaelp.tekst}
                     role="button" tabindex="0"
-                    style="background-image: {baggrund}; left: {posX}px; top: {posY}px;"
+                    style="{erSkattekortRygte ? `--rygte-bg: ${baggrund};` : `background-image: ${baggrund};`} left: {posX}px; top: {posY}px;"
                 >
                     <div class="inner" class:opslugt={erOpslugt}>
                         {#if erUdforsket && felt.hasBoat}
@@ -1560,15 +1759,15 @@ function udførBevægelse(nytIndeks: number) {
                             <img src="/tiles/blokker.webp" class="taageblokker-icon" class:taageblokker-inaktiv={spilTilstand.fogX < 0} alt="Tågeblokker" data-help-title="Tågeblokker" data-help-body="Holder tågen tilbage fra venstre side. Når tågen vender fra højre, beskytter blokkeren ikke længere." />
                         {/if}
 
-                        {#if erUdforsket && !felt.gravet}
+                        {#if (erUdforsket || erSkattekortRygte) && !felt.gravet}
                             {@const erIndenForPejling = regnHexAfstand(spilTilstand.spillerIndex, i, kortBredde) <= pejleRadius}
-                            {#if felt.isSkatteKlynge && harSkattekortAktivt}
-                                <img src="/tiles/treasuremark.webp" alt="Mulig skat" class="treasure-mark-icon" data-help-title="Mulig skat" data-help-body="Skattekortet peger på dette felt som mulig skatteklynge. Grav for at afsløre om der er noget." />
+                            {#if felt.isSkatteKlynge && (erSkattekortRygte || aktiveSkattekortFelter.includes(i))}
+                                <img src="/tiles/treasuremark.webp" alt="Mulig skat" class="treasure-mark-icon" data-help-title="Mulig skat" data-help-body="Skattekortet peger på dette felt som mulig skatteklynge. Kortet viser ikke, om kisten stadig er her." />
                             {/if}
-                            {#if harDetektor && erIndenForPejling && (felt.skjultGuld ?? 0) > 0}
+                            {#if erUdforsket && harDetektor && erIndenForPejling && (felt.skjultGuld ?? 0) > 0}
                                 <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" data-help-title="Guldspor" data-help-body="Din metaldetektor mærker skjult guld på kendte felter inden for radius 3. Grav feltet for at få det frem." style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 80});" />
                             {/if}
-                            {#if harKvist && erIndenForPejling && (felt.skjultLiv ?? 0) > 0}
+                            {#if erUdforsket && harKvist && erIndenForPejling && (felt.skjultLiv ?? 0) > 0}
                                 <img src="/tiles/livtaage.webp" alt="" class="mist-icon" data-help-title="Rodspor" data-help-body={harRunekvist ? 'Runekvisten mærker helende rødder på kendte felter inden for radius 3. Hvis du mangler HP, trækkes de automatisk op, når du går ind på feltet.' : 'Søgekvisten mærker helende rødder på kendte felter inden for radius 3. Grav feltet for at finde dem.'} style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultLiv ?? 0) / 40});" />
                             {/if}
                         {/if}
@@ -1624,7 +1823,7 @@ function udførBevægelse(nytIndeks: number) {
                                 alt=""
                                 class="workshop-icon"
                                 data-help-title="Værksted"
-                                data-help-body="Værkstedet opgraderer udstyr: skovl, stav, søgekvist, dirk, kniv, rustning, økse, bue, tøj, fakkel og detektor kan blive til stærkere versioner."
+                                data-help-body="Værkstedet opgraderer udstyr: skovl, stav, søgekvist, dirk, kniv, rustning, økse, bue, tøj, fakkel, sovepose og detektor kan blive til stærkere versioner."
                             />
                         {/if}
 
@@ -1703,15 +1902,47 @@ function udførBevægelse(nytIndeks: number) {
                 {/if}
             {/each}
 
-            {#if skattekortLinje}
+            {#if skattekortLinjer.length > 0}
                 <svg class="skattekort-linje-canvas" aria-hidden="true">
-                    <line
-                        x1={skattekortLinje.fra.x}
-                        y1={skattekortLinje.fra.y}
-                        x2={skattekortLinje.til.x}
-                        y2={skattekortLinje.til.y}
-                        class="skattekort-linje"
-                    />
+                    {#each skattekortLinjer as linje (linje.id)}
+                        <line
+                            x1={linje.fra.x}
+                            y1={linje.fra.y}
+                            x2={linje.til.x}
+                            y2={linje.til.y}
+                            class="skattekort-linje"
+                        />
+                    {/each}
+                </svg>
+
+                {#each spilTilstand.gitter as felt, i (i)}
+                    {@const raekke = Math.floor(i / kortBredde)}
+                    {@const kolonne = i % kortBredde}
+                    {@const posX = kolonne * HEX_W + (raekke % 2 !== 0 ? HEX_W / 2 : 0)}
+                    {@const posY = raekke * ROW_H}
+                    {@const erUdforsket = spilTilstand.devVisHeleKort || spilTilstand.mineKendteFelter.includes(i)}
+                    {@const erOpslugt = !spilTilstand.devVisHeleKort && erFeltITaagen(spilTilstand.gitter, i, spilTilstand.fogX, kortBredde)}
+                    {#if erUdforsket && !erOpslugt && felt.eventID && !felt.eventFuldført}
+                        {#if felt.eventID === 'campfire'}
+                            <img src="/tiles/campfire.webp" alt="" class="campfire-icon skattekort-ikon-overlag" aria-hidden="true" style="left: {posX + HEX_W / 2}px; top: {posY + 55}px;" />
+                        {:else if felt.eventID !== 'meteor_skat'}
+                            <img src="/tiles/event.png" alt="" class="event-crystal skattekort-ikon-overlag" aria-hidden="true" style="left: {posX + HEX_W / 2}px; top: {posY + 55}px;" />
+                        {/if}
+                    {/if}
+                {/each}
+            {/if}
+
+            {#if baadLinjer.length > 0}
+                <svg class="baad-linje-canvas" aria-hidden="true">
+                    {#each baadLinjer as linje (linje.id)}
+                        <line
+                            x1={linje.fra.x}
+                            y1={linje.fra.y}
+                            x2={linje.til.x}
+                            y2={linje.til.y}
+                            class="baad-linje"
+                        />
+                    {/each}
                 </svg>
             {/if}
 
@@ -2134,6 +2365,23 @@ function udførBevægelse(nytIndeks: number) {
         background: radial-gradient(circle at 50% 50%, rgba(255, 240, 180, 0.18), rgba(0, 0, 0, 0) 62%);
         animation: feltVenterKatastrofe 0.9s ease-in-out infinite alternate;
     }
+    .hex.skattekort-rygte {
+        background-image: none;
+        opacity: 1;
+    }
+    .hex.skattekort-rygte .inner::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image:
+            linear-gradient(rgba(226, 163, 66, 0.46), rgba(139, 75, 24, 0.36)),
+            var(--rygte-bg);
+        background-size: cover;
+        filter: sepia(0.62) saturate(1.35) hue-rotate(-8deg) brightness(0.92) contrast(1.03);
+        opacity: 0.92;
+    }
     .hex.unexplored { background-color: #000; }
     .inner { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
     
@@ -2242,16 +2490,34 @@ function udførBevægelse(nytIndeks: number) {
         width: 100%;
         height: 100%;
         pointer-events: none;
-        z-index: 12;
+        z-index: 8;
         overflow: visible;
     }
 
     .skattekort-linje {
-        stroke: rgba(255, 214, 70, 0.78);
-        stroke-width: 1.4;
+        stroke: rgba(210, 58, 42, 0.56);
+        stroke-width: 1.55;
         stroke-linecap: round;
         stroke-dasharray: 5 7;
-        filter: drop-shadow(0 0 4px rgba(255, 190, 40, 0.65));
+    }
+
+    .baad-linje-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 28;
+        overflow: visible;
+    }
+
+    .baad-linje {
+        stroke: rgba(255, 255, 255, 0.42);
+        stroke-width: 1.2;
+        stroke-linecap: round;
+        stroke-dasharray: 8 10;
+        filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.45));
     }
 
     .rute-canvas {
@@ -2273,6 +2539,13 @@ function udførBevægelse(nytIndeks: number) {
 
     .event-crystal { height: 60px; animation: float 3s infinite ease-in-out; z-index: 15; position: relative; }
     .campfire-icon { position: absolute; width: 80px; height: 80px; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 14; }
+    .skattekort-ikon-overlag {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 20;
+        animation: none;
+    }
     .portal-icon {
         position: absolute; width: 65px; height: 65px; z-index: 9; pointer-events: none;
         animation: portalPuls 2.5s infinite alternate ease-in-out;

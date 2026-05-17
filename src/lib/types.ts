@@ -68,6 +68,7 @@ export interface SpillerData {
     rumKode?: string;
     kanalNoegle?: string;
     harSkattekort?: boolean;
+    skattekortFelter?: number[];
     aktivTracker?: {
         targetNavn: string;
         slutterDag: number;
@@ -120,6 +121,7 @@ export interface Felt {
     skjultLoot?: string | null;
     tomSkattekiste?: boolean;
     isSkatteKlynge?: boolean;
+    skatId?: number;
 
     afgroede?: 'hvede' | 'boenner';
     smadretFremTilBlok?: number;

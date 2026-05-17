@@ -10,6 +10,7 @@ import { erAfgroedeModen, erHvedeBlok, erInsektPlageAktiv, hentAfgroedeBlok } fr
 import type { Biome, Felt, RygsækTing } from '$lib/types';
 import { delNyeKort, startVenteSpil } from '$lib/ventespil.svelte';
 import { startEvent } from '$lib/eventMotor.svelte';
+import { erFriskAktivSpiller } from '$lib/aktivSpiller';
 
 function eventKanalNavn() {
     return `room:${realtimeRumNoegle(spilTilstand.rumKode)}:events`;
@@ -271,11 +272,13 @@ export function harRygsaekItem(genstandId: string) {
                                     ? ['bue', 'mesterbue']
                                     : genstandId === 'flot_toej'
                                         ? ['flot_toej', 'royalt_toej']
-                                    : genstandId === 'fakkel'
-                                        ? ['fakkel', 'solfakkel']
-                                        : genstandId === 'metaldetektor'
-                                            ? ['metaldetektor', 'malmviser']
-                                            : [genstandId];
+                                        : genstandId === 'fakkel'
+                                            ? ['fakkel', 'solfakkel']
+                                            : genstandId === 'metaldetektor'
+                                                ? ['metaldetektor', 'malmviser']
+                                                : genstandId === 'sovepose'
+                                                    ? ['sovepose', 'silkesovepose']
+                                                    : [genstandId];
     return spilTilstand.mitUdstyr.some(ting => itemIds.includes(ting.id) && ting.maengde > 0);
 }
 
@@ -298,11 +301,13 @@ export function findRygsaekItemTilKrav(genstandId: string) {
                                     ? ['bue', 'mesterbue']
                                     : genstandId === 'flot_toej'
                                         ? ['flot_toej', 'royalt_toej']
-                                    : genstandId === 'fakkel'
-                                        ? ['fakkel', 'solfakkel']
-                                        : genstandId === 'metaldetektor'
-                                            ? ['metaldetektor', 'malmviser']
-                                            : [genstandId];
+                                        : genstandId === 'fakkel'
+                                            ? ['fakkel', 'solfakkel']
+                                            : genstandId === 'metaldetektor'
+                                                ? ['metaldetektor', 'malmviser']
+                                                : genstandId === 'sovepose'
+                                                    ? ['sovepose', 'silkesovepose']
+                                                    : [genstandId];
     return spilTilstand.mitUdstyr.find(ting => itemIds.includes(ting.id) && ting.maengde > 0)?.id ?? null;
 }
 
@@ -325,6 +330,7 @@ export function kanModtageItem(genstandId: string) {
     }
     if (genstandId === 'fakkel' || genstandId === 'solfakkel') return !harRygsaekItem('fakkel');
     if (genstandId === 'metaldetektor' || genstandId === 'malmviser') return !harRygsaekItem('metaldetektor');
+    if (genstandId === 'sovepose' || genstandId === 'silkesovepose') return !harRygsaekItem('sovepose');
     return !spilTilstand.mitUdstyr.some(ting => ting.id === genstandId && ting.maengde > 0);
 }
 
@@ -388,6 +394,11 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
 
     if (genstandId === 'malmviser') {
         spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'metaldetektor');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'silkesovepose') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'sovepose');
         udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
     }
 
@@ -1003,7 +1014,8 @@ export function hvil() {
         return;
     }
     
-    const harSovepose = spilTilstand.mitUdstyr?.some(ting => ting.id === 'sovepose');
+    const harSilkesovepose = spilTilstand.mitUdstyr?.some(ting => ting.id === 'silkesovepose');
+    const harSovepose = harSilkesovepose || spilTilstand.mitUdstyr?.some(ting => ting.id === 'sovepose');
     if (!harSovepose) {
         spilTilstand.logBesked = "Du mangler en sovepose for at slå lejr.";
         return;
@@ -1014,11 +1026,14 @@ export function hvil() {
         return;
     }
 
-    spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 20); 
+    const heling = harSilkesovepose ? 40 : 20;
+    spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + heling); 
     
     spilTilstand.nuvaerendeEnergi = 0;
     
-    spilTilstand.logBesked = "Du hviler i soveposen. Du får 20 HP, og tiden går.";
+    spilTilstand.logBesked = harSilkesovepose
+        ? "Du hviler i silkesoveposen. Du får 40 HP, og tiden går."
+        : "Du hviler i soveposen. Du får 20 HP, og tiden går.";
     
     fremrykTid();
     syncTilDb(); // Soveposen ændrer intet i landskabet. Drop (true).
@@ -1030,27 +1045,63 @@ export function aktiverHemmelighed() {
 
     brugFraRygsæk('hemmelighed', 1);
 
-    const klynge = spilTilstand.gitter.reduce((acc, felt, idx) => {
-        if (felt.isSkatteKlynge) acc.push(idx);
-        return acc;
-    }, [] as number[]);
+    const kendteKortFelter = new Set(spilTilstand.mineSkattekortFelter || []);
+    const klynger = hentSkatteKlynger()
+        .filter((klynge) => klynge.felter.every((idx) => !kendteKortFelter.has(idx)));
 
-    if (klynge.length > 0) {
-        const nyeFelter = new Set(spilTilstand.mineKendteFelter);
-        klynge.forEach(idx => nyeFelter.add(idx));
-        spilTilstand.mineKendteFelter = Array.from(nyeFelter);
+    if (klynger.length > 0) {
+        const valgtKlynge = vaelgVægtetSkatteKlynge(klynger, spilTilstand.spillerIndex);
+        const nyeKortFelter = new Set(spilTilstand.mineSkattekortFelter || []);
+        valgtKlynge.felter.forEach(idx => nyeKortFelter.add(idx));
+        spilTilstand.mineSkattekortFelter = Array.from(nyeKortFelter);
 
-        tilfoejTilRygsæk('skattekort_aabent', 1);
-        
-        spilTilstand.kameraFokus = klynge[Math.floor(klynge.length / 2)];
-        
-        spilTilstand.logBesked = "Du læser skattekortet. En klynge felter bliver synlig.";
+        spilTilstand.kameraFokus = valgtKlynge.center;
+        spilTilstand.logBesked = "Du læser skattekortet. Det gamle pergament peger på et område, men ikke på sandheden under jorden.";
     } else {
-        spilTilstand.logBesked = "Kortet viser ikke noget brugbart.";
+        spilTilstand.logBesked = "Skattekortet er for gammelt. Alle dets mærker fører til steder, du allerede har tydet.";
     }
     
     spilTilstand.gitter = [...spilTilstand.gitter];
     syncTilDb(); // Du ruller et kort ud. Kun dig og din rygsæk er involveret. Drop (true).
+}
+
+function hentSkatteKlynger() {
+    const grupper = new Map<number, number[]>();
+
+    spilTilstand.gitter.forEach((felt, idx) => {
+        if (!felt.isSkatteKlynge) return;
+        const id = felt.skatId ?? idx;
+        grupper.set(id, [...(grupper.get(id) || []), idx]);
+    });
+
+    return Array.from(grupper.entries()).map(([id, felter]) => ({
+        id,
+        felter,
+        center: findSkatteKlyngeCenter(felter)
+    }));
+}
+
+function findSkatteKlyngeCenter(klynge: number[]) {
+    const klyngeSet = new Set(klynge);
+    return klynge.find((index) => hentNaboIndices(index).filter((nabo) => klyngeSet.has(nabo)).length === 6)
+        ?? klynge[Math.floor(klynge.length / 2)];
+}
+
+function vaelgVægtetSkatteKlynge(klynger: Array<{ id: number; felter: number[]; center: number }>, spillerIndex: number) {
+    const bredde = hentKortBredde();
+    const vægtede = klynger.map((klynge) => ({
+        klynge,
+        vægt: 1 / Math.max(1, regnHexAfstand(spillerIndex, klynge.center, bredde))
+    }));
+    const samletVægt = vægtede.reduce((sum, entry) => sum + entry.vægt, 0);
+    let roll = Math.random() * samletVægt;
+
+    for (const entry of vægtede) {
+        roll -= entry.vægt;
+        if (roll <= 0) return entry.klynge;
+    }
+
+    return vægtede[vægtede.length - 1].klynge;
 }
 
 function harUdstyr(genstandId: string) {
@@ -1090,7 +1141,7 @@ function hentMuligeTrackerMaal() {
         .filter(([navn, spiller]) => {
             if (navn === spilTilstand.spillerNavn) return false;
             if (trackede.has(navn)) return false;
-            if (spiller.isDead || spiller.isWinner) return false;
+            if (!erFriskAktivSpiller(spiller)) return false;
             return spiller.index === spilTilstand.spillerIndex;
         })
         .map(([navn]) => navn);
@@ -1108,7 +1159,7 @@ function saetTracker(targetNavn: string, visLog = true) {
     }
 
     const target = spilTilstand.alleSpillere[targetNavn];
-    if (!target || target.index !== spilTilstand.spillerIndex || target.isDead || target.isWinner) {
+    if (!target || target.index !== spilTilstand.spillerIndex || !erFriskAktivSpiller(target)) {
         spilTilstand.logBesked = 'Du skal stå på samme felt som spilleren for at sætte en tracker.';
         return;
     }
@@ -1361,35 +1412,33 @@ export function plantSkat(gitter: Felt[]) {
     gitter.forEach(f => {
         f.isSkatteKlynge = false;
         f.tomSkattekiste = false;
+        f.skatId = undefined;
     });
 
-    const muligeCentre: number[] = [];
-    const minKol = Math.floor(bredde * 0.50);
-    const maxKol = Math.floor(bredde * 0.75);
+    const antalSkatte = beregnAntalSkatte(bredde);
+    const brugteCentre: number[] = [];
+    const minKol = Math.floor(bredde * 0.35);
+    const maxKol = Math.floor(bredde * 0.85);
 
-    for (let i = 0; i < gitter.length; i++) {
-        const kol = i % bredde;
-        if (kol >= minKol && kol <= maxKol) {
-            const naboer = hentNaboIndices(i);
-            if (naboer.length === 6) {
-                const alleGyldige = [i, ...naboer].every(idx => {
-                    const felt = gitter[idx];
-                    return felt.kanGraves && felt.biome !== 'hav' && felt.biome !== 'by' && felt.biome !== 'marked' && felt.biome !== 'meteor' && !felt.hasPortal && !felt.eventID;
-                });
-                if (alleGyldige) {
-                    muligeCentre.push(i);
-                }
-            }
+    for (let skatNr = 0; skatNr < antalSkatte; skatNr++) {
+        const zoneStart = minKol + Math.floor(((maxKol - minKol + 1) * skatNr) / antalSkatte);
+        const zoneSlut = minKol + Math.floor(((maxKol - minKol + 1) * (skatNr + 1)) / antalSkatte) - 1;
+        let muligeCentre = findMuligeSkatteCentre(gitter, Math.max(minKol, zoneStart), Math.min(maxKol, zoneSlut), brugteCentre);
+
+        if (muligeCentre.length === 0) {
+            muligeCentre = findMuligeSkatteCentre(gitter, minKol, maxKol, brugteCentre);
         }
-    }
 
-    if (muligeCentre.length > 0) {
+        if (muligeCentre.length === 0) continue;
+
         const center = muligeCentre[Math.floor(Math.random() * muligeCentre.length)];
+        brugteCentre.push(center);
         const klynge = [center, ...hentNaboIndices(center)];
         const skatteFelt = klynge[Math.floor(Math.random() * klynge.length)];
-        
+
         klynge.forEach(idx => {
             gitter[idx].isSkatteKlynge = true;
+            gitter[idx].skatId = skatNr + 1;
             if (idx === skatteFelt) {
                 gitter[idx].skjultLoot = 'skattekiste';
                 gitter[idx].skjultFaelde = false;
@@ -1403,6 +1452,37 @@ export function plantSkat(gitter: Felt[]) {
             }
         });
     }
+}
+
+function beregnAntalSkatte(bredde: number) {
+    if (bredde < 100) return 1;
+    if (bredde < 200) return 2;
+    if (bredde < 1000) return 3;
+    return 4;
+}
+
+function findMuligeSkatteCentre(gitter: Felt[], minKol: number, maxKol: number, brugteCentre: number[]) {
+    const bredde = hentKortBredde();
+    const minAfstand = Math.max(4, Math.floor(bredde / 8));
+    const muligeCentre: number[] = [];
+
+    for (let i = 0; i < gitter.length; i++) {
+        const kol = i % bredde;
+        if (kol >= minKol && kol <= maxKol && brugteCentre.every(center => regnHexAfstand(i, center, bredde) >= minAfstand)) {
+            const naboer = hentNaboIndices(i);
+            if (naboer.length === 6) {
+                const alleGyldige = [i, ...naboer].every(idx => {
+                    const felt = gitter[idx];
+                    return felt.kanGraves && !felt.isSkatteKlynge && felt.biome !== 'hav' && felt.biome !== 'by' && felt.biome !== 'marked' && felt.biome !== 'meteor' && !felt.hasPortal && !felt.eventID;
+                });
+                if (alleGyldige) {
+                    muligeCentre.push(i);
+                }
+            }
+        }
+    }
+
+    return muligeCentre;
 }
 
 function placerVaerksteder(gitter: Felt[]) {
@@ -1700,6 +1780,7 @@ export function tjekMiljoeSlitage(biome: string): string {
     let mistetFintToej = 0;
     let nedgraderetRoyaltToej = 0;
     let nedgraderetMalmviser = false;
+    let nedgraderetSilkesovepose = false;
 
     spilTilstand.mitUdstyr = spilTilstand.mitUdstyr.filter(vare => {
         if (biome === 'hav') {
@@ -1724,6 +1805,11 @@ export function tjekMiljoeSlitage(biome: string): string {
             }
             if (vare.id === 'sovepose') {
                 logBeskeder.push("Fugten ødelægger din sovepose.");
+                return false;
+            }
+            if (vare.id === 'silkesovepose') {
+                nedgraderetSilkesovepose = true;
+                logBeskeder.push("Hulefugten ødelægger foret i silkesoveposen. Den kan stadig bruges som almindelig sovepose.");
                 return false;
             }
         } else if (biome === 'blodskov') {
@@ -1780,6 +1866,10 @@ export function tjekMiljoeSlitage(biome: string): string {
 
     if (nedgraderetMalmviser) {
         spilTilstand.mitUdstyr.push({ id: 'metaldetektor', maengde: 1 });
+    }
+
+    if (nedgraderetSilkesovepose) {
+        spilTilstand.mitUdstyr.push({ id: 'sovepose', maengde: 1 });
     }
 
     return logBeskeder.length > 0 ? " " + logBeskeder.join(" ") : "";

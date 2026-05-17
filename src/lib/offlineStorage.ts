@@ -38,6 +38,7 @@ interface OfflineSnapshot {
     alleSpillere: typeof spilTilstand.alleSpillere;
     mitUdstyr: typeof spilTilstand.mitUdstyr;
     mineKendteFelter: number[];
+    mineSkattekortFelter?: number[];
     historik: number[];
     nuvaerendeEnergi: number;
     gratisNaesteBevaegelse?: boolean;
@@ -103,6 +104,7 @@ export function gemOfflineSpil() {
         alleSpillere: spilTilstand.alleSpillere,
         mitUdstyr: spilTilstand.mitUdstyr,
         mineKendteFelter: spilTilstand.mineKendteFelter,
+        mineSkattekortFelter: spilTilstand.mineSkattekortFelter,
         historik: spilTilstand.historik,
         nuvaerendeEnergi: spilTilstand.nuvaerendeEnergi,
         gratisNaesteBevaegelse: spilTilstand.gratisNaesteBevaegelse,
@@ -145,6 +147,7 @@ export function indlaesOfflineSpil() {
         spilTilstand.alleSpillere = data.alleSpillere || {};
         spilTilstand.mitUdstyr = data.mitUdstyr || [];
         spilTilstand.mineKendteFelter = data.mineKendteFelter || [];
+        spilTilstand.mineSkattekortFelter = data.mineSkattekortFelter || [];
         spilTilstand.historik = data.historik || [];
         spilTilstand.nuvaerendeEnergi = data.nuvaerendeEnergi ?? data.valgtKarakter?.baseEnergi ?? 10;
         spilTilstand.gratisNaesteBevaegelse = data.gratisNaesteBevaegelse ?? false;

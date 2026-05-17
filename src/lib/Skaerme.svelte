@@ -9,6 +9,7 @@
     import Regelbog from '$lib/Regelbog.svelte';
     import LydKnap from '$lib/LydKnap.svelte';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
+    import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
     import type { Karakter } from '$lib/types';
 
     let {
@@ -52,8 +53,6 @@
     let visProfil = $state(false);
     let profilNavnInput = $state('');
     let visLokaleTestKnapper = $state(false);
-    const oeNavnForled = ['rav', 'mose', 'jern', 'taage', 'maan', 'ask', 'skum', 'sort'];
-    const oeNavnEfterled = ['holm', 'vig', 'oe', 'rev', 'naes', 'skov', 'dal', 'borg'];
     const lokaleKortPresets = [
         { label: '20 x 20', bredde: 20, hoejde: 20 },
         { label: '50 x 20', bredde: 50, hoejde: 20 },
@@ -61,8 +60,8 @@
     ];
 
     function foreslaaOeNavn() {
-        const forled = oeNavnForled[Math.floor(Math.random() * oeNavnForled.length)];
-        const efterled = oeNavnEfterled[Math.floor(Math.random() * oeNavnEfterled.length)];
+        const forled = OE_NAVN_FORLED[Math.floor(Math.random() * OE_NAVN_FORLED.length)];
+        const efterled = OE_NAVN_EFTERLED[Math.floor(Math.random() * OE_NAVN_EFTERLED.length)];
         const oeNavn = `${forled}${efterled}`;
         spilTilstand.rumKode = oeNavn.charAt(0).toUpperCase() + oeNavn.slice(1);
     }
@@ -112,7 +111,7 @@
         anvendLydNiveau();
         tjekOfflineAppKlar();
         visLokaleTestKnapper = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-        spilTilstand.devVisHeleKort = visLokaleTestKnapper;
+        spilTilstand.devVisHeleKort = false;
 
         blandKarakterer();
     });
@@ -121,8 +120,8 @@
         if (!visLokaleTestKnapper) return;
         spilTilstand.kortBredde = bredde;
         spilTilstand.kortHoejde = hoejde;
-        spilTilstand.devVisHeleKort = true;
-        spilTilstand.statusBesked = `Testkort valgt: ${bredde} x ${hoejde}. Kun localhost viser hele øen.`;
+        spilTilstand.devVisHeleKort = false;
+        spilTilstand.statusBesked = `Testkort valgt: ${bredde} x ${hoejde}.`;
     }
 
     function findNiveau(score: number) {
@@ -385,6 +384,22 @@
             {:else}
                 <span>{spilTilstand.statusBesked || 'Scoren blev ikke gemt.'}</span>
                 <button type="button" onclick={gemScoreIgen}>Prøv igen</button>
+                {#if !authState.user}
+                    <div class="score-login-redning">
+                        <input
+                            type="email"
+                            bind:value={authState.email}
+                            placeholder="Email til login-link"
+                            onkeydown={(e) => { if (e.key === 'Enter') sendLoginLink(authState.email); }}
+                        />
+                        <button type="button" onclick={() => sendLoginLink(authState.email)} disabled={authState.loader}>
+                            {authState.loader ? 'Sender...' : 'Log ind igen'}
+                        </button>
+                    </div>
+                    {#if authState.besked}
+                        <span class="score-login-besked">{authState.besked}</span>
+                    {/if}
+                {/if}
             {/if}
         </div>
     {/if}
@@ -1033,6 +1048,7 @@
         justify-content: center;
         gap: 14px;
         font-size: 0.95rem;
+        flex-wrap: wrap;
     }
     .score-save-status.fejl {
         border-color: #a66;
@@ -1051,6 +1067,27 @@
     .score-save-status button:hover {
         background: #333;
         border-color: #bbb;
+    }
+    .score-login-redning {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .score-login-redning input {
+        min-width: 210px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #111;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        padding: 8px 10px;
+        font-size: 0.95rem;
+    }
+    .score-login-besked {
+        width: 100%;
+        color: #f4e2d8;
+        font-size: 0.88rem;
     }
 
     .tavle { position: relative; width: 320px; }

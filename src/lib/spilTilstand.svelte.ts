@@ -103,6 +103,7 @@ export const spilTilstand = $state({
     alleSpillere: {} as Record<string, SpillerData>,
     mitUdstyr: [] as RygsækTing[],
     mineKendteFelter: [] as number[],
+    mineSkattekortFelter: [] as number[],
     historik: [] as number[],
     aktivShop: null as string[] | null,
     aktivVaerksted: false,

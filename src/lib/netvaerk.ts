@@ -35,7 +35,7 @@ type ScoreRaekke = {
 };
 
 type HighscorePayload = {
-    user_id: string;
+    user_id?: string;
     player_name: string;
     room_code: string;
     score: number;
@@ -70,7 +70,7 @@ function harLocalStorage() {
 
 function highscorePendingId(payload: HighscorePayload) {
     return [
-        payload.user_id,
+        payload.user_id ?? 'venter-paa-login',
         payload.player_name,
         payload.room_code,
         payload.score,
@@ -110,6 +110,11 @@ function huskVentendeHighscore(payload: HighscorePayload) {
 
 function fjernVentendeHighscore(pendingId: string) {
     gemVentendeHighscores(hentVentendeHighscores().filter((score) => score.pending_id !== pendingId));
+}
+
+function markerLoginUdlobet() {
+    authState.user = null;
+    authState.profil = null;
 }
 
 function rensVisuelleFeltData(felt: Felt) {
@@ -216,6 +221,7 @@ export async function syncTilDb(opdaterKort = false) {
         energi: spilTilstand.nuvaerendeEnergi,
         mitUdstyr: spilTilstand.mitUdstyr,
         kendteFelter: spilTilstand.mineKendteFelter,
+        skattekortFelter: spilTilstand.mineSkattekortFelter,
         historik: spilTilstand.historik || [],
         tidligereHistorik: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.tidligereHistorik || [],
         isDead: isDead,
@@ -414,22 +420,11 @@ export async function gemHighscore() {
         gemOfflineScore();
         return true;
     }
-    const sessionResultat = await medTimeout(supabase.auth.getSession(), 12000, 'Login-tjek').catch((error) => {
-        console.error('Kunne ikke tjekke login før scoregemning', error);
-        return null;
-    });
-    const sessionUser = sessionResultat?.data.session?.user ?? authState.user;
-    if (!sessionUser) {
-        gemOfflineScore(true);
-        spilTilstand.statusBesked = 'Login mangler eller er udløbet. Log ind igen og prøv at gemme scoren.';
-        return false;
-    }
-
     const minePoint = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
     const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
     const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map';
-    const payload: HighscorePayload = {
-        user_id: sessionUser.id,
+    const lavPayload = (userId?: string): HighscorePayload => ({
+        user_id: userId,
         player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
         room_code: spilTilstand.rumKode,
         score: spilTilstand.samletScore,
@@ -442,13 +437,33 @@ export async function gemHighscore() {
         known_fields_count: spilTilstand.mineKendteFelter?.length || 0,
         mines_owned: minePoint,
         final_log: spilTilstand.logBesked
-    };
+    });
+
+    const sessionResultat = await medTimeout(supabase.auth.getSession(), 12000, 'Login-tjek').catch((error) => {
+        console.error('Kunne ikke tjekke login før scoregemning', error);
+        return null;
+    });
+    const sessionUser = sessionResultat?.data.session?.user;
+    if (!sessionUser) {
+        markerLoginUdlobet();
+        huskVentendeHighscore(lavPayload());
+        gemOfflineScore(true);
+        spilTilstand.statusBesked = 'Login mangler eller er udløbet. Scoren er gemt i browseren og sendes, når du logger ind igen.';
+        return false;
+    }
+
+    const payload = lavPayload(sessionUser.id);
 
     const pendingId = huskVentendeHighscore(payload);
     const error = await sendHighscorePayload(payload);
 
     if (error) {
         console.error('Kunne ikke gemme highscore', error);
+        if (error.message.toLowerCase().includes('logget ind')) {
+            markerLoginUdlobet();
+            spilTilstand.statusBesked = 'Login mangler eller er udløbet. Scoren er gemt i browseren og sendes, når du logger ind igen.';
+            return false;
+        }
         gemOfflineScore(true);
         spilTilstand.statusBesked = `Scoren kunne ikke gemmes globalt: ${error.message} Den prøves igen automatisk fra denne browser.`;
         return false;
@@ -465,13 +480,13 @@ export async function retryVentendeHighscores() {
     const sessionResultat = await medTimeout(supabase.auth.getSession(), 12000, 'Login-tjek').catch(() => null);
     if (sessionResultat?.data.session?.user?.id !== brugerId) return 0;
 
-    const ventende = hentVentendeHighscores().filter((score) => score.user_id === brugerId);
+    const ventende = hentVentendeHighscores().filter((score) => !score.user_id || score.user_id === brugerId);
     let gemt = 0;
 
     for (const score of ventende) {
         const { pending_id, created_at, ...payload } = score;
         void created_at;
-        const error = await sendHighscorePayload(payload);
+        const error = await sendHighscorePayload({ ...payload, user_id: payload.user_id ?? brugerId });
         if (!error) {
             fjernVentendeHighscore(pending_id);
             gemt++;
@@ -487,19 +502,22 @@ async function sendHighscorePayload(payload: HighscorePayload) {
         return null;
     });
 
-    if (!sessionResultat?.data.session?.user) {
+    const sessionUser = sessionResultat?.data.session?.user;
+    if (!sessionUser) {
+        markerLoginUdlobet();
         return new Error('Du er ikke logget ind længere. Log ind igen og prøv at gemme scoren.');
     }
+    const payloadMedBruger = { ...payload, user_id: payload.user_id ?? sessionUser.id };
 
     let sidsteFejl: Error | null = null;
 
     for (let forsoeg = 1; forsoeg <= 3; forsoeg++) {
-        const findesAllerede = await highscoreFindes(payload).catch(() => false);
+        const findesAllerede = await highscoreFindes(payloadMedBruger).catch(() => false);
         if (findesAllerede) return null;
 
         try {
             const { error } = await medTimeout(
-                supabase.from('game_results').insert([payload]),
+                supabase.from('game_results').insert([payloadMedBruger]),
                 20000,
                 'Gemning af score'
             );
@@ -513,7 +531,7 @@ async function sendHighscorePayload(payload: HighscorePayload) {
         await new Promise(resolve => setTimeout(resolve, 900 * forsoeg));
     }
 
-    if (await highscoreFindes(payload).catch(() => false)) return null;
+    if (await highscoreFindes(payloadMedBruger).catch(() => false)) return null;
 
     return sidsteFejl ?? new Error('Scoren kunne ikke gemmes.');
 }

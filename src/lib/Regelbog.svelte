@@ -93,7 +93,7 @@
                         <li>Hvis HP rammer 0 i tågen eller i vand, dør du, medmindre en livseliksir redder dig først.</li>
                         <li>Livseliksir bruges automatisk ved dødelig skade eller kollaps og sætter HP til 90.</li>
                         <li>Rustning mindsker skade. Kongepanser mindsker skade med 70%, men er stadig tungt. Elverrustning beskytter som almindelig rustning, men er ikke tung. Ridder med rustning eller panser tager ingen skade fra nedgravede fælder.</li>
-                        <li>Mad giver +20 HP og gør næste bevægelse gratis. Sovepose kan bruges i vildmarken og giver +20 HP, men bruger resten af dagen.</li>
+                        <li>Mad giver +20 HP og gør næste bevægelse gratis. Sovepose kan bruges i vildmarken og giver +20 HP, men bruger resten af dagen. Silkesovepose giver +40 HP og bliver kun nedgraderet til almindelig sovepose af hulefugt.</li>
                         <li>Fakkel udvider synet med +1. Solfakkel udvider synet med +2. Begge kan bruges til bål; solbålet afslører et større område og giver 100 guld i stedet for 50.</li>
                         <li>Viking og valkyrie går automatisk bersærk første gang pr. dag, de tager mindst 5 skade. Næste bevægelse koster 0 energi.</li>
                         <li>Hav og oversvømmelse kan slukke fakler og få tung rustning til at gå tabt.</li>
@@ -135,19 +135,20 @@
                     <h3>Inventory og udstyr</h3>
                     <ul>
                         <li>Tryk på en genstand i bunden for at bruge den, hvis den er aktiv.</li>
-                        <li>Skovl, sovepose, mad og dirk er kun aktive, når de kan bruges i den aktuelle situation.</li>
+                        <li>Skovl, sovepose/silkesovepose, mad og dirk er kun aktive, når de kan bruges i den aktuelle situation.</li>
                         <li>Kun mad og livseliksir kan stables i flere styk. Alle andre våben, værktøjer, tøj og særlige items findes kun én gang ad gangen.</li>
-                        <li>Store værktøjer, våben og tøj findes kun i én version ad gangen. Skovl/mesterskovl, stav/dragestav, søgekvist/runekvist, detektor/malmviser, dirk/mesterdirk, kniv/mesterkniv, rustning/kongepanser, økse/stormøkse, bue/falkebue, fakkel/solfakkel og klude/fint tøj/royalt tøj tæller som samme type.</li>
-                        <li>Fakkel og solfakkel kan lave bål. Stav og dragestav kan teleportere. Hemmeligheder og særlige fund kan have egne effekter.</li>
+                        <li>Store værktøjer, våben og tøj findes kun i én version ad gangen. Skovl/mesterskovl, stav/dragestav, søgekvist/runekvist, detektor/malmviser, dirk/mesterdirk, kniv/mesterkniv, rustning/kongepanser, økse/stormøkse, bue/falkebue, fakkel/solfakkel, sovepose/silkesovepose og klude/fint tøj/royalt tøj tæller som samme type.</li>
+                        <li>Fakkel og solfakkel kan lave bål. Stav og dragestav kan teleportere. Skattekort viser én mulig skatteklynge som et gammelt sepiafarvet kortspor, men afslører ikke om kisten allerede er taget.</li>
+                        <li>Skattekortspor tæller ikke som almindelig udforskning og giver ikke udforskningspoint, før du selv kommer tæt nok på feltet.</li>
                         <li>Nogle ting kan købes, andre findes kun i events. Elverrustning, opgraderede items og relikvier kan ikke købes i almindelige butikker.</li>
                     </ul>
-                    <p class="eksempel">Eksempel: En sovepose hjælper ikke midt i en by, men kan være stærk på roligere naturfelter. En almindelig stav flytter dig 4 felter mod øst. En dragestav flytter dig 5 felter, afslører ruten og kan redde dig fra åbent vand ved at blive nedgraderet til en almindelig stav.</p>
+                    <p class="eksempel">Eksempel: En sovepose hjælper ikke midt i en by, men kan være stærk på roligere naturfelter. Et skattekort kan tegne et rødt spor mod en gammel klynge, men du ved først ved gravning, om kisten stadig findes.</p>
                 </section>
 
                 <section>
                     <h3>Værksteder</h3>
                     <p>Værksteder findes i større byer. De sælger ikke almindelige varer, men bygger dit eksisterende udstyr om til en bedre version. Du beholder ikke den gamle genstand ved siden af den nye.</p>
-                    <p class="eksempel">Eksempel: Har du en skovl og 150 guld, kan værkstedet gøre den til en mesterskovl. Har du klude og 100 guld, kan de blive til fint tøj. Fint tøj kan for 500 guld blive til royalt tøj, som giver stor guldbonus, men bliver nedgraderet til fint tøj, hvis det flænses.</p>
+                    <p class="eksempel">Eksempel: Har du en skovl og 150 guld, kan værkstedet gøre den til en mesterskovl. Har du en sovepose og 150 guld, kan den blive til en silkesovepose. Har du klude og 100 guld, kan de blive til fint tøj. Fint tøj kan for 500 guld blive til royalt tøj, som giver stor guldbonus, men bliver nedgraderet til fint tøj, hvis det flænses.</p>
                 </section>
 
                 <section>
@@ -189,6 +190,7 @@
                     <ul>
                         <li>Score bygger på guld, udforskning, miner, fremdrift eller flugtbonus, og en HP-multiplikator.</li>
                         <li>Udforskning giver 2 point pr. kendt felt.</li>
+                        <li>Sepiafelter fra skattekort er kun kortspor og tæller ikke som kendte felter i score.</li>
                         <li>Fremdrift giver 2 point pr. kolonne mod øst. Hvis du slipper væk, får du 1000 point i stedet.</li>
                         <li>Miner giver 100 point pr. mine ganget med multiplayer-modifieren.</li>
                         <li>Til sidst ganges summen med 1 + HP/1000. Har du 100 HP, bliver summen ganget med 1,100.</li>

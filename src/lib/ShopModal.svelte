@@ -40,7 +40,9 @@
                                                     ? "Du har allerede en fakkel. Find et værksted, hvis den skal forbedres."
                                                     : id === 'metaldetektor' || id === 'malmviser'
                                                         ? "Du har allerede en detektor. Find et værksted, hvis den skal forbedres."
-                                                        : `Du har allerede ${vareData.navn}.`;
+                                                        : id === 'sovepose' || id === 'silkesovepose'
+                                                            ? "Du har allerede en sovepose. Find et værksted, hvis den skal forbedres."
+                                                            : `Du har allerede ${vareData.navn}.`;
             syncTilDb();
             return;
         }

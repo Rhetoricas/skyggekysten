@@ -18,6 +18,7 @@
     const ROYALT_TOEJ_OPGRADERING_PRIS = 500;
     const FAKKEL_OPGRADERING_PRIS = 225;
     const DETEKTOR_OPGRADERING_PRIS = 250;
+    const SOVEPOSE_OPGRADERING_PRIS = 150;
 
     let harSkovl = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'skovl' && ting.maengde > 0));
     let harMesterskovl = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'mesterskovl' && ting.maengde > 0));
@@ -54,6 +55,9 @@
     let harDetektor = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'metaldetektor' && ting.maengde > 0));
     let harMalmviser = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'malmviser' && ting.maengde > 0));
     let kanOpgradereDetektor = $derived(harDetektor && !harMalmviser && spilTilstand.guldTotal >= DETEKTOR_OPGRADERING_PRIS);
+    let harSovepose = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'sovepose' && ting.maengde > 0));
+    let harSilkesovepose = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'silkesovepose' && ting.maengde > 0));
+    let kanOpgradereSovepose = $derived(harSovepose && !harSilkesovepose && spilTilstand.guldTotal >= SOVEPOSE_OPGRADERING_PRIS);
 
     function opgraderSkovl() {
         if (harMesterskovl) {
@@ -368,6 +372,32 @@
         syncTilDb();
     }
 
+    function opgraderSovepose() {
+        if (harSilkesovepose) {
+            spilTilstand.logBesked = "Din sovepose er allerede opgraderet.";
+            return;
+        }
+
+        if (!harSovepose) {
+            spilTilstand.logBesked = "Værkstedet kan ikke fore en sovepose, du ikke har.";
+            return;
+        }
+
+        if (spilTilstand.guldTotal < SOVEPOSE_OPGRADERING_PRIS) {
+            spilTilstand.logBesked = "Mesteren kræver mere guld til silke, voksdug og guldsyning.";
+            syncTilDb();
+            return;
+        }
+
+        spilTilstand.guldTotal -= SOVEPOSE_OPGRADERING_PRIS;
+        spilTilstand.mitUdstyr = [
+            ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'sovepose' && ting.id !== 'silkesovepose'),
+            { id: 'silkesovepose', maengde: 1, anskaffetDag: spilTilstand.dag }
+        ];
+        spilTilstand.logBesked = "Værkstedet syr voksdug og silke omkring varmen. Din sovepose er nu en silkesovepose.";
+        syncTilDb();
+    }
+
     type Opgradering = {
         titel: string;
         fraId: string;
@@ -503,6 +533,18 @@
             opgrader: opgraderFakkel
         },
         {
+            titel: 'Sovepose til Silkesovepose',
+            fraId: 'sovepose',
+            tilId: 'silkesovepose',
+            pris: SOVEPOSE_OPGRADERING_PRIS,
+            harBasis: harSovepose && !harSilkesovepose,
+            kanOpgradere: kanOpgradereSovepose,
+            kortTekst: 'Hvile giver 40 HP i stedet for 20. I huler bliver den nedgraderet til almindelig sovepose.',
+            helpTitle: 'Sovepose-opgradering',
+            helpBody: 'Kræver en almindelig sovepose og 150 guld. Silkesoveposen giver 40 HP ved hvile og overlever hulefugt som almindelig sovepose.',
+            opgrader: opgraderSovepose
+        },
+        {
             titel: 'Detektor til Malmviser',
             fraId: 'metaldetektor',
             tilId: 'malmviser',
@@ -536,7 +578,7 @@
     <div
         class="vaerksted-content"
         data-help-title="Værksted"
-        data-help-body="Værkstedet opgraderer udstyr. Du beholder ikke den gamle genstand ved siden af den nye: skovlen bliver erstattet af en mesterskovl."
+        data-help-body="Værkstedet opgraderer udstyr. Du beholder ikke den gamle genstand ved siden af den nye: skovlen bliver erstattet af en mesterskovl, og soveposen kan blive til en silkesovepose."
     >
         <h2>Mesterværkstedet</h2>
         <p class="intro">Her kan almindeligt udstyr bygges om til noget bedre.</p>
