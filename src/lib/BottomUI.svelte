@@ -106,7 +106,7 @@
     }
 
     function erSituationsVare(vareId: string) {
-        return vareId === 'skovl' || vareId === 'mesterskovl' || vareId === 'sovepose' || vareId === 'mad' || vareId === 'dirk' || vareId === 'mesterdirk' || vareId === 'soegekvist' || vareId === 'runekvist' || vareId === 'metaldetektor' || vareId === 'malmviser';
+        return vareId === 'skovl' || vareId === 'mesterskovl' || vareId === 'sovepose' || vareId === 'mad' || vareId === 'dirk' || vareId === 'mesterdirk' || vareId === 'soegekvist' || vareId === 'runekvist';
     }
 
     function formaterNavn(tekst: string) {
@@ -117,6 +117,10 @@
     function forklaringForVare(vareId: string, aktiv: boolean) {
         const info = itemDB[vareId];
         if (!info) return 'Ukendt genstand.';
+
+        if (vareId === 'metaldetektor' || vareId === 'malmviser') {
+            return `${info.beskrivelse} Den virker passivt, mens du bevæger dig.`;
+        }
 
         const status = aktiv
             ? 'Den kan bruges lige nu.'

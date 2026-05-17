@@ -68,6 +68,38 @@
     let kortHoejde = $derived(spilTilstand.kortHoejde || HOEJDE);
 
     let harSkattekortAktivt = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'skattekort_aabent') ?? false);
+    function hexMidtpunkt(index: number) {
+        const raekke = Math.floor(index / kortBredde);
+        const kolonne = index % kortBredde;
+        return {
+            x: kolonne * HEX_W + (raekke % 2 !== 0 ? HEX_W / 2 : 0) + (HEX_W / 2),
+            y: raekke * ROW_H + 55
+        };
+    }
+
+    let skattekortLinje = $derived.by(() => {
+        if (!harSkattekortAktivt || spilTilstand.spillerIndex < 0) return null;
+
+        const markeretFelt = spilTilstand.gitter
+            .map((felt, index) => ({ felt, index }))
+            .filter(({ felt, index }) =>
+                felt.isSkatteKlynge &&
+                !felt.gravet &&
+                (spilTilstand.devVisHeleKort || spilTilstand.mineKendteFelter.includes(index))
+            )
+            .sort((a, b) =>
+                regnHexAfstand(spilTilstand.spillerIndex, a.index, kortBredde) -
+                regnHexAfstand(spilTilstand.spillerIndex, b.index, kortBredde) ||
+                a.index - b.index
+            )[0];
+
+        if (!markeretFelt) return null;
+
+        return {
+            fra: hexMidtpunkt(spilTilstand.spillerIndex),
+            til: hexMidtpunkt(markeretFelt.index)
+        };
+    });
 
     const biomeForklaringer: Record<string, string> = {
         mark: 'Mark kan graves og kan senere have afgroeder. Gravefund er ofte små: lidt guld, rod, sjælden fælde eller fakkel.',
@@ -1671,6 +1703,18 @@ function udførBevægelse(nytIndeks: number) {
                 {/if}
             {/each}
 
+            {#if skattekortLinje}
+                <svg class="skattekort-linje-canvas" aria-hidden="true">
+                    <line
+                        x1={skattekortLinje.fra.x}
+                        y1={skattekortLinje.fra.y}
+                        x2={skattekortLinje.til.x}
+                        y2={skattekortLinje.til.y}
+                        class="skattekort-linje"
+                    />
+                </svg>
+            {/if}
+
             {#if spilTilstand.gameState === 'win_map' || spilTilstand.gameState === 'dead_map'}
                 <svg class="rute-canvas">
                     {#each Object.entries(spilTilstand.alleSpillere) as [navn, data] (navn)}
@@ -2190,6 +2234,25 @@ function udførBevægelse(nytIndeks: number) {
     }
     .owner-badge.locked .mine-owner-portrait { border-color: #ff4444; }
     .lock-icon { position: absolute; bottom: -5px; left: -10px; font-size: 18px; filter: drop-shadow(0 2px 2px black); }
+
+    .skattekort-linje-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 12;
+        overflow: visible;
+    }
+
+    .skattekort-linje {
+        stroke: rgba(255, 214, 70, 0.78);
+        stroke-width: 1.4;
+        stroke-linecap: round;
+        stroke-dasharray: 5 7;
+        filter: drop-shadow(0 0 4px rgba(255, 190, 40, 0.65));
+    }
 
     .rute-canvas {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
