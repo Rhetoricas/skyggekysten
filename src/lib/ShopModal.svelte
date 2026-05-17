@@ -66,6 +66,12 @@
         if (!vareData) return;
         
         const salgspris = Math.floor(vareData.pris / 1.5);
+        if (salgspris <= 0) {
+            spilTilstand.logBesked = `Købmanden vil ikke købe ${vareData.navn}.`;
+            syncTilDb();
+            return;
+        }
+
         spilTilstand.guldTotal += salgspris;
         brugFraRygsæk(id, 1);
         spilTilstand.logBesked = `Du solgte ${vareData.navn} for ${salgspris} guld.`;

@@ -53,6 +53,7 @@
     let visDoedsLog = $state(false);
     let langsomtKamera = $state(false);
     let ruteOverblikState = '';
+    let ruteArkivForNaesteTur = $state<Record<string, number[][]>>({});
     let introAktiv = $state(false);
     let sidstePinchAfstand = 0;
     let inspectAktiv = $state(false);
@@ -419,6 +420,52 @@
         cam.saetZoom(window.innerWidth <= 700 ? 0.42 : 0.58);
     }
 
+    function ruteArkivNoegle(navn = spilTilstand.spillerNavn) {
+        return navn.trim().toLowerCase();
+    }
+
+    function ruteSignatur(rute: number[]) {
+        return rute.join(',');
+    }
+
+    function samlTidligereRuter(spiller?: SpillerData | null) {
+        const ruter = [...(spiller?.tidligereHistorik || [])];
+        if ((spiller?.historik?.length || 0) > 1) {
+            ruter.push(spiller!.historik!);
+        }
+        return ruter.filter((rute) => rute.length > 1);
+    }
+
+    function samlUnikkeRuter(...ruteLister: Array<number[][] | undefined>) {
+        const set = new Set<string>();
+        const ruter: number[][] = [];
+
+        for (const liste of ruteLister) {
+            for (const rute of liste || []) {
+                if (rute.length <= 1) continue;
+                const signatur = ruteSignatur(rute);
+                if (set.has(signatur)) continue;
+                set.add(signatur);
+                ruter.push(rute);
+            }
+        }
+
+        return ruter;
+    }
+
+    function arkiverRuterForNaesteTur(navn: string, spiller?: SpillerData | null) {
+        const noegle = ruteArkivNoegle(navn);
+        const ruter = samlUnikkeRuter(ruteArkivForNaesteTur[noegle], samlTidligereRuter(spiller));
+        if (ruter.length > 0) {
+            ruteArkivForNaesteTur = { ...ruteArkivForNaesteTur, [noegle]: ruter };
+        }
+        return ruter;
+    }
+
+    function hentArkiveredeRuter(navn = spilTilstand.spillerNavn) {
+        return ruteArkivForNaesteTur[ruteArkivNoegle(navn)] || [];
+    }
+
     let kameraStyle = $derived(`
         transform-origin: ${cam.x}px ${cam.y}px;
         transform: translate(calc(50vw - ${cam.x}px), calc(var(--camera-center-y, 50dvh) - ${cam.y}px)) scale(${cam.zoomLevel});
@@ -681,7 +728,9 @@
                             return;
                         }
 
+                        let tidligereRuter = samlTidligereRuter(eksisterende);
                         if (aktiveSpillere.length === 0) {
+                            tidligereRuter = arkiverRuterForNaesteTur(fundetNavn, eksisterende);
                             spilTilstand.erHost = true;
                             spilTilstand.alleSpillere = {};
                             spilTilstand.fogX = 0;
@@ -724,6 +773,16 @@
                         spilTilstand.mineKendteFelter = [];
                         spilTilstand.mineSkattekortFelter = [];
                         spilTilstand.historik = [];
+                        if (tidligereRuter.length > 0) {
+                            spilTilstand.alleSpillere[fundetNavn] = {
+                                ...eksisterende,
+                                historik: [],
+                                tidligereHistorik: tidligereRuter,
+                                isDead: true,
+                                isWinner: true,
+                                sidstAktiv: 0
+                            };
+                        }
                         spilTilstand.logHistorik = [];
                         spilTilstand.venteGratisFeltBrugt = null;
                         spilTilstand.gratisNaesteBevaegelse = false;
@@ -1128,11 +1187,15 @@
         
         spilTilstand.logHistorik = []; 
 
+        const arkiveredeRuter = hentArkiveredeRuter();
+
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             const spiller = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
-            if (spiller.historik && spiller.historik.length > 1) {
-                spiller.tidligereHistorik = [...(spiller.tidligereHistorik || []), spiller.historik];
-            }
+            spiller.tidligereHistorik = samlUnikkeRuter(
+                arkiveredeRuter,
+                spiller.tidligereHistorik,
+                spiller.historik && spiller.historik.length > 1 ? [spiller.historik] : []
+            );
             spiller.historik = [];
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = false;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isWinner = false;
@@ -1147,6 +1210,21 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisNaesteBevaegelse = false;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisBevaegelseKilde = '';
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].sidsteBersaerkDag = 0;
+        } else if (arkiveredeRuter.length > 0) {
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn] = {
+                index: spilTilstand.spillerIndex,
+                kolonne: 0,
+                hp: spilTilstand.livspoint,
+                guld: spilTilstand.guldTotal,
+                score: 0,
+                turNummer: 0,
+                retning: spilTilstand.retning,
+                historik: [],
+                tidligereHistorik: arkiveredeRuter,
+                isDead: false,
+                isWinner: false,
+                sidstAktiv: 0
+            };
         }
 
         const muligeStartFelter = [];
@@ -1964,8 +2042,8 @@ function udførBevægelse(nytIndeks: number) {
                                     <polyline
                                         points={oldPoints}
                                         fill="none"
-                                        stroke="rgba(255, 255, 255, 0.22)"
-                                        stroke-width="2.5"
+                                        stroke="rgba(255, 255, 255, 0.5)"
+                                        stroke-width="1.35"
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
                                         class="flugtrute-gammel"
