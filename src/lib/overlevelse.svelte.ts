@@ -92,7 +92,7 @@ function hashTekst(tekst: string) {
 }
 
 function sortDeterministiskBaadFelter(felter: number[]) {
-    const seed = spilTilstand.rumKode || 'taage';
+    const seed = spilTilstand.rundeSeed || spilTilstand.rumKode || 'taage';
     return [...felter].sort((a, b) => hashTekst(`${seed}:${a}`) - hashTekst(`${seed}:${b}`));
 }
 

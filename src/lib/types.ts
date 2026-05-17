@@ -58,6 +58,7 @@ export interface SpillerData {
     tidligereHistorik?: number[][];
     energi?: number;
     turNummer: number;
+    rundeSeed?: string;
     dag?: number;
     sidstAktiv?: number;
     activeAlarm?: boolean;

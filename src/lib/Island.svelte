@@ -466,6 +466,34 @@
         return ruteArkivForNaesteTur[ruteArkivNoegle(navn)] || [];
     }
 
+    function genererRundeSeed() {
+        if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+        return `${spilTilstand.rumKode || 'oe'}:${Date.now().toString(36)}:${Math.random().toString(36).slice(2)}`;
+    }
+
+    function hentAktivRundeSeedFraSpillere() {
+        return Object.values(spilTilstand.alleSpillere)
+            .find((spiller) => !spiller.isDead && !spiller.isWinner && !!spiller.rundeSeed)
+            ?.rundeSeed || '';
+    }
+
+    function overtagAktivRundeSeed() {
+        const seed = hentAktivRundeSeedFraSpillere();
+        if (seed) spilTilstand.rundeSeed = seed;
+        return seed;
+    }
+
+    function startNyRundeSeed() {
+        spilTilstand.rundeSeed = genererRundeSeed();
+        return spilTilstand.rundeSeed;
+    }
+
+    function sikrRundeSeed() {
+        if (overtagAktivRundeSeed()) return spilTilstand.rundeSeed;
+        if (!spilTilstand.rundeSeed) return startNyRundeSeed();
+        return spilTilstand.rundeSeed;
+    }
+
     let kameraStyle = $derived(`
         transform-origin: ${cam.x}px ${cam.y}px;
         transform: translate(calc(50vw - ${cam.x}px), calc(var(--camera-center-y, 50dvh) - ${cam.y}px)) scale(${cam.zoomLevel});
@@ -571,6 +599,7 @@
         cam.nulstil();
 
         spilTilstand.alleSpillere = {};
+        startNyRundeSeed();
 
         spilTilstand.fogX = 0;
         spilTilstand.dag = 1;
@@ -692,6 +721,7 @@
                 laesSessionDimensioner(data);
                 spilTilstand.gitter = data.kort;
                 spilTilstand.alleSpillere = filtrerSpillereTilKanal(data.spillere || {}, aktivKanalNoegle);
+                overtagAktivRundeSeed();
                 spilTilstand.fogX = data.fog_x || 0;
                 spilTilstand.erHost = false;
 
@@ -702,6 +732,7 @@
 
                 if (fundetNavn) {
                     const eksisterende = spilTilstand.alleSpillere[fundetNavn];
+                    if (eksisterende.rundeSeed) spilTilstand.rundeSeed = eksisterende.rundeSeed;
                     const sammeLogin = !!eksisterende.userId && !!authState.user?.id && eksisterende.userId === authState.user.id;
                     const sammeBrowser = !!eksisterende.browserId && eksisterende.browserId === mitBrowserId;
                     
@@ -733,6 +764,7 @@
                             tidligereRuter = arkiverRuterForNaesteTur(fundetNavn, eksisterende);
                             spilTilstand.erHost = true;
                             spilTilstand.alleSpillere = {};
+                            startNyRundeSeed();
                             spilTilstand.fogX = 0;
                             spilTilstand.dag = 1;
                             spilTilstand.historik = [];
@@ -847,6 +879,7 @@
                     if (spillereArr.length > 0 && aktiveSpillere.length === 0) {
                         spilTilstand.erHost = true;
                         spilTilstand.alleSpillere = {};
+                        startNyRundeSeed();
                         spilTilstand.fogX = 0;
                         nulstilKort();
 
@@ -870,6 +903,7 @@
             } else {
                 spilTilstand.erHost = true;
                 spilTilstand.alleSpillere = {};
+                startNyRundeSeed();
                 spilTilstand.fogX = 0;
                 spilTilstand.dag = 1;
                 spilTilstand.historik = [];
@@ -942,6 +976,7 @@
         spilTilstand.statusBesked = 'Offline. Spillet gemmes lokalt på denne enhed.';
         spilTilstand.erHost = true;
         spilTilstand.alleSpillere = {};
+        startNyRundeSeed();
         spilTilstand.fogX = 0;
         spilTilstand.dag = 1;
         spilTilstand.historik = [];
@@ -1170,6 +1205,7 @@
             return;
         }
 
+        sikrRundeSeed();
         spilTilstand.valgtKarakter = karakter;
         spilTilstand.maxLivspoint = karakter.startHp || 100;
         spilTilstand.livspoint = karakter.startHp;
@@ -1210,6 +1246,7 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisNaesteBevaegelse = false;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisBevaegelseKilde = '';
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].sidsteBersaerkDag = 0;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].rundeSeed = spilTilstand.rundeSeed;
         } else if (arkiveredeRuter.length > 0) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn] = {
                 index: spilTilstand.spillerIndex,
@@ -1219,6 +1256,7 @@
                 score: 0,
                 turNummer: 0,
                 retning: spilTilstand.retning,
+                rundeSeed: spilTilstand.rundeSeed,
                 historik: [],
                 tidligereHistorik: arkiveredeRuter,
                 isDead: false,
@@ -1373,6 +1411,7 @@
         if (aktiveUafsluttede.length === 0) {
             spilTilstand.erHost = true;
             spilTilstand.alleSpillere = {};
+            startNyRundeSeed();
             spilTilstand.fogX = 0;
             spilTilstand.dag = 1;
             spilTilstand.historik = [];

@@ -18,6 +18,7 @@ interface OfflineSnapshot {
     savedAt: string;
     spillerNavn: string;
     rumKode: string;
+    rundeSeed?: string;
     gameMode?: typeof spilTilstand.gameMode;
     erHost: boolean;
     gameState: typeof spilTilstand.gameState;
@@ -84,6 +85,7 @@ export function gemOfflineSpil() {
         savedAt: new Date().toISOString(),
         spillerNavn: spilTilstand.spillerNavn,
         rumKode: spilTilstand.rumKode,
+        rundeSeed: spilTilstand.rundeSeed,
         gameMode: spilTilstand.gameMode,
         erHost: spilTilstand.erHost,
         gameState: spilTilstand.gameState,
@@ -128,6 +130,7 @@ export function indlaesOfflineSpil() {
         spilTilstand.gameMode = data.gameMode === 'open' ? 'open' : 'offline';
         spilTilstand.spillerNavn = data.spillerNavn || 'Spiller';
         spilTilstand.rumKode = data.rumKode || 'offline';
+        spilTilstand.rundeSeed = data.rundeSeed || spilTilstand.rumKode;
         spilTilstand.erHost = data.erHost;
         spilTilstand.gameState = data.gameState || 'start';
         spilTilstand.kortBredde = data.kortBredde || STANDARD_KORT_BREDDE;

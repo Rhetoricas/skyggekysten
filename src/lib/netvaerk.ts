@@ -205,6 +205,10 @@ export async function syncTilDb(opdaterKort = false) {
     if (!spilTilstand.rumKode || !spilTilstand.spillerNavn) return;
     const aktivRumKode = spilTilstand.rumKode;
     const aktivKanalNoegle = realtimeRumNoegle(aktivRumKode);
+    const rundeSeed = spilTilstand.rundeSeed ||
+        spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.rundeSeed ||
+        `${aktivRumKode}:${Date.now().toString(36)}:${Math.random().toString(36).slice(2)}`;
+    spilTilstand.rundeSeed = rundeSeed;
 
     const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isDead ?? false);
     const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isWinner ?? false);
@@ -234,6 +238,7 @@ export async function syncTilDb(opdaterKort = false) {
         userId: authState.user?.id ?? null,
         rumKode: aktivRumKode,
         kanalNoegle: aktivKanalNoegle,
+        rundeSeed,
         besoegteMiner: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.besoegteMiner || [],
         harSkattekort: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.harSkattekort || false,
         aktivTracker: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.aktivTracker || null,

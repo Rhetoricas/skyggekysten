@@ -14,6 +14,7 @@ interface FlydendeTal {
 export const spilTilstand = $state({
     spillerNavn: '',
     rumKode: '',
+    rundeSeed: '',
     gameMode: 'open' as 'open' | 'offline',
     offlineMode: false,
     erHost: false,
