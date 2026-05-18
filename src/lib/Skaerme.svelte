@@ -558,7 +558,10 @@
                 {/if}
             </div>
             
-            <h1 class="doeds-titel">{formaterNavn(spilTilstand.spillerNavn)}, du døde på {formaterNavn(spilTilstand.rumKode)}</h1>
+            <h1 class="doeds-titel">{formaterNavn(spilTilstand.spillerNavn)} døde på {formaterNavn(spilTilstand.rumKode)}</h1>
+            <p class="beskrivelse">
+                {spilTilstand.logBesked} {hentMinHistorie(false)}
+            </p>
             
             <div class="score-container">
                 <img src="/screens/pergament.webp" alt="Pergament" class="pergament-billede" />
@@ -568,10 +571,6 @@
             </div>
 
             <img src="/screens/death.webp" alt="Døden" class="doeds-symbol" />
-
-            <p class="beskrivelse">
-                {spilTilstand.logBesked} {hentMinHistorie(false)}
-            </p>
 
             <div class="spec-paneler">
                 {@render pointSpecifikation()}
@@ -648,7 +647,7 @@
                     <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" draggable="false" />
                 {/if}
             </div>
-            <h1 class="sejr-titel">{formaterNavn(spilTilstand.spillerNavn)} slap væk fra {formaterNavn(spilTilstand.rumKode)}</h1>
+            <h1 class="sejr-titel">{formaterNavn(spilTilstand.spillerNavn)}, du slap væk fra {formaterNavn(spilTilstand.rumKode)}</h1>
             <p class="beskrivelse">
                 {hentMinHistorie(true)}
             </p>
