@@ -3,7 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { authState, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
     import { tilgaengeligeKarakterer } from '$lib/spildata';
-    import { beregnFremdriftPoint, beregnKortStoerrelseScoreModifier, beregnMinePoint, beregnMineScoreModifier, beregnSpillerScore, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
+    import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnSpillerScore, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
@@ -226,8 +226,7 @@
         const erVinder = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
         const fremdriftPoint = beregnFremdriftPoint(spilTilstand.maxKolonne, erVinder, spilTilstand.kortBredde);
         const hpMult = (1 + Math.max(0, spilTilstand.livspoint) / 1000);
-        const kortModifier = beregnKortStoerrelseScoreModifier(spilTilstand.kortBredde, spilTilstand.kortHoejde);
-        return { udforskning, minePoint, mineModifier, fremdriftPoint, erVinder, hpMult, kortModifier };
+        return { udforskning, minePoint, mineModifier, fremdriftPoint, erVinder, hpMult };
     }
 
     function hentSessionSpillere() {
@@ -261,7 +260,6 @@
         </div>
         <div class="kvittering-skiller"></div>
         <div class="kvittering-linje mult"><span>Helbreds-bonus (HP):</span> <span>x {hentPointSpec().hpMult.toFixed(3)}</span></div>
-        <div class="kvittering-linje mult"><span>Ø-størrelse:</span> <span>x {hentPointSpec().kortModifier.toFixed(2)}</span></div>
         <div class="kvittering-total"><span>Total Score:</span> <span>{spilTilstand.samletScore}</span></div>
     </div>
 {/snippet}

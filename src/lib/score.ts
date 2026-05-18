@@ -28,9 +28,9 @@ export function beregnFremdriftPoint(maxKolonne: number, erVinder: boolean, kort
 }
 
 export function beregnKortStoerrelseScoreModifier(kortBredde = STANDARD_KORT_BREDDE, kortHoejde = STANDARD_KORT_HOEJDE) {
-    const breddeMod = Math.pow(STANDARD_KORT_BREDDE / Math.max(1, kortBredde), 0.68);
-    const hoejdeMod = Math.pow(STANDARD_KORT_HOEJDE / Math.max(1, kortHoejde), 0.15);
-    return breddeMod * hoejdeMod;
+    void kortBredde;
+    void kortHoejde;
+    return 1;
 }
 
 export function beregnSpillerScore(
