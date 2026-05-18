@@ -431,9 +431,9 @@
             pris: STAV_OPGRADERING_PRIS,
             harBasis: harStav && !harDragestav,
             kanOpgradere: kanOpgradereStav,
-            kortTekst: '5 felter mod øst. Viser ruten imellem. Redder dig fra åbent vand og bliver til almindelig stav.',
+            kortTekst: '5 felter mod øst. Viser ruten imellem. Hvis teleporten ville ende i vand, stopper den sikkert og bliver til almindelig stav.',
             helpTitle: 'Stav-opgradering',
-            helpBody: 'Kræver en almindelig stav og 200 guld. Dragestaven teleporterer 5 felter mod øst, afslører ruten imellem og redder dig fra åbent vand ved at blive til en almindelig stav.',
+            helpBody: 'Kræver en almindelig stav og 200 guld. Dragestaven teleporterer 5 felter mod øst og afslører ruten imellem. Kun hvis selve teleporten ville ende i åbent vand, stopper den på sidste sikre felt og bliver til en almindelig stav.',
             opgrader: opgraderStav
         },
         {
@@ -670,7 +670,7 @@
             class="opgradering-kort"
             class:inaktiv={!kanOpgradereStav}
             data-help-title="Stav-opgradering"
-            data-help-body="Kræver en almindelig stav og 200 guld. Dragestaven teleporterer 5 felter mod øst, afslører ruten imellem og redder dig fra åbent vand ved at blive til en almindelig stav."
+            data-help-body="Kræver en almindelig stav og 200 guld. Dragestaven teleporterer 5 felter mod øst og afslører ruten imellem. Kun hvis selve teleporten ville ende i åbent vand, stopper den på sidste sikre felt og bliver til en almindelig stav."
         >
             <div class="ikon-par">
                 <img src={itemDB.stav.billede} alt="Stav" />
@@ -680,7 +680,7 @@
 
             <div class="tekst">
                 <strong>Stav til Dragestav</strong>
-                <p>5 felter mod øst. Viser ruten imellem. Redder dig fra åbent vand og bliver til almindelig stav.</p>
+                <p>5 felter mod øst. Viser ruten imellem. Hvis teleporten ville ende i vand, stopper den sikkert og bliver til almindelig stav.</p>
                 <span class="pris">{STAV_OPGRADERING_PRIS} Guld</span>
             </div>
 

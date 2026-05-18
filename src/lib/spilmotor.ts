@@ -2059,8 +2059,22 @@ function fjernUdstyrVedOversvoemmelse() {
     return { mistedeRustning, mistedeFakkel };
 }
 
+function bevarDragestavEfterOversvoemmelse(havdeDragestav: boolean) {
+    if (!havdeDragestav) return "";
+    if (spilTilstand.mitUdstyr.some((ting) => ting.id === 'dragestav' && ting.maengde > 0)) return "";
+
+    const nedgraderetStav = spilTilstand.mitUdstyr.find((ting) => ting.id === 'stav');
+    spilTilstand.mitUdstyr = [
+        ...spilTilstand.mitUdstyr.filter((ting) => ting.id !== 'stav'),
+        { id: 'dragestav', maengde: nedgraderetStav?.maengde || 1, anskaffetDag: nedgraderetStav?.anskaffetDag ?? spilTilstand.dag }
+    ];
+
+    return " Dragestaven ulmer, men oversvømmelsen kan ikke nedgradere den.";
+}
+
 export async function udloesOversvoemmelse(centerIndex: number) {
     rystSkaerm(1500);
+    const havdeDragestav = spilTilstand.mitUdstyr.some((ting) => ting.id === 'dragestav' && ting.maengde > 0);
 
     const felter = spilTilstand.gitter;
     const paavirkede = new Set<number>();
@@ -2109,9 +2123,11 @@ export async function udloesOversvoemmelse(centerIndex: number) {
 
     if (paavirkedeArray.includes(spilTilstand.spillerIndex)) {
         const { mistedeRustning, mistedeFakkel } = fjernUdstyrVedOversvoemmelse();
+        const dragestavLog = bevarDragestavEfterOversvoemmelse(havdeDragestav);
         const udstyrsLog = [
             mistedeFakkel ? "Vandet slukker din fakkel." : "",
-            mistedeRustning ? "Du mister din rustning i vandet." : ""
+            mistedeRustning ? "Du mister din rustning i vandet." : "",
+            dragestavLog
         ].filter(Boolean).join(" ");
 
         if (mistedeRustning) {

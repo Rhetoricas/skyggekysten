@@ -106,7 +106,24 @@
     }
 
     function erSituationsVare(vareId: string) {
-        return vareId === 'skovl' || vareId === 'mesterskovl' || vareId === 'sovepose' || vareId === 'silkesovepose' || vareId === 'mad' || vareId === 'dirk' || vareId === 'mesterdirk' || vareId === 'soegekvist' || vareId === 'runekvist';
+        return vareId === 'skovl' || vareId === 'mesterskovl' || vareId === 'sovepose' || vareId === 'silkesovepose' || vareId === 'mad' || vareId === 'dirk' || vareId === 'mesterdirk';
+    }
+
+    function erOpgraderetVare(vareId: string) {
+        return [
+            'kongepanser',
+            'royalt_toej',
+            'mesterkniv',
+            'mesterdirk',
+            'dragestav',
+            'mesterbue',
+            'stormoekse',
+            'mesterskovl',
+            'malmviser',
+            'runekvist',
+            'solfakkel',
+            'silkesovepose'
+        ].includes(vareId);
     }
 
     function formaterNavn(tekst: string) {
@@ -120,6 +137,10 @@
 
         if (vareId === 'metaldetektor' || vareId === 'malmviser') {
             return `${info.beskrivelse} Den virker passivt, mens du bevæger dig.`;
+        }
+
+        if (vareId === 'soegekvist' || vareId === 'runekvist') {
+            return `${info.beskrivelse} Den virker passivt, mens du bevÃ¦ger dig.`;
         }
 
         const status = aktiv
@@ -269,7 +290,7 @@
                             <img 
                                 src={dbInfo.billede} 
                                 alt={dbInfo.navn} 
-                                class="inventory-icon {erSituationsVare(vare.id) && !kanBrugeInventoryVare(vare.id) ? 'deaktiveret' : ''}" 
+                                class="inventory-icon {erOpgraderetVare(vare.id) ? 'opgraderet' : ''} {erSituationsVare(vare.id) && !kanBrugeInventoryVare(vare.id) ? 'deaktiveret' : ''}" 
                                 data-help-title={dbInfo.navn}
                                 data-help-body={forklaringForVare(vare.id, kanBrugeInventoryVare(vare.id))}
                             />
@@ -493,6 +514,9 @@
     }
     .inventory-icon.deaktiveret {
         filter: grayscale(100%) opacity(50%);
+    }
+    .inventory-icon.opgraderet.deaktiveret {
+        filter: grayscale(60%) opacity(70%) drop-shadow(0 0 9px rgba(255, 210, 90, 0.85)) drop-shadow(0 2px 5px rgba(0,0,0,0.9));
     }
     .maengde-badge {
         position: absolute;
