@@ -267,13 +267,18 @@
                 scoreGemningFejlet = false;
                 nyGlobalRekord = false;
             } else if (
-                (state === 'win' || state === 'dead' || state === 'win_map' || state === 'dead_map') &&
-                !scoreErGemt &&
-                !scoreGemmer &&
-                !scoreGemningFejlet &&
-                (spilTilstand.offlineMode || !!brugerId)
+                state === 'win' || state === 'dead' || state === 'win_map' || state === 'dead_map'
             ) {
-                gemScoreIgen();
+                opdaterSamletScore();
+
+                if (
+                    !scoreErGemt &&
+                    !scoreGemmer &&
+                    !scoreGemningFejlet &&
+                    (spilTilstand.offlineMode || !!brugerId)
+                ) {
+                    gemScoreIgen();
+                }
             }
         });
     });
@@ -1150,7 +1155,7 @@
         if (alarmKanal) supabase.removeChannel(alarmKanal);
     });
 
-    async function opdaterOgGemHighscore() {
+    function opdaterSamletScore() {
         const erVinder = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
 
         spilTilstand.samletScore = beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, spilTilstand.spillerNavn, {
@@ -1158,8 +1163,13 @@
             hp: spilTilstand.livspoint,
             kolonne: spilTilstand.maxKolonne,
             kendteFelter: spilTilstand.mineKendteFelter,
+            mitUdstyr: spilTilstand.mitUdstyr,
             isWinner: erVinder
         }, erVinder, spilTilstand.kortBredde, spilTilstand.kortHoejde);
+    }
+
+    async function opdaterOgGemHighscore() {
+        opdaterSamletScore();
 
         try {
             await syncTilDb(true);

@@ -1,5 +1,7 @@
 import type { Felt, SpillerData } from './types';
+import type { RygsækTing } from './types';
 import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
+import { itemDB } from './spildata';
 
 export const MEDALJE_GRAENSER = [0, 500, 1200, 2000, 3000, 4500, 6250, 8500, 11000, 14000] as const;
 export const M10_SCORE = MEDALJE_GRAENSER[MEDALJE_GRAENSER.length - 1];
@@ -19,6 +21,20 @@ export function beregnMineScoreModifier(antalSpillere: number) {
 export function beregnMinePoint(gitter: Felt[], spillerNavn: string, antalSpillere: number) {
     const antalMiner = gitter.filter((felt) => felt.hasGoldmine && felt.mineOwner === spillerNavn).length;
     return Math.floor(antalMiner * 100 * beregnMineScoreModifier(antalSpillere));
+}
+
+export function beregnSalgspris(itemId: string) {
+    const vareData = itemDB[itemId];
+    if (!vareData) return 0;
+    return Math.max(0, Math.floor(vareData.pris / 1.5));
+}
+
+export function beregnUdstyrPoint(udstyr: RygsækTing[] = []) {
+    return udstyr.reduce((sum, ting) => {
+        const antal = Math.max(0, ting.maengde || 0);
+        const pointPrStk = Math.floor((beregnSalgspris(ting.id) * 2) / 3);
+        return sum + antal * pointPrStk;
+    }, 0);
 }
 
 export function beregnFremdriftPoint(maxKolonne: number, erVinder: boolean, kortBredde = STANDARD_KORT_BREDDE) {
@@ -48,10 +64,11 @@ export function beregnSpillerScore(
     const kolonne = data.kolonne || 0;
     const udforskningPoint = (data.kendteFelter?.length || 0) * 2;
     const minePoint = beregnMinePoint(gitter, spillerNavn, antalSpillere);
+    const udstyrPoint = beregnUdstyrPoint(data.mitUdstyr || []);
     const fremdriftPoint = beregnFremdriftPoint(kolonne, erVinder, kortBredde);
     const kortModifier = beregnKortStoerrelseScoreModifier(kortBredde, kortHoejde);
 
-    return Math.floor((guld + fremdriftPoint + udforskningPoint + minePoint) * (1 + Math.max(0, hp) / 1000) * kortModifier);
+    return Math.floor((guld + fremdriftPoint + udforskningPoint + minePoint + udstyrPoint) * (1 + Math.max(0, hp) / 1000) * kortModifier);
 }
 
 export function findMedaljeNiveau(score: number) {

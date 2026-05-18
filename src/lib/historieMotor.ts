@@ -37,58 +37,58 @@ export function genererSlutHistorie(titel: string, niveau: number, oeNavn: strin
     if (vundet) {
         let blok1: string;
         if (hp <= 25) {
-            blok1 = `Du slæber dig op på stranden med kun ${hp} HP tilbage i kroppen og smager jern i munden. `;
+            blok1 = `Du når kysten med ${hp} HP tilbage og må samle vejret, før du går videre. `;
         } else if (hp <= 75) {
-            blok1 = `Du træder ud af mørket med ${hp} HP og mærker udmattelsen trække i knoglerne. `;
+            blok1 = `Du træder ud af tågen med ${hp} HP og tydelige spor efter rejsen. `;
         } else {
-            blok1 = `Kysten åbner sig foran dig. Du står rank med hele ${hp} HP, og tågen har knapt sat sine spor. `;
+            blok1 = `Du finder kysten i god behold med ${hp} HP tilbage. `;
         }
 
         let blok2: string;
         if (harDiamant) {
-            blok2 = "En kølig, massiv diamant kaster et skarpt lys fra din lomme. ";
+            blok2 = "Diamanten ligger stadig sikkert i din oppakning. ";
         } else if (harSvaerd) {
-            blok2 = "Dit våben er hakket og sløvt af de brutale kampe, du tog undervejs. ";
+            blok2 = "Dit våben bærer mærker efter turen. ";
         } else if (harSkovl) {
-            blok2 = "Dine hænder er dækket af tykt mudder fra de hemmeligheder, du flåede op af undergrunden. ";
+            blok2 = "Der sidder stadig jord på hænderne efter alt det, du gravede frem. ";
         } else {
-            blok2 = "Dine fingre er tomme, og rygsækken rasler hult i vinden. ";
+            blok2 = "Du har ikke meget udstyr tilbage, men du nåede ud. ";
         }
 
         let blok3: string;
         if (guld >= 1500) {
-            blok3 = `Du afsluttede rejsen på Dag ${dag} med et overskud, der trodser fornuften. Hele ${guld} guldklumper tynger dig ned. `;
+            blok3 = `På dag ${dag} forlader du øen med ${guld} guld. `;
         } else if (guld >= 400) {
-            blok3 = `Tiden pressede dig, men på Dag ${dag} krydser du grænsen med ${guld} mønter klirrende i tasken. `;
+            blok3 = `På dag ${dag} slipper du væk med ${guld} guld i tasken. `;
         } else {
-            blok3 = `Du nåede slutningen på Dag ${dag}, blottet for rigdom med usle ${guld} guld. Overlevelse må være belønning nok i sig selv. `;
+            blok3 = `På dag ${dag} slipper du væk med ${guld} guld. Det var nok denne gang. `;
         }
 
-        const blok4 = `Du har banet dig vej helt op til rang ${niveau}. Din nye titel: ${titelStort} AF ${oeNavnStort}`;
+        const blok4 = `Du ender på rang ${niveau}. Din titel: ${titelStort} AF ${oeNavnStort}`;
 
         return `${blok1}${blok2}${blok3}${blok4}`;
     } else {
         let blok2: string;
         if (harDiamant) {
-            blok2 = "Den massive diamant ligger nu ubrugelig og kold i din lomme. ";
+            blok2 = "Diamanten kom ikke med dig ud. ";
         } else if (harSvaerd) {
-            blok2 = "Dit beskadigede våben ligger rustent i græsset ved siden af dig. ";
+            blok2 = "Dit våben ligger tilbage på øen. ";
         } else if (harSkovl) {
-            blok2 = "Dine stive fingre klamrer sig stadig fast til det mudder, du gravede i. ";
+            blok2 = "Sporene efter dit gravearbejde er det eneste, der bliver tilbage. ";
         } else {
-            blok2 = "Dine tomme hænder griber krampagtigt ud i luften. ";
+            blok2 = "Du nåede ikke at få nok med dig. ";
         }
 
         let blok3: string;
         if (guld >= 1500) {
-            blok3 = `De ${guld} guldklumper, du grådigt samlede frem til Dag ${dag}, kan ikke købe dig fri fra mørket. `;
+            blok3 = `Du nåede dag ${dag} og samlede ${guld} guld, men kom ikke væk. `;
         } else if (guld >= 400) {
-            blok3 = `Du nåede frem til Dag ${dag} og skrabede ${guld} mønter sammen. Nu tilhører de bare undergrunden igen. `;
+            blok3 = `Du nåede dag ${dag} og samlede ${guld} guld, før turen sluttede. `;
         } else {
-            blok3 = `Du faldt på Dag ${dag} med usle ${guld} mønter. Du var aldrig tiltænkt storhed. `;
+            blok3 = `Du faldt på dag ${dag} med ${guld} guld. `;
         }
 
-        const blok4 = `Dit fald stopper på rang ${niveau}. Din sidste titel: ${titelStort} AF ${oeNavnStort}`;
+        const blok4 = `Du ender på rang ${niveau}. Din titel: ${titelStort} AF ${oeNavnStort}`;
 
         return `${blok2}${blok3}${blok4}`;
     }

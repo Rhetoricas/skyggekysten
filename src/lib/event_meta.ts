@@ -19,6 +19,7 @@ function beregnLiveScore(navn: string, data: Partial<SpillerData>) {
         hp,
         kolonne,
         kendteFelter: erMig ? spilTilstand.mineKendteFelter : data.kendteFelter,
+        mitUdstyr: erMig ? spilTilstand.mitUdstyr : data.mitUdstyr,
         isWinner: erVinder
     }, erVinder, spilTilstand.kortBredde, spilTilstand.kortHoejde);
 }
@@ -34,6 +35,7 @@ function hentScoreOversigt() {
                 guld: spilTilstand.guldTotal,
                 kolonne: spilTilstand.maxKolonne,
                 kendteFelter: spilTilstand.mineKendteFelter,
+                mitUdstyr: spilTilstand.mitUdstyr,
                 isWinner: spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map'
             } satisfies Partial<SpillerData>]
         ];

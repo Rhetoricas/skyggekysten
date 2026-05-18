@@ -4,6 +4,7 @@
     import { tilfoejTilRygsæk, brugFraRygsæk, kanModtageItem } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
     import { fremtvingKollaps } from '$lib/overlevelse.svelte';
+    import { beregnSalgspris } from '$lib/score';
 
     let { lukShop } = $props<{ lukShop: () => void }>();
 
@@ -65,7 +66,7 @@
         const vareData = itemDB[id];
         if (!vareData) return;
         
-        const salgspris = Math.floor(vareData.pris / 1.5);
+        const salgspris = beregnSalgspris(id);
         if (salgspris <= 0) {
             spilTilstand.logBesked = `Købmanden vil ikke købe ${vareData.navn}.`;
             syncTilDb();

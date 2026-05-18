@@ -3,7 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { authState, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
     import { tilgaengeligeKarakterer } from '$lib/spildata';
-    import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnSpillerScore, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
+    import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
@@ -223,10 +223,11 @@
         const antalSpillere = taelScoreSpillere(spilTilstand.alleSpillere);
         const mineModifier = beregnMineScoreModifier(antalSpillere);
         const minePoint = beregnMinePoint(spilTilstand.gitter, spilTilstand.spillerNavn, antalSpillere);
+        const udstyrPoint = beregnUdstyrPoint(spilTilstand.mitUdstyr);
         const erVinder = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
         const fremdriftPoint = beregnFremdriftPoint(spilTilstand.maxKolonne, erVinder, spilTilstand.kortBredde);
         const hpMult = (1 + Math.max(0, spilTilstand.livspoint) / 1000);
-        return { udforskning, minePoint, mineModifier, fremdriftPoint, erVinder, hpMult };
+        return { udforskning, minePoint, mineModifier, udstyrPoint, fremdriftPoint, erVinder, hpMult };
     }
 
     function hentSessionSpillere() {
@@ -255,9 +256,10 @@
         </div>
         <div class="kvittering-linje"><span>Udforskning:</span> <span>{hentPointSpec().udforskning}</span></div>
         <div class="kvittering-linje">
-            <span>Territorium (miner{hentPointSpec().mineModifier > 1 ? ` x${hentPointSpec().mineModifier}` : ''}):</span>
+            <span>Territorium (miner):</span>
             <span>{hentPointSpec().minePoint}</span>
         </div>
+        <div class="kvittering-linje"><span>Udstyr:</span> <span>{hentPointSpec().udstyrPoint}</span></div>
         <div class="kvittering-skiller"></div>
         <div class="kvittering-linje mult"><span>Helbreds-bonus (HP):</span> <span>x {hentPointSpec().hpMult.toFixed(3)}</span></div>
         <div class="kvittering-total"><span>Total Score:</span> <span>{spilTilstand.samletScore}</span></div>
@@ -470,9 +472,6 @@
                 <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
                 <div class="tavle-indhold global-indhold">
                     <h3>Top 10 global</h3>
-                    {#if !authState.user}
-                        <p class="global-note">Kræver login.</p>
-                    {/if}
                     {#if globaleScores.length === 0}
                         <p class="tom-liste">Ingen data endnu</p>
                     {:else}
@@ -594,11 +593,6 @@
                     <img src="/screens/boardlocal.webp" alt="Lokal tavle" class="tavle-billede" />
                     <div class="tavle-indhold lokal-indhold">
                         <h3>Top 10 på {formaterNavn(spilTilstand.rumKode)}</h3>
-                        {#if spilTilstand.offlineMode}
-                            <p class="global-note">Gemt lokalt i browseren.</p>
-                        {:else if !authState.user}
-                            <p class="global-note">Login kræves for at gemme score.</p>
-                        {/if}
                         {#if lokaleScores.length === 0}
                             <p class="tom-liste">Ingen resultater endnu</p>
                         {:else}
@@ -611,6 +605,11 @@
                                 {/each}
                             </ol>
                         {/if}
+                        {#if spilTilstand.offlineMode}
+                            <p class="global-note tavle-note-bund">Gemt lokalt i browseren.</p>
+                        {:else if !authState.user}
+                            <p class="global-note tavle-note-bund">Login kræves for at gemme score.</p>
+                        {/if}
                     </div>
                 </div>
                 {#if !spilTilstand.offlineMode}
@@ -618,9 +617,6 @@
                         <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
                         <div class="tavle-indhold global-indhold">
                             <h3>Top 10 global</h3>
-                            {#if !authState.user}
-                                <p class="global-note">Kræver login.</p>
-                            {/if}
                             {#if globaleScores.length === 0}
                                 <p class="tom-liste">Ingen data endnu</p>
                             {:else}
@@ -652,7 +648,7 @@
                     <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" draggable="false" />
                 {/if}
             </div>
-            <h1 class="sejr-titel">Slap væk fra {formaterNavn(spilTilstand.rumKode)}</h1>
+            <h1 class="sejr-titel">{formaterNavn(spilTilstand.spillerNavn)} slap væk fra {formaterNavn(spilTilstand.rumKode)}</h1>
             <p class="beskrivelse">
                 {hentMinHistorie(true)}
             </p>
@@ -684,11 +680,6 @@
                     <img src="/screens/boardlocal.webp" alt="Lokal tavle" class="tavle-billede" />
                     <div class="tavle-indhold lokal-indhold">
                         <h3>Top 10 på {formaterNavn(spilTilstand.rumKode)}</h3>
-                        {#if spilTilstand.offlineMode}
-                            <p class="global-note">Gemt lokalt i browseren.</p>
-                        {:else if !authState.user}
-                            <p class="global-note">Login kræves for at gemme score.</p>
-                        {/if}
                         {#if lokaleScores.length === 0}
                             <p class="tom-liste">Ingen resultater endnu</p>
                         {:else}
@@ -701,6 +692,11 @@
                                 {/each}
                             </ol>
                         {/if}
+                        {#if spilTilstand.offlineMode}
+                            <p class="global-note tavle-note-bund">Gemt lokalt i browseren.</p>
+                        {:else if !authState.user}
+                            <p class="global-note tavle-note-bund">Login kræves for at gemme score.</p>
+                        {/if}
                     </div>
                 </div>
                 {#if !spilTilstand.offlineMode}
@@ -708,9 +704,6 @@
                         <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
                         <div class="tavle-indhold global-indhold">
                             <h3>Top 10 global</h3>
-                            {#if !authState.user}
-                                <p class="global-note">Kræver login.</p>
-                            {/if}
                             {#if globaleScores.length === 0}
                                 <p class="tom-liste">Ingen data endnu</p>
                             {:else}
@@ -823,6 +816,7 @@
 
     .start-tavle { margin-top: 30px; width: 100%; max-width: 340px; }
     .global-note { color: #aaa; font-size: 0.78rem; margin: -4px 0 6px; }
+    .tavle-note-bund { margin: 10px 0 0; }
 
     .konto-panel {
         width: 100%;
