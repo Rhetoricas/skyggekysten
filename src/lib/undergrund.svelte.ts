@@ -142,10 +142,10 @@ export function grav() {
         spilTilstand.livspoint -= faeldeSkade;
         fundLog = `KLIK. En nedgravet fælde bider sig fast i dit ben (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`;
     } else if (fundetLoot === 'skattekiste') {
-        spilTilstand.guldTotal += 500;
+        spilTilstand.guldTotal += 600;
         tilfoejTilRygsæk('diamant', 1);
         felt.tomSkattekiste = true;
-        fundLog = `Skovlen rammer træ. Du åbner en kiste. (+500 Guld, +Diamant)`;
+        fundLog = `Skovlen rammer træ. Du åbner en kiste. (+600 Guld, +Diamant)`;
     } else if (guldVaerdi > 0) {
         const graveGuldMultiplier = harMesterskovl && harGyldenDestillator ? 3 : (harMesterskovl || harGyldenDestillator) ? 2 : 1;
         const malmviserMultiplier = harMalmviser ? 1.25 : 1;

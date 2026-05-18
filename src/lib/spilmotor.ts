@@ -608,7 +608,11 @@ function kanPlacerePortal(index: number) {
 }
 
 function hentKoebbareShopItems(shopItems: string[] | undefined) {
-    return (shopItems || []).filter((id) => itemDB[id]?.kanKoebes !== false);
+    return (shopItems || []).filter((id) => {
+        if (itemDB[id]?.kanKoebes === false) return false;
+        if (id === 'hemmelighed' && !harUtydedeSkattekortSpor()) return false;
+        return true;
+    });
 }
 
 export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) {
@@ -1058,7 +1062,8 @@ export function aktiverHemmelighed() {
         spilTilstand.kameraFokus = valgtKlynge.center;
         spilTilstand.logBesked = "Du læser skattekortet. Det gamle pergament peger på et område, men ikke på sandheden under jorden.";
     } else {
-        spilTilstand.logBesked = "Skattekortet er for gammelt. Alle dets mærker fører til steder, du allerede har tydet.";
+        spilTilstand.guldTotal += 50;
+        spilTilstand.logBesked = "Skattekortet er for gammelt. Alle dets mærker fører til steder, du allerede har tydet, men pergamentet er stadig 50 guld værd for en samler.";
     }
     
     spilTilstand.gitter = [...spilTilstand.gitter];
@@ -1079,6 +1084,11 @@ function hentSkatteKlynger() {
         felter,
         center: findSkatteKlyngeCenter(felter)
     }));
+}
+
+function harUtydedeSkattekortSpor() {
+    const kendteKortFelter = new Set(spilTilstand.mineSkattekortFelter || []);
+    return hentSkatteKlynger().some((klynge) => klynge.felter.every((idx) => !kendteKortFelter.has(idx)));
 }
 
 function findSkatteKlyngeCenter(klynge: number[]) {
@@ -1455,10 +1465,11 @@ export function plantSkat(gitter: Felt[]) {
 }
 
 function beregnAntalSkatte(bredde: number) {
-    if (bredde < 100) return 1;
-    if (bredde < 200) return 2;
-    if (bredde < 1000) return 3;
-    return 4;
+    void bredde;
+    const roll = Math.random();
+    if (roll < 0.45) return 1;
+    if (roll < 0.85) return 2;
+    return 3;
 }
 
 function findMuligeSkatteCentre(gitter: Felt[], minKol: number, maxKol: number, brugteCentre: number[]) {

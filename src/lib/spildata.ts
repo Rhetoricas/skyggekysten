@@ -57,7 +57,7 @@ export const itemDB: Record<string, { id: string; navn: string; type: ItemType; 
     'diamant': { id: 'diamant', navn: 'Diamant', type: 'skat', billede: '/inventory/diamant.webp', pris: 500, beskrivelse: "En sjælden og værdifuld ædelsten, der nemt kan sælges." },
     'gylden_destillator': { id: 'gylden_destillator', navn: 'Gylden Destillator', type: 'skat', billede: '/inventory/goldenhance.webp', pris: 700, kanKoebes: false, beskrivelse: "Relikvie. Opgravet guld er dobbelt værd. Sammen med mesterskovl bliver graveguld tredoblet i stedet for firedoblet." },
     'rodhjertet': { id: 'rodhjertet', navn: 'Rodhjertet', type: 'skat', billede: '/inventory/rootenhance.webp', pris: 500, kanKoebes: false, beskrivelse: "Relikvie. Helende rødder giver dobbelt HP, både ved gravning og når Runekvisten trækker dem op." },
-    'hemmelighed': { id: 'hemmelighed', navn: 'Skattekort', type: 'forbrug', billede: '/inventory/treasuremap.webp', pris: 100, beskrivelse: "Et gammelt skattekort. Brug det for at vise en mulig skatteklynge som et sepiafarvet kortspor. Det viser ikke, om kisten stadig er der." }
+    'hemmelighed': { id: 'hemmelighed', navn: 'Skattekort', type: 'forbrug', billede: '/inventory/treasuremap.webp', pris: 100, beskrivelse: "Et gammelt skattekort. Nogle øer kan gemme på flere skatte." }
 }
 
 export const tilgaengeligeKarakterer: Karakter[] = [

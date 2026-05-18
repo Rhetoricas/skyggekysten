@@ -303,7 +303,7 @@
             </div>
             <p class="konto-hint">Din score og statistik bliver gemt.</p>
         {:else}
-            <p class="konto-hint">Login er valgfrit. Uden login spiller du kun med på den ø, du åbner nu.</p>
+            <p class="konto-hint">Login er valgfrit. Uden login spiller du kun med på den ø, du åbner nu, og din score og profil bliver ikke gemt.</p>
             <div class="konto-login">
                 <input
                     type="email"
@@ -421,7 +421,7 @@
                 <img src="/events/launch.webp" alt="Båd" class="launch-image top-image clickable-boat" />
             </button>
 
-            <h1>Tågeøerne</h1>
+            <h1>Velkommen til tågeøerne</h1>
             <p>Alle der skriver samme ø-navn, spiller på samme ø, hvis de går i land inden for de fem første dage.</p>
 
             <div class="login-main">
@@ -732,7 +732,7 @@
     .login-main { width: min(100%, 560px); display: flex; flex-direction: column; align-items: center; }
     
     .boat-btn-wrapper { background: none; border: none; padding: 0; margin: 0; cursor: pointer; outline: none; }
-    .launch-image { width: clamp(260px, 72%, 380px); max-width: 100%; height: auto; border-radius: 4px; transition: 0.2s; }
+    .launch-image { width: clamp(320px, 82%, 520px); max-width: 100%; height: auto; border-radius: 4px; transition: 0.2s; }
     .launch-image:hover { transform: scale(1.05); filter: brightness(1.2); }
     .top-image { margin-bottom: 15px; }
 
@@ -1135,7 +1135,7 @@
         }
 
         .launch-image {
-            width: clamp(170px, 58%, 230px);
+            width: clamp(230px, 78%, 340px);
         }
 
         .top-image {

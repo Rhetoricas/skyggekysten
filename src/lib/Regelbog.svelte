@@ -138,7 +138,7 @@
                         <li>Skovl, sovepose/silkesovepose, mad og dirk er kun aktive, når de kan bruges i den aktuelle situation.</li>
                         <li>Kun mad og livseliksir kan stables i flere styk. Alle andre våben, værktøjer, tøj og særlige items findes kun én gang ad gangen.</li>
                         <li>Store værktøjer, våben og tøj findes kun i én version ad gangen. Skovl/mesterskovl, stav/dragestav, søgekvist/runekvist, detektor/malmviser, dirk/mesterdirk, kniv/mesterkniv, rustning/kongepanser, økse/stormøkse, bue/falkebue, fakkel/solfakkel, sovepose/silkesovepose og klude/fint tøj/royalt tøj tæller som samme type.</li>
-                        <li>Fakkel og solfakkel kan lave bål. Stav og dragestav kan teleportere. Skattekort viser én mulig skatteklynge som et gammelt sepiafarvet kortspor, men afslører ikke om kisten allerede er taget.</li>
+                        <li>Fakkel og solfakkel kan lave bål. Stav og dragestav kan teleportere. Skattekort viser en gammel skatteklynge som et sepiafarvet kortspor. Nogle øer kan gemme på flere skatte, og kortet afslører ikke om kisten allerede er taget. Butikker sælger ikke flere skattekort til dig, når du har tydet alle øens spor.</li>
                         <li>Skattekortspor tæller ikke som almindelig udforskning og giver ikke udforskningspoint, før du selv kommer tæt nok på feltet.</li>
                         <li>Nogle ting kan købes, andre findes kun i events. Elverrustning, opgraderede items og relikvier kan ikke købes i almindelige butikker.</li>
                     </ul>
@@ -188,11 +188,12 @@
                 <section>
                     <h3>Score</h3>
                     <ul>
-                        <li>Score bygger på guld, udforskning, miner, fremdrift eller flugtbonus, og en HP-multiplikator.</li>
+                        <li>Score bygger på guld, udforskning, miner, udstyr, fremdrift eller flugtbonus, og en HP-multiplikator.</li>
                         <li>Udforskning giver 2 point pr. kendt felt.</li>
                         <li>Sepiafelter fra skattekort er kun kortspor og tæller ikke som kendte felter i score.</li>
                         <li>Fremdrift giver 2 point pr. kolonne mod øst. Hvis du slipper væk, får du 1000 point i stedet.</li>
                         <li>Miner giver 100 point pr. mine ganget med multiplayer-modifieren.</li>
+                        <li>Udstyr giver point svarende til 2/3 af salgsprisen.</li>
                         <li>Til sidst ganges summen med 1 + HP/1000. Har du 100 HP, bliver summen ganget med 1,100.</li>
                         <li>Global highscore kræver login. Offline-score gemmes kun lokalt.</li>
                         <li>Hvis forbindelsen svigter, forsøger spillet at gemme ventende scores igen senere.</li>
