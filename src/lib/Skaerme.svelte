@@ -3,7 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { authState, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
     import { hentKarakterKlasseNavn, tilgaengeligeKarakterer } from '$lib/spildata';
-    import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
+    import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
@@ -228,12 +228,13 @@
         const udforskning = (spilTilstand.mineKendteFelter?.length || 0) * 2;
         const antalSpillere = taelScoreSpillere(spilTilstand.alleSpillere);
         const mineModifier = beregnMineScoreModifier(antalSpillere);
+        const multiplayerModifier = beregnMultiplayerScoreModifier(antalSpillere);
         const minePoint = beregnMinePoint(spilTilstand.gitter, spilTilstand.spillerNavn, antalSpillere);
         const udstyrPoint = beregnUdstyrPoint(spilTilstand.mitUdstyr);
         const erVinder = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
         const fremdriftPoint = beregnFremdriftPoint(spilTilstand.maxKolonne, erVinder, spilTilstand.kortBredde);
         const hpMult = (1 + Math.max(0, spilTilstand.livspoint) / 1000);
-        return { udforskning, minePoint, mineModifier, udstyrPoint, fremdriftPoint, erVinder, hpMult };
+        return { udforskning, minePoint, mineModifier, multiplayerModifier, udstyrPoint, fremdriftPoint, erVinder, hpMult };
     }
 
     function hentSessionSpillere() {
@@ -268,6 +269,7 @@
         <div class="kvittering-linje"><span>Udstyr:</span> <span>{hentPointSpec().udstyrPoint}</span></div>
         <div class="kvittering-skiller"></div>
         <div class="kvittering-linje mult"><span>Helbreds-bonus (HP):</span> <span>x {hentPointSpec().hpMult.toFixed(3)}</span></div>
+        <div class="kvittering-linje mult"><span>Multiplayer:</span> <span>x {hentPointSpec().multiplayerModifier.toFixed(1)}</span></div>
         <div class="kvittering-total"><span>Total Score:</span> <span>{spilTilstand.samletScore}</span></div>
     </div>
 {/snippet}

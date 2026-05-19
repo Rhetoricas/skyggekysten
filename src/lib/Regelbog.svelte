@@ -187,6 +187,7 @@
                         <li>Kun aktive spillere tæller som tempo-bremse. Hvis en spiller er død, sluppet væk eller inaktiv i flere minutter, holder de ikke de andre tilbage.</li>
                         <li>Jægere kan sætte en tracker, hvis de står på samme felt som en anden aktiv spiller. I 10 dage ser de de felter, den spiller kender.</li>
                         <li>Guldminer giver mere score i multiplayer, fordi de er sværere at holde. Minepoint stiger med antal spillere, op til en grænse.</li>
+                        <li>Den samlede score får også multiplayer-modifier: 1 spiller x1.0, 2 spillere x1.2, 3 spillere x1.4, 4 spillere x1.6, 5 spillere x1.8 og 6+ spillere x2.0.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Hvis en medspiller tager en mine, kan du se den skifte ejer på kortet. Hvis du senere går ind på den ulåste mine, overtager du den fra medspilleren. Hvis minen er låst, må du finde point et andet sted.</p>
                 </section>

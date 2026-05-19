@@ -1965,7 +1965,7 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
 
         if (erVandBiome(felt.biome) || felt.eventID) continue;
 
-        if (felt.biome === 'bjerg' && Math.random() < 0.05) {
+        if (felt.biome === 'bjerg' && Math.random() < 0.06) {
             felt.hasGoldmine = true;
         } else if (vildmark.includes(felt.biome as string) && Math.random() < 0.008) {
             felt.isCampfire = true;

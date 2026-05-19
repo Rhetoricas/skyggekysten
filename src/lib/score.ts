@@ -18,6 +18,10 @@ export function beregnMineScoreModifier(antalSpillere: number) {
     return Math.min(4, 1 + Math.max(0, antalSpillere - 1) * 0.5);
 }
 
+export function beregnMultiplayerScoreModifier(antalSpillere: number) {
+    return Math.min(2, 1 + Math.max(0, antalSpillere - 1) * 0.2);
+}
+
 export function beregnMinePoint(gitter: Felt[], spillerNavn: string, antalSpillere: number) {
     const antalMiner = gitter.filter((felt) => felt.hasGoldmine && felt.mineOwner === spillerNavn).length;
     return Math.floor(antalMiner * 100 * beregnMineScoreModifier(antalSpillere));
@@ -67,8 +71,9 @@ export function beregnSpillerScore(
     const udstyrPoint = beregnUdstyrPoint(data.mitUdstyr || []);
     const fremdriftPoint = beregnFremdriftPoint(kolonne, erVinder, kortBredde);
     const kortModifier = beregnKortStoerrelseScoreModifier(kortBredde, kortHoejde);
+    const multiplayerModifier = beregnMultiplayerScoreModifier(antalSpillere);
 
-    return Math.floor((guld + fremdriftPoint + udforskningPoint + minePoint + udstyrPoint) * (1 + Math.max(0, hp) / 1000) * kortModifier);
+    return Math.floor((guld + fremdriftPoint + udforskningPoint + minePoint + udstyrPoint) * (1 + Math.max(0, hp) / 1000) * kortModifier * multiplayerModifier);
 }
 
 export function findMedaljeNiveau(score: number) {
