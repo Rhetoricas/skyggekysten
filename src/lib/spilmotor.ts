@@ -339,47 +339,17 @@ export function kanModtageItem(genstandId: string) {
     return !spilTilstand.mitUdstyr.some(ting => ting.id === genstandId && ting.maengde > 0);
 }
 
-function sikkertItemAntal(maengde: unknown) {
+function normaliserItemAntal(maengde: unknown, fallback = 1) {
     const antal = Math.floor(Number(maengde));
-    return Number.isFinite(antal) && antal > 0 ? antal : 0;
-}
-
-function samlStackbareRygsaekItems(udstyrListe: RygsækTing[]) {
-    const samlet = new Map<string, RygsækTing>();
-    const normaliseret: RygsækTing[] = [];
-
-    for (const ting of udstyrListe) {
-        const id = String(ting.id || '').trim();
-        const maengde = sikkertItemAntal(ting.maengde);
-        if (!id || maengde <= 0) continue;
-
-        const normalTing = { ...ting, id, maengde };
-
-        if (!kanStackeItem(id)) {
-            normaliseret.push(normalTing);
-            continue;
-        }
-
-        const eksisterende = samlet.get(id);
-        if (eksisterende) {
-            eksisterende.maengde += maengde;
-            eksisterende.anskaffetDag = Math.min(eksisterende.anskaffetDag ?? spilTilstand.dag, normalTing.anskaffetDag ?? spilTilstand.dag);
-        } else {
-            samlet.set(id, normalTing);
-            normaliseret.push(normalTing);
-        }
-    }
-
-    return normaliseret;
+    return Number.isFinite(antal) && antal > 0 ? antal : fallback;
 }
 
 export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number = 1) {
     genstandId = String(genstandId || '').trim();
-    tilfoejetMaengde = sikkertItemAntal(tilfoejetMaengde) || 1;
-    if (!genstandId || !itemDB[genstandId]) return;
+    tilfoejetMaengde = normaliserItemAntal(tilfoejetMaengde);
+    if (!genstandId) return;
 
-    let udstyrListe = samlStackbareRygsaekItems(spilTilstand.mitUdstyr as RygsækTing[]);
-    spilTilstand.mitUdstyr = udstyrListe;
+    let udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
 
     if (genstandId === 'mesterskovl') {
         spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'skovl');
@@ -446,14 +416,16 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
         udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
     }
 
-    udstyrListe = samlStackbareRygsaekItems(udstyrListe);
-    spilTilstand.mitUdstyr = udstyrListe;
-
     const fundetTing = udstyrListe.find(ting => ting.id === genstandId);
 
     if (fundetTing) {
         if (kanStackeItem(genstandId)) {
-            fundetTing.maengde += tilfoejetMaengde;
+            const dubletAntal = udstyrListe
+                .filter(ting => ting.id === genstandId && ting !== fundetTing)
+                .reduce((sum, ting) => sum + normaliserItemAntal(ting.maengde, 0), 0);
+            fundetTing.maengde = normaliserItemAntal(fundetTing.maengde, 0) + dubletAntal + tilfoejetMaengde;
+            spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== genstandId || ting === fundetTing);
+            udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
         } else {
             spilTilstand.logBesked = `Du har allerede ${itemDB[genstandId]?.navn || 'den genstand'}.`;
             return;
@@ -472,7 +444,7 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
         udstyrListe.push(nyTing);
     }
     
-    spilTilstand.mitUdstyr = samlStackbareRygsaekItems(spilTilstand.mitUdstyr as RygsækTing[]);
+    spilTilstand.mitUdstyr = [...spilTilstand.mitUdstyr];
     syncTilDb(); // Ingen `true` her. Rygsæk er personlig.
 }
 
