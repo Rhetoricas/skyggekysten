@@ -4,6 +4,7 @@ import { authState } from './auth.svelte';
 import { gemOfflineScore, gemOfflineSpil, hentOfflineScores } from './offlineStorage';
 import { beregnSpillerScore } from './score';
 import { KORT_VERSION } from './kortDimensioner';
+import { hentKarakterNavneIKlasse } from './spildata';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Felt, SpillerData } from './types';
 
@@ -582,20 +583,25 @@ function formaterTopTi(data: ScoreRaekke[] | null | undefined) {
     return unikke;
 }
 
-export async function hentHighscores() {
+export async function hentHighscores(karakterKlasse?: string | null) {
+    const klasseNavne = hentKarakterNavneIKlasse(karakterKlasse);
     if (spilTilstand.offlineMode) {
-        return hentOfflineScores(spilTilstand.rumKode).slice(0, 10).map((score) => ({
+        return hentOfflineScores(spilTilstand.rumKode, karakterKlasse).slice(0, 10).map((score) => ({
             navn: score.navn,
             score: score.score,
             karakter: score.karakter
         }));
     }
 
+    let query = supabase
+        .from('game_results')
+        .select('player_name, score, character')
+        .eq('room_code', spilTilstand.rumKode);
+
+    if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
+
     const { data } = await medTimeout(
-        supabase
-            .from('game_results')
-            .select('player_name, score, character')
-            .eq('room_code', spilTilstand.rumKode)
+        query
             .order('score', { ascending: false })
             .limit(30),
         8000,
@@ -622,13 +628,18 @@ export async function hentHighscores() {
     return unikke;
 }
 
-export async function hentGlobalTopTi() {
+export async function hentGlobalTopTi(karakterKlasse?: string | null) {
     if (spilTilstand.offlineMode) return [];
+    const klasseNavne = hentKarakterNavneIKlasse(karakterKlasse);
+
+    let query = supabase
+        .from('game_results')
+        .select('player_name, room_code, score, character');
+
+    if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
 
     const { data } = await medTimeout(
-        supabase
-            .from('game_results')
-            .select('player_name, room_code, score, character')
+        query
             .order('score', { ascending: false })
             .limit(30),
         8000,
@@ -641,13 +652,18 @@ export async function hentGlobalTopTi() {
     return formaterTopTi(data);
 }
 
-export async function hentGlobalTopScore() {
+export async function hentGlobalTopScore(karakterKlasse?: string | null) {
     if (spilTilstand.offlineMode) return 0;
+    const klasseNavne = hentKarakterNavneIKlasse(karakterKlasse);
+
+    let query = supabase
+        .from('game_results')
+        .select('score');
+
+    if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
 
     const { data } = await medTimeout(
-        supabase
-            .from('game_results')
-            .select('score')
+        query
             .order('score', { ascending: false })
             .limit(1),
         8000,

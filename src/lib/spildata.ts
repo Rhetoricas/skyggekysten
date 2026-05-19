@@ -86,3 +86,36 @@ export const tilgaengeligeKarakterer: Karakter[] = [
     { id: 'joker_m', navn: "Joker", ikon: "/game_faces/joker_m.webp", startMsg: "Held er en strategi.", startHp: 50, startGuld: 1, startUdstyr: ['kniv'], moveCost: 1, digCost: 5, dmgMod: 2.0, goldMod: 1.5, fordel: "Guldbonus og godt syn.", ulempe: "Tyndt helbred og tager dobbelt skade.", baseEnergi: 7, synsRadius: 2 },
     { id: 'joker_f', navn: "Harlekin", ikon: "/game_faces/joker_f.webp", startMsg: "Held er en strategi.", startHp: 50, startGuld: 1, startUdstyr: ['kniv'], moveCost: 1, digCost: 5, dmgMod: 2.0, goldMod: 1.5, fordel: "Guldbonus og godt syn.", ulempe: "Tyndt helbred og tager dobbelt skade.", baseEnergi: 7, synsRadius: 2 }
 ];
+
+export const karakterKlasseNavne: Record<string, string> = {
+    knight: 'Ridder',
+    magician: 'Troldfolk',
+    thief: 'Tyv',
+    explorer: 'Udforsker',
+    viking: 'Viking',
+    royal: 'Adel',
+    hunter: 'Jæger',
+    pirate: 'Pirat',
+    dwarf: 'Dværg',
+    orc: 'Ork',
+    joker: 'Joker'
+};
+
+export function hentKarakterKlasseNoegle(karakter?: Pick<Karakter, 'id' | 'navn'> | string | null) {
+    if (!karakter) return null;
+    const idEllerNavn = typeof karakter === 'string' ? karakter : karakter.id || karakter.navn;
+    const fundet = tilgaengeligeKarakterer.find((k) => k.id === idEllerNavn || k.navn === idEllerNavn);
+    return (fundet?.id || idEllerNavn).split('_')[0] || null;
+}
+
+export function hentKarakterNavneIKlasse(klasseNoegle?: string | null) {
+    if (!klasseNoegle) return [];
+    return tilgaengeligeKarakterer
+        .filter((karakter) => hentKarakterKlasseNoegle(karakter) === klasseNoegle)
+        .map((karakter) => karakter.navn);
+}
+
+export function hentKarakterKlasseNavn(karakter?: Pick<Karakter, 'id' | 'navn'> | string | null) {
+    const klasseNoegle = hentKarakterKlasseNoegle(karakter);
+    return klasseNoegle ? karakterKlasseNavne[klasseNoegle] || klasseNoegle : 'Alle';
+}

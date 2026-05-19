@@ -1,6 +1,7 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 import type { Karakter } from './types';
+import { hentKarakterNavneIKlasse } from './spildata';
 
 const OFFLINE_GAME_KEY = 'taage_offline_spil';
 const OFFLINE_SCORES_KEY = 'taage_offline_scores';
@@ -184,16 +185,21 @@ export function gemOfflineScore(force = false) {
 
     scores.push(score);
     scores.sort((a, b) => b.score - a.score);
-    localStorage.setItem(OFFLINE_SCORES_KEY, JSON.stringify(scores.slice(0, 50)));
+    localStorage.setItem(OFFLINE_SCORES_KEY, JSON.stringify(scores.slice(0, 500)));
 }
 
-export function hentOfflineScores(oeNavn?: string) {
+export function hentOfflineScores(oeNavn?: string, karakterKlasse?: string | null) {
     if (!harLocalStorage()) return [] as OfflineScore[];
 
     try {
         const gemt = localStorage.getItem(OFFLINE_SCORES_KEY);
         const scores = gemt ? JSON.parse(gemt) as OfflineScore[] : [];
-        const filtreret = oeNavn ? scores.filter((score) => score.oeNavn === oeNavn) : scores;
+        const klasseNavne = hentKarakterNavneIKlasse(karakterKlasse);
+        const filtreret = scores.filter((score) => {
+            if (oeNavn && score.oeNavn !== oeNavn) return false;
+            if (klasseNavne.length > 0 && !klasseNavne.includes(score.karakter || '')) return false;
+            return true;
+        });
         return filtreret.sort((a, b) => b.score - a.score);
     } catch {
         return [];

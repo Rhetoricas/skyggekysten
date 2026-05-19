@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { authState, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
-    import { tilgaengeligeKarakterer } from '$lib/spildata';
+    import { hentKarakterKlasseNavn, tilgaengeligeKarakterer } from '$lib/spildata';
     import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
@@ -20,6 +20,7 @@
         genstartBane,
         nulstilHukommelse,
         lokaleScores,
+        klasseScores,
         globaleScores,
         nyGlobalRekord,
         harGemtOfflineSpil,
@@ -35,6 +36,7 @@
         genstartBane: () => void;
         nulstilHukommelse: () => void;
         lokaleScores: Array<{ navn: string; score: number; karakter?: string }>;
+        klasseScores: Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>;
         globaleScores: Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>;
         nyGlobalRekord: boolean;
         harGemtOfflineSpil: boolean;
@@ -139,6 +141,10 @@
 
     function formaterHighscoreNavn(tekst: string) {
         return formaterNavn(tekst).slice(0, 10);
+    }
+
+    function highscoreKlasseNavn() {
+        return hentKarakterKlasseNavn(spilTilstand.valgtKarakter);
     }
 
     function maskeretEmail(email?: string) {
@@ -612,6 +618,31 @@
                     </div>
                 </div>
                 {#if !spilTilstand.offlineMode}
+                    <div class="tavle klasse-tavle">
+                        <img src="/screens/boardglobal.webp" alt="Karakterklasse tavle" class="tavle-billede" />
+                        <div class="klasse-emblem">
+                            {#if spilTilstand.valgtKarakter}
+                                <img src={spilTilstand.valgtKarakter.ikon} alt="" />
+                            {/if}
+                        </div>
+                        <div class="tavle-indhold global-indhold">
+                            <h3>Top 10 {highscoreKlasseNavn()}</h3>
+                            {#if klasseScores.length === 0}
+                                <p class="tom-liste">Ingen data endnu</p>
+                            {:else}
+                                <ol>
+                                    {#each klasseScores as score, i (i)}
+                                        <li>
+                                            <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
+                                            <span class="point">{score.point}</span>
+                                        </li>
+                                    {/each}
+                                </ol>
+                            {/if}
+                        </div>
+                    </div>
+                {/if}
+                {#if !spilTilstand.offlineMode}
                     <div class="tavle">
                         <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
                         <div class="tavle-indhold global-indhold">
@@ -698,6 +729,31 @@
                         {/if}
                     </div>
                 </div>
+                {#if !spilTilstand.offlineMode}
+                    <div class="tavle klasse-tavle">
+                        <img src="/screens/boardglobal.webp" alt="Karakterklasse tavle" class="tavle-billede" />
+                        <div class="klasse-emblem">
+                            {#if spilTilstand.valgtKarakter}
+                                <img src={spilTilstand.valgtKarakter.ikon} alt="" />
+                            {/if}
+                        </div>
+                        <div class="tavle-indhold global-indhold">
+                            <h3>Top 10 {highscoreKlasseNavn()}</h3>
+                            {#if klasseScores.length === 0}
+                                <p class="tom-liste">Ingen data endnu</p>
+                            {:else}
+                                <ol>
+                                    {#each klasseScores as score, i (i)}
+                                        <li>
+                                            <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
+                                            <span class="point">{score.point}</span>
+                                        </li>
+                                    {/each}
+                                </ol>
+                            {/if}
+                        </div>
+                    </div>
+                {/if}
                 {#if !spilTilstand.offlineMode}
                     <div class="tavle">
                         <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
@@ -1026,7 +1082,7 @@
     .vinder { color: #ddd; } .doed { color: #666; }
     
     .slut-knapper { display: flex; gap: 20px; margin-top: 40px; padding-bottom: 60px; justify-content: center; width: 100%; max-width: 900px; }
-    .highscore-container { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; width: 100%; max-width: 900px; margin-top: 20px; }
+    .highscore-container { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; width: 100%; max-width: 1120px; margin-top: 20px; }
     .score-save-status {
         width: 100%;
         border: 1px solid #555;
@@ -1087,6 +1143,29 @@
     .tavle-indhold h3 { color: #fff; font-size: 1rem; text-align: center; font-family: 'Cinzel', serif; margin-top: 0;}
     .tavle-indhold ol { padding: 0; list-style: none; }
     .tavle-indhold li { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 5px 0; font-size: 0.85rem; }
+    .klasse-tavle .tavle-indhold { top: 18%; }
+    .klasse-emblem {
+        position: absolute;
+        top: 4%;
+        left: 50%;
+        width: 52px;
+        height: 52px;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.85);
+        background: rgba(0, 0, 0, 0.55);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+    }
+    .klasse-emblem img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
     .karakter-navn { color: #9aa69d; font-size: 0.75rem; }
     .status { color: #ccc; margin-top: 15px; }
 

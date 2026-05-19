@@ -21,7 +21,8 @@
         HEX_W,
         ROW_H,
         tilgaengeligeKarakterer,
-        itemDB
+        itemDB,
+        hentKarakterKlasseNoegle
     } from '$lib/spildata';
     import { vaelgStandardKortDimensioner } from '$lib/kortDimensioner';
     import { KORT_VERSION, kortPixelBredde, kortPixelHoejde } from '$lib/kortDimensioner';
@@ -46,6 +47,7 @@
     const SESSION_SELECT = 'rum_kode,kort,start_index,spillere,fog_x,kort_bredde,kort_hoejde,kort_version';
 
     let lokaleScores = $state<Array<{ navn: string; score: number; karakter?: string }>>([]);
+    let klasseScores = $state<Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);
     let globaleScores = $state<Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);    
     
     let flytterNu = false;
@@ -53,6 +55,10 @@
     let visDoedsLog = $state(false);
     let langsomtKamera = $state(false);
     let ruteOverblikState = '';
+
+    function aktuelHighscoreKlasse() {
+        return hentKarakterKlasseNoegle(spilTilstand.valgtKarakter);
+    }
     let ruteArkivForNaesteTur = $state<Record<string, number[][]>>({});
     let introAktiv = $state(false);
     let sidstePinchAfstand = 0;
@@ -1143,7 +1149,9 @@
                         ? 'En ventende score blev gemt efter genoprettet forbindelse.'
                         : `${gemteVentende} ventende scores blev gemt efter genoprettet forbindelse.`;
                 }
+                const klasse = aktuelHighscoreKlasse();
                 globaleScores = await hentGlobalTopTi();
+                klasseScores = klasse ? await hentGlobalTopTi(klasse) : [];
                 lokaleScores = await hentHighscores();
             })();
         }
@@ -1180,11 +1188,13 @@
             
             const highscoreGemt = await gemHighscore();
             const kanTjekkeGlobalRekord = highscoreGemt && spilTilstand.gameMode !== 'offline' && authState.user;
+            const klasse = aktuelHighscoreKlasse();
             const globalTopScore = kanTjekkeGlobalRekord ? await hentGlobalTopScore() : 0;
             nyGlobalRekord = !!kanTjekkeGlobalRekord && spilTilstand.samletScore >= M10_SCORE && spilTilstand.samletScore >= globalTopScore;
 
             lokaleScores = await hentHighscores();
             if (spilTilstand.gameMode !== 'offline') {
+                klasseScores = await hentGlobalTopTi(klasse);
                 globaleScores = await hentGlobalTopTi();
             }
             harGemtOfflineSpil = harOfflineSpil();
@@ -1783,6 +1793,7 @@ function udførBevægelse(nytIndeks: number) {
     {genstartBane} 
     {nulstilHukommelse}
     {lokaleScores} 
+    {klasseScores}
     {globaleScores}
     {nyGlobalRekord}
     {harGemtOfflineSpil}

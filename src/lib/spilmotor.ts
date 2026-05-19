@@ -698,6 +698,40 @@ function hentKoebbareShopItems(shopItems: string[] | undefined, felt: Felt) {
     return fyldShopErstatninger(filtreredeItems, felt, originaleItems.length);
 }
 
+function naegterHandelTilAktuelSpiller(felt: Felt | null | undefined) {
+    return !!spilTilstand.spillerNavn && !!felt?.naegterHandelFor?.includes(spilTilstand.spillerNavn);
+}
+
+function skraemNaboHandlende(centerIndeks: number) {
+    if (!spilTilstand.spillerNavn) return 0;
+
+    let antal = 0;
+    for (const naboIndeks of hentNaboIndices(centerIndeks)) {
+        const nabo = spilTilstand.gitter[naboIndeks];
+        if (!nabo) continue;
+
+        const harHandel = nabo.hasWorkshop || hentKoebbareShopItems(nabo.shopItems, nabo).length > 0;
+        if (!harHandel) continue;
+
+        const naegter = new Set(nabo.naegterHandelFor || []);
+        const foer = naegter.size;
+        naegter.add(spilTilstand.spillerNavn);
+        if (naegter.size === foer) continue;
+
+        nabo.naegterHandelFor = Array.from(naegter);
+        spilTilstand.gitter[naboIndeks] = { ...nabo };
+        broadcastFelt(naboIndeks, spilTilstand.gitter[naboIndeks]);
+        antal++;
+    }
+
+    if (antal > 0) {
+        spilTilstand.gitter = [...spilTilstand.gitter];
+        syncKortTilDbSenere();
+    }
+
+    return antal;
+}
+
 export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) {
     if (!spilTilstand.valgtKarakter) return false;
 
@@ -809,8 +843,8 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         spilTilstand.guldTotal += 5;
         ekstraLog += " Du finder 5 guld i byens uro.";
     } else if ((charId === 'joker_m' || charId === 'joker_f') && b === 'marked') {
-        spilTilstand.guldTotal += 10;
-        ekstraLog += " Din optræden giver 10 guld.";
+        spilTilstand.guldTotal += 20;
+        ekstraLog += " Din optræden giver 20 guld.";
     } else if ((charId === 'royal_m' || charId === 'royal_f') && b === 'by') {
         spilTilstand.guldTotal += 5;
         ekstraLog += " Du opkræver 5 guld i lokal skat.";
@@ -926,10 +960,22 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
             startEvent(felt.eventID);
             mapAendret = true;
         }
-        else if (felt.hasWorkshop) spilTilstand.aktivVaerksted = true;
+        else if (felt.hasWorkshop) {
+            if (naegterHandelTilAktuelSpiller(felt)) {
+                spilTilstand.logBesked = "Værkstedet lukker porten, da de ser dig. Rygtet om dine smadrede naboer er nået hertil.";
+            } else {
+                spilTilstand.aktivVaerksted = true;
+            }
+        }
         else {
             const koebbareShopItems = hentKoebbareShopItems(felt.shopItems, felt);
-            if (koebbareShopItems.length > 0) spilTilstand.aktivShop = koebbareShopItems;
+            if (koebbareShopItems.length > 0) {
+                if (naegterHandelTilAktuelSpiller(felt)) {
+                    spilTilstand.logBesked = "Boderne lukker skodderne, da de ser dig. Rygtet om dine smadrede naboer er nået hertil.";
+                } else {
+                    spilTilstand.aktivShop = koebbareShopItems;
+                }
+            }
         }
     }
 
@@ -1419,7 +1465,8 @@ export function plyndrFelt() {
     const havdeVaerksted = !!felt.hasWorkshop;
     const energiPris = varMarked ? 8 : havdeVaerksted ? 24 : 16;
     const skadePris = varMarked ? 30 : havdeVaerksted ? 75 : 45;
-    const kasseLoot = Math.max(0, felt.kasseGuld || 0);
+    const kasseIndhold = Math.max(0, felt.kasseGuld || 0);
+    const kasseLoot = Math.floor((kasseIndhold * 2) / 3);
     const basisLoot = varMarked
         ? 45 + Math.floor(Math.random() * 31)
         : havdeVaerksted
@@ -1433,6 +1480,7 @@ export function plyndrFelt() {
     felt.plyndret = undefined;
     felt.indbrudt = undefined;
     felt.kasseGuld = undefined;
+    felt.naegterHandelFor = undefined;
     felt.biome = 'ruin';
     felt.shopItems = undefined;
     felt.hasWorkshop = false;
@@ -1448,8 +1496,10 @@ export function plyndrFelt() {
         : havdeButik
             ? " Boderne står tilbage som splinter."
             : "";
-    const kasseLog = kasseLoot > 0 ? " Kassen ryger med i byttet." : "";
-    const smadreLog = `Du smadrer ${varMarked ? 'markedet' : havdeVaerksted ? 'værkstedet' : 'byen'} i blodrus og skraber ${loot} guld ud af resterne. Det koster ${energiPris} energi.${kasseLog}${ekstra}`;
+    const kasseLog = kasseIndhold > 0 ? " Det meste af kassen ryger med i byttet." : "";
+    const skraemteHandlende = skraemNaboHandlende(indeks);
+    const skraemmeLog = skraemteHandlende > 0 ? " Naboernes handlende har set nok og nægter at handle med dig." : "";
+    const smadreLog = `Du smadrer ${varMarked ? 'markedet' : havdeVaerksted ? 'værkstedet' : 'byen'} i blodrus og skraber ${loot} guld ud af resterne. Det koster ${energiPris} energi.${kasseLog}${ekstra}${skraemmeLog}`;
 
     broadcastFelt(indeks, spilTilstand.gitter[indeks]);
     syncKortTilDbSenere();
@@ -1690,6 +1740,7 @@ function placerVaerksteder(gitter: Felt[]) {
         felt.hasWorkshop = true;
         felt.shopItems = undefined;
         felt.kasseGuld = undefined;
+        felt.naegterHandelFor = undefined;
         felt.eventID = undefined;
         felt.hasPortal = false;
     }
@@ -1914,7 +1965,7 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
 
         if (erVandBiome(felt.biome) || felt.eventID) continue;
 
-        if (felt.biome === 'bjerg' && Math.random() < 0.04) {
+        if (felt.biome === 'bjerg' && Math.random() < 0.05) {
             felt.hasGoldmine = true;
         } else if (vildmark.includes(felt.biome as string) && Math.random() < 0.008) {
             felt.isCampfire = true;
@@ -2165,6 +2216,7 @@ export async function udloesNaturkatastrofe(centerIndex: number) {
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
         felter[idx].kasseGuld = undefined;
+        felter[idx].naegterHandelFor = undefined;
         felter[idx].hasWorkshop = false;
         felter[idx].eventID = 'meteor_skat';
         felter[idx].eventFuldført = false;
@@ -2225,6 +2277,7 @@ export async function udloesJordskaelv(centerIndex: number) {
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
         felter[idx].kasseGuld = undefined;
+        felter[idx].naegterHandelFor = undefined;
         felter[idx].hasWorkshop = false;
         felter[idx].eventID = undefined;
 
@@ -2314,6 +2367,7 @@ export async function udloesOversvoemmelse(centerIndex: number) {
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
         felter[idx].kasseGuld = undefined;
+        felter[idx].naegterHandelFor = undefined;
         felter[idx].hasWorkshop = false;
         felter[idx].eventID = undefined;
 
@@ -2372,6 +2426,7 @@ export async function udloesDoedeSlagmark(centerIndex: number) {
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
         felter[idx].kasseGuld = undefined;
+        felter[idx].naegterHandelFor = undefined;
         felter[idx].eventID = undefined;
         felter[idx].eventFuldført = false;
 
@@ -2443,6 +2498,7 @@ export function nulstilKort() {
         felt.indbrudt = undefined;
         felt.plyndret = undefined;
         felt.kasseGuld = undefined;
+        felt.naegterHandelFor = undefined;
         felt.mineOwner = undefined;
         felt.mineLocked = undefined;
         felt.hasMeteorStone = false;

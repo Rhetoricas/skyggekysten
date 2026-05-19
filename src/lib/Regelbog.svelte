@@ -174,7 +174,7 @@
 
                 <section>
                     <h3>Smadring</h3>
-                    <p>Køllen kan smadre markeder og almindelige byfelter til ruiner. Markeder koster 8 energi og 30 grundskade. Byfelter koster 16 energi og 45 grundskade. Værksteder koster 24 energi, 75 grundskade og kræver Murknuser. Grundbyttet er 45-75, 90-150 eller 225 guld plus kasse, påvirket af guldmodifier.</p>
+                    <p>Køllen kan smadre markeder og almindelige byfelter til ruiner. Markeder koster 8 energi og 30 grundskade. Byfelter koster 16 energi og 45 grundskade. Værksteder koster 24 energi, 75 grundskade og kræver Murknuser. Grundbyttet er 45-75, 90-150 eller 225 guld plus to tredjedele af kassen, påvirket af guldmodifier.</p>
                     <p class="eksempel">Eksempel: En ork kan købe en vare på et marked og bagefter smadre markedet for at få noget af værdien tilbage fra kassen. Prisen er tid og blod: energien kan ryge langt under nul, og svage karakterer kan knække på selve smadringen.</p>
                 </section>
 
@@ -201,7 +201,7 @@
                         <li>Miner giver 100 point pr. mine ganget med multiplayer-modifieren.</li>
                         <li>Udstyr giver point svarende til 2/3 af salgsprisen.</li>
                         <li>Til sidst ganges summen med 1 + HP/1000. Har du 100 HP, bliver summen ganget med 1,100.</li>
-                        <li>Global highscore kræver login. Offline-score gemmes kun lokalt.</li>
+                        <li>Global highscore kræver login. Slutskærmen viser lokal ø-score, global karakterklasse-score og global samlet score. Offline-score gemmes kun lokalt.</li>
                         <li>Hvis forbindelsen svigter, forsøger spillet at gemme ventende scores igen senere.</li>
                         <li>En særlig medalje kan gives ved ny global rekord, men kun hvis scoren også er høj nok.</li>
                     </ul>

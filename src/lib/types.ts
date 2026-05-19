@@ -110,6 +110,7 @@ export interface Felt {
     indbrudt?: boolean;
     plyndret?: boolean;
     kasseGuld?: number;
+    naegterHandelFor?: string[];
     
     type?: string;
     opdaget?: boolean;
