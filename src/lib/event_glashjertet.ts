@@ -425,10 +425,10 @@ export const glashjertetEvents = {
         ]
       },
       {
-        tekst: 'Smadr regnskabet med et våben og nægt hele præmissen.',
-        kraeverItem: 'oekse',
+        tekst: 'Smadr regnskabet med køllen og nægt hele præmissen.',
+        kraeverItem: 'koelle',
         udfaldListe: [
-          { log: 'Øksen flækker glasset. Regnskabet går i tusind stykker, og hvert stykke viser en anden udgave af dig, nogle rigere, nogle venligere, ingen uskyldige.', hpAendring: -20, guldAendring: 140 },
+          { log: 'Køllen flækker glasset. Regnskabet går i tusind stykker, og hvert stykke viser en anden udgave af dig, nogle rigere, nogle venligere, ingen uskyldige.', hpAendring: -20, guldAendring: 140 },
           { log: 'Glasset splintrer, og vraget mister sin hukommelse et øjeblik. I det øjeblik kan du stjæle fra selve efterregningen.', guldAendring: 230 },
           { log: 'Slaget rammer dybt. Ikke i glasset, men i den del af dig, der var træt af at blive målt. Det gør ondt, og det hjælper.', hpAendring: -24, maxHpAendring: 16 }
         ]

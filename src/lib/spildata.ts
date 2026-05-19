@@ -8,7 +8,7 @@ export { HEX_W, ROW_H };
 export const biomeVægte: Array<{ id: Biome; vaegt: number }> = [
     { id: 'mark', vaegt: 20 }, { id: 'eng', vaegt: 20 }, { id: 'skov', vaegt: 20 }, { id: 'bjerg', vaegt: 20 },
     { id: 'hule', vaegt: 3}, { id: 'ritual', vaegt: 3 }, { id: 'ruin', vaegt: 3 }, { id: 'bandit', vaegt: 3 },
-    { id: 'hoejland', vaegt: 15 }, { id: 'blodskov', vaegt: 5 }, { id: 'hav', vaegt: 10 },
+    { id: 'hoejland', vaegt: 15 }, { id: 'blodskov', vaegt: 5 }, { id: 'soe', vaegt: 5 },
     { id: 'krystal', vaegt: 5 }, { id: 'slagmark', vaegt: 5 }
 ];
 
@@ -16,10 +16,10 @@ export const biomeTerraenCost: Record<Biome, number> = {
     'mark': 1, 'eng': 1, 'by': 0, 'marked': 0,
     'skov': 3, 'ruin': 3, 'ritual': 3, 'bandit': 2, 'hoejland': 2, 'slagmark': 2,
     'bjerg': 5, 'blodskov': 4, 'hule': 4, 'krystal': 4,
-    'hav': 5, 'meteor': 1
+    'hav': 5, 'soe': 5, 'meteor': 1
 };
 
-export const markedVarePool = ['skovl', 'livseliksir', 'klude', 'kniv', 'metaldetektor', 'soegekvist', 'fakkel', 'sovepose', 'mad', 'hemmelighed'];
+export const markedVarePool = ['skovl', 'livseliksir', 'klude', 'kniv', 'koelle', 'metaldetektor', 'soegekvist', 'fakkel', 'sovepose', 'mad', 'hemmelighed'];
 
 export const itemDB: Record<string, { id: string; navn: string; type: ItemType; billede: string; pris: number; kanKoebes?: boolean; moveMod?: number; dmgMod?: number; synsMod?: number; energiMod?: number; goldMod?: number; beskrivelse?: string }> = {
     'klude': { id: 'klude', navn: 'Klude', type: 'tøj', billede: '/inventory/klude.webp', pris: 10, dmgMod: -0.05, beskrivelse: "Giver en smule beskyttelse. Du tager 5% mindre skade." },
@@ -38,6 +38,8 @@ export const itemDB: Record<string, { id: string; navn: string; type: ItemType; 
     'mesterbue': { id: 'mesterbue', navn: 'Falkebue', type: 'våben', billede: '/inventory/bue_upgr.webp', pris: 235, kanKoebes: false, beskrivelse: "Opgraderet bue. Tæller som bue i events. Buevalg giver lidt mere guld, mindre skade og afslører tre felter mod øst efter skuddet." },
     'oekse': { id: 'oekse', navn: 'Økse', type: 'våben', billede: '/inventory/oekse.webp', pris: 80, beskrivelse: "Et tungt våben. Bruges i enkelte events." },
     'stormoekse': { id: 'stormoekse', navn: 'Stormøkse', type: 'våben', billede: '/inventory/oekse_upgr.webp', pris: 255, kanKoebes: false, beskrivelse: "Opgraderet økse. Tæller som økse i events. Øksevalg giver mere guld og mindre skade, fordi den kan hugge forhindringer væk i ét slag." },
+    'koelle': { id: 'koelle', navn: 'Kølle', type: 'våben', billede: '/inventory/koelle.webp', pris: 150, beskrivelse: "Et brutalt våben. Kan smadre markeder og almindelige byfelter til ruiner for meget energi og HP." },
+    'koelle_upgr': { id: 'koelle_upgr', navn: 'Murknuser', type: 'våben', billede: '/inventory/koelle_upgr.webp', pris: 275, kanKoebes: false, beskrivelse: "Opgraderet kølle. Kan også smadre værksteder og tømme feltets pengekasse, men det koster hårdt i energi og HP." },
     'svaerd': { id: 'svaerd', navn: 'Sværd', type: 'våben', billede: '/inventory/svaerd.webp', pris: 80, beskrivelse: "Et alsidigt våben. Bruges i flere events." },
     'sabel': { id: 'sabel', navn: 'Sabel', type: 'våben', billede: '/inventory/sabel.webp', pris: 60, beskrivelse: "Et let våben. Bruges i enkelte events." },
     'skovl': { id: 'skovl', navn: 'Skovl', type: 'værktøj', billede: '/inventory/skovl.webp', pris: 60, beskrivelse: "Lader dig grave guld og helende rødder op. Uden skovl kan det blive dyrt at grave." },
@@ -75,12 +77,12 @@ export const tilgaengeligeKarakterer: Karakter[] = [
     { id: 'royal_f', navn: "Hertuginde", ikon: "/game_faces/royal_f.webp", startMsg: "Du starter med mange penge og intet våben.", startHp: 100, startGuld: 500, startUdstyr: ['flot_toej', 'sovepose'], moveCost: 1, digCost: 10, dmgMod: 1.1, goldMod: 1.2, fordel: "Meget guld og fint tøj.", ulempe: "Intet våben. Gravning koster mere HP.", baseEnergi: 6, synsRadius: 1 },
     { id: 'hunter_m', navn: "Jæger", ikon: "/game_faces/hunter_m.webp", startMsg: "Hold afstand til byttet.", startHp: 90, startGuld: 20, startUdstyr: ['bue', 'klude', 'sovepose'], moveCost: 1, digCost: 6, dmgMod: 1.1, goldMod: 1.0, fordel: "Starter med bue og højt syn.", ulempe: "Lav start-HP.", baseEnergi: 8, synsRadius: 2, biomeMod: { 'skov': -2, 'blodskov': -2 } },
     { id: 'hunter_f', navn: "Skytte", ikon: "/game_faces/hunter_f.webp", startMsg: "Hold afstand til byttet.", startHp: 90, startGuld: 20, startUdstyr: ['bue', 'klude', 'sovepose'], moveCost: 1, digCost: 6, dmgMod: 1.1, goldMod: 1.0, fordel: "Starter med bue og højt syn.", ulempe: "Lav start-HP.", baseEnergi: 8, synsRadius: 2, biomeMod: { 'skov': -2, 'blodskov': -2 } },
-    { id: 'pirate_m', navn: "Kaptajn", ikon: "/game_faces/pirate_m.webp", startMsg: "Havet tog alt andet.", startHp: 110, startGuld: 150, startUdstyr: ['sabel', 'klude', 'hemmelighed'], moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.2, fordel: "Høj kapital, sabel og et skattekort.", ulempe: "Ingen sovepose.", baseEnergi: 7, synsRadius: 1, biomeMod: { 'hav': -3 } },
-    { id: 'pirate_f', navn: "Korsar", ikon: "/game_faces/pirate_f.webp", startMsg: "Havet tog alt andet.", startHp: 110, startGuld: 150, startUdstyr: ['sabel', 'klude', 'hemmelighed'], moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.2, fordel: "Høj kapital, sabel og et skattekort.", ulempe: "Ingen sovepose.", baseEnergi: 7, synsRadius: 1, biomeMod: { 'hav': -3 } },
+    { id: 'pirate_m', navn: "Kaptajn", ikon: "/game_faces/pirate_m.webp", startMsg: "Havet tog alt andet.", startHp: 110, startGuld: 150, startUdstyr: ['sabel', 'klude', 'hemmelighed'], moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.2, fordel: "Høj kapital, sabel og et skattekort.", ulempe: "Ingen sovepose.", baseEnergi: 7, synsRadius: 1, biomeMod: { 'hav': -3, 'soe': -1 } },
+    { id: 'pirate_f', navn: "Korsar", ikon: "/game_faces/pirate_f.webp", startMsg: "Havet tog alt andet.", startHp: 110, startGuld: 150, startUdstyr: ['sabel', 'klude', 'hemmelighed'], moveCost: 1, digCost: 5, dmgMod: 1.0, goldMod: 1.2, fordel: "Høj kapital, sabel og et skattekort.", ulempe: "Ingen sovepose.", baseEnergi: 7, synsRadius: 1, biomeMod: { 'hav': -3, 'soe': -1 } },
     { id: 'dwarf_m', navn: "Dværg", ikon: "/game_faces/dwarf_m.webp", startMsg: "Du graver effektivt, men bevæger dig langsomt.", startHp: 130, startGuld: 80, startUdstyr: ['skovl', 'oekse', 'klude'], moveCost: 1.5, digCost: 2, dmgMod: 1.0, goldMod: 1.3, fordel: "God til at grave og tjene guld.", ulempe: "Langsom at flytte.", baseEnergi: 7, synsRadius: 1, biomeMod: { 'bjerg': -3, 'krystal': -2 } },
     { id: 'dwarf_f', navn: "Minegraver", ikon: "/game_faces/dwarf_f.webp", startMsg: "Du graver effektivt, men bevæger dig langsomt.", startHp: 130, startGuld: 80, startUdstyr: ['skovl', 'oekse', 'klude'], moveCost: 1.5, digCost: 2, dmgMod: 1.0, goldMod: 1.3, fordel: "God til at grave og tjene guld.", ulempe: "Langsom at flytte.", baseEnergi: 7, synsRadius: 1, biomeMod: { 'bjerg': -3, 'krystal': -2 } },
-    { id: 'orc_m', navn: "Ork", ikon: "/game_faces/orc_m.webp", startMsg: "Du starter med meget HP og lav guldindkomst.", startHp: 160, startGuld: 0, startUdstyr: ['svaerd', 'klude'], moveCost: 1, digCost: 6, dmgMod: 0.8, goldMod: 0.8, fordel: "Meget HP og lav skade.", ulempe: "Dårligere guldindkomst.", baseEnergi: 8, synsRadius: 1, biomeMod: { 'slagmark': -2 } },
-    { id: 'orc_f', navn: "Klanleder", ikon: "/game_faces/orc_f.webp", startMsg: "Du starter med meget HP og lav guldindkomst.", startHp: 160, startGuld: 0, startUdstyr: ['svaerd', 'klude'], moveCost: 1, digCost: 6, dmgMod: 0.8, goldMod: 0.8, fordel: "Meget HP og lav skade.", ulempe: "Dårligere guldindkomst.", baseEnergi: 8, synsRadius: 1, biomeMod: { 'slagmark': -2 } },
+    { id: 'orc_m', navn: "Ork", ikon: "/game_faces/orc_m.webp", startMsg: "Du starter med meget HP, kølle og lav guldindkomst.", startHp: 160, startGuld: 0, startUdstyr: ['koelle', 'klude'], moveCost: 1, digCost: 6, dmgMod: 0.8, goldMod: 0.8, fordel: "Meget HP, lav skade og kølle til at smadre civilisation.", ulempe: "Dårligere guldindkomst og smadring koster dyrebare dage.", baseEnergi: 8, synsRadius: 1, biomeMod: { 'slagmark': -2 } },
+    { id: 'orc_f', navn: "Klanleder", ikon: "/game_faces/orc_f.webp", startMsg: "Du starter med meget HP, kølle og lav guldindkomst.", startHp: 160, startGuld: 0, startUdstyr: ['koelle', 'klude'], moveCost: 1, digCost: 6, dmgMod: 0.8, goldMod: 0.8, fordel: "Meget HP, lav skade og kølle til at smadre civilisation.", ulempe: "Dårligere guldindkomst og smadring koster dyrebare dage.", baseEnergi: 8, synsRadius: 1, biomeMod: { 'slagmark': -2 } },
     { id: 'joker_m', navn: "Joker", ikon: "/game_faces/joker_m.webp", startMsg: "Held er en strategi.", startHp: 50, startGuld: 1, startUdstyr: ['kniv'], moveCost: 1, digCost: 5, dmgMod: 2.0, goldMod: 1.5, fordel: "Guldbonus og godt syn.", ulempe: "Tyndt helbred og tager dobbelt skade.", baseEnergi: 7, synsRadius: 2 },
     { id: 'joker_f', navn: "Harlekin", ikon: "/game_faces/joker_f.webp", startMsg: "Held er en strategi.", startHp: 50, startGuld: 1, startUdstyr: ['kniv'], moveCost: 1, digCost: 5, dmgMod: 2.0, goldMod: 1.5, fordel: "Guldbonus og godt syn.", ulempe: "Tyndt helbred og tager dobbelt skade.", baseEnergi: 7, synsRadius: 2 }
 ];

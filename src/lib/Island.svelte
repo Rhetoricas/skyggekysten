@@ -211,10 +211,11 @@
         bandit: 'Banditlejr er risikabel. Gravning giver ofte guld, men der er også stor fælderisiko.',
         hoejland: 'Højland er åbent terræn. Gravning kan give guld, rod, en lille fælderisiko eller fakkel.',
         blodskov: 'Blodskov er farligt og uroligt. Gravefund ligner andre farlige biomer: guld, rod, fælder og livseliksir.',
-        by: 'Byer kan have butikker, værksteder og indbrudsmuligheder. Du kan normalt ikke grave her.',
+        by: 'Byer kan have butikker, værksteder og indbrudsmuligheder. Spillere med kølle kan smadre dem til ruiner. Du kan normalt ikke grave her.',
         hav: 'Hav er farligt uden båd. Du tager skade i åbent vand, og tung rustning, fakler og flere skrøbelige ting kan gå tabt i vandet. Hvis du kollapser i vandet, drukner du, medmindre en livseliksir redder dig først.',
+        soe: 'Sø er indlandsvand. Den er farlig uden båd ligesom hav, men tæller ikke som kyst eller piratvand.',
         krystal: 'Krystalfelter er farlige og sjældne. Gravning kan give stærke fund, men også fælder.',
-        marked: 'Markeder kan have butikker. Du kan normalt ikke grave her.',
+        marked: 'Markeder kan have butikker. Spillere med kølle kan smadre dem til ruiner. Du kan normalt ikke grave her.',
         slagmark: 'Slagmark er et farligt gravefelt med guld, rødder, fælder og livseliksir.',
         meteor: 'Meteor-felter styres af meteor-eventet. Kig efter meteorstenen og eventet på feltet.'
     };
@@ -526,7 +527,7 @@
     });
 
     function preloadFiler() {
-        const standardBiomer = ['mark', 'eng', 'skov', 'bjerg', 'hule', 'ritual', 'ruin', 'bandit', 'blodskov', 'by', 'hav', 'krystal', 'marked', 'slagmark', 'meteor'];
+        const standardBiomer = ['mark', 'eng', 'skov', 'bjerg', 'hule', 'ritual', 'ruin', 'bandit', 'blodskov', 'by', 'hav', 'soe', 'krystal', 'marked', 'slagmark', 'meteor'];
         const billederTilPreload = [
             '/tiles/byshop.webp', '/tiles/markedshop.webp', '/tiles/udgravning.webp', '/tiles/empty_treasure.webp', '/tiles/treasuremark.webp',
             '/tiles/event.png', '/tiles/campfire.webp', '/events/ev_campfire.webp', '/tiles/guldtaage.webp', '/tiles/livtaage.webp',
@@ -537,8 +538,9 @@
         ];
 
         standardBiomer.forEach(biome => {
-            billederTilPreload.push(`/tiles/${biome}.webp`);
-            billederTilPreload.push(`/tiles/${biome}_taage.webp`);
+            const tileNavn = biome === 'soe' ? 'hav' : biome;
+            billederTilPreload.push(`/tiles/${tileNavn}.webp`);
+            billederTilPreload.push(`/tiles/${tileNavn}_taage.webp`);
         });
         Object.values(itemDB).forEach(item => billederTilPreload.push(item.billede));
         tilgaengeligeKarakterer.forEach(karakter => billederTilPreload.push(karakter.ikon));
@@ -1275,7 +1277,7 @@
 
         const muligeStartFelter = [];
         for (let raekke = 1; raekke < kortHoejde - 1; raekke++) {
-            if (spilTilstand.gitter[raekke * kortBredde + 1] && spilTilstand.gitter[raekke * kortBredde + 1].biome !== 'hav') {
+            if (spilTilstand.gitter[raekke * kortBredde + 1] && spilTilstand.gitter[raekke * kortBredde + 1].biome !== 'hav' && spilTilstand.gitter[raekke * kortBredde + 1].biome !== 'soe') {
                 muligeStartFelter.push(raekke * kortBredde + 1);
             }
         }
@@ -1540,7 +1542,16 @@
 
     function formaterBiomeNavn(biome: string | undefined) {
         if (!biome) return 'felt';
-        return biome.replace('hoejland', 'højland');
+        return biome.replace('hoejland', 'højland').replace('soe', 'sø');
+    }
+
+    function tileBaggrundForBiome(biome: string, erOpslugt: boolean) {
+        if (biome === 'soe') {
+            const billede = erOpslugt ? '/tiles/hav_taage.webp' : '/tiles/hav.webp';
+            return `url('${billede}')`;
+        }
+
+        return `url('/tiles/${biome}${erOpslugt ? '_taage' : ''}.webp')`;
     }
 
     function harKoebbarShop(felt: Felt) {
@@ -1567,6 +1578,7 @@
 
         if (erOpslugt) dele.push('Tågen har taget feltet. Det er farligt at stå her.');
         if (biome === 'hav') dele.push('Hav kan sluge tung rustning og fakler, og uden båd risikerer du drukning.');
+        if (biome === 'soe') dele.push('Søer er indlandsvand. De er farlige uden båd, men de tæller ikke som havkyst.');
         if (biome === 'hule') dele.push('Huler kan ødelægge soveposer og fint tøj.');
         if (biome === 'ruin') dele.push('Ruiner kan koste madrationer.');
         if (biome === 'krystal') dele.push('Krystaller kan ødelægge metaldetektor og gylden kikkert.');
@@ -1832,7 +1844,7 @@ function udførBevægelse(nytIndeks: number) {
                 {@const erSkattekortRygte = !erUdforsket && aktiveSkattekortFelter.includes(i)}
                 {@const erOpslugt = !spilTilstand.devVisHeleKort && erFeltITaagen(spilTilstand.gitter, i, spilTilstand.fogX, kortBredde)}
                 {@const vistBiome = felt.katastrofeVisuelAktiv && felt.katastrofeFraBiome ? felt.katastrofeFraBiome : felt.biome}
-                {@const baggrund = !erUdforsket && !erSkattekortRygte ? 'none' : erOpslugt ? `url('/tiles/${vistBiome}_taage.webp')` : `url('/tiles/${vistBiome}.webp')`}
+                {@const baggrund = !erUdforsket && !erSkattekortRygte ? 'none' : tileBaggrundForBiome(String(vistBiome), erOpslugt)}
                 {@const feltHjaelp = forklaringForFelt(felt, i, erUdforsket, erOpslugt, erSkattekortRygte)}
 
                 <div class="hex" class:active={spilTilstand.spillerIndex === i} class:unexplored={!erUdforsket && !erSkattekortRygte}
@@ -1948,11 +1960,11 @@ function udførBevægelse(nytIndeks: number) {
                                 alt=""
                                 class="workshop-icon"
                                 data-help-title="Værksted"
-                                data-help-body="Værkstedet opgraderer udstyr: skovl, stav, søgekvist, dirk, kniv, rustning, økse, bue, tøj, fakkel, sovepose og detektor kan blive til stærkere versioner."
+                                data-help-body="Værkstedet opgraderer udstyr: skovl, stav, søgekvist, dirk, kniv, rustning, økse, kølle, bue, tøj, fakkel, sovepose og detektor kan blive til stærkere versioner."
                             />
                         {/if}
 
-                        {#if erUdforsket && !erOpslugt && felt.indbrudt}
+                        {#if erUdforsket && !erOpslugt && felt.indbrudt && felt.biome === 'by'}
                             <span class="indbrud-marker" aria-label="Indbrudt" data-help-title="Indbrudt" data-help-body="Byfeltet er allerede brudt op med dirk. Det markerer et brugt indbrudssted.">
                                 <img src="/tiles/openlock.webp" alt="" class="indbrud-icon" />
                             </span>

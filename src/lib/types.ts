@@ -1,4 +1,4 @@
-export type Biome = 'mark' | 'eng' | 'skov' | 'bjerg' | 'hule' | 'ritual' | 'ruin' | 'bandit' | 'hoejland' | 'blodskov' | 'by' | 'hav' | 'krystal' | 'marked' | 'slagmark' | 'meteor';
+export type Biome = 'mark' | 'eng' | 'skov' | 'bjerg' | 'hule' | 'ritual' | 'ruin' | 'bandit' | 'hoejland' | 'blodskov' | 'by' | 'hav' | 'soe' | 'krystal' | 'marked' | 'slagmark' | 'meteor';
 export type ItemType = 'tøj' | 'våben' | 'værktøj' | 'forbrug' | 'forbandelse' | 'skat';
 
 export interface Item {
@@ -108,6 +108,8 @@ export interface Felt {
     eventID?: string;
     shopItems?: string[]; 
     indbrudt?: boolean;
+    plyndret?: boolean;
+    kasseGuld?: number;
     
     type?: string;
     opdaget?: boolean;

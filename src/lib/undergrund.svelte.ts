@@ -27,7 +27,7 @@ export function genererUndergrund(biome: Biome | string) {
         skjultLoot: null
     };
 
-    if (civilisation.includes(biome) || biome === 'hav') {
+    if (civilisation.includes(biome) || biome === 'hav' || biome === 'soe') {
         feltData.kanGraves = false;
         return feltData;
     }

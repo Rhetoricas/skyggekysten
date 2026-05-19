@@ -3,7 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
     import { grav } from '$lib/undergrund.svelte';
-    import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal, aktiverHemmelighed, begaaIndbrud, kanBegaaIndbrudPaaFelt } from '$lib/spilmotor';
+    import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal, aktiverHemmelighed, begaaIndbrud, kanBegaaIndbrudPaaFelt, kanPlyndreFelt, plyndrFelt } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
 
     let aktueltFelt = $derived(
@@ -14,6 +14,7 @@
 
     let kanGrave = $derived(aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves);
     let kanBegaaIndbrud = $derived(kanBegaaIndbrudPaaFelt(aktueltFelt));
+    let kanPlyndre = $derived(kanPlyndreFelt(aktueltFelt));
     let aktivTracker = $derived(spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.aktivTracker);
     let aktivTrackerSpiller = $derived(aktivTracker ? spilTilstand.alleSpillere[aktivTracker.targetNavn] : null);
     let trackerDageTilbage = $derived(aktivTracker ? Math.max(0, aktivTracker.slutterDag - spilTilstand.dag + 1) : 0);
@@ -87,6 +88,8 @@
             aktiverHemmelighed();
         } else if (vareId === 'dirk' || vareId === 'mesterdirk') {
             begaaIndbrud();
+        } else if (vareId === 'koelle' || vareId === 'koelle_upgr') {
+            plyndrFelt();
         }
     }
 
@@ -102,11 +105,12 @@
         }
         if (vareId === 'mad') return spilTilstand.livspoint < spilTilstand.maxLivspoint || !spilTilstand.gratisNaesteBevaegelse;
         if (vareId === 'dirk' || vareId === 'mesterdirk') return !!kanBegaaIndbrud;
+        if (vareId === 'koelle' || vareId === 'koelle_upgr') return !!kanPlyndre;
         return vareId === 'stav' || vareId === 'dragestav' || vareId === 'fakkel' || vareId === 'solfakkel' || vareId === 'hemmelighed';
     }
 
     function erSituationsVare(vareId: string) {
-        return vareId === 'skovl' || vareId === 'mesterskovl' || vareId === 'sovepose' || vareId === 'silkesovepose' || vareId === 'mad' || vareId === 'dirk' || vareId === 'mesterdirk';
+        return vareId === 'skovl' || vareId === 'mesterskovl' || vareId === 'sovepose' || vareId === 'silkesovepose' || vareId === 'mad' || vareId === 'dirk' || vareId === 'mesterdirk' || vareId === 'koelle' || vareId === 'koelle_upgr';
     }
 
     function erOpgraderetVare(vareId: string) {
@@ -118,6 +122,7 @@
             'dragestav',
             'mesterbue',
             'stormoekse',
+            'koelle_upgr',
             'mesterskovl',
             'malmviser',
             'runekvist',

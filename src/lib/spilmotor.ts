@@ -55,6 +55,10 @@ export function aktivKortVersion() {
     return KORT_VERSION;
 }
 
+export function erVandBiome(biome: string | Biome | null | undefined) {
+    return biome === 'hav' || biome === 'soe';
+}
+
 interface FaellesEventEffekt {
     senderNavn: string;
     besked: string;
@@ -268,17 +272,19 @@ export function harRygsaekItem(genstandId: string) {
                             ? ['rustning', 'kongepanser']
                             : genstandId === 'oekse'
                                 ? ['oekse', 'stormoekse']
-                                : genstandId === 'bue'
-                                    ? ['bue', 'mesterbue']
-                                    : genstandId === 'flot_toej'
-                                        ? ['flot_toej', 'royalt_toej']
-                                        : genstandId === 'fakkel'
-                                            ? ['fakkel', 'solfakkel']
-                                            : genstandId === 'metaldetektor'
-                                                ? ['metaldetektor', 'malmviser']
-                                                : genstandId === 'sovepose'
-                                                    ? ['sovepose', 'silkesovepose']
-                                                    : [genstandId];
+                                : genstandId === 'koelle'
+                                    ? ['koelle', 'koelle_upgr']
+                                    : genstandId === 'bue'
+                                        ? ['bue', 'mesterbue']
+                                        : genstandId === 'flot_toej'
+                                            ? ['flot_toej', 'royalt_toej']
+                                            : genstandId === 'fakkel'
+                                                ? ['fakkel', 'solfakkel']
+                                                : genstandId === 'metaldetektor'
+                                                    ? ['metaldetektor', 'malmviser']
+                                                    : genstandId === 'sovepose'
+                                                        ? ['sovepose', 'silkesovepose']
+                                                        : [genstandId];
     return spilTilstand.mitUdstyr.some(ting => itemIds.includes(ting.id) && ting.maengde > 0);
 }
 
@@ -297,17 +303,19 @@ export function findRygsaekItemTilKrav(genstandId: string) {
                             ? ['rustning', 'kongepanser']
                             : genstandId === 'oekse'
                                 ? ['oekse', 'stormoekse']
-                                : genstandId === 'bue'
-                                    ? ['bue', 'mesterbue']
-                                    : genstandId === 'flot_toej'
-                                        ? ['flot_toej', 'royalt_toej']
-                                        : genstandId === 'fakkel'
-                                            ? ['fakkel', 'solfakkel']
-                                            : genstandId === 'metaldetektor'
-                                                ? ['metaldetektor', 'malmviser']
-                                                : genstandId === 'sovepose'
-                                                    ? ['sovepose', 'silkesovepose']
-                                                    : [genstandId];
+                                : genstandId === 'koelle'
+                                    ? ['koelle', 'koelle_upgr']
+                                    : genstandId === 'bue'
+                                        ? ['bue', 'mesterbue']
+                                        : genstandId === 'flot_toej'
+                                            ? ['flot_toej', 'royalt_toej']
+                                            : genstandId === 'fakkel'
+                                                ? ['fakkel', 'solfakkel']
+                                                : genstandId === 'metaldetektor'
+                                                    ? ['metaldetektor', 'malmviser']
+                                                    : genstandId === 'sovepose'
+                                                        ? ['sovepose', 'silkesovepose']
+                                                        : [genstandId];
     return spilTilstand.mitUdstyr.find(ting => itemIds.includes(ting.id) && ting.maengde > 0)?.id ?? null;
 }
 
@@ -329,6 +337,7 @@ export function kanModtageItem(genstandId: string) {
     if (genstandId === 'kniv' || genstandId === 'mesterkniv') return !harRygsaekItem('kniv');
     if (genstandId === 'rustning' || genstandId === 'kongepanser') return !harRygsaekItem('rustning');
     if (genstandId === 'oekse' || genstandId === 'stormoekse') return !harRygsaekItem('oekse');
+    if (genstandId === 'koelle' || genstandId === 'koelle_upgr') return !harRygsaekItem('koelle');
     if (genstandId === 'bue' || genstandId === 'mesterbue') return !harRygsaekItem('bue');
     if (genstandId === 'klude' || genstandId === 'flot_toej' || genstandId === 'royalt_toej') {
         return !spilTilstand.mitUdstyr.some(ting => ['klude', 'flot_toej', 'royalt_toej'].includes(ting.id) && ting.maengde > 0);
@@ -383,6 +392,11 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
 
     if (genstandId === 'stormoekse') {
         spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'oekse');
+        udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    }
+
+    if (genstandId === 'koelle_upgr') {
+        spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'koelle');
         udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
     }
 
@@ -461,6 +475,22 @@ export function brugFraRygsæk(genstandId: string, brugtMaengde: number = 1) {
     
     spilTilstand.mitUdstyr = [...spilTilstand.mitUdstyr];
     syncTilDb(); // Ingen `true` her.
+}
+
+export function laegGuldIKasseForAktueltFelt(beloeb: number) {
+    const kasseBeloeb = Math.max(0, Math.floor(beloeb));
+    if (kasseBeloeb <= 0) return 0;
+
+    const indeks = spilTilstand.spillerIndex;
+    const felt = spilTilstand.gitter[indeks];
+    if (!felt) return 0;
+
+    felt.kasseGuld = Math.max(0, felt.kasseGuld || 0) + kasseBeloeb;
+    spilTilstand.gitter[indeks] = { ...felt };
+    spilTilstand.gitter = [...spilTilstand.gitter];
+    broadcastFelt(indeks, spilTilstand.gitter[indeks]);
+    syncKortTilDbSenere();
+    return felt.kasseGuld;
 }
 
 export function afslørOmraade(centerIndex: number, radius: number = 1) {
@@ -766,7 +796,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         mapAendret = true;
     }
 
-    if (felt.biome === 'hav' && !felt.hasBoat) {
+    if (erVandBiome(felt.biome) && !felt.hasBoat) {
         tagSkadeOgTjekDød(30, `Du ender i åbent vand. (-30 HP)`, "Du druknede i det åbne vand.");
         if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'dead') {
             return false;
@@ -1017,10 +1047,10 @@ export function udfoerDrageTeleport() {
     let maalIndeks = planlagtMaal;
     let nedgraderet = false;
 
-    if (planlagtFelt?.biome === 'hav' && !planlagtFelt.hasBoat) {
+    if (erVandBiome(planlagtFelt?.biome) && !planlagtFelt.hasBoat) {
         const sikkertMaal = [...rute].reverse().find((indeks) => {
             const felt = spilTilstand.gitter[indeks];
-            return felt && (felt.biome !== 'hav' || felt.hasBoat);
+            return felt && (!erVandBiome(felt.biome) || felt.hasBoat);
         });
 
         maalIndeks = sikkertMaal ?? gammeltIndeks;
@@ -1185,6 +1215,12 @@ export function kanBegaaIndbrudPaaFelt(felt: Felt | null | undefined) {
     if (!felt || felt.indbrudt) return false;
     if (felt.biome !== 'by') return false;
     return !felt.shopItems || felt.shopItems.length === 0;
+}
+
+export function kanPlyndreFelt(felt: Felt | null | undefined) {
+    if (!felt || felt.plyndret || !harRygsaekItem('koelle')) return false;
+    if (felt.hasWorkshop && !harRygsaekItem('koelle_upgr')) return false;
+    return felt.biome === 'by' || felt.biome === 'marked';
 }
 
 function erHunter() {
@@ -1357,6 +1393,76 @@ export function begaaIndbrud() {
     syncTilDb();
 }
 
+export function plyndrFelt() {
+    if (!spilTilstand.valgtKarakter || spilTilstand.erBevidstløs) return;
+
+    const indeks = spilTilstand.spillerIndex;
+    const felt = spilTilstand.gitter[indeks];
+
+    if (!harRygsaekItem('koelle')) {
+        spilTilstand.logBesked = "Du skal bruge en kølle for at smadre byer og markeder.";
+        return;
+    }
+
+    if (felt?.hasWorkshop && !harRygsaekItem('koelle_upgr')) {
+        spilTilstand.logBesked = "Værkstedets murværk holder. Du skal bruge en opgraderet kølle for at smadre det.";
+        return;
+    }
+
+    if (!kanPlyndreFelt(felt)) {
+        spilTilstand.logBesked = "Køllen kan kun smadre hele by- og markedsfelter.";
+        return;
+    }
+
+    const varMarked = felt.biome === 'marked';
+    const havdeButik = (felt.shopItems || []).some((itemId) => itemDB[itemId]?.kanKoebes !== false);
+    const havdeVaerksted = !!felt.hasWorkshop;
+    const energiPris = varMarked ? 8 : havdeVaerksted ? 24 : 16;
+    const skadePris = varMarked ? 30 : havdeVaerksted ? 75 : 45;
+    const kasseLoot = Math.max(0, felt.kasseGuld || 0);
+    const basisLoot = varMarked
+        ? 45 + Math.floor(Math.random() * 31)
+        : havdeVaerksted
+            ? 225
+            : 90 + Math.floor(Math.random() * 61);
+    const raaLoot = kasseLoot + basisLoot;
+    const loot = spilTilstand.beregnGuldIndkomst(raaLoot);
+
+    spilTilstand.nuvaerendeEnergi -= energiPris;
+    spilTilstand.guldTotal += loot;
+    felt.plyndret = undefined;
+    felt.indbrudt = undefined;
+    felt.kasseGuld = undefined;
+    felt.biome = 'ruin';
+    felt.shopItems = undefined;
+    felt.hasWorkshop = false;
+    felt.hasPortal = false;
+    felt.eventID = undefined;
+    felt.eventFuldført = false;
+    felt.kanGraves = true;
+    spilTilstand.gitter[indeks] = { ...felt };
+    spilTilstand.gitter = [...spilTilstand.gitter];
+
+    const ekstra = havdeVaerksted
+        ? " Værkstedet styrter sammen."
+        : havdeButik
+            ? " Boderne står tilbage som splinter."
+            : "";
+    const kasseLog = kasseLoot > 0 ? " Kassen ryger med i byttet." : "";
+    const smadreLog = `Du smadrer ${varMarked ? 'markedet' : havdeVaerksted ? 'værkstedet' : 'byen'} i blodrus og skraber ${loot} guld ud af resterne. Det koster ${energiPris} energi.${kasseLog}${ekstra}`;
+
+    broadcastFelt(indeks, spilTilstand.gitter[indeks]);
+    syncKortTilDbSenere();
+
+    tagSkadeOgTjekDød(skadePris, smadreLog, "Blodrusen blev for dyr.");
+
+    if (spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'dead' && spilTilstand.gameState !== 'win_map') {
+        fremrykTid();
+    }
+
+    syncTilDb(true);
+}
+
 function findMuligeBaadFelter() {
     const bredde = hentKortBredde();
     const hoejde = hentKortHoejde();
@@ -1365,7 +1471,7 @@ function findMuligeBaadFelter() {
         const landIndeks = r * bredde + (bredde - 2);
         const vandIndeks = r * bredde + (bredde - 1);
         if (
-            spilTilstand.gitter[landIndeks]?.biome !== 'hav' &&
+            !erVandBiome(spilTilstand.gitter[landIndeks]?.biome) &&
             spilTilstand.gitter[vandIndeks]?.biome === 'hav'
         ) {
             kystFelter.add(vandIndeks);
@@ -1378,7 +1484,7 @@ function findMuligeBaadFelter() {
             const kolonne = indeks % bredde;
             if (kolonne < bredde * 0.75 || felt?.biome !== 'hav') continue;
 
-            const naboLand = hentNaboIndices(indeks).some((naboIndeks) => spilTilstand.gitter[naboIndeks]?.biome !== 'hav');
+            const naboLand = hentNaboIndices(indeks).some((naboIndeks) => !erVandBiome(spilTilstand.gitter[naboIndeks]?.biome));
             if (naboLand) kystFelter.add(indeks);
         }
     }
@@ -1537,7 +1643,7 @@ function findMuligeSkatteCentre(gitter: Felt[], minKol: number, maxKol: number, 
             if (naboer.length === 6) {
                 const alleGyldige = [i, ...naboer].every(idx => {
                     const felt = gitter[idx];
-                    return felt.kanGraves && !felt.isSkatteKlynge && felt.biome !== 'hav' && felt.biome !== 'by' && felt.biome !== 'marked' && felt.biome !== 'meteor' && !felt.hasPortal && !felt.eventID;
+                    return felt.kanGraves && !felt.isSkatteKlynge && !erVandBiome(felt.biome) && felt.biome !== 'by' && felt.biome !== 'marked' && felt.biome !== 'meteor' && !felt.hasPortal && !felt.eventID;
                 });
                 if (alleGyldige) {
                     muligeCentre.push(i);
@@ -1583,6 +1689,7 @@ function placerVaerksteder(gitter: Felt[]) {
         const felt = gitter[centrum];
         felt.hasWorkshop = true;
         felt.shopItems = undefined;
+        felt.kasseGuld = undefined;
         felt.eventID = undefined;
         felt.hasPortal = false;
     }
@@ -1601,6 +1708,35 @@ function placerEkstraGuldmine(gitter: Felt[]) {
         .sort(() => Math.random() - 0.5);
 
     if (muligeFelter[0]) muligeFelter[0].felt.hasGoldmine = true;
+}
+
+function ladHavOvertrumfeSoe(raaKort: string[], bredde: number, hoejde: number) {
+    const aabne: number[] = [];
+    const besoegte = new Set<number>();
+    const tilfoejHvisVand = (indeks: number) => {
+        if (besoegte.has(indeks) || !erVandBiome(raaKort[indeks])) return;
+        besoegte.add(indeks);
+        aabne.push(indeks);
+    };
+
+    for (let kolonne = 0; kolonne < bredde; kolonne++) {
+        tilfoejHvisVand(kolonne);
+        tilfoejHvisVand((hoejde - 1) * bredde + kolonne);
+    }
+
+    for (let raekke = 1; raekke < hoejde - 1; raekke++) {
+        tilfoejHvisVand(raekke * bredde);
+        tilfoejHvisVand(raekke * bredde + bredde - 1);
+    }
+
+    while (aabne.length > 0) {
+        const indeks = aabne.shift()!;
+        raaKort[indeks] = 'hav';
+
+        for (const nabo of hentNaboIndices(indeks)) {
+            tilfoejHvisVand(nabo);
+        }
+    }
 }
 
 export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: number | null) {
@@ -1638,6 +1774,8 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
         raaKort = nytKort;
     }
 
+    ladHavOvertrumfeSoe(raaKort, bredde, hoejde);
+
     const bySementer = Math.max(1, Math.round(antal / 333));
     const markedSementer = Math.max(1, Math.round(antal / 300));
 
@@ -1647,7 +1785,7 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
             const raekke = Math.floor(indeks / bredde);
             const kolonne = indeks % bredde;
             if (raekke <= 0 || raekke >= hoejde - 1 || kolonne <= 0 || kolonne >= bredde - 1) continue;
-            if (raaKort[indeks] === 'hav' || undgaaBiomer.includes(raaKort[indeks])) continue;
+            if (erVandBiome(raaKort[indeks]) || undgaaBiomer.includes(raaKort[indeks])) continue;
             seeds.push(indeks);
         }
         return seeds;
@@ -1673,7 +1811,7 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
             const kolonne = nu % bredde;
             
             if (raekke === 0 || raekke === hoejde - 1 || kolonne === 0 || kolonne === bredde - 1) continue;
-            if (raaKort[nu] === 'hav') continue;
+            if (erVandBiome(raaKort[nu])) continue;
 
             raaKort[nu] = type;
             bygget++;
@@ -1716,7 +1854,7 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
     const eventChancer: Record<string, number> = {
         'hule': 0.50, 'ritual': 0.90, 'ruin': 0.50, 'bandit': 0.10, 'krystal': 0.02,
         'blodskov': 0.02, 'slagmark': 0.02, 'by': 0.02, 'marked': 0.02, 'hoejland': 0.01,
-        'hav': 0.005, 'bjerg': 0.01, 'skov': 0.01, 'eng': 0.01, 'mark': 0.01
+        'hav': 0.005, 'soe': 0, 'bjerg': 0.01, 'skov': 0.01, 'eng': 0.01, 'mark': 0.01
     };
 
     const tilfaeldigeFelter = Array.from({length: antal}, (_, i) => i).sort((a, b) => {
@@ -1770,11 +1908,11 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
     for (let indeks = 0; indeks < antal; indeks++) {
         const felt = nytGitter[indeks];
         
-        if (felt.biome !== 'hav' && felt.biome !== 'by' && felt.biome !== 'marked' && !felt.eventID && kanPlacerePortal(indeks) && Math.random() < 0.005) {
+        if (!erVandBiome(felt.biome) && felt.biome !== 'by' && felt.biome !== 'marked' && !felt.eventID && kanPlacerePortal(indeks) && Math.random() < 0.005) {
             felt.hasPortal = true;
         }
 
-        if (felt.biome === 'hav' || felt.eventID) continue;
+        if (erVandBiome(felt.biome) || felt.eventID) continue;
 
         if (felt.biome === 'bjerg' && Math.random() < 0.04) {
             felt.hasGoldmine = true;
@@ -1829,7 +1967,7 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
     spilTilstand.gitter = nytGitter;
     const muligeStartFelter = [];
     for (let raekke = 1; raekke < hoejde - 1; raekke++) {
-        if (spilTilstand.gitter[raekke * bredde + 1].biome !== 'hav') muligeStartFelter.push(raekke * bredde + 1);
+        if (!erVandBiome(spilTilstand.gitter[raekke * bredde + 1].biome)) muligeStartFelter.push(raekke * bredde + 1);
     }
     
     spilTilstand.retning = 'E';
@@ -1847,7 +1985,7 @@ export function tjekMiljoeSlitage(biome: string): string {
     let nedgraderetSilkesovepose = false;
 
     spilTilstand.mitUdstyr = spilTilstand.mitUdstyr.filter(vare => {
-        if (biome === 'hav') {
+        if (erVandBiome(biome)) {
             if (vare.id === 'rustning' || vare.id === 'kongepanser') {
                 logBeskeder.push(vare.id === 'kongepanser' ? "Kongepanseret er for tungt i vandet. Du mister det." : "Rustningen er for tung i vandet. Du mister den.");
                 return false;
@@ -2026,6 +2164,7 @@ export async function udloesNaturkatastrofe(centerIndex: number) {
         felter[idx].boatCount = undefined;
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
+        felter[idx].kasseGuld = undefined;
         felter[idx].hasWorkshop = false;
         felter[idx].eventID = 'meteor_skat';
         felter[idx].eventFuldført = false;
@@ -2076,7 +2215,7 @@ export async function udloesJordskaelv(centerIndex: number) {
     const fraBiomer = new Map<number, string | Biome>();
 
     for (const idx of paavirkedeArray) {
-        if (felter[idx].biome === 'hav') continue; 
+        if (erVandBiome(felter[idx].biome)) continue; 
         
         fraBiomer.set(idx, felter[idx].biome);
         felter[idx].biome = Math.random() < 0.2 ? 'ruin' : 'bjerg';
@@ -2085,6 +2224,7 @@ export async function udloesJordskaelv(centerIndex: number) {
         felter[idx].boatCount = undefined;
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
+        felter[idx].kasseGuld = undefined;
         felter[idx].hasWorkshop = false;
         felter[idx].eventID = undefined;
 
@@ -2173,6 +2313,7 @@ export async function udloesOversvoemmelse(centerIndex: number) {
         felter[idx].boatCount = undefined;
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
+        felter[idx].kasseGuld = undefined;
         felter[idx].hasWorkshop = false;
         felter[idx].eventID = undefined;
 
@@ -2221,7 +2362,7 @@ export async function udloesDoedeSlagmark(centerIndex: number) {
     const fraBiomer = new Map<number, string | Biome>();
 
     for (const idx of paavirkedeArray) {
-        if (felter[idx].biome === 'hav') continue;
+        if (erVandBiome(felter[idx].biome)) continue;
 
         fraBiomer.set(idx, felter[idx].biome);
         felter[idx].biome = 'slagmark';
@@ -2230,6 +2371,7 @@ export async function udloesDoedeSlagmark(centerIndex: number) {
         felter[idx].boatCount = undefined;
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
+        felter[idx].kasseGuld = undefined;
         felter[idx].eventID = undefined;
         felter[idx].eventFuldført = false;
 
@@ -2299,6 +2441,8 @@ export function nulstilKort() {
         felt.hoestetFremTilBlok = undefined;
         felt.insektPlageBlok = undefined;
         felt.indbrudt = undefined;
+        felt.plyndret = undefined;
+        felt.kasseGuld = undefined;
         felt.mineOwner = undefined;
         felt.mineLocked = undefined;
         felt.hasMeteorStone = false;

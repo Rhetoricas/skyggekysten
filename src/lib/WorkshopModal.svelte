@@ -1,7 +1,7 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
-    import { afslørMalmviserMiner } from '$lib/spilmotor';
+    import { afslørMalmviserMiner, laegGuldIKasseForAktueltFelt } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
 
     let { lukVaerksted } = $props<{ lukVaerksted: () => void }>();
@@ -13,6 +13,7 @@
     const KNIV_OPGRADERING_PRIS = 150;
     const RUSTNING_OPGRADERING_PRIS = 250;
     const OEKSE_OPGRADERING_PRIS = 175;
+    const KOELLE_OPGRADERING_PRIS = 185;
     const BUE_OPGRADERING_PRIS = 175;
     const KLUDER_OPGRADERING_PRIS = 100;
     const ROYALT_TOEJ_OPGRADERING_PRIS = 500;
@@ -41,6 +42,9 @@
     let harOekse = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'oekse' && ting.maengde > 0));
     let harStormoekse = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'stormoekse' && ting.maengde > 0));
     let kanOpgradereOekse = $derived(harOekse && !harStormoekse && spilTilstand.guldTotal >= OEKSE_OPGRADERING_PRIS);
+    let harKoelle = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'koelle' && ting.maengde > 0));
+    let harOpgraderetKoelle = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'koelle_upgr' && ting.maengde > 0));
+    let kanOpgradereKoelle = $derived(harKoelle && !harOpgraderetKoelle && spilTilstand.guldTotal >= KOELLE_OPGRADERING_PRIS);
     let harBue = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'bue' && ting.maengde > 0));
     let harMesterbue = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'mesterbue' && ting.maengde > 0));
     let kanOpgradereBue = $derived(harBue && !harMesterbue && spilTilstand.guldTotal >= BUE_OPGRADERING_PRIS);
@@ -59,6 +63,11 @@
     let harSilkesovepose = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'silkesovepose' && ting.maengde > 0));
     let kanOpgradereSovepose = $derived(harSovepose && !harSilkesovepose && spilTilstand.guldTotal >= SOVEPOSE_OPGRADERING_PRIS);
 
+    function betalTilVaerksted(pris: number) {
+        spilTilstand.guldTotal -= pris;
+        laegGuldIKasseForAktueltFelt(pris);
+    }
+
     function opgraderSkovl() {
         if (harMesterskovl) {
             spilTilstand.logBesked = "Din skovl er allerede opgraderet.";
@@ -76,7 +85,7 @@
             return;
         }
 
-        spilTilstand.guldTotal -= SKOVL_OPGRADERING_PRIS;
+        betalTilVaerksted(SKOVL_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'skovl' && ting.id !== 'mesterskovl'),
             { id: 'mesterskovl', maengde: 1, anskaffetDag: spilTilstand.dag }
@@ -102,7 +111,7 @@
             return;
         }
 
-        spilTilstand.guldTotal -= STAV_OPGRADERING_PRIS;
+        betalTilVaerksted(STAV_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'stav' && ting.id !== 'dragestav'),
             { id: 'dragestav', maengde: 1, anskaffetDag: spilTilstand.dag }
@@ -128,7 +137,7 @@
             return;
         }
 
-        spilTilstand.guldTotal -= KVIST_OPGRADERING_PRIS;
+        betalTilVaerksted(KVIST_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'soegekvist' && ting.id !== 'runekvist'),
             { id: 'runekvist', maengde: 1, anskaffetDag: spilTilstand.dag }
@@ -154,7 +163,7 @@
             return;
         }
 
-        spilTilstand.guldTotal -= DIRK_OPGRADERING_PRIS;
+        betalTilVaerksted(DIRK_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'dirk' && ting.id !== 'mesterdirk'),
             { id: 'mesterdirk', maengde: 1, anskaffetDag: spilTilstand.dag }
@@ -180,7 +189,7 @@
             return;
         }
 
-        spilTilstand.guldTotal -= KNIV_OPGRADERING_PRIS;
+        betalTilVaerksted(KNIV_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'kniv' && ting.id !== 'mesterkniv'),
             { id: 'mesterkniv', maengde: 1, anskaffetDag: spilTilstand.dag }
@@ -206,7 +215,7 @@
             return;
         }
 
-        spilTilstand.guldTotal -= RUSTNING_OPGRADERING_PRIS;
+        betalTilVaerksted(RUSTNING_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'rustning' && ting.id !== 'kongepanser'),
             { id: 'kongepanser', maengde: 1, anskaffetDag: spilTilstand.dag }
@@ -232,12 +241,38 @@
             return;
         }
 
-        spilTilstand.guldTotal -= OEKSE_OPGRADERING_PRIS;
+        betalTilVaerksted(OEKSE_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'oekse' && ting.id !== 'stormoekse'),
             { id: 'stormoekse', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet lægger runer i øksehovedet og hærder æggen. Din økse er nu en stormøkse.";
+        syncTilDb();
+    }
+
+    function opgraderKoelle() {
+        if (harOpgraderetKoelle) {
+            spilTilstand.logBesked = "Din kølle er allerede opgraderet.";
+            return;
+        }
+
+        if (!harKoelle) {
+            spilTilstand.logBesked = "Værkstedet kan ikke forstærke en kølle, du ikke har.";
+            return;
+        }
+
+        if (spilTilstand.guldTotal < KOELLE_OPGRADERING_PRIS) {
+            spilTilstand.logBesked = "Mesteren kræver mere guld til jernbånd, blykerne og nitter.";
+            syncTilDb();
+            return;
+        }
+
+        betalTilVaerksted(KOELLE_OPGRADERING_PRIS);
+        spilTilstand.mitUdstyr = [
+            ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'koelle' && ting.id !== 'koelle_upgr'),
+            { id: 'koelle_upgr', maengde: 1, anskaffetDag: spilTilstand.dag }
+        ];
+        spilTilstand.logBesked = "Værkstedet binder jern om hovedet og fylder kernen med bly. Din kølle er nu en murknuser.";
         syncTilDb();
     }
 
@@ -258,7 +293,7 @@
             return;
         }
 
-        spilTilstand.guldTotal -= BUE_OPGRADERING_PRIS;
+        betalTilVaerksted(BUE_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'bue' && ting.id !== 'mesterbue'),
             { id: 'mesterbue', maengde: 1, anskaffetDag: spilTilstand.dag }
@@ -284,7 +319,7 @@
             return;
         }
 
-        spilTilstand.guldTotal -= KLUDER_OPGRADERING_PRIS;
+        betalTilVaerksted(KLUDER_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'klude' && ting.id !== 'flot_toej' && ting.id !== 'royalt_toej'),
             { id: 'flot_toej', maengde: 1, anskaffetDag: spilTilstand.dag }
@@ -310,7 +345,7 @@
             return;
         }
 
-        spilTilstand.guldTotal -= ROYALT_TOEJ_OPGRADERING_PRIS;
+        betalTilVaerksted(ROYALT_TOEJ_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'klude' && ting.id !== 'flot_toej' && ting.id !== 'royalt_toej'),
             { id: 'royalt_toej', maengde: 1, anskaffetDag: spilTilstand.dag }
@@ -336,7 +371,7 @@
             return;
         }
 
-        spilTilstand.guldTotal -= FAKKEL_OPGRADERING_PRIS;
+        betalTilVaerksted(FAKKEL_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'fakkel' && ting.id !== 'solfakkel'),
             { id: 'solfakkel', maengde: 1, anskaffetDag: spilTilstand.dag }
@@ -362,7 +397,7 @@
             return;
         }
 
-        spilTilstand.guldTotal -= DETEKTOR_OPGRADERING_PRIS;
+        betalTilVaerksted(DETEKTOR_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'metaldetektor' && ting.id !== 'malmviser'),
             { id: 'malmviser', maengde: 1, anskaffetDag: spilTilstand.dag }
@@ -389,7 +424,7 @@
             return;
         }
 
-        spilTilstand.guldTotal -= SOVEPOSE_OPGRADERING_PRIS;
+        betalTilVaerksted(SOVEPOSE_OPGRADERING_PRIS);
         spilTilstand.mitUdstyr = [
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'sovepose' && ting.id !== 'silkesovepose'),
             { id: 'silkesovepose', maengde: 1, anskaffetDag: spilTilstand.dag }
@@ -495,6 +530,18 @@
             helpTitle: 'Økse-opgradering',
             helpBody: 'Kræver en almindelig økse og 175 guld. Stormøksen tæller som økse i events og gør øksevalg mere brutale: mere guld og mindre skade.',
             opgrader: opgraderOekse
+        },
+        {
+            titel: 'Kølle til Murknuser',
+            fraId: 'koelle',
+            tilId: 'koelle_upgr',
+            pris: KOELLE_OPGRADERING_PRIS,
+            harBasis: harKoelle && !harOpgraderetKoelle,
+            kanOpgradere: kanOpgradereKoelle,
+            kortTekst: 'Kan smadre værksteder og tømme feltets kasse. Smadring koster stadig meget energi.',
+            helpTitle: 'Kølle-opgradering',
+            helpBody: 'Kræver en almindelig kølle og 185 guld. Murknuseren kan smadre værkstedsfelter, som en almindelig kølle ikke kan knuse.',
+            opgrader: opgraderKoelle
         },
         {
             titel: 'Klude til Fint tøj',

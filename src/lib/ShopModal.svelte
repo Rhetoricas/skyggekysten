@@ -1,7 +1,7 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
-    import { tilfoejTilRygsæk, brugFraRygsæk, kanModtageItem } from '$lib/spilmotor';
+    import { tilfoejTilRygsæk, brugFraRygsæk, kanModtageItem, laegGuldIKasseForAktueltFelt } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
     import { fremtvingKollaps } from '$lib/overlevelse.svelte';
     import { beregnSalgspris } from '$lib/score';
@@ -33,23 +33,26 @@
                                     ? "Du har allerede en rustning. Find et værksted, hvis den skal forbedres."
                                     : id === 'oekse' || id === 'stormoekse'
                                         ? "Du har allerede en økse. Find et værksted, hvis den skal forbedres."
-                                        : id === 'bue' || id === 'mesterbue'
-                                            ? "Du har allerede en bue. Find et værksted, hvis den skal forbedres."
-                                            : id === 'klude' || id === 'flot_toej' || id === 'royalt_toej'
-                                                ? "Du har allerede tøj. Find et værksted, hvis det skal forbedres."
-                                                : id === 'fakkel' || id === 'solfakkel'
-                                                    ? "Du har allerede en fakkel. Find et værksted, hvis den skal forbedres."
-                                                    : id === 'metaldetektor' || id === 'malmviser'
-                                                        ? "Du har allerede en detektor. Find et værksted, hvis den skal forbedres."
-                                                        : id === 'sovepose' || id === 'silkesovepose'
-                                                            ? "Du har allerede en sovepose. Find et værksted, hvis den skal forbedres."
-                                                            : `Du har allerede ${vareData.navn}.`;
+                                        : id === 'koelle' || id === 'koelle_upgr'
+                                            ? "Du har allerede en kølle. Find et værksted, hvis den skal forbedres."
+                                            : id === 'bue' || id === 'mesterbue'
+                                                ? "Du har allerede en bue. Find et værksted, hvis den skal forbedres."
+                                                : id === 'klude' || id === 'flot_toej' || id === 'royalt_toej'
+                                                    ? "Du har allerede tøj. Find et værksted, hvis det skal forbedres."
+                                                    : id === 'fakkel' || id === 'solfakkel'
+                                                        ? "Du har allerede en fakkel. Find et værksted, hvis den skal forbedres."
+                                                        : id === 'metaldetektor' || id === 'malmviser'
+                                                            ? "Du har allerede en detektor. Find et værksted, hvis den skal forbedres."
+                                                            : id === 'sovepose' || id === 'silkesovepose'
+                                                                ? "Du har allerede en sovepose. Find et værksted, hvis den skal forbedres."
+                                                                : `Du har allerede ${vareData.navn}.`;
             syncTilDb();
             return;
         }
 
         if (spilTilstand.guldTotal >= vareData.pris) {
             spilTilstand.guldTotal -= vareData.pris;
+            laegGuldIKasseForAktueltFelt(vareData.pris);
             spilTilstand.logBesked = `Du købte ${vareData.navn} for ${vareData.pris} guld.`;
             tilfoejTilRygsæk(id, 1);
         } else {

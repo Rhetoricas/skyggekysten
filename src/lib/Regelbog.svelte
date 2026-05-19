@@ -135,9 +135,9 @@
                     <h3>Inventory og udstyr</h3>
                     <ul>
                         <li>Tryk på en genstand i bunden for at bruge den, hvis den er aktiv.</li>
-                        <li>Skovl, sovepose/silkesovepose, mad og dirk er kun aktive, når de kan bruges i den aktuelle situation.</li>
+                        <li>Skovl, sovepose/silkesovepose, mad, dirk og kølle er kun aktive, når de kan bruges i den aktuelle situation.</li>
                         <li>Kun mad og livseliksir kan stables i flere styk. Alle andre våben, værktøjer, tøj og særlige items findes kun én gang ad gangen.</li>
-                        <li>Store værktøjer, våben og tøj findes kun i én version ad gangen. Skovl/mesterskovl, stav/dragestav, søgekvist/runekvist, detektor/malmviser, dirk/mesterdirk, kniv/mesterkniv, rustning/kongepanser, økse/stormøkse, bue/falkebue, fakkel/solfakkel, sovepose/silkesovepose og klude/fint tøj/royalt tøj tæller som samme type.</li>
+                        <li>Store værktøjer, våben og tøj findes kun i én version ad gangen. Skovl/mesterskovl, stav/dragestav, søgekvist/runekvist, detektor/malmviser, dirk/mesterdirk, kniv/mesterkniv, rustning/kongepanser, økse/stormøkse, kølle/murknuser, bue/falkebue, fakkel/solfakkel, sovepose/silkesovepose og klude/fint tøj/royalt tøj tæller som samme type.</li>
                         <li>Fakkel og solfakkel kan lave bål. Stav og dragestav kan teleportere. Skattekort viser en gammel skatteklynge som et sepiafarvet kortspor. Nogle øer kan gemme på flere skatte, og kortet afslører ikke om kisten allerede er taget. Butikker sælger ikke flere skattekort til dig, når du har tydet alle øens spor.</li>
                         <li>Skattekortspor tæller ikke som almindelig udforskning og giver ikke udforskningspoint, før du selv kommer tæt nok på feltet.</li>
                         <li>Nogle ting kan købes, andre findes kun i events. Elverrustning, opgraderede items og relikvier kan ikke købes i almindelige butikker.</li>
@@ -170,6 +170,12 @@
                     <h3>Tyveri</h3>
                     <p>Dirken kan bruges til indbrud på tomme byfelter uden butik. Det koster halvdelen af din baseenergi rundet op. Udbyttet er 35-50 guld, og der er risiko for at blive opdaget og få tæv. Mesterdirken giver dobbelt udbytte, men gør ikke indbruddet sikrere.</p>
                     <p class="eksempel">Eksempel: Hvis du mangler lidt guld til en opgradering, kan indbrud være fristende. Tyve bliver sjældnere opdaget end andre, mens tunge krigere larmer mere.</p>
+                </section>
+
+                <section>
+                    <h3>Smadring</h3>
+                    <p>Køllen kan smadre markeder og almindelige byfelter til ruiner. Markeder koster 8 energi og 30 grundskade. Byfelter koster 16 energi og 45 grundskade. Værksteder koster 24 energi, 75 grundskade og kræver Murknuser. Grundbyttet er 45-75, 90-150 eller 225 guld plus kasse, påvirket af guldmodifier.</p>
+                    <p class="eksempel">Eksempel: En ork kan købe en vare på et marked og bagefter smadre markedet for at få noget af værdien tilbage fra kassen. Prisen er tid og blod: energien kan ryge langt under nul, og svage karakterer kan knække på selve smadringen.</p>
                 </section>
 
                 <section>

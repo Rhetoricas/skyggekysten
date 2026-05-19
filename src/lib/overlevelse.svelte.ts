@@ -6,6 +6,10 @@ import { erFeltITaagen } from './taage';
 import { erFriskAktivSpiller } from './aktivSpiller';
 import type { Felt, GravstenMinde } from './types';
 
+function erVandBiome(biome: string | null | undefined) {
+    return biome === 'hav' || biome === 'soe';
+}
+
 export function erSpillerITaagen() {
     return erFeltITaagen(spilTilstand.gitter, spilTilstand.spillerIndex, spilTilstand.fogX, hentKortBredde());
 }
@@ -123,7 +127,7 @@ function placerManglendeFlugtbaade(kystFelter: number[], oensketAntal: number) {
 
 function hentSpillerensLandmasse() {
     const start = spilTilstand.spillerIndex;
-    if (spilTilstand.gitter[start]?.biome === 'hav') return [];
+    if (erVandBiome(spilTilstand.gitter[start]?.biome)) return [];
 
     const landmasse: number[] = [];
     const aabne = [start];
@@ -131,11 +135,11 @@ function hentSpillerensLandmasse() {
     while (aabne.length > 0) {
         const indeks = aabne.pop()!;
         if (landmasse.includes(indeks)) continue;
-        if (spilTilstand.gitter[indeks]?.biome === 'hav') continue;
+        if (erVandBiome(spilTilstand.gitter[indeks]?.biome)) continue;
 
         landmasse.push(indeks);
         for (const nabo of hentNaboIndicesLokal(indeks)) {
-            if (!landmasse.includes(nabo) && spilTilstand.gitter[nabo]?.biome !== 'hav') {
+            if (!landmasse.includes(nabo) && !erVandBiome(spilTilstand.gitter[nabo]?.biome)) {
                 aabne.push(nabo);
             }
         }
@@ -180,7 +184,7 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
     const beskedMedTal = faktiskSkade > 0 ? `${besked} (-${faktiskSkade} HP)${bersaerkLog}` : besked;
 
     if (spilTilstand.livspoint <= 0) {
-        const erHavet = besked.includes("havet") || besked.includes("saltvand") || besked.includes("hav");
+        const erHavet = besked.includes("havet") || besked.includes("saltvand") || besked.includes("hav") || erVandBiome(spilTilstand.gitter[spilTilstand.spillerIndex]?.biome);
 
         if (brugEliksir()) {
             spilTilstand.logBesked = `Du faldt om. ${beskedMedTal} Eliksiren redder dig.`;
@@ -353,7 +357,7 @@ export function udfoerBlodofring() {
 export function fremtvingKollaps(brugerdefineretAarsag?: string) {
     if (spilTilstand.gameState !== 'play' || spilTilstand.erBevidstløs) return;
 
-    if (spilTilstand.gitter[spilTilstand.spillerIndex]?.biome === 'hav') {
+    if (erVandBiome(spilTilstand.gitter[spilTilstand.spillerIndex]?.biome)) {
         druknSpiller(brugerdefineretAarsag || "Du mistede bevidstheden i vandet og druknede.");
         return;
     }
