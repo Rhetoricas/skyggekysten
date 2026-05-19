@@ -199,7 +199,11 @@
         box-sizing: border-box;
     }
     
-    .ulåst:hover { background: #3a3a3a; border-color: #777; transform: translateX(5px); }
+    .ulåst:hover {
+        background: #3a3a3a;
+        border-color: #777;
+        box-shadow: inset 4px 0 0 rgba(255, 204, 0, 0.35);
+    }
     
     .låst {
         background: #111;

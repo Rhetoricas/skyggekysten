@@ -182,7 +182,7 @@
                         <li>Jægere kan sætte en tracker, hvis de står på samme felt som en anden aktiv spiller. I 10 dage ser de de felter, den spiller kender.</li>
                         <li>Guldminer giver mere score i multiplayer, fordi de er sværere at holde. Minepoint stiger med antal spillere, op til en grænse.</li>
                     </ul>
-                    <p class="eksempel">Eksempel: Hvis din datter tager en mine, kan du se den skifte ejer på kortet. Hvis du senere går ind på den ulåste mine, overtager du den fra hende. Hvis hun har låst den, må du finde point et andet sted.</p>
+                    <p class="eksempel">Eksempel: Hvis en medspiller tager en mine, kan du se den skifte ejer på kortet. Hvis du senere går ind på den ulåste mine, overtager du den fra medspilleren. Hvis minen er låst, må du finde point et andet sted.</p>
                 </section>
 
                 <section>
@@ -307,6 +307,7 @@
     .regelbog-indhold {
         overflow-y: auto;
         padding: 20px 24px 26px;
+        text-align: left;
     }
 
     .regelbog-indhold section {
@@ -336,6 +337,7 @@
         color: #d6d6d6;
         font-size: 1rem;
         line-height: 1.55;
+        text-align: left;
     }
 
     .regelbog-indhold p {
@@ -353,11 +355,12 @@
 
     .regelbog-indhold ul {
         margin: 0;
-        padding-left: 1.2rem;
+        padding-left: 0;
+        list-style: none;
     }
 
     .regelbog-indhold li + li {
-        margin-top: 5px;
+        margin-top: 8px;
     }
 
     @media (max-width: 700px) {

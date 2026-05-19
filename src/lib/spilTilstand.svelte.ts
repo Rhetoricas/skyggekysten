@@ -39,9 +39,10 @@ export const spilTilstand = $state({
     valgtKarakter: null as Karakter | null,
 
     get rygsækEffekt() {
-        return (this.mitUdstyr || []).reduce((acc: { move: number; dmg: number; syn: number; energi: number; gold: number }, slot: RygsækTing) => {
+        const effekt = (this.mitUdstyr || []).reduce((acc: { move: number; dmg: number; syn: number; energi: number; gold: number }, slot: RygsækTing) => {
             const info = itemDB[slot.id];
             if (!info || slot.maengde <= 0) return acc;
+            if (slot.id === 'fakkel' || slot.id === 'solfakkel') return acc;
             return {
                 move: acc.move + (info.moveMod || 0),
                 dmg: acc.dmg + (info.dmgMod || 0),
@@ -50,6 +51,13 @@ export const spilTilstand = $state({
                 gold: acc.gold + (info.goldMod || 0)
             };
         }, { move: 0, dmg: 0, syn: 0, energi: 0, gold: 0 });
+
+        const fakkelSyn = (this.mitUdstyr || []).reduce((bedste: number, slot: RygsækTing) => {
+            if (slot.maengde <= 0 || (slot.id !== 'fakkel' && slot.id !== 'solfakkel')) return bedste;
+            return Math.max(bedste, itemDB[slot.id]?.synsMod || 0);
+        }, 0);
+
+        return { ...effekt, syn: effekt.syn + fakkelSyn };
     },
 
     get maxEnergi(): number { return (this.valgtKarakter?.baseEnergi || 10) + this.rygsækEffekt.energi; },

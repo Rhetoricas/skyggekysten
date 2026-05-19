@@ -312,7 +312,12 @@ export function findRygsaekItemTilKrav(genstandId: string) {
 }
 
 export function kanStackeItem(genstandId: string) {
-    return genstandId === 'mad' || genstandId === 'livseliksir';
+    return genstandId === 'mad' ||
+        genstandId === 'livseliksir' ||
+        genstandId === 'diamant' ||
+        genstandId === 'hemmelighed' ||
+        genstandId === 'fakkel' ||
+        genstandId === 'solfakkel';
 }
 
 export function kanModtageItem(genstandId: string) {
@@ -334,8 +339,47 @@ export function kanModtageItem(genstandId: string) {
     return !spilTilstand.mitUdstyr.some(ting => ting.id === genstandId && ting.maengde > 0);
 }
 
+function sikkertItemAntal(maengde: unknown) {
+    const antal = Math.floor(Number(maengde));
+    return Number.isFinite(antal) && antal > 0 ? antal : 0;
+}
+
+function samlStackbareRygsaekItems(udstyrListe: RygsækTing[]) {
+    const samlet = new Map<string, RygsækTing>();
+    const normaliseret: RygsækTing[] = [];
+
+    for (const ting of udstyrListe) {
+        const id = String(ting.id || '').trim();
+        const maengde = sikkertItemAntal(ting.maengde);
+        if (!id || maengde <= 0) continue;
+
+        const normalTing = { ...ting, id, maengde };
+
+        if (!kanStackeItem(id)) {
+            normaliseret.push(normalTing);
+            continue;
+        }
+
+        const eksisterende = samlet.get(id);
+        if (eksisterende) {
+            eksisterende.maengde += maengde;
+            eksisterende.anskaffetDag = Math.min(eksisterende.anskaffetDag ?? spilTilstand.dag, normalTing.anskaffetDag ?? spilTilstand.dag);
+        } else {
+            samlet.set(id, normalTing);
+            normaliseret.push(normalTing);
+        }
+    }
+
+    return normaliseret;
+}
+
 export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number = 1) {
-    let udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
+    genstandId = String(genstandId || '').trim();
+    tilfoejetMaengde = sikkertItemAntal(tilfoejetMaengde) || 1;
+    if (!genstandId || !itemDB[genstandId]) return;
+
+    let udstyrListe = samlStackbareRygsaekItems(spilTilstand.mitUdstyr as RygsækTing[]);
+    spilTilstand.mitUdstyr = udstyrListe;
 
     if (genstandId === 'mesterskovl') {
         spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== 'skovl');
@@ -402,6 +446,9 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
         udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
     }
 
+    udstyrListe = samlStackbareRygsaekItems(udstyrListe);
+    spilTilstand.mitUdstyr = udstyrListe;
+
     const fundetTing = udstyrListe.find(ting => ting.id === genstandId);
 
     if (fundetTing) {
@@ -425,7 +472,7 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
         udstyrListe.push(nyTing);
     }
     
-    spilTilstand.mitUdstyr = [...spilTilstand.mitUdstyr];
+    spilTilstand.mitUdstyr = samlStackbareRygsaekItems(spilTilstand.mitUdstyr as RygsækTing[]);
     syncTilDb(); // Ingen `true` her. Rygsæk er personlig.
 }
 
@@ -607,12 +654,46 @@ function kanPlacerePortal(index: number) {
     return index % bredde <= bredde - 5;
 }
 
-function hentKoebbareShopItems(shopItems: string[] | undefined) {
-    return (shopItems || []).filter((id) => {
-        if (itemDB[id]?.kanKoebes === false) return false;
-        if (id === 'hemmelighed' && !harUtydedeSkattekortSpor()) return false;
-        return true;
-    });
+function erKoebbarShopVare(id: string) {
+    const item = itemDB[id];
+    if (!item || item.kanKoebes === false) return false;
+    if (id === 'hemmelighed' && !harUtydedeSkattekortSpor()) return false;
+    return true;
+}
+
+function hentShopPuljeTilErstatning(felt: Felt) {
+    const basisPulje = felt.biome === 'marked'
+        ? markedVarePool
+        : Object.keys(itemDB).filter(k => itemDB[k].pris > 0 && itemDB[k].type !== 'forbandelse' && itemDB[k].type !== 'skat');
+
+    return basisPulje.filter(erKoebbarShopVare);
+}
+
+function fyldShopErstatninger(items: string[], felt: Felt, antal: number) {
+    const valgte = [...items];
+    const brugte = new Set(valgte);
+    const pulje = hentShopPuljeTilErstatning(felt)
+        .filter(id => !brugte.has(id))
+        .sort(() => Math.random() - 0.5);
+
+    const godeErstatninger = pulje.filter(kanModtageItem);
+    const resten = pulje.filter(id => !godeErstatninger.includes(id));
+
+    for (const id of [...godeErstatninger, ...resten]) {
+        if (valgte.length >= antal) break;
+        valgte.push(id);
+        brugte.add(id);
+    }
+
+    return valgte;
+}
+
+function hentKoebbareShopItems(shopItems: string[] | undefined, felt: Felt) {
+    const originaleItems = shopItems || [];
+    const filtreredeItems = originaleItems.filter(erKoebbarShopVare);
+
+    if (filtreredeItems.length >= originaleItems.length) return filtreredeItems;
+    return fyldShopErstatninger(filtreredeItems, felt, originaleItems.length);
 }
 
 export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) {
@@ -810,7 +891,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         spilTilstand.logBesked = samletLog;
     }
 
-    if (options.triggerPortal !== false && felt.hasPortal && hentKoebbareShopItems(felt.shopItems).length === 0 && !felt.hasWorkshop) {
+    if (options.triggerPortal !== false && felt.hasPortal && hentKoebbareShopItems(felt.shopItems, felt).length === 0 && !felt.hasWorkshop) {
         udfoerPortalTeleport();
         spilTilstand.gitter = [...spilTilstand.gitter];
         syncTilDb(mapAendret);
@@ -845,7 +926,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         }
         else if (felt.hasWorkshop) spilTilstand.aktivVaerksted = true;
         else {
-            const koebbareShopItems = hentKoebbareShopItems(felt.shopItems);
+            const koebbareShopItems = hentKoebbareShopItems(felt.shopItems, felt);
             if (koebbareShopItems.length > 0) spilTilstand.aktivShop = koebbareShopItems;
         }
     }
