@@ -301,12 +301,9 @@ Det virker når valget bruger `kraeverItem`, `kosterItem` eller `kraeverEtAfItem
 
 ## Stack-regler
 
-Kun disse kan stacke:
+Disse items kan ligge i flere eksemplarer hos samme spiller: `mad`, `livseliksir`, `diamant`, `hemmelighed`, `fakkel` og `solfakkel`.
 
-- `mad`
-- `livseliksir`
-
-Alle andre items er normalt én pr. spiller. Brug ikke events til at give fire skovle, tre fakler osv. `tilfoejTilRygsæk` håndterer meget, men eventdesign bør stadig undgå dubletter.
+Alle andre items er normalt én pr. spiller. `tilfoejTilRygsæk` håndterer dubletter ved at afvise eller opgradere inden for samme udstyrsfamilie, men eventdesign bør stadig undgå at give dubletter af unikt udstyr som skovle, stave, våben, tøj, rustninger og specialværktøj.
 
 ## Karakterer og karakter-id'er
 
@@ -438,4 +435,3 @@ Gode events bør:
 - Hvis item skal bruges op, bruges `kosterItem`; hvis det kun skal kræves, bruges `kraeverItem`.
 - Hvis guld gives, bruges `guldAendring` eller `guldOp`, så guldmodifikatorer virker.
 - Hvis skade gives, bruges `hpAendring` eller `hpNed`, så skadeberegning virker.
-

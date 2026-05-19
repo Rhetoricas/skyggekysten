@@ -50,9 +50,8 @@
 
         if (spilTilstand.guldTotal >= vareData.pris) {
             spilTilstand.guldTotal -= vareData.pris;
+            spilTilstand.logBesked = `Du købte ${vareData.navn} for ${vareData.pris} guld.`;
             tilfoejTilRygsæk(id, 1);
-            spilTilstand.logBesked = `Du købte ${vareData.navn}.`;
-            syncTilDb();
         } else {
             spilTilstand.livspoint -= 2;
             spilTilstand.logBesked = `Købmanden smider dig ud for at røre ved noget du ikke har råd til.`;
@@ -74,9 +73,8 @@
         }
 
         spilTilstand.guldTotal += salgspris;
-        brugFraRygsæk(id, 1);
         spilTilstand.logBesked = `Du solgte ${vareData.navn} for ${salgspris} guld.`;
-        syncTilDb();
+        brugFraRygsæk(id, 1);
     }
 </script>
 

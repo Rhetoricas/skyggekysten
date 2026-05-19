@@ -258,7 +258,6 @@
 
     $effect(() => {
         const state = spilTilstand.gameState;
-        const brugerId = authState.user?.id;
         
         untrack(() => {
             if (state === 'play') {
@@ -274,8 +273,7 @@
                 if (
                     !scoreErGemt &&
                     !scoreGemmer &&
-                    !scoreGemningFejlet &&
-                    (spilTilstand.offlineMode || !!brugerId)
+                    !scoreGemningFejlet
                 ) {
                     gemScoreIgen();
                 }
