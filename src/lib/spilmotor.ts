@@ -908,7 +908,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
 
     if ((charId === 'thief_m' || charId === 'thief_f') && (b === 'marked' || b === 'by')) {
         spilTilstand.guldTotal += 5;
-        ekstraLog += " Du finder 5 guld i byens uro.";
+        ekstraLog += " Du finder 5 guld i en tilfældig lomme.";
     } else if ((charId === 'joker_m' || charId === 'joker_f') && b === 'marked') {
         spilTilstand.guldTotal += 20;
         ekstraLog += " Din optræden giver 20 guld.";
@@ -956,7 +956,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
                 
                 if (!harBesoegt) {
                     spiller.besoegteMiner.push(nytIndeks);
-                    const basisGuld = 100 + (ejedeMiner * 50);
+                    const basisGuld = 100 + (ejedeMiner * 25);
                     const faktiskGuld = spilTilstand.beregnGuldIndkomst ? spilTilstand.beregnGuldIndkomst(basisGuld) : basisGuld;
                     spilTilstand.guldTotal += faktiskGuld;
                     ekstraLog += tidligereEjer
@@ -2043,7 +2043,7 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
 
         if (erVandBiome(felt.biome) || felt.eventID) continue;
 
-        if (felt.biome === 'bjerg' && Math.random() < 0.06) {
+        if (felt.biome === 'bjerg' && Math.random() < 0.04) {
             felt.hasGoldmine = true;
         } else if (vildmark.includes(felt.biome as string) && Math.random() < 0.008) {
             felt.isCampfire = true;
