@@ -19,7 +19,7 @@ export function beregnMineScoreModifier(antalSpillere: number) {
 }
 
 export function beregnMultiplayerScoreModifier(antalSpillere: number) {
-    return Math.min(2, 1 + Math.max(0, antalSpillere - 1) * 0.2);
+    return Math.min(1.5, 1 + Math.max(0, antalSpillere - 1) * 0.1);
 }
 
 export function beregnMinePoint(gitter: Felt[], spillerNavn: string, antalSpillere: number) {
