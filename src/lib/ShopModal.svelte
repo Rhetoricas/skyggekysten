@@ -1,7 +1,7 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
-    import { tilfoejTilRygsæk, brugFraRygsæk, kanModtageItem, laegGuldIKasseForAktueltFelt, tagGuldFraKasseForAktueltFelt } from '$lib/spilmotor';
+    import { tilfoejTilRygsæk, brugFraRygsæk, kanModtageItem, laegGuldIKasseForAktueltFelt, tagGuldFraKasseForAktueltFelt, fjernVareFraAktuelShop } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
     import { fremtvingKollaps } from '$lib/overlevelse.svelte';
     import { beregnSalgspris } from '$lib/score';
@@ -53,8 +53,13 @@
         if (spilTilstand.guldTotal >= vareData.pris) {
             spilTilstand.guldTotal -= vareData.pris;
             laegGuldIKasseForAktueltFelt(vareData.pris);
+            fjernVareFraAktuelShop(id);
             spilTilstand.logBesked = `Du købte ${vareData.navn} for ${vareData.pris} guld.`;
             tilfoejTilRygsæk(id, 1);
+            if (spilTilstand.mitUdstyr.some((ting) => (ting.id === 'koelle' || ting.id === 'koelle_upgr') && ting.maengde > 0)) {
+                spilTilstand.logBesked = `Du købte ${vareData.navn} for ${vareData.pris} guld. Købmanden får øje på køllen og tør ikke handle mere med dig.`;
+                lukShop();
+            }
         } else {
             spilTilstand.livspoint -= 2;
             spilTilstand.logBesked = `Købmanden smider dig ud for at røre ved noget du ikke har råd til.`;

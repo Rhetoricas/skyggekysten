@@ -107,6 +107,8 @@ export interface Felt {
     isCampfire?: boolean;
     eventID?: string;
     shopItems?: string[]; 
+    shopBasisItems?: string[];
+    shopGenopfyldtDag?: number;
     indbrudt?: boolean;
     plyndret?: boolean;
     kasseGuld?: number;

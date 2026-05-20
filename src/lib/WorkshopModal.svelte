@@ -68,6 +68,20 @@
         laegGuldIKasseForAktueltFelt(pris);
     }
 
+    function harKoelleEllerMurknuser() {
+        return spilTilstand.mitUdstyr.some((ting) => (ting.id === 'koelle' || ting.id === 'koelle_upgr') && ting.maengde > 0);
+    }
+
+    function afslutOpgradering() {
+        if (harKoelleEllerMurknuser()) {
+            spilTilstand.logBesked += " Mesteren får øje på køllen og tør ikke arbejde mere for dig.";
+            lukVaerksted();
+            return;
+        }
+
+        syncTilDb();
+    }
+
     function opgraderSkovl() {
         if (harMesterskovl) {
             spilTilstand.logBesked = "Din skovl er allerede opgraderet.";
@@ -91,7 +105,7 @@
             { id: 'mesterskovl', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet afbalancerer skaftet og hærder bladet. Din skovl er nu en mesterskovl.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderStav() {
@@ -117,7 +131,7 @@
             { id: 'dragestav', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet tvinder dragekraft ind i staven. Den er nu en dragestav.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderKvist() {
@@ -143,7 +157,7 @@
             { id: 'runekvist', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet skærer runer i kvisten. Den kan nu trække rødder op uden at grave.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderDirk() {
@@ -169,7 +183,7 @@
             { id: 'mesterdirk', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet sliber dirkens tænder og skjuler nye fjedre i tasken. Den er nu en mesterdirk.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderKniv() {
@@ -195,7 +209,7 @@
             { id: 'mesterkniv', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet hærder bladet og afbalancerer grebet. Din kniv er nu en mesterkniv.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderRustning() {
@@ -221,7 +235,7 @@
             { id: 'kongepanser', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet forgylder pladerne og låser ædelsten i brystet. Din rustning er nu et kongepanser.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderOekse() {
@@ -247,7 +261,7 @@
             { id: 'stormoekse', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet lægger runer i øksehovedet og hærder æggen. Din økse er nu en stormøkse.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderKoelle() {
@@ -273,7 +287,7 @@
             { id: 'koelle_upgr', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet binder jern om hovedet og fylder kernen med bly. Din kølle er nu en murknuser.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderBue() {
@@ -299,7 +313,7 @@
             { id: 'mesterbue', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet spænder buen med ny sene og indlægger horn i grebet. Din bue er nu en falkebue.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderKlude() {
@@ -325,7 +339,7 @@
             { id: 'flot_toej', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet vasker, farver og syr dine klude om. Du har nu fint tøj.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderFintToej() {
@@ -351,7 +365,7 @@
             { id: 'royalt_toej', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet broderer guldkant og lægger pels over skuldrene. Dit fine tøj er nu royalt.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderFakkel() {
@@ -377,7 +391,7 @@
             { id: 'solfakkel', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet binder ildstenen i faklens krone. Din fakkel er nu en solfakkel.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderDetektor() {
@@ -404,7 +418,7 @@
         ];
         afslørMalmviserMiner();
         spilTilstand.logBesked = "Værkstedet kalibrerer spolen til ren malmklang. Din detektor er nu en malmviser.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     function opgraderSovepose() {
@@ -430,7 +444,7 @@
             { id: 'silkesovepose', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         spilTilstand.logBesked = "Værkstedet syr voksdug og silke omkring varmen. Din sovepose er nu en silkesovepose.";
-        syncTilDb();
+        afslutOpgradering();
     }
 
     type Opgradering = {

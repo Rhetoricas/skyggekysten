@@ -509,6 +509,32 @@ export function tagGuldFraKasseForAktueltFelt(beloeb: number) {
     return felt.kasseGuld;
 }
 
+export function fjernVareFraAktuelShop(genstandId: string) {
+    const indeks = spilTilstand.spillerIndex;
+    const felt = spilTilstand.gitter[indeks];
+    if (!felt) return;
+
+    sikrShopBasisItems(felt);
+
+    const fjernEn = (items: string[] | null | undefined) => {
+        const liste = [...(items || [])];
+        const itemIndex = liste.indexOf(genstandId);
+        if (itemIndex === -1) return liste;
+        liste.splice(itemIndex, 1);
+        return liste;
+    };
+
+    const nyeShopItems = fjernEn(felt.shopItems);
+    const nyAktivShop = fjernEn(spilTilstand.aktivShop);
+
+    felt.shopItems = nyeShopItems.length > 0 ? nyeShopItems : undefined;
+    spilTilstand.aktivShop = nyAktivShop;
+    spilTilstand.gitter[indeks] = { ...felt };
+    spilTilstand.gitter = [...spilTilstand.gitter];
+    broadcastFelt(indeks, spilTilstand.gitter[indeks]);
+    syncKortTilDbSenere();
+}
+
 export function afslørOmraade(centerIndex: number, radius: number = 1) {
     const bredde = hentKortBredde();
     const totalFelter = spilTilstand.gitter.length;
@@ -714,6 +740,25 @@ function hentKoebbareShopItems(shopItems: string[] | undefined, felt: Felt) {
     return fyldShopErstatninger(filtreredeItems, felt, originaleItems.length);
 }
 
+function sikrShopBasisItems(felt: Felt) {
+    if (!felt.shopBasisItems && felt.shopItems && felt.shopItems.length > 0) {
+        felt.shopBasisItems = [...felt.shopItems];
+        felt.shopGenopfyldtDag = spilTilstand.dag || 1;
+    }
+}
+
+function genopfyldShopHvisNyDag(felt: Felt) {
+    sikrShopBasisItems(felt);
+    if (!felt.shopBasisItems || felt.shopBasisItems.length === 0) return false;
+
+    const aktuelDag = spilTilstand.dag || 1;
+    if ((felt.shopGenopfyldtDag || aktuelDag) >= aktuelDag) return false;
+
+    felt.shopItems = [...felt.shopBasisItems];
+    felt.shopGenopfyldtDag = aktuelDag;
+    return true;
+}
+
 function naegterHandelTilAktuelSpiller(felt: Felt | null | undefined) {
     return !!spilTilstand.spillerNavn && !!felt?.naegterHandelFor?.includes(spilTilstand.spillerNavn);
 }
@@ -726,7 +771,7 @@ function skraemNaboHandlende(centerIndeks: number) {
         const nabo = spilTilstand.gitter[naboIndeks];
         if (!nabo) continue;
 
-        const harHandel = nabo.hasWorkshop || hentKoebbareShopItems(nabo.shopItems, nabo).length > 0;
+        const harHandel = nabo.hasWorkshop || (nabo.shopBasisItems?.length || 0) > 0 || hentKoebbareShopItems(nabo.shopItems, nabo).length > 0;
         if (!harHandel) continue;
 
         const naegter = new Set(nabo.naegterHandelFor || []);
@@ -746,6 +791,11 @@ function skraemNaboHandlende(centerIndeks: number) {
     }
 
     return antal;
+}
+
+function erOrk() {
+    const id = spilTilstand.valgtKarakter?.id;
+    return id === 'orc_m' || id === 'orc_f';
 }
 
 export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) {
@@ -941,6 +991,10 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
     
     if (samletLog) {
         spilTilstand.logBesked = samletLog;
+    }
+
+    if (felt.shopItems || felt.shopBasisItems) {
+        mapAendret = genopfyldShopHvisNyDag(felt) || mapAendret;
     }
 
     if (options.triggerPortal !== false && felt.hasPortal && hentKoebbareShopItems(felt.shopItems, felt).length === 0 && !felt.hasWorkshop) {
@@ -1499,11 +1553,14 @@ export function plyndrFelt() {
     felt.naegterHandelFor = undefined;
     felt.biome = 'ruin';
     felt.shopItems = undefined;
+    felt.shopBasisItems = undefined;
+    felt.shopGenopfyldtDag = undefined;
     felt.hasWorkshop = false;
     felt.hasPortal = false;
     felt.eventID = undefined;
     felt.eventFuldført = false;
-    felt.kanGraves = true;
+    Object.assign(felt, genererUndergrund('ruin'));
+    felt.gravet = false;
     spilTilstand.gitter[indeks] = { ...felt };
     spilTilstand.gitter = [...spilTilstand.gitter];
 
@@ -1513,7 +1570,7 @@ export function plyndrFelt() {
             ? " Boderne står tilbage som splinter."
             : "";
     const kasseLog = kasseIndhold > 0 ? " Det meste af kassen ryger med i byttet." : "";
-    const skraemteHandlende = skraemNaboHandlende(indeks);
+    const skraemteHandlende = erOrk() ? skraemNaboHandlende(indeks) : 0;
     const skraemmeLog = skraemteHandlende > 0 ? " Naboernes handlende har set nok og nægter at handle med dig." : "";
     const smadreLog = `Du smadrer ${varMarked ? 'markedet' : havdeVaerksted ? 'værkstedet' : 'byen'} i blodrus og skraber ${loot} guld ud af resterne. Det koster ${energiPris} energi.${kasseLog}${ekstra}${skraemmeLog}`;
 
@@ -1755,6 +1812,8 @@ function placerVaerksteder(gitter: Felt[]) {
         const felt = gitter[centrum];
         felt.hasWorkshop = true;
         felt.shopItems = undefined;
+        felt.shopBasisItems = undefined;
+        felt.shopGenopfyldtDag = undefined;
         felt.kasseGuld = undefined;
         felt.naegterHandelFor = undefined;
         felt.eventID = undefined;
@@ -1998,6 +2057,8 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
                     if (!valgte.includes(vare)) valgte.push(vare);
                 }
                 felt.shopItems = valgte;
+                felt.shopBasisItems = [...valgte];
+                felt.shopGenopfyldtDag = spilTilstand.dag || 1;
             }
         }
     }
@@ -2231,6 +2292,8 @@ export async function udloesNaturkatastrofe(centerIndex: number) {
         felter[idx].boatCount = undefined;
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
+        felter[idx].shopBasisItems = undefined;
+        felter[idx].shopGenopfyldtDag = undefined;
         felter[idx].kasseGuld = undefined;
         felter[idx].naegterHandelFor = undefined;
         felter[idx].hasWorkshop = false;
@@ -2292,6 +2355,8 @@ export async function udloesJordskaelv(centerIndex: number) {
         felter[idx].boatCount = undefined;
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
+        felter[idx].shopBasisItems = undefined;
+        felter[idx].shopGenopfyldtDag = undefined;
         felter[idx].kasseGuld = undefined;
         felter[idx].naegterHandelFor = undefined;
         felter[idx].hasWorkshop = false;
@@ -2382,6 +2447,8 @@ export async function udloesOversvoemmelse(centerIndex: number) {
         felter[idx].boatCount = undefined;
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
+        felter[idx].shopBasisItems = undefined;
+        felter[idx].shopGenopfyldtDag = undefined;
         felter[idx].kasseGuld = undefined;
         felter[idx].naegterHandelFor = undefined;
         felter[idx].hasWorkshop = false;
@@ -2441,6 +2508,8 @@ export async function udloesDoedeSlagmark(centerIndex: number) {
         felter[idx].boatCount = undefined;
         felter[idx].afgroede = undefined;
         felter[idx].shopItems = undefined;
+        felter[idx].shopBasisItems = undefined;
+        felter[idx].shopGenopfyldtDag = undefined;
         felter[idx].kasseGuld = undefined;
         felter[idx].naegterHandelFor = undefined;
         felter[idx].eventID = undefined;
