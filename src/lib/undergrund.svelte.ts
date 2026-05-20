@@ -2,6 +2,7 @@ import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremtvingKollaps, fremrykTid, udloesBersaerkHvisRelevant } from '$lib/overlevelse.svelte';
 import { afslørOmraade, tilfoejTilRygsæk } from '$lib/spilmotor';
+import { startEvent } from '$lib/eventMotor.svelte';
 import type { Biome } from './types';
 
 function tilfaeldigtTal(min: number, max: number) {
@@ -79,6 +80,11 @@ export function grav() {
     
     const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
     if (!felt || felt.gravet) return;
+
+    if (felt.eventID === 'meteor_skat' && !felt.eventFuldført) {
+        startEvent('meteor_skat');
+        return;
+    }
     
     if (!felt.kanGraves) {
         spilTilstand.logBesked = "Du kan ikke grave her.";

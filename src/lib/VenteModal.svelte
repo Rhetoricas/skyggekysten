@@ -6,10 +6,24 @@
     let { kanSpilleIgen } = $props<{ kanSpilleIgen: boolean }>();
 
     let langsomsteDag = $derived.by(() => {
-        const spillere = Object.values(spilTilstand.alleSpillere);
-        if (spillere.length <= 1) return spilTilstand.dag;
+        const aktive = Object.entries(spilTilstand.alleSpillere)
+            .filter(([navn, spiller]) =>
+                navn !== spilTilstand.spillerNavn &&
+                erFriskAktivSpiller(spiller) &&
+                (!spilTilstand.rundeSeed || !spiller.rundeSeed || spiller.rundeSeed === spilTilstand.rundeSeed)
+            )
+            .map(([, spiller]) => spiller);
 
-        const aktive = spillere.filter((s) => erFriskAktivSpiller(s));
+        const mig = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
+        if (spilTilstand.spillerNavn && spilTilstand.valgtKarakter && spilTilstand.gameState === 'play') {
+            aktive.push({
+                ...(mig || {}),
+                dag: spilTilstand.dag,
+                sidstAktiv: Date.now(),
+                isDead: false,
+                isWinner: false
+            });
+        }
 
         if (aktive.length === 0) return spilTilstand.dag;
         return Math.min(...aktive.map((s) => s.dag || 1));

@@ -65,6 +65,20 @@ function medTimeout<T>(promise: PromiseLike<T>, ms: number, label: string): Prom
     });
 }
 
+function vaelgNyesteSpillerData(serverData?: SpillerData, lokalData?: SpillerData) {
+    if (!serverData) return lokalData;
+    if (!lokalData) return serverData;
+    if (serverData.rundeSeed && lokalData.rundeSeed && serverData.rundeSeed !== lokalData.rundeSeed) {
+        return (lokalData.sidstAktiv || 0) > (serverData.sidstAktiv || 0) ? lokalData : serverData;
+    }
+
+    const serverDag = serverData.dag || 1;
+    const lokalDag = lokalData.dag || 1;
+    if (serverDag !== lokalDag) return lokalDag > serverDag ? lokalData : serverData;
+
+    return (lokalData.sidstAktiv || 0) > (serverData.sidstAktiv || 0) ? lokalData : serverData;
+}
+
 function harLocalStorage() {
     return typeof localStorage !== 'undefined';
 }
@@ -378,11 +392,14 @@ async function udfoerDbUpload(sendKort: boolean) {
     const serverSpillere = filtrerSpillereTilKanal((aktuelSession?.spillere || {}) as Record<string, SpillerData>, aktivKanalNoegle, aktivRumKode);
     const lokaleSpillere = filtrerSpillereTilKanal(spilTilstand.alleSpillere, aktivKanalNoegle, aktivRumKode);
     const minSpiller = lokaleSpillere[spilTilstand.spillerNavn];
-    const spillereTilUpload = {
-        ...serverSpillere,
-        ...Object.fromEntries(Object.entries(lokaleSpillere).filter(([navn]) => !serverSpillere[navn])),
-        ...(minSpiller ? { [spilTilstand.spillerNavn]: minSpiller } : {})
-    };
+    const spillernavne = new Set([...Object.keys(serverSpillere), ...Object.keys(lokaleSpillere)]);
+    const spillereTilUpload = Object.fromEntries(
+        Array.from(spillernavne).map((navn) => [
+            navn,
+            vaelgNyesteSpillerData(serverSpillere[navn], lokaleSpillere[navn])
+        ]).filter(([, spiller]) => !!spiller)
+    ) as Record<string, SpillerData>;
+    if (minSpiller) spillereTilUpload[spilTilstand.spillerNavn] = minSpiller;
 
     const opdatering: any = {
         spillere: spillereTilUpload,
@@ -696,7 +713,8 @@ export function startRealtime() {
             if (data.navn !== spilTilstand.spillerNavn) {
                 if (typeof data.kortBredde === 'number') spilTilstand.kortBredde = data.kortBredde;
                 if (typeof data.kortHoejde === 'number') spilTilstand.kortHoejde = data.kortHoejde;
-                spilTilstand.alleSpillere[data.navn] = data.data;
+                const eksisterende = spilTilstand.alleSpillere[data.navn];
+                spilTilstand.alleSpillere[data.navn] = vaelgNyesteSpillerData(eksisterende, data.data) || data.data;
                 if (data.fogX !== undefined && erTaageLaengereFremme(data.fogX, spilTilstand.fogX)) {
                     spilTilstand.fogX = data.fogX;
                 }

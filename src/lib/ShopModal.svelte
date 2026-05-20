@@ -1,7 +1,7 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
-    import { tilfoejTilRygsæk, brugFraRygsæk, kanModtageItem, laegGuldIKasseForAktueltFelt } from '$lib/spilmotor';
+    import { tilfoejTilRygsæk, brugFraRygsæk, kanModtageItem, laegGuldIKasseForAktueltFelt, tagGuldFraKasseForAktueltFelt } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
     import { fremtvingKollaps } from '$lib/overlevelse.svelte';
     import { beregnSalgspris } from '$lib/score';
@@ -75,6 +75,7 @@
             return;
         }
 
+        tagGuldFraKasseForAktueltFelt(salgspris);
         spilTilstand.guldTotal += salgspris;
         spilTilstand.logBesked = `Du solgte ${vareData.navn} for ${salgspris} guld.`;
         brugFraRygsæk(id, 1);

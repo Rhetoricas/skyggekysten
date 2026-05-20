@@ -174,7 +174,7 @@
 
                 <section>
                     <h3>Smadring</h3>
-                    <p>Køllen kan smadre markeder og almindelige byfelter til ruiner. Markeder koster 8 energi og 30 grundskade. Byfelter koster 16 energi og 45 grundskade. Værksteder koster 24 energi, 75 grundskade og kræver Murknuser. Grundbyttet er 45-75, 90-150 eller 225 guld plus to tredjedele af kassen, påvirket af guldmodifier.</p>
+                    <p>Køllen kan smadre markeder og almindelige byfelter til ruiner. Markeder koster 8 energi og 20 grundskade. Byfelter koster 16 energi og 30 grundskade. Værksteder koster 24 energi, 50 grundskade og kræver Murknuser. Grundbyttet er 45-75, 90-150 eller 225 guld plus to tredjedele af kassen, påvirket af guldmodifier.</p>
                     <p class="eksempel">Eksempel: En ork kan købe en vare på et marked og bagefter smadre markedet for at få noget af værdien tilbage fra kassen. Prisen er tid og blod: energien kan ryge langt under nul, og svage karakterer kan knække på selve smadringen.</p>
                 </section>
 

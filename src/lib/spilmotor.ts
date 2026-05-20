@@ -485,7 +485,23 @@ export function laegGuldIKasseForAktueltFelt(beloeb: number) {
     const felt = spilTilstand.gitter[indeks];
     if (!felt) return 0;
 
-    felt.kasseGuld = Math.max(0, felt.kasseGuld || 0) + kasseBeloeb;
+    felt.kasseGuld = (felt.kasseGuld || 0) + kasseBeloeb;
+    spilTilstand.gitter[indeks] = { ...felt };
+    spilTilstand.gitter = [...spilTilstand.gitter];
+    broadcastFelt(indeks, spilTilstand.gitter[indeks]);
+    syncKortTilDbSenere();
+    return felt.kasseGuld;
+}
+
+export function tagGuldFraKasseForAktueltFelt(beloeb: number) {
+    const kasseBeloeb = Math.max(0, Math.floor(beloeb));
+    if (kasseBeloeb <= 0) return 0;
+
+    const indeks = spilTilstand.spillerIndex;
+    const felt = spilTilstand.gitter[indeks];
+    if (!felt) return 0;
+
+    felt.kasseGuld = (felt.kasseGuld || 0) - kasseBeloeb;
     spilTilstand.gitter[indeks] = { ...felt };
     spilTilstand.gitter = [...spilTilstand.gitter];
     broadcastFelt(indeks, spilTilstand.gitter[indeks]);
@@ -1464,7 +1480,7 @@ export function plyndrFelt() {
     const havdeButik = (felt.shopItems || []).some((itemId) => itemDB[itemId]?.kanKoebes !== false);
     const havdeVaerksted = !!felt.hasWorkshop;
     const energiPris = varMarked ? 8 : havdeVaerksted ? 24 : 16;
-    const skadePris = varMarked ? 30 : havdeVaerksted ? 75 : 45;
+    const skadePris = varMarked ? 20 : havdeVaerksted ? 50 : 30;
     const kasseIndhold = Math.max(0, felt.kasseGuld || 0);
     const kasseLoot = Math.floor((kasseIndhold * 2) / 3);
     const basisLoot = varMarked

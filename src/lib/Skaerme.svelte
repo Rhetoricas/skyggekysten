@@ -622,11 +622,6 @@
                 {#if !spilTilstand.offlineMode}
                     <div class="tavle klasse-tavle">
                         <img src="/screens/boardglobal.webp" alt="Karakterklasse tavle" class="tavle-billede" />
-                        <div class="klasse-emblem">
-                            {#if spilTilstand.valgtKarakter}
-                                <img src={spilTilstand.valgtKarakter.ikon} alt="" />
-                            {/if}
-                        </div>
                         <div class="tavle-indhold global-indhold">
                             <h3>Top 10 {highscoreKlasseNavn()}</h3>
                             {#if klasseScores.length === 0}
@@ -734,11 +729,6 @@
                 {#if !spilTilstand.offlineMode}
                     <div class="tavle klasse-tavle">
                         <img src="/screens/boardglobal.webp" alt="Karakterklasse tavle" class="tavle-billede" />
-                        <div class="klasse-emblem">
-                            {#if spilTilstand.valgtKarakter}
-                                <img src={spilTilstand.valgtKarakter.ikon} alt="" />
-                            {/if}
-                        </div>
                         <div class="tavle-indhold global-indhold">
                             <h3>Top 10 {highscoreKlasseNavn()}</h3>
                             {#if klasseScores.length === 0}
@@ -1145,29 +1135,6 @@
     .tavle-indhold h3 { color: #fff; font-size: 1rem; text-align: center; font-family: 'Cinzel', serif; margin-top: 0;}
     .tavle-indhold ol { padding: 0; list-style: none; }
     .tavle-indhold li { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 5px 0; font-size: 0.85rem; }
-    .klasse-tavle .tavle-indhold { top: 18%; }
-    .klasse-emblem {
-        position: absolute;
-        top: 4%;
-        left: 50%;
-        width: 52px;
-        height: 52px;
-        transform: translateX(-50%);
-        border-radius: 50%;
-        border: 2px solid rgba(255, 255, 255, 0.85);
-        background: rgba(0, 0, 0, 0.55);
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
-    }
-    .klasse-emblem img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
     .karakter-navn { color: #9aa69d; font-size: 0.75rem; }
     .status { color: #ccc; margin-top: 15px; }
 

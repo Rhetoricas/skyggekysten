@@ -41,6 +41,7 @@
     import Regelbog from '$lib/Regelbog.svelte';
     import LydKnap from '$lib/LydKnap.svelte';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
+    import { lukVenteSpil } from '$lib/ventespil.svelte';
 
     const cam = skabKamera();
     const MAX_DAGE_FORAN = 5;
@@ -76,6 +77,9 @@
     let kortBredde = $derived(spilTilstand.kortBredde || BREDDE);
     let kortHoejde = $derived(spilTilstand.kortHoejde || HOEJDE);
     const erLocalhost = () => browser && ['localhost', '127.0.0.1'].includes(window.location.hostname);
+
+    const SKATTEKORT_STOP_AFSTAND = 200;
+    const SKATTEKORT_MIN_LINJE_LAENGDE = 40;
 
     let harSkattekortAktivt = $derived((spilTilstand.mineSkattekortFelter?.length || 0) > 0);
     function hexMidtpunkt(index: number) {
@@ -141,20 +145,20 @@
     function lavSkattekortLinje(fra: { x: number; y: number }, centerIndex: number, startForskydning = 0) {
         const center = hexMidtpunkt(centerIndex);
         const start = startForskydning > 0 ? forskydPunktMod(fra, center, startForskydning) : fra;
-        const centerKolonne = centerIndex % kortBredde;
-        const stopKolonne = center.x >= start.x
-            ? Math.max(0, centerKolonne - 2)
-            : Math.min(kortBredde - 1, centerKolonne + 2);
-        const stopX = center.x + ((stopKolonne - centerKolonne) * HEX_W);
-        const fremdrift = center.x === start.x
-            ? 0.82
-            : Math.max(0, Math.min(1, (stopX - start.x) / (center.x - start.x)));
+        const dx = center.x - start.x;
+        const dy = center.y - start.y;
+        const laengde = Math.hypot(dx, dy);
+        const linjeLaengde = Math.min(
+            laengde,
+            Math.max(SKATTEKORT_MIN_LINJE_LAENGDE, laengde - SKATTEKORT_STOP_AFSTAND)
+        );
+        const fremdrift = laengde === 0 ? 0 : linjeLaengde / laengde;
 
         return {
             fra: start,
             til: {
-                x: start.x + (center.x - start.x) * fremdrift,
-                y: start.y + (center.y - start.y) * fremdrift
+                x: start.x + dx * fremdrift,
+                y: start.y + dy * fremdrift
             }
         };
     }
@@ -347,6 +351,30 @@
     });
 
     $effect(() => {
+        const venteAktiv = spilTilstand.venteSpilAktiv;
+        const state = spilTilstand.gameState;
+        const dag = spilTilstand.dag;
+        const spillereStatus = Object.values(spilTilstand.alleSpillere)
+            .map((spiller) => `${spiller.dag || 1}:${spiller.sidstAktiv || 0}:${spiller.isDead ? 1 : 0}:${spiller.isWinner ? 1 : 0}:${spiller.rundeSeed || ''}`)
+            .join('|');
+        void dag;
+        void spillereStatus;
+
+        if (!venteAktiv || state !== 'play') return;
+
+        untrack(() => {
+            if (spilTilstand.dag < hentLangsomsteDag() + MAX_DAGE_FORAN) {
+                const puljeGuld = spilTilstand.ventePuljeGuld;
+                const puljeLiv = spilTilstand.ventePuljeLiv;
+                lukVenteSpil();
+                spilTilstand.logBesked = puljeGuld > 0 || puljeLiv > 0
+                    ? `De andre holder dig ikke tilbage længere. Du tager ${puljeGuld} guld og ${puljeLiv} HP med fra bordet.`
+                    : "De andre holder dig ikke tilbage længere.";
+            }
+        });
+    });
+
+    $effect(() => {
         const state = spilTilstand.gameState;
         const erSlutkort = state === 'win_map' || state === 'dead_map';
 
@@ -491,6 +519,20 @@
         const seed = hentAktivRundeSeedFraSpillere();
         if (seed) spilTilstand.rundeSeed = seed;
         return seed;
+    }
+
+    function overtagRundeSeedVedIndgang(rentNavn: string, browserId: string) {
+        const egenEntry = Object.entries(spilTilstand.alleSpillere).find(([navn, spiller]) =>
+            navn.toLowerCase() === rentNavn.toLowerCase() &&
+            !!spiller.rundeSeed &&
+            (erSammeSpiller(spiller, browserId) || !spiller.isDead && !spiller.isWinner)
+        );
+        if (egenEntry?.[1].rundeSeed) {
+            spilTilstand.rundeSeed = egenEntry[1].rundeSeed;
+            return egenEntry[1].rundeSeed;
+        }
+
+        return overtagAktivRundeSeed();
     }
 
     function startNyRundeSeed() {
@@ -732,7 +774,7 @@
                 laesSessionDimensioner(data);
                 spilTilstand.gitter = data.kort;
                 spilTilstand.alleSpillere = filtrerSpillereTilKanal(data.spillere || {}, aktivKanalNoegle);
-                overtagAktivRundeSeed();
+                overtagRundeSeedVedIndgang(rentNavn, mitBrowserId);
                 spilTilstand.fogX = data.fog_x || 0;
                 spilTilstand.erHost = false;
 
@@ -1374,12 +1416,20 @@
     }
 
     function hentLangsomsteDag() {
-        const spillere = Object.values(spilTilstand.alleSpillere);
-        if (spillere.length <= 1) return spilTilstand.dag;
-        
-        const aktive = spillere.filter((s: SpillerData) => {
-            return erAktivSessionSpiller(s);
-        });
+        const aktive = Object.entries(spilTilstand.alleSpillere)
+            .filter(([navn, spiller]) => navn !== spilTilstand.spillerNavn && erAktivSessionSpiller(spiller))
+            .map(([, spiller]) => spiller);
+
+        const mig = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
+        if (spilTilstand.spillerNavn && spilTilstand.valgtKarakter && spilTilstand.gameState === 'play') {
+            aktive.push({
+                ...(mig || {}),
+                dag: spilTilstand.dag,
+                sidstAktiv: Date.now(),
+                isDead: false,
+                isWinner: false
+            } as SpillerData);
+        }
         
         if (aktive.length === 0) return spilTilstand.dag;
         return Math.min(...aktive.map((s: SpillerData) => s.dag || 1));
@@ -1396,7 +1446,8 @@
     }
 
     function erAktivSessionSpiller(spiller: SpillerData) {
-        return erFriskAktivSpiller(spiller);
+        if (!erFriskAktivSpiller(spiller)) return false;
+        return !spilTilstand.rundeSeed || !spiller.rundeSeed || spiller.rundeSeed === spilTilstand.rundeSeed;
     }
 
     function erSammeSpiller(spiller: SpillerData, browserId: string) {
@@ -1420,13 +1471,21 @@
         const uafsluttede = alleEntries.filter(([, spiller]) => !spiller.isDead && !spiller.isWinner);
         if (uafsluttede.length === 0) return true;
 
+        const erEgenUafsluttetSpiller = (navn: string, spiller: SpillerData) =>
+            !spiller.isDead &&
+            !spiller.isWinner &&
+            navn.toLowerCase() === rentNavn.toLowerCase() &&
+            erSammeSpiller(spiller, browserId);
+
         const egetNavn = alleEntries.find(([navn]) => navn.toLowerCase() === rentNavn.toLowerCase())?.[0] ?? rentNavn;
         const egenSpiller = spilTilstand.alleSpillere[egetNavn];
         if (egenSpiller && kanGenoptagePrivatUdloebetSpil(egenSpiller, egetNavn, browserId, alleEntries)) {
             return true;
         }
 
-        const aktiveUafsluttede = uafsluttede.filter(([, spiller]) => erAktivSessionSpiller(spiller));
+        const aktiveUafsluttede = uafsluttede.filter(([navn, spiller]) =>
+            erEgenUafsluttetSpiller(navn, spiller) || erAktivSessionSpiller(spiller)
+        );
 
         if (aktiveUafsluttede.length === 0) {
             spilTilstand.erHost = true;
@@ -1463,7 +1522,12 @@
         }
 
         const rensede = Object.fromEntries(
-            alleEntries.filter(([, spiller]) => spiller.isDead || spiller.isWinner || erAktivSessionSpiller(spiller))
+            alleEntries.filter(([navn, spiller]) =>
+                spiller.isDead ||
+                spiller.isWinner ||
+                erEgenUafsluttetSpiller(navn, spiller) ||
+                erAktivSessionSpiller(spiller)
+            )
         );
         if (Object.keys(rensede).length === alleEntries.length) return true;
 
