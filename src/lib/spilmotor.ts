@@ -439,7 +439,6 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
                 .reduce((sum, ting) => sum + normaliserItemAntal(ting.maengde, 0), 0);
             fundetTing.maengde = normaliserItemAntal(fundetTing.maengde, 0) + dubletAntal + tilfoejetMaengde;
             spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== genstandId || ting === fundetTing);
-            udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
         } else {
             spilTilstand.logBesked = `Du har allerede ${itemDB[genstandId]?.navn || 'den genstand'}.`;
             return;
@@ -705,38 +704,11 @@ function erKoebbarShopVare(id: string) {
     return true;
 }
 
-function hentShopPuljeTilErstatning(felt: Felt) {
-    const basisPulje = felt.biome === 'marked'
-        ? markedVarePool
-        : Object.keys(itemDB).filter(k => itemDB[k].pris > 0 && itemDB[k].type !== 'forbandelse' && itemDB[k].type !== 'skat');
-
-    return basisPulje.filter(erKoebbarShopVare);
-}
-
-function fyldShopErstatninger(items: string[], felt: Felt, antal: number) {
-    const valgte = [...items];
-    const brugte = new Set(valgte);
-    const pulje = hentShopPuljeTilErstatning(felt)
-        .filter(id => !brugte.has(id))
-        .sort(() => Math.random() - 0.5);
-
-    const godeErstatninger = pulje.filter(kanModtageItem);
-    const resten = pulje.filter(id => !godeErstatninger.includes(id));
-
-    for (const id of [...godeErstatninger, ...resten]) {
-        if (valgte.length >= antal) break;
-        valgte.push(id);
-        brugte.add(id);
-    }
-
-    return valgte;
-}
-
 function harShop(felt: Felt | null | undefined) {
     return !!felt && (((felt.shopBasisItems || []).length > 0) || ((felt.shopItems || []).length > 0));
 }
 
-function hentKoebbareShopItems(shopItems: string[] | undefined, felt: Felt) {
+function hentKoebbareShopItems(shopItems: string[] | undefined) {
     const originaleItems = shopItems || [];
     return originaleItems.filter(erKoebbarShopVare);
 }
@@ -792,11 +764,6 @@ function skraemNaboHandlende(centerIndeks: number) {
     }
 
     return antal;
-}
-
-function erOrk() {
-    const id = spilTilstand.valgtKarakter?.id;
-    return id === 'orc_m' || id === 'orc_f';
 }
 
 export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) {
@@ -1039,7 +1006,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
             }
         }
         else {
-            const koebbareShopItems = hentKoebbareShopItems(felt.shopItems, felt);
+            const koebbareShopItems = hentKoebbareShopItems(felt.shopItems);
             if (harShop(felt) && koebbareShopItems.length > 0) {
                 if (naegterHandelTilAktuelSpiller(felt)) {
                     spilTilstand.logBesked = "Boderne lukker skodderne, da de ser dig. Rygtet om dine smadrede naboer er nået hertil.";
@@ -1573,7 +1540,7 @@ export function plyndrFelt() {
             ? " Boderne står tilbage som splinter."
             : "";
     const kasseLog = kasseIndhold > 0 ? " Det meste af kassen ryger med i byttet." : "";
-    const skraemteHandlende = erOrk() ? skraemNaboHandlende(indeks) : 0;
+    const skraemteHandlende = skraemNaboHandlende(indeks);
     const skraemmeLog = skraemteHandlende > 0 ? " Naboernes handlende har set nok og nægter at handle med dig." : "";
     const smadreLog = `Du smadrer ${varMarked ? 'markedet' : havdeVaerksted ? 'værkstedet' : 'byen'} i blodrus og skraber ${loot} guld ud af resterne. Det koster ${energiPris} energi.${kasseLog}${ekstra}${skraemmeLog}`;
 

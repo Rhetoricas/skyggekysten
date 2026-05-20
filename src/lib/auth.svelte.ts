@@ -34,6 +34,44 @@ export const authState = $state({
 });
 
 let authStartet = false;
+let authHeartbeatTimer: ReturnType<typeof setInterval> | null = null;
+
+async function vedligeholdLogin() {
+    if (!authState.user) return;
+
+    const { data } = await supabase.auth.getSession();
+    const session = data.session;
+    if (!session) {
+        authState.user = null;
+        authState.profil = null;
+        return;
+    }
+
+    authState.user = session.user;
+
+    const sekunderTilUdlob = (session.expires_at ?? 0) - Math.floor(Date.now() / 1000);
+    if (sekunderTilUdlob > 5 * 60) return;
+
+    const { data: refreshData, error } = await supabase.auth.refreshSession();
+    if (error || !refreshData.session) return;
+
+    authState.user = refreshData.session.user;
+    if (!authState.profil) await hentEllerOpretProfil();
+}
+
+function startAuthHeartbeat() {
+    if (authHeartbeatTimer || typeof window === 'undefined') return;
+
+    authHeartbeatTimer = setInterval(() => {
+        void vedligeholdLogin();
+    }, 60 * 1000);
+
+    window.addEventListener('focus', () => void vedligeholdLogin());
+    window.addEventListener('online', () => void vedligeholdLogin());
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) void vedligeholdLogin();
+    });
+}
 
 function loginFejlBesked(message: string) {
     const lavere = message.toLowerCase();
@@ -47,6 +85,7 @@ function loginFejlBesked(message: string) {
 export async function initAuth() {
     if (authStartet) return;
     authStartet = true;
+    startAuthHeartbeat();
 
     const { data } = await supabase.auth.getSession();
     authState.user = data.session?.user ?? null;
