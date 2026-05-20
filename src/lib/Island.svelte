@@ -1629,7 +1629,7 @@
     }
 
     function harKoebbarShop(felt: Felt) {
-        return (felt.shopItems || []).some((itemId) => itemDB[itemId]?.kanKoebes !== false);
+        return (felt.shopBasisItems || []).length > 0 || (felt.shopItems || []).some((itemId) => itemDB[itemId]?.kanKoebes !== false);
     }
 
     function forklaringForFelt(felt: Felt, index: number, erUdforsket: boolean, erOpslugt: boolean, erSkattekortRygte = false) {

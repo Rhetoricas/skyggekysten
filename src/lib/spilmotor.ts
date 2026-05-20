@@ -527,7 +527,7 @@ export function fjernVareFraAktuelShop(genstandId: string) {
     const nyeShopItems = fjernEn(felt.shopItems);
     const nyAktivShop = fjernEn(spilTilstand.aktivShop);
 
-    felt.shopItems = nyeShopItems.length > 0 ? nyeShopItems : undefined;
+    felt.shopItems = nyeShopItems;
     spilTilstand.aktivShop = nyAktivShop;
     spilTilstand.gitter[indeks] = { ...felt };
     spilTilstand.gitter = [...spilTilstand.gitter];
@@ -732,12 +732,13 @@ function fyldShopErstatninger(items: string[], felt: Felt, antal: number) {
     return valgte;
 }
 
+function harShop(felt: Felt | null | undefined) {
+    return !!felt && (((felt.shopBasisItems || []).length > 0) || ((felt.shopItems || []).length > 0));
+}
+
 function hentKoebbareShopItems(shopItems: string[] | undefined, felt: Felt) {
     const originaleItems = shopItems || [];
-    const filtreredeItems = originaleItems.filter(erKoebbarShopVare);
-
-    if (filtreredeItems.length >= originaleItems.length) return filtreredeItems;
-    return fyldShopErstatninger(filtreredeItems, felt, originaleItems.length);
+    return originaleItems.filter(erKoebbarShopVare);
 }
 
 function sikrShopBasisItems(felt: Felt) {
@@ -771,7 +772,7 @@ function skraemNaboHandlende(centerIndeks: number) {
         const nabo = spilTilstand.gitter[naboIndeks];
         if (!nabo) continue;
 
-        const harHandel = nabo.hasWorkshop || (nabo.shopBasisItems?.length || 0) > 0 || hentKoebbareShopItems(nabo.shopItems, nabo).length > 0;
+        const harHandel = nabo.hasWorkshop || harShop(nabo);
         if (!harHandel) continue;
 
         const naegter = new Set(nabo.naegterHandelFor || []);
@@ -997,7 +998,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         mapAendret = genopfyldShopHvisNyDag(felt) || mapAendret;
     }
 
-    if (options.triggerPortal !== false && felt.hasPortal && hentKoebbareShopItems(felt.shopItems, felt).length === 0 && !felt.hasWorkshop) {
+    if (options.triggerPortal !== false && felt.hasPortal && !harShop(felt) && !felt.hasWorkshop) {
         udfoerPortalTeleport();
         spilTilstand.gitter = [...spilTilstand.gitter];
         syncTilDb(mapAendret);
@@ -1039,12 +1040,14 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         }
         else {
             const koebbareShopItems = hentKoebbareShopItems(felt.shopItems, felt);
-            if (koebbareShopItems.length > 0) {
+            if (harShop(felt) && koebbareShopItems.length > 0) {
                 if (naegterHandelTilAktuelSpiller(felt)) {
                     spilTilstand.logBesked = "Boderne lukker skodderne, da de ser dig. Rygtet om dine smadrede naboer er nået hertil.";
                 } else {
                     spilTilstand.aktivShop = koebbareShopItems;
                 }
+            } else if (harShop(felt)) {
+                spilTilstand.logBesked = "Butikkens hylde er tom for i dag. Kom tilbage i morgen.";
             }
         }
     }
@@ -1330,7 +1333,7 @@ function erTungKrigerklasse() {
 export function kanBegaaIndbrudPaaFelt(felt: Felt | null | undefined) {
     if (!felt || felt.indbrudt) return false;
     if (felt.biome !== 'by') return false;
-    return !felt.shopItems || felt.shopItems.length === 0;
+    return !harShop(felt);
 }
 
 export function kanPlyndreFelt(felt: Felt | null | undefined) {
@@ -1531,7 +1534,7 @@ export function plyndrFelt() {
     }
 
     const varMarked = felt.biome === 'marked';
-    const havdeButik = (felt.shopItems || []).some((itemId) => itemDB[itemId]?.kanKoebes !== false);
+    const havdeButik = harShop(felt);
     const havdeVaerksted = !!felt.hasWorkshop;
     const energiPris = varMarked ? 8 : havdeVaerksted ? 24 : 16;
     const skadePris = varMarked ? 20 : havdeVaerksted ? 50 : 30;
