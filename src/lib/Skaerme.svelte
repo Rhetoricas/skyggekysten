@@ -466,13 +466,13 @@
                         </li>
                     {/each}
                 </ol>
-                {#if globaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
-                    <button type="button" class="highscore-naeste" onclick={naesteGlobalHighscoreSide} aria-label="Vis nÃ¦ste 10 globale highscores">
-                        â†’
-                    </button>
-                {/if}
             {/if}
         </div>
+        {#if globaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
+            <button type="button" class="highscore-naeste" onclick={naesteGlobalHighscoreSide} aria-label="Vis nÃ¦ste 10 globale highscores">
+                &gt;
+            </button>
+        {/if}
     </div>
 {/snippet}
 
@@ -494,13 +494,13 @@
                         </li>
                     {/each}
                 </ol>
-                {#if klasseScores.length > HIGHSCORE_SIDE_STOERRELSE}
-                    <button type="button" class="highscore-naeste" onclick={naesteKlasseHighscoreSide} aria-label="Vis nÃ¦ste 10 highscores for karakterklassen">
-                        â†’
-                    </button>
-                {/if}
             {/if}
         </div>
+        {#if klasseScores.length > HIGHSCORE_SIDE_STOERRELSE}
+            <button type="button" class="highscore-naeste" onclick={naesteKlasseHighscoreSide} aria-label="Vis nÃ¦ste 10 highscores for karakterklassen">
+                &gt;
+            </button>
+        {/if}
     </div>
 {/snippet}
 
@@ -1147,7 +1147,7 @@
     .tavle-indhold .point { font-variant-numeric: tabular-nums; }
     .placering { color: #b8aa86; min-width: 24px; text-align: right; font-variant-numeric: tabular-nums; }
     .highscore-naeste {
-        position: absolute; right: 0; bottom: -30px;
+        position: absolute; left: 50%; bottom: -22px; transform: translateX(-50%);
         width: 38px; height: 28px; border: 1px solid rgba(245, 208, 113, 0.45);
         border-radius: 50%; background: rgba(0, 0, 0, 0.35); color: #f5d071;
         font-size: 1.35rem; line-height: 1; cursor: pointer;
