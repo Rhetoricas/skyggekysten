@@ -12,6 +12,8 @@
     import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
     import type { Karakter } from '$lib/types';
 
+    type GlobalScore = { spillerNavn: string; oeNavn: string; point: number; karakter?: string };
+
     let {
         opretEllerDeltag,
         startOfflineSpil,
@@ -36,8 +38,8 @@
         genstartBane: () => void;
         nulstilHukommelse: () => void;
         lokaleScores: Array<{ navn: string; score: number; karakter?: string }>;
-        klasseScores: Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>;
-        globaleScores: Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>;
+        klasseScores: GlobalScore[];
+        globaleScores: GlobalScore[];
         nyGlobalRekord: boolean;
         harGemtOfflineSpil: boolean;
         offlineSpilInfo: { spillerNavn: string; rumKode: string; gameState: string; dag: number; savedAt: string } | null;
@@ -55,6 +57,9 @@
     let visProfil = $state(false);
     let profilNavnInput = $state('');
     let visLokaleTestKnapper = $state(false);
+    let globalHighscoreSide = $state(0);
+    let klasseHighscoreSide = $state(0);
+    const HIGHSCORE_SIDE_STOERRELSE = 10;
     const lokaleKortPresets = [
         { label: '20 x 20', bredde: 20, hoejde: 20 },
         { label: '50 x 20', bredde: 50, hoejde: 20 },
@@ -145,6 +150,36 @@
 
     function highscoreKlasseNavn() {
         return hentKarakterKlasseNavn(spilTilstand.valgtKarakter);
+    }
+
+    function highscoreSideAntal(scores: Array<unknown>) {
+        return Math.max(1, Math.ceil(Math.min(scores.length, 100) / HIGHSCORE_SIDE_STOERRELSE));
+    }
+
+    function normaliserHighscoreSide(side: number, scores: Array<unknown>) {
+        const antalSider = highscoreSideAntal(scores);
+        return ((side % antalSider) + antalSider) % antalSider;
+    }
+
+    function highscoreSideStart(side: number, scores: Array<unknown>) {
+        return normaliserHighscoreSide(side, scores) * HIGHSCORE_SIDE_STOERRELSE;
+    }
+
+    function highscoreSideSlut(side: number, scores: Array<unknown>) {
+        return highscoreSideStart(side, scores) + HIGHSCORE_SIDE_STOERRELSE;
+    }
+
+    function highscoreSide(scores: GlobalScore[], side: number): GlobalScore[] {
+        const start = highscoreSideStart(side, scores);
+        return scores.slice(start, start + HIGHSCORE_SIDE_STOERRELSE);
+    }
+
+    function naesteGlobalHighscoreSide() {
+        globalHighscoreSide = (normaliserHighscoreSide(globalHighscoreSide, globaleScores) + 1) % highscoreSideAntal(globaleScores);
+    }
+
+    function naesteKlasseHighscoreSide() {
+        klasseHighscoreSide = (normaliserHighscoreSide(klasseHighscoreSide, klasseScores) + 1) % highscoreSideAntal(klasseScores);
     }
 
     function maskeretEmail(email?: string) {
@@ -413,6 +448,62 @@
     {/if}
 {/snippet}
 
+{#snippet globalHighscoreTavle()}
+    {@const sideStart = highscoreSideStart(globalHighscoreSide, globaleScores)}
+    <div class="tavle">
+        <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
+        <div class="tavle-indhold global-indhold">
+            <h3>Top {sideStart + 1}-{highscoreSideSlut(globalHighscoreSide, globaleScores)} global</h3>
+            {#if globaleScores.length === 0}
+                <p class="tom-liste">Ingen data endnu</p>
+            {:else}
+                <ol start={sideStart + 1}>
+                    {#each highscoreSide(globaleScores, globalHighscoreSide) as score, i (sideStart + i)}
+                        <li>
+                            <span class="placering">{sideStart + i + 1}.</span>
+                            <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
+                            <span class="point">{score.point}</span>
+                        </li>
+                    {/each}
+                </ol>
+                {#if globaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
+                    <button type="button" class="highscore-naeste" onclick={naesteGlobalHighscoreSide} aria-label="Vis nÃ¦ste 10 globale highscores">
+                        â†’
+                    </button>
+                {/if}
+            {/if}
+        </div>
+    </div>
+{/snippet}
+
+{#snippet klasseHighscoreTavle()}
+    {@const sideStart = highscoreSideStart(klasseHighscoreSide, klasseScores)}
+    <div class="tavle klasse-tavle">
+        <img src="/screens/boardglobal.webp" alt="Karakterklasse tavle" class="tavle-billede" />
+        <div class="tavle-indhold global-indhold">
+            <h3>Top {sideStart + 1}-{highscoreSideSlut(klasseHighscoreSide, klasseScores)} {highscoreKlasseNavn()}</h3>
+            {#if klasseScores.length === 0}
+                <p class="tom-liste">Ingen data endnu</p>
+            {:else}
+                <ol start={sideStart + 1}>
+                    {#each highscoreSide(klasseScores, klasseHighscoreSide) as score, i (sideStart + i)}
+                        <li>
+                            <span class="placering">{sideStart + i + 1}.</span>
+                            <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
+                            <span class="point">{score.point}</span>
+                        </li>
+                    {/each}
+                </ol>
+                {#if klasseScores.length > HIGHSCORE_SIDE_STOERRELSE}
+                    <button type="button" class="highscore-naeste" onclick={naesteKlasseHighscoreSide} aria-label="Vis nÃ¦ste 10 highscores for karakterklassen">
+                        â†’
+                    </button>
+                {/if}
+            {/if}
+        </div>
+    </div>
+{/snippet}
+
 {#snippet topKnapper()}
     <div class="screen-top-actions">
         <Regelbog />
@@ -476,23 +567,8 @@
 
             <p class="status larger-status">{spilTilstand.statusBesked}</p>
             
-            <div class="tavle start-tavle">
-                <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
-                <div class="tavle-indhold global-indhold">
-                    <h3>Top 10 global</h3>
-                    {#if globaleScores.length === 0}
-                        <p class="tom-liste">Ingen data endnu</p>
-                    {:else}
-                        <ol>
-                            {#each globaleScores as score, i (i)}
-                                <li>
-                                    <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
-                                    <span class="point">{score.point}</span>
-                                </li>
-                            {/each}
-                        </ol>
-                    {/if}
-                </div>
+            <div class="start-tavle">
+                {@render globalHighscoreTavle()}
             </div>
 
             <div class="offline-bottom">
@@ -620,44 +696,10 @@
                     </div>
                 </div>
                 {#if !spilTilstand.offlineMode}
-                    <div class="tavle klasse-tavle">
-                        <img src="/screens/boardglobal.webp" alt="Karakterklasse tavle" class="tavle-billede" />
-                        <div class="tavle-indhold global-indhold">
-                            <h3>Top 10 {highscoreKlasseNavn()}</h3>
-                            {#if klasseScores.length === 0}
-                                <p class="tom-liste">Ingen data endnu</p>
-                            {:else}
-                                <ol>
-                                    {#each klasseScores as score, i (i)}
-                                        <li>
-                                            <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
-                                            <span class="point">{score.point}</span>
-                                        </li>
-                                    {/each}
-                                </ol>
-                            {/if}
-                        </div>
-                    </div>
+                    {@render klasseHighscoreTavle()}
                 {/if}
                 {#if !spilTilstand.offlineMode}
-                    <div class="tavle">
-                        <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
-                        <div class="tavle-indhold global-indhold">
-                            <h3>Top 10 global</h3>
-                            {#if globaleScores.length === 0}
-                                <p class="tom-liste">Ingen data endnu</p>
-                            {:else}
-                                <ol>
-                                    {#each globaleScores as score, i (i)}
-                                        <li>
-                                            <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
-                                            <span class="point">{score.point}</span>
-                                        </li>
-                                    {/each}
-                                </ol>
-                            {/if}
-                        </div>
-                    </div>
+                    {@render globalHighscoreTavle()}
                 {/if}
             </div>
         </div>
@@ -727,44 +769,10 @@
                     </div>
                 </div>
                 {#if !spilTilstand.offlineMode}
-                    <div class="tavle klasse-tavle">
-                        <img src="/screens/boardglobal.webp" alt="Karakterklasse tavle" class="tavle-billede" />
-                        <div class="tavle-indhold global-indhold">
-                            <h3>Top 10 {highscoreKlasseNavn()}</h3>
-                            {#if klasseScores.length === 0}
-                                <p class="tom-liste">Ingen data endnu</p>
-                            {:else}
-                                <ol>
-                                    {#each klasseScores as score, i (i)}
-                                        <li>
-                                            <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
-                                            <span class="point">{score.point}</span>
-                                        </li>
-                                    {/each}
-                                </ol>
-                            {/if}
-                        </div>
-                    </div>
+                    {@render klasseHighscoreTavle()}
                 {/if}
                 {#if !spilTilstand.offlineMode}
-                    <div class="tavle">
-                        <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
-                        <div class="tavle-indhold global-indhold">
-                            <h3>Top 10 global</h3>
-                            {#if globaleScores.length === 0}
-                                <p class="tom-liste">Ingen data endnu</p>
-                            {:else}
-                                <ol>
-                                    {#each globaleScores as score, i (i)}
-                                        <li>
-                                            <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
-                                            <span class="point">{score.point}</span>
-                                        </li>
-                                    {/each}
-                                </ol>
-                            {/if}
-                        </div>
-                    </div>
+                    {@render globalHighscoreTavle()}
                 {/if}
             </div>
         </div>
@@ -1134,7 +1142,18 @@
     .tavle-indhold { position: absolute; width: 76%; left: 12%; top: 12%; color: #eee; }
     .tavle-indhold h3 { color: #fff; font-size: 1rem; text-align: center; font-family: 'Cinzel', serif; margin-top: 0;}
     .tavle-indhold ol { padding: 0; list-style: none; }
-    .tavle-indhold li { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 5px 0; font-size: 0.85rem; }
+    .tavle-indhold li { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 5px 0; font-size: 0.85rem; }
+    .tavle-indhold .navn { flex: 1; min-width: 0; }
+    .tavle-indhold .point { font-variant-numeric: tabular-nums; }
+    .placering { color: #b8aa86; min-width: 24px; text-align: right; font-variant-numeric: tabular-nums; }
+    .highscore-naeste {
+        position: absolute; right: 0; bottom: -30px;
+        width: 38px; height: 28px; border: 1px solid rgba(245, 208, 113, 0.45);
+        border-radius: 50%; background: rgba(0, 0, 0, 0.35); color: #f5d071;
+        font-size: 1.35rem; line-height: 1; cursor: pointer;
+        display: inline-flex; align-items: center; justify-content: center;
+    }
+    .highscore-naeste:hover { background: rgba(245, 208, 113, 0.14); }
     .karakter-navn { color: #9aa69d; font-size: 0.75rem; }
     .status { color: #ccc; margin-top: 15px; }
 

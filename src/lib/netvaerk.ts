@@ -581,7 +581,7 @@ async function highscoreFindes(payload: HighscorePayload) {
     return !!data?.length;
 }
 
-function formaterTopTi(data: ScoreRaekke[] | null | undefined) {
+function formaterTopScores(data: ScoreRaekke[] | null | undefined, antal = 10) {
     const unikke = [];
     const fundne = new Set();
     for (const raekke of data || []) {
@@ -594,7 +594,7 @@ function formaterTopTi(data: ScoreRaekke[] | null | undefined) {
                 point: raekke.score,
                 karakter: raekke.character
             });
-            if (unikke.length === 10) break;
+            if (unikke.length === antal) break;
         }
     }
     return unikke;
@@ -646,6 +646,10 @@ export async function hentHighscores(karakterKlasse?: string | null) {
 }
 
 export async function hentGlobalTopTi(karakterKlasse?: string | null) {
+    return hentGlobalTopHundrede(karakterKlasse).then((scores) => scores.slice(0, 10));
+}
+
+export async function hentGlobalTopHundrede(karakterKlasse?: string | null) {
     if (spilTilstand.offlineMode) return [];
     const klasseNavne = hentKarakterNavneIKlasse(karakterKlasse);
 
@@ -658,15 +662,15 @@ export async function hentGlobalTopTi(karakterKlasse?: string | null) {
     const { data } = await medTimeout(
         query
             .order('score', { ascending: false })
-            .limit(30),
+            .limit(160),
         8000,
         'Hentning af global score'
     ).catch((error) => {
-        console.warn('Kunne ikke hente global top 10', error);
+        console.warn('Kunne ikke hente global top 100', error);
         return { data: [] };
     });
 
-    return formaterTopTi(data);
+    return formaterTopScores(data, 100);
 }
 
 export async function hentGlobalTopScore(karakterKlasse?: string | null) {

@@ -8,7 +8,7 @@
     import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { M10_SCORE, beregnSpillerScore } from '$lib/score';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopTi, hentGlobalTopScore, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores } from '$lib/netvaerk';
+    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, hentGlobalTopScore, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
     import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
@@ -55,6 +55,7 @@
     let sejlendeBaadIndex = $state<number | null>(null);
     let visDoedsLog = $state(false);
     let langsomtKamera = $state(false);
+    let sidsteKikkertMode = '';
     let ruteOverblikState = '';
 
     function aktuelHighscoreKlasse() {
@@ -329,6 +330,27 @@
                 cam.foelgSpiller(aktueltIndex, kortBredde, HEX_W, ROW_H);
             });
         }
+    });
+
+    $effect(() => {
+        const kikkertMode = spilTilstand.mitUdstyr?.some(i => i.id === 'kikkert_250')
+            ? 'kikkert_250'
+            : spilTilstand.mitUdstyr?.some(i => i.id === 'kikkert_45')
+                ? 'kikkert_45'
+                : '';
+
+        if (kikkertMode === sidsteKikkertMode) return;
+        sidsteKikkertMode = kikkertMode;
+
+        if (spilTilstand.gameState !== 'play' || !kikkertMode) return;
+
+        untrack(() => {
+            setTimeout(() => {
+                if (spilTilstand.gameState === 'play') {
+                    cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
+                }
+            }, 0);
+        });
     });
 
     $effect(() => {
@@ -1157,7 +1179,7 @@
             harGemtOfflineSpil = harOfflineSpil();
             offlineSpilInfo = hentOfflineSpilInfo();
             lokaleScores = await hentHighscores();
-            globaleScores = await hentGlobalTopTi();
+            globaleScores = await hentGlobalTopHundrede();
         })();
 
         return () => {
@@ -1192,8 +1214,8 @@
                         : `${gemteVentende} ventende scores blev gemt efter genoprettet forbindelse.`;
                 }
                 const klasse = aktuelHighscoreKlasse();
-                globaleScores = await hentGlobalTopTi();
-                klasseScores = klasse ? await hentGlobalTopTi(klasse) : [];
+                globaleScores = await hentGlobalTopHundrede();
+                klasseScores = klasse ? await hentGlobalTopHundrede(klasse) : [];
                 lokaleScores = await hentHighscores();
             })();
         }
@@ -1236,8 +1258,8 @@
 
             lokaleScores = await hentHighscores();
             if (spilTilstand.gameMode !== 'offline') {
-                klasseScores = await hentGlobalTopTi(klasse);
-                globaleScores = await hentGlobalTopTi();
+                klasseScores = await hentGlobalTopHundrede(klasse);
+                globaleScores = await hentGlobalTopHundrede();
             }
             harGemtOfflineSpil = harOfflineSpil();
             offlineSpilInfo = hentOfflineSpilInfo();
