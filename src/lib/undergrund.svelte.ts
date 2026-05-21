@@ -155,7 +155,7 @@ export function grav() {
     } else if (guldVaerdi > 0) {
         const graveGuldMultiplier = harMesterskovl && harGyldenDestillator ? 3 : (harMesterskovl || harGyldenDestillator) ? 2 : 1;
         const malmviserMultiplier = harMalmviser ? 1.25 : 1;
-        let maengde = Math.floor(guldVaerdi * graveGuldMultiplier * malmviserMultiplier * spilTilstand.valgtKarakter.goldMod);
+        let maengde = Math.floor(guldVaerdi * graveGuldMultiplier * malmviserMultiplier);
         maengde = spilTilstand.beregnGuldIndkomst(maengde);
         const foerGuld = spilTilstand.guldTotal;
         spilTilstand.guldTotal += maengde;
