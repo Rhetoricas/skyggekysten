@@ -736,6 +736,29 @@ function naegterHandelTilAktuelSpiller(felt: Felt | null | undefined) {
     return !!spilTilstand.spillerNavn && !!felt?.naegterHandelFor?.includes(spilTilstand.spillerNavn);
 }
 
+export function naegtHandelForAktuelSpillerPaaAktueltFelt() {
+    if (!spilTilstand.spillerNavn) return false;
+
+    const indeks = spilTilstand.spillerIndex;
+    const felt = spilTilstand.gitter[indeks];
+    if (!felt) return false;
+
+    const harHandel = felt.hasWorkshop || harShop(felt);
+    if (!harHandel) return false;
+
+    const naegter = new Set(felt.naegterHandelFor || []);
+    const foer = naegter.size;
+    naegter.add(spilTilstand.spillerNavn);
+    if (naegter.size === foer) return false;
+
+    felt.naegterHandelFor = Array.from(naegter);
+    spilTilstand.gitter[indeks] = { ...felt };
+    spilTilstand.gitter = [...spilTilstand.gitter];
+    broadcastFelt(indeks, spilTilstand.gitter[indeks]);
+    syncKortTilDbSenere();
+    return true;
+}
+
 function skraemNaboHandlende(centerIndeks: number) {
     if (!spilTilstand.spillerNavn) return 0;
 
@@ -2100,7 +2123,7 @@ export function tjekMiljoeSlitage(biome: string): string {
             }
             if (vare.id === 'flot_toej') {
                 mistetFintToej += vare.maengde;
-                logBeskeder.push("Hulen ødelægger dit fine tøj. Du får klude tilbage.");
+                logBeskeder.push("Hulen ødelægger dit fine tøj. Du får almindeligt tøj tilbage.");
                 return false;
             }
             if (vare.id === 'sovepose') {

@@ -78,7 +78,7 @@
                     <ul>
                         <li>Du afslører felter omkring dig, når du bevæger dig. Din synsradius kommer fra karakteren og udstyr som fakkel.</li>
                         <li>Bjerge blokerer udsyn, medmindre du selv står på et bjerg. Bjergfelter giver mindst radius 2, når du kommer derop.</li>
-                        <li>Tågen begynder at rykke efter dag 5. Hvis du står i tågen, når tiden går, tager du skade.</li>
+                        <li>Tågen begynder først at rykke efter dag 6. Hvis du står i tågen, når tiden går, tager du skade.</li>
                         <li>I tågen kan du lave blodoffer: -10 Max HP for +50 HP.</li>
                         <li>Nogle sjældne events kan holde tågen tilbage, blokere den bag et felt eller vise en båd for alle.</li>
                     </ul>
@@ -136,8 +136,8 @@
                     <ul>
                         <li>Tryk på en genstand i bunden for at bruge den, hvis den er aktiv.</li>
                         <li>Skovl, sovepose/silkesovepose, mad, dirk og kølle er kun aktive, når de kan bruges i den aktuelle situation.</li>
-                        <li>Kun mad og livseliksir kan stables i flere styk. Alle andre våben, værktøjer, tøj og særlige items findes kun én gang ad gangen.</li>
-                        <li>Store værktøjer, våben og tøj findes kun i én version ad gangen. Skovl/mesterskovl, stav/dragestav, søgekvist/runekvist, detektor/malmviser, dirk/mesterdirk, kniv/mesterkniv, rustning/kongepanser, økse/stormøkse, kølle/murknuser, bue/falkebue, fakkel/solfakkel, sovepose/silkesovepose og klude/fint tøj/royalt tøj tæller som samme type.</li>
+                        <li>Mad, livseliksir, fakler, skattekort og diamanter kan stables i flere styk. De fleste andre våben, værktøjer, tøj og særlige items findes kun én gang ad gangen.</li>
+                        <li>Store værktøjer, våben og tøj findes kun i én version ad gangen. Skovl/mesterskovl, stav/dragestav, søgekvist/runekvist, detektor/malmviser, dirk/mesterdirk, kniv/mesterkniv, rustning/kongepanser, økse/stormøkse, kølle/murknuser, bue/falkebue, fakkel/solfakkel, sovepose/silkesovepose og tøj/fint tøj/royalt tøj tæller som samme type.</li>
                         <li>Fakkel og solfakkel kan lave bål. Stav og dragestav kan teleportere. Skattekort viser en gammel skatteklynge som et sepiafarvet kortspor. Nogle øer kan gemme på flere skatte, og kortet afslører ikke om kisten allerede er taget. Butikker sælger ikke flere skattekort til dig, når du har tydet alle øens spor.</li>
                         <li>Skattekortspor tæller ikke som almindelig udforskning og giver ikke udforskningspoint, før du selv kommer tæt nok på feltet.</li>
                         <li>Nogle ting kan købes, andre findes kun i events. Elverrustning, opgraderede items og relikvier kan ikke købes i almindelige butikker.</li>
@@ -148,7 +148,7 @@
                 <section>
                     <h3>Værksteder</h3>
                     <p>Værksteder findes i større byer. De sælger ikke almindelige varer, men bygger dit eksisterende udstyr om til en bedre version. Du beholder ikke den gamle genstand ved siden af den nye.</p>
-                    <p class="eksempel">Eksempel: Har du en skovl og 150 guld, kan værkstedet gøre den til en mesterskovl. Har du en sovepose og 150 guld, kan den blive til en silkesovepose. Har du klude og 100 guld, kan de blive til fint tøj. Fint tøj kan for 500 guld blive til royalt tøj, som giver stor guldbonus, men bliver nedgraderet til fint tøj, hvis det flænses.</p>
+                    <p class="eksempel">Eksempel: Har du en skovl og 150 guld, kan værkstedet gøre den til en mesterskovl. Har du en sovepose og 150 guld, kan den blive til en silkesovepose. Har du tøj og 100 guld, kan det blive til fint tøj. Fint tøj kan for 500 guld blive til royalt tøj, som giver stor guldbonus, men bliver nedgraderet til fint tøj, hvis det flænses.</p>
                 </section>
 
                 <section>
@@ -204,7 +204,7 @@
                         <li>Til sidst ganges summen med 1 + HP/1000. Har du 100 HP, bliver summen ganget med 1,100.</li>
                         <li>Global highscore kræver login. Slutskærmen viser lokal ø-score, global karakterklasse-score og global samlet score. Offline-score gemmes kun lokalt.</li>
                         <li>Hvis forbindelsen svigter, forsøger spillet at gemme ventende scores igen senere.</li>
-                        <li>En særlig medalje kan gives ved ny global rekord, men kun hvis scoren også er høj nok.</li>
+                        <li>Medalje 11 gives kun, hvis du kommer på global top 10 og scorer over 12500.</li>
                     </ul>
                     <p class="eksempel">Eksempel: 1000 guld, 200 udforskningspoint, 300 minepoint og 1000 flugtpoint bliver 2500 før HP. Med 80 HP ender det på 2700 point.</p>
                 </section>

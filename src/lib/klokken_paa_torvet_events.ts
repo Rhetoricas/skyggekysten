@@ -220,10 +220,10 @@ Kvinden, drengen stjal for, åbner øjnene. “Lad være med at gøre mig til en
         ]
       },
       {
-        tekst: 'Riv klude til kolde omslag og køb tid med hænderne i stedet for flasken.',
+        tekst: 'Riv tøj til kolde omslag og køb tid med hænderne i stedet for flasken.',
         kosterItem: 'klude',
         udfaldListe: [
-          { log: `Klude er ikke medicin, men de er noget. En af patienterne holder op med at ryste så voldsomt. Det lille hjælper ikke nok. Det hjælper alligevel.`, hpAendring: 10, maxHpAendring: 3, naesteTrin: 'klokken_dosis' },
+          { log: `Tøj er ikke medicin, men det er noget. En af patienterne holder op med at ryste så voldsomt. Det lille hjælper ikke nok. Det hjælper alligevel.`, hpAendring: 10, maxHpAendring: 3, naesteTrin: 'klokken_dosis' },
           { log: `Du arbejder så længe ved sengene, at torvets råb bliver fjerne. Det føles godt at gøre noget konkret, også når det ikke afgør sagen.`, hpAendring: -5, maxHpAendring: 8, naesteTrin: 'klokken_dosis' },
           { log: `Lægen tager imod kludene uden ceremoni. Hun har ikke brug for pæne følelser. Hun har brug for tørre hænder og mere tid.`, hpAendring: 12, naesteTrin: 'klokken_dosis' }
         ]

@@ -377,12 +377,12 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 } 
             },
             { 
-                tekst: "Filtrér dampen gennem beskidte klude", 
+                tekst: "Filtrér dampen gennem beskidt tøj", 
                 kosterItem: 'klude', 
                 effekt: () => {
                     const energi = Math.floor(Math.random() * 3) + 3;
                     return { 
-                        logBesked: "Kludene tager noget af giften. Du får energi uden at tage skade.", 
+                        logBesked: "Tøjet tager noget af giften. Du får energi uden at tage skade.", 
                         energiOp: energi
                     };
                 } 

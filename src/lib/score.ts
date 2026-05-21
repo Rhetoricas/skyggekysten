@@ -3,7 +3,7 @@ import type { RygsækTing } from './types';
 import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 import { itemDB } from './spildata';
 
-export const MEDALJE_GRAENSER = [0, 500, 1200, 2000, 3000, 4500, 6250, 8500, 11000, 14000] as const;
+export const MEDALJE_GRAENSER = [0, 500, 1200, 2100, 3200, 4500, 6000, 7800, 10000, 12500] as const;
 export const M10_SCORE = MEDALJE_GRAENSER[MEDALJE_GRAENSER.length - 1];
 
 export function taelScoreSpillere(alleSpillere: Record<string, Partial<SpillerData>> = {}) {

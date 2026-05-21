@@ -283,7 +283,7 @@ export function fremrykTid() {
         
         const taagenGaarModOest = spilTilstand.fogX >= 0;
         const taagenHoldtTilDag = taagenGaarModOest ? Math.max(0, ...spilTilstand.gitter.map((felt) => felt.taagenHoldtTilDag || 0)) : 0;
-        if (spilTilstand.dag > 5 && spilTilstand.dag > taagenHoldtTilDag) {
+        if (spilTilstand.dag > 6 && spilTilstand.dag > taagenHoldtTilDag) {
             const dynamiskFart = 0.5 + Math.pow(spilTilstand.dag / 100, 2);
             const fremrykning = (HEX_W * dynamiskFart) / antalLevende;
             const oestkant = hentKortBredde() * HEX_W;

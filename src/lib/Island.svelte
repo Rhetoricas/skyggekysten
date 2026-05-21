@@ -8,7 +8,7 @@
     import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { M10_SCORE, beregnSpillerScore } from '$lib/score';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, hentGlobalTopScore, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores } from '$lib/netvaerk';
+    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
     import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
@@ -1251,15 +1251,23 @@
             }
             
             const highscoreGemt = await gemHighscore();
-            const kanTjekkeGlobalRekord = highscoreGemt && spilTilstand.gameMode !== 'offline' && authState.user;
+            const kanTjekkeTopTi = highscoreGemt && spilTilstand.gameMode !== 'offline' && authState.user;
             const klasse = aktuelHighscoreKlasse();
-            const globalTopScore = kanTjekkeGlobalRekord ? await hentGlobalTopScore() : 0;
-            nyGlobalRekord = !!kanTjekkeGlobalRekord && spilTilstand.samletScore >= M10_SCORE && spilTilstand.samletScore >= globalTopScore;
+            nyGlobalRekord = false;
 
             lokaleScores = await hentHighscores();
             if (spilTilstand.gameMode !== 'offline') {
                 klasseScores = await hentGlobalTopHundrede(klasse);
                 globaleScores = await hentGlobalTopHundrede();
+                const highscoreNavn = authState.profil?.display_name || spilTilstand.spillerNavn;
+                nyGlobalRekord = !!kanTjekkeTopTi &&
+                    spilTilstand.samletScore > M10_SCORE &&
+                    globaleScores.slice(0, 10).some((score) =>
+                        score.point === spilTilstand.samletScore &&
+                        score.spillerNavn === highscoreNavn &&
+                        score.oeNavn === spilTilstand.rumKode &&
+                        score.karakter === spilTilstand.valgtKarakter?.navn
+                    );
             }
             harGemtOfflineSpil = harOfflineSpil();
             offlineSpilInfo = hentOfflineSpilInfo();

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { itemDB } from '$lib/spildata';
-    import { afslørMalmviserMiner, laegGuldIKasseForAktueltFelt } from '$lib/spilmotor';
+    import { afslørMalmviserMiner, laegGuldIKasseForAktueltFelt, naegtHandelForAktuelSpillerPaaAktueltFelt } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
 
     let { lukVaerksted } = $props<{ lukVaerksted: () => void }>();
@@ -74,7 +74,9 @@
 
     function afslutOpgradering() {
         if (harKoelleEllerMurknuser()) {
-            spilTilstand.logBesked += " Mesteren får øje på køllen og tør ikke arbejde mere for dig.";
+            naegtHandelForAktuelSpillerPaaAktueltFelt();
+            const senesteBesked = spilTilstand.logBesked.replace(/^DAG \d+ - /, '');
+            spilTilstand.logBesked = `${senesteBesked} Mesteren får øje på køllen og tør ikke arbejde mere for dig.`;
             lukVaerksted();
             return;
         }
@@ -318,7 +320,7 @@
 
     function opgraderKlude() {
         if (harFintToej || harRoyaltToej) {
-            spilTilstand.logBesked = "Dit tøj er allerede bedre end klude.";
+            spilTilstand.logBesked = "Dit tøj er allerede fint nok.";
             return;
         }
 
@@ -338,7 +340,7 @@
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'klude' && ting.id !== 'flot_toej' && ting.id !== 'royalt_toej'),
             { id: 'flot_toej', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
-        spilTilstand.logBesked = "Værkstedet vasker, farver og syr dine klude om. Du har nu fint tøj.";
+        spilTilstand.logBesked = "Værkstedet vasker, farver og syr dit tøj om. Du har nu fint tøj.";
         afslutOpgradering();
     }
 
@@ -558,7 +560,7 @@
             opgrader: opgraderKoelle
         },
         {
-            titel: 'Klude til Fint tøj',
+            titel: 'Tøj til Fint tøj',
             fraId: 'klude',
             tilId: 'flot_toej',
             pris: KLUDER_OPGRADERING_PRIS,
@@ -566,7 +568,7 @@
             kanOpgradere: kanOpgradereKlude,
             kortTekst: 'Fint tøj giver +15% guldindkomst og lidt beskyttelse, men kan blive flænset i huler og blodskov.',
             helpTitle: 'Tøj-opgradering',
-            helpBody: 'Kræver klude og 100 guld. Værkstedet syr dem om til fint tøj, som giver bedre guldindkomst.',
+            helpBody: 'Kræver tøj og 100 guld. Værkstedet syr det om til fint tøj, som giver bedre guldindkomst.',
             opgrader: opgraderKlude
         },
         {
@@ -905,16 +907,16 @@
             class="opgradering-kort"
             class:inaktiv={!kanOpgradereKlude}
             data-help-title="Tøj-opgradering"
-            data-help-body="Kræver klude og 100 guld. Værkstedet syr dem om til fint tøj, som giver bedre guldindkomst."
+            data-help-body="Kræver tøj og 100 guld. Værkstedet syr det om til fint tøj, som giver bedre guldindkomst."
         >
             <div class="ikon-par">
-                <img src={itemDB.klude.billede} alt="Klude" />
+                <img src={itemDB.klude.billede} alt="Tøj" />
                 <span>→</span>
                 <img src={itemDB.flot_toej.billede} alt="Fint tøj" class="opgraderet" />
             </div>
 
             <div class="tekst">
-                <strong>Klude til Fint tøj</strong>
+                <strong>Tøj til Fint tøj</strong>
                 <p>Fint tøj giver +15% guldindkomst og lidt beskyttelse, men kan blive flænset i huler og blodskov.</p>
                 <span class="pris">{KLUDER_OPGRADERING_PRIS} Guld</span>
             </div>
@@ -924,9 +926,9 @@
                 onclick={opgraderKlude}
                 disabled={!kanOpgradereKlude}
                 data-help-title="Opgrader"
-                data-help-body={harRoyaltToej ? 'Du har allerede royalt tøj.' : harFintToej ? 'Du har allerede fint tøj.' : harKlude ? 'Bruger 100 guld og syr dine klude om til fint tøj.' : 'Du skal først have klude.'}
+                data-help-body={harRoyaltToej ? 'Du har allerede royalt tøj.' : harFintToej ? 'Du har allerede fint tøj.' : harKlude ? 'Bruger 100 guld og syr dit tøj om til fint tøj.' : 'Du skal først have tøj.'}
             >
-                {harRoyaltToej || harFintToej ? 'Opgraderet' : harKlude ? 'Opgrader' : 'Kræver klude'}
+                {harRoyaltToej || harFintToej ? 'Opgraderet' : harKlude ? 'Opgrader' : 'Kræver tøj'}
             </button>
         </div>
 

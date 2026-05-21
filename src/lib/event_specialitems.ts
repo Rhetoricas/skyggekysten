@@ -22,31 +22,31 @@ export const specialItemEvents: Record<string, SpilEvent> = {
         unik: false,
         valg: [
             {
-                tekst: 'Ret den gyldne kikkert mod spejlet',
+                tekst: 'Ret den gyldne kikkert mod spejlet og vend tågen mod sig selv',
                 kraeverItem: 'kikkert_45',
                 effekt: () => {
                     rykTaagenTilbage(2);
-                    return { logBesked: 'Kikkerten viser tågen dens egen bagside. Den trækker sig to felter tilbage.' };
+                    return { logBesked: 'Kikkerten viser tågen dens egen bagside. Disen folder sig væk fra øen og giver jer lidt mere tid.' };
                 }
             },
             {
-                tekst: 'Tving spejlet åbent med staven',
+                tekst: 'Tving spejlet åbent med staven og pres tågen væk',
                 kraeverItem: 'stav',
                 effekt: () => {
                     rykTaagenTilbage(2);
-                    return { logBesked: 'Staven slår en ren linje gennem glasset. Tågen rykker to felter tilbage, men spejlet lukker sig med det samme.', energiNed: 2 };
+                    return { logBesked: 'Staven slår en ren linje gennem glasset. Tågen viger, men spejlet klapper hårdt i og tager kræfter med sig.', energiNed: 2 };
                 }
             },
             {
-                tekst: 'Hold faklen foran glasset',
+                tekst: 'Hold faklen foran glasset og læs tågens folder',
                 kraeverItem: 'fakkel',
                 effekt: () => {
                     afslørOmraade(spilTilstand.spillerIndex, 2);
-                    return { logBesked: 'Lyset gør ikke tågen bange, men det får den til at tegne sine nærmeste folder tydeligt.' };
+                    return { logBesked: 'Lyset gør ikke tågen bange, men spejlet tegner landskabet omkring dig tydeligere.' };
                 }
             },
             {
-                tekst: 'Lad spejlet stå',
+                tekst: 'Lad spejlet stå og gå videre uden at røre tågen',
                 udfaldListe: [
                     { log: 'Du går videre uden at lade spejlet lære dit ansigt.' }
                 ]

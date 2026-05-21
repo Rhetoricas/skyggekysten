@@ -284,10 +284,10 @@ Lederen stikker hurtigt en læderflaske ind for at fange dråberne. Hun siger, d
     billede: '/events/ev_blodskov.webp',
     valg: [
       {
-        tekst: 'Saml saften op med dine egne klude.',
+        tekst: 'Saml saften op med dit eget tøj.',
         kosterItem: 'klude',
         udfaldListe: [
-          { log: `Kludene fungerer som svampe. Du vrider dem ned i din egen taske og får et massivt energiboost af dampen alene.`, hpAendring: 25, maxHpAendring: 10, naesteTrin: 'blodskov_kernen' },
+          { log: `Tøjet fungerer som en svamp. Du vrider det ned i din egen taske og får et massivt energiboost af dampen alene.`, hpAendring: 25, maxHpAendring: 10, naesteTrin: 'blodskov_kernen' },
           { log: `Syren i saften ætser stoffet på sekunder. Du når lige akkurat at undgå brændsår på fingrene.`, hpAendring: -5, naesteTrin: 'blodskov_kernen' },
           { log: `Det drypper på mønterne i lommen, som tager en underlig rød glans og stiger i værdi for samlere.`, guldAendring: 120, naesteTrin: 'blodskov_efterspillet' }
         ]
