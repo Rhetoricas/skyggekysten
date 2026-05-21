@@ -2281,9 +2281,8 @@ function udførBevægelse(nytIndeks: number) {
     <div class="intro-overlay">
         <div class="intro-box">
             <div class="intro-media">
-                <video autoplay muted loop playsinline poster="/video/intro-boat.webp" aria-label="Båden synker i tågen">
-                    <source src="/video/intro-boat.mp4" type="video/mp4" />
-                    <img src="/video/intro-boat.webp" alt="Båden synker i tågen" />
+                <video autoplay muted playsinline aria-label="Startvideo">
+                    <source src="/video/start_video.mp4" type="video/mp4" />
                 </video>
                 <div class="intro-taage"></div>
             </div>
@@ -2539,9 +2538,8 @@ function udførBevægelse(nytIndeks: number) {
         background: #050706;
         margin-bottom: 20px;
     }
-    .intro-media video,
-    .intro-media img {
-        width: min(560px, 100%);
+    .intro-media video {
+        width: 100%;
         aspect-ratio: 16 / 9;
         display: block;
         margin: 0 auto;
