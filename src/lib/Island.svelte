@@ -1429,6 +1429,7 @@
     function lukEventOgShop() {
         const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
         const lukkedeInteraktion = !!spilTilstand.aktivShop || spilTilstand.aktivVaerksted;
+        const lukkedeEvent = eventState.aktivt;
         
         if (felt && eventState.aktivt && felt.eventID !== 'campfire' && felt.eventID !== 'meteor_skat' && felt.eventID !== 'stjernekald') {
             felt.eventFuldført = true;
@@ -1438,7 +1439,7 @@
         spilTilstand.aktivShop = null;
         spilTilstand.aktivVaerksted = false;
         
-        if (felt && felt.hasPortal && !lukkedeInteraktion) {
+        if (felt && felt.hasPortal && !lukkedeInteraktion && !lukkedeEvent) {
             udfoerPortalTeleport();
         } else {
             syncTilDb(!lukkedeInteraktion);
@@ -1692,7 +1693,7 @@
         if (harKoebbarShop(felt)) dele.push('Feltet har en butik.');
         if (felt.hasWorkshop) dele.push('Feltet har et værksted, hvor udstyr kan opgraderes.');
         if (felt.hasGoldmine) dele.push(felt.mineOwner ? `Guldminen ejes af ${felt.mineOwner}.` : 'Der er en guldmine her.');
-        if (felt.hasPortal) dele.push('Portalen kan flytte dig mod øst.');
+        if (felt.hasPortal && !(felt.eventID && !felt.eventFuldført)) dele.push('Portalen kan flytte dig mod øst.');
         if (felt.taageBlokker) dele.push('Tågeblokkeren kan holde tågen tilbage fra venstre, indtil tågen vender.');
         const gravstenListe = gravstenListeForFelt(felt);
         if (gravstenListe.length > 1) dele.push(`Gravstenen rummer ${gravstenListe.length} dødsfald på dette felt.`);
@@ -2044,7 +2045,7 @@ function udførBevægelse(nytIndeks: number) {
                             {/if}
                         {/if}
 
-                        {#if erUdforsket && felt.hasPortal}
+                        {#if erUdforsket && felt.hasPortal && !(felt.eventID && !felt.eventFuldført)}
                             <img src="/tiles/portal.webp" alt="Portal" class="portal-icon" data-help-title="Portal" data-help-body="Portalen slynger dig 4, 5 eller 6 felter mod øst. Landingsfeltet aktiveres som et normalt felt." />
                         {/if}
 

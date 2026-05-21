@@ -988,7 +988,15 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         mapAendret = genopfyldShopHvisNyDag(felt) || mapAendret;
     }
 
-    if (options.triggerPortal !== false && felt.hasPortal && !harShop(felt) && !felt.hasWorkshop) {
+    const harVentendeEvent = !!felt.eventID && !felt.eventFuldført;
+    if (harVentendeEvent && felt.hasPortal) {
+        felt.hasPortal = false;
+        spilTilstand.gitter[nytIndeks] = { ...felt };
+        broadcastFelt(nytIndeks, spilTilstand.gitter[nytIndeks]);
+        mapAendret = true;
+    }
+
+    if (options.triggerPortal !== false && felt.hasPortal && !harVentendeEvent && !harShop(felt) && !felt.hasWorkshop) {
         udfoerPortalTeleport();
         spilTilstand.gitter = [...spilTilstand.gitter];
         syncTilDb(mapAendret);
@@ -2035,7 +2043,7 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
 
         if (felt.biome === 'bjerg' && Math.random() < 0.04) {
             felt.hasGoldmine = true;
-        } else if (vildmark.includes(felt.biome as string) && Math.random() < 0.008) {
+        } else if (!felt.hasPortal && vildmark.includes(felt.biome as string) && Math.random() < 0.008) {
             felt.isCampfire = true;
             felt.eventID = 'campfire';
         } else if ((felt.biome === 'by' || felt.biome === 'marked') && !felt.hasPortal) {
