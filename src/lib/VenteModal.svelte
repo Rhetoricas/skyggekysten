@@ -1,9 +1,19 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
-    import { startVenteSpil, vendKort, stopVenteSpil, lukVenteSpil, erNaesteVenteRundeGratis } from '$lib/ventespil.svelte';
+    import { VENTE_MAKS_MS, erVenteTidUdlobet, startVenteSpil, vendKort, stopVenteSpil, erNaesteVenteRundeGratis, venteTidTilbageMs } from '$lib/ventespil.svelte';
     import { erFriskAktivSpiller } from '$lib/aktivSpiller';
     
     let { kanSpilleIgen } = $props<{ kanSpilleIgen: boolean }>();
+    let nu = $state(Date.now());
+
+    onMount(() => {
+        const timer = window.setInterval(() => {
+            nu = Date.now();
+        }, 500);
+
+        return () => window.clearInterval(timer);
+    });
 
     let langsomsteDag = $derived.by(() => {
         const aktive = Object.entries(spilTilstand.alleSpillere)
@@ -30,6 +40,9 @@
     });
 
     let dageForan = $derived(Math.max(0, (spilTilstand.dag || 1) - langsomsteDag));
+    let sekunderTilbage = $derived(Math.ceil(venteTidTilbageMs(nu) / 1000));
+    let impTidUdlobet = $derived(erVenteTidUdlobet(nu));
+    let kanStarteRunde = $derived(kanSpilleIgen && !impTidUdlobet);
     let naesteRundeErGratis = $derived(erNaesteVenteRundeGratis());
     let kanBetaleNaesteRunde = $derived(naesteRundeErGratis || spilTilstand.guldTotal + spilTilstand.ventePuljeGuld >= 5);
 </script>
@@ -37,10 +50,17 @@
 <div class="vente-overlay">
     <div class="vente-content">
         <h2>Tiden står stille</h2>
+        <div class="imp-timer" class:udloebet={impTidUdlobet}>
+            {#if impTidUdlobet}
+                Impen pakker sammen efter denne runde
+            {:else}
+                Impen bliver i {sekunderTilbage} sekunder
+            {/if}
+        </div>
         <p class="vente-desc">
             Du har slået lejr <strong style="color: gold;">{dageForan} {dageForan === 1 ? 'dag' : 'dage'}</strong> foran den langsomste på øen. 
             En imp dukker pludselig op med et magisk kortspil. <br><br>
-            <strong>Regler:</strong> Du får én gratis runde pr. felt. Du kan først få en ny gratis runde, når du har flyttet dig. På samme felt kan du selv købe flere runder for 5 guld. Træk kort for at vinde guld eller helbred. Trækker du kraniet, mister du alt det, du har vundet i <em>denne</em> runde.
+            <strong>Regler:</strong> Impen bliver højst {Math.round(VENTE_MAKS_MS / 1000)} sekunder. Du får én gratis runde pr. felt. Du kan først få en ny gratis runde, når du har flyttet dig. På samme felt kan du selv købe flere runder for 5 guld. Træk kort for at vinde guld eller helbred. Trækker du kraniet, mister du alt det, du har vundet i <em>denne</em> runde.
         </p>
 
         <div class="vente-board">
@@ -83,9 +103,7 @@
                     <button class="vente-btn stop-btn" onclick={stopVenteSpil}>Stop og behold puljen</button>
                 {/if}
             {:else if spilTilstand.venteFase === 'tabt' || spilTilstand.venteFase === 'vundet' || spilTilstand.venteFase === 'venter' || spilTilstand.venteFase === 'trukket'}
-                <button class="vente-btn forlad-btn" onclick={lukVenteSpil}>Forlad bordet</button>
-
-                {#if kanSpilleIgen}
+                {#if kanStarteRunde}
                     <button
                         class="vente-btn spil-igen-btn"
                         disabled={!kanBetaleNaesteRunde}
@@ -95,7 +113,7 @@
                     </button>
                 {:else}
                     <button class="vente-btn udsolgt-btn" disabled>
-                        De andre har indhentet dig.
+                        {impTidUdlobet ? 'Impen pakker sammen.' : 'De andre er ved at pakke bordet sammen.'}
                     </button>
                 {/if}
             {/if}
@@ -114,6 +132,24 @@
         text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
     }
     .vente-content h2 { margin-top: 0; color: #ffcc00; }
+    .imp-timer {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 34px;
+        padding: 6px 14px;
+        margin-bottom: 14px;
+        border: 1px solid rgba(255, 204, 0, 0.42);
+        border-radius: 4px;
+        color: #ffe28a;
+        background: rgba(255, 204, 0, 0.08);
+        font-weight: 800;
+    }
+    .imp-timer.udloebet {
+        border-color: rgba(180, 180, 180, 0.35);
+        color: #ccc;
+        background: rgba(255, 255, 255, 0.07);
+    }
     .vente-desc { font-size: 16px; margin-bottom: 20px; color: #ccc; }
     .vente-board { display: flex; gap: 20px; justify-content: center; margin: 40px 0; flex-wrap: wrap; }
     .vente-kort { width: 160px; height: 224px; cursor: pointer; perspective: 1000px; }
@@ -145,8 +181,6 @@
     }
     .stop-btn { background: #2a4a2a; }
     .stop-btn:hover { background: #3a5a3a; }
-    .forlad-btn { background: #2a2a2a; }
-    .forlad-btn:hover { background: #3a3a3a; }
     .spil-igen-btn { background: #8b6508; }
     .spil-igen-btn:hover:not(:disabled) { background: #a67c00; }
     .spil-igen-btn:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -171,6 +205,12 @@
         .vente-desc {
             font-size: 0.9rem;
             margin-bottom: 12px;
+        }
+
+        .imp-timer {
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
         }
 
         .vente-board {

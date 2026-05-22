@@ -41,7 +41,7 @@
     import Regelbog from '$lib/Regelbog.svelte';
     import LydKnap from '$lib/LydKnap.svelte';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
-    import { lukVenteSpil } from '$lib/ventespil.svelte';
+    import { erVenteTidUdlobet, lukVenteSpil } from '$lib/ventespil.svelte';
 
     const cam = skabKamera();
     const MAX_DAGE_FORAN = 5;
@@ -57,6 +57,7 @@
     let langsomtKamera = $state(false);
     let sidsteKikkertMode = '';
     let ruteOverblikState = '';
+    let venteUrTick = $state(Date.now());
 
     function aktuelHighscoreKlasse() {
         return hentKarakterKlasseNoegle(spilTilstand.valgtKarakter);
@@ -376,23 +377,29 @@
         const venteAktiv = spilTilstand.venteSpilAktiv;
         const state = spilTilstand.gameState;
         const dag = spilTilstand.dag;
+        const ur = venteUrTick;
         const spillereStatus = Object.values(spilTilstand.alleSpillere)
             .map((spiller) => `${spiller.dag || 1}:${spiller.sidstAktiv || 0}:${spiller.isDead ? 1 : 0}:${spiller.isWinner ? 1 : 0}:${spiller.rundeSeed || ''}`)
             .join('|');
         void dag;
+        void ur;
         void spillereStatus;
 
         if (!venteAktiv || state !== 'play') return;
 
         untrack(() => {
+            if (!spilTilstand.venteStartTid) spilTilstand.venteStartTid = ur;
             const erMidtIRunde = spilTilstand.venteFase === 'spiller' || spilTilstand.venteFase === 'viser_gevinst';
-            if (!erMidtIRunde && spilTilstand.dag < hentLangsomsteDag() + MAX_DAGE_FORAN) {
+            const langsomsteHarIndhentet = spilTilstand.dag <= hentLangsomsteDag();
+            const impensTidErGaaet = erVenteTidUdlobet(ur);
+            if (!erMidtIRunde && (langsomsteHarIndhentet || impensTidErGaaet)) {
                 const puljeGuld = spilTilstand.ventePuljeGuld;
                 const puljeLiv = spilTilstand.ventePuljeLiv;
+                const aarsag = langsomsteHarIndhentet ? 'De andre har indhentet dig.' : 'Impen pakker bordet sammen.';
                 lukVenteSpil();
                 spilTilstand.logBesked = puljeGuld > 0 || puljeLiv > 0
-                    ? `De andre har indhentet dig. Du tager ${puljeGuld} guld og ${puljeLiv} HP med fra bordet.`
-                    : "De andre har indhentet dig, og impens bord forsvinder.";
+                    ? `${aarsag} Du tager ${puljeGuld} guld og ${puljeLiv} HP med fra bordet.`
+                    : `${aarsag} Du kan spille videre.`;
             }
         });
     });
@@ -694,6 +701,7 @@
         spilTilstand.gratisNaesteBevaegelse = false;
         spilTilstand.gratisBevaegelseKilde = '';
         spilTilstand.sidsteBersaerkDag = 0;
+        spilTilstand.venteFriIndtilDag = 0;
         
         nulstilKort();
 
@@ -853,6 +861,8 @@
                             spilTilstand.ventePuljeGuld = 0;
                             spilTilstand.ventePuljeLiv = 0;
                             spilTilstand.venteRunde = 0;
+                            spilTilstand.venteStartTid = 0;
+                            spilTilstand.venteFriIndtilDag = 0;
                             nulstilKort();
 
                             const { error: resetError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
@@ -896,6 +906,7 @@
                         spilTilstand.gratisNaesteBevaegelse = false;
                         spilTilstand.gratisBevaegelseKilde = '';
                         spilTilstand.sidsteBersaerkDag = 0;
+                        spilTilstand.venteFriIndtilDag = 0;
                         spilTilstand.gameState = 'select';
                         spilTilstand.statusBesked = eksisterende.isWinner
                             ? 'Den gamle tur var afsluttet. Vælg karakter for at starte rent.'
@@ -924,6 +935,7 @@
                     spilTilstand.gratisNaesteBevaegelse = eksisterende.gratisNaesteBevaegelse ?? false;
                     spilTilstand.gratisBevaegelseKilde = eksisterende.gratisBevaegelseKilde ?? '';
                     spilTilstand.sidsteBersaerkDag = eksisterende.sidsteBersaerkDag ?? 0;
+                    spilTilstand.venteFriIndtilDag = eksisterende.venteFriIndtilDag ?? 0;
 
                     afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
                     startRealtime();
@@ -989,6 +1001,8 @@
                 spilTilstand.ventePuljeGuld = 0;
                 spilTilstand.ventePuljeLiv = 0;
                 spilTilstand.venteRunde = 0;
+                spilTilstand.venteStartTid = 0;
+                spilTilstand.venteFriIndtilDag = 0;
                 if (!erLocalhost()) {
                     const dimensioner = vaelgStandardKortDimensioner();
                     saetKortDimensioner(dimensioner.bredde, dimensioner.hoejde);
@@ -1103,6 +1117,9 @@
         initAuth();
         preloadFiler();
         let genopretterForbindelse = false;
+        const venteUrTimer = window.setInterval(() => {
+            if (spilTilstand.venteSpilAktiv) venteUrTick = Date.now();
+        }, 1000);
 
         const erAktivtOnlinespil = () => spilTilstand.gameState === 'play' && !spilTilstand.offlineMode;
 
@@ -1184,6 +1201,7 @@
         })();
 
         return () => {
+            window.clearInterval(venteUrTimer);
             window.clearInterval(heartbeatTimer);
             document.removeEventListener('visibilitychange', gemHvisSkjult);
             window.removeEventListener('focus', haandterOnline);
@@ -1339,6 +1357,7 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisNaesteBevaegelse = false;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisBevaegelseKilde = '';
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].sidsteBersaerkDag = 0;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].venteFriIndtilDag = 0;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].rundeSeed = spilTilstand.rundeSeed;
         } else if (arkiveredeRuter.length > 0) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn] = {
@@ -1354,6 +1373,7 @@
                 tidligereHistorik: arkiveredeRuter,
                 isDead: false,
                 isWinner: false,
+                venteFriIndtilDag: 0,
                 sidstAktiv: 0
             };
         }
@@ -1535,6 +1555,8 @@
             spilTilstand.ventePuljeGuld = 0;
             spilTilstand.ventePuljeLiv = 0;
             spilTilstand.venteRunde = 0;
+            spilTilstand.venteStartTid = 0;
+            spilTilstand.venteFriIndtilDag = 0;
             nulstilKort();
 
             const { error } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
@@ -2309,7 +2331,7 @@ function udførBevægelse(nytIndeks: number) {
 {#if eventState.aktivt} <EventModal lukEvent={lukEventOgShop} /> {/if}
 {#if spilTilstand.aktivShop} <ShopModal lukShop={lukEventOgShop} /> {/if}
 {#if spilTilstand.aktivVaerksted} <WorkshopModal lukVaerksted={lukEventOgShop} /> {/if}
-{#if spilTilstand.venteSpilAktiv} <VenteModal kanSpilleIgen={spilTilstand.dag >= hentLangsomsteDag() + MAX_DAGE_FORAN} /> {/if}
+{#if spilTilstand.venteSpilAktiv} <VenteModal kanSpilleIgen={spilTilstand.dag > hentLangsomsteDag() && !erVenteTidUdlobet(venteUrTick)} /> {/if}
 
 {#if spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'win_map'}
     <div class="slut-panel" class:vundet={spilTilstand.gameState === 'win_map'}>

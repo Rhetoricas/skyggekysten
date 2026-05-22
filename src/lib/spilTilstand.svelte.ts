@@ -123,6 +123,8 @@ export const spilTilstand = $state({
     venteFase: 'venter' as 'venter' | 'spiller' | 'viser_gevinst' | 'tabt' | 'vundet' | 'trukket',
     sidsteVenteDag: 0,
     venteRunde: 0,
+    venteStartTid: 0,
+    venteFriIndtilDag: 0,
     venteGratisFeltBrugt: null as number | null,
     venteKort: [] as Array<{ type: string; vaerdi: number; afsloeret: boolean }>,
     gratisNaesteBevaegelse: false,

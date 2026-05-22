@@ -260,7 +260,8 @@ export async function syncTilDb(opdaterKort = false) {
         trackedeSpillere: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.trackedeSpillere || [],
         gratisNaesteBevaegelse: spilTilstand.gratisNaesteBevaegelse,
         gratisBevaegelseKilde: spilTilstand.gratisBevaegelseKilde,
-        sidsteBersaerkDag: spilTilstand.sidsteBersaerkDag
+        sidsteBersaerkDag: spilTilstand.sidsteBersaerkDag,
+        venteFriIndtilDag: spilTilstand.venteFriIndtilDag || 0
     };
     const scoreData = {
         ...mig,

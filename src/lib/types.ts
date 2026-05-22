@@ -78,6 +78,7 @@ export interface SpillerData {
     gratisNaesteBevaegelse?: boolean;
     gratisBevaegelseKilde?: '' | 'mad' | 'bersaerk';
     sidsteBersaerkDag?: number;
+    venteFriIndtilDag?: number;
 }
 
 export interface GravstenMinde {

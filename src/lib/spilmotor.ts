@@ -804,7 +804,8 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
         return false;
     }
 
-    if (spilTilstand.dag >= options.langsomsteDag + options.maxDageForan) {
+    const venteFredet = (spilTilstand.venteFriIndtilDag || 0) > (spilTilstand.dag || 1);
+    if (!venteFredet && spilTilstand.dag >= options.langsomsteDag + options.maxDageForan) {
         spilTilstand.logBesked = 'Du må vente på de andre spillere.';
         startVenteSpil(false);
         return false;

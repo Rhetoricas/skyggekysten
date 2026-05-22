@@ -1,8 +1,20 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb } from './netvaerk';
 
+export const VENTE_MAKS_MS = 60 * 1000;
+export const VENTE_FRI_DAGE = 5;
+
 let rundeGuld = 0;
 let rundeLiv = 0;
+
+export function venteTidTilbageMs(now = Date.now()) {
+    const startTid = spilTilstand.venteStartTid || now;
+    return Math.max(0, VENTE_MAKS_MS - (now - startTid));
+}
+
+export function erVenteTidUdlobet(now = Date.now()) {
+    return spilTilstand.venteSpilAktiv && venteTidTilbageMs(now) <= 0;
+}
 
 export function delNyeKort() {
     const typer = ['slut'];
@@ -36,6 +48,18 @@ export function erNaesteVenteRundeGratis() {
 }
 
 export function startVenteSpil(kosterPenge: boolean = false) {
+    if (!spilTilstand.venteSpilAktiv || !spilTilstand.venteStartTid) {
+        spilTilstand.venteStartTid = Date.now();
+    }
+
+    if (erVenteTidUdlobet()) {
+        spilTilstand.venteSpilAktiv = true;
+        spilTilstand.venteFase = 'venter';
+        spilTilstand.logBesked = "Impen pakker bordet sammen. Du kan ikke starte flere ventespilsrunder.";
+        syncTilDb();
+        return;
+    }
+
     const foersteRunde = erNaesteVenteRundeGratis();
     const skalBetale = !foersteRunde && kosterPenge;
 
@@ -158,8 +182,13 @@ export function stopVenteSpil() {
 export function lukVenteSpil() {
     udbetalPulje();
 
+    spilTilstand.venteFriIndtilDag = Math.max(spilTilstand.venteFriIndtilDag || 0, (spilTilstand.dag || 1) + VENTE_FRI_DAGE);
+    const mig = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
+    if (mig) mig.venteFriIndtilDag = spilTilstand.venteFriIndtilDag;
+
     spilTilstand.venteSpilAktiv = false;
     spilTilstand.venteRunde = 0;
+    spilTilstand.venteStartTid = 0;
     spilTilstand.venteFase = 'venter';
     syncTilDb();
 }
