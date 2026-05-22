@@ -723,12 +723,12 @@ export async function hentHighscores(karakterKlasse?: string | null) {
             erVinder: score.erVinder,
             erDoed: score.erDoed,
             dage: score.dage,
-        guld: score.guld,
-        maxKolonne: score.maxKolonne,
-        kendteFelter: score.kendteFelter,
-        miner: score.miner,
-        antalSpillere: score.antalSpillere
-    }));
+            guld: score.guld,
+            maxKolonne: score.maxKolonne,
+            kendteFelter: score.kendteFelter,
+            miner: score.miner,
+            antalSpillere: score.antalSpillere
+        }));
     }
 
     let query = supabase

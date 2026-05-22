@@ -436,11 +436,13 @@
         const state = spilTilstand.gameState;
         const dag = spilTilstand.dag;
         const ur = venteUrTick;
+        const iTaagen = erITågen;
         const spillereStatus = Object.values(spilTilstand.alleSpillere)
             .map((spiller) => `${spiller.dag || 1}:${spiller.sidstAktiv || 0}:${spiller.isDead ? 1 : 0}:${spiller.isWinner ? 1 : 0}:${spiller.rundeSeed || ''}`)
             .join('|');
         void dag;
         void ur;
+        void iTaagen;
         void spillereStatus;
 
         if (!venteAktiv || state !== 'play') return;
@@ -450,6 +452,15 @@
             const erMidtIRunde = spilTilstand.venteFase === 'spiller' || spilTilstand.venteFase === 'viser_gevinst';
             const langsomsteHarIndhentet = spilTilstand.dag <= hentLangsomsteDag();
             const impensTidErGaaet = erVenteTidUdlobet(ur);
+            if (iTaagen) {
+                const puljeGuld = spilTilstand.ventePuljeGuld;
+                const puljeLiv = spilTilstand.ventePuljeLiv;
+                lukVenteSpil();
+                spilTilstand.logBesked = puljeGuld > 0 || puljeLiv > 0
+                    ? `Tågen vælter ind over lejren. Impen river kortene til sig og forsvinder. Du tager ${puljeGuld} guld og ${puljeLiv} HP med fra bordet.`
+                    : 'Tågen vælter ind over lejren. Impen river kortene til sig og forsvinder.';
+                return;
+            }
             if (!erMidtIRunde && (langsomsteHarIndhentet || impensTidErGaaet)) {
                 const puljeGuld = spilTilstand.ventePuljeGuld;
                 const puljeLiv = spilTilstand.ventePuljeLiv;
