@@ -846,12 +846,13 @@ export async function hentGlobalTopScore(karakterKlasse?: string | null) {
 }
 
 let sub: RealtimeChannel | null = null;
-export function startRealtime() {
+export function startRealtime(forceReconnect = false) {
     if (spilTilstand.offlineMode) return;
     if (!spilTilstand.rumKode) return;
     const aktivRumKode = spilTilstand.rumKode;
     const aktivKanalNoegle = realtimeRumNoegle(aktivRumKode);
 
+    if (forceReconnect && sub) stopRealtime();
     if (sub && subRumKode === aktivKanalNoegle) return;
     if (sub) stopRealtime();
 

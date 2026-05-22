@@ -1220,6 +1220,10 @@
         }, 1000);
 
         const erAktivtOnlinespil = () => spilTilstand.gameState === 'play' && !spilTilstand.offlineMode;
+        const harOnlineSession = () => {
+            if (spilTilstand.offlineMode || !spilTilstand.rumKode || !spilTilstand.spillerNavn) return false;
+            return ['play', 'win', 'win_map', 'dead', 'dead_map'].includes(spilTilstand.gameState);
+        };
 
         const heartbeat = async () => {
             if (spilTilstand.offlineMode && spilTilstand.gameState === 'play') {
@@ -1227,17 +1231,22 @@
                 return;
             }
 
-            if (!erAktivtOnlinespil()) return;
+            if (!harOnlineSession()) return;
 
             if (browser && !navigator.onLine) {
                 spilTilstand.statusBesked = 'Forbindelsen er afbrudt. Spillet fortsætter lokalt indtil videre.';
                 return;
             }
 
-            await syncTilDb(false);
-            const gemt = await flushVentendeSync();
-            if (!gemt) {
-                spilTilstand.statusBesked = spilTilstand.statusBesked || 'Forbindelsen til øen driller. Spillet prøver igen.';
+            if (erAktivtOnlinespil()) {
+                startRealtime();
+                await syncTilDb(false);
+                const gemt = await flushVentendeSync();
+                if (!gemt) {
+                    spilTilstand.statusBesked = spilTilstand.statusBesked || 'Forbindelsen til øen driller. Spillet prøver igen.';
+                }
+            } else {
+                startRealtime(true);
             }
         };
 
@@ -1249,7 +1258,7 @@
                 return;
             }
 
-            if (!erAktivtOnlinespil()) return;
+            if (!harOnlineSession()) return;
 
             genopretterForbindelse = true;
             try {
@@ -1275,14 +1284,14 @@
             void genopretForbindelse();
         };
         const haandterOffline = () => {
-            if (erAktivtOnlinespil()) {
+            if (harOnlineSession()) {
                 spilTilstand.statusBesked = 'Forbindelsen er afbrudt. Spillet fortsætter lokalt indtil videre.';
             }
         };
 
         const heartbeatTimer = window.setInterval(() => {
             void heartbeat();
-        }, 60 * 1000);
+        }, 30 * 1000);
 
         document.addEventListener('visibilitychange', gemHvisSkjult);
         window.addEventListener('focus', haandterOnline);
