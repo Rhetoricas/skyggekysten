@@ -386,9 +386,15 @@
             <span>{hentPointSpec().minePoint}</span>
         </div>
         <div class="kvittering-linje"><span>Udstyr:</span> <span>{hentPointSpec().udstyrPoint}</span></div>
-        <div class="kvittering-skiller"></div>
-        <div class="kvittering-linje mult"><span>Helbreds-bonus (HP):</span> <span>x {hentPointSpec().hpMult.toFixed(3)}</span></div>
-        <div class="kvittering-linje mult"><span>Multiplayer:</span> <span>x {hentPointSpec().multiplayerModifier.toFixed(1)}</span></div>
+        {#if hentPointSpec().hpMult > 1 || hentPointSpec().multiplayerModifier > 1}
+            <div class="kvittering-skiller"></div>
+        {/if}
+        {#if hentPointSpec().hpMult > 1}
+            <div class="kvittering-linje mult"><span>Helbreds-bonus (HP):</span> <span>x {hentPointSpec().hpMult.toFixed(3)}</span></div>
+        {/if}
+        {#if hentPointSpec().multiplayerModifier > 1}
+            <div class="kvittering-linje mult"><span>Multiplayer:</span> <span>x {hentPointSpec().multiplayerModifier.toFixed(1)}</span></div>
+        {/if}
         <div class="kvittering-total"><span>Total Score:</span> <span>{spilTilstand.samletScore}</span></div>
     </div>
 {/snippet}
