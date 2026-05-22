@@ -1,5 +1,6 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
+import { taelScoreSpillere } from './score';
 import type { Karakter } from './types';
 import { hentKarakterNavneIKlasse } from './spildata';
 
@@ -19,6 +20,7 @@ export interface OfflineScore {
     maxKolonne?: number;
     kendteFelter?: number;
     miner?: number;
+    antalSpillere?: number;
 }
 
 interface OfflineSnapshot {
@@ -194,7 +196,8 @@ export function gemOfflineScore(force = false) {
         guld: spilTilstand.guldTotal,
         maxKolonne: spilTilstand.maxKolonne,
         kendteFelter: spilTilstand.mineKendteFelter?.length || 0,
-        miner: spilTilstand.gitter.filter(felt => felt.hasGoldmine && felt.mineOwner === spilTilstand.spillerNavn).length
+        miner: spilTilstand.gitter.filter(felt => felt.hasGoldmine && felt.mineOwner === spilTilstand.spillerNavn).length,
+        antalSpillere: taelScoreSpillere(spilTilstand.alleSpillere)
     };
 
     scores.push(score);

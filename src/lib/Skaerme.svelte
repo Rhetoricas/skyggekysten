@@ -22,6 +22,7 @@
         maxKolonne?: number;
         kendteFelter?: number;
         miner?: number;
+        antalSpillere?: number;
     };
 
     type LokalScore = HighscoreDetaljer & { navn: string; score: number; karakter?: string };
@@ -213,7 +214,7 @@
 
     function harHighscoreDetaljer(score: HighscoreDetaljer | null) {
         if (!score) return false;
-        return [score.dage, score.guld, score.maxKolonne, score.kendteFelter, score.miner].some(v => v !== undefined && v !== null);
+        return [score.dage, score.guld, score.maxKolonne, score.kendteFelter, score.miner, score.antalSpillere].some(v => v !== undefined && v !== null);
     }
 
     function talEllerUkendt(v?: number) {
@@ -239,6 +240,11 @@
     function highscoreMineBasis(score: HighscoreDetaljer) {
         if (score.miner === undefined || score.miner === null) return null;
         return score.miner * 100;
+    }
+
+    function highscoreSpillerAntal(score: HighscoreDetaljer) {
+        if (score.antalSpillere === undefined || score.antalSpillere === null) return 'Ukendt';
+        return score.antalSpillere <= 1 ? 'Solo' : `Multiplayer (${score.antalSpillere})`;
     }
 
     async function hentOgVisHighscoreDetaljer(id?: number) {
@@ -525,6 +531,7 @@
                         <div><span>Fremdrift</span><strong>{highscoreFremdrift(valgtHighscore) ?? 'Ukendt'}</strong></div>
                         <div><span>Udforskning</span><strong>{highscoreUdforskning(valgtHighscore) ?? 'Ukendt'}</strong></div>
                         <div><span>Miner</span><strong>{valgtHighscore.miner ?? 'Ukendt'}</strong></div>
+                        <div><span>Spilform</span><strong>{highscoreSpillerAntal(valgtHighscore)}</strong></div>
                     </div>
                     {#if highscoreMineBasis(valgtHighscore) !== null}
                         <p class="highscore-detail-note">Minerne svarer til {highscoreMineBasis(valgtHighscore)} basispoint før multiplayer-bonus.</p>

@@ -2,7 +2,7 @@ import { supabase } from './supabaseClient';
 import { spilTilstand } from './spilTilstand.svelte';
 import { authState } from './auth.svelte';
 import { gemOfflineScore, gemOfflineSpil, hentOfflineScores } from './offlineStorage';
-import { beregnSpillerScore } from './score';
+import { beregnSpillerScore, taelScoreSpillere } from './score';
 import { KORT_VERSION } from './kortDimensioner';
 import { hentKarakterNavneIKlasse } from './spildata';
 import type { RealtimeChannel } from '@supabase/supabase-js';
@@ -41,6 +41,7 @@ type ScoreRaekke = {
     max_column?: number;
     known_fields_count?: number;
     mines_owned?: number;
+    player_count?: number;
 };
 
 type HighscorePayload = {
@@ -56,6 +57,7 @@ type HighscorePayload = {
     max_column: number;
     known_fields_count: number;
     mines_owned: number;
+    player_count: number;
     final_log: string;
 };
 
@@ -102,6 +104,7 @@ function highscorePendingId(payload: HighscorePayload) {
         payload.max_column,
         payload.known_fields_count,
         payload.mines_owned,
+        payload.player_count,
         payload.is_winner ? 'w' : 'nw',
         payload.is_dead ? 'd' : 'nd'
     ].join('|');
@@ -453,6 +456,7 @@ export async function gemHighscore() {
         return true;
     }
     const minePoint = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
+    const antalSpillere = taelScoreSpillere(spilTilstand.alleSpillere);
     const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
     const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map';
     const lavPayload = (userId?: string): HighscorePayload => ({
@@ -468,6 +472,7 @@ export async function gemHighscore() {
         max_column: spilTilstand.maxKolonne,
         known_fields_count: spilTilstand.mineKendteFelter?.length || 0,
         mines_owned: minePoint,
+        player_count: antalSpillere,
         final_log: spilTilstand.logBesked
     });
 
@@ -718,11 +723,12 @@ export async function hentHighscores(karakterKlasse?: string | null) {
             erVinder: score.erVinder,
             erDoed: score.erDoed,
             dage: score.dage,
-            guld: score.guld,
-            maxKolonne: score.maxKolonne,
-            kendteFelter: score.kendteFelter,
-            miner: score.miner
-        }));
+        guld: score.guld,
+        maxKolonne: score.maxKolonne,
+        kendteFelter: score.kendteFelter,
+        miner: score.miner,
+        antalSpillere: score.antalSpillere
+    }));
     }
 
     let query = supabase
@@ -794,7 +800,7 @@ export async function hentHighscoreDetaljer(id: number) {
 
     const { data, error } = await supabase
         .from('game_results')
-        .select('is_winner, is_dead, days, gold, max_column, known_fields_count, mines_owned')
+        .select('is_winner, is_dead, days, gold, max_column, known_fields_count, mines_owned, player_count')
         .eq('id', id)
         .single();
 
@@ -810,7 +816,8 @@ export async function hentHighscoreDetaljer(id: number) {
         guld: data.gold,
         maxKolonne: data.max_column,
         kendteFelter: data.known_fields_count,
-        miner: data.mines_owned
+        miner: data.mines_owned,
+        antalSpillere: data.player_count
     };
 }
 

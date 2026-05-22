@@ -27,6 +27,7 @@ create table if not exists public.game_results (
     max_column integer not null default 0,
     known_fields_count integer not null default 0,
     mines_owned integer not null default 0,
+    player_count integer not null default 1,
     final_log text,
     game_mode text not null default 'open' check (game_mode in ('open', 'offline')),
     created_at timestamptz not null default now()
@@ -35,6 +36,9 @@ create table if not exists public.game_results (
 alter table public.game_results
 add column if not exists game_mode text not null default 'open'
 check (game_mode in ('open', 'offline'));
+
+alter table public.game_results
+add column if not exists player_count integer not null default 1;
 
 do $$
 declare
