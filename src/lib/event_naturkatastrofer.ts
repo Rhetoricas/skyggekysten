@@ -138,6 +138,11 @@ export const naturkatastrofeEvents: Record<string, SpilEvent> = {
                 effekt: () => udvindMeteorSkat('oekse')
             },
             {
+                tekst: 'Knus skallen med køllen',
+                kosterItem: 'koelle',
+                effekt: () => udvindMeteorSkat('koelle')
+            },
+            {
                 tekst: 'Brug sværdet som brækjern',
                 kosterItem: 'svaerd',
                 effekt: () => udvindMeteorSkat('svaerd')

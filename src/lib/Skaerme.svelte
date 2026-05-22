@@ -8,11 +8,25 @@
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
     import LydKnap from '$lib/LydKnap.svelte';
+    import { hentHighscoreDetaljer } from '$lib/netvaerk';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
     import type { Karakter } from '$lib/types';
 
-    type GlobalScore = { spillerNavn: string; oeNavn: string; point: number; karakter?: string };
+    type HighscoreDetaljer = {
+        id?: number;
+        erVinder?: boolean;
+        erDoed?: boolean;
+        dage?: number;
+        guld?: number;
+        maxKolonne?: number;
+        kendteFelter?: number;
+        miner?: number;
+    };
+
+    type LokalScore = HighscoreDetaljer & { navn: string; score: number; karakter?: string };
+    type GlobalScore = HighscoreDetaljer & { spillerNavn: string; oeNavn: string; point: number; karakter?: string };
+    type ValgtHighscore = HighscoreDetaljer & { navn: string; point: number; karakter?: string; oeNavn?: string; henterDetaljer?: boolean };
 
     let {
         opretEllerDeltag,
@@ -37,7 +51,7 @@
         bekræftValg: (k: Karakter) => void;
         genstartBane: () => void;
         nulstilHukommelse: () => void;
-        lokaleScores: Array<{ navn: string; score: number; karakter?: string }>;
+        lokaleScores: LokalScore[];
         klasseScores: GlobalScore[];
         globaleScores: GlobalScore[];
         nyGlobalRekord: boolean;
@@ -59,6 +73,7 @@
     let visLokaleTestKnapper = $state(false);
     let globalHighscoreSide = $state(0);
     let klasseHighscoreSide = $state(0);
+    let valgtHighscore = $state<ValgtHighscore | null>(null);
     const HIGHSCORE_SIDE_STOERRELSE = 10;
     const lokaleKortPresets = [
         { label: '20 x 20', bredde: 20, hoejde: 20 },
@@ -172,6 +187,69 @@
     function highscoreSide(scores: GlobalScore[], side: number): GlobalScore[] {
         const start = highscoreSideStart(side, scores);
         return scores.slice(start, start + HIGHSCORE_SIDE_STOERRELSE);
+    }
+
+    async function aabnGlobalHighscore(score: GlobalScore) {
+        valgtHighscore = {
+            ...score,
+            navn: score.spillerNavn,
+            point: score.point,
+            oeNavn: score.oeNavn,
+            henterDetaljer: !!score.id && !harHighscoreDetaljer(score)
+        };
+        await hentOgVisHighscoreDetaljer(score.id);
+    }
+
+    async function aabnLokalHighscore(score: LokalScore) {
+        valgtHighscore = {
+            ...score,
+            navn: score.navn,
+            point: score.score,
+            oeNavn: spilTilstand.rumKode,
+            henterDetaljer: !!score.id && !harHighscoreDetaljer(score)
+        };
+        await hentOgVisHighscoreDetaljer(score.id);
+    }
+
+    function harHighscoreDetaljer(score: HighscoreDetaljer | null) {
+        if (!score) return false;
+        return [score.dage, score.guld, score.maxKolonne, score.kendteFelter, score.miner].some(v => v !== undefined && v !== null);
+    }
+
+    function talEllerUkendt(v?: number) {
+        return v === undefined || v === null ? 'Ukendt' : `${v}`;
+    }
+
+    function highscoreStatus(score: HighscoreDetaljer) {
+        if (score.erVinder) return 'Sluppet væk';
+        if (score.erDoed) return 'Død';
+        return 'Ukendt';
+    }
+
+    function highscoreFremdrift(score: HighscoreDetaljer) {
+        if (score.maxKolonne === undefined || score.maxKolonne === null) return null;
+        return beregnFremdriftPoint(score.maxKolonne, !!score.erVinder, spilTilstand.kortBredde);
+    }
+
+    function highscoreUdforskning(score: HighscoreDetaljer) {
+        if (score.kendteFelter === undefined || score.kendteFelter === null) return null;
+        return score.kendteFelter * 2;
+    }
+
+    function highscoreMineBasis(score: HighscoreDetaljer) {
+        if (score.miner === undefined || score.miner === null) return null;
+        return score.miner * 100;
+    }
+
+    async function hentOgVisHighscoreDetaljer(id?: number) {
+        if (!id) return;
+        const detaljer = await hentHighscoreDetaljer(id);
+        if (!detaljer || valgtHighscore?.id !== id) return;
+        valgtHighscore = {
+            ...valgtHighscore,
+            ...detaljer,
+            henterDetaljer: false
+        };
     }
 
     function naesteGlobalHighscoreSide() {
@@ -419,6 +497,47 @@
     {/if}
 {/snippet}
 
+{#snippet highscoreDetaljeModal()}
+    {#if valgtHighscore}
+        <div class="highscore-detail-overlay" role="presentation">
+            <button type="button" class="highscore-detail-backdrop" onclick={() => valgtHighscore = null} aria-label="Luk scoreopgørelse"></button>
+            <div class="highscore-detail-modal" role="dialog" aria-modal="true" aria-labelledby="highscore-detail-title" tabindex="-1">
+                <div class="highscore-detail-header">
+                    <div>
+                        <h2 id="highscore-detail-title">{formaterNavn(valgtHighscore.navn)}</h2>
+                        <p>{valgtHighscore.karakter || 'Ukendt'}{valgtHighscore.oeNavn ? `, ${formaterNavn(valgtHighscore.oeNavn)}` : ''}</p>
+                    </div>
+                    <button type="button" onclick={() => valgtHighscore = null}>Luk</button>
+                </div>
+
+                <div class="highscore-detail-total">
+                    <span>Total score</span>
+                    <strong>{valgtHighscore.point}</strong>
+                </div>
+
+                {#if valgtHighscore.henterDetaljer}
+                    <p class="highscore-detail-note">Henter opgørelse...</p>
+                {:else if harHighscoreDetaljer(valgtHighscore)}
+                    <div class="highscore-detail-grid">
+                        <div><span>Status</span><strong>{highscoreStatus(valgtHighscore)}</strong></div>
+                        <div><span>Dage</span><strong>{talEllerUkendt(valgtHighscore.dage)}</strong></div>
+                        <div><span>Guld</span><strong>{talEllerUkendt(valgtHighscore.guld)}</strong></div>
+                        <div><span>Fremdrift</span><strong>{highscoreFremdrift(valgtHighscore) ?? 'Ukendt'}</strong></div>
+                        <div><span>Udforskning</span><strong>{highscoreUdforskning(valgtHighscore) ?? 'Ukendt'}</strong></div>
+                        <div><span>Miner</span><strong>{valgtHighscore.miner ?? 'Ukendt'}</strong></div>
+                    </div>
+                    {#if highscoreMineBasis(valgtHighscore) !== null}
+                        <p class="highscore-detail-note">Minerne svarer til {highscoreMineBasis(valgtHighscore)} basispoint før multiplayer-bonus.</p>
+                    {/if}
+                    <p class="highscore-detail-note">Highscore gemmer nøgletal. Udstyr, HP og alle bonusser kan derfor ikke altid genskabes præcist her.</p>
+                {:else}
+                    <p class="highscore-detail-note">Denne score er gemt før detaljeopgørelsen, så kun totalscoren er tilgængelig.</p>
+                {/if}
+            </div>
+        </div>
+    {/if}
+{/snippet}
+
 {#snippet scoreGemStatus()}
     {#if scoreGemmer || scoreGemningFejlet}
         <div class="score-save-status" class:fejl={scoreGemningFejlet}>
@@ -453,16 +572,18 @@
     <div class="tavle">
         <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
-            <h3>Top {sideStart + 1}-{highscoreSideSlut(globalHighscoreSide, globaleScores)} global</h3>
+            <h3>Top 100 global</h3>
             {#if globaleScores.length === 0}
                 <p class="tom-liste">Ingen data endnu</p>
             {:else}
                 <ol start={sideStart + 1}>
                     {#each highscoreSide(globaleScores, globalHighscoreSide) as score, i (sideStart + i)}
                         <li>
-                            <span class="placering">{sideStart + i + 1}.</span>
-                            <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
-                            <span class="point">{score.point}</span>
+                            <button type="button" class="highscore-række" onclick={() => aabnGlobalHighscore(score)} aria-label={`Vis scoreopgørelse for ${score.spillerNavn}`}>
+                                <span class="placering">{sideStart + i + 1}.</span>
+                                <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
+                                <span class="point">{score.point}</span>
+                            </button>
                         </li>
                     {/each}
                 </ol>
@@ -481,16 +602,18 @@
     <div class="tavle klasse-tavle">
         <img src="/screens/boardglobal.webp" alt="Karakterklasse tavle" class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
-            <h3>Top {sideStart + 1}-{highscoreSideSlut(klasseHighscoreSide, klasseScores)} {highscoreKlasseNavn()}</h3>
+            <h3>Top 100 {highscoreKlasseNavn()}</h3>
             {#if klasseScores.length === 0}
                 <p class="tom-liste">Ingen data endnu</p>
             {:else}
                 <ol start={sideStart + 1}>
                     {#each highscoreSide(klasseScores, klasseHighscoreSide) as score, i (sideStart + i)}
                         <li>
-                            <span class="placering">{sideStart + i + 1}.</span>
-                            <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
-                            <span class="point">{score.point}</span>
+                            <button type="button" class="highscore-række" onclick={() => aabnGlobalHighscore(score)} aria-label={`Vis scoreopgørelse for ${score.spillerNavn}`}>
+                                <span class="placering">{sideStart + i + 1}.</span>
+                                <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
+                                <span class="point">{score.point}</span>
+                            </button>
                         </li>
                     {/each}
                 </ol>
@@ -682,8 +805,10 @@
                             <ol>
                                 {#each lokaleScores as hs, i (i)}
                                     <li>
-                                        <span class="navn">{formaterHighscoreNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
-                                        <span class="point">{hs.score}</span>
+                                        <button type="button" class="highscore-række" onclick={() => aabnLokalHighscore(hs)} aria-label={`Vis scoreopgørelse for ${hs.navn}`}>
+                                            <span class="navn">{formaterHighscoreNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
+                                            <span class="point">{hs.score}</span>
+                                        </button>
                                     </li>
                                 {/each}
                             </ol>
@@ -755,8 +880,10 @@
                             <ol>
                                 {#each lokaleScores as hs, i (i)}
                                     <li>
-                                        <span class="navn">{formaterHighscoreNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
-                                        <span class="point">{hs.score}</span>
+                                        <button type="button" class="highscore-række" onclick={() => aabnLokalHighscore(hs)} aria-label={`Vis scoreopgørelse for ${hs.navn}`}>
+                                            <span class="navn">{formaterHighscoreNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
+                                            <span class="point">{hs.score}</span>
+                                        </button>
                                     </li>
                                 {/each}
                             </ol>
@@ -780,6 +907,7 @@
 {/if}
 
 {@render profilModal()}
+{@render highscoreDetaljeModal()}
 
 <style>
     .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: #1a1a1a; display: flex; align-items: flex-start; justify-content: center; z-index: 1000; font-family: system-ui, -apple-system, sans-serif; overflow-y: auto; padding: calc(env(safe-area-inset-top, 0px) + 18px) 18px calc(env(safe-area-inset-bottom, 0px) + 18px); box-sizing: border-box; -webkit-overflow-scrolling: touch; }
@@ -1142,7 +1270,27 @@
     .tavle-indhold { position: absolute; width: 76%; left: 12%; top: 12%; color: #eee; }
     .tavle-indhold h3 { color: #fff; font-size: 1rem; text-align: center; font-family: 'Cinzel', serif; margin-top: 0;}
     .tavle-indhold ol { padding: 0; list-style: none; }
-    .tavle-indhold li { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 5px 0; font-size: 0.85rem; }
+    .tavle-indhold li { border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 0; font-size: 0.85rem; }
+    .highscore-række {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 6px;
+        align-items: baseline;
+        background: transparent;
+        border: 0;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        padding: 5px 0;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .highscore-række:hover,
+    .highscore-række:focus-visible {
+        background: rgba(245, 208, 113, 0.11);
+        outline: none;
+    }
     .tavle-indhold .navn { flex: 1; min-width: 0; }
     .tavle-indhold .point { font-variant-numeric: tabular-nums; }
     .placering { color: #b8aa86; min-width: 24px; text-align: right; font-variant-numeric: tabular-nums; }
@@ -1156,6 +1304,110 @@
     .highscore-naeste:hover { background: rgba(245, 208, 113, 0.14); }
     .karakter-navn { color: #9aa69d; font-size: 0.75rem; }
     .status { color: #ccc; margin-top: 15px; }
+
+    .highscore-detail-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1400;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        box-sizing: border-box;
+    }
+    .highscore-detail-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.72);
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+    }
+    .highscore-detail-modal {
+        position: relative;
+        z-index: 1;
+        width: min(430px, 100%);
+        background: #191919;
+        color: #eee;
+        border: 1px solid rgba(245, 208, 113, 0.35);
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 22px 70px rgba(0, 0, 0, 0.55);
+        font-family: system-ui, -apple-system, sans-serif;
+    }
+    .highscore-detail-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+        margin-bottom: 16px;
+    }
+    .highscore-detail-header h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        color: #fff;
+        font-family: 'Cinzel', serif;
+    }
+    .highscore-detail-header p {
+        margin: 4px 0 0;
+        color: #aeb8b0;
+    }
+    .highscore-detail-header button {
+        background: #2b2b2b;
+        color: #eee;
+        border: 1px solid #555;
+        border-radius: 6px;
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+    .highscore-detail-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 12px 0;
+        margin-bottom: 14px;
+    }
+    .highscore-detail-total span {
+        color: #c8c0aa;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+    }
+    .highscore-detail-total strong {
+        color: #f5d071;
+        font-size: 1.8rem;
+        font-variant-numeric: tabular-nums;
+    }
+    .highscore-detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+    .highscore-detail-grid div {
+        background: rgba(255, 255, 255, 0.055);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 6px;
+        padding: 10px;
+        min-width: 0;
+    }
+    .highscore-detail-grid span {
+        display: block;
+        color: #aeb8b0;
+        font-size: 0.78rem;
+        margin-bottom: 4px;
+    }
+    .highscore-detail-grid strong {
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+    }
+    .highscore-detail-note {
+        color: #cfc8b7;
+        font-size: 0.9rem;
+        line-height: 1.35;
+        margin: 12px 0 0;
+    }
 
     .screen-top-actions {
         position: fixed;

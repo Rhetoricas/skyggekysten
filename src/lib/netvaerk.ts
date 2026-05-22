@@ -29,10 +29,18 @@ export function realtimeRumNoegle(rumKode: string) {
 }
 
 type ScoreRaekke = {
+    id?: number;
     player_name: string;
     room_code?: string;
     score: number;
     character?: string;
+    is_winner?: boolean;
+    is_dead?: boolean;
+    days?: number;
+    gold?: number;
+    max_column?: number;
+    known_fields_count?: number;
+    mines_owned?: number;
 };
 
 type HighscorePayload = {
@@ -590,10 +598,18 @@ function formaterTopScores(data: ScoreRaekke[] | null | undefined, antal = 10) {
         if (!fundne.has(noegle)) {
             fundne.add(noegle);
             unikke.push({
+                id: raekke.id,
                 spillerNavn: raekke.player_name,
                 oeNavn: raekke.room_code || '',
                 point: raekke.score,
-                karakter: raekke.character
+                karakter: raekke.character,
+                erVinder: raekke.is_winner,
+                erDoed: raekke.is_dead,
+                dage: raekke.days,
+                guld: raekke.gold,
+                maxKolonne: raekke.max_column,
+                kendteFelter: raekke.known_fields_count,
+                miner: raekke.mines_owned
             });
             if (unikke.length === antal) break;
         }
@@ -607,13 +623,20 @@ export async function hentHighscores(karakterKlasse?: string | null) {
         return hentOfflineScores(spilTilstand.rumKode, karakterKlasse).slice(0, 10).map((score) => ({
             navn: score.navn,
             score: score.score,
-            karakter: score.karakter
+            karakter: score.karakter,
+            erVinder: score.erVinder,
+            erDoed: score.erDoed,
+            dage: score.dage,
+            guld: score.guld,
+            maxKolonne: score.maxKolonne,
+            kendteFelter: score.kendteFelter,
+            miner: score.miner
         }));
     }
 
     let query = supabase
         .from('game_results')
-        .select('player_name, score, character')
+        .select('id, player_name, score, character')
         .eq('room_code', spilTilstand.rumKode);
 
     if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
@@ -636,6 +659,7 @@ export async function hentHighscores(karakterKlasse?: string | null) {
         if (!fundne.has(noegle)) {
             fundne.add(noegle);
             unikke.push({
+                id: raekke.id,
                 navn: raekke.player_name,
                 score: raekke.score,
                 karakter: raekke.character
@@ -656,7 +680,7 @@ export async function hentGlobalTopHundrede(karakterKlasse?: string | null) {
 
     let query = supabase
         .from('game_results')
-        .select('player_name, room_code, score, character');
+        .select('id, player_name, room_code, score, character');
 
     if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
 
@@ -672,6 +696,31 @@ export async function hentGlobalTopHundrede(karakterKlasse?: string | null) {
     });
 
     return formaterTopScores(data, 100);
+}
+
+export async function hentHighscoreDetaljer(id: number) {
+    if (spilTilstand.offlineMode) return null;
+
+    const { data, error } = await supabase
+        .from('game_results')
+        .select('is_winner, is_dead, days, gold, max_column, known_fields_count, mines_owned')
+        .eq('id', id)
+        .single();
+
+    if (error || !data) {
+        console.warn('Kunne ikke hente highscore-detaljer', error);
+        return null;
+    }
+
+    return {
+        erVinder: data.is_winner,
+        erDoed: data.is_dead,
+        dage: data.days,
+        guld: data.gold,
+        maxKolonne: data.max_column,
+        kendteFelter: data.known_fields_count,
+        miner: data.mines_owned
+    };
 }
 
 export async function hentGlobalTopScore(karakterKlasse?: string | null) {

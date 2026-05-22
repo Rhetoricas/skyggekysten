@@ -12,6 +12,13 @@ export interface OfflineScore {
     karakter?: string;
     oeNavn: string;
     createdAt: string;
+    erVinder?: boolean;
+    erDoed?: boolean;
+    dage?: number;
+    guld?: number;
+    maxKolonne?: number;
+    kendteFelter?: number;
+    miner?: number;
 }
 
 interface OfflineSnapshot {
@@ -180,7 +187,14 @@ export function gemOfflineScore(force = false) {
         score: spilTilstand.samletScore,
         karakter: spilTilstand.valgtKarakter?.navn,
         oeNavn: spilTilstand.rumKode,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        erVinder: spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map',
+        erDoed: spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map',
+        dage: spilTilstand.dag,
+        guld: spilTilstand.guldTotal,
+        maxKolonne: spilTilstand.maxKolonne,
+        kendteFelter: spilTilstand.mineKendteFelter?.length || 0,
+        miner: spilTilstand.gitter.filter(felt => felt.hasGoldmine && felt.mineOwner === spilTilstand.spillerNavn).length
     };
 
     scores.push(score);

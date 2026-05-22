@@ -161,7 +161,7 @@
                         <li>Subevents er fortsættelser af samme event og bliver ikke trukket som almindelige events.</li>
                         <li>Hvis et event kræver eller bruger en almindelig genstand, kan en opgraderet version ofte tælle som samme type. Betales den, ryger den opgraderede genstand også.</li>
                         <li>Stormøksen forbedrer øksevalg i events med mere guld og mindre skade. Falkebuen forbedrer buevalg og afslører tre felter mod øst efter skuddet.</li>
-                        <li>Meteorstenen kan åbnes med hænderne eller med udstyr. Mesterskovlen giver 600 guld og en diamant, men skovlen går tabt i stenen.</li>
+                        <li>Meteorstenen kan åbnes med hænderne eller med udstyr som skovl, økse, kølle og sværd. Mesterskovlen giver 600 guld og en diamant, men skovlen går tabt i stenen.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Et jordskælv kan gøre en eng til bjerg eller ruin. Hvis der lå en guldmine, butik, båd eller et værksted på feltet, er det væk bagefter. Et eventvalg kan altså være godt for dig her og nu, men dyrt for kortet.</p>
                 </section>
