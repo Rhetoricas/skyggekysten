@@ -385,13 +385,14 @@
         if (!venteAktiv || state !== 'play') return;
 
         untrack(() => {
-            if (spilTilstand.dag < hentLangsomsteDag() + MAX_DAGE_FORAN) {
+            const erMidtIRunde = spilTilstand.venteFase === 'spiller' || spilTilstand.venteFase === 'viser_gevinst';
+            if (!erMidtIRunde && spilTilstand.dag < hentLangsomsteDag() + MAX_DAGE_FORAN) {
                 const puljeGuld = spilTilstand.ventePuljeGuld;
                 const puljeLiv = spilTilstand.ventePuljeLiv;
                 lukVenteSpil();
                 spilTilstand.logBesked = puljeGuld > 0 || puljeLiv > 0
-                    ? `De andre holder dig ikke tilbage længere. Du tager ${puljeGuld} guld og ${puljeLiv} HP med fra bordet.`
-                    : "De andre holder dig ikke tilbage længere.";
+                    ? `De andre har indhentet dig. Du tager ${puljeGuld} guld og ${puljeLiv} HP med fra bordet.`
+                    : "De andre har indhentet dig, og impens bord forsvinder.";
             }
         });
     });
