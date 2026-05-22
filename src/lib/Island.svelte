@@ -8,7 +8,7 @@
     import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { M10_SCORE, beregnSpillerScore } from '$lib/score';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores } from '$lib/netvaerk';
+    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
     import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
@@ -46,6 +46,8 @@
     const cam = skabKamera();
     const MAX_DAGE_FORAN = 5;
     const SESSION_SELECT = 'rum_kode,kort,start_index,spillere,fog_x,kort_bredde,kort_hoejde,kort_version';
+    const START_AUTO_REFRESH_MS = 10000;
+    const START_AUTO_REFRESH_KEY = 'taage_pending_start';
 
     let lokaleScores = $state<Array<{ navn: string; score: number; karakter?: string }>>([]);
     let klasseScores = $state<Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);
@@ -62,6 +64,62 @@
     function aktuelHighscoreKlasse() {
         return hentKarakterKlasseNoegle(spilTilstand.valgtKarakter);
     }
+
+    type PendingStart = {
+        navn: string;
+        rumKode: string;
+        refreshes: number;
+        startet: number;
+    };
+
+    function laesPendingStart() {
+        if (!browser) return null;
+        try {
+            const gemt = sessionStorage.getItem(START_AUTO_REFRESH_KEY);
+            return gemt ? JSON.parse(gemt) as PendingStart : null;
+        } catch {
+            return null;
+        }
+    }
+
+    function gemPendingStart(navn: string, rumKode: string, refreshes = 0) {
+        if (!browser) return;
+        sessionStorage.setItem(START_AUTO_REFRESH_KEY, JSON.stringify({
+            navn,
+            rumKode,
+            refreshes,
+            startet: Date.now()
+        } satisfies PendingStart));
+    }
+
+    function rydPendingStart() {
+        if (!browser) return;
+        sessionStorage.removeItem(START_AUTO_REFRESH_KEY);
+    }
+
+    function erForbindelsesStatus() {
+        return spilTilstand.statusBesked === 'Forbinder dig til øen...' ||
+            spilTilstand.statusBesked === 'Øen svarer langsomt. Prøver igen...';
+    }
+
+    function planlaegAutoRefreshVedStart(navn: string, rumKode: string) {
+        if (!browser) return null;
+
+        return window.setTimeout(() => {
+            const pending = laesPendingStart();
+            if (!pending || pending.navn !== navn || pending.rumKode !== rumKode) return;
+            if (spilTilstand.gameState !== 'start' || !erForbindelsesStatus()) return;
+
+            if (pending.refreshes >= 1) {
+                spilTilstand.statusBesked = 'Forbindelsen hænger stadig. Prøv igen eller refresh siden manuelt.';
+                return;
+            }
+
+            gemPendingStart(navn, rumKode, pending.refreshes + 1);
+            window.location.reload();
+        }, START_AUTO_REFRESH_MS);
+    }
+
     let ruteArkivForNaesteTur = $state<Record<string, number[][]>>({});
     let introAktiv = $state(false);
     let sidstePinchAfstand = 0;
@@ -675,6 +733,9 @@
             return;
         }
 
+        stopRealtime();
+        annullerVentendeNetvaerkSync();
+
         spilTilstand.logHistorik = [];
         spilTilstand.logBesked = '';
         visDoedsLog = false;
@@ -761,6 +822,10 @@
         spilTilstand.spillerNavn = rentNavn;
         spilTilstand.rumKode = renKode;
         spilTilstand.statusBesked = 'Forbinder dig til øen...';
+        const pendingStart = laesPendingStart();
+        const refreshes = pendingStart?.navn === rentNavn && pendingStart.rumKode === renKode ? pendingStart.refreshes : 0;
+        gemPendingStart(rentNavn, renKode, refreshes);
+        let autoRefreshTimer = planlaegAutoRefreshVedStart(rentNavn, renKode);
         
         const aktivRumKode = renKode;
         const aktivKanalNoegle = realtimeRumNoegle(aktivRumKode);
@@ -1041,6 +1106,14 @@
             spilTilstand.statusBesked = err instanceof Error && err.message === 'timeout'
                 ? 'Forbindelsen til øen tog for lang tid. Prøv igen.'
                 : "Der opstod en fejl under forbindelsen.";
+        } finally {
+            if (autoRefreshTimer !== null) {
+                window.clearTimeout(autoRefreshTimer);
+                autoRefreshTimer = null;
+            }
+            if (spilTilstand.gameState !== 'start' || !erForbindelsesStatus()) {
+                rydPendingStart();
+            }
         }
     }
 
@@ -1117,6 +1190,18 @@
         initAuth();
         preloadFiler();
         let genopretterForbindelse = false;
+        const pendingStart = laesPendingStart();
+        if (pendingStart && pendingStart.refreshes > 0 && Date.now() - pendingStart.startet < 2 * 60 * 1000) {
+            spilTilstand.spillerNavn = pendingStart.navn;
+            spilTilstand.rumKode = pendingStart.rumKode;
+            spilTilstand.statusBesked = 'Forbindelsen hang. Starter igen efter refresh...';
+            window.setTimeout(() => {
+                if (spilTilstand.gameState === 'start') void opretEllerDeltag();
+            }, 350);
+        } else if (pendingStart) {
+            rydPendingStart();
+        }
+
         const venteUrTimer = window.setInterval(() => {
             if (spilTilstand.venteSpilAktiv) venteUrTick = Date.now();
         }, 1000);
@@ -1264,12 +1349,21 @@
 
         try {
             await syncTilDb(true);
-            const sessionGemt = await flushVentendeSync();
+            let sessionGemt = await flushVentendeSync();
+            if (!sessionGemt) {
+                await syncTilDb(true);
+                sessionGemt = await flushVentendeSync();
+            }
+            const afslutningGemt = await gemAfsluttetSpillerISession();
+            sessionGemt = sessionGemt && afslutningGemt;
             if (!sessionGemt) {
                 console.warn('Ø-sessionen blev ikke gemt før highscore. Forsøger stadig at gemme scoren.');
             }
             
             const highscoreGemt = await gemHighscore();
+            if (highscoreGemt && !afslutningGemt) {
+                sessionGemt = await gemAfsluttetSpillerISession();
+            }
             const kanTjekkeTopTi = highscoreGemt && spilTilstand.gameMode !== 'offline' && authState.user;
             const klasse = aktuelHighscoreKlasse();
             nyGlobalRekord = false;

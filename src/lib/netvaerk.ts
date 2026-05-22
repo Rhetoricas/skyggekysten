@@ -505,6 +505,97 @@ export async function gemHighscore() {
     return true;
 }
 
+export async function gemAfsluttetSpillerISession() {
+    if (spilTilstand.offlineMode) return true;
+    if (!spilTilstand.rumKode || !spilTilstand.spillerNavn) return false;
+
+    const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
+    const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map';
+    if (!isWinner && !isDead) return true;
+
+    const aktivRumKode = spilTilstand.rumKode;
+    const aktivKanalNoegle = realtimeRumNoegle(aktivRumKode);
+    const navn = spilTilstand.spillerNavn;
+    const eksisterende = spilTilstand.alleSpillere[navn];
+    const afsluttetSpiller: SpillerData = {
+        ...(eksisterende || {}),
+        index: spilTilstand.spillerIndex,
+        hp: spilTilstand.livspoint,
+        maxHp: spilTilstand.maxLivspoint,
+        guld: spilTilstand.guldTotal,
+        kolonne: spilTilstand.maxKolonne,
+        dag: spilTilstand.dag,
+        retning: spilTilstand.retning,
+        ikon: spilTilstand.valgtKarakter?.ikon ?? eksisterende?.ikon,
+        energi: spilTilstand.nuvaerendeEnergi,
+        mitUdstyr: spilTilstand.mitUdstyr,
+        kendteFelter: spilTilstand.mineKendteFelter,
+        skattekortFelter: spilTilstand.mineSkattekortFelter,
+        historik: spilTilstand.historik || [],
+        tidligereHistorik: eksisterende?.tidligereHistorik || [],
+        isDead,
+        isWinner,
+        escapeIndex: eksisterende?.escapeIndex ?? null,
+        escapeIcon: eksisterende?.escapeIcon ?? spilTilstand.valgtKarakter?.ikon ?? null,
+        score: spilTilstand.samletScore,
+        turNummer: eksisterende?.turNummer ?? 0,
+        rundeSeed: spilTilstand.rundeSeed || eksisterende?.rundeSeed,
+        sidstAktiv: Date.now(),
+        activeAlarm: false,
+        browserId: localStorage.getItem('taage_browser_id'),
+        userId: authState.user?.id ?? null,
+        rumKode: aktivRumKode,
+        kanalNoegle: aktivKanalNoegle,
+        besoegteMiner: eksisterende?.besoegteMiner || [],
+        harSkattekort: eksisterende?.harSkattekort || false,
+        aktivTracker: null,
+        trackedeSpillere: [],
+        gratisNaesteBevaegelse: false,
+        gratisBevaegelseKilde: '',
+        sidsteBersaerkDag: spilTilstand.sidsteBersaerkDag,
+        venteFriIndtilDag: spilTilstand.venteFriIndtilDag || 0
+    };
+
+    spilTilstand.alleSpillere[navn] = afsluttetSpiller;
+
+    const { data, error: hentError } = await medTimeout(
+        supabase
+            .from('spil_sessioner')
+            .select('spillere')
+            .eq('rum_kode', aktivRumKode)
+            .maybeSingle(),
+        12000,
+        'Hentning af ø-session'
+    ).catch((error) => ({ data: null, error }));
+
+    if (hentError) {
+        console.error('Kunne ikke hente ø-session ved afslutning', hentError);
+        return false;
+    }
+
+    const serverSpillere = filtrerSpillereTilKanal((data?.spillere || {}) as Record<string, SpillerData>, aktivKanalNoegle, aktivRumKode);
+    const spillere = {
+        ...serverSpillere,
+        [navn]: afsluttetSpiller
+    };
+
+    const { error: gemError } = await medTimeout(
+        supabase
+            .from('spil_sessioner')
+            .update({ spillere })
+            .eq('rum_kode', aktivRumKode),
+        12000,
+        'Gemning af afsluttet spiller'
+    ).catch((error) => ({ error }));
+
+    if (gemError) {
+        console.error('Kunne ikke gemme afsluttet spiller i ø-session', gemError);
+        return false;
+    }
+
+    return true;
+}
+
 export async function retryVentendeHighscores() {
     const brugerId = authState.user?.id;
     if (!brugerId || spilTilstand.offlineMode) return 0;
