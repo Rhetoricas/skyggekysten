@@ -1029,11 +1029,24 @@
                         return;
                     }
 
-                    if (spillereArr.length > 0 && aktiveSpillere.length === 0) {
+                    if ((spillereArr.length > 0 && aktiveSpillere.length === 0) || (spillereArr.length === 0 && erTomSessionForurenet(data))) {
                         spilTilstand.erHost = true;
                         spilTilstand.alleSpillere = {};
                         startNyRundeSeed();
                         spilTilstand.fogX = 0;
+                        spilTilstand.dag = 1;
+                        spilTilstand.historik = [];
+                        spilTilstand.logHistorik = [];
+                        spilTilstand.venteGratisFeltBrugt = null;
+                        spilTilstand.gratisNaesteBevaegelse = false;
+                        spilTilstand.gratisBevaegelseKilde = '';
+                        spilTilstand.sidsteBersaerkDag = 0;
+                        spilTilstand.venteSpilAktiv = false;
+                        spilTilstand.ventePuljeGuld = 0;
+                        spilTilstand.ventePuljeLiv = 0;
+                        spilTilstand.venteRunde = 0;
+                        spilTilstand.venteStartTid = 0;
+                        spilTilstand.venteFriIndtilDag = 0;
                         nulstilKort();
 
                         const { error: resetError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
@@ -1923,6 +1936,21 @@
 
     function laesSessionDimensioner(data: { kort_bredde?: number | null; kort_hoejde?: number | null } | null | undefined) {
         saetKortDimensioner(data?.kort_bredde ?? BREDDE, data?.kort_hoejde ?? HOEJDE);
+    }
+
+    function erTomSessionForurenet(data: { kort?: Felt[] | null; fog_x?: number | null } | null | undefined) {
+        if (!data) return false;
+        if ((data.fog_x || 0) !== 0) return true;
+        return (data.kort || []).some((felt) =>
+            !!felt.mineOwner ||
+            !!felt.gravet ||
+            !!felt.udforsket ||
+            !!felt.eventFuldført ||
+            !!felt.indbrudt ||
+            !!felt.plyndret ||
+            (felt.naegterHandelFor?.length || 0) > 0 ||
+            !!felt.shopGenopfyldtDag
+        );
     }
 
     async function medRetry<T>(kald: () => PromiseLike<T>, antalForsoeg = 2): Promise<T> {
