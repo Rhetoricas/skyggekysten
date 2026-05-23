@@ -592,7 +592,14 @@ export async function gemAfsluttetSpillerISession() {
     const { error: gemError } = await medTimeout(
         supabase
             .from('spil_sessioner')
-            .update({ spillere })
+            .update({
+                spillere,
+                kort: rensKortTilSync(spilTilstand.gitter),
+                fog_x: Math.round(spilTilstand.fogX),
+                kort_bredde: spilTilstand.kortBredde,
+                kort_hoejde: spilTilstand.kortHoejde,
+                kort_version: KORT_VERSION
+            })
             .eq('rum_kode', aktivRumKode),
         12000,
         'Gemning af afsluttet spiller'
