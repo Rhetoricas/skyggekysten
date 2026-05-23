@@ -17,7 +17,7 @@ function ridderPanserStopperNedgravetFaelde() {
 }
 
 export function genererUndergrund(biome: Biome | string) {
-    const farlige = ['ruin', 'blodskov', 'hule', 'slagmark', 'ritual', 'krystal'];
+    const farlige = ['ruin', 'blodskov', 'hule', 'slagmark', 'ritual'];
     const civilisation = ['by', 'marked'];
 
     const feltData: { kanGraves: boolean; skjultGuld: number; skjultLiv: number; skjultFaelde: boolean; skjultLoot: string | null } = { 
@@ -61,6 +61,10 @@ export function genererUndergrund(biome: Biome | string) {
         else if (terningKast < 45) feltData.skjultLiv = tilfaeldigtTal(10, 20);
         else if (terningKast < 50) feltData.skjultFaelde = true;
         else if (terningKast < 58) feltData.skjultLoot = 'fakkel';
+    } else if (biome === 'krystal') {
+        if (terningKast < 40) feltData.skjultGuld = tilfaeldigtTal(5, 10);
+        else if (terningKast < 60) feltData.skjultFaelde = true;
+        else if (terningKast < 75) feltData.skjultLoot = 'diamant';
     } else if (farlige.includes(biome)) {
         if (terningKast < 45) feltData.skjultGuld = tilfaeldigtTal(25, 50);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(10, 20);

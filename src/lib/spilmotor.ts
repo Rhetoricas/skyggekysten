@@ -597,6 +597,30 @@ export function afslørMalmviserMiner(centerIndex: number = spilTilstand.spiller
     return aendret;
 }
 
+function afslørKrystalResonans(centerIndex: number) {
+    const stav = spilTilstand.mitUdstyr.find((ting) => (ting.id === 'stav' || ting.id === 'dragestav') && ting.maengde > 0);
+    if (!stav || spilTilstand.gitter[centerIndex]?.biome !== 'krystal') return 0;
+
+    const radius = stav.id === 'dragestav' ? 5 : 4;
+    const kendte = new Set(spilTilstand.mineKendteFelter);
+    let antal = 0;
+
+    spilTilstand.gitter.forEach((felt, indeks) => {
+        if (felt?.biome !== 'krystal') return;
+        if (regnHexAfstand(centerIndex, indeks) > radius) return;
+        if (kendte.has(indeks)) return;
+
+        kendte.add(indeks);
+        antal++;
+    });
+
+    if (antal > 0) {
+        spilTilstand.mineKendteFelter = Array.from(kendte);
+    }
+
+    return antal;
+}
+
 export function afslørFalkebueSyn(centerIndex: number) {
     let indeks: number | null = centerIndex;
 
@@ -911,6 +935,11 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
     } else if ((charId === 'magician_m' || charId === 'magician_f') && b === 'ritual') {
         spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 5);
         ekstraLog += " Ritualpladsen giver dig 5 HP.";
+    }
+
+    const krystallerAfsloret = afslørKrystalResonans(nytIndeks);
+    if (krystallerAfsloret > 0) {
+        ekstraLog += ` Staven svarer på krystallet og viser ${krystallerAfsloret} ${krystallerAfsloret === 1 ? 'krystalfelt' : 'krystalfelter'} i nærheden.`;
     }
 
     const harRunekvist = spilTilstand.mitUdstyr.some(ting => ting.id === 'runekvist' && ting.maengde > 0);
