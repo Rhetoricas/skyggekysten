@@ -2404,11 +2404,11 @@ function udførBevægelse(nytIndeks: number) {
                             <polyline 
                                 points={points} 
                                 fill="none" 
-                                stroke={erMig ? '#ffffff' : 'rgba(230, 230, 230, 0.55)'} 
+                                stroke={erMig ? '#ffffff' : 'rgba(192, 238, 78, 0.82)'} 
                                 stroke-width={erMig ? "6" : "4"}
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                class="flugtrute"
+                                class={erMig ? 'flugtrute' : 'flugtrute flugtrute-modspiller'}
                             />
                             
                             <image 
@@ -2937,6 +2937,7 @@ function udførBevægelse(nytIndeks: number) {
         pointer-events: none; z-index: 18; overflow: visible;
     }
     .flugtrute { animation: tegnRute 3s linear forwards; filter: drop-shadow(0 0 5px rgba(255,255,255,0.4)); }
+    .flugtrute-modspiller { filter: drop-shadow(0 0 6px rgba(190, 238, 78, 0.55)); }
     .flugtrute-gammel { pointer-events: none; }
     @keyframes tegnRute { from { stroke-dashoffset: 2000; } to { stroke-dashoffset: 0; } }
     
