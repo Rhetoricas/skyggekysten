@@ -1035,8 +1035,6 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         return true;
     }
 
-    fremrykTid();
-    
     if (felt.hasBoat) {
         const baadeTilbage = Math.max(0, (felt.boatCount || 1) - 1);
         felt.boatCount = baadeTilbage > 0 ? baadeTilbage : undefined;
@@ -1044,17 +1042,25 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         options.onBaadStart?.(nytIndeks);
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isWinner = true;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = false;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].deathCause = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIndex = nytIndeks;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIcon = spilTilstand.valgtKarakter?.ikon ?? null;
         }
+        spilTilstand.doedsAarsag = null;
         spilTilstand.logBesked = "Du går ombord i båden og forlader øen.";
         broadcastFelt(nytIndeks, felt);
         mapAendret = true;
+        spilTilstand.gitter = [...spilTilstand.gitter];
+        syncTilDb(true);
         setTimeout(() => {
             spilTilstand.gameState = 'win_map';
             syncTilDb(true); 
         }, 3000);
+        return true;
     } else {
+        fremrykTid();
+
         if (felt.eventID && !felt.eventFuldført) {
             felt.eventFuldført = true;
             broadcastFelt(nytIndeks, felt);

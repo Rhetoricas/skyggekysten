@@ -1367,7 +1367,10 @@
     });
 
     function opdaterSamletScore() {
-        const erVinder = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
+        const erVinder =
+            spilTilstand.gameState === 'win' ||
+            spilTilstand.gameState === 'win_map' ||
+            !!spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isWinner;
 
         spilTilstand.samletScore = beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, spilTilstand.spillerNavn, {
             guld: spilTilstand.guldTotal,

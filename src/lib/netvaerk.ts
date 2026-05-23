@@ -238,8 +238,13 @@ export async function syncTilDb(opdaterKort = false) {
         `${aktivRumKode}:${Date.now().toString(36)}:${Math.random().toString(36).slice(2)}`;
     spilTilstand.rundeSeed = rundeSeed;
 
-    const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isDead ?? false);
-    const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map' || (spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isWinner ?? false);
+    const aktuelSpiller = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
+    const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map' || (aktuelSpiller?.isWinner ?? false);
+    const isDead = !isWinner && (
+        spilTilstand.gameState === 'dead' ||
+        spilTilstand.gameState === 'dead_map' ||
+        (aktuelSpiller?.isDead ?? false)
+    );
 
     const mig = {
         index: spilTilstand.spillerIndex,
@@ -460,8 +465,13 @@ export async function gemHighscore() {
     }
     const minePoint = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
     const antalSpillere = taelScoreSpillere(spilTilstand.alleSpillere);
-    const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
-    const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map';
+    const aktuelSpiller = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
+    const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map' || (aktuelSpiller?.isWinner ?? false);
+    const isDead = !isWinner && (
+        spilTilstand.gameState === 'dead' ||
+        spilTilstand.gameState === 'dead_map' ||
+        (aktuelSpiller?.isDead ?? false)
+    );
     const lavPayload = (userId?: string): HighscorePayload => ({
         user_id: userId,
         player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
@@ -518,14 +528,18 @@ export async function gemAfsluttetSpillerISession() {
     if (spilTilstand.offlineMode) return true;
     if (!spilTilstand.rumKode || !spilTilstand.spillerNavn) return false;
 
-    const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map';
-    const isDead = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map';
+    const eksisterende = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
+    const isWinner = spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map' || (eksisterende?.isWinner ?? false);
+    const isDead = !isWinner && (
+        spilTilstand.gameState === 'dead' ||
+        spilTilstand.gameState === 'dead_map' ||
+        (eksisterende?.isDead ?? false)
+    );
     if (!isWinner && !isDead) return true;
 
     const aktivRumKode = spilTilstand.rumKode;
     const aktivKanalNoegle = realtimeRumNoegle(aktivRumKode);
     const navn = spilTilstand.spillerNavn;
-    const eksisterende = spilTilstand.alleSpillere[navn];
     const afsluttetSpiller: SpillerData = {
         ...(eksisterende || {}),
         index: spilTilstand.spillerIndex,
