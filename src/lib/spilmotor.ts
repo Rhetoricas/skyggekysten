@@ -1257,11 +1257,6 @@ export function hvil() {
         return;
     }
 
-    if ((spilTilstand.nuvaerendeEnergi || 0) >= spilTilstand.valgtKarakter.baseEnergi) {
-        spilTilstand.logBesked = "Du er allerede udhvilet.";
-        return;
-    }
-
     const heling = harSilkesovepose ? 40 : 20;
     spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + heling); 
     

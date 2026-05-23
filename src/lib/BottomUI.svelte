@@ -99,8 +99,7 @@
             return !!(
                 aktueltFelt &&
                 hvileBiomer.includes(aktueltFelt.biome as string) &&
-                spilTilstand.valgtKarakter &&
-                spilTilstand.nuvaerendeEnergi < spilTilstand.valgtKarakter.baseEnergi
+                spilTilstand.valgtKarakter
             );
         }
         if (vareId === 'mad') return spilTilstand.livspoint < spilTilstand.maxLivspoint || !spilTilstand.gratisNaesteBevaegelse;
