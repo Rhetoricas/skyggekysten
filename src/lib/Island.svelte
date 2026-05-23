@@ -127,6 +127,7 @@
     let inspectBoble = $state<{ titel: string; tekst: string; x: number; y: number } | null>(null);
     
     let harDetektor = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'metaldetektor' || ting.id === 'malmviser') ?? false);
+    let harMalmviser = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'malmviser') ?? false);
     let harRunekvist = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'runekvist') ?? false);
     let harKvist = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'soegekvist' || ting.id === 'runekvist') ?? false);
     let aktuelSynsRadius = $derived(Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn));
@@ -271,7 +272,7 @@
     });
 
     const biomeForklaringer: Record<string, string> = {
-        mark: 'Mark kan graves og kan senere have afgroeder. Gravefund er ofte små: lidt guld, rod, sjælden fælde eller fakkel.',
+        mark: 'Mark kan graves og kan senere have afgrøder. Gravefund er ofte små: lidt guld, rod, sjælden fælde eller fakkel.',
         eng: 'Eng er et let naturfelt. Det kan graves og har små chancer for guld, rod, fælde eller fakkel.',
         skov: 'Skov kan give gode helende rødder ved gravning og har en lille chance for livseliksir.',
         bjerg: 'Bjerg er tungt terræn for mange karakterer. Ved gravning finder du ofte guld, men også fælder og fakler.',
@@ -282,9 +283,9 @@
         hoejland: 'Højland er åbent terræn. Gravning kan give guld, rod, en lille fælderisiko eller fakkel.',
         blodskov: 'Blodskov er farligt og uroligt. Gravefund ligner andre farlige biomer: guld, rod, fælder og livseliksir.',
         by: 'Byer kan have butikker, værksteder og indbrudsmuligheder. Spillere med kølle kan smadre dem til ruiner. Du kan normalt ikke grave her.',
-        hav: 'Hav er farligt uden båd. Du tager skade i åbent vand, og tung rustning, fakler og flere skrøbelige ting kan gå tabt i vandet. Hvis du kollapser i vandet, drukner du, medmindre en livseliksir redder dig først.',
-        soe: 'Sø er indlandsvand. Den er farlig uden båd ligesom hav, men tæller ikke som kyst eller piratvand.',
-        krystal: 'Krystalfelter er farlige og sjældne. Gravning kan give stærke fund, men også fælder.',
+        hav: 'Hav er farligt uden båd. Du tager skade i åbent vand, og almindelig rustning, kongepanser og fakler går tabt i vandet. Hvis du kollapser i vandet, drukner du, medmindre en livseliksir redder dig først.',
+        soe: 'Sø er indlandsvand. Den er farlig uden båd ligesom hav. Den er ikke kyst, men pirater har lidt lettere ved den.',
+        krystal: 'Krystalfelter er farlige og sjældne. Gravning kan give små guldfund, fælder eller diamanter. Stave viser krystalfelter i nærheden, når du står på krystal.',
         marked: 'Markeder kan have butikker. Spillere med kølle kan smadre dem til ruiner. Du kan normalt ikke grave her.',
         slagmark: 'Slagmark er et farligt gravefelt med guld, rødder, fælder og livseliksir.',
         meteor: 'Meteor-felter styres af meteor-eventet. Kig efter meteorstenen og eventet på feltet.'
@@ -1841,16 +1842,16 @@
         const dele: string[] = [biomeForklaringer[biome] || 'Et udforsket felt på øen.'];
 
         if (erOpslugt) dele.push('Tågen har taget feltet. Det er farligt at stå her.');
-        if (biome === 'hav') dele.push('Hav kan sluge tung rustning og fakler, og uden båd risikerer du drukning.');
+        if (biome === 'hav') dele.push('Hav kan sluge almindelig rustning og kongepanser samt slukke fakler. Elverrustning går ikke tabt i vand.');
         if (biome === 'soe') dele.push('Søer er indlandsvand. De er farlige uden båd, men de tæller ikke som havkyst.');
         if (biome === 'hule') dele.push('Huler kan ødelægge soveposer og fint tøj.');
         if (biome === 'ruin') dele.push('Ruiner kan koste madrationer.');
-        if (biome === 'krystal') dele.push('Krystaller kan ødelægge metaldetektor og gylden kikkert.');
+        if (biome === 'krystal') dele.push('Krystaller ødelægger metaldetektor og gylden kikkert. Malmviser bliver til almindelig detektor.');
         if (biome === 'ritual') dele.push('Ritualfelter kan ødelægge søgekvist.');
-        if (felt.hasBoat) dele.push(`Der ${felt.boatCount && felt.boatCount > 1 ? `ligger ${felt.boatCount} både` : 'ligger en flugtbåd'} her.`);
+        if (felt.hasBoat) dele.push(`Der ${felt.boatCount && felt.boatCount > 1 ? `ligger ${felt.boatCount} både` : 'ligger en flugtbåd'} her. Går du ombord, har du vundet.`);
         if (felt.eventID && !felt.eventFuldført) dele.push('Feltet har et event, som starter når du går ind på det.');
-        if (harKoebbarShop(felt)) dele.push('Feltet har en butik.');
-        if (felt.hasWorkshop) dele.push('Feltet har et værksted, hvor udstyr kan opgraderes.');
+        if (harKoebbarShop(felt)) dele.push('Feltet har en butik. Dagens varer deles af spillerne og genfyldes næste dag.');
+        if (felt.hasWorkshop) dele.push('Feltet har et værksted, hvor udstyr kan opgraderes. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang.');
         if (felt.hasGoldmine) dele.push(felt.mineOwner ? `Guldminen ejes af ${felt.mineOwner}.` : 'Der er en guldmine her.');
         if (felt.hasPortal && !(felt.eventID && !felt.eventFuldført)) dele.push('Portalen kan flytte dig mod øst.');
         if (felt.taageBlokker) dele.push('Tågeblokkeren kan holde tågen tilbage fra venstre, indtil tågen vender.');
@@ -2143,7 +2144,7 @@ function udførBevægelse(nytIndeks: number) {
                                 <div class="sejr-lys"></div>
                             {/if}
                             {#each Array.from({ length: Math.min(felt.boatCount || 1, 4) }, (_ignore, index) => index) as baadNr (baadNr)}
-                                <img src="/tiles/baad.webp" alt="Flugtbåd" class="escape-boat boat-{baadNr}" data-help-title="Flugtbåd" data-help-body="Gå ind på bådfeltet for at forlade øen. Antallet af både afgør hvor mange spillere der kan slippe væk herfra." />
+                                <img src="/tiles/baad.webp" alt="Flugtbåd" class="escape-boat boat-{baadNr}" data-help-title="Flugtbåd" data-help-body="Gå ind på bådfeltet for at vinde og forlade øen. Hver båd kan bruges én gang." />
                             {/each}
                             {#if (felt.boatCount || 1) > 4}
                                 <span class="boat-count">×{felt.boatCount}</span>
@@ -2182,7 +2183,7 @@ function udførBevægelse(nytIndeks: number) {
                                 <img src="/tiles/treasuremark.webp" alt="Mulig skat" class="treasure-mark-icon" data-help-title="Mulig skat" data-help-body="Skattekortet peger på dette felt som mulig skatteklynge. Kortet viser ikke, om kisten stadig er her." />
                             {/if}
                             {#if erUdforsket && harDetektor && erIndenForPejling && (felt.skjultGuld ?? 0) > 0}
-                                <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" data-help-title="Guldspor" data-help-body="Din metaldetektor mærker skjult guld på kendte felter inden for radius 3. Grav feltet for at få det frem." style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 80});" />
+                                <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" data-help-title="Guldspor" data-help-body={harMalmviser ? 'Din malmviser mærker skjult guld på kendte felter inden for radius 3. Grav feltet for at få det frem med malmviserbonus.' : 'Din metaldetektor mærker skjult guld på kendte felter inden for radius 3. Grav feltet for at få det frem.'} style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 80});" />
                             {/if}
                             {#if erUdforsket && harKvist && erIndenForPejling && (felt.skjultLiv ?? 0) > 0}
                                 <img src="/tiles/livtaage.webp" alt="" class="mist-icon" data-help-title="Rodspor" data-help-body={harRunekvist ? 'Runekvisten mærker helende rødder på kendte felter inden for radius 3. Hvis du mangler HP, trækkes de automatisk op, når du går ind på feltet.' : 'Søgekvisten mærker helende rødder på kendte felter inden for radius 3. Grav feltet for at finde dem.'} style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultLiv ?? 0) / 40});" />
@@ -2229,7 +2230,7 @@ function udførBevægelse(nytIndeks: number) {
                                 alt="" 
                                 class="shop-icon" 
                                 data-help-title={felt.biome === 'by' ? 'Bybutik' : 'Marked'}
-                                data-help-body="Butikken sælger varer for guld. Vareudvalget ligger på feltet og deles af spillerne på øen."
+                                data-help-body="Butikken sælger dagens varer for guld. Hylden deles af spillerne og genfyldes med butikkens faste varer næste dag. Har du kølle eller murknuser, stopper købmanden med at handle med dig efter et køb."
                                 onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')} 
                             />
                         {/if}
@@ -2240,7 +2241,7 @@ function udførBevægelse(nytIndeks: number) {
                                 alt=""
                                 class="workshop-icon"
                                 data-help-title="Værksted"
-                                data-help-body="Værkstedet opgraderer udstyr: skovl, stav, søgekvist, dirk, kniv, rustning, økse, kølle, bue, tøj, fakkel, sovepose og detektor kan blive til stærkere versioner."
+                                data-help-body="Værkstedet opgraderer udstyr og erstatter den gamle genstand med den nye. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang."
                             />
                         {/if}
 

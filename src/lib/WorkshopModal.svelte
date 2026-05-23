@@ -496,7 +496,7 @@
             kanOpgradere: kanOpgradereKvist,
             kortTekst: 'Trækker skjult liv op ved ankomst, hvis du mangler HP. Koster 1 energi og efterlader feltet ugravet, men tomt.',
             helpTitle: 'Kvist-opgradering',
-            helpBody: 'Kræver søgekvist og 175 guld. Runekvisten viser rødder i samme radius 3 og trækker automatisk skjult liv op, når du mangler HP og går ind på feltet.',
+            helpBody: 'Kræver søgekvist og 175 guld. Runekvisten viser rødder i radius 3 og trækker automatisk skjult liv op, når du mangler HP og går ind på feltet. Det koster 1 energi og efterlader feltet ugravet, men tomt.',
             opgrader: opgraderKvist
         },
         {
@@ -532,7 +532,7 @@
             kanOpgradere: kanOpgradereRustning,
             kortTekst: '70% skadesreduktion. Stadig tung: +1 energi pr. skridt. Går tabt i vand som almindelig rustning.',
             helpTitle: 'Rustning-opgradering',
-            helpBody: 'Kræver almindelig rustning og 250 guld. Kongepanseret reducerer skade med 70%, men koster stadig 1 ekstra energi pr. skridt.',
+            helpBody: 'Kræver almindelig rustning og 250 guld. Kongepanseret reducerer skade med 70%, men koster stadig 1 ekstra energi pr. skridt og går tabt i vand.',
             opgrader: opgraderRustning
         },
         {
@@ -616,7 +616,7 @@
             kanOpgradere: kanOpgradereDetektor,
             kortTekst: 'Viser skjult guld i radius 3. Guldminer inden for radius 2 popper frem gennem bjerge. Graveguld giver 25% ekstra.',
             helpTitle: 'Detektor-opgradering',
-            helpBody: 'Kræver en almindelig detektor og 250 guld. Malmviseren viser skjult guld som før, afslører guldminer inden for radius 2 og giver 25% mere, når du graver guldet frem.',
+            helpBody: 'Kræver en almindelig detektor og 250 guld. Malmviseren viser skjult guld som før, afslører guldminer inden for radius 2 og giver 25% mere, når du graver guldet frem. Krystaller nedgraderer den til almindelig detektor.',
             opgrader: opgraderDetektor
         },
         {
@@ -641,7 +641,7 @@
     <div
         class="vaerksted-content"
         data-help-title="Værksted"
-        data-help-body="Værkstedet opgraderer udstyr. Du beholder ikke den gamle genstand ved siden af den nye: skovlen bliver erstattet af en mesterskovl, og soveposen kan blive til en silkesovepose."
+        data-help-body="Værkstedet opgraderer udstyr. Du beholder ikke den gamle genstand ved siden af den nye. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang."
     >
         <h2>Mesterværkstedet</h2>
         <p class="intro">Her kan almindeligt udstyr bygges om til noget bedre.</p>

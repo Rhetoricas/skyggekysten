@@ -23,6 +23,23 @@
     let graveIkon = $derived(harMesterskovl ? itemDB.mesterskovl.billede : harSkovl ? itemDB.skovl.billede : '/ui/haandgrav.webp');
     let graveNavn = $derived(harMesterskovl ? 'Mesterskovl' : harSkovl ? 'Skovl' : 'Grav med hænderne');
     let graveAlt = $derived(kanGrave ? (harSkovl ? `Grav med ${harMesterskovl ? 'mesterskovl' : 'skovl'}` : 'Grav med hænderne') : 'Her kan ikke graves');
+    let graveEnergiPris = $derived(spilTilstand.valgtKarakter?.digCost ?? 3);
+    let haandGraveEnergiPris = $derived(graveEnergiPris + 4);
+    let haandGraveSkade = $derived(spilTilstand.beregnSkade(4));
+    let hpHjaelp = $derived('Dit helbred. På land kollapser du normalt ved 0 HP. I tåge eller vand dør du, medmindre en livseliksir redder dig først. Mad giver +20 HP.');
+    let energiHjaelp = $derived(
+        spilTilstand.gratisNaesteBevaegelse
+            ? (spilTilstand.gratisBevaegelseKilde === 'bersaerk'
+                ? 'Din næste bevægelse koster 0 energi på grund af bersærkergang.'
+                : 'Din næste bevægelse koster 0 energi på grund af mad.')
+            : 'Energi bruges på bevægelse, gravning og visse handlinger. Når energien løber tør, går dagen videre efter handlingen.'
+    );
+    let graveHjaelp = $derived.by(() => {
+        if (!kanGrave) return 'Du kan ikke grave på dette felt lige nu.';
+        if (harMesterskovl) return `Graver for ${graveEnergiPris} energi. Mesterskovlen giver normalt dobbelt guld og finder nedgravede fælder uden skade.`;
+        if (harSkovl) return `Graver for ${graveEnergiPris} energi. Nedgravede fælder udløses stadig.`;
+        return `Graver med hænderne for ${haandGraveEnergiPris} energi og ${haandGraveSkade} HP. Nedgravede fælder kan stadig udløses.`;
+    });
     const hvileBiomer = ['eng', 'skov', 'mark', 'bjerg', 'hoejland'];
 
     let visLog = $state(false);
@@ -32,6 +49,13 @@
     let totalArmor = $derived(100 - Math.round(((spilTilstand.valgtKarakter?.dmgMod ?? 1.0) + spilTilstand.rygsækEffekt.dmg) * 100));
     let totalGoldMod = $derived(Math.round(((spilTilstand.valgtKarakter?.goldMod ?? 1.0) + spilTilstand.rygsækEffekt.gold) * 100));
     let totalSyn = $derived((spilTilstand.valgtKarakter?.synsRadius ?? 1) + spilTilstand.rygsækEffekt.syn);
+    let moveBadgeHjaelp = $derived(`Din grundpris for et skridt er ${totalMove} energi før terræn. Terrænet lægges oveni, og prisen kan aldrig komme under 1.`);
+    let skadeBadgeHjaelp = $derived(totalArmor >= 0
+        ? `Du tager ${totalArmor}% mindre skade fra karakter og udstyr.`
+        : `Du tager ${Math.abs(totalArmor)}% mere skade fra karakter og udstyr.`
+    );
+    let guldBadgeHjaelp = $derived(`Din guldindkomst er ${totalGoldMod}% af grundbeløbet, før særlige udstyrseffekter på selve fundet.`);
+    let synBadgeHjaelp = $derived(`Dit syn er radius ${totalSyn}. Karakter, fakler og andet udstyr kan ændre tallet.`);
 
     let aktuelLog = $derived(spilTilstand.logHistorik.length > 0 ? spilTilstand.logHistorik[spilTilstand.logHistorik.length - 1] : '');
     let forrigeLog = $derived(spilTilstand.logHistorik.length > 1 ? spilTilstand.logHistorik[spilTilstand.logHistorik.length - 2] : '');
@@ -144,14 +168,22 @@
         }
 
         if (vareId === 'soegekvist' || vareId === 'runekvist') {
-            return `${info.beskrivelse} Den virker passivt, mens du bevÃ¦ger dig.`;
+            return `${info.beskrivelse} Den virker passivt, mens du bevæger dig.`;
+        }
+
+        if (vareId === 'livseliksir') {
+            return `${info.beskrivelse} Den bruges automatisk ved dødelig skade.`;
+        }
+
+        if (vareId === 'diamant') {
+            return `${info.beskrivelse} Den kan sælges i butikker.`;
         }
 
         const status = aktiv
             ? 'Den kan bruges lige nu.'
             : erSituationsVare(vareId)
                 ? 'Den kan ikke bruges i den nuværende situation.'
-                : 'Den kan normalt bruges fra inventory.';
+                : 'Effekten virker automatisk eller i events; den skal ikke aktiveres fra inventory.';
 
         return `${info.beskrivelse} ${status}`;
     }
@@ -202,25 +234,25 @@
         {/if}
 
         {#if totalMove !== 1}
-            <span class="mod-badge move {totalMove > 1 ? 'negativ' : ''}">
+            <span class="mod-badge move {totalMove > 1 ? 'negativ' : ''}" data-help-title="Bevægelse" data-help-body={moveBadgeHjaelp}>
                 <img src="/ui/stat_move.webp" alt="" />
                 {totalMove}
             </span>
         {/if}
         {#if totalArmor !== 0}
-            <span class="mod-badge dmg {totalArmor < 0 ? 'negativ' : ''}">
+            <span class="mod-badge dmg {totalArmor < 0 ? 'negativ' : ''}" data-help-title="Skade" data-help-body={skadeBadgeHjaelp}>
                 <img src="/ui/stat_dmg.webp" alt="" />
                 {totalArmor}%
             </span>
         {/if}
         {#if totalGoldMod !== 100}
-            <span class="mod-badge gold {totalGoldMod < 100 ? 'negativ' : ''}">
+            <span class="mod-badge gold {totalGoldMod < 100 ? 'negativ' : ''}" data-help-title="Guldmodifier" data-help-body={guldBadgeHjaelp}>
                 <img src="/ui/stat_gold.webp" alt="" />
                 {totalGoldMod}%
             </span>
         {/if}
         {#if totalSyn !== 1}
-            <span class="mod-badge syn {totalSyn < 1 ? 'negativ' : ''}">
+            <span class="mod-badge syn {totalSyn < 1 ? 'negativ' : ''}" data-help-title="Syn" data-help-body={synBadgeHjaelp}>
                 <img src="/ui/stat_syn.webp" alt="" />
                 {totalSyn}
             </span>
@@ -229,7 +261,7 @@
 
     <div class="ui-content">
         <div class="status-row">
-            <div class="status-item" class:kritisk={spilTilstand.livspoint < 30} data-help-title="HP" data-help-body="Dit helbred. Når HP når 0, dør du eller reddes af en livseliksir, hvis du har en. Mad giver nu +20 HP.">
+            <div class="status-item" class:kritisk={spilTilstand.livspoint < 30} data-help-title="HP" data-help-body={hpHjaelp}>
                 <img src="/inventory/hp.webp" alt="Liv" class="status-icon" />
                 <span class="status-value">{spilTilstand.livspoint}</span>
             </div>
@@ -239,7 +271,7 @@
                 <span class="status-value">{spilTilstand.guldTotal}</span>
             </div>
         
-            <div class="energi-sektion" data-help-title="Energi" data-help-body={spilTilstand.gratisNaesteBevaegelse ? (spilTilstand.gratisBevaegelseKilde === 'bersaerk' ? 'Din næste bevægelse koster 0 energi på grund af bersærkergang.' : 'Din næste bevægelse koster 0 energi på grund af mad.') : 'Energi bruges på bevægelse, gravning og visse handlinger. Når energien løber tør, går der en ny dag.'}>
+            <div class="energi-sektion" data-help-title="Energi" data-help-body={energiHjaelp}>
                 <div class="energi-container">
                     <div class="energi-grid">
                         {#each Array(9) as tomPlads, i (i)}
@@ -259,12 +291,12 @@
                 role="button"
                 tabindex={kanGrave ? 0 : -1}
                 data-help-title={graveNavn}
-                data-help-body={kanGrave ? (harMesterskovl ? 'Graver med lavere energipris, giver dobbelt guld og finder nedgravede fælder uden at udløse dem.' : harSkovl ? 'Graver feltet med lavere energipris.' : 'Graver feltet uden skovl. Det koster ekstra energi og HP.') : 'Du kan ikke grave på dette felt lige nu.'}
+                data-help-body={graveHjaelp}
                 onclick={() => { if (kanGrave) grav(); }}
                 onkeydown={(e) => { if (kanGrave && (e.key === 'Enter' || e.key === ' ')) grav(); }}
             >
                 <div class="ikon-container">
-                    <img src={graveIkon} alt={graveAlt} class="inventory-icon grave-icon {harMesterskovl ? 'opgraderet' : ''} {kanGrave ? '' : 'deaktiveret'}" data-help-title={graveNavn} data-help-body={kanGrave ? (harMesterskovl ? 'Graver med lavere energipris, giver dobbelt guld og finder nedgravede fælder uden at udløse dem.' : harSkovl ? 'Graver feltet med lavere energipris. Nedgravede fælder udløses ved gravning.' : 'Graver feltet uden skovl. Det koster ekstra energi og HP, og nedgravede fælder kan udløses.') : 'Du kan ikke grave på dette felt lige nu.'} />
+                    <img src={graveIkon} alt={graveAlt} class="inventory-icon grave-icon {harMesterskovl ? 'opgraderet' : ''} {kanGrave ? '' : 'deaktiveret'}" data-help-title={graveNavn} data-help-body={graveHjaelp} />
                 </div>
             </div>
 

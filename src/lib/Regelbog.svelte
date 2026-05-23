@@ -68,7 +68,7 @@
                         <li>Du kan godt bruge mere energi, end du har tilbage. Så går dagen videre efter handlingen, og du får ny energi.</li>
                         <li>Bevægelse i tågen koster 2 ekstra energi.</li>
                         <li>Mad og bersærkergang kan gøre næste bevægelse gratis.</li>
-                        <li>Hvis du kommer mindst 5 dage foran den langsomste aktive spiller i multiplayer, må du vente, indtil den langsomste når din dag. Impens bord bliver dog højst i 60 sekunder. Du får én gratis ventespilsrunde på det felt, du står på; flere runder på samme felt koster 5 guld. Bordet lukker selv, når ventetiden er slut.</li>
+                        <li>Hvis du kommer mindst 5 dage foran den langsomste aktive spiller i multiplayer, åbner ventespillet. Bordet lukker, når den langsomste når din dag, når tågen rammer feltet, eller efter højst 60 sekunder. Når bordet lukker, kan du spille mindst 5 dage uden nyt ventespil. Du får én gratis ventespilsrunde på det felt, du står på; flere runder på samme felt koster 5 guld.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Har du 3 energi tilbage, og et bjerg koster 6, kan du stadig gå derind. Du ender på negativ energi, feltet aktiveres, og bagefter går tiden videre til næste dag.</p>
                 </section>
@@ -82,7 +82,7 @@
                         <li>I tågen kan du lave blodoffer: -10 Max HP for +50 HP.</li>
                         <li>Nogle sjældne events kan holde tågen tilbage, blokere den bag et felt eller vise en båd for alle.</li>
                     </ul>
-                    <p class="eksempel">Eksempel: En jæger eller udforsker ser længere end de fleste. Står der et bjerg imellem dig og kysten, kan ukendte farer stadig gemme sig bag det, indtil du får et bedre udsyn.</p>
+                    <p class="eksempel">Eksempel: Jæger, skytte, opdager og eventyrer ser længere end de fleste. Står der et bjerg imellem dig og kysten, kan ukendte farer stadig gemme sig bag det, indtil du får et bedre udsyn.</p>
                 </section>
 
                 <section>
@@ -96,7 +96,7 @@
                         <li>Mad giver +20 HP og gør næste bevægelse gratis. Sovepose kan bruges i vildmarken og giver +20 HP, men bruger resten af dagen. Silkesovepose giver +40 HP og bliver kun nedgraderet til almindelig sovepose af hulefugt.</li>
                         <li>Fakkel udvider synet med +1. Solfakkel udvider synet med +2. Begge kan bruges til bål; solbålet afslører et større område og giver 100 guld i stedet for 50.</li>
                         <li>Viking og valkyrie går automatisk bersærk første gang pr. dag, de tager mindst 5 skade. Næste bevægelse koster 0 energi.</li>
-                        <li>Hav og oversvømmelse kan slukke fakler og få tung rustning til at gå tabt.</li>
+                        <li>Vand og oversvømmelse slukker fakler. Almindelig rustning og kongepanser går tabt i vand; elverrustning gør ikke.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Hvis du har 12 HP og står foran et farligt felt, kan mad være bedre end at spare det. Hvis du alligevel ryger i 0 HP på land, kollapser du; sker det i tågen eller vandet, er det langt farligere.</p>
                 </section>
@@ -121,11 +121,12 @@
                     <h3>Felter</h3>
                     <ul>
                         <li>Byer og markeder kan have butikker. Byer kan også have værksteder. Tomme byfelter kan brydes op med dirk.</li>
+                        <li>Butikker genfylder deres faste varer, når en ny dag er gået. Har du kølle eller murknuser, stopper den handlende med at handle med dig efter et køb.</li>
                         <li>Marker modner i blokke på ti dage. Modne afgrøder giver lidt HP, men kan høstes én gang pr. blok eller ødelægges af græshopper og katastrofer.</li>
                         <li>Guldminer giver guld og point. En ulåst mine kan overtages af andre spillere.</li>
                         <li>Første gang du overtager en mine, får du guld. Hvis du senere tager en tidligere besøgt mine tilbage, låses den.</li>
                         <li>En låst mine kan ikke overtages, men den kan stadig blive ødelagt af katastrofer.</li>
-                        <li>Flugtbåde dukker normalt op på østkysten fra dag 6. Antallet følger de levende spillere. Hver båd kan bruges én gang.</li>
+                        <li>Flugtbåde dukker normalt op på østkysten fra dag 6. Antallet følger de levende spillere. Hver båd kan bruges én gang. Når du går ombord, har du vundet.</li>
                         <li>Portaler slynger dig 4, 5 eller 6 felter mod øst. Landingsfeltet behandles som et normalt felt.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Du overtager en neutral mine og får guld. Kommer en anden spiller senere forbi, kan de tage den, hvis den ikke er låst. Hvis du tager den tilbage efter at have besøgt den før, låses den. Rammer en meteor feltet, forsvinder minen uanset ejer.</p>
@@ -174,7 +175,7 @@
 
                 <section>
                     <h3>Smadring</h3>
-                    <p>Køllen kan smadre markeder og almindelige byfelter til ruiner. Markeder koster 8 energi og 20 grundskade. Byfelter koster 16 energi og 30 grundskade. Værksteder koster 24 energi, 50 grundskade og kræver Murknuser. Grundbyttet er 45-75, 90-150 eller 225 guld plus to tredjedele af kassen, påvirket af guldmodifier.</p>
+                    <p>Køllen kan smadre markeder og almindelige byfelter til ruiner. Markeder koster 8 energi og 20 grundskade. Byfelter koster 16 energi og 30 grundskade. Værksteder koster 24 energi, 50 grundskade og kræver Murknuser. Grundbyttet er 45-75, 90-150 eller 225 guld plus to tredjedele af kassen, påvirket af guldmodifier. Handlende på nabofelter nægter bagefter at handle med dig.</p>
                     <p class="eksempel">Eksempel: En ork kan købe en vare på et marked og bagefter smadre markedet for at få noget af værdien tilbage fra kassen. Prisen er tid og blod: energien kan ryge langt under nul, og svage karakterer kan knække på selve smadringen.</p>
                 </section>
 
@@ -195,11 +196,11 @@
                 <section>
                     <h3>Score</h3>
                     <ul>
-                        <li>Score bygger på guld, udforskning, miner, udstyr, fremdrift eller flugtbonus, og en HP-multiplikator.</li>
+                        <li>Score bygger på guld, udforskning, miner, udstyr, fremdrift eller flugtbonus, og HP- og multiplayer-multiplikatorer.</li>
                         <li>Udforskning giver 2 point pr. kendt felt.</li>
                         <li>Sepiafelter fra skattekort er kun kortspor og tæller ikke som kendte felter i score.</li>
                         <li>Fremdrift giver 2 point pr. kolonne mod øst. Hvis du slipper væk, får du 1000 point i stedet.</li>
-                        <li>Miner giver 100 point pr. mine ganget med multiplayer-modifieren.</li>
+                        <li>Miner giver 100 point pr. mine ganget med mine-modifieren for antal spillere.</li>
                         <li>Udstyr giver point svarende til 2/3 af salgsprisen.</li>
                         <li>Til sidst ganges summen med 1 + HP/1000. Har du 100 HP, bliver summen ganget med 1,100.</li>
                         <li>Global highscore kræver login. Slutskærmen viser lokal ø-score, global karakterklasse-score og global samlet score. Offline-score gemmes kun lokalt.</li>
