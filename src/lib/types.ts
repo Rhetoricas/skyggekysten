@@ -48,6 +48,7 @@ export interface SpillerData {
     guld: number;
     isDead: boolean;
     isWinner: boolean;
+    deathCause?: 'vand' | 'taage' | null;
     escapeIndex?: number | null;
     escapeIcon?: string | null;
     score: number;

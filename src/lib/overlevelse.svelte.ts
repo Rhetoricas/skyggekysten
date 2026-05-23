@@ -203,8 +203,10 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
         }
 
         spilTilstand.gameState = 'dead_map';
+        spilTilstand.doedsAarsag = 'taage';
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = true;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].deathCause = 'taage';
         }
 
         const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
@@ -223,11 +225,13 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
 
 function druknSpiller(besked: string) {
     spilTilstand.gameState = 'dead_map';
+    spilTilstand.doedsAarsag = 'vand';
     spilTilstand.erBevidstløs = false;
     spilTilstand.livspoint = 0;
 
     if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
         spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = true;
+        spilTilstand.alleSpillere[spilTilstand.spillerNavn].deathCause = 'vand';
     }
 
     const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
@@ -251,8 +255,10 @@ export function tjekOverlevelse() {
         }
 
         spilTilstand.gameState = 'dead_map';
+        spilTilstand.doedsAarsag = 'taage';
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = true;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].deathCause = 'taage';
         }
 
         const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];

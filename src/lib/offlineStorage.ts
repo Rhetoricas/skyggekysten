@@ -15,6 +15,7 @@ export interface OfflineScore {
     createdAt: string;
     erVinder?: boolean;
     erDoed?: boolean;
+    doedsAarsag?: 'vand' | 'taage' | null;
     dage?: number;
     guld?: number;
     maxKolonne?: number;
@@ -192,6 +193,7 @@ export function gemOfflineScore(force = false) {
         createdAt: new Date().toISOString(),
         erVinder: spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map',
         erDoed: spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map',
+        doedsAarsag: spilTilstand.doedsAarsag,
         dage: spilTilstand.dag,
         guld: spilTilstand.guldTotal,
         maxKolonne: spilTilstand.maxKolonne,

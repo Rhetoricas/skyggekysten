@@ -796,8 +796,10 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     if (mig && mig.sidstAktiv && (Date.now() - mig.sidstAktiv > 5 * 60 * 1000) && options.erITaagen) {
         spilTilstand.livspoint = 0;
         spilTilstand.gameState = 'dead_map';
+        spilTilstand.doedsAarsag = 'taage';
         if (spilTilstand.alleSpillere[spilTilstand.spillerNavn]) {
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = true;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].deathCause = 'taage';
         }
         spilTilstand.logBesked = "Du har været væk for længe. Tågen har indhentet dig.";
         syncTilDb(true);

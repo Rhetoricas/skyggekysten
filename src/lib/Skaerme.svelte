@@ -17,6 +17,7 @@
         id?: number;
         erVinder?: boolean;
         erDoed?: boolean;
+        doedsAarsag?: 'vand' | 'taage' | null;
         dage?: number;
         guld?: number;
         maxKolonne?: number;
@@ -214,7 +215,7 @@
 
     function harHighscoreDetaljer(score: HighscoreDetaljer | null) {
         if (!score) return false;
-        return [score.dage, score.guld, score.maxKolonne, score.kendteFelter, score.miner, score.antalSpillere].some(v => v !== undefined && v !== null);
+        return [score.dage, score.guld, score.maxKolonne, score.kendteFelter, score.miner, score.antalSpillere, score.doedsAarsag].some(v => v !== undefined && v !== null);
     }
 
     function talEllerUkendt(v?: number) {
@@ -223,8 +224,14 @@
 
     function highscoreStatus(score: HighscoreDetaljer) {
         if (score.erVinder) return 'Sluppet væk';
-        if (score.erDoed) return 'Død';
+        if (score.erDoed) return score.doedsAarsag ? `Død i ${score.doedsAarsag === 'vand' ? 'vand' : 'tåge'}` : 'Død';
         return 'Ukendt';
+    }
+
+    function spillerStatus(data: { isWinner?: boolean; isDead?: boolean; deathCause?: 'vand' | 'taage' | null }) {
+        if (data.isWinner) return 'Sluppet væk';
+        if (!data.isDead) return 'I tågen';
+        return data.deathCause ? `Død i ${data.deathCause === 'vand' ? 'vand' : 'tåge'}` : 'Død';
     }
 
     function highscoreFremdrift(score: HighscoreDetaljer) {
@@ -409,7 +416,7 @@
                     <div class="session-info">
                         <span class="session-navn">{formaterNavn(navn)}</span>
                         <span class="session-status" class:vinder={data.isWinner} class:doed={data.isDead}>
-                            {data.isWinner ? 'Sluppet væk' : (data.isDead ? 'Død' : 'I tågen')}
+                            {spillerStatus(data)}
                         </span>
                     </div>
                     <div class="session-stats">

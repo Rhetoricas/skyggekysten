@@ -764,6 +764,7 @@
         spilTilstand.livspoint = 100;
         spilTilstand.guldTotal = 0;
         spilTilstand.maxKolonne = 0;
+        spilTilstand.doedsAarsag = null;
         spilTilstand.nuvaerendeEnergi = 0;
         spilTilstand.mitUdstyr = [];
         spilTilstand.mineKendteFelter = [];
@@ -1169,6 +1170,7 @@
         spilTilstand.historik = [];
         spilTilstand.logHistorik = [];
         spilTilstand.samletScore = 0;
+        spilTilstand.doedsAarsag = null;
         scoreErGemt = false;
         nyGlobalRekord = false;
         initialiserGitter(spilTilstand.kortBredde, spilTilstand.kortHoejde);
@@ -1450,6 +1452,7 @@
         
         spilTilstand.guldTotal = karakter.startGuld;
         spilTilstand.maxKolonne = 1;
+        spilTilstand.doedsAarsag = null;
         spilTilstand.dag = 1;
         spilTilstand.nuvaerendeEnergi = karakter.baseEnergi;
         spilTilstand.mitUdstyr = [];
@@ -1473,6 +1476,7 @@
             spiller.historik = [];
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isDead = false;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].isWinner = false;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].deathCause = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].dag = 1; 
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].besoegteMiner = [];
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].harSkattekort = false;
@@ -1500,6 +1504,7 @@
                 tidligereHistorik: arkiveredeRuter,
                 isDead: false,
                 isWinner: false,
+                deathCause: null,
                 venteFriIndtilDag: 0,
                 sidstAktiv: 0
             };
@@ -1606,7 +1611,8 @@
                 dag: spilTilstand.dag,
                 sidstAktiv: Date.now(),
                 isDead: false,
-                isWinner: false
+                isWinner: false,
+                deathCause: null
             } as SpillerData);
         }
         
@@ -2488,7 +2494,7 @@ function udførBevægelse(nytIndeks: number) {
                     <img src={data.ikon || '/tiles/player.webp'} alt="" />
                     <div class="info">
                         <strong>{navn}</strong>
-                        <span>{data.isWinner ? 'Sluppet væk' : (data.isDead ? 'Død' : 'I tågen')}</span>
+                        <span>{data.isWinner ? 'Sluppet væk' : (data.isDead ? (data.deathCause ? `Død i ${data.deathCause === 'vand' ? 'vand' : 'tåge'}` : 'Død') : 'I tågen')}</span>
                     </div>
                     <div class="stats">
                         <span title="Score">{score}</span>

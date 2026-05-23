@@ -36,6 +36,7 @@ type ScoreRaekke = {
     character?: string;
     is_winner?: boolean;
     is_dead?: boolean;
+    death_cause?: 'vand' | 'taage' | null;
     days?: number;
     gold?: number;
     max_column?: number;
@@ -52,6 +53,7 @@ type HighscorePayload = {
     character?: string;
     is_winner: boolean;
     is_dead: boolean;
+    death_cause?: 'vand' | 'taage' | null;
     days: number;
     gold: number;
     max_column: number;
@@ -256,6 +258,7 @@ export async function syncTilDb(opdaterKort = false) {
         tidligereHistorik: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.tidligereHistorik || [],
         isDead: isDead,
         isWinner: isWinner,
+        deathCause: isDead ? spilTilstand.doedsAarsag : null,
         escapeIndex: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.escapeIndex ?? null,
         escapeIcon: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.escapeIcon ?? spilTilstand.valgtKarakter?.ikon ?? null,
         sidstAktiv: Date.now(), 
@@ -467,6 +470,7 @@ export async function gemHighscore() {
         character: spilTilstand.valgtKarakter?.navn,
         is_winner: isWinner,
         is_dead: isDead,
+        death_cause: isDead ? spilTilstand.doedsAarsag : null,
         days: spilTilstand.dag,
         gold: spilTilstand.guldTotal,
         max_column: spilTilstand.maxKolonne,
@@ -540,6 +544,7 @@ export async function gemAfsluttetSpillerISession() {
         tidligereHistorik: eksisterende?.tidligereHistorik || [],
         isDead,
         isWinner,
+        deathCause: isDead ? spilTilstand.doedsAarsag : null,
         escapeIndex: eksisterende?.escapeIndex ?? null,
         escapeIcon: eksisterende?.escapeIcon ?? spilTilstand.valgtKarakter?.ikon ?? null,
         score: spilTilstand.samletScore,
@@ -701,6 +706,7 @@ function formaterTopScores(data: ScoreRaekke[] | null | undefined, antal = 10) {
                 karakter: raekke.character,
                 erVinder: raekke.is_winner,
                 erDoed: raekke.is_dead,
+                doedsAarsag: raekke.death_cause,
                 dage: raekke.days,
                 guld: raekke.gold,
                 maxKolonne: raekke.max_column,
@@ -722,6 +728,7 @@ export async function hentHighscores(karakterKlasse?: string | null) {
             karakter: score.karakter,
             erVinder: score.erVinder,
             erDoed: score.erDoed,
+            doedsAarsag: score.doedsAarsag,
             dage: score.dage,
             guld: score.guld,
             maxKolonne: score.maxKolonne,
@@ -733,7 +740,7 @@ export async function hentHighscores(karakterKlasse?: string | null) {
 
     let query = supabase
         .from('game_results')
-        .select('id, player_name, score, character')
+        .select('id, player_name, score, character, is_winner, is_dead, death_cause')
         .eq('room_code', spilTilstand.rumKode);
 
     if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
@@ -759,7 +766,10 @@ export async function hentHighscores(karakterKlasse?: string | null) {
                 id: raekke.id,
                 navn: raekke.player_name,
                 score: raekke.score,
-                karakter: raekke.character
+                karakter: raekke.character,
+                erVinder: raekke.is_winner,
+                erDoed: raekke.is_dead,
+                doedsAarsag: raekke.death_cause
             });
             if (unikke.length === 10) break;
         }
@@ -777,7 +787,7 @@ export async function hentGlobalTopHundrede(karakterKlasse?: string | null) {
 
     let query = supabase
         .from('game_results')
-        .select('id, player_name, room_code, score, character');
+        .select('id, player_name, room_code, score, character, is_winner, is_dead, death_cause');
 
     if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
 
@@ -800,7 +810,7 @@ export async function hentHighscoreDetaljer(id: number) {
 
     const { data, error } = await supabase
         .from('game_results')
-        .select('is_winner, is_dead, days, gold, max_column, known_fields_count, mines_owned, player_count')
+        .select('is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count')
         .eq('id', id)
         .single();
 
@@ -812,6 +822,7 @@ export async function hentHighscoreDetaljer(id: number) {
     return {
         erVinder: data.is_winner,
         erDoed: data.is_dead,
+        doedsAarsag: data.death_cause,
         dage: data.days,
         guld: data.gold,
         maxKolonne: data.max_column,

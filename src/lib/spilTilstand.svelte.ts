@@ -19,6 +19,7 @@ export const spilTilstand = $state({
     offlineMode: false,
     erHost: false,
     gameState: 'start' as 'start' | 'select' | 'play' | 'dead' | 'dead_map' | 'win' | 'win_map',
+    doedsAarsag: null as 'vand' | 'taage' | null,
     gitter: [] as Felt[],
     kortBredde: STANDARD_KORT_BREDDE,
     kortHoejde: STANDARD_KORT_HOEJDE,

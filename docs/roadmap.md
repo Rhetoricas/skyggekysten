@@ -79,6 +79,7 @@ Nuværende retning:
 
 Åbne ideer:
 
+- Banditlejr-shop: overvej at banditfelter kan have en lille sortbørs-shop med kølle og dirk til salg.
 - Lager kan have begrænset antal pr. dag, men pas på at det føles som en dum butik.
 - Dagsgenopfyldning koster tid, så det kan være en strategi uden at være gratis.
 - Flere ens basisvarer i en butik kan være tilfældigt 1-3, hvis det ikke giver shopping-mikrostyring.

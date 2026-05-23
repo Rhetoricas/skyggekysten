@@ -22,6 +22,7 @@ create table if not exists public.game_results (
     character text,
     is_winner boolean not null default false,
     is_dead boolean not null default false,
+    death_cause text check (death_cause in ('vand', 'taage')),
     days integer not null default 0,
     gold integer not null default 0,
     max_column integer not null default 0,
@@ -39,6 +40,10 @@ check (game_mode in ('open', 'offline'));
 
 alter table public.game_results
 add column if not exists player_count integer not null default 1;
+
+alter table public.game_results
+add column if not exists death_cause text
+check (death_cause in ('vand', 'taage'));
 
 do $$
 declare
