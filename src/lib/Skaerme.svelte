@@ -269,8 +269,16 @@
         globalHighscoreSide = (normaliserHighscoreSide(globalHighscoreSide, globaleScores) + 1) % highscoreSideAntal(globaleScores);
     }
 
+    function forrigeGlobalHighscoreSide() {
+        globalHighscoreSide = normaliserHighscoreSide(globalHighscoreSide, globaleScores) - 1;
+    }
+
     function naesteKlasseHighscoreSide() {
         klasseHighscoreSide = (normaliserHighscoreSide(klasseHighscoreSide, klasseScores) + 1) % highscoreSideAntal(klasseScores);
+    }
+
+    function forrigeKlasseHighscoreSide() {
+        klasseHighscoreSide = normaliserHighscoreSide(klasseHighscoreSide, klasseScores) - 1;
     }
 
     function maskeretEmail(email?: string) {
@@ -589,6 +597,7 @@
 
 {#snippet globalHighscoreTavle()}
     {@const sideStart = highscoreSideStart(globalHighscoreSide, globaleScores)}
+    {@const aktuelSide = normaliserHighscoreSide(globalHighscoreSide, globaleScores)}
     <div class="tavle">
         <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
@@ -619,6 +628,7 @@
 
 {#snippet klasseHighscoreTavle()}
     {@const sideStart = highscoreSideStart(klasseHighscoreSide, klasseScores)}
+    {@const aktuelSide = normaliserHighscoreSide(klasseHighscoreSide, klasseScores)}
     <div class="tavle klasse-tavle">
         <img src="/screens/boardglobal.webp" alt="Karakterklasse tavle" class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
