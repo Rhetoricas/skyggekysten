@@ -25,14 +25,14 @@ export function udloesBersaerkHvisRelevant(faktiskSkade: number) {
     if (faktiskSkade < BERSAERK_MIN_HP_TAB) return '';
     if (spilTilstand.sidsteBersaerkDag === spilTilstand.dag) return '';
 
-    if (spilTilstand.gratisNaesteBevaegelse) {
+    if (spilTilstand.gratisNaesteBevaegelse && spilTilstand.gratisBevaegelseKilde === 'bersaerk') {
         return '';
     }
 
     spilTilstand.sidsteBersaerkDag = spilTilstand.dag;
     spilTilstand.gratisNaesteBevaegelse = true;
     spilTilstand.gratisBevaegelseKilde = 'bersaerk';
-    return ' Smerten vækker bersærkergangen. Næste bevægelse koster 0 energi.';
+    return ' Smerten vækker bersærkergangen. Næste energikrævende handling koster 0 energi.';
 }
 
 function tilfoejGravsten(felt: Felt, tekst: string) {

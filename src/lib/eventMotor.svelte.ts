@@ -3,6 +3,7 @@ import { eventBibliotek } from './eventBibliotek';
 import { afslørFalkebueSyn, tilfoejTilRygsæk, brugFraRygsæk, harRygsaekItem, findRygsaekItemTilKrav } from './spilmotor';
 import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremrykTid, udloesBersaerkHvisRelevant } from './overlevelse.svelte';
+import { brugEnergi } from './energi';
 import type { Valg } from './eventBibliotek';
 
 export const eventState = $state({
@@ -66,7 +67,8 @@ export function kanViseValg(valg: Valg) {
         if (!findRygsaekItemTilKrav(valg.kosterItem)) return false;
     }
 
-    if (valg.kosterEnergi && spilTilstand.nuvaerendeEnergi < valg.kosterEnergi) return false;
+    const bersaerkBetalerEnergi = spilTilstand.gratisNaesteBevaegelse && spilTilstand.gratisBevaegelseKilde === 'bersaerk';
+    if (valg.kosterEnergi && spilTilstand.nuvaerendeEnergi < valg.kosterEnergi && !bersaerkBetalerEnergi) return false;
 
     return true;
 }
@@ -119,12 +121,16 @@ export function tagValg(valg: Valg) {
         if (betaltItem) brugFraRygsæk(betaltItem, 1);
     }
     if (valg.puljeVaerdi) spilTilstand.guldTotal -= valg.puljeVaerdi;
-    if (valg.kosterEnergi) spilTilstand.nuvaerendeEnergi -= valg.kosterEnergi;
+    let gratisEnergiKvittering = "";
+    if (valg.kosterEnergi) {
+        const energiBetaling = brugEnergi(valg.kosterEnergi);
+        if (energiBetaling.gratis) gratisEnergiKvittering = " (Bersærkergangen betaler energien)";
+    }
 
     eventState.valgLåst = true;
 
     let samletLogTekst = "";
-    let kvittering = "";
+    let kvittering = gratisEnergiKvittering;
 
     if (valg.udfaldListe && valg.udfaldListe.length > 0) {
         const resultat = { ...valg.udfaldListe[Math.floor(Math.random() * valg.udfaldListe.length)] };

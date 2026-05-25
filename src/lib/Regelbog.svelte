@@ -67,7 +67,7 @@
                         <li>Hver bevægelse koster energi. Prisen afhænger af karakter, udstyr, terræn og eventuelle terrænfordele.</li>
                         <li>Du kan godt bruge mere energi, end du har tilbage. Så går dagen videre efter handlingen, og du får ny energi.</li>
                         <li>Bevægelse i tågen koster 2 ekstra energi.</li>
-                        <li>Mad og bersærkergang kan gøre næste bevægelse gratis.</li>
+                        <li>Mad kan gøre næste bevægelse gratis. Bersærkergang kan gøre næste energikrævende handling gratis.</li>
                         <li>Hvis du kommer mindst 5 dage foran den langsomste aktive spiller i multiplayer, åbner ventespillet. Bordet lukker, når den langsomste når din dag, når tågen rammer feltet, eller efter højst 60 sekunder. Når bordet lukker, kan du spille mindst 5 dage uden nyt ventespil. Du får én gratis ventespilsrunde på det felt, du står på; flere runder på samme felt koster 5 guld.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Har du 3 energi tilbage, og et bjerg koster 6, kan du stadig gå derind. Du ender på negativ energi, feltet aktiveres, og bagefter går tiden videre til næste dag.</p>
@@ -79,7 +79,6 @@
                         <li>Du afslører felter omkring dig, når du bevæger dig. Din synsradius kommer fra karakteren og udstyr som fakkel.</li>
                         <li>Bjerge blokerer udsyn, medmindre du selv står på et bjerg. Bjergfelter giver mindst radius 2, når du kommer derop.</li>
                         <li>Tågen begynder først at rykke efter dag 6. Hvis du står i tågen, når tiden går, tager du skade.</li>
-                        <li>I tågen kan du lave blodoffer: -10 Max HP for +50 HP.</li>
                         <li>Nogle sjældne events kan holde tågen tilbage, blokere den bag et felt eller vise en båd for alle.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Jæger, skytte, opdager og eventyrer ser længere end de fleste. Står der et bjerg imellem dig og kysten, kan ukendte farer stadig gemme sig bag det, indtil du får et bedre udsyn.</p>
@@ -91,11 +90,11 @@
                         <li>HP er dit helbred. Når HP rammer 0 uden for tåge og hav, kollapser du normalt i stedet for at dø.</li>
                         <li>Ved kollaps mister du halvdelen af dit guld, tiden går, og du vågner kort efter med 10 HP.</li>
                         <li>Hvis HP rammer 0 i tågen eller i vand, dør du, medmindre en livseliksir redder dig først.</li>
-                        <li>Livseliksir bruges automatisk ved dødelig skade eller kollaps og sætter HP til 90.</li>
+                        <li>Livseliksir bruges automatisk ved dødelig skade eller kollaps og giver dig op til 90 HP tilbage, selv om dit max er højere.</li>
                         <li>Rustning mindsker skade. Kongepanser mindsker skade med 70%, men er stadig tungt. Elverrustning beskytter som almindelig rustning, men er ikke tung. Ridder med rustning eller panser tager ingen skade fra nedgravede fælder.</li>
                         <li>Mad giver +20 HP og gør næste bevægelse gratis. Sovepose kan bruges i vildmarken og giver +20 HP, men bruger resten af dagen. Silkesovepose giver +40 HP og bliver kun nedgraderet til almindelig sovepose af hulefugt.</li>
                         <li>Fakkel udvider synet med +1. Solfakkel udvider synet med +2. Begge kan bruges til bål; solbålet afslører et større område og giver 100 guld i stedet for 50.</li>
-                        <li>Viking og valkyrie går automatisk bersærk første gang pr. dag, de tager mindst 5 skade. Næste bevægelse koster 0 energi.</li>
+                        <li>Viking og valkyrie går automatisk bersærk første gang pr. dag, de tager mindst 5 skade. Næste energikrævende handling koster 0 energi.</li>
                         <li>Vand og oversvømmelse slukker fakler. Almindelig rustning og kongepanser går tabt i vand; elverrustning gør ikke.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Hvis du har 12 HP og står foran et farligt felt, kan mad være bedre end at spare det. Hvis du alligevel ryger i 0 HP på land, kollapser du; sker det i tågen eller vandet, er det langt farligere.</p>
@@ -162,7 +161,7 @@
                         <li>Subevents er fortsættelser af samme event og bliver ikke trukket som almindelige events.</li>
                         <li>Hvis et event kræver eller bruger en almindelig genstand, kan en opgraderet version ofte tælle som samme type. Betales den, ryger den opgraderede genstand også.</li>
                         <li>Stormøksen forbedrer øksevalg i events med mere guld og mindre skade. Falkebuen forbedrer buevalg og afslører tre felter mod øst efter skuddet.</li>
-                        <li>Meteorstenen kan åbnes med hænderne eller med udstyr som skovl, økse, kølle og sværd. Mesterskovlen giver 600 guld og en diamant, men skovlen går tabt i stenen.</li>
+                        <li>Meteorstenen kan åbnes med hænderne eller med udstyr som skovl, økse, kølle og sværd. Åbner du den med et værktøj, går værktøjet tabt, og du får guld og en diamant. Mesterskovlen giver det største udbytte. Guldet behandles som event-guld og påvirkes af guldmodifier.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Et jordskælv kan gøre en eng til bjerg eller ruin. Hvis der lå en guldmine, butik, båd eller et værksted på feltet, er det væk bagefter. Et eventvalg kan altså være godt for dig her og nu, men dyrt for kortet.</p>
                 </section>

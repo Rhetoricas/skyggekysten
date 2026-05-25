@@ -1,6 +1,7 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremtvingKollaps, fremrykTid, udloesBersaerkHvisRelevant } from '$lib/overlevelse.svelte';
+import { brugEnergi } from '$lib/energi';
 import { afslørOmraade, tilfoejTilRygsæk } from '$lib/spilmotor';
 import { startEvent } from '$lib/eventMotor.svelte';
 import type { Biome } from './types';
@@ -115,12 +116,15 @@ export function grav() {
     let udstyrsLog = ""; 
 
     const faktiskEnergiPris = harSkovl ? baseGravePris : baseGravePris + 4;
-    spilTilstand.nuvaerendeEnergi -= faktiskEnergiPris;
+    const energiBetaling = brugEnergi(faktiskEnergiPris);
+    const energiTekst = energiBetaling.gratis ? 'bersærkergangen betaler energien' : `${faktiskEnergiPris} Energi`;
 
     if (!harSkovl) {
         const skade = spilTilstand.beregnSkade(4);
         spilTilstand.livspoint -= skade;
-        udstyrsLog = ` Du graver uden skovl. Du mister ${skade} HP og ${faktiskEnergiPris} Energi.${udloesBersaerkHvisRelevant(skade)}`;
+        udstyrsLog = ` Du graver uden skovl. Du mister ${skade} HP og ${energiTekst}.${udloesBersaerkHvisRelevant(skade)}`;
+    } else if (energiBetaling.gratis) {
+        udstyrsLog = " Bersærkergangen betaler energien.";
     }
 
     const guldVaerdi = felt.skjultGuld ?? 0;

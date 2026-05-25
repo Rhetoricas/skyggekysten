@@ -6,6 +6,7 @@ import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
 import { fremrykTid, fremtvingKollaps, tagSkadeOgTjekDød, udloesBersaerkHvisRelevant } from '$lib/overlevelse.svelte';
+import { brugEnergi } from '$lib/energi';
 import { erAfgroedeModen, erHvedeBlok, erInsektPlageAktiv, hentAfgroedeBlok } from '$lib/afgroeder';
 import type { Biome, Felt, RygsækTing } from '$lib/types';
 import { delNyeKort, startVenteSpil } from '$lib/ventespil.svelte';
@@ -844,13 +845,7 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     const biomeRabat = spilTilstand.valgtKarakter.biomeMod?.[felt.biome as string] || 0;
     const pris = Math.max(1, spilTilstand.valgtKarakter.moveCost + spilTilstand.rygsækEffekt.move + grundPris + biomeRabat);
 
-    const gratisBevaegelse = spilTilstand.gratisNaesteBevaegelse;
-    const gratisBevaegelseKilde = spilTilstand.gratisBevaegelseKilde;
-    spilTilstand.nuvaerendeEnergi -= gratisBevaegelse ? 0 : (options.erITaagen ? pris + 2 : pris);
-    if (gratisBevaegelse) {
-        spilTilstand.gratisNaesteBevaegelse = false;
-        spilTilstand.gratisBevaegelseKilde = '';
-    }
+    const energiBetaling = brugEnergi(options.erITaagen ? pris + 2 : pris, 'bevaegelse');
 
     const gammelIndex = spilTilstand.spillerIndex;
     spilTilstand.spillerIndex = nytIndeks;
@@ -864,7 +859,7 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     if (nyKolonne > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nyKolonne;
 
     const ankomstResultat = haandterAnkomstPaaFelt(nytIndeks, 'gang', {
-        startLog: gratisBevaegelse ? (gratisBevaegelseKilde === 'bersaerk' ? "Bersærkergangen bærer dig frem. Bevægelsen koster 0 energi." : "Maden holder dig i gang. Bevægelsen koster 0 energi.") : "",
+        startLog: energiBetaling.gratis ? (energiBetaling.kilde === 'bersaerk' ? "Bersærkergangen bærer dig frem. Bevægelsen koster 0 energi." : "Maden holder dig i gang. Bevægelsen koster 0 energi.") : "",
         onBaadStart: options.onBaadStart
     });
     tjekAutoTracker();
@@ -949,14 +944,15 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         const hpFoer = spilTilstand.livspoint;
         spilTilstand.livspoint += harRodhjertet ? skjultLiv * 2 : skjultLiv;
         const faktiskHeling = spilTilstand.livspoint - hpFoer;
-        spilTilstand.nuvaerendeEnergi -= 1;
+        const energiBetaling = brugEnergi(1);
+        const energiTekst = energiBetaling.gratis ? "bersærkergangen betaler energien" : "-1 energi";
         felt.skjultLiv = 0;
         felt.skjultGuld = 0;
         felt.skjultLoot = null;
         felt.skjultFaelde = false;
         ekstraLog += faktiskHeling > 0
-            ? ` Runekvisten trækker rødderne op uden at grave. Jorden falder sammen til sten og orme. (+${faktiskHeling} HP, -1 energi)`
-            : " Runekvisten trækker rødderne op uden at grave, men du kan ikke rumme mere liv. Jorden falder sammen til sten og orme. (-1 energi)";
+            ? ` Runekvisten trækker rødderne op uden at grave. Jorden falder sammen til sten og orme. (+${faktiskHeling} HP, ${energiTekst})`
+            : ` Runekvisten trækker rødderne op uden at grave, men du kan ikke rumme mere liv. Jorden falder sammen til sten og orme. (${energiTekst})`;
         broadcastFelt(nytIndeks, felt);
         mapAendret = true;
     }
@@ -1148,7 +1144,7 @@ export function udfoerTeleportMedOptions(options: TeleportOptions) {
     }
 
     const pris = options.energiPris ?? spilTilstand.valgtKarakter.baseEnergi;
-    spilTilstand.nuvaerendeEnergi -= pris;
+    const energiBetaling = brugEnergi(pris);
 
     const gammeltIndeks = spilTilstand.spillerIndex;
     const maal = beregnTeleportMaal(gammeltIndeks, options.afstand ?? 4);
@@ -1170,7 +1166,9 @@ export function udfoerTeleportMedOptions(options: TeleportOptions) {
     }
 
     haandterAnkomstPaaFelt(maal.indeks, options.kilde, {
-        startLog: options.startLog
+        startLog: energiBetaling.gratis
+            ? `${options.startLog ?? ''} Bersærkergangen betaler energien.`.trim()
+            : options.startLog
     });
     tjekAutoTracker();
     return true;
@@ -1214,7 +1212,7 @@ export function udfoerDrageTeleport() {
     }
 
     const pris = spilTilstand.valgtKarakter.baseEnergi;
-    spilTilstand.nuvaerendeEnergi -= pris;
+    const energiBetaling = brugEnergi(pris);
     spilTilstand.spillerIndex = maalIndeks;
     if (maalIndeks !== gammeltIndeks) spilTilstand.venteGratisFeltBrugt = null;
     if (!spilTilstand.historik) spilTilstand.historik = [];
@@ -1227,10 +1225,11 @@ export function udfoerDrageTeleport() {
         spilTilstand.maxKolonne = kolonne;
     }
 
-    haandterAnkomstPaaFelt(maalIndeks, 'stav', {
-        startLog: nedgraderet
+    const startLog = nedgraderet
             ? "Dragestaven kaster dig mod øst, men åbent vand svarer igen. Den redder dig til sidste sikre felt og brænder ned til en almindelig stav."
-            : "Dragestaven flytter dig fem felter mod øst og viser ruten imellem."
+            : "Dragestaven flytter dig fem felter mod øst og viser ruten imellem.";
+    haandterAnkomstPaaFelt(maalIndeks, 'stav', {
+        startLog: energiBetaling.gratis ? `${startLog} Bersærkergangen betaler energien.` : startLog
     });
     tjekAutoTracker();
     return true;
@@ -1516,7 +1515,8 @@ export function begaaIndbrud() {
     const opdagelsesChance = erTyveklasse() ? 0.1 : erTungKrigerklasse() ? 0.45 : 0.25;
     const opdaget = Math.random() < opdagelsesChance;
 
-    spilTilstand.nuvaerendeEnergi -= energiPris;
+    const energiBetaling = brugEnergi(energiPris);
+    const energiLog = energiBetaling.gratis ? "Bersærkergangen betaler energien." : `Det koster ${energiPris} energi.`;
     felt.indbrudt = true;
     spilTilstand.guldTotal += udbytte;
     spilTilstand.gitter[indeks] = { ...felt };
@@ -1525,11 +1525,11 @@ export function begaaIndbrud() {
         const grundSkade = erTungKrigerklasse() ? 16 : 22;
         tagSkadeOgTjekDød(
             grundSkade,
-            `Du begår indbrud${harMesterdirk ? ' med mesterdirken' : ''} og finder ${udbytte} guld. Det koster ${energiPris} energi. Du bliver opdaget og får tæv.`,
+            `Du begår indbrud${harMesterdirk ? ' med mesterdirken' : ''} og finder ${udbytte} guld. ${energiLog} Du bliver opdaget og får tæv.`,
             "Vagterne slog dig ihjel."
         );
     } else {
-        spilTilstand.logBesked = `Du begår indbrud${harMesterdirk ? ' med mesterdirken' : ''} og finder ${udbytte} guld. Det koster ${energiPris} energi. Ingen når at stoppe dig.`;
+        spilTilstand.logBesked = `Du begår indbrud${harMesterdirk ? ' med mesterdirken' : ''} og finder ${udbytte} guld. ${energiLog} Ingen når at stoppe dig.`;
     }
 
     spilTilstand.gitter = [...spilTilstand.gitter];
@@ -1579,7 +1579,8 @@ export function plyndrFelt() {
     const raaLoot = kasseLoot + basisLoot;
     const loot = spilTilstand.beregnGuldIndkomst(raaLoot);
 
-    spilTilstand.nuvaerendeEnergi -= energiPris;
+    const energiBetaling = brugEnergi(energiPris);
+    const energiLog = energiBetaling.gratis ? "Bersærkergangen betaler energien." : `Det koster ${energiPris} energi.`;
     spilTilstand.guldTotal += loot;
     felt.plyndret = undefined;
     felt.indbrudt = undefined;
@@ -1606,7 +1607,7 @@ export function plyndrFelt() {
     const kasseLog = kasseIndhold > 0 ? " Det meste af kassen ryger med i byttet." : "";
     const skraemteHandlende = skraemNaboHandlende(indeks);
     const skraemmeLog = skraemteHandlende > 0 ? " Naboernes handlende har set nok og nægter at handle med dig." : "";
-    const smadreLog = `Du smadrer ${varMarked ? 'markedet' : havdeVaerksted ? 'værkstedet' : 'byen'} i blodrus og skraber ${loot} guld ud af resterne. Det koster ${energiPris} energi.${kasseLog}${ekstra}${skraemmeLog}`;
+    const smadreLog = `Du smadrer ${varMarked ? 'markedet' : havdeVaerksted ? 'værkstedet' : 'byen'} i blodrus og skraber ${loot} guld ud af resterne. ${energiLog}${kasseLog}${ekstra}${skraemmeLog}`;
 
     broadcastFelt(indeks, spilTilstand.gitter[indeks]);
     syncKortTilDbSenere();
@@ -2584,7 +2585,8 @@ export function udloesInsektPlage(centerIndex: number) {
 
 export function udvindMeteorSkat(metode: string): { logBesked: string; hpNed?: number; guldOp?: number; itemUd?: string } {
     const pris = spilTilstand.valgtKarakter ? spilTilstand.valgtKarakter.baseEnergi * 2 : 10;
-    spilTilstand.nuvaerendeEnergi -= pris;
+    const energiBetaling = brugEnergi(pris);
+    const energiLog = energiBetaling.gratis ? " Bersærkergangen betaler energien." : "";
     
     const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
     felt.hasMeteorStone = false;
@@ -2592,13 +2594,13 @@ export function udvindMeteorSkat(metode: string): { logBesked: string; hpNed?: n
     
     if (metode === 'haender') {
         return {
-            logBesked: `Du får noget af guldet fri af stenen.`,
+            logBesked: `Du får noget af guldet fri af stenen.${energiLog}`,
             hpNed: 20,
             guldOp: 150
         };
     } else {
         return {
-            logBesked: `Værktøjet går tabt, men du får stenen åbnet.`,
+            logBesked: `Værktøjet går tabt, men du får stenen åbnet.${energiLog}`,
             guldOp: metode === 'mesterskovl' ? 600 : 300,
             itemUd: 'diamant' 
         };

@@ -30,7 +30,7 @@
     let energiHjaelp = $derived(
         spilTilstand.gratisNaesteBevaegelse
             ? (spilTilstand.gratisBevaegelseKilde === 'bersaerk'
-                ? 'Din næste bevægelse koster 0 energi på grund af bersærkergang.'
+                ? 'Din næste energikrævende handling koster 0 energi på grund af bersærkergang.'
                 : 'Din næste bevægelse koster 0 energi på grund af mad.')
             : 'Energi bruges på bevægelse, gravning og visse handlinger. Når energien løber tør, går dagen videre efter handlingen.'
     );
