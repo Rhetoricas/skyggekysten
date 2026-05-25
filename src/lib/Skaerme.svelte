@@ -619,6 +619,11 @@
             {/if}
         </div>
         {#if globaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
+            {#if aktuelSide > 0}
+                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeGlobalHighscoreSide} aria-label="Vis forrige 10 globale highscores">
+                    &lt;
+                </button>
+            {/if}
             <button type="button" class="highscore-naeste" onclick={naesteGlobalHighscoreSide} aria-label="Vis nÃ¦ste 10 globale highscores">
                 &gt;
             </button>
@@ -650,6 +655,11 @@
             {/if}
         </div>
         {#if klasseScores.length > HIGHSCORE_SIDE_STOERRELSE}
+            {#if aktuelSide > 0}
+                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeKlasseHighscoreSide} aria-label="Vis forrige 10 highscores for karakterklassen">
+                    &lt;
+                </button>
+            {/if}
             <button type="button" class="highscore-naeste" onclick={naesteKlasseHighscoreSide} aria-label="Vis nÃ¦ste 10 highscores for karakterklassen">
                 &gt;
             </button>
@@ -1331,6 +1341,7 @@
         font-size: 1.35rem; line-height: 1; cursor: pointer;
         display: inline-flex; align-items: center; justify-content: center;
     }
+    .highscore-forrige { left: calc(50% - 46px); }
     .highscore-naeste:hover { background: rgba(245, 208, 113, 0.14); }
     .karakter-navn { color: #9aa69d; font-size: 0.75rem; }
     .status { color: #ccc; margin-top: 15px; }
