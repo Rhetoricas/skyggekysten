@@ -873,12 +873,14 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
     const charId = spilTilstand.valgtKarakter?.id;
 
     const nulHp = ['mark', 'by', 'eng', 'marked', 'hoejland', 'skov'];
-    const toHp = ['bjerg', 'hule'];
+    const toHp = ['hule', 'meteor'];
     const erDvaerg = charId === 'dwarf_m' || charId === 'dwarf_f';
     let hpStraf = 0;
     
     if (nulHp.includes(felt.biome as string)) hpStraf = 0;
-    else if (toHp.includes(felt.biome as string)) hpStraf = 3;
+    else if (felt.biome === 'bjerg') hpStraf = 3;
+    else if (toHp.includes(felt.biome as string)) hpStraf = 2;
+    else if (felt.biome === 'blodskov') hpStraf = 1;
     if (erDvaerg && felt.biome === 'bjerg') hpStraf = 1;
 
     if (hpStraf > 0) {
@@ -2593,18 +2595,54 @@ export function udvindMeteorSkat(metode: string): { logBesked: string; hpNed?: n
     broadcastFelt(spilTilstand.spillerIndex, felt);
     
     if (metode === 'haender') {
+        const toejLog = flensToejPaaMeteor();
         return {
-            logBesked: `Du får noget af guldet fri af stenen.${energiLog}`,
+            logBesked: `Du får noget af guldet fri af stenen.${energiLog}${toejLog}`,
             hpNed: 20,
-            guldOp: 150
+            guldOp: 100
         };
     } else {
         return {
             logBesked: `Værktøjet går tabt, men du får stenen åbnet.${energiLog}`,
-            guldOp: metode === 'mesterskovl' ? 600 : 300,
+            guldOp: metode === 'mesterskovl' ? 500 : 250,
             itemUd: 'diamant' 
         };
     }
+}
+
+function flensToejPaaMeteor() {
+    const logBeskeder: string[] = [];
+    let mistetFintToej = 0;
+    let nedgraderetRoyaltToej = 0;
+
+    spilTilstand.mitUdstyr = spilTilstand.mitUdstyr.filter(vare => {
+        if (vare.id === 'royalt_toej') {
+            nedgraderetRoyaltToej += vare.maengde;
+            logBeskeder.push("Meteorens varme flænser dit royale tøj. Det bliver til almindeligt fint tøj.");
+            return false;
+        }
+        if (vare.id === 'flot_toej') {
+            mistetFintToej += vare.maengde;
+            logBeskeder.push("Meteorens varme ødelægger dit fine tøj.");
+            return false;
+        }
+        return true;
+    });
+
+    if (mistetFintToej > 0) {
+        const klude = spilTilstand.mitUdstyr.find(i => i.id === 'klude');
+        if (klude) {
+            klude.maengde += mistetFintToej;
+        } else {
+            spilTilstand.mitUdstyr.push({ id: 'klude', maengde: mistetFintToej });
+        }
+    }
+
+    if (nedgraderetRoyaltToej > 0) {
+        spilTilstand.mitUdstyr.push({ id: 'flot_toej', maengde: nedgraderetRoyaltToej });
+    }
+
+    return logBeskeder.length > 0 ? " " + logBeskeder.join(" ") : "";
 }
 
 export function nulstilKort() {
