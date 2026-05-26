@@ -1217,6 +1217,7 @@
         initAuth();
         preloadFiler();
         let genopretterForbindelse = false;
+        let sidstGenopfrisketVedFokus = 0;
         const pendingStart = laesPendingStart();
         if (pendingStart && pendingStart.refreshes > 0 && Date.now() - pendingStart.startet < 2 * 60 * 1000) {
             spilTilstand.spillerNavn = pendingStart.navn;
@@ -1284,6 +1285,42 @@
             }
         };
 
+        const genopfriskListerEfterReconnect = async () => {
+            if (spilTilstand.offlineMode) {
+                lokaleScores = await hentHighscores();
+                return;
+            }
+
+            const gemteVentende = authState.user?.id ? await retryVentendeHighscores() : 0;
+            if (gemteVentende > 0) {
+                scoreErGemt = true;
+                scoreGemningFejlet = false;
+                spilTilstand.statusBesked = gemteVentende === 1
+                    ? 'En ventende score blev gemt efter genoprettet forbindelse.'
+                    : `${gemteVentende} ventende scores blev gemt efter genoprettet forbindelse.`;
+            }
+
+            const klasse = aktuelHighscoreKlasse();
+            const [nyeLokaleScores, nyeGlobaleScores, nyeKlasseScores] = await Promise.all([
+                hentHighscores(),
+                hentGlobalTopHundrede(),
+                klasse ? hentGlobalTopHundrede(klasse) : Promise.resolve([])
+            ]);
+            lokaleScores = nyeLokaleScores;
+            globaleScores = nyeGlobaleScores;
+            klasseScores = nyeKlasseScores;
+        };
+
+        const genopfriskEfterFokus = async () => {
+            const nu = Date.now();
+            if (nu - sidstGenopfrisketVedFokus < 2500) return;
+            sidstGenopfrisketVedFokus = nu;
+
+            await genopretForbindelse();
+            if (browser && !navigator.onLine) return;
+            await genopfriskListerEfterReconnect();
+        };
+
         const gemHvisSidenForsvinder = () => {
             void flushVentendeSync();
         };
@@ -1291,11 +1328,11 @@
             if (document.hidden) {
                 gemHvisSidenForsvinder();
             } else {
-                void genopretForbindelse();
+                void genopfriskEfterFokus();
             }
         };
         const haandterOnline = () => {
-            void genopretForbindelse();
+            void genopfriskEfterFokus();
         };
         const haandterOffline = () => {
             if (harOnlineSession()) {
