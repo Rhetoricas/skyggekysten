@@ -1081,7 +1081,9 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
                     spilTilstand.aktivShop = koebbareShopItems;
                 }
             } else if (harShop(felt)) {
-                spilTilstand.logBesked = "Butikkens hylde er tom for i dag. Kom tilbage i morgen.";
+                spilTilstand.logBesked = felt.shopItems?.includes('hemmelighed') && !harUtydedeSkattekortSpor()
+                    ? "Købmanden har ikke flere skattekort, der peger på noget nyt på denne ø."
+                    : "Butikkens hylde er tom for i dag. Kom tilbage i morgen.";
             }
         }
     }
