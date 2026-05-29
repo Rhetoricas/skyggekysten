@@ -912,7 +912,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
     }
 
     if (erVandBiome(felt.biome) && !felt.hasBoat) {
-        tagSkadeOgTjekDød(30, `Du ender i åbent vand. (-30 HP)`, "Du druknede i det åbne vand.");
+        tagSkadeOgTjekDød(30, `Du ender i åbent vand.`, "Du druknede i det åbne vand.");
         if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'dead') {
             return false;
         }
@@ -2350,7 +2350,7 @@ export async function udloesNaturkatastrofe(centerIndex: number) {
     broadcastFelter(paavirkedeArray.map((index) => ({ index, feltData: felter[index] })));
 
     if (paavirkedeArray.includes(spilTilstand.spillerIndex)) {
-        tagSkadeOgTjekDød(30, "Meteoren rammer dit felt. (-30 HP)", "Nedslaget dræbte dig.");
+        tagSkadeOgTjekDød(30, "Meteoren rammer dit felt.", "Nedslaget dræbte dig.");
     }
 
     syncTilDb(true); // Massiv meteor der smadrer tyve felter permanent. Her skal databasen æde det hele.
@@ -2411,7 +2411,7 @@ export async function udloesJordskaelv(centerIndex: number) {
     broadcastFelter(paavirkedeArray.map((index) => ({ index, feltData: felter[index] })));
 
     if (paavirkedeArray.includes(spilTilstand.spillerIndex)) {
-        tagSkadeOgTjekDød(40, "Jorden brød op under dig. (-40 HP)", "Jordskælvet dræbte dig.");
+        tagSkadeOgTjekDød(40, "Jorden brød op under dig.", "Jordskælvet dræbte dig.");
     }
 
     syncTilDb(true); // Landskab skifter fuldstændig. Æd data.

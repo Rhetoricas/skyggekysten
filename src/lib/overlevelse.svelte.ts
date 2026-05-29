@@ -16,6 +16,11 @@ export function erSpillerITaagen() {
 
 let sidstBrugtEliksir = 0;
 const BERSAERK_MIN_HP_TAB = 5;
+const SKADE_TAL_SUFFIX = /\s*\(-\d+\s*HP\)\s*$/i;
+
+function udenHardcodedSkadeTal(besked: string) {
+    return besked.replace(SKADE_TAL_SUFFIX, '');
+}
 
 export function udloesBersaerkHvisRelevant(faktiskSkade: number) {
     const karakterId = spilTilstand.valgtKarakter?.id;
@@ -177,14 +182,15 @@ function brugEliksir() {
 export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: string) {
     if (spilTilstand.gameState !== 'play') return;
     
+    const rensetBesked = udenHardcodedSkadeTal(besked);
     const faktiskSkade = spilTilstand.beregnSkade(skade);
     spilTilstand.livspoint -= faktiskSkade;
     const bersaerkLog = udloesBersaerkHvisRelevant(faktiskSkade);
     
-    const beskedMedTal = faktiskSkade > 0 ? `${besked} (-${faktiskSkade} HP)${bersaerkLog}` : besked;
+    const beskedMedTal = faktiskSkade > 0 ? `${rensetBesked} (-${faktiskSkade} HP)${bersaerkLog}` : rensetBesked;
 
     if (spilTilstand.livspoint <= 0) {
-        const erHavet = besked.includes("havet") || besked.includes("saltvand") || besked.includes("hav") || erVandBiome(spilTilstand.gitter[spilTilstand.spillerIndex]?.biome);
+        const erHavet = rensetBesked.includes("havet") || rensetBesked.includes("saltvand") || rensetBesked.includes("hav") || erVandBiome(spilTilstand.gitter[spilTilstand.spillerIndex]?.biome);
 
         if (brugEliksir()) {
             spilTilstand.logBesked = `Du faldt om. ${beskedMedTal} Eliksiren redder dig.`;

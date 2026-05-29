@@ -148,9 +148,9 @@ export function grav() {
     let fundLog = "Du finder ikke noget brugbart.";
 
     if (faelde && harMesterskovl) {
-        fundLog = "Mesterskovlen finder fælden, før den klapper. Du får den gravet fri uden skade. (-0 HP)";
+        fundLog = "Mesterskovlen finder fælden, før den klapper. Du får den gravet fri uden skade.";
     } else if (faelde && ridderPanserStopperNedgravetFaelde()) {
-        fundLog = "KLIK. Den nedgravede fælde klapper om dit panser, men ridderens træning holder benet fri. (-0 HP)";
+        fundLog = "KLIK. Den nedgravede fælde klapper om dit panser, men ridderens træning holder benet fri.";
     } else if (faelde) {
         const faeldeSkade = spilTilstand.beregnSkade(10);
         spilTilstand.livspoint -= faeldeSkade;

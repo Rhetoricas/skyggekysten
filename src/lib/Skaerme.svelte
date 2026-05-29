@@ -83,6 +83,7 @@
     let klasseHighscoreSide = $state(0);
     let valgtHighscore = $state<ValgtHighscore | null>(null);
     let visHighscoreLog = $state(false);
+    let profilNavnGemTimer: ReturnType<typeof setTimeout> | null = null;
     const HIGHSCORE_SIDE_STOERRELSE = 10;
     const lokaleKortPresets = [
         { label: '20 x 20', bredde: 20, hoejde: 20 },
@@ -359,7 +360,41 @@
         return typeof navigator !== 'undefined' && !navigator.onLine;
     }
 
-    function startSpilMedLyd() {
+    function rensProfilNavn(navn: string) {
+        return navn.replace(/[^a-zA-Z0-9æøåÆØÅ ]/g, '').trim().substring(0, 15);
+    }
+
+    async function gemProfilNavnFraStartfelt() {
+        if (!authState.user) return;
+
+        const rentNavn = rensProfilNavn(spilTilstand.spillerNavn);
+        if (!rentNavn || rentNavn === authState.profil?.display_name) return;
+
+        if (profilNavnGemTimer) {
+            clearTimeout(profilNavnGemTimer);
+            profilNavnGemTimer = null;
+        }
+
+        await gemProfilNavn(rentNavn);
+        if (authState.profil?.display_name) {
+            profilNavnInput = authState.profil.display_name;
+            spilTilstand.spillerNavn = authState.profil.display_name;
+        }
+    }
+
+    function planlaegProfilNavnGem() {
+        if (!authState.user) return;
+        if (profilNavnGemTimer) clearTimeout(profilNavnGemTimer);
+
+        profilNavnGemTimer = setTimeout(() => {
+            profilNavnGemTimer = null;
+            void gemProfilNavnFraStartfelt();
+        }, 800);
+    }
+
+    async function startSpilMedLyd() {
+        await gemProfilNavnFraStartfelt();
+
         if (spilTilstand.musikTaendt && lydStart) {
             lydStart.currentTime = 0;
             lydStart.volume = hentLydVolumen();
@@ -403,6 +438,9 @@
     $effect(() => {
         if (authState.profil?.display_name) {
             profilNavnInput = authState.profil.display_name;
+            if (spilTilstand.gameState === 'start') {
+                spilTilstand.spillerNavn = authState.profil.display_name;
+            }
         }
     });
 
@@ -802,6 +840,7 @@
                     maxlength="15" 
                     placeholder="Spillernavn" 
                     class="large-input" 
+                    oninput={planlaegProfilNavnGem}
                     onkeydown={trykEnter}
                 />
                 

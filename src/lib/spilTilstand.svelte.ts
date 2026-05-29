@@ -101,6 +101,8 @@ export const spilTilstand = $state({
             const sidsteLinje = this.logHistorik[sidsteIndex];
             if (sidsteLinje === prefix && rensetV !== '') {
                 this.logHistorik[sidsteIndex] = fuldBesked;
+            } else if (fuldBesked.startsWith(`${sidsteLinje} `)) {
+                this.logHistorik[sidsteIndex] = fuldBesked;
             } else if (sidsteLinje !== fuldBesked) {
                 this.logHistorik.push(fuldBesked);
             }

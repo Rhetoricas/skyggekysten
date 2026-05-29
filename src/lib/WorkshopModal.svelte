@@ -435,7 +435,7 @@
         }
 
         if (spilTilstand.guldTotal < SOVEPOSE_OPGRADERING_PRIS) {
-            spilTilstand.logBesked = "Mesteren kræver mere guld til silke, voksdug og guldsyning.";
+            spilTilstand.logBesked = "Mesteren kræver mere guld til silke, dun og guldsyning.";
             syncTilDb();
             return;
         }
@@ -445,7 +445,7 @@
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'sovepose' && ting.id !== 'silkesovepose'),
             { id: 'silkesovepose', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
-        spilTilstand.logBesked = "Værkstedet syr voksdug og silke omkring varmen. Din sovepose er nu en silkesovepose.";
+        spilTilstand.logBesked = "Værkstedet syr blødt silkefoer og dun i posen. Din sovepose er nu en silkesovepose.";
         afslutOpgradering();
     }
 
