@@ -3,8 +3,15 @@ import { build, files, version } from '$service-worker';
 const CACHE = `taageoerne-${version}`;
 const APP_SHELL = '/';
 const ASSETS = [APP_SHELL, ...build, ...files].filter((asset) => !asset.endsWith('.map'));
+const DEV_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0']);
+const ER_DEV_HOST = DEV_HOSTS.has(self.location.hostname);
 
 self.addEventListener('install', (event) => {
+    if (ER_DEV_HOST) {
+        event.waitUntil(self.skipWaiting());
+        return;
+    }
+
     event.waitUntil(
         caches
             .open(CACHE)
@@ -17,7 +24,7 @@ self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches
             .keys()
-            .then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))
+            .then((keys) => Promise.all(keys.filter((key) => ER_DEV_HOST || key !== CACHE).map((key) => caches.delete(key))))
             .then(() => self.clients.claim())
     );
 });
@@ -54,11 +61,14 @@ async function appShellFallback(request: Request) {
 }
 
 self.addEventListener('fetch', (event) => {
+    if (ER_DEV_HOST) return;
+
     const request = event.request;
     if (request.method !== 'GET') return;
 
     const url = new URL(request.url);
     if (url.origin !== self.location.origin) return;
+    if (url.pathname === '/service-worker.js') return;
 
     if (request.mode === 'navigate') {
         event.respondWith(appShellFallback(request));

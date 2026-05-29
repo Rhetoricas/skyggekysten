@@ -7,6 +7,7 @@ export const offlineAppState = $state({
 
 const SERVICE_WORKER_URL = '/service-worker.js';
 const OFFLINE_TIMEOUT_MS = 45000;
+const SERVICE_WORKER_OPTIONS: RegistrationOptions = { updateViaCache: 'none' };
 
 function medTimeout<T>(promise: PromiseLike<T>, ms = OFFLINE_TIMEOUT_MS): Promise<T> {
     let timer: ReturnType<typeof setTimeout>;
@@ -20,7 +21,7 @@ function medTimeout<T>(promise: PromiseLike<T>, ms = OFFLINE_TIMEOUT_MS): Promis
 async function hentServiceWorkerRegistration() {
     let registration = await navigator.serviceWorker.getRegistration();
     if (!registration) {
-        registration = await navigator.serviceWorker.register(SERVICE_WORKER_URL);
+        registration = await navigator.serviceWorker.register(SERVICE_WORKER_URL, SERVICE_WORKER_OPTIONS);
     } else {
         registration.update().catch(() => {});
     }

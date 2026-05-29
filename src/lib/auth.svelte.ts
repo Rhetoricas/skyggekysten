@@ -104,6 +104,8 @@ export async function initAuth() {
 }
 
 export async function sendLoginLink(email: string) {
+    if (authState.loader) return;
+
     const rentEmail = email.trim();
     if (!rentEmail) {
         authState.besked = 'Skriv din email.';
@@ -111,21 +113,30 @@ export async function sendLoginLink(email: string) {
     }
 
     authState.loader = true;
-    const { error } = await supabase.auth.signInWithOtp({
-        email: rentEmail,
-        options: {
-            emailRedirectTo: window.location.origin
+    authState.besked = '';
+
+    try {
+        const { error } = await supabase.auth.signInWithOtp({
+            email: rentEmail,
+            options: {
+                emailRedirectTo: window.location.origin
+            }
+        });
+
+        if (error) {
+            console.error('Login-link kunne ikke sendes:', error);
+            authState.besked = loginFejlBesked(error.message);
+            return;
         }
-    });
-    authState.loader = false;
 
-    if (error) {
+        authState.besked = 'Vi har sendt et login-link til din email. Hvis du allerede har bedt om et link, kan Supabase kræve en kort pause før næste mail.';
+    } catch (error) {
         console.error('Login-link kunne ikke sendes:', error);
-        authState.besked = loginFejlBesked(error.message);
-        return;
+        const message = error instanceof Error ? error.message : 'Ukendt fejl';
+        authState.besked = loginFejlBesked(message);
+    } finally {
+        authState.loader = false;
     }
-
-    authState.besked = 'Vi har sendt et login-link til din email. Hvis du allerede har bedt om et link, kan Supabase kræve en kort pause før næste mail.';
 }
 
 export async function logUd() {
