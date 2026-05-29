@@ -30,6 +30,11 @@ create table if not exists public.game_results (
     mines_owned integer not null default 0,
     player_count integer not null default 1,
     final_log text,
+    medal_path text,
+    medal_level integer,
+    route_indices jsonb,
+    route_width integer,
+    route_height integer,
     game_mode text not null default 'open' check (game_mode in ('open', 'offline')),
     created_at timestamptz not null default now()
 );
@@ -40,6 +45,21 @@ check (game_mode in ('open', 'offline'));
 
 alter table public.game_results
 add column if not exists player_count integer not null default 1;
+
+alter table public.game_results
+add column if not exists medal_path text;
+
+alter table public.game_results
+add column if not exists medal_level integer;
+
+alter table public.game_results
+add column if not exists route_indices jsonb;
+
+alter table public.game_results
+add column if not exists route_width integer;
+
+alter table public.game_results
+add column if not exists route_height integer;
 
 alter table public.game_results
 add column if not exists death_cause text
@@ -96,4 +116,10 @@ using (true);
 drop policy if exists "Users can insert their own results" on public.game_results;
 create policy "Users can insert their own results"
 on public.game_results for insert
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can update their own results" on public.game_results;
+create policy "Users can update their own results"
+on public.game_results for update
+using ((select auth.uid()) = user_id)
 with check ((select auth.uid()) = user_id);

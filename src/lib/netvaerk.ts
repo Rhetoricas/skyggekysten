@@ -2,7 +2,7 @@ import { supabase } from './supabaseClient';
 import { spilTilstand } from './spilTilstand.svelte';
 import { authState } from './auth.svelte';
 import { gemOfflineScore, gemOfflineSpil, hentOfflineScores } from './offlineStorage';
-import { beregnSpillerScore, taelScoreSpillere } from './score';
+import { beregnSpillerScore, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from './score';
 import { KORT_VERSION } from './kortDimensioner';
 import { hentKarakterNavneIKlasse } from './spildata';
 import type { RealtimeChannel } from '@supabase/supabase-js';
@@ -61,6 +61,11 @@ type HighscorePayload = {
     mines_owned: number;
     player_count: number;
     final_log: string;
+    medal_path?: string;
+    medal_level?: number;
+    route_indices?: number[];
+    route_width?: number;
+    route_height?: number;
 };
 
 type VentendeHighscore = HighscorePayload & {
@@ -138,6 +143,43 @@ function huskVentendeHighscore(payload: HighscorePayload) {
 
 function fjernVentendeHighscore(pendingId: string) {
     gemVentendeHighscores(hentVentendeHighscores().filter((score) => score.pending_id !== pendingId));
+}
+
+function erManglendeRuteKolonneFejl(error: unknown) {
+    const besked = error && typeof error === 'object' && 'message' in error
+        ? String((error as { message?: unknown }).message).toLowerCase()
+        : '';
+    return (
+        besked.includes('route_indices') ||
+        besked.includes('route_width') ||
+        besked.includes('route_height')
+    );
+}
+
+function erManglendeMedaljeKolonneFejl(error: unknown) {
+    const besked = error && typeof error === 'object' && 'message' in error
+        ? String((error as { message?: unknown }).message).toLowerCase()
+        : '';
+    return besked.includes('medal_path') || besked.includes('medal_level');
+}
+
+function erManglendeEkstraHighscoreKolonneFejl(error: unknown) {
+    return erManglendeRuteKolonneFejl(error) || erManglendeMedaljeKolonneFejl(error);
+}
+
+function udenRuteFelter<T extends HighscorePayload>(payload: T) {
+    const { route_indices, route_width, route_height, ...udenRute } = payload;
+    void route_indices;
+    void route_width;
+    void route_height;
+    return udenRute;
+}
+
+function udenMedaljeFelter<T extends HighscorePayload>(payload: T) {
+    const { medal_path, medal_level, ...udenMedalje } = payload;
+    void medal_path;
+    void medal_level;
+    return udenMedalje;
 }
 
 function markerLoginUdlobet() {
@@ -472,23 +514,37 @@ export async function gemHighscore() {
         spilTilstand.gameState === 'dead_map' ||
         (aktuelSpiller?.isDead ?? false)
     );
-    const lavPayload = (userId?: string): HighscorePayload => ({
-        user_id: userId,
-        player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
-        room_code: spilTilstand.rumKode,
-        score: spilTilstand.samletScore,
-        character: spilTilstand.valgtKarakter?.navn,
-        is_winner: isWinner,
-        is_dead: isDead,
-        death_cause: isDead ? spilTilstand.doedsAarsag : null,
-        days: spilTilstand.dag,
-        gold: spilTilstand.guldTotal,
-        max_column: spilTilstand.maxKolonne,
-        known_fields_count: spilTilstand.mineKendteFelter?.length || 0,
-        mines_owned: minePoint,
-        player_count: antalSpillere,
-        final_log: spilTilstand.logBesked
-    });
+    const fuldLog = spilTilstand.logHistorik.filter((linje) => linje.includes(' - ')).join('\n') || spilTilstand.logBesked;
+    const aktivRute = (spilTilstand.historik || []).filter((index) => Number.isFinite(index));
+    const lavPayload = (userId?: string): HighscorePayload => {
+        const payload: HighscorePayload = {
+            user_id: userId,
+            player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
+            room_code: spilTilstand.rumKode,
+            score: spilTilstand.samletScore,
+            character: spilTilstand.valgtKarakter?.navn,
+            is_winner: isWinner,
+            is_dead: isDead,
+            death_cause: isDead ? spilTilstand.doedsAarsag : null,
+            days: spilTilstand.dag,
+            gold: spilTilstand.guldTotal,
+            max_column: spilTilstand.maxKolonne,
+            known_fields_count: spilTilstand.mineKendteFelter?.length || 0,
+            mines_owned: minePoint,
+            player_count: antalSpillere,
+            final_log: fuldLog,
+            medal_path: findMedaljeSti(spilTilstand.samletScore, false),
+            medal_level: findMedaljeNiveau(spilTilstand.samletScore)
+        };
+
+        if (aktivRute.length > 1) {
+            payload.route_indices = aktivRute;
+            payload.route_width = spilTilstand.kortBredde;
+            payload.route_height = spilTilstand.kortHoejde;
+        }
+
+        return payload;
+    };
 
     const sessionResultat = await medTimeout(supabase.auth.getSession(), 12000, 'Login-tjek').catch((error) => {
         console.error('Kunne ikke tjekke login før scoregemning', error);
@@ -661,7 +717,7 @@ async function sendHighscorePayload(payload: HighscorePayload) {
         markerLoginUdlobet();
         return new Error('Du er ikke logget ind længere. Log ind igen og prøv at gemme scoren.');
     }
-    const payloadMedBruger = { ...payload, user_id: payload.user_id ?? sessionUser.id };
+    let payloadMedBruger = { ...payload, user_id: payload.user_id ?? sessionUser.id };
 
     let sidsteFejl: Error | null = null;
 
@@ -677,6 +733,14 @@ async function sendHighscorePayload(payload: HighscorePayload) {
             );
 
             if (!error) return null;
+            if (erManglendeMedaljeKolonneFejl(error) && payloadMedBruger.medal_path) {
+                payloadMedBruger = udenMedaljeFelter(payloadMedBruger);
+                continue;
+            }
+            if (erManglendeRuteKolonneFejl(error) && payloadMedBruger.route_indices) {
+                payloadMedBruger = udenRuteFelter(payloadMedBruger);
+                continue;
+            }
             sidsteFejl = error;
         } catch (error) {
             sidsteFejl = error instanceof Error ? error : new Error('Gemning af score fejlede.');
@@ -829,11 +893,21 @@ export async function hentGlobalTopHundrede(karakterKlasse?: string | null) {
 export async function hentHighscoreDetaljer(id: number) {
     if (spilTilstand.offlineMode) return null;
 
-    const { data, error } = await supabase
+    let { data, error }: { data: any; error: any } = await supabase
         .from('game_results')
-        .select('is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count')
+        .select('is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count, final_log, medal_path, medal_level, route_indices, route_width, route_height')
         .eq('id', id)
         .single();
+
+    if (error && erManglendeEkstraHighscoreKolonneFejl(error)) {
+        const fallback = await supabase
+            .from('game_results')
+            .select('is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count, final_log')
+            .eq('id', id)
+            .single();
+        data = fallback.data;
+        error = fallback.error;
+    }
 
     if (error || !data) {
         console.warn('Kunne ikke hente highscore-detaljer', error);
@@ -849,8 +923,32 @@ export async function hentHighscoreDetaljer(id: number) {
         maxKolonne: data.max_column,
         kendteFelter: data.known_fields_count,
         miner: data.mines_owned,
-        antalSpillere: data.player_count
+        antalSpillere: data.player_count,
+        finalLog: data.final_log,
+        medalPath: data.medal_path,
+        medalLevel: data.medal_level,
+        rute: Array.isArray(data.route_indices) ? data.route_indices.filter((index: unknown) => typeof index === 'number' && Number.isFinite(index)) : undefined,
+        ruteBredde: data.route_width,
+        ruteHoejde: data.route_height
     };
+}
+
+export async function opdaterHighscoreMedalje(id: number | undefined, score: number, erNyGlobalRekord: boolean) {
+    if (!id || spilTilstand.offlineMode) return false;
+
+    const medalPath = findMedaljeSti(score, erNyGlobalRekord);
+    const medalLevel = findMedaljeNiveau(score) + (erNyGlobalRekord ? 1 : 0);
+    const { error } = await supabase
+        .from('game_results')
+        .update({ medal_path: medalPath, medal_level: medalLevel })
+        .eq('id', id);
+
+    if (error) {
+        if (!erManglendeMedaljeKolonneFejl(error)) console.warn('Kunne ikke opdatere highscore-medalje', error);
+        return false;
+    }
+
+    return true;
 }
 
 export async function hentGlobalTopScore(karakterKlasse?: string | null) {

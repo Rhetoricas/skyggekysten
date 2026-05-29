@@ -8,7 +8,7 @@
     import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { M10_SCORE, beregnSpillerScore } from '$lib/score';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession } from '$lib/netvaerk';
+    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
     import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
@@ -50,8 +50,8 @@
     const START_AUTO_REFRESH_KEY = 'taage_pending_start';
 
     let lokaleScores = $state<Array<{ navn: string; score: number; karakter?: string }>>([]);
-    let klasseScores = $state<Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);
-    let globaleScores = $state<Array<{ spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);    
+    let klasseScores = $state<Array<{ id?: number; spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);
+    let globaleScores = $state<Array<{ id?: number; spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);    
     
     let flytterNu = false;
     let sejlendeBaadIndex = $state<number | null>(null);
@@ -1457,6 +1457,13 @@
                         score.oeNavn === spilTilstand.rumKode &&
                         score.karakter === spilTilstand.valgtKarakter?.navn
                     );
+                const gemtScore = globaleScores.find((score) =>
+                    score.point === spilTilstand.samletScore &&
+                    score.spillerNavn === highscoreNavn &&
+                    score.oeNavn === spilTilstand.rumKode &&
+                    score.karakter === spilTilstand.valgtKarakter?.navn
+                );
+                await opdaterHighscoreMedalje(gemtScore?.id, spilTilstand.samletScore, nyGlobalRekord);
             }
             harGemtOfflineSpil = harOfflineSpil();
             offlineSpilInfo = hentOfflineSpilInfo();

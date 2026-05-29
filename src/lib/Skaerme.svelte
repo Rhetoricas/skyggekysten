@@ -24,6 +24,12 @@
         kendteFelter?: number;
         miner?: number;
         antalSpillere?: number;
+        finalLog?: string | null;
+        medalPath?: string | null;
+        medalLevel?: number | null;
+        rute?: number[];
+        ruteBredde?: number | null;
+        ruteHoejde?: number | null;
     };
 
     type LokalScore = HighscoreDetaljer & { navn: string; score: number; karakter?: string };
@@ -76,6 +82,7 @@
     let globalHighscoreSide = $state(0);
     let klasseHighscoreSide = $state(0);
     let valgtHighscore = $state<ValgtHighscore | null>(null);
+    let visHighscoreLog = $state(false);
     const HIGHSCORE_SIDE_STOERRELSE = 10;
     const lokaleKortPresets = [
         { label: '20 x 20', bredde: 20, hoejde: 20 },
@@ -156,6 +163,10 @@
         return findMedaljeSti(score, nyGlobalRekord);
     }
 
+    function findHighscoreMedalje(score: ValgtHighscore) {
+        return score.medalPath || findMedaljeSti(score.point, false);
+    }
+
     function formaterNavn(tekst: string) {
         if (!tekst) return '';
         return tekst.charAt(0).toUpperCase() + tekst.slice(1).toLowerCase();
@@ -192,6 +203,7 @@
     }
 
     async function aabnGlobalHighscore(score: GlobalScore) {
+        visHighscoreLog = false;
         valgtHighscore = {
             ...score,
             navn: score.spillerNavn,
@@ -203,6 +215,7 @@
     }
 
     async function aabnLokalHighscore(score: LokalScore) {
+        visHighscoreLog = false;
         valgtHighscore = {
             ...score,
             navn: score.navn,
@@ -234,11 +247,6 @@
         return data.deathCause ? `Død i ${data.deathCause === 'vand' ? 'vand' : 'tåge'}` : 'Død';
     }
 
-    function highscoreFremdrift(score: HighscoreDetaljer) {
-        if (score.maxKolonne === undefined || score.maxKolonne === null) return null;
-        return beregnFremdriftPoint(score.maxKolonne, !!score.erVinder, spilTilstand.kortBredde);
-    }
-
     function highscoreUdforskning(score: HighscoreDetaljer) {
         if (score.kendteFelter === undefined || score.kendteFelter === null) return null;
         return score.kendteFelter * 2;
@@ -252,6 +260,70 @@
     function highscoreSpillerAntal(score: HighscoreDetaljer) {
         if (score.antalSpillere === undefined || score.antalSpillere === null) return 'Ukendt';
         return score.antalSpillere <= 1 ? 'Solo' : `Multiplayer (${score.antalSpillere})`;
+    }
+
+    function lukHighscoreDetaljer() {
+        visHighscoreLog = false;
+        valgtHighscore = null;
+    }
+
+    function highscoreLogLinjer(score: HighscoreDetaljer | null) {
+        return (score?.finalLog || '')
+            .split(/\r?\n/)
+            .map((linje) => linje.trim())
+            .filter(Boolean);
+    }
+
+    function highscoreRute(score: ValgtHighscore | null) {
+        if (score?.rute && score.rute.length > 1) {
+            return {
+                rute: score.rute,
+                bredde: score.ruteBredde || spilTilstand.kortBredde || 20,
+                hoejde: score.ruteHoejde || spilTilstand.kortHoejde || 20
+            };
+        }
+
+        const matcherAktuelSession =
+            !!score &&
+            score.point === spilTilstand.samletScore &&
+            (!score.oeNavn || score.oeNavn.toLowerCase() === spilTilstand.rumKode.toLowerCase());
+
+        if (matcherAktuelSession && spilTilstand.historik?.length > 1) {
+            return {
+                rute: spilTilstand.historik,
+                bredde: spilTilstand.kortBredde || 20,
+                hoejde: spilTilstand.kortHoejde || 20
+            };
+        }
+
+        return null;
+    }
+
+    function highscoreMiniRute(score: ValgtHighscore | null) {
+        const routeData = highscoreRute(score);
+        if (!routeData) return null;
+
+        const hexW = 38;
+        const rowH = 32;
+        const padding = 18;
+        const punkter = routeData.rute.map((index) => {
+            const raekke = Math.floor(index / routeData.bredde);
+            const kolonne = index % routeData.bredde;
+            return {
+                x: kolonne * hexW + (raekke % 2 !== 0 ? hexW / 2 : 0) + hexW / 2 + padding,
+                y: raekke * rowH + rowH / 2 + padding
+            };
+        });
+
+        const kortBredde = routeData.bredde * hexW + hexW / 2 + padding * 2;
+        const kortHoejde = routeData.hoejde * rowH + padding * 2;
+
+        return {
+            points: punkter.map((punkt) => `${punkt.x.toFixed(1)},${punkt.y.toFixed(1)}`).join(' '),
+            viewBox: `0 0 ${kortBredde.toFixed(1)} ${kortHoejde.toFixed(1)}`,
+            start: punkter[0],
+            slut: punkter[punkter.length - 1]
+        };
     }
 
     async function hentOgVisHighscoreDetaljer(id?: number) {
@@ -527,19 +599,20 @@
 {#snippet highscoreDetaljeModal()}
     {#if valgtHighscore}
         <div class="highscore-detail-overlay" role="presentation">
-            <button type="button" class="highscore-detail-backdrop" onclick={() => valgtHighscore = null} aria-label="Luk scoreopgørelse"></button>
+            <button type="button" class="highscore-detail-backdrop" onclick={lukHighscoreDetaljer} aria-label="Luk scoreopgørelse"></button>
             <div class="highscore-detail-modal" role="dialog" aria-modal="true" aria-labelledby="highscore-detail-title" tabindex="-1">
                 <div class="highscore-detail-header">
                     <div>
                         <h2 id="highscore-detail-title">{formaterNavn(valgtHighscore.navn)}</h2>
                         <p>{valgtHighscore.karakter || 'Ukendt'}{valgtHighscore.oeNavn ? `, ${formaterNavn(valgtHighscore.oeNavn)}` : ''}</p>
                     </div>
-                    <button type="button" onclick={() => valgtHighscore = null}>Luk</button>
+                    <button type="button" onclick={lukHighscoreDetaljer}>Luk</button>
                 </div>
 
                 <div class="highscore-detail-total">
-                    <span>Total score</span>
+                    <span>TOTAL SCORE</span>
                     <strong>{valgtHighscore.point}</strong>
+                    <img src={findHighscoreMedalje(valgtHighscore)} alt="Medalje" />
                 </div>
 
                 {#if valgtHighscore.henterDetaljer}
@@ -547,21 +620,62 @@
                 {:else if harHighscoreDetaljer(valgtHighscore)}
                     <div class="highscore-detail-grid">
                         <div><span>Status</span><strong>{highscoreStatus(valgtHighscore)}</strong></div>
-                        <div><span>Dage</span><strong>{talEllerUkendt(valgtHighscore.dage)}</strong></div>
+                        <div class="highscore-days-card">
+                            <span>Dage</span>
+                            <strong>{talEllerUkendt(valgtHighscore.dage)}</strong>
+                            <button type="button" class="highscore-log-button" onclick={() => visHighscoreLog = true} aria-label="Åbn logbog" title="Åbn logbog">
+                                <img src="/ui/logbog.webp" alt="" />
+                            </button>
+                        </div>
                         <div><span>Guld</span><strong>{talEllerUkendt(valgtHighscore.guld)}</strong></div>
-                        <div><span>Fremdrift</span><strong>{highscoreFremdrift(valgtHighscore) ?? 'Ukendt'}</strong></div>
                         <div><span>Udforskning</span><strong>{highscoreUdforskning(valgtHighscore) ?? 'Ukendt'}</strong></div>
                         <div><span>Miner</span><strong>{valgtHighscore.miner ?? 'Ukendt'}</strong></div>
                         <div><span>Spilform</span><strong>{highscoreSpillerAntal(valgtHighscore)}</strong></div>
                     </div>
-                    {#if highscoreMineBasis(valgtHighscore) !== null}
-                        <p class="highscore-detail-note">Minerne svarer til {highscoreMineBasis(valgtHighscore)} basispoint før multiplayer-bonus.</p>
+                    {@const miniRute = highscoreMiniRute(valgtHighscore)}
+                    {#if miniRute}
+                        <div class="highscore-route-preview" aria-label="Rute">
+                            <svg viewBox={miniRute.viewBox} preserveAspectRatio="xMidYMid meet">
+                                <polyline
+                                    points={miniRute.points}
+                                    fill="none"
+                                    stroke="rgba(255, 255, 255, 0.88)"
+                                    stroke-width="6"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="highscore-route-line"
+                                />
+                                <circle cx={miniRute.start.x} cy={miniRute.start.y} r="7" class="highscore-route-start" />
+                                <circle cx={miniRute.slut.x} cy={miniRute.slut.y} r="9" class="highscore-route-end" />
+                            </svg>
+                        </div>
                     {/if}
-                    <p class="highscore-detail-note">Highscore gemmer nøgletal. Udstyr, HP og alle bonusser kan derfor ikke altid genskabes præcist her.</p>
                 {:else}
                     <p class="highscore-detail-note">Denne score er gemt før detaljeopgørelsen, så kun totalscoren er tilgængelig.</p>
                 {/if}
+
             </div>
+
+            {#if visHighscoreLog}
+                <div class="highscore-log-overlay" role="presentation">
+                    <button type="button" class="highscore-log-backdrop" onclick={() => visHighscoreLog = false} aria-label="Luk logbog"></button>
+                    <div class="highscore-log-modal" role="dialog" aria-modal="true" aria-labelledby="highscore-log-title" tabindex="-1">
+                        <div class="highscore-log-header">
+                            <h3 id="highscore-log-title">Logbog</h3>
+                            <button type="button" onclick={() => visHighscoreLog = false} aria-label="Luk logbog">Luk</button>
+                        </div>
+                        <div class="highscore-log-list">
+                            {#if highscoreLogLinjer(valgtHighscore).length > 0}
+                                {#each highscoreLogLinjer(valgtHighscore) as linje, index (index)}
+                                    <p>{linje}</p>
+                                {/each}
+                            {:else}
+                                <p>Logbogen er ikke gemt for denne score endnu.</p>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            {/if}
         </div>
     {/if}
 {/snippet}
@@ -597,7 +711,6 @@
 
 {#snippet globalHighscoreTavle()}
     {@const sideStart = highscoreSideStart(globalHighscoreSide, globaleScores)}
-    {@const aktuelSide = normaliserHighscoreSide(globalHighscoreSide, globaleScores)}
     <div class="tavle">
         <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
@@ -619,21 +732,20 @@
             {/if}
         </div>
         {#if globaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
-            {#if aktuelSide > 0}
+            <div class="highscore-pager">
                 <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeGlobalHighscoreSide} aria-label="Vis forrige 10 globale highscores">
                     &lt;
                 </button>
-            {/if}
-            <button type="button" class="highscore-naeste" onclick={naesteGlobalHighscoreSide} aria-label="Vis nÃ¦ste 10 globale highscores">
-                &gt;
-            </button>
+                <button type="button" class="highscore-naeste" onclick={naesteGlobalHighscoreSide} aria-label="Vis næste 10 globale highscores">
+                    &gt;
+                </button>
+            </div>
         {/if}
     </div>
 {/snippet}
 
 {#snippet klasseHighscoreTavle()}
     {@const sideStart = highscoreSideStart(klasseHighscoreSide, klasseScores)}
-    {@const aktuelSide = normaliserHighscoreSide(klasseHighscoreSide, klasseScores)}
     <div class="tavle klasse-tavle">
         <img src="/screens/boardglobal.webp" alt="Karakterklasse tavle" class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
@@ -655,14 +767,14 @@
             {/if}
         </div>
         {#if klasseScores.length > HIGHSCORE_SIDE_STOERRELSE}
-            {#if aktuelSide > 0}
+            <div class="highscore-pager">
                 <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeKlasseHighscoreSide} aria-label="Vis forrige 10 highscores for karakterklassen">
                     &lt;
                 </button>
-            {/if}
-            <button type="button" class="highscore-naeste" onclick={naesteKlasseHighscoreSide} aria-label="Vis nÃ¦ste 10 highscores for karakterklassen">
-                &gt;
-            </button>
+                <button type="button" class="highscore-naeste" onclick={naesteKlasseHighscoreSide} aria-label="Vis næste 10 highscores for karakterklassen">
+                    &gt;
+                </button>
+            </div>
         {/if}
     </div>
 {/snippet}
@@ -993,7 +1105,7 @@
         background: rgba(255, 255, 255, 0.1);
         border-color: #666;
     }
-    .offline-bottom { width: min(100%, 560px); margin-top: 28px; display: flex; flex-direction: column; align-items: center; }
+    .offline-bottom { width: min(100%, 560px); margin-top: 56px; display: flex; flex-direction: column; align-items: center; }
     .ballon-download {
         width: 150px;
         min-height: 82px;
@@ -1334,14 +1446,16 @@
     .tavle-indhold .navn { flex: 1; min-width: 0; }
     .tavle-indhold .point { font-variant-numeric: tabular-nums; }
     .placering { color: #b8aa86; min-width: 24px; text-align: right; font-variant-numeric: tabular-nums; }
-    .highscore-naeste {
+    .highscore-pager {
         position: absolute; left: 50%; bottom: -22px; transform: translateX(-50%);
+        display: flex; gap: 8px; align-items: center; justify-content: center;
+    }
+    .highscore-naeste {
         width: 38px; height: 28px; border: 1px solid rgba(245, 208, 113, 0.45);
         border-radius: 50%; background: rgba(0, 0, 0, 0.35); color: #f5d071;
         font-size: 1.35rem; line-height: 1; cursor: pointer;
         display: inline-flex; align-items: center; justify-content: center;
     }
-    .highscore-forrige { left: calc(50% - 46px); }
     .highscore-naeste:hover { background: rgba(245, 208, 113, 0.14); }
     .karakter-navn { color: #9aa69d; font-size: 0.75rem; }
     .status { color: #ccc; margin-top: 15px; }
@@ -1402,15 +1516,21 @@
         cursor: pointer;
     }
     .highscore-detail-total {
+        position: relative;
         display: flex;
-        justify-content: space-between;
-        align-items: baseline;
+        align-items: center;
+        justify-content: center;
+        min-height: 116px;
         border-top: 1px solid rgba(255, 255, 255, 0.12);
         border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-        padding: 12px 0;
+        padding: 14px 122px 14px 150px;
         margin-bottom: 14px;
     }
     .highscore-detail-total span {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
         color: #c8c0aa;
         text-transform: uppercase;
         letter-spacing: 0.08em;
@@ -1418,8 +1538,26 @@
     }
     .highscore-detail-total strong {
         color: #f5d071;
-        font-size: 1.8rem;
+        font-family: 'Cinzel', serif;
+        font-size: 2.15rem;
+        font-weight: 700;
         font-variant-numeric: tabular-nums;
+        line-height: 1;
+        text-align: center;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .highscore-detail-total img {
+        position: absolute;
+        right: 22px;
+        top: -1px;
+        display: block;
+        width: 92px;
+        height: 118px;
+        object-fit: contain;
+        object-position: top center;
+        filter: drop-shadow(0 10px 18px rgba(245, 208, 113, 0.22));
     }
     .highscore-detail-grid {
         display: grid;
@@ -1427,6 +1565,7 @@
         gap: 10px;
     }
     .highscore-detail-grid div {
+        position: relative;
         background: rgba(255, 255, 255, 0.055);
         border: 1px solid rgba(255, 255, 255, 0.09);
         border-radius: 6px;
@@ -1443,11 +1582,141 @@
         color: #fff;
         font-variant-numeric: tabular-nums;
     }
+    .highscore-days-card {
+        min-height: 86px;
+    }
     .highscore-detail-note {
         color: #cfc8b7;
         font-size: 0.9rem;
         line-height: 1.35;
         margin: 12px 0 0;
+    }
+    .highscore-route-preview {
+        height: 118px;
+        margin-top: 8px;
+        margin-bottom: -8px;
+        background: radial-gradient(circle at 50% 40%, rgba(245, 208, 113, 0.055), transparent 62%);
+        overflow: hidden;
+        pointer-events: none;
+    }
+    .highscore-route-preview svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .highscore-route-line {
+        opacity: 0.78;
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.34));
+    }
+    .highscore-route-start {
+        fill: rgba(25, 25, 25, 0.9);
+        stroke: rgba(255, 255, 255, 0.72);
+        stroke-width: 2.5;
+    }
+    .highscore-route-end {
+        fill: rgba(245, 208, 113, 0.88);
+        stroke: rgba(255, 244, 199, 0.88);
+        stroke-width: 2.5;
+        filter: drop-shadow(0 0 6px rgba(245, 208, 113, 0.45));
+    }
+    .highscore-log-button {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -42%);
+        width: min(82px, calc(100% - 34px));
+        height: min(82px, calc(100% - 12px));
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        color: #f1dfaa;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+    .highscore-log-button img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 0 8px rgba(245, 208, 113, 0.18));
+    }
+    .highscore-log-button:hover,
+    .highscore-log-button:focus-visible {
+        background: transparent;
+        outline: none;
+    }
+    .highscore-log-button:hover img,
+    .highscore-log-button:focus-visible img {
+        filter: drop-shadow(0 0 13px rgba(245, 208, 113, 0.34));
+    }
+    .highscore-log-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        box-sizing: border-box;
+        background: rgba(0, 0, 0, 0.55);
+    }
+    .highscore-log-backdrop {
+        position: absolute;
+        inset: 0;
+        border: 0;
+        padding: 0;
+        background: transparent;
+        cursor: pointer;
+    }
+    .highscore-log-modal {
+        position: relative;
+        z-index: 1;
+        width: min(640px, 100%);
+        max-height: min(720px, 86dvh);
+        background: #111;
+        color: #eee;
+        border: 1px solid rgba(245, 208, 113, 0.35);
+        border-radius: 8px;
+        padding: 18px;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.62);
+        display: flex;
+        flex-direction: column;
+    }
+    .highscore-log-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+    .highscore-log-header h3 {
+        margin: 0;
+        color: #f5d071;
+        font-family: 'Cinzel', serif;
+    }
+    .highscore-log-header button {
+        background: #2b2b2b;
+        color: #eee;
+        border: 1px solid #555;
+        border-radius: 6px;
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+    .highscore-log-list {
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+    .highscore-log-list p {
+        margin: 0;
+        padding: 9px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: #ddd6c6;
+        line-height: 1.4;
+    }
+    .highscore-log-list p:last-child {
+        border-bottom: 0;
     }
 
     .screen-top-actions {
