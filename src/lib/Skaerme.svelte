@@ -247,11 +247,6 @@
         return data.deathCause ? `Død i ${data.deathCause === 'vand' ? 'vand' : 'tåge'}` : 'Død';
     }
 
-    function highscoreUdforskning(score: HighscoreDetaljer) {
-        if (score.kendteFelter === undefined || score.kendteFelter === null) return null;
-        return score.kendteFelter * 2;
-    }
-
     function highscoreMineBasis(score: HighscoreDetaljer) {
         if (score.miner === undefined || score.miner === null) return null;
         return score.miner * 100;
@@ -628,7 +623,7 @@
                             </button>
                         </div>
                         <div><span>Guld</span><strong>{talEllerUkendt(valgtHighscore.guld)}</strong></div>
-                        <div><span>Udforskning</span><strong>{highscoreUdforskning(valgtHighscore) ?? 'Ukendt'}</strong></div>
+                        <div><span>Udforskning</span><strong>{talEllerUkendt(valgtHighscore.kendteFelter)}</strong></div>
                         <div><span>Miner</span><strong>{valgtHighscore.miner ?? 'Ukendt'}</strong></div>
                         <div><span>Spilform</span><strong>{highscoreSpillerAntal(valgtHighscore)}</strong></div>
                     </div>
@@ -640,7 +635,7 @@
                                     points={miniRute.points}
                                     fill="none"
                                     stroke="rgba(255, 255, 255, 0.88)"
-                                    stroke-width="6"
+                                    stroke-width="8"
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                     class="highscore-route-line"
