@@ -1,0 +1,22 @@
+{
+	"headers": [
+		{
+			"source": "/service-worker.js",
+			"headers": [
+				{
+					"key": "Cache-Control",
+					"value": "no-cache, no-store, must-revalidate"
+				}
+			]
+		},
+		{
+			"source": "/_app/version.json",
+			"headers": [
+				{
+					"key": "Cache-Control",
+					"value": "no-cache, no-store, must-revalidate"
+				}
+			]
+		}
+	]
+}
