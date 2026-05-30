@@ -1,6 +1,6 @@
 # Roadmap og idebank
 
-Senest opdateret: 2026-05-22
+Senest opdateret: 2026-05-30
 
 Dette dokument er til ideer, balancering og designspor, som skal være nemme at finde igen. Det er ikke en kravspecifikation. Når noget herfra skal laves, skal vi stadig tale det igennem først, især hvis det ændrer centrale regler.
 
@@ -92,12 +92,59 @@ Nuværende retning:
 - Highscore-rækker kan klikkes for opgørelse.
 - Detaljer hentes lazy pr. række, så top 100 ikke henter unødige felter.
 - Score gemmer `player_count`, så man kan se solo/multiplayer.
+- Medaljer findes som scorebaserede niveauer i dag. Særlige trofævarianter er kun et roadmap-spor, ikke implementeret.
 
 Åbne ideer:
 
 - Overvej filtrering/visning for solo vs multiplayer.
 - Overvej om top 10-listen skal give særlig medalje eller markering mere synligt.
 - Gamle highscores kan rettes direkte i DB ved navneændringer, hvis der kun er få.
+
+### Medaljer og særlige trofæer
+
+Roadmap-status:
+
+- Ikke implementeret endnu.
+- Nuværende system gemmer standardmedalje ud fra score.
+- Næste designspor er at give hver afsluttet tur højst én særlig trofævariant oven på standardmedaljen.
+- Trofæet skal vælges ved spilslut ud fra en analyse af turen. Backend skal gemme resultatet, men ikke være dommer undervejs.
+- Toplister må stadig ikke hente log/rute/tung detaljedata, før spilleren klikker på en konkret score.
+
+Grundmodel:
+
+- Spilleren får altid en standardmedalje baseret på score.
+- Hvis turen har en markant særlig bedrift, kan standardmedaljen få en trofævariant.
+- Der vises kun ét trofæ på medaljen pr. spil, så medaljen er let at aflæse.
+- Spillet kan godt beregne flere kandidater, men den stærkeste kandidat vinder.
+- Man skal ikke jage lave medaljeniveauer. Trofætypen samles som bedrift, og score afgør hvor flot versionen bliver.
+- Eksempel: En tur udløser Minekronen og scorer til medaljeniveau 8. Resultatet bliver "M8 Minekronen". En senere bedre tur kan blive "M10 Minekronen".
+
+Mulig teknisk model:
+
+- Tilføj et lille `achievementStats`-objekt i spiltilstanden til ting, som ikke kan udledes sikkert bagefter.
+- Eksempler: samlet skade, tågeskade, vandskade, kollaps, livseliksir-redninger, opgraderinger, relikvier, katastrofer overlevet, særlige events.
+- Ved spilslut kører en funktion, fx `findTrophyType(spilTilstand, achievementStats)`.
+- Gem evt. `trophy_type` og `achievement_stats` i `game_results`, ud over eksisterende `medal_path`/`medal_level`.
+
+Foreslåede trofætyper:
+
+- Standardmedaljen: fallback når ingen særlig bedrift dominerer.
+- Minekronen: mange miner, minekontrol, mine-overtagelser eller høj mine-score.
+- Tågevandreren: overlever meget tåge, tågeskade, blodofring eller flugt sent i tågen.
+- Havmærket: vand, hav, druknefare, oversvømmelse eller tabt udstyr i vand.
+- Relikviejægeren: sjældne/magiske ting som Rodhjertet, Gylden Destillator, dragestav, runekvist eller malmviser.
+- Handelsfyrsten: ekstrem guldøkonomi, handel, tøjbonus, salg/køb, tyveri eller indbrud.
+- Blodprisen: lav HP, mange skadeshændelser, livseliksir-redning, kollaps, max-HP-tab eller blodofring.
+- Korttegneren: mange kendte felter, lang rute, høj max-kolonne, kikkert/fakkel/syn eller skattekortspor.
+- Udstyrsmesteren: mange opgraderinger, værkstedsbrug eller stærk gear-progression.
+- Skæbnebruddet: usandsynligt comeback, katastrofer overlevet, ekstrem risiko eller en tur der egentlig burde være mislykkedes.
+
+Åbne designspørgsmål:
+
+- Skal trofæsamling vises på profilsiden som bedste version pr. trofætype?
+- Skal enkelte trofæer have klassebonus i vurderingen, eller skal alle klasser kunne få alle trofæer?
+- Hvordan prioriteres to lige stærke kandidater, fx Minekronen vs Handelsfyrsten?
+- Skal gamle scores uden `achievementStats` altid vises som standardmedaljer?
 
 ## Multiplayer og forbindelse
 

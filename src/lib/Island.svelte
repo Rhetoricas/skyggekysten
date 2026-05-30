@@ -60,6 +60,7 @@
     let sidsteKikkertMode = '';
     let ruteOverblikState = '';
     let venteUrTick = $state(Date.now());
+    let sidstAutoUdfyldtProfilNavn = '';
 
     function aktuelHighscoreKlasse() {
         return hentKarakterKlasseNoegle(spilTilstand.valgtKarakter);
@@ -1372,8 +1373,9 @@
 
     $effect(() => {
         const profilNavn = authState.profil?.display_name;
-        if (spilTilstand.gameState === 'start' && profilNavn && !spilTilstand.spillerNavn) {
+        if (spilTilstand.gameState === 'start' && profilNavn && profilNavn !== sidstAutoUdfyldtProfilNavn) {
             spilTilstand.spillerNavn = profilNavn;
+            sidstAutoUdfyldtProfilNavn = profilNavn;
         }
     });
 
