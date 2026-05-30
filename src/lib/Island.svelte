@@ -1893,7 +1893,7 @@
         if (biome === 'hule') dele.push('Huler kan ødelægge soveposer og fint tøj.');
         if (biome === 'ruin') dele.push('Ruiner kan koste madrationer.');
         if (biome === 'krystal') dele.push('Krystaller ødelægger metaldetektor og gylden kikkert. Malmviser bliver til almindelig detektor.');
-        if (biome === 'ritual') dele.push('Ritualfelter kan ødelægge søgekvist.');
+        if (biome === 'ritual') dele.push('Ritualfelter kan ødelægge søgekvist. Runekvist bliver til almindelig søgekvist.');
         if (felt.hasBoat) dele.push(`Der ${felt.boatCount && felt.boatCount > 1 ? `ligger ${felt.boatCount} både` : 'ligger en flugtbåd'} her. Går du ombord, har du vundet.`);
         if (felt.eventID && !felt.eventFuldført) dele.push('Feltet har et event, som starter når du går ind på det.');
         if (harKoebbarShop(felt)) dele.push('Feltet har en butik. Dagens varer deles af spillerne og genfyldes næste dag.');

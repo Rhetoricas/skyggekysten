@@ -2150,6 +2150,7 @@ export function tjekMiljoeSlitage(biome: string): string {
     let nedgraderetRoyaltToej = 0;
     let nedgraderetMalmviser = false;
     let nedgraderetSilkesovepose = false;
+    let nedgraderetRunekvist = false;
 
     spilTilstand.mitUdstyr = spilTilstand.mitUdstyr.filter(vare => {
         if (erVandBiome(biome)) {
@@ -2212,6 +2213,11 @@ export function tjekMiljoeSlitage(biome: string): string {
                 return false;
             }
         } else if (biome === 'ritual') {
+            if (vare.id === 'runekvist') {
+                nedgraderetRunekvist = true;
+                logBeskeder.push("Ritualpladsen river runerne ud af din runekvist. Den kan stadig bruges som søgekvist.");
+                return false;
+            }
             if (vare.id === 'soegekvist') {
                 logBeskeder.push("Ritualpladsen ødelægger din søgekvist.");
                 return false;
@@ -2239,6 +2245,10 @@ export function tjekMiljoeSlitage(biome: string): string {
 
     if (nedgraderetSilkesovepose) {
         spilTilstand.mitUdstyr.push({ id: 'sovepose', maengde: 1 });
+    }
+
+    if (nedgraderetRunekvist) {
+        spilTilstand.mitUdstyr.push({ id: 'soegekvist', maengde: 1 });
     }
 
     return logBeskeder.length > 0 ? " " + logBeskeder.join(" ") : "";
