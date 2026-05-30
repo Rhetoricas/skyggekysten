@@ -6,6 +6,19 @@ const ASSETS = [APP_SHELL, ...build, ...files].filter((asset) => !asset.endsWith
 const DEV_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0']);
 const ER_DEV_HOST = DEV_HOSTS.has(self.location.hostname);
 
+async function cacheAssets(cacheName: string, assets: string[]) {
+    const cache = await caches.open(cacheName);
+    await Promise.allSettled(
+        assets.map(async (asset) => {
+            try {
+                await cache.add(asset);
+            } catch (error) {
+                console.warn('Offline-cache sprang asset over:', asset, error);
+            }
+        })
+    );
+}
+
 self.addEventListener('install', (event) => {
     if (ER_DEV_HOST) {
         event.waitUntil(self.skipWaiting());
@@ -13,9 +26,7 @@ self.addEventListener('install', (event) => {
     }
 
     event.waitUntil(
-        caches
-            .open(CACHE)
-            .then((cache) => cache.addAll(ASSETS))
+        cacheAssets(CACHE, ASSETS)
             .then(() => self.skipWaiting())
     );
 });
