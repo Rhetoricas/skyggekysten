@@ -1734,8 +1734,6 @@
         list-style: none;
         margin: 0;
         padding: 0;
-        max-height: 220px;
-        overflow-y: auto;
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 6px;
         background: rgba(0, 0, 0, 0.18);
