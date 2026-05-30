@@ -36,6 +36,7 @@
     type GlobalScore = HighscoreDetaljer & { spillerNavn: string; oeNavn: string; point: number; karakter?: string };
     type ValgtHighscore = HighscoreDetaljer & { navn: string; point: number; karakter?: string; oeNavn?: string; henterDetaljer?: boolean };
     type HighscoreDrilldown = { titel: string; scores: GlobalScore[]; henter: boolean };
+    const HIGHSCORE_DRILLDOWN_ANTAL = 10;
 
     let {
         opretEllerDeltag,
@@ -343,7 +344,7 @@
 
     async function aabnHighscoreFilter(titel: string, filter: { spillerNavn?: string; karakter?: string; karakterKlasse?: string | null; oeNavn?: string }) {
         highscoreDrilldown = { titel, scores: [], henter: true };
-        const scores = await hentGlobalHighscoresForFilter(filter, 100);
+        const scores = await hentGlobalHighscoresForFilter(filter, HIGHSCORE_DRILLDOWN_ANTAL);
         if (highscoreDrilldown?.titel !== titel) return;
         highscoreDrilldown = { titel, scores, henter: false };
     }
@@ -355,19 +356,19 @@
 
     function aabnSpillerHighscoreFilter() {
         if (!valgtHighscore) return;
-        void aabnHighscoreFilter(`Top 100: ${formaterNavn(valgtHighscore.navn)}`, { spillerNavn: valgtHighscore.navn });
+        void aabnHighscoreFilter(`Top ${HIGHSCORE_DRILLDOWN_ANTAL}: ${formaterNavn(valgtHighscore.navn)}`, { spillerNavn: valgtHighscore.navn });
     }
 
     function aabnKarakterHighscoreFilter() {
         if (!valgtHighscore?.karakter) return;
         const klasseNoegle = hentKarakterKlasseNoegle(valgtHighscore.karakter);
         const klasseNavn = hentKarakterKlasseNavn(valgtHighscore.karakter);
-        void aabnHighscoreFilter(`Top 100: ${klasseNavn}`, { karakterKlasse: klasseNoegle });
+        void aabnHighscoreFilter(`Top ${HIGHSCORE_DRILLDOWN_ANTAL}: ${klasseNavn}`, { karakterKlasse: klasseNoegle });
     }
 
     function aabnOeHighscoreFilter() {
         if (!valgtHighscore?.oeNavn) return;
-        void aabnHighscoreFilter(`Top 100 på ${formaterNavn(valgtHighscore.oeNavn)}`, { oeNavn: valgtHighscore.oeNavn });
+        void aabnHighscoreFilter(`Top ${HIGHSCORE_DRILLDOWN_ANTAL} på ${formaterNavn(valgtHighscore.oeNavn)}`, { oeNavn: valgtHighscore.oeNavn });
     }
 
     function naesteGlobalHighscoreSide() {
@@ -772,7 +773,7 @@
                             <p class="highscore-detail-note">Ingen scores fundet.</p>
                         {:else}
                             <ol class="highscore-filter-list">
-                                {#each highscoreDrilldown.scores.slice(0, 100) as score, i (score.id || `${score.spillerNavn}-${score.point}-${score.oeNavn}-${i}`)}
+                                {#each highscoreDrilldown.scores as score, i (score.id || `${score.spillerNavn}-${score.point}-${score.oeNavn}-${i}`)}
                                     <li>
                                         <button type="button" onclick={() => aabnHighscoreFraFilter(score)}>
                                             <span>{i + 1}.</span>
