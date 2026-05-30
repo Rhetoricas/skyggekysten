@@ -82,6 +82,7 @@
     let visLokaleTestKnapper = $state(false);
     let globalHighscoreSide = $state(0);
     let klasseHighscoreSide = $state(0);
+    let lokalHighscoreSide = $state(0);
     let valgtHighscore = $state<ValgtHighscore | null>(null);
     let visHighscoreLog = $state(false);
     let profilNavnGemTimer: ReturnType<typeof setTimeout> | null = null;
@@ -201,6 +202,11 @@
     }
 
     function highscoreSide(scores: GlobalScore[], side: number): GlobalScore[] {
+        const start = highscoreSideStart(side, scores);
+        return scores.slice(start, start + HIGHSCORE_SIDE_STOERRELSE);
+    }
+
+    function lokalHighscoreSideScores(scores: LokalScore[], side: number): LokalScore[] {
         const start = highscoreSideStart(side, scores);
         return scores.slice(start, start + HIGHSCORE_SIDE_STOERRELSE);
     }
@@ -378,6 +384,14 @@
 
     function forrigeKlasseHighscoreSide() {
         klasseHighscoreSide = normaliserHighscoreSide(klasseHighscoreSide, klasseScores) - 1;
+    }
+
+    function naesteLokalHighscoreSide() {
+        lokalHighscoreSide = (normaliserHighscoreSide(lokalHighscoreSide, lokaleScores) + 1) % highscoreSideAntal(lokaleScores);
+    }
+
+    function forrigeLokalHighscoreSide() {
+        lokalHighscoreSide = normaliserHighscoreSide(lokalHighscoreSide, lokaleScores) - 1;
     }
 
     function maskeretEmail(email?: string) {
@@ -1070,14 +1084,15 @@
                 <div class="tavle">
                     <img src="/screens/boardlocal.webp" alt="Lokal tavle" class="tavle-billede" />
                     <div class="tavle-indhold lokal-indhold">
-                        <h3>Top 10 på {formaterNavn(spilTilstand.rumKode)}</h3>
+                        <h3>Top 100 på {formaterNavn(spilTilstand.rumKode)}</h3>
                         {#if lokaleScores.length === 0}
                             <p class="tom-liste">Ingen resultater endnu</p>
                         {:else}
-                            <ol>
-                                {#each lokaleScores as hs, i (i)}
+                            <ol start={highscoreSideStart(lokalHighscoreSide, lokaleScores) + 1}>
+                                {#each lokalHighscoreSideScores(lokaleScores, lokalHighscoreSide) as hs, i (highscoreSideStart(lokalHighscoreSide, lokaleScores) + i)}
                                     <li>
                                         <button type="button" class="highscore-række" onclick={() => aabnLokalHighscore(hs)} aria-label={`Vis scoreopgørelse for ${hs.navn}`}>
+                                            <span class="placering">{highscoreSideStart(lokalHighscoreSide, lokaleScores) + i + 1}.</span>
                                             <span class="navn">{formaterHighscoreNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
                                             <span class="point">{hs.score}</span>
                                         </button>
@@ -1091,6 +1106,16 @@
                             <p class="global-note tavle-note-bund">Login kræves for at gemme score.</p>
                         {/if}
                     </div>
+                    {#if lokaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
+                        <div class="highscore-pager">
+                            <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeLokalHighscoreSide} aria-label="Vis forrige 10 highscores på øen">
+                                &lt;
+                            </button>
+                            <button type="button" class="highscore-naeste" onclick={naesteLokalHighscoreSide} aria-label="Vis næste 10 highscores på øen">
+                                &gt;
+                            </button>
+                        </div>
+                    {/if}
                 </div>
                 {#if !spilTilstand.offlineMode}
                     {@render klasseHighscoreTavle()}
@@ -1145,14 +1170,15 @@
                 <div class="tavle">
                     <img src="/screens/boardlocal.webp" alt="Lokal tavle" class="tavle-billede" />
                     <div class="tavle-indhold lokal-indhold">
-                        <h3>Top 10 på {formaterNavn(spilTilstand.rumKode)}</h3>
+                        <h3>Top 100 på {formaterNavn(spilTilstand.rumKode)}</h3>
                         {#if lokaleScores.length === 0}
                             <p class="tom-liste">Ingen resultater endnu</p>
                         {:else}
-                            <ol>
-                                {#each lokaleScores as hs, i (i)}
+                            <ol start={highscoreSideStart(lokalHighscoreSide, lokaleScores) + 1}>
+                                {#each lokalHighscoreSideScores(lokaleScores, lokalHighscoreSide) as hs, i (highscoreSideStart(lokalHighscoreSide, lokaleScores) + i)}
                                     <li>
                                         <button type="button" class="highscore-række" onclick={() => aabnLokalHighscore(hs)} aria-label={`Vis scoreopgørelse for ${hs.navn}`}>
+                                            <span class="placering">{highscoreSideStart(lokalHighscoreSide, lokaleScores) + i + 1}.</span>
                                             <span class="navn">{formaterHighscoreNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
                                             <span class="point">{hs.score}</span>
                                         </button>
@@ -1166,6 +1192,16 @@
                             <p class="global-note tavle-note-bund">Login kræves for at gemme score.</p>
                         {/if}
                     </div>
+                    {#if lokaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
+                        <div class="highscore-pager">
+                            <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeLokalHighscoreSide} aria-label="Vis forrige 10 highscores på øen">
+                                &lt;
+                            </button>
+                            <button type="button" class="highscore-naeste" onclick={naesteLokalHighscoreSide} aria-label="Vis næste 10 highscores på øen">
+                                &gt;
+                            </button>
+                        </div>
+                    {/if}
                 </div>
                 {#if !spilTilstand.offlineMode}
                     {@render klasseHighscoreTavle()}

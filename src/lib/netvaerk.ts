@@ -807,7 +807,7 @@ function formaterTopScores(data: ScoreRaekke[] | null | undefined, antal = 10) {
 export async function hentHighscores(karakterKlasse?: string | null) {
     const klasseNavne = hentKarakterNavneIKlasse(karakterKlasse);
     if (spilTilstand.offlineMode) {
-        return hentOfflineScores(spilTilstand.rumKode, karakterKlasse).slice(0, 10).map((score) => ({
+        return hentOfflineScores(spilTilstand.rumKode, karakterKlasse).slice(0, 100).map((score) => ({
             navn: score.navn,
             score: score.score,
             karakter: score.karakter,
@@ -833,7 +833,7 @@ export async function hentHighscores(karakterKlasse?: string | null) {
     const { data } = await medTimeout(
         query
             .order('score', { ascending: false })
-            .limit(30),
+            .limit(160),
         8000,
         'Hentning af ø-score'
     ).catch((error) => {
@@ -856,7 +856,7 @@ export async function hentHighscores(karakterKlasse?: string | null) {
                 erDoed: raekke.is_dead,
                 doedsAarsag: raekke.death_cause
             });
-            if (unikke.length === 10) break;
+            if (unikke.length === 100) break;
         }
     }
     return unikke;
