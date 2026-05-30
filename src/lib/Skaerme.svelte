@@ -1545,8 +1545,8 @@
     .tavle-indhold li { border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 0; font-size: 0.85rem; }
     .highscore-række {
         width: 100%;
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 3ch minmax(0, 1fr) auto;
         gap: 6px;
         align-items: baseline;
         background: transparent;
@@ -1563,9 +1563,22 @@
         background: rgba(245, 208, 113, 0.11);
         outline: none;
     }
-    .tavle-indhold .navn { flex: 1; min-width: 0; }
-    .tavle-indhold .point { font-variant-numeric: tabular-nums; }
-    .placering { color: #b8aa86; min-width: 24px; text-align: right; font-variant-numeric: tabular-nums; }
+    .tavle-indhold .navn {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .tavle-indhold .point {
+        font-variant-numeric: tabular-nums;
+    }
+    .placering { color: #b8aa86; text-align: right; font-variant-numeric: tabular-nums; }
+    .karakter-navn {
+        color: #9aa69d;
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
     .highscore-pager {
         position: absolute; left: 50%; bottom: -22px; transform: translateX(-50%);
         display: flex; gap: 8px; align-items: center; justify-content: center;
@@ -1577,7 +1590,6 @@
         display: inline-flex; align-items: center; justify-content: center;
     }
     .highscore-naeste:hover { background: rgba(245, 208, 113, 0.14); }
-    .karakter-navn { color: #9aa69d; font-size: 0.75rem; }
     .status { color: #ccc; margin-top: 15px; }
 
     .highscore-detail-overlay {
