@@ -890,6 +890,33 @@ export async function hentGlobalTopHundrede(karakterKlasse?: string | null) {
     return formaterTopScores(data, 100);
 }
 
+export async function hentGlobalHighscoresForFilter(filter: { spillerNavn?: string; karakter?: string; karakterKlasse?: string | null; oeNavn?: string }, antal = 100) {
+    if (spilTilstand.offlineMode) return [];
+    const klasseNavne = filter.karakterKlasse ? hentKarakterNavneIKlasse(filter.karakterKlasse) : [];
+
+    let query = supabase
+        .from('game_results')
+        .select('id, player_name, room_code, score, character, is_winner, is_dead, death_cause');
+
+    if (filter.spillerNavn) query = query.eq('player_name', filter.spillerNavn);
+    if (filter.karakter) query = query.eq('character', filter.karakter);
+    if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
+    if (filter.oeNavn) query = query.eq('room_code', filter.oeNavn);
+
+    const { data } = await medTimeout(
+        query
+            .order('score', { ascending: false })
+            .limit(Math.max(10, antal + 60)),
+        8000,
+        'Hentning af filtreret highscore'
+    ).catch((error) => {
+        console.warn('Kunne ikke hente filtreret highscore', error);
+        return { data: [] };
+    });
+
+    return formaterTopScores(data, antal);
+}
+
 export async function hentHighscoreDetaljer(id: number) {
     if (spilTilstand.offlineMode) return null;
 

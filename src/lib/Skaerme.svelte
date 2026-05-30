@@ -2,13 +2,13 @@
     import { onMount } from 'svelte';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { authState, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
-    import { hentKarakterKlasseNavn, tilgaengeligeKarakterer } from '$lib/spildata';
+    import { hentKarakterKlasseNavn, hentKarakterKlasseNoegle, tilgaengeligeKarakterer } from '$lib/spildata';
     import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
     import LydKnap from '$lib/LydKnap.svelte';
-    import { hentHighscoreDetaljer } from '$lib/netvaerk';
+    import { hentGlobalHighscoresForFilter, hentHighscoreDetaljer } from '$lib/netvaerk';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
     import type { Karakter } from '$lib/types';
@@ -35,6 +35,7 @@
     type LokalScore = HighscoreDetaljer & { navn: string; score: number; karakter?: string };
     type GlobalScore = HighscoreDetaljer & { spillerNavn: string; oeNavn: string; point: number; karakter?: string };
     type ValgtHighscore = HighscoreDetaljer & { navn: string; point: number; karakter?: string; oeNavn?: string; henterDetaljer?: boolean };
+    type HighscoreDrilldown = { titel: string; scores: GlobalScore[]; henter: boolean };
 
     let {
         opretEllerDeltag,
@@ -84,6 +85,7 @@
     let valgtHighscore = $state<ValgtHighscore | null>(null);
     let visHighscoreLog = $state(false);
     let profilNavnGemTimer: ReturnType<typeof setTimeout> | null = null;
+    let highscoreDrilldown = $state<HighscoreDrilldown | null>(null);
     const HIGHSCORE_SIDE_STOERRELSE = 10;
     const lokaleKortPresets = [
         { label: '20 x 20', bredde: 20, hoejde: 20 },
@@ -331,6 +333,35 @@
             ...detaljer,
             henterDetaljer: false
         };
+    }
+
+    async function aabnHighscoreFilter(titel: string, filter: { spillerNavn?: string; karakter?: string; karakterKlasse?: string | null; oeNavn?: string }) {
+        highscoreDrilldown = { titel, scores: [], henter: true };
+        const scores = await hentGlobalHighscoresForFilter(filter, 100);
+        if (highscoreDrilldown?.titel !== titel) return;
+        highscoreDrilldown = { titel, scores, henter: false };
+    }
+
+    async function aabnHighscoreFraFilter(score: GlobalScore) {
+        highscoreDrilldown = null;
+        await aabnGlobalHighscore(score);
+    }
+
+    function aabnSpillerHighscoreFilter() {
+        if (!valgtHighscore) return;
+        void aabnHighscoreFilter(`Top 100: ${formaterNavn(valgtHighscore.navn)}`, { spillerNavn: valgtHighscore.navn });
+    }
+
+    function aabnKarakterHighscoreFilter() {
+        if (!valgtHighscore?.karakter) return;
+        const klasseNoegle = hentKarakterKlasseNoegle(valgtHighscore.karakter);
+        const klasseNavn = hentKarakterKlasseNavn(valgtHighscore.karakter);
+        void aabnHighscoreFilter(`Top 100: ${klasseNavn}`, { karakterKlasse: klasseNoegle });
+    }
+
+    function aabnOeHighscoreFilter() {
+        if (!valgtHighscore?.oeNavn) return;
+        void aabnHighscoreFilter(`Top 100 på ${formaterNavn(valgtHighscore.oeNavn)}`, { oeNavn: valgtHighscore.oeNavn });
     }
 
     function naesteGlobalHighscoreSide() {
@@ -636,8 +667,36 @@
             <div class="highscore-detail-modal" role="dialog" aria-modal="true" aria-labelledby="highscore-detail-title" tabindex="-1">
                 <div class="highscore-detail-header">
                     <div>
-                        <h2 id="highscore-detail-title">{formaterNavn(valgtHighscore.navn)}</h2>
-                        <p>{valgtHighscore.karakter || 'Ukendt'}{valgtHighscore.oeNavn ? `, ${formaterNavn(valgtHighscore.oeNavn)}` : ''}</p>
+                        <button
+                            type="button"
+                            class="highscore-filter-link highscore-name-link"
+                            onclick={aabnSpillerHighscoreFilter}
+                        >
+                            <h2 id="highscore-detail-title">{formaterNavn(valgtHighscore.navn)}</h2>
+                        </button>
+                        <p>
+                            {#if valgtHighscore.karakter}
+                                <button
+                                    type="button"
+                                    class="highscore-filter-link"
+                                    onclick={aabnKarakterHighscoreFilter}
+                                >
+                                    {valgtHighscore.karakter}
+                                </button>
+                            {:else}
+                                Ukendt
+                            {/if}
+                            {#if valgtHighscore.oeNavn}
+                                <span>, </span>
+                                <button
+                                    type="button"
+                                    class="highscore-filter-link"
+                                    onclick={aabnOeHighscoreFilter}
+                                >
+                                    {formaterNavn(valgtHighscore.oeNavn)}
+                                </button>
+                            {/if}
+                        </p>
                     </div>
                     <button type="button" onclick={lukHighscoreDetaljer}>Luk</button>
                 </div>
@@ -685,6 +744,33 @@
                     {/if}
                 {:else}
                     <p class="highscore-detail-note">Denne score er gemt før detaljeopgørelsen, så kun totalscoren er tilgængelig.</p>
+                {/if}
+
+                {#if highscoreDrilldown}
+                    <div class="highscore-filter-panel">
+                        <div class="highscore-filter-header">
+                            <h3>{highscoreDrilldown.titel}</h3>
+                            <button type="button" onclick={() => highscoreDrilldown = null}>Skjul</button>
+                        </div>
+                        {#if highscoreDrilldown.henter}
+                            <p class="highscore-detail-note">Henter liste...</p>
+                        {:else if highscoreDrilldown.scores.length === 0}
+                            <p class="highscore-detail-note">Ingen scores fundet.</p>
+                        {:else}
+                            <ol class="highscore-filter-list">
+                                {#each highscoreDrilldown.scores.slice(0, 100) as score, i (score.id || `${score.spillerNavn}-${score.point}-${score.oeNavn}-${i}`)}
+                                    <li>
+                                        <button type="button" onclick={() => aabnHighscoreFraFilter(score)}>
+                                            <span>{i + 1}.</span>
+                                            <strong>{formaterHighscoreNavn(score.spillerNavn)}</strong>
+                                            <em>{score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)}</em>
+                                            <b>{score.point}</b>
+                                        </button>
+                                    </li>
+                                {/each}
+                            </ol>
+                        {/if}
+                    </div>
                 {/if}
 
             </div>
@@ -1548,6 +1634,108 @@
         border-radius: 6px;
         padding: 8px 12px;
         cursor: pointer;
+    }
+    .highscore-detail-header .highscore-filter-link {
+        background: transparent;
+        border: 0;
+        border-radius: 4px;
+        color: inherit;
+        padding: 0 2px;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+    .highscore-detail-header .highscore-filter-link:hover,
+    .highscore-detail-header .highscore-filter-link:focus-visible {
+        color: #f5d071;
+        outline: none;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+    .highscore-detail-header .highscore-name-link {
+        display: block;
+    }
+    .highscore-filter-panel {
+        margin-top: 14px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        padding-top: 12px;
+    }
+    .highscore-filter-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+    .highscore-filter-header h3 {
+        margin: 0;
+        color: #f5d071;
+        font-family: 'Cinzel', serif;
+        font-size: 1rem;
+    }
+    .highscore-filter-header button {
+        background: transparent;
+        color: #cfc8b7;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 4px;
+        padding: 5px 8px;
+        cursor: pointer;
+    }
+    .highscore-filter-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 220px;
+        overflow-y: auto;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.18);
+    }
+    .highscore-filter-list li + li {
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .highscore-filter-list button {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 32px minmax(72px, 1fr) minmax(96px, 1.3fr) auto;
+        align-items: baseline;
+        gap: 8px;
+        background: transparent;
+        color: #eee;
+        border: 0;
+        padding: 7px 8px;
+        text-align: left;
+        cursor: pointer;
+        font: inherit;
+    }
+    .highscore-filter-list button:hover,
+    .highscore-filter-list button:focus-visible {
+        background: rgba(245, 208, 113, 0.1);
+        outline: none;
+    }
+    .highscore-filter-list span {
+        color: #b8aa86;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+    .highscore-filter-list strong {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .highscore-filter-list em {
+        min-width: 0;
+        color: #9aa69d;
+        font-size: 0.78rem;
+        font-style: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .highscore-filter-list b {
+        color: #f5d071;
+        font-variant-numeric: tabular-nums;
     }
     .highscore-detail-total {
         position: relative;
