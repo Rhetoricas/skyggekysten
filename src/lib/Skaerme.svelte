@@ -1841,7 +1841,11 @@
         justify-content: center;
         padding: 18px;
         box-sizing: border-box;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
     }
+    .highscore-detail-overlay::-webkit-scrollbar { display: none; }
     .highscore-detail-backdrop {
         position: absolute;
         inset: 0;
@@ -1854,6 +1858,7 @@
         position: relative;
         z-index: 1;
         width: min(430px, 100%);
+        margin: auto 0;
         background: #191919;
         color: #eee;
         border: 1px solid rgba(245, 208, 113, 0.35);
@@ -2132,8 +2137,12 @@
         justify-content: center;
         padding: 18px;
         box-sizing: border-box;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
         background: rgba(0, 0, 0, 0.55);
     }
+    .highscore-log-overlay::-webkit-scrollbar { display: none; }
     .highscore-log-backdrop {
         position: absolute;
         inset: 0;
@@ -2147,6 +2156,7 @@
         z-index: 1;
         width: min(640px, 100%);
         max-height: min(720px, 86dvh);
+        margin: auto 0;
         background: #111;
         color: #eee;
         border: 1px solid rgba(245, 208, 113, 0.35);
@@ -2417,6 +2427,29 @@
             top: 10px;
             right: 10px;
             gap: 8px;
+        }
+
+        .highscore-detail-overlay {
+            align-items: flex-start;
+            justify-content: center;
+            padding: calc(env(safe-area-inset-top, 0px) + 12px) 10px calc(env(safe-area-inset-bottom, 0px) + 28px);
+        }
+
+        .highscore-detail-modal {
+            width: min(430px, 100%);
+            margin: 0;
+            padding: 14px;
+        }
+
+        .highscore-log-overlay {
+            align-items: flex-start;
+            justify-content: center;
+            padding: calc(env(safe-area-inset-top, 0px) + 12px) 10px calc(env(safe-area-inset-bottom, 0px) + 28px);
+        }
+
+        .highscore-log-modal {
+            margin: 0;
+            max-height: none;
         }
 
     }
