@@ -1389,10 +1389,11 @@
     }
     .start-tagline {
         max-width: 860px;
-        margin: 18px auto 0;
+        margin: 14px auto 0;
         color: #e3ded1;
-        font-size: clamp(1.05rem, 2.2vw, 1.6rem);
-        font-weight: 600;
+        font-family: 'Cinzel', serif;
+        font-size: clamp(0.9rem, 1.65vw, 1.2rem);
+        font-weight: 700;
         white-space: nowrap;
     }
     .start-intel {
@@ -2292,7 +2293,7 @@
         .start-tagline {
             max-width: 100%;
             margin-top: 12px;
-            font-size: clamp(0.82rem, 4.2vw, 1.05rem);
+            font-size: clamp(0.68rem, 3.3vw, 0.9rem);
         }
 
         .start-intel {
