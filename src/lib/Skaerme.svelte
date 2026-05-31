@@ -1503,7 +1503,13 @@
         background: rgba(255, 255, 255, 0.16);
     }
 
-    .start-tavle { margin-top: 30px; width: 100%; max-width: 340px; }
+    .start-tavle {
+        display: grid;
+        place-items: center;
+        margin-top: 30px;
+        width: 100%;
+        max-width: 340px;
+    }
     .global-note { color: #aaa; font-size: 0.78rem; margin: -4px 0 6px; }
     .tavle-note-bund { margin: 10px 0 0; }
 
@@ -1716,7 +1722,7 @@
     .vinder { color: #ddd; } .doed { color: #666; }
     
     .slut-knapper { display: flex; gap: 20px; margin-top: 40px; padding-bottom: 60px; justify-content: center; width: 100%; max-width: 900px; }
-    .highscore-container { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; width: 100%; max-width: 1120px; margin-top: 20px; }
+    .highscore-container { display: flex; gap: 2rem; justify-content: center; align-items: flex-start; flex-wrap: wrap; width: 100%; max-width: 1120px; margin-top: 20px; }
     .score-save-status {
         width: 100%;
         border: 1px solid #555;
@@ -1771,7 +1777,7 @@
         font-size: 0.88rem;
     }
 
-    .tavle { position: relative; width: 320px; }
+    .tavle { position: relative; width: min(320px, 100%); margin-inline: auto; }
     .tavle-billede { width: 100%; }
     .tavle-indhold { position: absolute; width: 76%; left: 12%; top: 12%; color: #eee; }
     .tavle-indhold h3 { color: #fff; font-size: 1rem; text-align: center; font-family: 'Cinzel', serif; margin-top: 0;}
@@ -2329,7 +2335,8 @@
 
         .start-tavle {
             margin-top: 14px;
-            max-width: 280px;
+            width: min(100%, 320px);
+            max-width: 320px;
         }
 
         .konto-login,
