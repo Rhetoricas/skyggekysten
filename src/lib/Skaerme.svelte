@@ -934,7 +934,7 @@
                 <div class="start-copy">
                     <p class="start-eyebrow">En ny ø venter</p>
                     <h1 id="start-title">Tågeøerne</h1>
-                    <p class="start-tagline">Udforsk, overlev, og find en båd før tågen lukker sig.</p>
+                    <p class="start-tagline">Udforsk, overlev, og find en båd før tågen tager dig.</p>
                 </div>
             </section>
 
@@ -1374,7 +1374,7 @@
     }
     .start-copy h1 {
         margin: 0;
-        font-size: clamp(3.8rem, 10vw, 8.5rem);
+        font-size: clamp(4.15rem, 10.6vw, 8.9rem);
         line-height: 0.84;
         letter-spacing: 0;
         color: #f7f2e8;
@@ -1388,11 +1388,12 @@
         text-transform: uppercase;
     }
     .start-tagline {
-        max-width: 760px;
+        max-width: 860px;
         margin: 18px auto 0;
         color: #e3ded1;
         font-size: clamp(1.05rem, 2.2vw, 1.6rem);
         font-weight: 600;
+        white-space: nowrap;
     }
     .start-intel {
         width: min(100%, 720px);
@@ -2262,7 +2263,7 @@
         }
 
         .start-copy h1 {
-            font-size: clamp(2.55rem, 12.4vw, 4.35rem);
+            font-size: clamp(2.7rem, 13.1vw, 4.55rem);
             line-height: 0.92;
             white-space: nowrap;
         }
@@ -2273,9 +2274,9 @@
         }
 
         .start-tagline {
-            max-width: 330px;
+            max-width: 100%;
             margin-top: 12px;
-            font-size: 1.05rem;
+            font-size: clamp(0.82rem, 4.2vw, 1.05rem);
         }
 
         .start-intel {
