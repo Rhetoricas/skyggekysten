@@ -932,9 +932,9 @@
                     <img src="/events/launch.webp" alt="Båd ved tågeøen" class="launch-image clickable-boat" />
                 </button>
                 <div class="start-copy">
-                    <p class="start-eyebrow">Tågen lukker sig</p>
+                    <p class="start-eyebrow">En ny ø venter</p>
                     <h1 id="start-title">Tågeøerne</h1>
-                    <p class="start-tagline">Gå i land. Grav dybt. Find båden, før øen tager dig.</p>
+                    <p class="start-tagline">Udforsk, overlev, og find en båd før tågen lukker sig.</p>
                 </div>
             </section>
 
@@ -1366,6 +1366,8 @@
     .start-copy {
         position: relative;
         z-index: 1;
+        width: 100%;
+        box-sizing: border-box;
         margin-top: clamp(150px, 19vw, 230px);
         padding: 0 14px;
         text-shadow: 0 4px 18px rgba(0, 0, 0, 0.92);
@@ -2251,7 +2253,7 @@
 
         .start-copy {
             margin-top: 142px;
-            padding: 0;
+            padding: 0 6px;
         }
 
         .overlay h1 {
@@ -2260,7 +2262,9 @@
         }
 
         .start-copy h1 {
-            font-size: clamp(3.25rem, 18vw, 5rem);
+            font-size: clamp(2.55rem, 12.4vw, 4.35rem);
+            line-height: 0.92;
+            white-space: nowrap;
         }
 
         .start-eyebrow {
