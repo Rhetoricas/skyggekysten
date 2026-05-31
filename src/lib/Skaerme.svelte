@@ -921,18 +921,29 @@
 {/snippet}
 
 {#if spilTilstand.gameState === 'start'}
-    <div class="overlay">
-        <div class="login-box combined-box">
+    <div class="overlay start-overlay">
+        <div class="start-fog start-fog-left"></div>
+        <div class="start-fog start-fog-right"></div>
+        <div class="login-box combined-box start-shell">
             {@render topKnapper()}
 
-            <button type="button" class="boat-btn-wrapper" onclick={(e) => { e.preventDefault(); startSpilMedLyd(); }}>
-                <img src="/events/launch.webp" alt="Båd" class="launch-image top-image clickable-boat" />
-            </button>
+            <section class="start-hero" aria-labelledby="start-title">
+                <button type="button" class="boat-btn-wrapper start-boat" onclick={(e) => { e.preventDefault(); startSpilMedLyd(); }}>
+                    <img src="/events/launch.webp" alt="Båd ved tågeøen" class="launch-image clickable-boat" />
+                </button>
+                <div class="start-copy">
+                    <p class="start-eyebrow">Tågen lukker sig</p>
+                    <h1 id="start-title">Tågeøerne</h1>
+                    <p class="start-tagline">Gå i land. Grav dybt. Find båden, før øen tager dig.</p>
+                </div>
+            </section>
 
-            <h1>Velkommen til tågeøerne</h1>
-            <p>Alle der skriver samme ø-navn, spiller på samme ø, hvis de går i land inden for de fem første dage.</p>
+            <div class="start-intel">
+                <span>Samme ø-navn giver samme ø</span>
+                <strong>De første fem dage afgør, hvem der når med.</strong>
+            </div>
 
-            <div class="login-main">
+            <div class="login-main start-form">
                 {@render kontoPanel()}
                 
                 <input 
@@ -1220,17 +1231,200 @@
 
 <style>
     .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: #1a1a1a; display: flex; align-items: flex-start; justify-content: center; z-index: 1000; font-family: system-ui, -apple-system, sans-serif; overflow-y: auto; padding: calc(env(safe-area-inset-top, 0px) + 18px) 18px calc(env(safe-area-inset-bottom, 0px) + 18px); box-sizing: border-box; -webkit-overflow-scrolling: touch; }
+    .start-overlay {
+        background:
+            linear-gradient(180deg, rgba(8, 10, 9, 0.4) 0%, #111 58%, #160606 100%),
+            radial-gradient(ellipse at 50% -8%, rgba(166, 190, 166, 0.28) 0%, rgba(30, 58, 49, 0.12) 34%, transparent 70%),
+            linear-gradient(90deg, #080909 0%, #181a17 52%, #080706 100%);
+        overflow-x: hidden;
+    }
+    .start-overlay::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background:
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        background-size: 92px 92px;
+        opacity: 0.12;
+        mask-image: linear-gradient(180deg, transparent, #000 18%, #000 78%, transparent);
+    }
+    .start-overlay::after {
+        content: "";
+        position: fixed;
+        inset: -18%;
+        z-index: 0;
+        pointer-events: none;
+        background:
+            radial-gradient(ellipse at 12% 42%, rgba(115, 206, 148, 0.34), transparent 31%),
+            radial-gradient(ellipse at 62% 20%, rgba(162, 224, 176, 0.26), transparent 34%),
+            radial-gradient(ellipse at 45% 72%, rgba(48, 145, 111, 0.34), transparent 34%),
+            radial-gradient(ellipse at 88% 54%, rgba(133, 202, 158, 0.25), transparent 30%),
+            linear-gradient(105deg, transparent 0%, rgba(111, 204, 151, 0.16) 34%, transparent 52%, rgba(78, 164, 132, 0.14) 72%, transparent 100%);
+        filter: blur(30px);
+        opacity: 1;
+        mix-blend-mode: screen;
+        animation: start-taage-drift 12s ease-in-out infinite alternate;
+    }
+    .start-fog {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        z-index: 0;
+        width: min(28vw, 360px);
+        pointer-events: none;
+        opacity: 0.62;
+        filter: blur(14px);
+        background:
+            radial-gradient(ellipse at 50% 28%, rgba(177, 238, 187, 0.34), transparent 32%),
+            radial-gradient(ellipse at 50% 62%, rgba(73, 172, 139, 0.36), transparent 38%),
+            linear-gradient(180deg, transparent 0%, rgba(185, 225, 190, 0.34) 32%, rgba(82, 158, 132, 0.32) 62%, transparent 100%);
+    }
+    .start-fog-left { left: -110px; transform: translateX(0) skewX(-8deg); animation: start-taage-left 9s ease-in-out infinite alternate; }
+    .start-fog-right { right: -120px; transform: translateX(0) skewX(7deg); animation: start-taage-right 10s ease-in-out infinite alternate; animation-delay: -4s; }
+    @keyframes start-taage-drift {
+        from {
+            transform: translate3d(-5%, 1.5%, 0) scale(1);
+        }
+        to {
+            transform: translate3d(5%, -2.5%, 0) scale(1.1);
+        }
+    }
+    @keyframes start-taage-left {
+        from {
+            opacity: 0.42;
+            transform: translateX(-24px) skewX(-8deg) scaleY(1);
+        }
+        to {
+            opacity: 0.78;
+            transform: translateX(78px) skewX(-4deg) scaleY(1.08);
+        }
+    }
+    @keyframes start-taage-right {
+        from {
+            opacity: 0.38;
+            transform: translateX(28px) skewX(7deg) scaleY(1.05);
+        }
+        to {
+            opacity: 0.72;
+            transform: translateX(-86px) skewX(3deg) scaleY(0.98);
+        }
+    }
     .combined-box { max-height: none; overflow: visible; }
     .login-box { position: relative; background: transparent; padding: 38px 40px 40px; border-radius: 0; border: none; text-align: center; max-width: 900px; width: 90%; display: flex; flex-direction: column; align-items: center; }
+    .start-shell {
+        position: relative;
+        z-index: 1;
+        width: min(1120px, 94vw);
+        max-width: none;
+        padding-top: 20px;
+    }
     .login-main { width: min(100%, 560px); display: flex; flex-direction: column; align-items: center; }
+    .start-hero {
+        position: relative;
+        width: 100%;
+        min-height: clamp(340px, 46vw, 520px);
+        display: grid;
+        place-items: center;
+        margin: 2px 0 18px;
+        isolation: isolate;
+    }
+    .start-hero::before {
+        content: "";
+        position: absolute;
+        inset: 6% 7% auto;
+        height: 54%;
+        z-index: -2;
+        background: radial-gradient(ellipse at center, rgba(190, 218, 190, 0.18), rgba(58, 71, 62, 0.1) 42%, transparent 72%);
+        border-radius: 50%;
+        filter: blur(18px);
+    }
+    .start-hero::after {
+        content: "";
+        position: absolute;
+        left: 9%;
+        right: 9%;
+        bottom: 9%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(216, 190, 118, 0.42), transparent);
+    }
     
     .boat-btn-wrapper { background: none; border: none; padding: 0; margin: 0; cursor: pointer; outline: none; }
-    .launch-image { width: clamp(320px, 82%, 520px); max-width: 100%; height: auto; border-radius: 4px; transition: 0.2s; }
-    .launch-image:hover { transform: scale(1.05); filter: brightness(1.2); }
-    .top-image { margin-bottom: 15px; }
-
+    .start-boat {
+        position: absolute;
+        top: 0;
+        width: min(760px, 88vw);
+        opacity: 0.88;
+        filter: drop-shadow(0 28px 36px rgba(0, 0, 0, 0.6));
+    }
+    .launch-image { width: 100%; max-width: 100%; height: auto; border-radius: 4px; transition: 0.2s; }
+    .launch-image:hover { transform: scale(1.025); filter: brightness(1.12); }
     .overlay h1 { color: #fff; margin-top: 0; font-size: 2.5rem; text-align: center; font-family: 'Cinzel', serif; }
     .login-box p { color: #ccc; margin-bottom: 20px; line-height: 1.4; }
+    .start-copy {
+        position: relative;
+        z-index: 1;
+        margin-top: clamp(150px, 19vw, 230px);
+        padding: 0 14px;
+        text-shadow: 0 4px 18px rgba(0, 0, 0, 0.92);
+    }
+    .start-copy h1 {
+        margin: 0;
+        font-size: clamp(3.8rem, 10vw, 8.5rem);
+        line-height: 0.84;
+        letter-spacing: 0;
+        color: #f7f2e8;
+    }
+    .start-eyebrow {
+        margin: 0 0 12px;
+        color: #c34135;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        font-size: clamp(0.9rem, 1.7vw, 1.25rem);
+        text-transform: uppercase;
+    }
+    .start-tagline {
+        max-width: 760px;
+        margin: 18px auto 0;
+        color: #e3ded1;
+        font-size: clamp(1.05rem, 2.2vw, 1.6rem);
+        font-weight: 600;
+    }
+    .start-intel {
+        width: min(100%, 720px);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 4px;
+        margin: -8px 0 18px;
+        padding: 12px 18px;
+        color: #d6d0c2;
+        text-align: center;
+        border-top: 1px solid rgba(245, 208, 113, 0.24);
+        border-bottom: 1px solid rgba(195, 65, 53, 0.28);
+        background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.28), transparent);
+        box-sizing: border-box;
+    }
+    .start-intel span {
+        color: #9fb6a8;
+        font-size: 0.86rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+    .start-intel strong {
+        color: #f3ead6;
+        font-size: 1.05rem;
+    }
+    .start-form {
+        position: relative;
+        padding: 18px;
+        border: 1px solid rgba(245, 208, 113, 0.18);
+        border-radius: 8px;
+        background: linear-gradient(180deg, rgba(24, 24, 22, 0.88), rgba(9, 9, 8, 0.88));
+        box-shadow: 0 22px 50px rgba(0, 0, 0, 0.32);
+        box-sizing: border-box;
+    }
     
     .large-input { display: block; width: 100%; padding: 15px; margin-bottom: 20px; font-size: 1.2rem; background: #0d0d0d; color: white; border: 1px solid #444; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
     .oe-input-wrap { position: relative; width: 100%; margin-bottom: 20px; }
@@ -2032,17 +2226,69 @@
             min-height: max-content;
         }
 
-        .launch-image {
-            width: clamp(230px, 78%, 340px);
+        .start-shell {
+            padding: 12px 6px 26px;
         }
 
-        .top-image {
-            margin-bottom: 8px;
+        .start-fog {
+            width: 44vw;
+            opacity: 0.28;
+        }
+
+        .start-hero {
+            min-height: 315px;
+            margin: 0 0 12px;
+        }
+
+        .start-boat {
+            width: min(520px, 112vw);
+            top: 4px;
+        }
+
+        .launch-image {
+            width: 100%;
+        }
+
+        .start-copy {
+            margin-top: 142px;
+            padding: 0;
         }
 
         .overlay h1 {
             font-size: 1.75rem;
             margin-bottom: 8px;
+        }
+
+        .start-copy h1 {
+            font-size: clamp(3.25rem, 18vw, 5rem);
+        }
+
+        .start-eyebrow {
+            margin-bottom: 8px;
+            font-size: 0.82rem;
+        }
+
+        .start-tagline {
+            max-width: 330px;
+            margin-top: 12px;
+            font-size: 1.05rem;
+        }
+
+        .start-intel {
+            margin: -4px 0 12px;
+            padding: 10px 12px;
+        }
+
+        .start-intel span {
+            font-size: 0.72rem;
+        }
+
+        .start-intel strong {
+            font-size: 0.92rem;
+        }
+
+        .start-form {
+            padding: 12px;
         }
 
         .login-box p {
