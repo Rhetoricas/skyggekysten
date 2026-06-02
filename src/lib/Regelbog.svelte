@@ -1,5 +1,5 @@
 <script lang="ts">
-    let { knapClass = '', knapTekst = '☰' } = $props<{ knapClass?: string; knapTekst?: string }>();
+    let { knapClass = '', knapTekst = '' } = $props<{ knapClass?: string; knapTekst?: string }>();
 
     let visRegler = $state(false);
 
@@ -26,7 +26,16 @@
     title="Regelbog"
     aria-label="Åbn regelbog"
 >
-    {knapTekst}
+    {#if knapTekst}
+        {knapTekst}
+    {:else}
+        <svg class="regelbog-ikon" viewBox="0 0 48 48" aria-hidden="true">
+            <path class="bog-side bog-side-venstre" d="M8 10h12c3.2 0 5.4 1.2 6 3.2V39c-.9-1.7-3-2.7-6-2.7H8z" />
+            <path class="bog-side bog-side-hoejre" d="M40 10H28c-3.2 0-5.4 1.2-6 3.2V39c.9-1.7 3-2.7 6-2.7h12z" />
+            <path class="bog-ryg" d="M24 13v26" />
+            <path class="bog-linje" d="M13 17h8M13 23h8M29 17h6M29 23h8M29 29h6" />
+        </svg>
+    {/if}
 </button>
 
 {#if visRegler}
@@ -227,15 +236,42 @@
         background: transparent;
         color: #f4f4f4;
         font-family: 'Cinzel', Georgia, serif;
-        font-size: 1.8rem;
+        font-size: 1.35rem;
         line-height: 1;
         font-weight: 700;
         cursor: pointer;
+        padding: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
         transition: transform 0.2s, color 0.2s, text-shadow 0.2s;
+    }
+
+    .regelbog-ikon {
+        width: 37px;
+        height: 37px;
+        overflow: visible;
+        filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.72));
+    }
+
+    .bog-side {
+        fill: rgba(216, 228, 222, 0.9);
+        stroke: #f4fbf8;
+        stroke-width: 1.7;
+        stroke-linejoin: round;
+    }
+
+    .bog-side-hoejre {
+        fill: rgba(188, 204, 197, 0.88);
+    }
+
+    .bog-ryg,
+    .bog-linje {
+        fill: none;
+        stroke: #52605b;
+        stroke-width: 1.8;
+        stroke-linecap: round;
     }
 
     .regelbog-knap:hover {
@@ -375,6 +411,11 @@
             width: 42px;
             height: 42px;
             font-size: 1.55rem;
+        }
+
+        .regelbog-ikon {
+            width: 33px;
+            height: 33px;
         }
 
         .regelbog-overlay {

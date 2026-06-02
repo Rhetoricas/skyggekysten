@@ -6,7 +6,7 @@ import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
 import { fremrykTid, fremtvingKollaps, tagSkadeOgTjekDød, udloesBersaerkHvisRelevant } from '$lib/overlevelse.svelte';
-import { brugEnergi } from '$lib/energi';
+import { brugEnergi, brugResterendeEnergi } from '$lib/energi';
 import { erAfgroedeModen, erHvedeBlok, erInsektPlageAktiv, hentAfgroedeBlok } from '$lib/afgroeder';
 import type { Biome, Felt, RygsækTing } from '$lib/types';
 import { delNyeKort, startVenteSpil } from '$lib/ventespil.svelte';
@@ -1272,7 +1272,7 @@ export function hvil() {
     const heling = harSilkesovepose ? 40 : 20;
     spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + heling); 
     
-    spilTilstand.nuvaerendeEnergi = 0;
+    brugResterendeEnergi();
     
     spilTilstand.logBesked = harSilkesovepose
         ? "Du hviler i silkesoveposen. Du får 40 HP, og tiden går."
@@ -1370,7 +1370,7 @@ function erTungKrigerklasse() {
 export function kanBegaaIndbrudPaaFelt(felt: Felt | null | undefined) {
     if (!felt || felt.indbrudt) return false;
     if (felt.biome !== 'by') return false;
-    return !harShop(felt);
+    return !felt.hasWorkshop && !harShop(felt);
 }
 
 export function kanPlyndreFelt(felt: Felt | null | undefined) {

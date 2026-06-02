@@ -59,3 +59,12 @@ export function brugEnergi(pris: number, handling: EnergiHandling = 'handling', 
     visBrugteEnergiKugler(faktiskPris, animation);
     return { pris: faktiskPris, gratis: false, kilde: '' as const };
 }
+
+export function brugResterendeEnergi(animation: EnergiAnimationOptions = {}) {
+    const faktiskPris = Math.max(0, spilTilstand.nuvaerendeEnergi || 0);
+    if (faktiskPris <= 0) return { pris: 0 };
+
+    spilTilstand.nuvaerendeEnergi = 0;
+    visBrugteEnergiKugler(faktiskPris, animation);
+    return { pris: faktiskPris };
+}

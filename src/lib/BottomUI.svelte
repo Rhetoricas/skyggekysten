@@ -366,7 +366,7 @@
         left: 0;
         width: 100vw;
         height: 20vh;
-        background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.15) 30%, rgba(0, 0, 0, 0.4) 100%);
+        background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.45) 24%, rgba(0, 0, 0, 0.92) 100%);
         z-index: -1;
         pointer-events: none;
     }

@@ -2209,7 +2209,7 @@
         z-index: 1200;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 6px;
     }
 
     @media (max-width: 700px) {

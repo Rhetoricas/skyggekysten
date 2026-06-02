@@ -294,11 +294,11 @@
         bandit: 'Banditlejr er risikabel. Gravning giver ofte guld, men der er også stor fælderisiko.',
         hoejland: 'Højland er åbent terræn. Gravning kan give guld, rod, en lille fælderisiko eller fakkel.',
         blodskov: 'Blodskov er farligt og uroligt. Gravefund ligner andre farlige biomer: guld, rod, fælder og livseliksir.',
-        by: 'Byer kan have butikker, værksteder og indbrudsmuligheder. Spillere med kølle kan smadre dem til ruiner. Du kan normalt ikke grave her.',
+        by: 'Byer kan have butikker, værksteder og indbrudsmuligheder. Spillere med kølle kan smadre dem til ruiner.',
         hav: 'Hav er farligt uden båd. Du tager skade i åbent vand, og almindelig rustning, kongepanser og fakler går tabt i vandet. Hvis du kollapser i vandet, drukner du, medmindre en livseliksir redder dig først.',
         soe: 'Sø er indlandsvand. Den er farlig uden båd ligesom hav. Den er ikke kyst, men pirater har lidt lettere ved den.',
         krystal: 'Krystalfelter er farlige og sjældne. Gravning kan give små guldfund, fælder eller diamanter. Stave viser krystalfelter i nærheden, når du står på krystal.',
-        marked: 'Markeder kan have butikker. Spillere med kølle kan smadre dem til ruiner. Du kan normalt ikke grave her.',
+        marked: 'Markeder kan have butikker. Spillere med kølle kan smadre dem til ruiner.',
         slagmark: 'Slagmark er et farligt gravefelt med guld, rødder, fælder og livseliksir.',
         meteor: 'Meteor-felter styres af meteor-eventet. Kig efter meteorstenen og eventet på feltet.'
     };
@@ -712,6 +712,11 @@
     }
 
     function håndterTastatur(ev: KeyboardEvent) {
+        if (inspectAktiv && ev.key === 'Escape') {
+            lukInspect();
+            ev.preventDefault();
+            return;
+        }
         if (introAktiv || ev.repeat || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.aktivVaerksted || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
         if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
 
@@ -1943,8 +1948,8 @@
     }
 
     function startInspect() {
-        inspectAktiv = true;
-        inspectBoble = null;
+        inspectAktiv = !inspectAktiv;
+        if (!inspectAktiv) inspectBoble = null;
     }
 
     function lukInspect() {
@@ -1954,9 +1959,17 @@
 
     function haandterInspectKlik(e: MouseEvent) {
         if (!inspectAktiv) return;
+        if (cam.harTrukket) return;
 
         const target = e.target as HTMLElement | null;
+        if (target?.closest('.inspect-knap, .inspect-boble, .inspect-luk, .fokus-knap, .regelbog-knap, .musik-toggle-btn')) return;
         const element = target?.closest('[data-help-title]') as HTMLElement | null;
+        if (element?.dataset.helpTitle === 'Ukendt felt') {
+            lukInspect();
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
 
         e.preventDefault();
         e.stopPropagation();
@@ -1967,7 +1980,6 @@
             tekst: element?.dataset.helpBody || 'Tryk på et felt, ikon eller en knap for at få en forklaring.',
             ...placering
         };
-        inspectAktiv = false;
     }
 
     function touchAfstand(touches: TouchList) {
@@ -2139,17 +2151,23 @@ function udførBevægelse(nytIndeks: number) {
             title="Fokuser på dig"
             aria-label="Fokuser på dig"
         >
-            ⌖
+            <svg class="top-ikon-svg fokus-ikon" viewBox="0 0 48 48" aria-hidden="true">
+                <circle cx="24" cy="24" r="9" />
+                <path d="M24 7v8M24 33v8M7 24h8M33 24h8" />
+            </svg>
         </button>
         <button
             type="button"
             class="top-ikon-knap inspect-knap"
             class:aktiv={inspectAktiv}
             onclick={startInspect}
-            title="Forklar næste tryk"
-            aria-label="Forklar næste tryk"
+            title={inspectAktiv ? 'Slå forklaringsmode fra' : 'Slå forklaringsmode til'}
+            aria-label={inspectAktiv ? 'Slå forklaringsmode fra' : 'Slå forklaringsmode til'}
         >
-            ?
+            <svg class="top-ikon-svg inspect-ikon" viewBox="0 0 48 48" aria-hidden="true">
+                <path d="M18 18a6.5 6.5 0 0 1 12.2 3.2c0 5.8-6.2 5.5-6.2 11" />
+                <circle cx="24" cy="38" r="1.8" />
+            </svg>
         </button>
         <Regelbog />
         <LydKnap />
@@ -2160,8 +2178,9 @@ function udførBevægelse(nytIndeks: number) {
     </div>
 {/if}
 
-<div class="game-container">
+<div class="game-container" class:inspect-mode={inspectAktiv}>
     <div class="camera" role="presentation"
+        ondragstart={(e) => e.preventDefault()}
         onwheel={(e) => cam.håndterZoom(e, !!eventState.aktivt || !!spilTilstand.aktivShop || !!spilTilstand.aktivVaerksted)}
         onpointerdown={(e) => cam.startTræk(e, !!eventState.aktivt || !!spilTilstand.aktivShop || !!spilTilstand.aktivVaerksted)}
         onpointermove={cam.træk}
@@ -2170,7 +2189,7 @@ function udførBevægelse(nytIndeks: number) {
         ontouchmove={haandterTouchZoom}
         ontouchend={stopTouchZoom}
         ontouchcancel={stopTouchZoom}
-        style="cursor: {cam.isDragging ? 'grabbing' : 'grab'}; touch-action: none;"
+        style="cursor: {cam.isDragging ? 'grabbing' : inspectAktiv ? 'help' : 'grab'}; touch-action: none;"
     >
         <div class="map" style={kameraStyle}>
             {#each spilTilstand.aktiveEnergiKugler || [] as kugle (kugle.id)}
@@ -2312,7 +2331,7 @@ function udførBevægelse(nytIndeks: number) {
                         {/if}
 
                         {#if erUdforsket && !erOpslugt && felt.indbrudt && felt.biome === 'by'}
-                            <span class="indbrud-marker" aria-label="Indbrudt" data-help-title="Indbrudt" data-help-body="Byfeltet er allerede brudt op med dirk. Det markerer et brugt indbrudssted.">
+                            <span class="indbrud-marker" aria-label="Indbrudt" data-help-title="Indbrud" data-help-body="Låsen markerer, at der allerede har været indbrud.">
                                 <img src="/tiles/openlock.webp" alt="" class="indbrud-icon" />
                             </span>
                         {/if}
@@ -2518,12 +2537,6 @@ function udførBevægelse(nytIndeks: number) {
     </div>
 </div>
 
-{#if inspectAktiv}
-    <div class="inspect-hint" role="status">
-        Tryk på et felt, ikon eller en knap
-    </div>
-{/if}
-
 {#if inspectBoble}
     <div
         class="inspect-boble"
@@ -2646,6 +2659,18 @@ function udførBevægelse(nytIndeks: number) {
     }
 
     .game-container { position: fixed; inset: 0; width: 100vw; height: 100dvh; overflow: hidden; background: #000; user-select: none; -webkit-user-select: none; }
+    .game-container.inspect-mode {
+        cursor: help;
+    }
+    .game-container.inspect-mode [data-help-title] {
+        cursor: help;
+        pointer-events: auto;
+    }
+    .game-container img {
+        -webkit-user-drag: none;
+        user-select: none;
+        -webkit-user-select: none;
+    }
     .game-help-actions {
         position: fixed;
         top: calc(env(safe-area-inset-top, 0px) + 14px);
@@ -2654,7 +2679,7 @@ function udførBevægelse(nytIndeks: number) {
         pointer-events: auto;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 6px;
     }
     .top-ikon-knap {
         width: 48px;
@@ -2663,41 +2688,71 @@ function udførBevægelse(nytIndeks: number) {
         background: transparent;
         color: #f4f4f4;
         font-family: 'Cinzel', Georgia, serif;
-        font-size: 1.8rem;
+        font-size: 1.25rem;
         line-height: 1;
         font-weight: 700;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 0;
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
         transition: transform 0.2s, color 0.2s, text-shadow 0.2s;
+    }
+    .top-ikon-svg {
+        width: 34px;
+        height: 34px;
+        overflow: visible;
+        fill: none;
+        stroke: #e2ebe7;
+        stroke-width: 3.1;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.72));
+    }
+    .inspect-ikon circle {
+        fill: #e2ebe7;
+        stroke: none;
+    }
+    .inspect-ikon {
+        width: 37px;
+        height: 37px;
+    }
+    .inspect-knap {
+        position: relative;
+    }
+    .inspect-knap.aktiv .inspect-ikon {
+        stroke: #ffd66f;
+        filter: drop-shadow(0 0 10px rgba(255, 214, 111, 0.75)) drop-shadow(0 3px 5px rgba(0, 0, 0, 0.72));
+    }
+    .inspect-knap.aktiv .inspect-ikon circle {
+        fill: #ffd66f;
+    }
+    .inspect-knap.aktiv::after {
+        content: '';
+        position: absolute;
+        inset: 2px;
+        border: 1.5px solid rgba(255, 214, 111, 0.88);
+        border-radius: 999px;
+        box-shadow: 0 0 12px rgba(255, 214, 111, 0.38);
+        pointer-events: none;
+        animation: inspect-svaj 2.4s ease-in-out infinite;
+    }
+    @keyframes inspect-svaj {
+        0%, 100% {
+            transform: rotate(-2deg) scale(0.98);
+            opacity: 0.76;
+        }
+        50% {
+            transform: rotate(2deg) scale(1.03);
+            opacity: 1;
+        }
     }
     .top-ikon-knap:hover,
     .top-ikon-knap.aktiv {
         color: #fff;
         transform: scale(1.04);
         text-shadow: 0 0 14px rgba(255, 255, 255, 0.45), 0 2px 8px rgba(0, 0, 0, 0.95);
-    }
-    .fokus-knap {
-        font-size: 1.95rem;
-    }
-    .inspect-hint {
-        position: fixed;
-        left: 50%;
-        top: calc(env(safe-area-inset-top, 0px) + 18px);
-        transform: translateX(-50%);
-        z-index: 4200;
-        max-width: calc(100vw - 24px);
-        padding: 9px 13px;
-        border: 1px solid rgba(255, 255, 255, 0.24);
-        border-radius: 8px;
-        background: rgba(18, 18, 18, 0.88);
-        color: #f6f6f6;
-        font-size: 0.9rem;
-        font-weight: 700;
-        pointer-events: none;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.45);
     }
     .inspect-boble {
         position: fixed;

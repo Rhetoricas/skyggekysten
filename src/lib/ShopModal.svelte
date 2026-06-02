@@ -97,6 +97,8 @@
                 {@const tilbud = itemDB[itemId]}
                 {#if tilbud && tilbud.kanKoebes !== false}
                     <div class="vare-kort" 
+                         data-help-title={tilbud.navn}
+                         data-help-body={`${tilbud.beskrivelse || 'Vare i butikken.'} Pris: ${tilbud.pris} guld.`}
                          onclick={() => købVare(itemId)} 
                          onkeydown={(e) => { if (e.key === 'Enter') købVare(itemId); }}
                          role="button" tabindex="0">
@@ -115,7 +117,7 @@
             <p>Dine ting (klik for at sælge):</p>
             
             <div class="inventory-small-row">
-                <div class="small-item guld-item" title="Din formue">
+                <div class="small-item guld-item" title="Din formue" data-help-title="Guld" data-help-body="Din nuværende formue. Guld bruges til køb og tæller med i score.">
                     <img src="/inventory/guld.webp" alt="Guld" />
                     <span class="count">{spilTilstand.guldTotal}</span>
                 </div>
@@ -124,6 +126,8 @@
                     {@const dbInfo = itemDB[vare.id]}
                     {#if dbInfo}
                         <div class="small-item clickable" 
+                             data-help-title={dbInfo.navn}
+                             data-help-body={`${dbInfo.beskrivelse || 'Genstand i din rygsæk.'} Klik normalt her for at sælge den.`}
                              onclick={() => sælgVare(vare.id)} 
                              onkeydown={(e) => { if (e.key === 'Enter') sælgVare(vare.id); }}
                              role="button" tabindex="0">
