@@ -153,6 +153,17 @@
         };
     }
 
+    function energiAnimationPunkt(ting: { feltIndex: number; tilFeltIndex?: number; ruteAndel?: number }) {
+        const fra = hexMidtpunkt(ting.feltIndex);
+        if (ting.tilFeltIndex === undefined) return fra;
+        const til = hexMidtpunkt(ting.tilFeltIndex);
+        const andel = ting.ruteAndel ?? 0.5;
+        return {
+            x: fra.x + (til.x - fra.x) * andel,
+            y: fra.y + (til.y - fra.y) * andel
+        };
+    }
+
     function findSkatteKlyngeCenter(klynge: number[]) {
         const klyngeSet = new Set(klynge);
         return klynge.find((index) => hentNaboIndices(index).filter((nabo) => klyngeSet.has(nabo)).length === 6)
@@ -525,7 +536,7 @@
         spilTilstand.aktiveTal = [...spilTilstand.aktiveTal, { id, tekst, type, feltIndex, offsetX, offsetY }];
         setTimeout(() => {
             spilTilstand.aktiveTal = spilTilstand.aktiveTal.filter(t => t.id !== id);
-        }, 3000);
+        }, 3800);
     }
 
     function hexCenter(index: number) {
@@ -2162,6 +2173,15 @@ function udførBevægelse(nytIndeks: number) {
         style="cursor: {cam.isDragging ? 'grabbing' : 'grab'}; touch-action: none;"
     >
         <div class="map" style={kameraStyle}>
+            {#each spilTilstand.aktiveEnergiKugler || [] as kugle (kugle.id)}
+                {@const punkt = energiAnimationPunkt(kugle)}
+                <img
+                    src="/tiles/energi_taendt.webp"
+                    alt=""
+                    class="flyvende-energi-kugle"
+                    style="left: {punkt.x}px; top: {punkt.y}px; --energi-x: {kugle.offsetX}px; --energi-y: {kugle.offsetY}px; --energi-delay: {kugle.delay}ms;"
+                />
+            {/each}
             {#each spilTilstand.gitter as felt, i (i)}
                 {@const raekke = Math.floor(i / kortBredde)}
                 {@const kolonne = i % kortBredde}
@@ -2484,6 +2504,16 @@ function udførBevægelse(nytIndeks: number) {
                     {/each}
                 </svg>
             {/if}
+
+            {#each spilTilstand.aktiveEnergiTal || [] as tal (tal.id)}
+                {@const punkt = energiAnimationPunkt({ ...tal, ruteAndel: 0.5 })}
+                <div
+                    class="flyvende-energi-tal"
+                    style="left: {punkt.x}px; top: {punkt.y}px;"
+                >
+                    {tal.antal}
+                </div>
+            {/each}
         </div>
     </div>
 </div>
@@ -3122,9 +3152,56 @@ function udførBevægelse(nytIndeks: number) {
     
     .flydende-tal {
         position: absolute; bottom: 50px; font-family: serif; font-weight: bold;
-        animation: rise 2.5s forwards; pointer-events: none; z-index: 100;
+        animation: rise 3.4s forwards; pointer-events: none; z-index: 100;
     }
-    @keyframes rise { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-30px); } }
+    @keyframes rise {
+        0% { opacity: 0; transform: translateY(0); }
+        18% { opacity: 1; transform: translateY(-5px); }
+        100% { opacity: 0; transform: translateY(-34px); }
+    }
+    .flyvende-energi-kugle {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        z-index: 101;
+        pointer-events: none;
+        transform: translate(calc(-50% + var(--energi-x, 0px)), calc(-50% + var(--energi-y, 0px))) scale(1);
+        filter: drop-shadow(0 0 6px rgba(255, 221, 97, 0.65));
+        animation: energiKugleFlyv 1.15s ease-out forwards;
+        animation-delay: var(--energi-delay, 0ms);
+    }
+    @keyframes energiKugleFlyv {
+        0% {
+            opacity: 0;
+            transform: translate(calc(-50% + var(--energi-x, 0px)), calc(-50% + var(--energi-y, 0px) + 8px)) scale(0.72);
+        }
+        16% {
+            opacity: 1;
+            transform: translate(calc(-50% + var(--energi-x, 0px)), calc(-50% + var(--energi-y, 0px))) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(calc(-50% + var(--energi-x, 0px)), calc(-50% + var(--energi-y, 0px) - 58px)) scale(0.38);
+        }
+    }
+    .flyvende-energi-tal {
+        position: absolute;
+        z-index: 220;
+        pointer-events: none;
+        color: #8ee8ff;
+        font-family: 'Cinzel', serif;
+        font-weight: 800;
+        font-size: 1.15rem;
+        line-height: 1;
+        text-shadow: 0 0 7px rgba(87, 218, 255, 0.95), 0 0 14px rgba(55, 160, 255, 0.55), 0 2px 4px rgba(0, 0, 0, 0.95);
+        transform: translate(-50%, -50%);
+        animation: energiTalFlyv 1.45s ease-in forwards;
+    }
+    @keyframes energiTalFlyv {
+        0% { opacity: 0; transform: translate(-50%, calc(-50% + 8px)) scale(0.82); }
+        18% { opacity: 1; transform: translate(-50%, calc(-50% - 2px)) scale(1); }
+        100% { opacity: 0; transform: translate(-50%, calc(-50% - 48px)) scale(0.78); }
+    }
     .opslugt { opacity: 0.8; filter: grayscale(0.8) brightness(0.6); }
 
     .slut-panel {

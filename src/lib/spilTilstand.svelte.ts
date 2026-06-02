@@ -11,6 +11,23 @@ interface FlydendeTal {
     offsetY: number;
 }
 
+interface EnergiKugle {
+    id: number;
+    feltIndex: number;
+    tilFeltIndex?: number;
+    offsetX: number;
+    offsetY: number;
+    delay: number;
+    ruteAndel: number;
+}
+
+interface EnergiForbrugTal {
+    id: number;
+    feltIndex: number;
+    tilFeltIndex?: number;
+    antal: number;
+}
+
 export const spilTilstand = $state({
     spillerNavn: '',
     rumKode: '',
@@ -136,5 +153,7 @@ export const spilTilstand = $state({
     
     erBevidstløs: false,
     aktiveTal: [] as FlydendeTal[],
+    aktiveEnergiKugler: [] as EnergiKugle[],
+    aktiveEnergiTal: [] as EnergiForbrugTal[],
     musikTaendt: true,
 });

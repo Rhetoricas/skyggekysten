@@ -845,9 +845,12 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     const biomeRabat = spilTilstand.valgtKarakter.biomeMod?.[felt.biome as string] || 0;
     const pris = Math.max(1, spilTilstand.valgtKarakter.moveCost + spilTilstand.rygsækEffekt.move + grundPris + biomeRabat);
 
-    const energiBetaling = brugEnergi(options.erITaagen ? pris + 2 : pris, 'bevaegelse');
-
     const gammelIndex = spilTilstand.spillerIndex;
+    const energiBetaling = brugEnergi(options.erITaagen ? pris + 2 : pris, 'bevaegelse', {
+        fraFeltIndex: gammelIndex,
+        tilFeltIndex: nytIndeks
+    });
+
     spilTilstand.spillerIndex = nytIndeks;
     if (nytIndeks !== gammelIndex) spilTilstand.venteGratisFeltBrugt = null;
     if (!spilTilstand.historik) spilTilstand.historik = [];

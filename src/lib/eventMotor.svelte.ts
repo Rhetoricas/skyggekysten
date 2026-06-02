@@ -3,7 +3,7 @@ import { eventBibliotek } from './eventBibliotek';
 import { afslørFalkebueSyn, tilfoejTilRygsæk, brugFraRygsæk, harRygsaekItem, findRygsaekItemTilKrav } from './spilmotor';
 import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremrykTid, udloesBersaerkHvisRelevant } from './overlevelse.svelte';
-import { brugEnergi } from './energi';
+import { brugEnergi, visBrugteEnergiKugler } from './energi';
 import type { Valg } from './eventBibliotek';
 
 export const eventState = $state({
@@ -251,6 +251,7 @@ export function tagValg(valg: Valg) {
         }
         if (resultat.energiNed) {
             spilTilstand.nuvaerendeEnergi -= resultat.energiNed;
+            visBrugteEnergiKugler(resultat.energiNed);
             kvittering += ` (-${resultat.energiNed} Energi)`;
         }
         if (resultat.itemUd) {
