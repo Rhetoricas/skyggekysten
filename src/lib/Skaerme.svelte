@@ -214,6 +214,7 @@
 
     async function aabnGlobalHighscore(score: GlobalScore) {
         visHighscoreLog = false;
+        highscoreDrilldown = null;
         valgtHighscore = {
             ...score,
             navn: score.spillerNavn,
@@ -226,6 +227,7 @@
 
     async function aabnLokalHighscore(score: LokalScore) {
         visHighscoreLog = false;
+        highscoreDrilldown = null;
         valgtHighscore = {
             ...score,
             navn: score.navn,
@@ -269,6 +271,7 @@
 
     function lukHighscoreDetaljer() {
         visHighscoreLog = false;
+        highscoreDrilldown = null;
         valgtHighscore = null;
     }
 

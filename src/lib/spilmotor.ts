@@ -5,7 +5,7 @@ import { KORT_VERSION, normaliserKortDimensioner, STANDARD_KORT_BREDDE, STANDARD
 import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
-import { fremrykTid, fremtvingKollaps, tagSkadeOgTjekDød, udloesBersaerkHvisRelevant } from '$lib/overlevelse.svelte';
+import { erSpillerITaagen, fremrykTid, fremtvingKollaps, tagSkadeOgTjekDød, udloesBersaerkHvisRelevant } from '$lib/overlevelse.svelte';
 import { brugEnergi, brugResterendeEnergi } from '$lib/energi';
 import { erAfgroedeModen, erHvedeBlok, erInsektPlageAktiv, hentAfgroedeBlok } from '$lib/afgroeder';
 import type { Biome, Felt, RygsækTing } from '$lib/types';
@@ -1253,6 +1253,11 @@ export function udfoerPortalTeleport() {
 
 export function hvil() {
     if (!spilTilstand.valgtKarakter || spilTilstand.erBevidstløs) return;
+
+    if (erSpillerITaagen()) {
+        spilTilstand.logBesked = "Du kan ikke slå lejr i tågen.";
+        return;
+    }
 
     const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
     const vildmark = ['eng', 'skov', 'mark', 'bjerg', 'hoejland' ];

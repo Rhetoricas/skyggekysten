@@ -87,7 +87,7 @@
                     <ul>
                         <li>Du afslører felter omkring dig, når du bevæger dig. Din synsradius kommer fra karakteren og udstyr som fakkel.</li>
                         <li>Bjerge blokerer udsyn, medmindre du selv står på et bjerg. Bjergfelter giver mindst radius 2, når du kommer derop.</li>
-                        <li>Tågen begynder først at rykke efter dag 6. Hvis du står i tågen, når tiden går, tager du skade.</li>
+                        <li>Tågen begynder først at rykke efter dag 6. Hvis du står i tågen, når tiden går, tager du skade. Du kan ikke slå lejr i tågen.</li>
                         <li>Nogle sjældne events kan holde tågen tilbage, blokere den bag et felt eller vise en båd for alle.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Jæger, skytte, opdager og eventyrer ser længere end de fleste. Står der et bjerg imellem dig og kysten, kan ukendte farer stadig gemme sig bag det, indtil du får et bedre udsyn.</p>
