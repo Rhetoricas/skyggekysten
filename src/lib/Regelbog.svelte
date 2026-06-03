@@ -77,7 +77,7 @@
                         <li>Du kan godt bruge mere energi, end du har tilbage. Så går dagen videre efter handlingen, og du får ny energi.</li>
                         <li>Bevægelse i tågen koster 2 ekstra energi.</li>
                         <li>Mad kan gøre næste bevægelse gratis. Bersærkergang kan gøre næste energikrævende handling gratis.</li>
-                        <li>Hvis du kommer mindst 5 dage foran den langsomste aktive spiller i multiplayer, åbner ventespillet. Bordet lukker, når den langsomste når din dag, når tågen rammer feltet, eller efter højst 60 sekunder. Når bordet lukker, kan du spille mindst 5 dage uden nyt ventespil. Du får én gratis ventespilsrunde på det felt, du står på; flere runder på samme felt koster 5 guld.</li>
+                        <li>Hvis du kommer mindst 5 dage foran den langsomste aktive spiller i multiplayer, åbner ventespillet. Bordet lukker, når den langsomste når din dag, når tågen er tæt på feltet, eller efter højst 60 sekunder. Når bordet lukker, kan du spille mindst 5 dage uden nyt ventespil. Du får én gratis ventespilsrunde på det felt, du står på; flere runder på samme felt koster 5 guld.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Har du 3 energi tilbage, og et bjerg koster 6, kan du stadig gå derind. Du ender på negativ energi, feltet aktiveres, og bagefter går tiden videre til næste dag.</p>
                 </section>

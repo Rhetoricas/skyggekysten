@@ -45,6 +45,7 @@
 
     const cam = skabKamera();
     const MAX_DAGE_FORAN = 5;
+    const VENTE_TAAGE_VARSEL_FELTER = 2;
     const SESSION_SELECT = 'rum_kode,kort,start_index,spillere,fog_x,kort_bredde,kort_hoejde,kort_version';
     const START_AUTO_REFRESH_MS = 10000;
     const START_AUTO_REFRESH_KEY = 'taage_pending_start';
@@ -64,6 +65,15 @@
 
     function aktuelHighscoreKlasse() {
         return hentKarakterKlasseNoegle(spilTilstand.valgtKarakter);
+    }
+
+    function erTågenTætPåVentespilfelt() {
+        if (!spilTilstand.venteSpilAktiv) return false;
+        const varselAfstand = HEX_W * VENTE_TAAGE_VARSEL_FELTER;
+        const varsletFogX = spilTilstand.fogX < 0
+            ? spilTilstand.fogX - varselAfstand
+            : spilTilstand.fogX + varselAfstand;
+        return erFeltITaagen(spilTilstand.gitter, spilTilstand.spillerIndex, varsletFogX, kortBredde);
     }
 
     type PendingStart = {
@@ -450,12 +460,14 @@
         const dag = spilTilstand.dag;
         const ur = venteUrTick;
         const iTaagen = erITågen;
+        const taagenNaerVentespil = erTågenTætPåVentespilfelt();
         const spillereStatus = Object.values(spilTilstand.alleSpillere)
             .map((spiller) => `${spiller.dag || 1}:${spiller.sidstAktiv || 0}:${spiller.isDead ? 1 : 0}:${spiller.isWinner ? 1 : 0}:${spiller.rundeSeed || ''}`)
             .join('|');
         void dag;
         void ur;
         void iTaagen;
+        void taagenNaerVentespil;
         void spillereStatus;
 
         if (!venteAktiv || state !== 'play') return;
@@ -465,13 +477,16 @@
             const erMidtIRunde = spilTilstand.venteFase === 'spiller' || spilTilstand.venteFase === 'viser_gevinst';
             const langsomsteHarIndhentet = spilTilstand.dag <= hentLangsomsteDag();
             const impensTidErGaaet = erVenteTidUdlobet(ur);
-            if (iTaagen) {
+            if (iTaagen || taagenNaerVentespil) {
                 const puljeGuld = spilTilstand.ventePuljeGuld;
                 const puljeLiv = spilTilstand.ventePuljeLiv;
                 lukVenteSpil();
+                const aarsag = iTaagen
+                    ? 'Tågen vælter ind over lejren.'
+                    : 'Tågen kryber tæt på lejren.';
                 spilTilstand.logBesked = puljeGuld > 0 || puljeLiv > 0
-                    ? `Tågen vælter ind over lejren. Impen river kortene til sig og forsvinder. Du tager ${puljeGuld} guld og ${puljeLiv} HP med fra bordet.`
-                    : 'Tågen vælter ind over lejren. Impen river kortene til sig og forsvinder.';
+                    ? `${aarsag} Impen river kortene til sig og forsvinder. Du tager ${puljeGuld} guld og ${puljeLiv} HP med fra bordet.`
+                    : `${aarsag} Impen river kortene til sig og forsvinder.`;
                 return;
             }
             if (!erMidtIRunde && (langsomsteHarIndhentet || impensTidErGaaet)) {
@@ -1959,9 +1974,8 @@
 
     function haandterInspectKlik(e: MouseEvent) {
         if (!inspectAktiv) return;
-        if (cam.harTrukket) return;
-
         const target = e.target as HTMLElement | null;
+        if (cam.harTrukket && target?.closest('.game-container')) return;
         if (target?.closest('.inspect-knap, .inspect-boble, .inspect-luk, .fokus-knap, .regelbog-knap, .musik-toggle-btn')) return;
         const element = target?.closest('[data-help-title]') as HTMLElement | null;
         if (element?.dataset.helpTitle === 'Ukendt felt') {

@@ -115,6 +115,7 @@ export interface Felt {
     plyndret?: boolean;
     kasseGuld?: number;
     naegterHandelFor?: string[];
+    naegterHandelGrundFor?: Record<string, 'koelle' | 'smadrede_naboer'>;
     
     type?: string;
     opdaget?: boolean;

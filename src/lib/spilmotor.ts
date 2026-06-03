@@ -761,6 +761,24 @@ function naegterHandelTilAktuelSpiller(felt: Felt | null | undefined) {
     return !!spilTilstand.spillerNavn && !!felt?.naegterHandelFor?.includes(spilTilstand.spillerNavn);
 }
 
+function handelNaegtelseGrund(felt: Felt | null | undefined) {
+    if (!spilTilstand.spillerNavn) return 'smadrede_naboer';
+    return felt?.naegterHandelGrundFor?.[spilTilstand.spillerNavn] || 'smadrede_naboer';
+}
+
+function handelNaegtelseBesked(felt: Felt | null | undefined, type: 'shop' | 'vaerksted') {
+    const grund = handelNaegtelseGrund(felt);
+    if (grund === 'koelle') {
+        return type === 'vaerksted'
+            ? "Værkstedet lukker porten, da de ser dig. Mesteren husker køllen og tør ikke arbejde for dig igen."
+            : "Boderne lukker skodderne, da de ser dig. Købmanden husker køllen og tør ikke handle mere med dig.";
+    }
+
+    return type === 'vaerksted'
+        ? "Værkstedet lukker porten, da de ser dig. Rygtet om dine smadrede naboer er nået hertil."
+        : "Boderne lukker skodderne, da de ser dig. Rygtet om dine smadrede naboer er nået hertil.";
+}
+
 export function naegtHandelForAktuelSpillerPaaAktueltFelt() {
     if (!spilTilstand.spillerNavn) return false;
 
@@ -777,6 +795,10 @@ export function naegtHandelForAktuelSpillerPaaAktueltFelt() {
     if (naegter.size === foer) return false;
 
     felt.naegterHandelFor = Array.from(naegter);
+    felt.naegterHandelGrundFor = {
+        ...(felt.naegterHandelGrundFor || {}),
+        [spilTilstand.spillerNavn]: 'koelle'
+    };
     spilTilstand.gitter[indeks] = { ...felt };
     spilTilstand.gitter = [...spilTilstand.gitter];
     broadcastFelt(indeks, spilTilstand.gitter[indeks]);
@@ -801,6 +823,10 @@ function skraemNaboHandlende(centerIndeks: number) {
         if (naegter.size === foer) continue;
 
         nabo.naegterHandelFor = Array.from(naegter);
+        nabo.naegterHandelGrundFor = {
+            ...(nabo.naegterHandelGrundFor || {}),
+            [spilTilstand.spillerNavn]: 'smadrede_naboer'
+        };
         spilTilstand.gitter[naboIndeks] = { ...nabo };
         broadcastFelt(naboIndeks, spilTilstand.gitter[naboIndeks]);
         antal++;
@@ -1070,7 +1096,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         }
         else if (felt.hasWorkshop) {
             if (naegterHandelTilAktuelSpiller(felt)) {
-                spilTilstand.logBesked = "Værkstedet lukker porten, da de ser dig. Rygtet om dine smadrede naboer er nået hertil.";
+                spilTilstand.logBesked = handelNaegtelseBesked(felt, 'vaerksted');
             } else {
                 spilTilstand.aktivVaerksted = true;
             }
@@ -1079,7 +1105,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
             const koebbareShopItems = hentKoebbareShopItems(felt.shopItems);
             if (harShop(felt) && koebbareShopItems.length > 0) {
                 if (naegterHandelTilAktuelSpiller(felt)) {
-                    spilTilstand.logBesked = "Boderne lukker skodderne, da de ser dig. Rygtet om dine smadrede naboer er nået hertil.";
+                    spilTilstand.logBesked = handelNaegtelseBesked(felt, 'shop');
                 } else {
                     spilTilstand.aktivShop = koebbareShopItems;
                 }
@@ -1598,6 +1624,7 @@ export function plyndrFelt() {
     felt.indbrudt = undefined;
     felt.kasseGuld = undefined;
     felt.naegterHandelFor = undefined;
+    felt.naegterHandelGrundFor = undefined;
     felt.biome = 'ruin';
     felt.shopItems = undefined;
     felt.shopBasisItems = undefined;
@@ -1863,6 +1890,7 @@ function placerVaerksteder(gitter: Felt[]) {
         felt.shopGenopfyldtDag = undefined;
         felt.kasseGuld = undefined;
         felt.naegterHandelFor = undefined;
+        felt.naegterHandelGrundFor = undefined;
         felt.eventID = undefined;
         felt.hasPortal = false;
     }
@@ -2353,6 +2381,7 @@ export async function udloesNaturkatastrofe(centerIndex: number) {
         felter[idx].shopGenopfyldtDag = undefined;
         felter[idx].kasseGuld = undefined;
         felter[idx].naegterHandelFor = undefined;
+        felter[idx].naegterHandelGrundFor = undefined;
         felter[idx].hasWorkshop = false;
         felter[idx].eventID = 'meteor_skat';
         felter[idx].eventFuldført = false;
@@ -2416,6 +2445,7 @@ export async function udloesJordskaelv(centerIndex: number) {
         felter[idx].shopGenopfyldtDag = undefined;
         felter[idx].kasseGuld = undefined;
         felter[idx].naegterHandelFor = undefined;
+        felter[idx].naegterHandelGrundFor = undefined;
         felter[idx].hasWorkshop = false;
         felter[idx].eventID = undefined;
 
@@ -2508,6 +2538,7 @@ export async function udloesOversvoemmelse(centerIndex: number) {
         felter[idx].shopGenopfyldtDag = undefined;
         felter[idx].kasseGuld = undefined;
         felter[idx].naegterHandelFor = undefined;
+        felter[idx].naegterHandelGrundFor = undefined;
         felter[idx].hasWorkshop = false;
         felter[idx].eventID = undefined;
 
@@ -2569,6 +2600,7 @@ export async function udloesDoedeSlagmark(centerIndex: number) {
         felter[idx].shopGenopfyldtDag = undefined;
         felter[idx].kasseGuld = undefined;
         felter[idx].naegterHandelFor = undefined;
+        felter[idx].naegterHandelGrundFor = undefined;
         felter[idx].eventID = undefined;
         felter[idx].eventFuldført = false;
 
@@ -2678,6 +2710,7 @@ export function nulstilKort() {
         felt.plyndret = undefined;
         felt.kasseGuld = undefined;
         felt.naegterHandelFor = undefined;
+        felt.naegterHandelGrundFor = undefined;
         felt.mineOwner = undefined;
         felt.mineLocked = undefined;
         felt.hasMeteorStone = false;
