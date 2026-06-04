@@ -44,6 +44,28 @@ export function diamantStoerrelse(vaerdi: number) {
     return 0.7 + normaliseret * 0.95;
 }
 
+export function diamantStoerrelsesNavn(vaerdi: number) {
+    if (vaerdi >= 950) return 'enorm';
+    if (vaerdi >= 500) return 'stor';
+    return 'lille';
+}
+
+export function beskrivDiamantFund(vaerdier: number[] = []) {
+    const reneVaerdier = vaerdier
+        .map((vaerdi) => Math.round(Number(vaerdi)))
+        .filter((vaerdi) => Number.isFinite(vaerdi) && vaerdi > 0);
+
+    if (reneVaerdier.length === 0) return '';
+    if (reneVaerdier.length === 1) {
+        const vaerdi = reneVaerdier[0];
+        return `${diamantStoerrelsesNavn(vaerdi)} diamant (${vaerdi} guld)`;
+    }
+
+    return `${reneVaerdier.length} diamanter: ${reneVaerdier
+        .map((vaerdi) => `${diamantStoerrelsesNavn(vaerdi)} ${vaerdi}`)
+        .join(', ')}`;
+}
+
 export const MEDALJE_GRAENSER = [0, 500, 1200, 2100, 3200, 4500, 6000, 7800, 10000, 12500] as const;
 export const M10_SCORE = MEDALJE_GRAENSER[MEDALJE_GRAENSER.length - 1];
 

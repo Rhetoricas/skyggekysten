@@ -2,7 +2,7 @@ import { spilTilstand } from '$lib/spilTilstand.svelte';
 import { syncTilDb, broadcastFelt, broadcastFelter, syncKortTilDbSenere, realtimeRumNoegle } from '$lib/netvaerk';
 import { HEX_W, biomeVægte, biomeTerraenCost, itemDB, markedVarePool } from '$lib/spildata';
 import { KORT_VERSION, normaliserKortDimensioner, STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from '$lib/kortDimensioner';
-import { rulDiamantVaerdi } from '$lib/score';
+import { beskrivDiamantFund, rulDiamantVaerdi } from '$lib/score';
 import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
@@ -358,7 +358,7 @@ function normaliserItemAntal(maengde: unknown, fallback = 1) {
 export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number = 1) {
     genstandId = String(genstandId || '').trim();
     tilfoejetMaengde = normaliserItemAntal(tilfoejetMaengde);
-    if (!genstandId) return;
+    if (!genstandId) return { tilfoejet: false, diamantVaerdier: [], diamantBeskrivelse: '' };
 
     let udstyrListe = spilTilstand.mitUdstyr as RygsækTing[];
 
@@ -452,12 +452,12 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
             spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== genstandId || ting === fundetTing);
         } else {
             spilTilstand.logBesked = `Du har allerede ${itemDB[genstandId]?.navn || 'den genstand'}.`;
-            return;
+            return { tilfoejet: false, diamantVaerdier: [], diamantBeskrivelse: '' };
         }
     } else {
         if (!kanModtageItem(genstandId)) {
             spilTilstand.logBesked = `Du har allerede ${itemDB[genstandId]?.navn || 'den type udstyr'}.`;
-            return;
+            return { tilfoejet: false, diamantVaerdier: [], diamantBeskrivelse: '' };
         }
 
         const nyTing: RygsækTing = {
@@ -471,6 +471,11 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
     
     spilTilstand.mitUdstyr = [...spilTilstand.mitUdstyr];
     syncTilDb(); // Ingen `true` her. Rygsæk er personlig.
+    return {
+        tilfoejet: true,
+        diamantVaerdier: nyeDiamanter,
+        diamantBeskrivelse: beskrivDiamantFund(nyeDiamanter)
+    };
 }
 
 export function brugFraRygsæk(genstandId: string, brugtMaengde: number = 1) {

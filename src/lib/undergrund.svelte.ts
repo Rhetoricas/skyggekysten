@@ -157,9 +157,9 @@ export function grav() {
         fundLog = `KLIK. En nedgravet fælde bider sig fast i dit ben (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`;
     } else if (fundetLoot === 'skattekiste') {
         spilTilstand.guldTotal += 600;
-        tilfoejTilRygsæk('diamant', 1);
+        const diamantFund = tilfoejTilRygsæk('diamant', 1);
         felt.tomSkattekiste = true;
-        fundLog = `Skovlen rammer træ. Du åbner en kiste. (+600 Guld, +Diamant)`;
+        fundLog = `Skovlen rammer træ. Du åbner en kiste. (+600 Guld, +${diamantFund?.diamantBeskrivelse || 'diamant'})`;
     } else if (guldVaerdi > 0) {
         const graveGuldMultiplier = harMesterskovl && harGyldenDestillator ? 3 : (harMesterskovl || harGyldenDestillator) ? 2 : 1;
         const malmviserMultiplier = harMalmviser ? 1.25 : 1;
@@ -188,8 +188,10 @@ export function grav() {
             fundLog = `Du finder en rod, men du har ikke brug for mere liv lige nu.`;
         }
     } else if (fundetLoot) {
-        tilfoejTilRygsæk(fundetLoot, 1);
-        fundLog = `Du graver en ${fundetLoot} frem.`;
+        const itemFund = tilfoejTilRygsæk(fundetLoot, 1);
+        fundLog = fundetLoot === 'diamant'
+            ? `Du graver en ${itemFund?.diamantBeskrivelse || 'diamant'} frem.`
+            : `Du graver en ${fundetLoot} frem.`;
     }
 
     spilTilstand.logBesked = fundLog + udstyrsLog;

@@ -191,8 +191,10 @@ export function tagValg(valg: Valg) {
         if (resultat.givItem) {
             resultat.givItem.split(',').forEach(item => {
                 const id = item.trim();
-                tilfoejTilRygsæk(id, 1);
-                kvittering += ` (+${id})`;
+                const itemFund = tilfoejTilRygsæk(id, 1);
+                kvittering += id === 'diamant'
+                    ? ` (+${itemFund?.diamantBeskrivelse || 'diamant'})`
+                    : ` (+${id})`;
             });
         }
         if (resultat.mistItem) {
@@ -257,8 +259,10 @@ export function tagValg(valg: Valg) {
         if (resultat.itemUd) {
             resultat.itemUd.split(',').forEach((item: string) => {
                 const id = item.trim();
-                tilfoejTilRygsæk(id, 1);
-                kvittering += ` (+${id})`;
+                const itemFund = tilfoejTilRygsæk(id, 1);
+                kvittering += id === 'diamant'
+                    ? ` (+${itemFund?.diamantBeskrivelse || 'diamant'})`
+                    : ` (+${id})`;
             });
         }
 
