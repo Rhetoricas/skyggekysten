@@ -5,6 +5,8 @@
     import { grav } from '$lib/undergrund.svelte';
     import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal, aktiverHemmelighed, begaaIndbrud, kanBegaaIndbrudPaaFelt, kanPlyndreFelt, plyndrFelt } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
+    import { diamantSamletVaerdi, diamantVaerdier } from '$lib/score';
+    import type { RygsækTing } from '$lib/types';
 
     let aktueltFelt = $derived(
         spilTilstand.valgtKarakter && spilTilstand.gitter?.length > 0 
@@ -15,9 +17,6 @@
     let kanGrave = $derived(aktueltFelt && !aktueltFelt.gravet && aktueltFelt.kanGraves);
     let kanBegaaIndbrud = $derived(kanBegaaIndbrudPaaFelt(aktueltFelt));
     let kanPlyndre = $derived(kanPlyndreFelt(aktueltFelt));
-    let aktivTracker = $derived(spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.aktivTracker);
-    let aktivTrackerSpiller = $derived(aktivTracker ? spilTilstand.alleSpillere[aktivTracker.targetNavn] : null);
-    let trackerDageTilbage = $derived(aktivTracker ? Math.max(0, aktivTracker.slutterDag - spilTilstand.dag + 1) : 0);
     let harMesterskovl = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'mesterskovl' && ting.maengde > 0) ?? false);
     let harSkovl = $derived(spilTilstand.mitUdstyr?.some((ting) => (ting.id === 'skovl' || ting.id === 'mesterskovl') && ting.maengde > 0) ?? false);
     let graveIkon = $derived(harMesterskovl ? itemDB.mesterskovl.billede : harSkovl ? itemDB.skovl.billede : '/ui/haandgrav.webp');
@@ -42,25 +41,9 @@
     });
     const hvileBiomer = ['eng', 'skov', 'mark', 'bjerg', 'hoejland'];
 
-    let visLog = $state(false);
-    let logContainerRef = $state<HTMLDivElement | null>(null);
-
-    let totalMove = $derived((spilTilstand.valgtKarakter?.moveCost ?? 1) + spilTilstand.rygsækEffekt.move);
-    let totalArmor = $derived(100 - Math.round(((spilTilstand.valgtKarakter?.dmgMod ?? 1.0) + spilTilstand.rygsækEffekt.dmg) * 100));
-    let totalGoldMod = $derived(Math.round(((spilTilstand.valgtKarakter?.goldMod ?? 1.0) + spilTilstand.rygsækEffekt.gold) * 100));
-    let totalSyn = $derived((spilTilstand.valgtKarakter?.synsRadius ?? 1) + spilTilstand.rygsækEffekt.syn);
-    let moveBadgeHjaelp = $derived(`Din grundpris for et skridt er ${totalMove} energi før terræn. Terrænet lægges oveni, og prisen kan aldrig komme under 1.`);
-    let skadeBadgeHjaelp = $derived(totalArmor >= 0
-        ? `Du tager ${totalArmor}% mindre skade fra karakter og udstyr.`
-        : `Du tager ${Math.abs(totalArmor)}% mere skade fra karakter og udstyr.`
-    );
-    let guldBadgeHjaelp = $derived(`Din guldindkomst er ${totalGoldMod}% af grundbeløbet, før særlige udstyrseffekter på selve fundet.`);
-    let synBadgeHjaelp = $derived(`Dit syn er radius ${totalSyn}. Karakter, fakler og andet udstyr kan ændre tallet.`);
-
     let aktuelLog = $derived(spilTilstand.logHistorik.length > 0 ? spilTilstand.logHistorik[spilTilstand.logHistorik.length - 1] : '');
     let forrigeLog = $derived(spilTilstand.logHistorik.length > 1 ? spilTilstand.logHistorik[spilTilstand.logHistorik.length - 2] : '');
-
-    let rensedeLogLinjer = $derived(spilTilstand.logHistorik.filter(linje => linje.includes(' - ')));
+    let tredjeLog = $derived(spilTilstand.logHistorik.length > 2 ? spilTilstand.logHistorik[spilTilstand.logHistorik.length - 3] : '');
 
     $effect(() => {
         const dag = spilTilstand.dag;
@@ -70,12 +53,6 @@
                 spilTilstand.logBesked = "";
             }
         });
-    });
-
-    $effect(() => {
-        if (visLog && rensedeLogLinjer.length && logContainerRef) {
-            logContainerRef.scrollTop = logContainerRef.scrollHeight;
-        }
     });
 
     function spisMad() {
@@ -159,7 +136,19 @@
         return tekst.charAt(0).toUpperCase() + tekst.slice(1).toLowerCase();
     }
 
-    function forklaringForVare(vareId: string, aktiv: boolean) {
+    function diamantForklaring(vare: RygsækTing) {
+        const vaerdier = diamantVaerdier(vare);
+        if (vaerdier.length === 0) return 'En sjælden ædelsten. Den kan sælges i butikker.';
+        if (vaerdier.length === 1) return `Diamantens værdi er ${vaerdier[0]} guld. I butikker får du 75% af værdien.`;
+        return `${vaerdier.length} diamanter, samlet værdi ${diamantSamletVaerdi(vare)} guld. Rå værdier: ${vaerdier.join(', ')}. I butikker sælges de samlet for 75% af værdien.`;
+    }
+
+    function vareBadgeTekst(vare: RygsækTing) {
+        if (vare.id === 'diamant') return `${diamantSamletVaerdi(vare)}`;
+        return vare.maengde > 1 ? `${vare.maengde}` : '';
+    }
+
+    function forklaringForVare(vareId: string, aktiv: boolean, vare?: RygsækTing) {
         const info = itemDB[vareId];
         if (!info) return 'Ukendt genstand.';
 
@@ -176,7 +165,7 @@
         }
 
         if (vareId === 'diamant') {
-            return `${info.beskrivelse} Den kan sælges i butikker.`;
+            return vare ? diamantForklaring(vare) : `${info.beskrivelse} Den kan sælges i butikker.`;
         }
 
         const status = aktiv
@@ -189,74 +178,13 @@
     }
 </script>
 
-{#if visLog}
-    <div class="log-modal-overlay" onclick={() => visLog = false} role="presentation">
-        <div class="log-modal-content" onclick={(e) => e.stopPropagation()} role="presentation">
-            <div class="log-header">
-                <h2>Logbog</h2>
-                <button class="luk-btn" onclick={() => visLog = false} aria-label="Luk logbog">×</button>
-            </div>
-            
-            <div class="log-liste" bind:this={logContainerRef}>
-                {#each rensedeLogLinjer as linje, i (i)}
-                    <p class="log-post" class:nyeste={i === rensedeLogLinjer.length - 1}>
-                        {linje}
-                    </p>
-                {/each}
-            </div>
-        </div>
-    </div>
-{/if}
-
 <footer class="ui">
     <div class="island-overskrift">{formaterNavn(spilTilstand.rumKode)}</div>
     
-    <div 
-        class="log-container klikbar" 
-        onclick={() => visLog = true}
-        onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') visLog = true; }}
-        data-help-title="Logbog"
-        data-help-body="Her ser du de seneste beskeder. Tryk på loggen for at åbne hele logbogen."
-        role="button"
-        tabindex="0"
-    >
+    <div class="log-container">
         <div class="log-line aktuel">{aktuelLog || '\u00A0'}</div>
         <div class="log-line forrige">{forrigeLog || '\u00A0'}</div>
-    </div>
-
-    <div class="instrument-braet">
-        {#if aktivTracker && aktivTrackerSpiller && trackerDageTilbage > 0}
-            <div class="tracker-status" title="Du ser de felter, denne spiller ser.">
-                <img src={aktivTrackerSpiller.ikon || '/tiles/player.webp'} alt="" />
-                <span>{aktivTracker.targetNavn}</span>
-                <small>{trackerDageTilbage} dage</small>
-            </div>
-        {/if}
-
-        {#if totalMove !== 1}
-            <span class="mod-badge move {totalMove > 1 ? 'negativ' : ''}" data-help-title="Bevægelse" data-help-body={moveBadgeHjaelp}>
-                <img src="/ui/stat_move.webp" alt="" />
-                {totalMove}
-            </span>
-        {/if}
-        {#if totalArmor !== 0}
-            <span class="mod-badge dmg {totalArmor < 0 ? 'negativ' : ''}" data-help-title="Skade" data-help-body={skadeBadgeHjaelp}>
-                <img src="/ui/stat_dmg.webp" alt="" />
-                {totalArmor}%
-            </span>
-        {/if}
-        {#if totalGoldMod !== 100}
-            <span class="mod-badge gold {totalGoldMod < 100 ? 'negativ' : ''}" data-help-title="Guldmodifier" data-help-body={guldBadgeHjaelp}>
-                <img src="/ui/stat_gold.webp" alt="" />
-                {totalGoldMod}%
-            </span>
-        {/if}
-        {#if totalSyn !== 1}
-            <span class="mod-badge syn {totalSyn < 1 ? 'negativ' : ''}" data-help-title="Syn" data-help-body={synBadgeHjaelp}>
-                <img src="/ui/stat_syn.webp" alt="" />
-                {totalSyn}
-            </span>
-        {/if}
+        <div class="log-line tredje">{tredjeLog || '\u00A0'}</div>
     </div>
 
     <div class="ui-content">
@@ -306,7 +234,7 @@
                     <div 
                         class="inventory-item {kanBrugeInventoryVare(vare.id) ? 'klikbar' : ''}" 
                         data-help-title={dbInfo.navn}
-                        data-help-body={forklaringForVare(vare.id, kanBrugeInventoryVare(vare.id))}
+                        data-help-body={forklaringForVare(vare.id, kanBrugeInventoryVare(vare.id), vare)}
                         onclick={() => {
                             if (kanBrugeInventoryVare(vare.id)) {
                                 haandterInventoryKlik(vare.id);
@@ -328,10 +256,10 @@
                                 alt={dbInfo.navn} 
                                 class="inventory-icon {erOpgraderetVare(vare.id) ? 'opgraderet' : ''} {erSituationsVare(vare.id) && !kanBrugeInventoryVare(vare.id) ? 'deaktiveret' : ''}" 
                                 data-help-title={dbInfo.navn}
-                                data-help-body={forklaringForVare(vare.id, kanBrugeInventoryVare(vare.id))}
+                                data-help-body={forklaringForVare(vare.id, kanBrugeInventoryVare(vare.id), vare)}
                             />
-                            {#if vare.maengde > 1}
-                                <span class="maengde-badge">{vare.maengde}</span>
+                            {#if vareBadgeTekst(vare)}
+                                <span class="maengde-badge {vare.id === 'diamant' ? 'diamant-badge' : ''}">{vareBadgeTekst(vare)}</span>
                             {/if}
                         </div>
                     </div>
@@ -388,11 +316,6 @@
         align-items: center;
         margin-bottom: 0.8rem;
     }
-    .log-container.klikbar {
-        pointer-events: auto;
-        cursor: pointer;
-        touch-action: manipulation;
-    }
     .log-line {
         text-align: center;
         width: 100%;
@@ -408,73 +331,15 @@
         font-size: 1.2rem;
         min-height: 1.5rem;
     }
-    .log-line.forrige {
+    .log-line.forrige,
+    .log-line.tredje {
         color: #888;
         font-size: 0.9rem;
         min-height: 1.2rem;
         margin-top: 2px;
     }
-    
-    .instrument-braet {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 12px;
-        pointer-events: auto;
-        flex-wrap: wrap;
-        user-select: none;
-        -webkit-user-select: none;
-    }
-    .tracker-status {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        min-height: 34px;
-        padding: 0.2rem 0.55rem 0.2rem 0.3rem;
-        border-radius: 999px;
-        background: rgba(8, 18, 24, 0.68);
-        color: #e9f7ff;
-        font-family: 'Cinzel', serif;
-        font-size: 0.9rem;
-        box-shadow: 0 0 14px rgba(126, 214, 255, 0.22);
-    }
-    .tracker-status img {
-        width: 32px;
-        height: 32px;
-        object-fit: contain;
-        border-radius: 50%;
-        filter: drop-shadow(0 0 5px rgba(126, 214, 255, 0.8));
-    }
-    .tracker-status small {
-        color: #9fd7f4;
-        font-family: system-ui, sans-serif;
-        font-size: 0.72rem;
-        white-space: nowrap;
-    }
-    .mod-badge {
-        background: transparent;
-        color: #aaa;
-        padding: 2px 6px;
-        font-family: monospace;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        gap: 0;
-    }
-    .mod-badge img {
-        width: 24px;
-        height: auto;
-        opacity: 0.85;
-        margin-right: 0px;
-    }
-    .mod-badge.negativ {
-        color: #cc5555 !important;
-    }
-    .mod-badge.negativ img {
-        filter: grayscale(100%) !important;
-        opacity: 0.5 !important;
+    .log-line.tredje {
+        color: #666;
     }
 
     .ui-content {
@@ -524,6 +389,12 @@
     .inventory-item.klikbar:hover {
         transform: scale(1.05);
     }
+    :global(body.inspect-global) .ui,
+    :global(body.inspect-global) .ui *,
+    :global(body.inspect-global) .inventory-item,
+    :global(body.inspect-global) .inventory-item * {
+        cursor: none !important;
+    }
     .inventory-row {
         display: flex;
         align-items: flex-start;
@@ -565,6 +436,14 @@
         border-radius: 4px;
         font-weight: bold;
     }
+    .maengde-badge.diamant-badge {
+        background: rgba(0, 0, 0, 0.72);
+        color: #ffe066;
+        font-size: 0.8rem;
+        line-height: 1;
+        min-width: 2.2em;
+        text-align: center;
+    }
     .energi-container {
         display: flex;
         flex-direction: column;
@@ -590,47 +469,6 @@
         filter: grayscale(100%) opacity(24%);
         transform: scale(0.82);
     }
-
-    .log-modal-overlay {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100vw; height: 100dvh;
-        background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
-        z-index: 5200; display: flex;
-        align-items: center; justify-content: center;
-        pointer-events: auto;
-    }
-    .log-modal-content {
-        background: #1a1a1a;
-        width: 90%;
-        max-width: 600px; height: 60dvh;
-        border: 1px solid #444; border-radius: 8px; display: flex; flex-direction: column;
-    }
-    .log-header {
-        display: flex; justify-content: space-between; padding: 15px 20px;
-        border-bottom: 1px solid #333;
-    }
-    .log-header h2 { color: #ffcc00; font-family: 'Cinzel', serif; margin: 0;
-    }
-    .luk-btn {
-        width: 42px;
-        height: 42px;
-        border: 1px solid #666;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.08);
-        color: #fff;
-        font-size: 1.6rem;
-        line-height: 1;
-        cursor: pointer;
-        flex: 0 0 auto;
-    }
-    .luk-btn:hover {
-        background: rgba(255, 255, 255, 0.16);
-    }
-    .log-liste { padding: 20px; overflow-y: auto; flex-grow: 1; }
-    .log-post { color: #aaa;
-        border-left: 2px solid #333; padding-left: 12px; margin-bottom: 10px; }
-    .log-post.nyeste { color: white; border-left-color: #ffcc00; }
 
     @media (max-width: 700px) {
         .ui {
@@ -661,23 +499,12 @@
             min-height: 1rem;
         }
 
-        .log-line.forrige {
-            display: none;
-        }
-
-        .instrument-braet {
-            gap: 4px;
-            margin-bottom: 4px;
-            min-height: 18px;
-        }
-
-        .mod-badge {
-            font-size: 0.75rem;
-            padding: 0 2px;
-        }
-
-        .mod-badge img {
-            width: 16px;
+        .log-line.forrige,
+        .log-line.tredje {
+            display: block;
+            font-size: 0.68rem;
+            min-height: 0.82rem;
+            margin-top: 1px;
         }
 
         .ui-content {
@@ -745,31 +572,5 @@
             padding: 1px 4px;
         }
 
-        .log-modal-overlay {
-            align-items: stretch;
-            padding: 12px;
-            box-sizing: border-box;
-        }
-
-        .log-modal-content {
-            position: relative;
-            width: 100%;
-            height: auto;
-            max-height: calc(100dvh - 24px);
-        }
-
-        .log-header {
-            padding: 12px 64px 12px 14px;
-        }
-
-        .luk-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 48px;
-            height: 48px;
-            font-size: 1.9rem;
-            z-index: 2;
-        }
     }
 </style>

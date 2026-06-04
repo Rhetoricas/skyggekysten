@@ -4,7 +4,7 @@
     import { tilfoejTilRygsæk, brugFraRygsæk, kanModtageItem, laegGuldIKasseForAktueltFelt, tagGuldFraKasseForAktueltFelt, fjernVareFraAktuelShop, naegtHandelForAktuelSpillerPaaAktueltFelt } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
     import { fremtvingKollaps } from '$lib/overlevelse.svelte';
-    import { beregnSalgspris } from '$lib/score';
+    import { beregnSalgspris, diamantSalgspris } from '$lib/score';
 
     let { lukShop } = $props<{ lukShop: () => void }>();
 
@@ -73,8 +73,12 @@
     function sælgVare(id: string) {
         const vareData = itemDB[id];
         if (!vareData) return;
-        
-        const salgspris = beregnSalgspris(id);
+
+        const rygsaekTing = spilTilstand.mitUdstyr.find((ting) => ting.id === id);
+        const antal = Math.max(1, rygsaekTing?.maengde || 1);
+        const salgspris = id === 'diamant'
+            ? diamantSalgspris(rygsaekTing)
+            : beregnSalgspris(id);
         if (salgspris <= 0) {
             spilTilstand.logBesked = `Købmanden vil ikke købe ${vareData.navn}.`;
             syncTilDb();
@@ -83,8 +87,25 @@
 
         tagGuldFraKasseForAktueltFelt(salgspris);
         spilTilstand.guldTotal += salgspris;
-        spilTilstand.logBesked = `Du solgte ${vareData.navn} for ${salgspris} guld.`;
-        brugFraRygsæk(id, 1);
+        spilTilstand.logBesked = id === 'diamant' && antal > 1
+            ? `Du solgte ${antal} diamanter for ${salgspris} guld.`
+            : `Du solgte ${vareData.navn} for ${salgspris} guld.`;
+        brugFraRygsæk(id, id === 'diamant' ? antal : 1);
+    }
+
+    function salgsHjaelp(vare: { id: string; maengde: number; diamanter?: number[] }) {
+        const dbInfo = itemDB[vare.id];
+        if (!dbInfo) return 'Genstand i din rygsæk.';
+        if (vare.id === 'diamant') {
+            return vare.maengde > 1
+                ? `${vare.maengde} diamanter. De sælges samlet for ${diamantSalgspris(vare)} guld.`
+                : `Diamanten sælges for ${diamantSalgspris(vare)} guld.`;
+        }
+        return `${dbInfo.beskrivelse || 'Genstand i din rygsæk.'} Klik her for at sælge den for 75% af værdien.`;
+    }
+
+    function vareSalgspris(vare: { id: string; maengde: number; diamanter?: number[] }) {
+        return vare.id === 'diamant' ? diamantSalgspris(vare) : beregnSalgspris(vare.id);
     }
 </script>
 
@@ -114,7 +135,7 @@
         </div>
 
         <div class="sell-section">
-            <p>Dine ting (klik for at sælge):</p>
+            <p>Dine ting (klik for at sælge for 75% af værdien):</p>
             
             <div class="inventory-small-row">
                 <div class="small-item guld-item" title="Din formue" data-help-title="Guld" data-help-body="Din nuværende formue. Guld bruges til køb og tæller med i score.">
@@ -127,12 +148,13 @@
                     {#if dbInfo}
                         <div class="small-item clickable" 
                              data-help-title={dbInfo.navn}
-                             data-help-body={`${dbInfo.beskrivelse || 'Genstand i din rygsæk.'} Klik normalt her for at sælge den.`}
+                             data-help-body={salgsHjaelp(vare)}
                              onclick={() => sælgVare(vare.id)} 
                              onkeydown={(e) => { if (e.key === 'Enter') sælgVare(vare.id); }}
-                             role="button" tabindex="0">
+                            role="button" tabindex="0">
                             <img src={dbInfo.billede} alt={dbInfo.navn} />
                             <span class="count">{vare.maengde}</span>
+                            <span class="sell-price">{vareSalgspris(vare)}</span>
                         </div>
                     {/if}
                 {/each}
@@ -195,6 +217,21 @@
         position: absolute; bottom: -2px; right: -2px; background: black; 
         color: gold; font-size: 0.7rem; padding: 0 3px;
     }
+    .small-item .sell-price {
+        position: absolute;
+        left: 50%;
+        bottom: -18px;
+        transform: translateX(-50%);
+        min-width: 30px;
+        padding: 1px 4px;
+        border-radius: 3px;
+        background: rgba(0, 0, 0, 0.84);
+        color: #ffd95a;
+        font-family: monospace;
+        font-size: 0.68rem;
+        line-height: 1.1;
+        white-space: nowrap;
+    }
     
     .forlad-btn { 
         margin-top: 40px; background: transparent; border: 1px solid #444; 
@@ -250,6 +287,10 @@
 
         .forlad-btn {
             margin-top: 18px;
+        }
+
+        .inventory-small-row {
+            row-gap: 24px;
         }
     }
 </style>

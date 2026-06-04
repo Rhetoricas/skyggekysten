@@ -3,6 +3,47 @@ import type { RygsækTing } from './types';
 import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 import { itemDB } from './spildata';
 
+export const DIAMANT_MIN_VAERDI = 200;
+export const DIAMANT_MAX_VAERDI = 1200;
+export const BUTIK_SALGS_ANDEL = 0.75;
+export const SLUT_SALGS_ANDEL = 0.5;
+const DIAMANT_FORDELING_EKSPONENT = 2;
+
+export function rulDiamantVaerdi() {
+    return DIAMANT_MIN_VAERDI + Math.round(Math.pow(Math.random(), DIAMANT_FORDELING_EKSPONENT) * (DIAMANT_MAX_VAERDI - DIAMANT_MIN_VAERDI));
+}
+
+export function diamantVaerdier(ting: Partial<RygsækTing> | null | undefined) {
+    if (!ting || ting.id !== 'diamant') return [];
+    const antal = Math.max(0, Math.floor(Number(ting.maengde) || 0));
+    const gemte = Array.isArray(ting.diamanter)
+        ? ting.diamanter
+            .map((vaerdi) => Math.round(Number(vaerdi)))
+            .filter((vaerdi) => Number.isFinite(vaerdi) && vaerdi > 0)
+        : [];
+
+    if (gemte.length >= antal) return gemte.slice(0, antal);
+    const fallback = itemDB.diamant?.pris || 500;
+    return [...gemte, ...Array.from({ length: antal - gemte.length }, () => fallback)];
+}
+
+export function diamantSamletVaerdi(ting: Partial<RygsækTing> | null | undefined) {
+    return diamantVaerdier(ting).reduce((sum, vaerdi) => sum + vaerdi, 0);
+}
+
+export function diamantSalgspris(ting: Partial<RygsækTing> | null | undefined) {
+    return Math.floor(diamantSamletVaerdi(ting) * BUTIK_SALGS_ANDEL);
+}
+
+export function diamantSlutSalgspris(ting: Partial<RygsækTing> | null | undefined) {
+    return Math.floor(diamantSamletVaerdi(ting) * SLUT_SALGS_ANDEL);
+}
+
+export function diamantStoerrelse(vaerdi: number) {
+    const normaliseret = Math.max(0, Math.min(1, (vaerdi - DIAMANT_MIN_VAERDI) / (DIAMANT_MAX_VAERDI - DIAMANT_MIN_VAERDI)));
+    return 0.7 + normaliseret * 0.95;
+}
+
 export const MEDALJE_GRAENSER = [0, 500, 1200, 2100, 3200, 4500, 6000, 7800, 10000, 12500] as const;
 export const M10_SCORE = MEDALJE_GRAENSER[MEDALJE_GRAENSER.length - 1];
 
@@ -30,15 +71,41 @@ export function beregnMinePoint(gitter: Felt[], spillerNavn: string, antalSpille
 export function beregnSalgspris(itemId: string) {
     const vareData = itemDB[itemId];
     if (!vareData) return 0;
-    return Math.max(0, Math.floor(vareData.pris / 1.5));
+    return Math.max(0, Math.floor(vareData.pris * BUTIK_SALGS_ANDEL));
+}
+
+export function beregnSlutSalgspris(ting: Partial<RygsækTing> | null | undefined) {
+    if (!ting?.id) return 0;
+    const antal = Math.max(0, Math.floor(Number(ting.maengde) || 0));
+    if (antal <= 0) return 0;
+    if (ting.id === 'diamant') return diamantSlutSalgspris(ting);
+    const vareData = itemDB[ting.id];
+    if (!vareData) return 0;
+    return Math.max(0, Math.floor(vareData.pris * SLUT_SALGS_ANDEL) * antal);
+}
+
+export function beskrivSlutSalg(udstyr: RygsækTing[] = []) {
+    const poster = udstyr
+        .map((ting) => {
+            const salgspris = beregnSlutSalgspris(ting);
+            if (salgspris <= 0) return '';
+            const antal = Math.max(0, Math.floor(Number(ting.maengde) || 0));
+            const navn = itemDB[ting.id]?.navn || ting.id;
+            return `${antal > 1 ? `${antal} x ` : ''}${navn} (${salgspris} point)`;
+        })
+        .filter(Boolean);
+
+    const total = udstyr.reduce((sum, ting) => sum + beregnSlutSalgspris(ting), 0);
+    return {
+        total,
+        tekst: total > 0
+            ? `Dit resterende udstyr og dine diamanter omregnes til ${total} point: ${poster.join(', ')}.`
+            : ''
+    };
 }
 
 export function beregnUdstyrPoint(udstyr: RygsækTing[] = []) {
-    return udstyr.reduce((sum, ting) => {
-        const antal = Math.max(0, ting.maengde || 0);
-        const pointPrStk = Math.floor((beregnSalgspris(ting.id) * 2) / 3);
-        return sum + antal * pointPrStk;
-    }, 0);
+    return udstyr.reduce((sum, ting) => sum + beregnSlutSalgspris(ting), 0);
 }
 
 export function beregnFremdriftPoint(maxKolonne: number, erVinder: boolean, kortBredde = STANDARD_KORT_BREDDE) {

@@ -19,6 +19,7 @@ export interface RygsækTing {
     id: string;
     maengde: number;
     anskaffetDag?: number;
+    diamanter?: number[];
 }
 
 export interface Karakter { 

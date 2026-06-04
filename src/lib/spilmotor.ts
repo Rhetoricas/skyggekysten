@@ -2,6 +2,7 @@ import { spilTilstand } from '$lib/spilTilstand.svelte';
 import { syncTilDb, broadcastFelt, broadcastFelter, syncKortTilDbSenere, realtimeRumNoegle } from '$lib/netvaerk';
 import { HEX_W, biomeVægte, biomeTerraenCost, itemDB, markedVarePool } from '$lib/spildata';
 import { KORT_VERSION, normaliserKortDimensioner, STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from '$lib/kortDimensioner';
+import { rulDiamantVaerdi } from '$lib/score';
 import { supabase } from '$lib/supabaseClient';
 import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
@@ -432,6 +433,9 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
     }
 
     const fundetTing = udstyrListe.find(ting => ting.id === genstandId);
+    const nyeDiamanter = genstandId === 'diamant'
+        ? Array.from({ length: tilfoejetMaengde }, () => rulDiamantVaerdi())
+        : [];
 
     if (fundetTing) {
         if (kanStackeItem(genstandId)) {
@@ -439,6 +443,12 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
                 .filter(ting => ting.id === genstandId && ting !== fundetTing)
                 .reduce((sum, ting) => sum + normaliserItemAntal(ting.maengde, 0), 0);
             fundetTing.maengde = normaliserItemAntal(fundetTing.maengde, 0) + dubletAntal + tilfoejetMaengde;
+            if (genstandId === 'diamant') {
+                const dubletDiamanter = udstyrListe
+                    .filter(ting => ting.id === genstandId && ting !== fundetTing)
+                    .flatMap(ting => ting.diamanter || []);
+                fundetTing.diamanter = [...(fundetTing.diamanter || []), ...dubletDiamanter, ...nyeDiamanter];
+            }
             spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== genstandId || ting === fundetTing);
         } else {
             spilTilstand.logBesked = `Du har allerede ${itemDB[genstandId]?.navn || 'den genstand'}.`;
@@ -455,6 +465,7 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
             maengde: tilfoejetMaengde,
             anskaffetDag: spilTilstand.dag
         };
+        if (genstandId === 'diamant') nyTing.diamanter = nyeDiamanter;
         udstyrListe.push(nyTing);
     }
     
@@ -467,6 +478,9 @@ export function brugFraRygsæk(genstandId: string, brugtMaengde: number = 1) {
     
     if (indeks === -1) return;
 
+    if (genstandId === 'diamant') {
+        spilTilstand.mitUdstyr[indeks].diamanter = (spilTilstand.mitUdstyr[indeks].diamanter || []).slice(brugtMaengde);
+    }
     spilTilstand.mitUdstyr[indeks].maengde -= brugtMaengde;
 
     if (spilTilstand.mitUdstyr[indeks].maengde <= 0) {

@@ -7,7 +7,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
-    import { M10_SCORE, beregnSpillerScore } from '$lib/score';
+    import { M10_SCORE, beregnSpillerScore, beskrivSlutSalg } from '$lib/score';
     import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
     import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
@@ -136,6 +136,13 @@
     let sidstePinchAfstand = 0;
     let inspectAktiv = $state(false);
     let inspectBoble = $state<{ titel: string; tekst: string; x: number; y: number } | null>(null);
+    let inspectCursor = $state({ x: 0, y: 0, synlig: false });
+
+    $effect(() => {
+        if (!browser) return;
+        document.documentElement.classList.toggle('inspect-global', inspectAktiv);
+        return () => document.documentElement.classList.remove('inspect-global');
+    });
     
     let harDetektor = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'metaldetektor' || ting.id === 'malmviser') ?? false);
     let harMalmviser = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'malmviser') ?? false);
@@ -732,8 +739,15 @@
             ev.preventDefault();
             return;
         }
-        if (introAktiv || ev.repeat || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.aktivVaerksted || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
         if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+
+        if (!ev.repeat && (ev.key === '+' || ev.code === 'NumpadAdd') && spilTilstand.gameState === 'play' && !introAktiv && !spilTilstand.venteSpilAktiv) {
+            startInspect();
+            ev.preventDefault();
+            return;
+        }
+
+        if (introAktiv || ev.repeat || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.aktivVaerksted || spilTilstand.gameState !== 'play' || spilTilstand.venteSpilAktiv) return;
 
         const tast = ev.key.toLowerCase();
         if (tast === 'g') {
@@ -1442,6 +1456,11 @@
             spilTilstand.gameState === 'win' ||
             spilTilstand.gameState === 'win_map' ||
             !!spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isWinner;
+        const slutSalg = beskrivSlutSalg(spilTilstand.mitUdstyr);
+
+        if (slutSalg.tekst && !spilTilstand.logHistorik.some((linje) => linje.includes('Dit resterende udstyr og dine diamanter omregnes'))) {
+            spilTilstand.logBesked = slutSalg.tekst;
+        }
 
         spilTilstand.samletScore = beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, spilTilstand.spillerNavn, {
             guld: spilTilstand.guldTotal,
@@ -1950,11 +1969,12 @@
         const bredde = Math.min(280, Math.max(220, window.innerWidth - 24));
         const hoejde = 170;
         const margin = 12;
-        let x = clientX + 12;
-        let y = clientY + 12;
+        const cursorAfstand = 52;
+        let x = clientX + cursorAfstand;
+        let y = clientY + cursorAfstand;
 
-        if (x + bredde > window.innerWidth - margin) x = clientX - bredde - 12;
-        if (y + hoejde > window.innerHeight - margin) y = clientY - hoejde - 12;
+        if (x + bredde > window.innerWidth - margin) x = clientX - bredde - cursorAfstand;
+        if (y + hoejde > window.innerHeight - margin) y = clientY - hoejde - cursorAfstand;
 
         return {
             x: Math.max(margin, Math.min(x, window.innerWidth - bredde - margin)),
@@ -1964,12 +1984,35 @@
 
     function startInspect() {
         inspectAktiv = !inspectAktiv;
-        if (!inspectAktiv) inspectBoble = null;
+        if (inspectAktiv) {
+            inspectCursor = {
+                x: inspectCursor.x || (browser ? window.innerWidth / 2 : 0),
+                y: inspectCursor.y || (browser ? window.innerHeight / 2 : 0),
+                synlig: true
+            };
+        } else {
+            inspectBoble = null;
+            inspectCursor.synlig = false;
+        }
     }
 
     function lukInspect() {
         inspectAktiv = false;
         inspectBoble = null;
+        inspectCursor.synlig = false;
+    }
+
+    function haandterInspectPointerMove(e: PointerEvent) {
+        if (e.pointerType === 'touch') {
+            inspectCursor.synlig = false;
+            return;
+        }
+
+        inspectCursor = { x: e.clientX, y: e.clientY, synlig: inspectAktiv };
+    }
+
+    function skjulInspectCursor() {
+        inspectCursor.synlig = false;
     }
 
     function haandterInspectKlik(e: MouseEvent) {
@@ -2132,7 +2175,24 @@ function udførBevægelse(nytIndeks: number) {
     }
 </script>
 
-<svelte:window onkeydown={håndterTastatur} onclickcapture={haandterInspectKlik} />
+<svelte:head>
+    <style>
+        html.inspect-global,
+        html.inspect-global *,
+        body.inspect-global,
+        body.inspect-global * {
+            cursor: none !important;
+        }
+    </style>
+</svelte:head>
+
+<svelte:window
+    onkeydown={håndterTastatur}
+    onclickcapture={haandterInspectKlik}
+    onpointermove={haandterInspectPointerMove}
+    onpointerleave={skjulInspectCursor}
+/>
+<svelte:body class:inspect-global={inspectAktiv} />
 
 {#if spilTilstand.gameState === 'play'}
     <BottomUI />
@@ -2203,7 +2263,7 @@ function udførBevægelse(nytIndeks: number) {
         ontouchmove={haandterTouchZoom}
         ontouchend={stopTouchZoom}
         ontouchcancel={stopTouchZoom}
-        style="cursor: {cam.isDragging ? 'grabbing' : inspectAktiv ? 'help' : 'grab'}; touch-action: none;"
+        style="cursor: {inspectAktiv ? 'none' : cam.isDragging ? 'grabbing' : 'grab'}; touch-action: none;"
     >
         <div class="map" style={kameraStyle}>
             {#each spilTilstand.aktiveEnergiKugler || [] as kugle (kugle.id)}
@@ -2551,6 +2611,22 @@ function udførBevægelse(nytIndeks: number) {
     </div>
 </div>
 
+{#if inspectAktiv && inspectCursor.synlig}
+    <div
+        class="inspect-cursor-follow"
+        style="left: {inspectCursor.x}px; top: {inspectCursor.y}px;"
+        aria-hidden="true"
+    >
+        <svg viewBox="0 0 64 64">
+            <path class="cursor-pil" d="M5 4l17 12-8.1 2.2 5.5 10.2-5 2.6-5.4-10.2-5.8 6.1z" />
+            <g class="cursor-spoergsmaal" transform="translate(9 -7) scale(0.78)">
+                <path d="M18 18a6.5 6.5 0 0 1 12.2 3.2c0 5.8-6.2 5.5-6.2 11" />
+                <circle cx="24" cy="38" r="1.8" />
+            </g>
+        </svg>
+    </div>
+{/if}
+
 {#if inspectBoble}
     <div
         class="inspect-boble"
@@ -2674,11 +2750,42 @@ function udførBevægelse(nytIndeks: number) {
 
     .game-container { position: fixed; inset: 0; width: 100vw; height: 100dvh; overflow: hidden; background: #000; user-select: none; -webkit-user-select: none; }
     .game-container.inspect-mode {
-        cursor: help;
+        cursor: none;
     }
     .game-container.inspect-mode [data-help-title] {
-        cursor: help;
+        cursor: none;
         pointer-events: auto;
+    }
+    .inspect-cursor-follow {
+        position: fixed;
+        z-index: 9000;
+        width: 64px;
+        height: 64px;
+        transform: translate(1px, 1px);
+        pointer-events: none;
+        filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.95));
+    }
+    .inspect-cursor-follow svg {
+        width: 64px;
+        height: 64px;
+        overflow: visible;
+    }
+    .inspect-cursor-follow .cursor-pil {
+        fill: #f5f5ee;
+        stroke: #050505;
+        stroke-width: 1.8;
+        stroke-linejoin: round;
+    }
+    .inspect-cursor-follow .cursor-spoergsmaal path {
+        fill: none;
+        stroke: #ffd66f;
+        stroke-width: 3.1;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .inspect-cursor-follow .cursor-spoergsmaal circle {
+        fill: #ffd66f;
+        stroke: none;
     }
     .game-container img {
         -webkit-user-drag: none;
@@ -2781,6 +2888,10 @@ function udførBevægelse(nytIndeks: number) {
         background: rgba(20, 20, 20, 0.94);
         color: #f2f2f2;
         box-shadow: 0 18px 55px rgba(0,0,0,0.62);
+        cursor: none !important;
+    }
+    .inspect-boble * {
+        cursor: none !important;
     }
     .inspect-boble h3 {
         margin: 0 0 7px;
@@ -2807,7 +2918,7 @@ function udførBevægelse(nytIndeks: number) {
         color: #fff;
         font-size: 1.2rem;
         line-height: 1;
-        cursor: pointer;
+        cursor: none !important;
     }
     .zoom-actions {
         position: fixed;
