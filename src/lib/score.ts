@@ -3,8 +3,8 @@ import type { RygsækTing } from './types';
 import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 import { itemDB } from './spildata';
 
-export const DIAMANT_MIN_VAERDI = 200;
-export const DIAMANT_MAX_VAERDI = 1200;
+export const DIAMANT_MIN_VAERDI = 250;
+export const DIAMANT_MAX_VAERDI = 600;
 export const BUTIK_SALGS_ANDEL = 0.75;
 export const SLUT_SALGS_ANDEL = 0.5;
 const DIAMANT_FORDELING_EKSPONENT = 2;
@@ -45,8 +45,8 @@ export function diamantStoerrelse(vaerdi: number) {
 }
 
 export function diamantStoerrelsesNavn(vaerdi: number) {
-    if (vaerdi >= 950) return 'enorm';
-    if (vaerdi >= 500) return 'stor';
+    if (vaerdi >= 500) return 'enorm';
+    if (vaerdi >= 375) return 'stor';
     return 'lille';
 }
 

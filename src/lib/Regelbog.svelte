@@ -145,7 +145,7 @@
                     <ul>
                         <li>Tryk på en genstand i bunden for at bruge den, hvis den er aktiv.</li>
                         <li>Skovl, sovepose/silkesovepose, mad, dirk og kølle er kun aktive, når de kan bruges i den aktuelle situation.</li>
-                        <li>Mad, livseliksir, fakler, skattekort og diamanter kan stables i flere styk. De fleste andre våben, værktøjer, tøj og særlige items findes kun én gang ad gangen.</li>
+                        <li>Mad, livseliksir, fakler, skattekort og diamanter kan stables i flere styk. Diamanter er 250-600 guld værd: under 375 er lille, 375-499 er stor, og 500+ er enorm. De fleste andre våben, værktøjer, tøj og særlige items findes kun én gang ad gangen.</li>
                         <li>Store værktøjer, våben og tøj findes kun i én version ad gangen. Skovl/mesterskovl, stav/dragestav, søgekvist/runekvist, detektor/malmviser, dirk/mesterdirk, kniv/mesterkniv, rustning/kongepanser, økse/stormøkse, kølle/murknuser, bue/falkebue, fakkel/solfakkel, sovepose/silkesovepose og tøj/fint tøj/royalt tøj tæller som samme type.</li>
                         <li>Fakkel og solfakkel kan lave bål. Stav og dragestav kan teleportere. Skattekort viser en gammel skatteklynge som et sepiafarvet kortspor. Nogle øer kan gemme på flere skatte, og kortet afslører ikke om kisten allerede er taget. Butikker sælger ikke flere skattekort til dig, når du har tydet alle øens spor.</li>
                         <li>Skattekortspor tæller ikke som almindelig udforskning og giver ikke udforskningspoint, før du selv kommer tæt nok på feltet.</li>

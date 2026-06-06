@@ -65,7 +65,7 @@ export function genererUndergrund(biome: Biome | string) {
     } else if (biome === 'krystal') {
         if (terningKast < 40) feltData.skjultGuld = tilfaeldigtTal(5, 10);
         else if (terningKast < 60) feltData.skjultFaelde = true;
-        else if (terningKast < 75) feltData.skjultLoot = 'diamant';
+        else if (terningKast < 78) feltData.skjultLoot = 'diamant';
     } else if (farlige.includes(biome)) {
         if (terningKast < 45) feltData.skjultGuld = tilfaeldigtTal(25, 50);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(10, 20);

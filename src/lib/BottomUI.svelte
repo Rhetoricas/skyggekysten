@@ -5,7 +5,7 @@
     import { grav } from '$lib/undergrund.svelte';
     import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal, aktiverHemmelighed, begaaIndbrud, kanBegaaIndbrudPaaFelt, kanPlyndreFelt, plyndrFelt } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
-    import { diamantSamletVaerdi, diamantVaerdier } from '$lib/score';
+    import { diamantSamletVaerdi, diamantStoerrelsesNavn, diamantVaerdier } from '$lib/score';
     import type { RygsækTing } from '$lib/types';
 
     let aktueltFelt = $derived(
@@ -139,8 +139,8 @@
     function diamantForklaring(vare: RygsækTing) {
         const vaerdier = diamantVaerdier(vare);
         if (vaerdier.length === 0) return 'En sjælden ædelsten. Den kan sælges i butikker.';
-        if (vaerdier.length === 1) return `Diamantens værdi er ${vaerdier[0]} guld. I butikker får du 75% af værdien.`;
-        return `${vaerdier.length} diamanter, samlet værdi ${diamantSamletVaerdi(vare)} guld. Rå værdier: ${vaerdier.join(', ')}. I butikker sælges de samlet for 75% af værdien.`;
+        if (vaerdier.length === 1) return `Det er en ${diamantStoerrelsesNavn(vaerdier[0])} diamant til ${vaerdier[0]} guld. I butikker får du 75% af værdien.`;
+        return `${vaerdier.length} diamanter, samlet værdi ${diamantSamletVaerdi(vare)} guld. Størrelser: ${vaerdier.map((vaerdi) => `${diamantStoerrelsesNavn(vaerdi)} ${vaerdi}`).join(', ')}. I butikker sælges de samlet for 75% af værdien.`;
     }
 
     function vareBadgeTekst(vare: RygsækTing) {
