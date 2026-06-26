@@ -355,7 +355,7 @@ function normaliserItemAntal(maengde: unknown, fallback = 1) {
     return Number.isFinite(antal) && antal > 0 ? antal : fallback;
 }
 
-export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number = 1) {
+export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number = 1, diamantVaerdier?: number[]) {
     genstandId = String(genstandId || '').trim();
     tilfoejetMaengde = normaliserItemAntal(tilfoejetMaengde);
     if (!genstandId) return { tilfoejet: false, diamantVaerdier: [], diamantBeskrivelse: '' };
@@ -433,8 +433,17 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
     }
 
     const fundetTing = udstyrListe.find(ting => ting.id === genstandId);
+    const angivneDiamanter = Array.isArray(diamantVaerdier)
+        ? diamantVaerdier
+            .map((vaerdi) => Math.round(Number(vaerdi)))
+            .filter((vaerdi) => Number.isFinite(vaerdi) && vaerdi > 0)
+            .slice(0, tilfoejetMaengde)
+        : [];
     const nyeDiamanter = genstandId === 'diamant'
-        ? Array.from({ length: tilfoejetMaengde }, () => rulDiamantVaerdi())
+        ? [
+            ...angivneDiamanter,
+            ...Array.from({ length: tilfoejetMaengde - angivneDiamanter.length }, () => rulDiamantVaerdi())
+        ]
         : [];
 
     if (fundetTing) {

@@ -157,9 +157,10 @@ export function grav() {
         fundLog = `KLIK. En nedgravet fælde bider sig fast i dit ben (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`;
     } else if (fundetLoot === 'skattekiste') {
         spilTilstand.guldTotal += 600;
-        const diamantFund = tilfoejTilRygsæk('diamant', 1);
+        const unikDiamantVaerdi = tilfaeldigtTal(600, 800);
+        tilfoejTilRygsæk('diamant', 1, [unikDiamantVaerdi]);
         felt.tomSkattekiste = true;
-        fundLog = `Skovlen rammer træ. Du åbner en kiste. (+600 Guld, +${diamantFund?.diamantBeskrivelse || 'diamant'})`;
+        fundLog = `Skovlen rammer træ. Du åbner en kiste. (+600 Guld, +unik diamant (${unikDiamantVaerdi} guld))`;
     } else if (guldVaerdi > 0) {
         const graveGuldMultiplier = harMesterskovl && harGyldenDestillator ? 3 : (harMesterskovl || harGyldenDestillator) ? 2 : 1;
         const malmviserMultiplier = harMalmviser ? 1.25 : 1;
