@@ -3,7 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { authState, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
     import { hentKarakterKlasseNavn, hentKarakterKlasseNoegle, tilgaengeligeKarakterer } from '$lib/spildata';
-    import { MEDALJE_GRAENSER, beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
+    import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
@@ -179,8 +179,14 @@
 
     function profilMedaljer() {
         const bedsteNiveau = findMedaljeNiveau(profilMedaljeScore());
-        const niveauer = Array.from({ length: MEDALJE_GRAENSER.length }, (_, index) => index);
-        return [bedsteNiveau, ...niveauer.filter((niveau) => niveau !== bedsteNiveau)];
+        return [
+            { sti: `/screens/m${bedsteNiveau + 1}.webp`, label: 'Bedste opnåede medalje', bedste: true },
+            ...Array.from({ length: 9 }, (_, index) => ({
+                sti: '/screens/m3.webp',
+                label: `Trofæmedalje ${index + 1}`,
+                bedste: false
+            }))
+        ];
     }
 
     function formaterNavn(tekst: string) {
@@ -623,14 +629,12 @@
             </div>
             <p class="konto-hint">Din score og statistik bliver gemt.</p>
             <div class="konto-medaljer" aria-label="Dine medaljer">
-                {#each profilMedaljer() as niveau, index (`profil-medalje-${index}-${niveau}`)}
-                    {@const erBedste = index === 0}
-                    {@const erOpnaaet = niveau <= findMedaljeNiveau(profilMedaljeScore())}
+                {#each profilMedaljer() as medalje, index (`profil-medalje-${index}-${medalje.sti}`)}
                     <img
-                        src={`/screens/m${niveau + 1}.webp`}
-                        alt={erBedste ? 'Bedste opnåede medalje' : `Medalje ${niveau + 1}`}
-                        class:bedste={erBedste}
-                        class:laast={!erOpnaaet}
+                        src={medalje.sti}
+                        alt={medalje.label}
+                        class:bedste={medalje.bedste}
+                        class:trofae-placeholder={!medalje.bedste}
                         draggable="false"
                     />
                 {/each}
@@ -1595,7 +1599,7 @@
         transform: translateY(-5px);
         filter: drop-shadow(0 7px 10px rgba(245, 208, 113, 0.25)) drop-shadow(0 5px 7px rgba(0, 0, 0, 0.55));
     }
-    .konto-medaljer img.laast {
+    .konto-medaljer img.trofae-placeholder {
         opacity: 0.32;
         filter: grayscale(0.9) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.42));
     }
