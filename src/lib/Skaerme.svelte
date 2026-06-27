@@ -3,7 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { authState, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
     import { hentKarakterKlasseNavn, hentKarakterKlasseNoegle, tilgaengeligeKarakterer } from '$lib/spildata';
-    import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
+    import { MEDALJE_GRAENSER, beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
@@ -88,6 +88,7 @@
     let visHighscoreLog = $state(false);
     let profilNavnGemTimer: ReturnType<typeof setTimeout> | null = null;
     let highscoreDrilldown = $state<HighscoreDrilldown | null>(null);
+    let statsHentetForUser = $state('');
     const HIGHSCORE_SIDE_STOERRELSE = 10;
     const lokaleKortPresets = [
         { label: '20 x 20', bredde: 20, hoejde: 20 },
@@ -170,6 +171,16 @@
 
     function findHighscoreMedalje(score: ValgtHighscore) {
         return score.medalPath || findMedaljeSti(score.point, false);
+    }
+
+    function profilMedaljeScore() {
+        return authState.stats?.bedsteScore || 0;
+    }
+
+    function profilMedaljer() {
+        const bedsteNiveau = findMedaljeNiveau(profilMedaljeScore());
+        const niveauer = Array.from({ length: MEDALJE_GRAENSER.length }, (_, index) => index);
+        return [bedsteNiveau, ...niveauer.filter((niveau) => niveau !== bedsteNiveau)];
     }
 
     function formaterNavn(tekst: string) {
@@ -493,6 +504,13 @@
         }
     });
 
+    $effect(() => {
+        const userId = authState.user?.id || '';
+        if (!userId || statsHentetForUser === userId) return;
+        statsHentetForUser = userId;
+        void hentProfilStats();
+    });
+
     async function aabnProfil() {
         visProfil = true;
         await hentProfilStats();
@@ -604,6 +622,19 @@
                 </div>
             </div>
             <p class="konto-hint">Din score og statistik bliver gemt.</p>
+            <div class="konto-medaljer" aria-label="Dine medaljer">
+                {#each profilMedaljer() as niveau, index (`profil-medalje-${index}-${niveau}`)}
+                    {@const erBedste = index === 0}
+                    {@const erOpnaaet = niveau <= findMedaljeNiveau(profilMedaljeScore())}
+                    <img
+                        src={`/screens/m${niveau + 1}.webp`}
+                        alt={erBedste ? 'Bedste opnåede medalje' : `Medalje ${niveau + 1}`}
+                        class:bedste={erBedste}
+                        class:laast={!erOpnaaet}
+                        draggable="false"
+                    />
+                {/each}
+            </div>
         {:else}
             <p class="konto-hint">Login er valgfrit. Uden login spiller du kun med på den ø, du åbner nu, og din score og profil bliver ikke gemt.</p>
             <div class="konto-login">
@@ -1531,6 +1562,42 @@
         margin: 0 0 10px;
         color: #bbb;
         font-size: 0.9rem;
+    }
+    .konto-medaljer {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+        gap: 4px;
+        align-items: start;
+        margin: 10px 0 2px;
+        padding: 12px 4px 0;
+    }
+    .konto-medaljer::before {
+        content: "";
+        position: absolute;
+        left: 4px;
+        right: 4px;
+        top: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(245, 208, 113, 0.42), rgba(255, 255, 255, 0.14), transparent);
+    }
+    .konto-medaljer img {
+        width: 100%;
+        max-width: 42px;
+        aspect-ratio: 1;
+        object-fit: contain;
+        justify-self: center;
+        filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.55));
+        transform: translateY(-2px);
+    }
+    .konto-medaljer img.bedste {
+        max-width: 48px;
+        transform: translateY(-5px);
+        filter: drop-shadow(0 7px 10px rgba(245, 208, 113, 0.25)) drop-shadow(0 5px 7px rgba(0, 0, 0, 0.55));
+    }
+    .konto-medaljer img.laast {
+        opacity: 0.32;
+        filter: grayscale(0.9) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.42));
     }
     .konto-login {
         display: flex;
