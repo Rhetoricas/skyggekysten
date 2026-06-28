@@ -8,7 +8,7 @@
     import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { M10_SCORE, beregnSpillerScore, beskrivSlutSalg } from '$lib/score';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje } from '$lib/netvaerk';
+    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje, hentAktueltHighscoreResultatId } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
     import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
@@ -31,7 +31,7 @@
     import { eventBibliotek } from '$lib/eventBibliotek';
     import { erAfgroedeModen, hentAfgroedeBlok, hentInsektPlageBlok } from '$lib/afgroeder';
     import { erFeltITaagen } from '$lib/taage';
-    import { findNyeTrofaeer, gemTrofaeIds, hentGemteTrofaeIds, huskVentendeSupabaseTrofaeer, lavTrofaeOwnerKey, normaliserTrofaeIds, nulstilTrofaeStats, retryVentendeSupabaseTrofaeer } from '$lib/trofaeer';
+    import { findNyeTrofaeer, gemSupabaseTrofaeAwards, gemTrofaeAwards, gemTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, huskVentendeSupabaseTrofaeer, lavTrofaeAwardData, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, nulstilTrofaeStats, retryVentendeSupabaseTrofaeer } from '$lib/trofaeer';
 
     import Skaerme from './Skaerme.svelte';
     import ShopModal from '$lib/ShopModal.svelte';
@@ -1512,8 +1512,34 @@
         }
     }
 
+    async function gemNyeTrofaeAwardsForHighscore(highscoreGemt: boolean) {
+        if (!highscoreGemt || !authState.user?.id || spilTilstand.offlineMode) return;
+        const nyeIds = normaliserTrofaeIds(spilTilstand.nyeTrofaeIds || []);
+        if (nyeIds.length === 0) return;
+
+        const gameResultId = await medTimeout(hentAktueltHighscoreResultatId(), 10000).catch((error) => {
+            console.warn('Kunne ikke finde highscore-id til trofae-award', error);
+            return null;
+        });
+        if (!gameResultId) return;
+
+        const ownerKey = lavTrofaeOwnerKey(authState.user.id, spilTilstand.spillerNavn);
+        const eksisterendeAwards = hentGemteTrofaeAwards(ownerKey);
+        const nyeAwards = nyeIds.map((id) => ({
+            id,
+            gameResultId,
+            awardedAt: new Date().toISOString(),
+            awardData: lavTrofaeAwardData(id)
+        }));
+        const samledeAwards = normaliserTrofaeAwards([...eksisterendeAwards, ...nyeAwards]);
+        gemTrofaeAwards(ownerKey, samledeAwards);
+        void gemSupabaseTrofaeAwards(authState.user.id, nyeAwards);
+    }
+
     async function opdaterScoreTavlerEfterGemning(highscoreGemt: boolean, afslutningGemt: boolean) {
         try {
+            await gemNyeTrofaeAwardsForHighscore(highscoreGemt);
+
             if (highscoreGemt && !afslutningGemt) {
                 await medTimeout(gemAfsluttetSpillerISession(), 15000).catch((error) => {
                     console.warn('Kunne ikke eftergemme oe-session efter score', error);

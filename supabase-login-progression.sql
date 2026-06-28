@@ -91,8 +91,21 @@ create index if not exists game_results_score_idx on public.game_results (score 
 create index if not exists game_results_user_idx on public.game_results (user_id, created_at desc);
 create index if not exists game_results_mode_score_idx on public.game_results (game_mode, score desc);
 
+create table if not exists public.profile_trophies (
+    user_id uuid not null references auth.users(id) on delete cascade,
+    trophy_id text not null,
+    game_result_id bigint references public.game_results(id) on delete set null,
+    award_data jsonb not null default '{}'::jsonb,
+    awarded_at timestamptz not null default now(),
+    primary key (user_id, trophy_id)
+);
+
+create index if not exists profile_trophies_user_idx on public.profile_trophies (user_id, awarded_at);
+create index if not exists profile_trophies_game_result_idx on public.profile_trophies (game_result_id);
+
 alter table public.profiles enable row level security;
 alter table public.game_results enable row level security;
+alter table public.profile_trophies enable row level security;
 
 drop policy if exists "Profiles are readable by everyone" on public.profiles;
 drop policy if exists "Users can read their own profile" on public.profiles;
@@ -124,5 +137,21 @@ with check ((select auth.uid()) = user_id);
 drop policy if exists "Users can update their own results" on public.game_results;
 create policy "Users can update their own results"
 on public.game_results for update
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can read their own trophies" on public.profile_trophies;
+create policy "Users can read their own trophies"
+on public.profile_trophies for select
+using ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can insert their own trophies" on public.profile_trophies;
+create policy "Users can insert their own trophies"
+on public.profile_trophies for insert
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can update their own trophies" on public.profile_trophies;
+create policy "Users can update their own trophies"
+on public.profile_trophies for update
 using ((select auth.uid()) = user_id)
 with check ((select auth.uid()) = user_id);

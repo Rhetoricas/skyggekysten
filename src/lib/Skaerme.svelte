@@ -8,10 +8,10 @@
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
     import LydKnap from '$lib/LydKnap.svelte';
-    import { hentGlobalHighscoresForFilter, hentHighscoreDetaljer } from '$lib/netvaerk';
+    import { hentBedsteHighscoreForBruger, hentGlobalHighscoresForFilter, hentHighscoreDetaljer, hentHighscoreResultat } from '$lib/netvaerk';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
-    import { TROFAE_DEFINITIONER, findTrofae, gemTrofaeIds, hentGemteTrofaeIds, lavTrofaeOwnerKey, normaliserTrofaeIds } from '$lib/trofaeer';
+    import { TROFAE_DEFINITIONER, findTrofae, gemTrofaeAwards, gemTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, hentSupabaseTrofaeAwards, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, type TrofaeAward } from '$lib/trofaeer';
     import type { Karakter } from '$lib/types';
 
     type HighscoreDetaljer = {
@@ -41,7 +41,7 @@
     const PROFIL_BEDSTE_SCORE_PREFIX = 'taage_profile_best_score:';
     const TROFAE_MEDALJER = [
         { sti: '/screens/mineejeren.webp', label: 'Mineejer', krav: '12 miner ved spilslut' },
-        { sti: '/screens/taagekonge.webp', label: 'Tågekonge', krav: '10 bevægelser i tåge' },
+        { sti: '/screens/taagekonge.webp', label: 'Tågekonge', krav: '20 bevægelser i tåge' },
         { sti: '/screens/Bølgebæreren.webp', label: 'Bølgebærer', krav: 'start en oversvømmelse og tag skade fra vand 5 gange' },
         { sti: '/screens/relikviejægeren.webp', label: 'Relikviejæger', krav: 'hav 3 af 4 magiske genstande i rygsækken ved spilslut' },
         { sti: '/screens/guldfyrsten.webp', label: 'Guldfyrste', krav: '5000 guld ved spilslut' },
@@ -105,6 +105,7 @@
     let gemtProfilBedsteScore = $state(0);
     let valgtLaastTrofae = $state<{ sti: string; label: string; krav?: string; episkTekst?: string; opnaaet?: boolean } | null>(null);
     let lokaleTrofaeIds = $state<string[]>([]);
+    let lokaleTrofaeAwards = $state<TrofaeAward[]>([]);
     const HIGHSCORE_SIDE_STOERRELSE = 10;
     const lokaleKortPresets = [
         { label: '20 x 20', bredde: 20, hoejde: 20 },
@@ -224,15 +225,28 @@
         lokaleTrofaeIds = samlede;
     }
 
+    function awardForTrofae(id: string) {
+        return lokaleTrofaeAwards.find((award) => award.id === id) || null;
+    }
+
+    async function opdaterLokaleTrofaeAwards() {
+        const ownerKey = trofaeOwnerKey();
+        const lokaleAwards = hentGemteTrofaeAwards(ownerKey);
+        const onlineAwards = authState.user?.id ? await hentSupabaseTrofaeAwards(authState.user.id) : [];
+        const samledeAwards = normaliserTrofaeAwards([...lokaleAwards, ...onlineAwards]);
+        if (samledeAwards.length > 0) gemTrofaeAwards(ownerKey, samledeAwards);
+        lokaleTrofaeAwards = samledeAwards;
+    }
+
     function sorteredeTrofaeMedaljer() {
         const opnaaet = new Set(lokaleTrofaeIds);
         const optjente = lokaleTrofaeIds
             .map((id) => findTrofae(id))
             .filter((trofae): trofae is NonNullable<ReturnType<typeof findTrofae>> => !!trofae)
-            .map((trofae) => ({ ...trofae, opnaaet: true }));
+            .map((trofae) => ({ ...trofae, award: awardForTrofae(trofae.id), opnaaet: true }));
         const laaste = TROFAE_DEFINITIONER
             .filter((trofae) => !opnaaet.has(trofae.id))
-            .map((trofae) => ({ ...trofae, opnaaet: false }));
+            .map((trofae) => ({ ...trofae, award: null, opnaaet: false }));
         return [...optjente, ...laaste];
     }
 
@@ -263,7 +277,42 @@
         ];
     }
 
-    function aabnLaastTrofae(medalje: { sti: string; label: string; bedste: boolean; opnaaet?: boolean; krav?: string; episkTekst?: string }) {
+    async function aabnLaastTrofae(medalje: { id?: string; sti: string; label: string; bedste: boolean; opnaaet?: boolean; krav?: string; episkTekst?: string; award?: TrofaeAward | null }) {
+        if (medalje.bedste && authState.user?.id) {
+            const bedsteSpil = await hentBedsteHighscoreForBruger(authState.user.id);
+            if (bedsteSpil) {
+                visHighscoreLog = false;
+                highscoreDrilldown = null;
+                valgtLaastTrofae = null;
+                valgtHighscore = { ...bedsteSpil, henterDetaljer: false };
+                return;
+            }
+        }
+
+        if (medalje.opnaaet && medalje.id) {
+            await opdaterLokaleTrofaeAwards();
+            const award = medalje.award || awardForTrofae(medalje.id);
+            if (award?.gameResultId) {
+                const awardSpil = await hentHighscoreResultat(award.gameResultId);
+                if (awardSpil) {
+                    visHighscoreLog = false;
+                    highscoreDrilldown = null;
+                    valgtLaastTrofae = null;
+                    valgtHighscore = { ...awardSpil, henterDetaljer: false };
+                    return;
+                }
+            }
+        } else if (medalje.opnaaet && medalje.award?.gameResultId) {
+            const awardSpil = await hentHighscoreResultat(medalje.award.gameResultId);
+            if (awardSpil) {
+                visHighscoreLog = false;
+                highscoreDrilldown = null;
+                valgtLaastTrofae = null;
+                valgtHighscore = { ...awardSpil, henterDetaljer: false };
+                return;
+            }
+        }
+
         valgtLaastTrofae = medalje;
     }
 
@@ -616,9 +665,12 @@
     $effect(() => {
         const owner = trofaeOwnerKey();
         const nyeTrofaeer = (spilTilstand.nyeTrofaeIds || []).join('|');
+        const userId = authState.user?.id || '';
         void owner;
         void nyeTrofaeer;
+        void userId;
         opdaterLokaleTrofaeIds();
+        void opdaterLokaleTrofaeAwards();
     });
 
     function aabnProfil() {

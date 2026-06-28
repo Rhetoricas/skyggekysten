@@ -29,6 +29,13 @@ export interface TrofaeStats {
     diamantRaavaerdiFundet: number;
 }
 
+export interface TrofaeAward {
+    id: TrofaeId;
+    gameResultId?: number | null;
+    awardedAt?: string;
+    awardData?: Record<string, unknown>;
+}
+
 export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     {
         id: 'mineejeren',
@@ -41,8 +48,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         id: 'taagekonge',
         sti: '/screens/taagekonge.webp',
         label: 'Tågekonge',
-        krav: 'Overlev spillet efter 10 bevægelser i tåge.',
-        episkTekst: 'Du gik 10 gange i tågen og kom ud igen.'
+        krav: 'Overlev spillet efter 20 bevægelser i tåge.',
+        episkTekst: 'Du gik 20 gange i tågen og kom ud igen.'
     },
     {
         id: 'boelgebaereren',
@@ -96,11 +103,12 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
 ];
 
 const TROFAE_STORAGE_PREFIX = 'taage_trofaeer:';
+const TROFAE_AWARD_STORAGE_PREFIX = 'taage_trofae_awards:';
 const TROFAE_PENDING_SYNC_KEY = 'taage_pending_trofaeer';
 const TROFAE_SUPABASE_TIMEOUT_MS = 8000;
 const TROFAE_KRAV = {
     miner: 12,
-    taageBevaegelser: 10,
+    taageBevaegelser: 20,
     vandSkader: 5,
     magiskeGenstande: 3,
     guld: 5000,
@@ -161,6 +169,10 @@ export function lavTrofaeOwnerKey(userId?: string | null, spillerNavn?: string |
 
 function storageKey(ownerKey: string) {
     return `${TROFAE_STORAGE_PREFIX}${ownerKey}`;
+}
+
+function awardStorageKey(ownerKey: string) {
+    return `${TROFAE_AWARD_STORAGE_PREFIX}${ownerKey}`;
 }
 
 function medTimeout<T>(promise: PromiseLike<T>, ms: number, label: string): Promise<T> {
@@ -238,11 +250,57 @@ export function gemTrofaeIds(ownerKey: string, ids: TrofaeId[]) {
     localStorage.setItem(storageKey(ownerKey), JSON.stringify(unikke));
 }
 
+export function hentGemteTrofaeAwards(ownerKey: string): TrofaeAward[] {
+    if (typeof localStorage === 'undefined') return [];
+    try {
+        return normaliserTrofaeAwards(JSON.parse(localStorage.getItem(awardStorageKey(ownerKey)) || '[]'));
+    } catch {
+        return [];
+    }
+}
+
+export function gemTrofaeAwards(ownerKey: string, awards: TrofaeAward[]) {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.setItem(awardStorageKey(ownerKey), JSON.stringify(normaliserTrofaeAwards(awards)));
+}
+
 export function normaliserTrofaeIds(ids: unknown): TrofaeId[] {
     if (!Array.isArray(ids)) return [];
     const kendteIds = new Set(TROFAE_DEFINITIONER.map((trofae) => trofae.id));
     const gyldige = ids.filter((id): id is TrofaeId => typeof id === 'string' && kendteIds.has(id as TrofaeId));
     return gyldige.filter((id, index) => gyldige.indexOf(id) === index);
+}
+
+export function normaliserTrofaeAwards(awards: unknown): TrofaeAward[] {
+    if (!Array.isArray(awards)) return [];
+    const kendteIds = new Set(TROFAE_DEFINITIONER.map((trofae) => trofae.id));
+    const seneste = new Map<TrofaeId, TrofaeAward>();
+
+    for (const award of awards) {
+        const id = typeof award?.id === 'string' && kendteIds.has(award.id as TrofaeId)
+            ? award.id as TrofaeId
+            : null;
+        if (!id) continue;
+
+        const gameResultId = Number(award?.gameResultId ?? award?.game_result_id);
+        const awardData = award?.awardData && typeof award.awardData === 'object'
+            ? award.awardData as Record<string, unknown>
+            : award?.award_data && typeof award.award_data === 'object'
+                ? award.award_data as Record<string, unknown>
+                : {};
+        seneste.set(id, {
+            id,
+            gameResultId: Number.isFinite(gameResultId) && gameResultId > 0 ? gameResultId : null,
+            awardedAt: typeof award?.awardedAt === 'string'
+                ? award.awardedAt
+                : typeof award?.awarded_at === 'string'
+                    ? award.awarded_at
+                    : new Date().toISOString(),
+            awardData
+        });
+    }
+
+    return Array.from(seneste.values());
 }
 
 export async function gemSupabaseTrofaeIds(userId: string | null | undefined, ids: TrofaeId[]) {
@@ -291,6 +349,68 @@ export async function retryVentendeSupabaseTrofaeer(userId?: string | null) {
     return gemt;
 }
 
+export async function gemSupabaseTrofaeAwards(userId: string | null | undefined, awards: TrofaeAward[]) {
+    if (!userId) return false;
+    const reneAwards = normaliserTrofaeAwards(awards).filter((award) => award.gameResultId);
+    if (reneAwards.length === 0) return true;
+
+    try {
+        const { error } = await medTimeout(
+            supabase
+                .from('profile_trophies')
+                .upsert(
+                    reneAwards.map((award) => ({
+                        user_id: userId,
+                        trophy_id: award.id,
+                        game_result_id: award.gameResultId,
+                        award_data: award.awardData || {},
+                        awarded_at: award.awardedAt || new Date().toISOString()
+                    })),
+                    { onConflict: 'user_id,trophy_id' }
+                ),
+            TROFAE_SUPABASE_TIMEOUT_MS,
+            'Gemning af trofae-awards'
+        );
+        if (error) {
+            console.warn('Trofae-awards kunne ikke gemmes i Supabase:', error);
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.warn('Trofae-awards kunne ikke gemmes i Supabase:', error);
+        return false;
+    }
+}
+
+export async function hentSupabaseTrofaeAwards(userId: string | null | undefined) {
+    if (!userId) return [];
+
+    try {
+        const { data, error } = await medTimeout(
+            supabase
+                .from('profile_trophies')
+                .select('trophy_id, game_result_id, award_data, awarded_at')
+                .eq('user_id', userId)
+                .order('awarded_at', { ascending: true }),
+            TROFAE_SUPABASE_TIMEOUT_MS,
+            'Hentning af trofae-awards'
+        );
+        if (error) {
+            console.warn('Trofae-awards kunne ikke hentes fra Supabase:', error);
+            return [];
+        }
+        return normaliserTrofaeAwards((data || []).map((award) => ({
+            id: award.trophy_id,
+            gameResultId: award.game_result_id,
+            awardData: award.award_data,
+            awardedAt: award.awarded_at
+        })));
+    } catch (error) {
+        console.warn('Trofae-awards kunne ikke hentes fra Supabase:', error);
+        return [];
+    }
+}
+
 export function findTrofae(id: string | null | undefined) {
     return TROFAE_DEFINITIONER.find((trofae) => trofae.id === id) ?? null;
 }
@@ -318,6 +438,23 @@ export function registrerDiamantFund(vaerdier: number[]) {
         .filter((vaerdi) => Number.isFinite(vaerdi) && vaerdi > 0)
         .reduce((total, vaerdi) => total + vaerdi, 0);
     if (sum > 0) stats().diamantRaavaerdiFundet += sum;
+}
+
+export function lavTrofaeAwardData(id: TrofaeId): Record<string, unknown> {
+    const t = stats();
+    const items = spilTilstand.mitUdstyr || [];
+    const data: Record<TrofaeId, Record<string, unknown>> = {
+        mineejeren: { miner: antalMiner() },
+        taagekonge: { taageBevaegelser: t.taageBevaegelser },
+        boelgebaereren: { oversvoemmelseStartet: t.oversvoemmelseStartet, vandSkader: t.vandSkader },
+        relikviejaegeren: { magiskeGenstande: antalItemsFraSet(items, MAGISKE_GENSTANDE) },
+        guldfyrsten: { guld: spilTilstand.guldTotal },
+        livsvogteren: { healetHp: t.healetHp },
+        korttegneren: { kendteFelter: spilTilstand.mineKendteFelter?.length || 0 },
+        udstyrsmesteren: { opgraderingsPoint: antalOpgraderingsPoint(items) },
+        diamantjaegeren: { diamantRaavaerdiFundet: t.diamantRaavaerdiFundet }
+    };
+    return data[id] || {};
 }
 
 function antalMiner() {
