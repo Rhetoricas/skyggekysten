@@ -326,6 +326,7 @@
     let scoreErGemt = $state(false);
     let scoreGemmer = $state(false);
     let scoreGemningFejlet = $state(false);
+    let scoreGemningRunId = 0;
     let nyGlobalRekord = $state(false);
     let harGemtOfflineSpil = $state(false);
     let offlineSpilInfo = $state<ReturnType<typeof hentOfflineSpilInfo>>(null);
@@ -1511,6 +1512,65 @@
         }
     }
 
+    async function opdaterScoreTavlerEfterGemning(highscoreGemt: boolean, afslutningGemt: boolean) {
+        try {
+            if (highscoreGemt && !afslutningGemt) {
+                await medTimeout(gemAfsluttetSpillerISession(), 15000).catch((error) => {
+                    console.warn('Kunne ikke eftergemme oe-session efter score', error);
+                    return false;
+                });
+            }
+
+            const klasse = aktuelHighscoreKlasse();
+            nyGlobalRekord = false;
+
+            lokaleScores = await medTimeout(hentHighscores(), 10000).catch((error) => {
+                console.warn('Kunne ikke genhente lokale highscores efter score', error);
+                return lokaleScores;
+            });
+
+            if (spilTilstand.gameMode === 'offline') return;
+
+            const [nyeKlasseScores, nyeGlobaleScores] = await medTimeout(
+                Promise.all([
+                    klasse ? hentGlobalTopHundrede(klasse) : Promise.resolve([]),
+                    hentGlobalTopHundrede()
+                ]),
+                12000
+            ).catch((error) => {
+                console.warn('Kunne ikke genhente globale highscores efter score', error);
+                return [klasseScores, globaleScores] as const;
+            });
+
+            klasseScores = nyeKlasseScores;
+            globaleScores = nyeGlobaleScores;
+
+            const kanTjekkeTopTi = highscoreGemt && !!authState.user;
+            const highscoreNavn = authState.profil?.display_name || spilTilstand.spillerNavn;
+            nyGlobalRekord = !!kanTjekkeTopTi &&
+                spilTilstand.samletScore > M10_SCORE &&
+                globaleScores.slice(0, 10).some((score) =>
+                    score.point === spilTilstand.samletScore &&
+                    score.spillerNavn === highscoreNavn &&
+                    score.oeNavn === spilTilstand.rumKode &&
+                    score.karakter === spilTilstand.valgtKarakter?.navn
+                );
+            const gemtScore = globaleScores.find((score) =>
+                score.point === spilTilstand.samletScore &&
+                score.spillerNavn === highscoreNavn &&
+                score.oeNavn === spilTilstand.rumKode &&
+                score.karakter === spilTilstand.valgtKarakter?.navn
+            );
+
+            await medTimeout(opdaterHighscoreMedalje(gemtScore?.id, spilTilstand.samletScore, nyGlobalRekord), 10000).catch((error) => {
+                console.warn('Kunne ikke opdatere highscore-medalje efter score', error);
+                return false;
+            });
+        } catch (error) {
+            console.warn('Efterarbejde efter scoregemning fejlede', error);
+        }
+    }
+
     async function opdaterOgGemHighscore() {
         try {
             opdaterSamletScore();
@@ -1528,38 +1588,11 @@
             }
             
             const highscoreGemt = await gemHighscore();
-            if (highscoreGemt && !afslutningGemt) {
-                sessionGemt = await gemAfsluttetSpillerISession();
-            }
-            const kanTjekkeTopTi = highscoreGemt && spilTilstand.gameMode !== 'offline' && authState.user;
-            const klasse = aktuelHighscoreKlasse();
-            nyGlobalRekord = false;
-
-            lokaleScores = await hentHighscores();
-            if (spilTilstand.gameMode !== 'offline') {
-                klasseScores = await hentGlobalTopHundrede(klasse);
-                globaleScores = await hentGlobalTopHundrede();
-                const highscoreNavn = authState.profil?.display_name || spilTilstand.spillerNavn;
-                nyGlobalRekord = !!kanTjekkeTopTi &&
-                    spilTilstand.samletScore > M10_SCORE &&
-                    globaleScores.slice(0, 10).some((score) =>
-                        score.point === spilTilstand.samletScore &&
-                        score.spillerNavn === highscoreNavn &&
-                        score.oeNavn === spilTilstand.rumKode &&
-                        score.karakter === spilTilstand.valgtKarakter?.navn
-                    );
-                const gemtScore = globaleScores.find((score) =>
-                    score.point === spilTilstand.samletScore &&
-                    score.spillerNavn === highscoreNavn &&
-                    score.oeNavn === spilTilstand.rumKode &&
-                    score.karakter === spilTilstand.valgtKarakter?.navn
-                );
-                await opdaterHighscoreMedalje(gemtScore?.id, spilTilstand.samletScore, nyGlobalRekord);
-            }
             harGemtOfflineSpil = harOfflineSpil();
             offlineSpilInfo = hentOfflineSpilInfo();
             scoreErGemt = highscoreGemt;
             scoreGemningFejlet = !highscoreGemt;
+            void opdaterScoreTavlerEfterGemning(highscoreGemt, afslutningGemt);
         } catch (error) {
             console.error('Score-flowet fejlede', error);
             spilTilstand.statusBesked = error instanceof Error ? error.message : 'Scoren kunne ikke gemmes.';
@@ -1573,6 +1606,14 @@
         if (scoreGemmer) return;
         scoreGemningFejlet = false;
         scoreGemmer = true;
+        const aktuelGemning = ++scoreGemningRunId;
+        window.setTimeout(() => {
+            if (scoreGemmer && scoreGemningRunId === aktuelGemning) {
+                scoreGemmer = false;
+                scoreGemningFejlet = true;
+                spilTilstand.statusBesked = 'Scoregemningen tog for lang tid. Scoren er gemt lokalt og prøves igen automatisk.';
+            }
+        }, 45000);
         opdaterOgGemHighscore();
     }
 

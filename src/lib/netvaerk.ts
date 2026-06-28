@@ -965,10 +965,17 @@ export async function opdaterHighscoreMedalje(id: number | undefined, score: num
 
     const medalPath = findMedaljeSti(score, erNyGlobalRekord);
     const medalLevel = findMedaljeNiveau(score) + (erNyGlobalRekord ? 1 : 0);
-    const { error } = await supabase
-        .from('game_results')
-        .update({ medal_path: medalPath, medal_level: medalLevel })
-        .eq('id', id);
+    const { error } = await medTimeout(
+        supabase
+            .from('game_results')
+            .update({ medal_path: medalPath, medal_level: medalLevel })
+            .eq('id', id),
+        8000,
+        'Opdatering af highscore-medalje'
+    ).catch((fangetFejl) => {
+        console.warn('Kunne ikke opdatere highscore-medalje', fangetFejl);
+        return { error: fangetFejl };
+    });
 
     if (error) {
         if (!erManglendeMedaljeKolonneFejl(error)) console.warn('Kunne ikke opdatere highscore-medalje', error);

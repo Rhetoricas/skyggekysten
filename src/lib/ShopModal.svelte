@@ -8,6 +8,20 @@
 
     let { lukShop } = $props<{ lukShop: () => void }>();
 
+    function kanKoebeFintToejMedKlude(id: string) {
+        if (id !== 'flot_toej') return false;
+        const harKlude = spilTilstand.mitUdstyr.some((ting) => ting.id === 'klude' && ting.maengde > 0);
+        const harBedreToej = spilTilstand.mitUdstyr.some((ting) => (ting.id === 'flot_toej' || ting.id === 'royalt_toej') && ting.maengde > 0);
+        return harKlude && !harBedreToej;
+    }
+
+    function vareKoebspris(id: string) {
+        const vareData = itemDB[id];
+        if (!vareData) return 0;
+        const kludeRabat = kanKoebeFintToejMedKlude(id) ? beregnSalgspris('klude') : 0;
+        return Math.max(0, vareData.pris - kludeRabat);
+    }
+
     function købVare(id: string) {
         const vareData = itemDB[id];
         if (!vareData) return;
@@ -18,7 +32,9 @@
             return;
         }
 
-        if (!kanModtageItem(id)) {
+        const brugerKludeSomRabat = kanKoebeFintToejMedKlude(id);
+
+        if (!brugerKludeSomRabat && !kanModtageItem(id)) {
             spilTilstand.logBesked = id === 'skovl' || id === 'mesterskovl'
                 ? "Du har allerede en skovl. Find et værksted, hvis den skal forbedres."
                 : id === 'stav' || id === 'dragestav'
@@ -50,15 +66,23 @@
             return;
         }
 
-        if (spilTilstand.guldTotal >= vareData.pris) {
-            spilTilstand.guldTotal -= vareData.pris;
-            laegGuldIKasseForAktueltFelt(vareData.pris);
+        const kludeRabat = brugerKludeSomRabat ? beregnSalgspris('klude') : 0;
+        const pris = Math.max(0, vareData.pris - kludeRabat);
+
+        if (spilTilstand.guldTotal >= pris) {
+            spilTilstand.guldTotal -= pris;
+            laegGuldIKasseForAktueltFelt(pris);
             fjernVareFraAktuelShop(id);
-            spilTilstand.logBesked = `Du købte ${vareData.navn} for ${vareData.pris} guld.`;
+            if (brugerKludeSomRabat) brugFraRygsæk('klude', 1);
+            spilTilstand.logBesked = brugerKludeSomRabat
+                ? `Du købte ${vareData.navn} for ${pris} guld. Købmanden tog dit gamle tøj som ${kludeRabat} guld i rabat.`
+                : `Du købte ${vareData.navn} for ${vareData.pris} guld.`;
             tilfoejTilRygsæk(id, 1);
             if (spilTilstand.mitUdstyr.some((ting) => (ting.id === 'koelle' || ting.id === 'koelle_upgr') && ting.maengde > 0)) {
                 naegtHandelForAktuelSpillerPaaAktueltFelt();
-                spilTilstand.logBesked = `Du købte ${vareData.navn} for ${vareData.pris} guld. Købmanden får øje på køllen og tør ikke handle mere med dig.`;
+                spilTilstand.logBesked = brugerKludeSomRabat
+                    ? `Du købte ${vareData.navn} for ${pris} guld med dit gamle tøj som rabat. Købmanden får øje på køllen og tør ikke handle mere med dig.`
+                    : `Du købte ${vareData.navn} for ${vareData.pris} guld. Købmanden får øje på køllen og tør ikke handle mere med dig.`;
                 lukShop();
             }
         } else {
@@ -119,13 +143,13 @@
                 {#if tilbud && tilbud.kanKoebes !== false}
                     <div class="vare-kort" 
                          data-help-title={tilbud.navn}
-                         data-help-body={`${tilbud.beskrivelse || 'Vare i butikken.'} Pris: ${tilbud.pris} guld.`}
+                         data-help-body={`${tilbud.beskrivelse || 'Vare i butikken.'} Pris: ${vareKoebspris(itemId)} guld${kanKoebeFintToejMedKlude(itemId) ? ` efter ${beregnSalgspris('klude')} guld i rabat for dit gamle tøj` : ''}.`}
                          onclick={() => købVare(itemId)} 
                          onkeydown={(e) => { if (e.key === 'Enter') købVare(itemId); }}
                          role="button" tabindex="0">
                         <img src={tilbud.billede} alt="" class="vare-ikon" />
                         <strong class="vare-navn">{tilbud.navn}</strong>
-                        <span class="vare-pris">{tilbud.pris} Guld</span>
+                        <span class="vare-pris">{vareKoebspris(itemId)} Guld</span>
                         {#if tilbud.beskrivelse}
                             <p class="vare-regler">{tilbud.beskrivelse}</p>
                         {/if}
