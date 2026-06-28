@@ -96,6 +96,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
 ];
 
 const TROFAE_STORAGE_PREFIX = 'taage_trofaeer:';
+const TROFAE_PENDING_SYNC_KEY = 'taage_pending_trofaeer';
+const TROFAE_SUPABASE_TIMEOUT_MS = 8000;
 const TROFAE_KRAV = {
     miner: 12,
     taageBevaegelser: 10,
@@ -128,6 +130,12 @@ const OPGRADERINGS_POINT = new Map<string, number>([
 ]);
 const MAGISKE_GENSTANDE = new Set(['rodhjertet', 'gylden_destillator', 'dragestav', 'runekvist']);
 
+type VentendeTrofaeSync = {
+    userId: string;
+    ids: TrofaeId[];
+    updatedAt: string;
+};
+
 export function nulstilTrofaeStats(): TrofaeStats {
     return {
         taageBevaegelser: 0,
@@ -155,6 +163,66 @@ function storageKey(ownerKey: string) {
     return `${TROFAE_STORAGE_PREFIX}${ownerKey}`;
 }
 
+function medTimeout<T>(promise: PromiseLike<T>, ms: number, label: string): Promise<T> {
+    return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error(`${label} tog for lang tid.`)), ms);
+        Promise.resolve(promise)
+            .then(resolve, reject)
+            .finally(() => clearTimeout(timer));
+    });
+}
+
+function hentVentendeTrofaeSyncs(): VentendeTrofaeSync[] {
+    if (typeof localStorage === 'undefined') return [];
+    try {
+        const data = JSON.parse(localStorage.getItem(TROFAE_PENDING_SYNC_KEY) || '[]');
+        if (!Array.isArray(data)) return [];
+        return data
+            .map((sync) => ({
+                userId: typeof sync?.userId === 'string' ? sync.userId : '',
+                ids: normaliserTrofaeIds(sync?.ids),
+                updatedAt: typeof sync?.updatedAt === 'string' ? sync.updatedAt : new Date().toISOString()
+            }))
+            .filter((sync) => sync.userId && sync.ids.length > 0);
+    } catch {
+        return [];
+    }
+}
+
+function gemVentendeTrofaeSyncs(syncs: VentendeTrofaeSync[]) {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.setItem(TROFAE_PENDING_SYNC_KEY, JSON.stringify(syncs));
+}
+
+export function huskVentendeSupabaseTrofaeer(userId: string | null | undefined, ids: TrofaeId[]) {
+    if (!userId) return;
+    const nyeIds = normaliserTrofaeIds(ids);
+    if (nyeIds.length === 0) return;
+
+    const syncs = hentVentendeTrofaeSyncs();
+    const eksisterende = syncs.find((sync) => sync.userId === userId);
+    if (eksisterende) {
+        eksisterende.ids = normaliserTrofaeIds([...eksisterende.ids, ...nyeIds]);
+        eksisterende.updatedAt = new Date().toISOString();
+    } else {
+        syncs.push({ userId, ids: nyeIds, updatedAt: new Date().toISOString() });
+    }
+    gemVentendeTrofaeSyncs(syncs);
+}
+
+function sammeTrofaeIds(a: TrofaeId[], b: TrofaeId[]) {
+    return a.length === b.length && a.every((id, index) => id === b[index]);
+}
+
+function fjernVentendeSupabaseTrofaeer(userId: string, ids: TrofaeId[]) {
+    const sendteIds = normaliserTrofaeIds(ids);
+    gemVentendeTrofaeSyncs(
+        hentVentendeTrofaeSyncs().filter((sync) =>
+            sync.userId !== userId || !sammeTrofaeIds(sync.ids, sendteIds)
+        )
+    );
+}
+
 export function hentGemteTrofaeIds(ownerKey: string): TrofaeId[] {
     if (typeof localStorage === 'undefined') return [];
     try {
@@ -180,13 +248,25 @@ export function normaliserTrofaeIds(ids: unknown): TrofaeId[] {
 export async function gemSupabaseTrofaeIds(userId: string | null | undefined, ids: TrofaeId[]) {
     if (!userId) return false;
 
-    const { error } = await supabase
-        .from('profiles')
-        .update({
-            trophies: normaliserTrofaeIds(ids),
-            updated_at: new Date().toISOString()
-        })
-        .eq('id', userId);
+    let error: { message?: string } | null = null;
+
+    try {
+        const resultat = await medTimeout(
+            supabase
+                .from('profiles')
+                .update({
+                    trophies: normaliserTrofaeIds(ids),
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', userId),
+            TROFAE_SUPABASE_TIMEOUT_MS,
+            'Gemning af trofaeer'
+        );
+        error = resultat.error;
+    } catch (fangetFejl) {
+        console.warn('Trofaeer kunne ikke gemmes i Supabase:', fangetFejl);
+        return false;
+    }
 
     if (error) {
         console.warn('Trofæer kunne ikke gemmes i Supabase:', error);
@@ -194,6 +274,21 @@ export async function gemSupabaseTrofaeIds(userId: string | null | undefined, id
     }
 
     return true;
+}
+
+export async function retryVentendeSupabaseTrofaeer(userId?: string | null) {
+    const syncs = hentVentendeTrofaeSyncs().filter((sync) => !userId || sync.userId === userId);
+    let gemt = 0;
+
+    for (const sync of syncs) {
+        const gemtOnline = await gemSupabaseTrofaeIds(sync.userId, sync.ids);
+        if (gemtOnline) {
+            fjernVentendeSupabaseTrofaeer(sync.userId, sync.ids);
+            gemt++;
+        }
+    }
+
+    return gemt;
 }
 
 export function findTrofae(id: string | null | undefined) {

@@ -1,11 +1,12 @@
 import { supabase } from './supabaseClient';
 import { type LydNiveau, lydKontrol, saetLydNiveau } from './lydKontrol.svelte';
 import {
-    gemSupabaseTrofaeIds,
     gemTrofaeIds,
     hentGemteTrofaeIds,
+    huskVentendeSupabaseTrofaeer,
     lavTrofaeOwnerKey,
     normaliserTrofaeIds,
+    retryVentendeSupabaseTrofaeer,
     type TrofaeId
 } from './trofaeer';
 
@@ -68,7 +69,8 @@ async function synkProfilTrofaeerMedLokalCache(profil: Profil | null) {
         samledeIds.some((id, index) => id !== profilIds[index]);
 
     if (erAendret) {
-        await gemSupabaseTrofaeIds(authState.user.id, samledeIds);
+        huskVentendeSupabaseTrofaeer(authState.user.id, samledeIds);
+        void retryVentendeSupabaseTrofaeer(authState.user.id);
     }
 
     return { ...profil, trophies: samledeIds } satisfies Profil;
@@ -86,6 +88,7 @@ async function vedligeholdLogin() {
     }
 
     authState.user = session.user;
+    void retryVentendeSupabaseTrofaeer(authState.user.id);
 
     const sekunderTilUdlob = (session.expires_at ?? 0) - Math.floor(Date.now() / 1000);
     if (sekunderTilUdlob > 5 * 60) return;
@@ -127,7 +130,10 @@ export async function initAuth() {
 
     const { data } = await supabase.auth.getSession();
     authState.user = data.session?.user ?? null;
-    if (authState.user) await hentEllerOpretProfil();
+    if (authState.user) {
+        await hentEllerOpretProfil();
+        void retryVentendeSupabaseTrofaeer(authState.user.id);
+    }
 
     supabase.auth.onAuthStateChange(async (_event, session) => {
         const forrigeUserId = authState.user?.id || '';
@@ -141,6 +147,7 @@ export async function initAuth() {
         }
         if (authState.user) {
             await hentEllerOpretProfil();
+            void retryVentendeSupabaseTrofaeer(authState.user.id);
         } else {
             authState.profil = null;
             authState.stats = null;

@@ -31,7 +31,7 @@
     import { eventBibliotek } from '$lib/eventBibliotek';
     import { erAfgroedeModen, hentAfgroedeBlok, hentInsektPlageBlok } from '$lib/afgroeder';
     import { erFeltITaagen } from '$lib/taage';
-    import { findNyeTrofaeer, gemSupabaseTrofaeIds, gemTrofaeIds, hentGemteTrofaeIds, lavTrofaeOwnerKey, normaliserTrofaeIds, nulstilTrofaeStats } from '$lib/trofaeer';
+    import { findNyeTrofaeer, gemTrofaeIds, hentGemteTrofaeIds, huskVentendeSupabaseTrofaeer, lavTrofaeOwnerKey, normaliserTrofaeIds, nulstilTrofaeStats, retryVentendeSupabaseTrofaeer } from '$lib/trofaeer';
 
     import Skaerme from './Skaerme.svelte';
     import ShopModal from '$lib/ShopModal.svelte';
@@ -1343,6 +1343,9 @@
                 return;
             }
 
+            if (authState.user?.id) {
+                void retryVentendeSupabaseTrofaeer(authState.user.id);
+            }
             const gemteVentende = authState.user?.id ? await retryVentendeHighscores() : 0;
             if (gemteVentende > 0) {
                 scoreErGemt = true;
@@ -1384,6 +1387,7 @@
             }
         };
         const haandterOnline = () => {
+            if (authState.user?.id) void retryVentendeSupabaseTrofaeer(authState.user.id);
             void genopfriskEfterFokus();
         };
         const haandterOffline = () => {
@@ -1435,6 +1439,7 @@
         const brugerId = authState.user?.id;
         if (brugerId) {
             (async () => {
+                void retryVentendeSupabaseTrofaeer(brugerId);
                 const gemteVentende = await retryVentendeHighscores();
                 if (gemteVentende > 0) {
                     scoreErGemt = true;
@@ -1478,7 +1483,7 @@
         }, erVinder, spilTilstand.kortBredde, spilTilstand.kortHoejde);
     }
 
-    async function opdaterLokaleTrofaeer() {
+    function opdaterLokaleTrofaeer() {
         const ownerKey = lavTrofaeOwnerKey(authState.user?.id, spilTilstand.spillerNavn);
         const gemteIds = normaliserTrofaeIds([
             ...hentGemteTrofaeIds(ownerKey),
@@ -1491,10 +1496,11 @@
             const samledeIds = normaliserTrofaeIds([...gemteIds, ...nyeIds]);
             gemTrofaeIds(ownerKey, samledeIds);
             if (authState.user?.id) {
-                const gemtOnline = await gemSupabaseTrofaeIds(authState.user.id, samledeIds);
-                if (gemtOnline && authState.profil) {
-                    authState.profil = { ...authState.profil, trophies: samledeIds };
-                }
+                huskVentendeSupabaseTrofaeer(authState.user.id, samledeIds);
+                void retryVentendeSupabaseTrofaeer(authState.user.id);
+            }
+            if (authState.profil) {
+                authState.profil = { ...authState.profil, trophies: samledeIds };
             }
             spilTilstand.nyeTrofaeIds = nyeIds;
             return;
@@ -1506,10 +1512,9 @@
     }
 
     async function opdaterOgGemHighscore() {
-        opdaterSamletScore();
-        await opdaterLokaleTrofaeer();
-
         try {
+            opdaterSamletScore();
+            opdaterLokaleTrofaeer();
             await syncTilDb(true);
             let sessionGemt = await flushVentendeSync();
             if (!sessionGemt) {
