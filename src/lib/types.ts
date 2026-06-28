@@ -72,6 +72,7 @@ export interface SpillerData {
     kanalNoegle?: string;
     harSkattekort?: boolean;
     skattekortFelter?: number[];
+    trofaeStats?: import('./trofaeer').TrofaeRunStats;
     aktivTracker?: {
         targetNavn: string;
         slutterDag: number;

@@ -13,6 +13,9 @@ alter table public.profiles
 add column if not exists sound_level text not null default 'fuld'
 check (sound_level in ('fuld', 'lav', 'slukket'));
 
+alter table public.profiles
+add column if not exists trophies jsonb not null default '[]'::jsonb;
+
 create table if not exists public.game_results (
     id bigint generated always as identity primary key,
     user_id uuid not null references auth.users(id) on delete cascade,

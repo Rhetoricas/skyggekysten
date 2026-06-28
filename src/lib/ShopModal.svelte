@@ -51,14 +51,19 @@
         }
 
         if (spilTilstand.guldTotal >= vareData.pris) {
+            const erstatterKlude = id === 'flot_toej' && spilTilstand.mitUdstyr.some((ting) => ting.id === 'klude' && ting.maengde > 0);
             spilTilstand.guldTotal -= vareData.pris;
             laegGuldIKasseForAktueltFelt(vareData.pris);
             fjernVareFraAktuelShop(id);
-            spilTilstand.logBesked = `Du købte ${vareData.navn} for ${vareData.pris} guld.`;
+            spilTilstand.logBesked = erstatterKlude
+                ? `Du købte ${vareData.navn} for ${vareData.pris} guld. Kludene går tabt.`
+                : `Du købte ${vareData.navn} for ${vareData.pris} guld.`;
             tilfoejTilRygsæk(id, 1);
             if (spilTilstand.mitUdstyr.some((ting) => (ting.id === 'koelle' || ting.id === 'koelle_upgr') && ting.maengde > 0)) {
                 naegtHandelForAktuelSpillerPaaAktueltFelt();
-                spilTilstand.logBesked = `Du købte ${vareData.navn} for ${vareData.pris} guld. Købmanden får øje på køllen og tør ikke handle mere med dig.`;
+                spilTilstand.logBesked = erstatterKlude
+                    ? `Du købte ${vareData.navn} for ${vareData.pris} guld. Kludene går tabt. Købmanden får øje på køllen og tør ikke handle mere med dig.`
+                    : `Du købte ${vareData.navn} for ${vareData.pris} guld. Købmanden får øje på køllen og tør ikke handle mere med dig.`;
                 lukShop();
             }
         } else {

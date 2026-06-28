@@ -1,6 +1,7 @@
 import type { Felt, Karakter, SpillerData, RygsækTing } from './types';
 import { itemDB } from './spildata';
 import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
+import { nyTrofaeRunStats } from './trofaeer';
 
 interface FlydendeTal {
     id: number;
@@ -48,7 +49,14 @@ export const spilTilstand = $state({
     maxLivspoint: 100,
     _livspoint: 100,
     get livspoint(): number { return this._livspoint; },
-    set livspoint(v: number) { this._livspoint = Math.max(0, Math.min(this.maxLivspoint, v)); },
+    set livspoint(v: number) {
+        const foer = this._livspoint;
+        const naeste = Math.max(0, Math.min(this.maxLivspoint, v));
+        if (this.gameState === 'play' && naeste > foer) {
+            this.trofaeStats.healing += naeste - foer;
+        }
+        this._livspoint = naeste;
+    },
     
     _guldTotal: 0,
     get guldTotal(): number { return this._guldTotal; },
@@ -133,6 +141,7 @@ export const spilTilstand = $state({
     mitUdstyr: [] as RygsækTing[],
     mineKendteFelter: [] as number[],
     mineSkattekortFelter: [] as number[],
+    trofaeStats: nyTrofaeRunStats(),
     historik: [] as number[],
     aktivShop: null as string[] | null,
     aktivVaerksted: false,

@@ -11,6 +11,7 @@
     import { hentGlobalHighscoresForFilter, hentHighscoreDetaljer } from '$lib/netvaerk';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
+    import { TROFAE_DEFINITIONER, normaliserProfilTrofaeer } from '$lib/trofaeer';
     import type { Karakter } from '$lib/types';
 
     type HighscoreDetaljer = {
@@ -36,6 +37,7 @@
     type GlobalScore = HighscoreDetaljer & { spillerNavn: string; oeNavn: string; point: number; karakter?: string };
     type ValgtHighscore = HighscoreDetaljer & { navn: string; point: number; karakter?: string; oeNavn?: string; henterDetaljer?: boolean };
     type HighscoreDrilldown = { titel: string; scores: GlobalScore[]; henter: boolean };
+    type ProfilMedalje = { sti: string; label: string; bedste: boolean; opnaaet: boolean; krav?: string };
     const HIGHSCORE_DRILLDOWN_ANTAL = 10;
 
     let {
@@ -88,14 +90,15 @@
     let visHighscoreLog = $state(false);
     let profilNavnGemTimer: ReturnType<typeof setTimeout> | null = null;
     let highscoreDrilldown = $state<HighscoreDrilldown | null>(null);
+    let valgtLaastTrofae = $state<ProfilMedalje | null>(null);
     let statsHentetForUser = $state('');
+    let sidstKendteBedsteProfilScore = $state(0);
     const HIGHSCORE_SIDE_STOERRELSE = 10;
     const lokaleKortPresets = [
         { label: '20 x 20', bredde: 20, hoejde: 20 },
         { label: '50 x 20', bredde: 50, hoejde: 20 },
         { label: '100 x 20', bredde: 100, hoejde: 20 }
     ];
-
     function foreslaaOeNavn() {
         const forled = OE_NAVN_FORLED[Math.floor(Math.random() * OE_NAVN_FORLED.length)];
         const efterled = OE_NAVN_EFTERLED[Math.floor(Math.random() * OE_NAVN_EFTERLED.length)];
@@ -109,6 +112,10 @@
     }
 
     $effect(() => {
+        if (!authState.user) {
+            sidstKendteBedsteProfilScore = 0;
+        }
+
         if (spilTilstand.gameState !== forrigeState) {
             if (spilTilstand.gameState === 'select') {
                 blandKarakterer();
@@ -174,19 +181,48 @@
     }
 
     function profilMedaljeScore() {
-        return authState.stats?.bedsteScore || 0;
+        const bedsteScore = authState.stats?.bedsteScore;
+        if (typeof bedsteScore === 'number' && bedsteScore > sidstKendteBedsteProfilScore) {
+            sidstKendteBedsteProfilScore = bedsteScore;
+        }
+        return sidstKendteBedsteProfilScore;
     }
 
     function profilMedaljer() {
         const bedsteNiveau = findMedaljeNiveau(profilMedaljeScore());
+        const opnaaedeTrofaeer = normaliserProfilTrofaeer(authState.profil?.trophies || []);
+        const opnaaedeIds = new Set(opnaaedeTrofaeer.map((trofae) => trofae.id));
+        const opnaaedeMedaljer: ProfilMedalje[] = opnaaedeTrofaeer
+            .flatMap((trofae) => {
+                const definition = TROFAE_DEFINITIONER.find((item) => item.id === trofae.id);
+                return definition
+                    ? [{ sti: definition.billede, label: definition.navn, bedste: false, opnaaet: true, krav: definition.krav }]
+                    : [];
+            });
+        const manglendeMedaljer: ProfilMedalje[] = TROFAE_DEFINITIONER
+            .filter((definition) => !opnaaedeIds.has(definition.id))
+            .map((definition) => ({
+                sti: definition.billede,
+                label: definition.navn,
+                bedste: false,
+                opnaaet: false,
+                krav: definition.krav
+            }));
+
         return [
-            { sti: `/screens/m${bedsteNiveau + 1}.webp`, label: 'Bedste opnåede medalje', bedste: true },
-            ...Array.from({ length: 9 }, (_, index) => ({
-                sti: '/screens/m3.webp',
-                label: `Trofæmedalje ${index + 1}`,
-                bedste: false
-            }))
-        ];
+            { sti: `/screens/m${bedsteNiveau + 1}.webp`, label: 'Topmedalje', bedste: true, opnaaet: true },
+            ...opnaaedeMedaljer,
+            ...manglendeMedaljer
+        ] satisfies ProfilMedalje[];
+    }
+
+    function aabnLaastTrofae(medalje: ProfilMedalje) {
+        if (medalje.opnaaet || medalje.bedste) return;
+        valgtLaastTrofae = medalje;
+    }
+
+    function lukLaastTrofae() {
+        valgtLaastTrofae = null;
     }
 
     function formaterNavn(tekst: string) {
@@ -630,13 +666,22 @@
             <p class="konto-hint">Din score og statistik bliver gemt.</p>
             <div class="konto-medaljer" aria-label="Dine medaljer">
                 {#each profilMedaljer() as medalje, index (`profil-medalje-${index}-${medalje.sti}`)}
-                    <img
-                        src={medalje.sti}
-                        alt={medalje.label}
-                        class:bedste={medalje.bedste}
-                        class:trofae-placeholder={!medalje.bedste}
-                        draggable="false"
-                    />
+                    <button
+                        type="button"
+                        class="konto-medalje-knap"
+                        class:kan-aabnes={!medalje.opnaaet && !medalje.bedste}
+                        disabled={medalje.opnaaet || medalje.bedste}
+                        onclick={() => aabnLaastTrofae(medalje)}
+                        aria-label={medalje.opnaaet || medalje.bedste ? medalje.label : `Se krav for ${medalje.label}`}
+                    >
+                        <img
+                            src={medalje.sti}
+                            alt={medalje.label}
+                            class:bedste={medalje.bedste}
+                            class:trofae-placeholder={!medalje.opnaaet && !medalje.bedste}
+                            draggable="false"
+                        />
+                    </button>
                 {/each}
             </div>
         {:else}
@@ -657,6 +702,27 @@
             <p class="konto-besked">{authState.besked}</p>
         {/if}
     </div>
+{/snippet}
+
+{#snippet laastTrofaeModal()}
+    {#if valgtLaastTrofae}
+        <div class="trofae-info-overlay" role="presentation" onclick={lukLaastTrofae}>
+            <div
+                class="trofae-info-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="trofae-info-titel"
+                tabindex="-1"
+                onclick={(e) => e.stopPropagation()}
+                onkeydown={(e) => e.stopPropagation()}
+            >
+                <img src={valgtLaastTrofae.sti} alt={valgtLaastTrofae.label} draggable="false" />
+                <h3 id="trofae-info-titel">{valgtLaastTrofae.label}</h3>
+                <p>{valgtLaastTrofae.krav}</p>
+                <button type="button" onclick={lukLaastTrofae}>Luk</button>
+            </div>
+        </div>
+    {/if}
 {/snippet}
 
 {#snippet profilModal()}
@@ -693,6 +759,29 @@
                         <div><strong>{authState.stats.flestFelter}</strong><span>Flest felter</span></div>
                         <div><strong>{authState.stats.flestMiner}</strong><span>Flest miner</span></div>
                         <div><strong>{authState.stats.favoritKarakter}</strong><span>Mest spillet</span></div>
+                    </div>
+
+                    <div class="profil-medaljehylde" aria-label="Profilmedaljer">
+                        {#each profilMedaljer() as medalje, index (`profil-hylde-${index}-${medalje.label}`)}
+                            <div class="profil-medalje" class:opnaaet={medalje.opnaaet}>
+                                <button
+                                    type="button"
+                                    class="profil-medalje-knap"
+                                    class:kan-aabnes={!medalje.opnaaet && !medalje.bedste}
+                                    disabled={medalje.opnaaet || medalje.bedste}
+                                    onclick={() => aabnLaastTrofae(medalje)}
+                                    aria-label={medalje.opnaaet || medalje.bedste ? medalje.label : `Se krav for ${medalje.label}`}
+                                >
+                                    <img
+                                        src={medalje.sti}
+                                        alt={medalje.label}
+                                        class:bedste={medalje.bedste}
+                                        draggable="false"
+                                    />
+                                </button>
+                                <span>{medalje.label}</span>
+                            </div>
+                        {/each}
                     </div>
 
                     <div class="profil-liste">
@@ -1265,6 +1354,7 @@
 {/if}
 
 {@render profilModal()}
+{@render laastTrofaeModal()}
 {@render highscoreDetaljeModal()}
 
 <style>
@@ -1585,6 +1675,27 @@
         height: 1px;
         background: linear-gradient(90deg, transparent, rgba(245, 208, 113, 0.42), rgba(255, 255, 255, 0.14), transparent);
     }
+    .konto-medalje-knap {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        min-width: 0;
+        cursor: default;
+    }
+    .konto-medalje-knap.kan-aabnes {
+        cursor: pointer;
+    }
+    .konto-medalje-knap:focus-visible {
+        outline: 2px solid rgba(245, 208, 113, 0.75);
+        outline-offset: 3px;
+        border-radius: 999px;
+    }
+    .konto-medalje-knap.kan-aabnes:hover img {
+        opacity: 0.52;
+        filter: grayscale(0.8) brightness(0.95) drop-shadow(0 5px 8px rgba(245, 208, 113, 0.18));
+    }
     .konto-medaljer img {
         width: 100%;
         max-width: 42px;
@@ -1668,12 +1779,16 @@
         max-width: 100%;
         max-height: 90dvh;
         overflow-y: auto;
+        scrollbar-width: none;
         background: #151515;
         border: 1px solid #444;
         border-radius: 8px;
         padding: 20px;
         color: white;
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+    .profil-modal::-webkit-scrollbar {
+        display: none;
     }
     .profil-header {
         display: flex;
@@ -1716,6 +1831,132 @@
     .profil-grid span {
         color: #aaa;
         font-size: 0.82rem;
+    }
+    .profil-medaljehylde {
+        --profil-medalje-size: 150px;
+        --profil-medalje-row: 184px;
+        --profil-medalje-row-gap: 30px;
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-auto-rows: var(--profil-medalje-row);
+        gap: var(--profil-medalje-row-gap) 16px;
+        margin: 28px 0 24px;
+        padding: 0 6px;
+    }
+    .profil-medaljehylde::before,
+    .profil-medaljehylde::after {
+        content: "";
+        position: absolute;
+        left: 4px;
+        right: 4px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(245, 208, 113, 0.48), rgba(255, 255, 255, 0.16), transparent);
+    }
+    .profil-medaljehylde::before {
+        top: 0;
+    }
+    .profil-medaljehylde::after {
+        top: calc(var(--profil-medalje-row) + var(--profil-medalje-row-gap));
+    }
+    .profil-medalje {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 7px;
+        text-align: center;
+        color: #9c9c9c;
+        font-size: 0.82rem;
+        line-height: 1.15;
+        padding-top: 0;
+    }
+    .profil-medalje-knap {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        width: min(var(--profil-medalje-size), 100%);
+        aspect-ratio: 1;
+        cursor: default;
+    }
+    .profil-medalje-knap.kan-aabnes {
+        cursor: pointer;
+    }
+    .profil-medalje-knap:focus-visible {
+        outline: 2px solid rgba(245, 208, 113, 0.75);
+        outline-offset: 4px;
+        border-radius: 999px;
+    }
+    .profil-medalje img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: contain;
+        opacity: 0.18;
+        filter: grayscale(1) brightness(0.74) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.45));
+    }
+    .profil-medalje-knap.kan-aabnes:hover img {
+        opacity: 0.34;
+        filter: grayscale(0.95) brightness(0.92) drop-shadow(0 6px 9px rgba(245, 208, 113, 0.14));
+    }
+    .profil-medalje.opnaaet {
+        color: #f1dfb4;
+    }
+    .profil-medalje.opnaaet img {
+        opacity: 1;
+        filter: drop-shadow(0 7px 10px rgba(245, 208, 113, 0.25)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.55));
+    }
+    .trofae-info-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 4200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.58);
+        box-sizing: border-box;
+    }
+    .trofae-info-modal {
+        width: min(340px, 100%);
+        border: 1px solid rgba(245, 208, 113, 0.35);
+        border-radius: 8px;
+        background: rgba(18, 18, 18, 0.97);
+        color: #f4efe5;
+        padding: 20px 18px 18px;
+        text-align: center;
+        box-shadow: 0 20px 52px rgba(0, 0, 0, 0.62);
+    }
+    .trofae-info-modal img {
+        width: 92px;
+        aspect-ratio: 1;
+        object-fit: contain;
+        opacity: 0.4;
+        filter: grayscale(1) brightness(0.82) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.5));
+        margin-bottom: 6px;
+    }
+    .trofae-info-modal h3 {
+        margin: 0 0 8px;
+        font-family: 'Cinzel', serif;
+        font-size: 1.25rem;
+    }
+    .trofae-info-modal p {
+        margin: 0 0 16px;
+        color: #d5c8aa;
+        line-height: 1.35;
+    }
+    .trofae-info-modal button {
+        border: 1px solid rgba(245, 208, 113, 0.45);
+        border-radius: 6px;
+        background: rgba(245, 208, 113, 0.1);
+        color: #f4efe5;
+        padding: 8px 18px;
+        cursor: pointer;
+    }
+    .trofae-info-modal button:hover,
+    .trofae-info-modal button:focus-visible {
+        background: rgba(245, 208, 113, 0.18);
     }
     .profil-liste {
         margin-top: 14px;
@@ -2433,6 +2674,20 @@
 
         .profil-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .profil-medaljehylde {
+            --profil-medalje-size: clamp(54px, 17vw, 86px);
+            --profil-medalje-row: clamp(92px, 26vw, 122px);
+            --profil-medalje-row-gap: 20px;
+            gap: var(--profil-medalje-row-gap) 8px;
+            margin: 22px 0 18px;
+            padding-inline: 0;
+        }
+
+        .profil-medalje {
+            gap: 5px;
+            font-size: clamp(0.58rem, 2.45vw, 0.72rem);
         }
 
         .character-select {
