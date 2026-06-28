@@ -40,15 +40,15 @@
     const HIGHSCORE_DRILLDOWN_ANTAL = 10;
     const PROFIL_BEDSTE_SCORE_PREFIX = 'taage_profile_best_score:';
     const TROFAE_MEDALJER = [
-        { sti: '/screens/mineejeren.webp', label: 'Mineejeren', krav: '12 miner ved spilslut' },
+        { sti: '/screens/mineejeren.webp', label: 'Mineejer', krav: '12 miner ved spilslut' },
         { sti: '/screens/taagekonge.webp', label: 'Tågekonge', krav: '10 bevægelser i tåge' },
-        { sti: '/screens/Bølgebæreren.webp', label: 'Bølgebæreren', krav: 'start en oversvømmelse og tag skade fra vand 5 gange' },
-        { sti: '/screens/relikviejægeren.webp', label: 'Relikviejægeren', krav: 'hav 3 af 4 magiske genstande i rygsækken ved spilslut' },
-        { sti: '/screens/guldfyrsten.webp', label: 'Guldfyrsten', krav: '5000 guld ved spilslut' },
-        { sti: '/screens/livsvogteren.webp', label: 'Livvogteren', krav: 'heal 400 HP' },
-        { sti: '/screens/korttegneren.webp', label: 'Korttegneren', krav: '1500 kendte felter' },
-        { sti: '/screens/udstyrsmesteren.webp', label: 'Udstyrsmesteren', krav: '10 opgraderede items i rygsækken samtidig' },
-        { sti: '/screens/diamantjægeren.webp', label: 'Diamantjægeren', krav: 'find diamanter med en samlet værdi på mindst 3000' }
+        { sti: '/screens/Bølgebæreren.webp', label: 'Bølgebærer', krav: 'start en oversvømmelse og tag skade fra vand 5 gange' },
+        { sti: '/screens/relikviejægeren.webp', label: 'Relikviejæger', krav: 'hav 3 af 4 magiske genstande i rygsækken ved spilslut' },
+        { sti: '/screens/guldfyrsten.webp', label: 'Guldfyrste', krav: '5000 guld ved spilslut' },
+        { sti: '/screens/livsvogteren.webp', label: 'Livvogter', krav: 'heal 400 HP' },
+        { sti: '/screens/korttegneren.webp', label: 'Korttegner', krav: '1500 kendte felter' },
+        { sti: '/screens/udstyrsmesteren.webp', label: 'Udstyrsmester', krav: '10 opgraderede items i rygsækken samtidig' },
+        { sti: '/screens/diamantjægeren.webp', label: 'Diamantjæger', krav: 'find diamanter med en samlet værdi på mindst 3000' }
     ];
 
     let {
@@ -239,7 +239,13 @@
     function profilMedaljer() {
         const bedsteNiveau = findMedaljeNiveau(profilMedaljeScore());
         return [
-            { sti: `/screens/m${bedsteNiveau + 1}.webp`, label: 'Topmedalje', bedste: true, opnaaet: false },
+            {
+                sti: `/screens/m${bedsteNiveau + 1}.webp`,
+                label: 'Topmedalje',
+                krav: 'Den medalje har du fået for din højeste score.',
+                bedste: true,
+                opnaaet: true
+            },
             ...sorteredeTrofaeMedaljer().map((medalje) => ({ ...medalje, bedste: false }))
         ];
     }
@@ -258,7 +264,6 @@
     }
 
     function aabnLaastTrofae(medalje: { sti: string; label: string; bedste: boolean; opnaaet?: boolean; krav?: string; episkTekst?: string }) {
-        if (medalje.bedste) return;
         valgtLaastTrofae = medalje;
     }
 
@@ -759,8 +764,7 @@
                     <button
                         type="button"
                         class="konto-medalje-knap"
-                        class:kan-aabnes={!medalje.bedste}
-                        disabled={medalje.bedste}
+                        class:kan-aabnes={true}
                         onclick={() => aabnLaastTrofae(medalje)}
                         aria-label={medalje.bedste ? medalje.label : medalje.opnaaet ? `Se ${medalje.label}` : `Se krav for ${medalje.label}`}
                     >
@@ -886,8 +890,7 @@
                             <button
                                 type="button"
                                 class="profil-medalje-knap"
-                                class:kan-aabnes={!medalje.bedste}
-                                disabled={medalje.bedste}
+                                class:kan-aabnes={true}
                                 onclick={() => aabnLaastTrofae(medalje)}
                                 aria-label={medalje.bedste ? medalje.label : medalje.opnaaet ? `Se ${medalje.label}` : `Se krav for ${medalje.label}`}
                             >

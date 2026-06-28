@@ -33,7 +33,7 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     {
         id: 'mineejeren',
         sti: '/screens/mineejeren.webp',
-        label: 'Mineejeren',
+        label: 'Mineejer',
         krav: 'Overlev spillet med 12 miner ved spilslut.',
         episkTekst: 'Du ejede 12 miner og slap levende væk.'
     },
@@ -47,49 +47,49 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     {
         id: 'boelgebaereren',
         sti: '/screens/Bølgebæreren.webp',
-        label: 'Bølgebæreren',
+        label: 'Bølgebærer',
         krav: 'Overlev spillet efter at have startet en oversvømmelse og taget skade fra vand 5 gange.',
         episkTekst: 'Du startede en oversvømmelse, bar vandets straf og overlevede.'
     },
     {
         id: 'relikviejaegeren',
         sti: '/screens/relikviejægeren.webp',
-        label: 'Relikviejægeren',
+        label: 'Relikviejæger',
         krav: 'Overlev spillet med 3 af 4 magiske genstande i rygsækken: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.',
         episkTekst: 'Du bar tre magiske genstande ud af tågen.'
     },
     {
         id: 'guldfyrsten',
         sti: '/screens/guldfyrsten.webp',
-        label: 'Guldfyrsten',
+        label: 'Guldfyrste',
         krav: 'Overlev spillet med 5000 guld. Kun rent guld tæller.',
         episkTekst: 'Du slap væk med 5000 guld i hænderne.'
     },
     {
         id: 'livsvogteren',
         sti: '/screens/livsvogteren.webp',
-        label: 'Livvogteren',
+        label: 'Livvogter',
         krav: 'Overlev spillet efter at have healet 400 HP.',
         episkTekst: 'Du helede 400 HP og holdt dig levende hele vejen.'
     },
     {
         id: 'korttegneren',
         sti: '/screens/korttegneren.webp',
-        label: 'Korttegneren',
+        label: 'Korttegner',
         krav: 'Overlev spillet med 1500 kendte felter.',
         episkTekst: 'Du kortlagde 1500 felter og fandt hjem.'
     },
     {
         id: 'udstyrsmesteren',
         sti: '/screens/udstyrsmesteren.webp',
-        label: 'Udstyrsmesteren',
+        label: 'Udstyrsmester',
         krav: 'Overlev spillet med 10 opgraderede items i rygsækken på samme tid.',
         episkTekst: 'Du bar 10 mesterlige stykker udstyr på samme tid.'
     },
     {
         id: 'diamantjaegeren',
         sti: '/screens/diamantjægeren.webp',
-        label: 'Diamantjægeren',
+        label: 'Diamantjæger',
         krav: 'Overlev spillet efter at have fundet diamanter med en samlet værdi på mindst 3000.',
         episkTekst: 'Du fandt diamanter med en samlet værdi på mindst 3000.'
     }
