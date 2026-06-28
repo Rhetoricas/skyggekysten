@@ -1,6 +1,7 @@
 import type { Felt, Karakter, SpillerData, RygsækTing } from './types';
 import { itemDB } from './spildata';
 import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
+import type { TrofaeId, TrofaeStats } from './trofaeer';
 
 interface FlydendeTal {
     id: number;
@@ -133,6 +134,8 @@ export const spilTilstand = $state({
     mitUdstyr: [] as RygsækTing[],
     mineKendteFelter: [] as number[],
     mineSkattekortFelter: [] as number[],
+    trofaeStats: null as TrofaeStats | null,
+    nyeTrofaeIds: [] as TrofaeId[],
     historik: [] as number[],
     aktivShop: null as string[] | null,
     aktivVaerksted: false,

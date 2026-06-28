@@ -4,6 +4,7 @@ import { HEX_W } from './spildata';
 import { brugFraRygsæk, hentKortBredde, hentKortHoejde, hentNaboIRetning } from './spilmotor';
 import { erFeltITaagen } from './taage';
 import { erFriskAktivSpiller } from './aktivSpiller';
+import { registrerHeling, registrerVandSkade } from './trofaeer';
 import type { Felt, GravstenMinde } from './types';
 
 function erVandBiome(biome: string | null | undefined) {
@@ -165,14 +166,18 @@ function brugEliksir() {
     const nu = Date.now();
     
     if (nu - sidstBrugtEliksir < 1000) {
+        const foerHp = spilTilstand.livspoint;
         spilTilstand.livspoint = 90;
+        registrerHeling(foerHp, spilTilstand.livspoint);
         return true; 
     }
 
     const harEliksir = spilTilstand.mitUdstyr?.some(i => i.id === 'livseliksir' && i.maengde > 0);
     if (harEliksir) {
         brugFraRygsæk('livseliksir', 1);
+        const foerHp = spilTilstand.livspoint;
         spilTilstand.livspoint = 90;
+        registrerHeling(foerHp, spilTilstand.livspoint);
         sidstBrugtEliksir = nu;
         return true;
     }
@@ -191,6 +196,7 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
 
     if (spilTilstand.livspoint <= 0) {
         const erHavet = rensetBesked.includes("havet") || rensetBesked.includes("saltvand") || rensetBesked.includes("hav") || erVandBiome(spilTilstand.gitter[spilTilstand.spillerIndex]?.biome);
+        if (erHavet) registrerVandSkade(faktiskSkade);
 
         if (brugEliksir()) {
             spilTilstand.logBesked = `Du faldt om. ${beskedMedTal} Eliksiren redder dig.`;
@@ -224,6 +230,8 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
         spilTilstand.logBesked = doedsBesked || `${beskedMedTal} Du døde.`;
         syncTilDb(true);
     } else {
+        const erHavet = rensetBesked.includes("havet") || rensetBesked.includes("saltvand") || rensetBesked.includes("hav") || erVandBiome(spilTilstand.gitter[spilTilstand.spillerIndex]?.biome);
+        if (erHavet) registrerVandSkade(faktiskSkade);
         spilTilstand.logBesked = beskedMedTal;
         syncTilDb();
     }
@@ -358,8 +366,10 @@ export function udfoerBlodofring() {
         return;
     }
     
+    const foerHp = spilTilstand.livspoint;
     spilTilstand.maxLivspoint -= 10;
     spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 50);
+    registrerHeling(foerHp, spilTilstand.livspoint);
     
     spilTilstand.logBesked = `Du bruger blodofferet. (-10 Max HP, +50 HP)`;
     

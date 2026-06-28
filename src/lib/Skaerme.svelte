@@ -11,6 +11,7 @@
     import { hentGlobalHighscoresForFilter, hentHighscoreDetaljer } from '$lib/netvaerk';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
+    import { TROFAE_DEFINITIONER, findTrofae, gemTrofaeIds, hentGemteTrofaeIds, lavTrofaeOwnerKey, normaliserTrofaeIds } from '$lib/trofaeer';
     import type { Karakter } from '$lib/types';
 
     type HighscoreDetaljer = {
@@ -37,6 +38,18 @@
     type ValgtHighscore = HighscoreDetaljer & { navn: string; point: number; karakter?: string; oeNavn?: string; henterDetaljer?: boolean };
     type HighscoreDrilldown = { titel: string; scores: GlobalScore[]; henter: boolean };
     const HIGHSCORE_DRILLDOWN_ANTAL = 10;
+    const PROFIL_BEDSTE_SCORE_PREFIX = 'taage_profile_best_score:';
+    const TROFAE_MEDALJER = [
+        { sti: '/screens/mineejeren.webp', label: 'Mineejeren', krav: '12 miner ved spilslut' },
+        { sti: '/screens/taagekonge.webp', label: 'Tågekonge', krav: '10 bevægelser i tåge' },
+        { sti: '/screens/Bølgebæreren.webp', label: 'Bølgebæreren', krav: 'start en oversvømmelse og tag skade fra vand 5 gange' },
+        { sti: '/screens/relikviejægeren.webp', label: 'Relikviejægeren', krav: 'hav 3 af 4 magiske genstande i rygsækken ved spilslut' },
+        { sti: '/screens/guldfyrsten.webp', label: 'Guldfyrsten', krav: '5000 guld ved spilslut' },
+        { sti: '/screens/livsvogteren.webp', label: 'Livsvogteren', krav: 'heal 400 HP' },
+        { sti: '/screens/korttegneren.webp', label: 'Korttegneren', krav: '1500 kendte felter' },
+        { sti: '/screens/udstyrsmesteren.webp', label: 'Udstyrsmesteren', krav: '10 opgraderede items i rygsækken samtidig' },
+        { sti: '/screens/diamantjægeren.webp', label: 'Diamantjægeren', krav: 'find diamanter for 3000 rå værdi' }
+    ];
 
     let {
         opretEllerDeltag,
@@ -89,6 +102,9 @@
     let profilNavnGemTimer: ReturnType<typeof setTimeout> | null = null;
     let highscoreDrilldown = $state<HighscoreDrilldown | null>(null);
     let statsHentetForUser = $state('');
+    let gemtProfilBedsteScore = $state(0);
+    let valgtLaastTrofae = $state<{ sti: string; label: string; krav?: string; episkTekst?: string; opnaaet?: boolean } | null>(null);
+    let lokaleTrofaeIds = $state<string[]>([]);
     const HIGHSCORE_SIDE_STOERRELSE = 10;
     const lokaleKortPresets = [
         { label: '20 x 20', bredde: 20, hoejde: 20 },
@@ -173,20 +189,81 @@
         return score.medalPath || findMedaljeSti(score.point, false);
     }
 
+    function profilBedsteScoreKey(userId: string) {
+        return `${PROFIL_BEDSTE_SCORE_PREFIX}${userId}`;
+    }
+
+    function hentGemtProfilBedsteScore(userId: string) {
+        if (typeof localStorage === 'undefined') return 0;
+        const gemt = Number(localStorage.getItem(profilBedsteScoreKey(userId)));
+        return Number.isFinite(gemt) && gemt > 0 ? gemt : 0;
+    }
+
+    function gemProfilBedsteScore(userId: string, score: number) {
+        if (typeof localStorage === 'undefined' || !userId || score <= 0) return;
+        localStorage.setItem(profilBedsteScoreKey(userId), String(Math.round(score)));
+    }
+
     function profilMedaljeScore() {
-        return authState.stats?.bedsteScore || 0;
+        return Math.max(gemtProfilBedsteScore, authState.stats?.bedsteScore || 0);
+    }
+
+    function trofaeOwnerKey() {
+        return lavTrofaeOwnerKey(authState.user?.id, spilTilstand.spillerNavn);
+    }
+
+    function opdaterLokaleTrofaeIds() {
+        const ownerKey = trofaeOwnerKey();
+        const gemte = normaliserTrofaeIds([
+            ...hentGemteTrofaeIds(ownerKey),
+            ...(authState.profil?.trophies || [])
+        ]);
+        const nye = spilTilstand.nyeTrofaeIds || [];
+        const samlede = normaliserTrofaeIds([...gemte, ...nye]);
+        if (samlede.length > 0) gemTrofaeIds(ownerKey, samlede);
+        lokaleTrofaeIds = samlede;
+    }
+
+    function sorteredeTrofaeMedaljer() {
+        const opnaaet = new Set(lokaleTrofaeIds);
+        const optjente = lokaleTrofaeIds
+            .map((id) => findTrofae(id))
+            .filter((trofae): trofae is NonNullable<ReturnType<typeof findTrofae>> => !!trofae)
+            .map((trofae) => ({ ...trofae, opnaaet: true }));
+        const laaste = TROFAE_DEFINITIONER
+            .filter((trofae) => !opnaaet.has(trofae.id))
+            .map((trofae) => ({ ...trofae, opnaaet: false }));
+        return [...optjente, ...laaste];
     }
 
     function profilMedaljer() {
         const bedsteNiveau = findMedaljeNiveau(profilMedaljeScore());
         return [
-            { sti: `/screens/m${bedsteNiveau + 1}.webp`, label: 'Bedste opnåede medalje', bedste: true },
-            ...Array.from({ length: 9 }, (_, index) => ({
-                sti: '/screens/m3.webp',
-                label: `Trofæmedalje ${index + 1}`,
-                bedste: false
-            }))
+            { sti: `/screens/m${bedsteNiveau + 1}.webp`, label: 'Topmedalje', bedste: true, opnaaet: false },
+            ...sorteredeTrofaeMedaljer().map((medalje) => ({ ...medalje, bedste: false }))
         ];
+    }
+
+    function loginTeaserMedaljer() {
+        return [
+            {
+                sti: '/screens/m1.webp',
+                label: 'Topmedalje',
+                krav: 'Log ind for at gemme din bedste scoremedalje på profilen.',
+                bedste: false,
+                opnaaet: false
+            },
+            ...TROFAE_DEFINITIONER.map((medalje) => ({ ...medalje, bedste: false, opnaaet: false }))
+        ];
+    }
+
+    function aabnLaastTrofae(medalje: { sti: string; label: string; bedste: boolean; opnaaet?: boolean; krav?: string; episkTekst?: string }) {
+        if (medalje.bedste) return;
+        valgtLaastTrofae = medalje;
+    }
+
+    function lukLaastTrofae() {
+        valgtLaastTrofae = null;
     }
 
     function formaterNavn(tekst: string) {
@@ -512,14 +589,36 @@
 
     $effect(() => {
         const userId = authState.user?.id || '';
-        if (!userId || statsHentetForUser === userId) return;
+        if (!userId) {
+            statsHentetForUser = '';
+            gemtProfilBedsteScore = 0;
+            return;
+        }
+        gemtProfilBedsteScore = Math.max(gemtProfilBedsteScore, hentGemtProfilBedsteScore(userId));
+        if (statsHentetForUser === userId && authState.stats) return;
         statsHentetForUser = userId;
         void hentProfilStats();
     });
 
-    async function aabnProfil() {
+    $effect(() => {
+        const userId = authState.user?.id || '';
+        const bedsteScore = authState.stats?.bedsteScore || 0;
+        if (!userId || bedsteScore <= gemtProfilBedsteScore) return;
+        gemtProfilBedsteScore = bedsteScore;
+        gemProfilBedsteScore(userId, bedsteScore);
+    });
+
+    $effect(() => {
+        const owner = trofaeOwnerKey();
+        const nyeTrofaeer = (spilTilstand.nyeTrofaeIds || []).join('|');
+        void owner;
+        void nyeTrofaeer;
+        opdaterLokaleTrofaeIds();
+    });
+
+    function aabnProfil() {
         visProfil = true;
-        await hentProfilStats();
+        void hentProfilStats();
     }
 
     async function gemProfil() {
@@ -563,7 +662,34 @@
         return genererSlutHistorie(titel, niveau, spilTilstand.rumKode, erVundet);
     }
 
+    function nyeTrofaeer() {
+        return (spilTilstand.nyeTrofaeIds || [])
+            .map((id) => findTrofae(id))
+            .filter((trofae): trofae is NonNullable<ReturnType<typeof findTrofae>> => !!trofae);
+    }
+
 </script>
+
+{#snippet episkeTrofaeer()}
+    {@const trofaeer = nyeTrofaeer()}
+    {#if trofaeer.length > 0}
+        <section class="episk-trofae-panel" aria-label="Nye trofæmedaljer">
+            <p class="episk-kicker">Ny trofæmedalje</p>
+            <h2>{trofaeer.length === 1 ? trofaeer[0].label : `${trofaeer.length} episke trofæer`}</h2>
+            <div class="episk-trofae-liste">
+                {#each trofaeer as trofae (trofae.id)}
+                    <div class="episk-trofae">
+                        <img src={trofae.sti} alt={trofae.label} draggable="false" />
+                        <div>
+                            <strong>{trofae.label}</strong>
+                            <span>{trofae.episkTekst}</span>
+                        </div>
+                    </div>
+                {/each}
+            </div>
+        </section>
+    {/if}
+{/snippet}
 
 {#snippet pointSpecifikation()}
     <div class="point-kvittering">
@@ -630,17 +756,44 @@
             <p class="konto-hint">Din score og statistik bliver gemt.</p>
             <div class="konto-medaljer" aria-label="Dine medaljer">
                 {#each profilMedaljer() as medalje, index (`profil-medalje-${index}-${medalje.sti}`)}
-                    <img
-                        src={medalje.sti}
-                        alt={medalje.label}
-                        class:bedste={medalje.bedste}
-                        class:trofae-placeholder={!medalje.bedste}
-                        draggable="false"
-                    />
+                    <button
+                        type="button"
+                        class="konto-medalje-knap"
+                        class:kan-aabnes={!medalje.bedste}
+                        disabled={medalje.bedste}
+                        onclick={() => aabnLaastTrofae(medalje)}
+                        aria-label={medalje.bedste ? medalje.label : medalje.opnaaet ? `Se ${medalje.label}` : `Se krav for ${medalje.label}`}
+                    >
+                        <img
+                            src={medalje.sti}
+                            alt={medalje.label}
+                            class:bedste={medalje.bedste}
+                            class:trofae-opnaaet={medalje.opnaaet}
+                            class:trofae-placeholder={!medalje.bedste && !medalje.opnaaet}
+                            draggable="false"
+                        />
+                    </button>
                 {/each}
             </div>
         {:else}
             <p class="konto-hint">Login er valgfrit. Uden login spiller du kun med på den ø, du åbner nu, og din score og profil bliver ikke gemt.</p>
+            <div class="konto-medaljer konto-medaljer-login-teaser" aria-label="Medaljer du kan gemme med login">
+                {#each loginTeaserMedaljer() as medalje, index (`login-teaser-medalje-${index}-${medalje.sti}`)}
+                    <button
+                        type="button"
+                        class="konto-medalje-knap kan-aabnes"
+                        onclick={() => aabnLaastTrofae(medalje)}
+                        aria-label={`Se krav for ${medalje.label}`}
+                    >
+                        <img
+                            src={medalje.sti}
+                            alt={medalje.label}
+                            class:trofae-placeholder={true}
+                            draggable="false"
+                        />
+                    </button>
+                {/each}
+            </div>
             <div class="konto-login">
                 <input
                     type="email"
@@ -657,6 +810,37 @@
             <p class="konto-besked">{authState.besked}</p>
         {/if}
     </div>
+{/snippet}
+
+{#snippet laastTrofaeModal()}
+    {#if valgtLaastTrofae}
+        <div class="trofae-info-overlay" role="presentation" onclick={lukLaastTrofae}>
+            <div
+                class="trofae-info-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="trofae-info-titel"
+                tabindex="-1"
+                onclick={(e) => e.stopPropagation()}
+                onkeydown={(e) => e.stopPropagation()}
+            >
+                <img
+                    src={valgtLaastTrofae.sti}
+                    alt={valgtLaastTrofae.label}
+                    class:opnaaet={valgtLaastTrofae.opnaaet}
+                    draggable="false"
+                />
+                <h3 id="trofae-info-titel">{valgtLaastTrofae.label}</h3>
+                {#if valgtLaastTrofae.opnaaet && valgtLaastTrofae.episkTekst}
+                    <p>{valgtLaastTrofae.episkTekst}</p>
+                    <p class="trofae-info-krav">Krav: {valgtLaastTrofae.krav}</p>
+                {:else}
+                    <p>{valgtLaastTrofae.krav}</p>
+                {/if}
+                <button type="button" onclick={lukLaastTrofae}>Luk</button>
+            </div>
+        </div>
+    {/if}
 {/snippet}
 
 {#snippet profilModal()}
@@ -694,7 +878,33 @@
                         <div><strong>{authState.stats.flestMiner}</strong><span>Flest miner</span></div>
                         <div><strong>{authState.stats.favoritKarakter}</strong><span>Mest spillet</span></div>
                     </div>
+                {/if}
 
+                <div class="profil-medaljehylde" aria-label="Profilmedaljer">
+                    {#each profilMedaljer() as medalje, index (`profil-hylde-${index}-${medalje.sti}`)}
+                        <div class="profil-medalje" class:opnaaet={medalje.bedste || medalje.opnaaet}>
+                            <button
+                                type="button"
+                                class="profil-medalje-knap"
+                                class:kan-aabnes={!medalje.bedste}
+                                disabled={medalje.bedste}
+                                onclick={() => aabnLaastTrofae(medalje)}
+                                aria-label={medalje.bedste ? medalje.label : medalje.opnaaet ? `Se ${medalje.label}` : `Se krav for ${medalje.label}`}
+                            >
+                                <img
+                                    src={medalje.sti}
+                                    alt={medalje.label}
+                                    class:bedste={medalje.bedste}
+                                    class:trofae-opnaaet={medalje.opnaaet}
+                                    draggable="false"
+                                />
+                            </button>
+                            <span>{medalje.label}</span>
+                        </div>
+                    {/each}
+                </div>
+
+                {#if authState.stats}
                     <div class="profil-liste">
                         <h3>Sejre pr. karakter</h3>
                         {#if authState.stats.karakterSejre.length === 0}
@@ -1193,6 +1403,7 @@
             <p class="beskrivelse">
                 {hentMinHistorie(true)}
             </p>
+            {@render episkeTrofaeer()}
             
             <div class="score-container">
                 <img src="/screens/pergament.webp" alt="Pergament" class="pergament-billede" />
@@ -1265,6 +1476,7 @@
 {/if}
 
 {@render profilModal()}
+{@render laastTrofaeModal()}
 {@render highscoreDetaljeModal()}
 
 <style>
@@ -1574,7 +1786,7 @@
         gap: 4px;
         align-items: start;
         margin: 10px 0 2px;
-        padding: 12px 4px 0;
+        padding: 8px 4px 0;
     }
     .konto-medaljer::before {
         content: "";
@@ -1585,23 +1797,186 @@
         height: 1px;
         background: linear-gradient(90deg, transparent, rgba(245, 208, 113, 0.42), rgba(255, 255, 255, 0.14), transparent);
     }
+    .konto-medalje-knap {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        cursor: default;
+        justify-self: center;
+        width: min(48px, 100%);
+        aspect-ratio: 1;
+    }
+    .konto-medalje-knap.kan-aabnes {
+        cursor: pointer;
+    }
+    .konto-medalje-knap:focus-visible {
+        outline: 2px solid rgba(245, 208, 113, 0.75);
+        outline-offset: 3px;
+        border-radius: 999px;
+    }
     .konto-medaljer img {
         width: 100%;
-        max-width: 42px;
         aspect-ratio: 1;
         object-fit: contain;
         justify-self: center;
         filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.55));
-        transform: translateY(-2px);
+        transform: translateY(-8px);
     }
     .konto-medaljer img.bedste {
-        max-width: 48px;
-        transform: translateY(-5px);
         filter: drop-shadow(0 7px 10px rgba(245, 208, 113, 0.25)) drop-shadow(0 5px 7px rgba(0, 0, 0, 0.55));
+    }
+    .konto-medalje-knap.kan-aabnes:hover img {
+        opacity: 0.44;
+        filter: grayscale(0.85) brightness(0.96) drop-shadow(0 5px 7px rgba(245, 208, 113, 0.12));
     }
     .konto-medaljer img.trofae-placeholder {
         opacity: 0.32;
         filter: grayscale(0.9) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.42));
+    }
+    .konto-medaljer img.trofae-opnaaet,
+    .konto-medalje-knap.kan-aabnes:hover img.trofae-opnaaet {
+        opacity: 1;
+        filter: drop-shadow(0 7px 10px rgba(245, 208, 113, 0.25)) drop-shadow(0 5px 7px rgba(0, 0, 0, 0.55));
+    }
+    .konto-medaljer-login-teaser {
+        margin-bottom: 12px;
+    }
+    .profil-medaljehylde {
+        --profil-medalje-size: 150px;
+        --profil-medalje-row: 184px;
+        --profil-medalje-row-gap: 30px;
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-auto-rows: var(--profil-medalje-row);
+        gap: var(--profil-medalje-row-gap) 16px;
+        margin: 28px 0 24px;
+        padding: 0 6px;
+    }
+    .profil-medaljehylde::before,
+    .profil-medaljehylde::after {
+        content: "";
+        position: absolute;
+        left: 4px;
+        right: 4px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(245, 208, 113, 0.48), rgba(255, 255, 255, 0.16), transparent);
+    }
+    .profil-medaljehylde::before {
+        top: 0;
+    }
+    .profil-medaljehylde::after {
+        top: calc(var(--profil-medalje-row) + var(--profil-medalje-row-gap));
+    }
+    .profil-medalje {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 7px;
+        text-align: center;
+        color: #9c9c9c;
+        font-size: 0.82rem;
+        line-height: 1.15;
+        padding-top: 0;
+    }
+    .profil-medalje-knap {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        width: min(var(--profil-medalje-size), 100%);
+        aspect-ratio: 1;
+        cursor: default;
+    }
+    .profil-medalje-knap.kan-aabnes {
+        cursor: pointer;
+    }
+    .profil-medalje-knap:focus-visible {
+        outline: 2px solid rgba(245, 208, 113, 0.75);
+        outline-offset: 4px;
+        border-radius: 999px;
+    }
+    .profil-medalje img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: contain;
+        opacity: 0.18;
+        filter: grayscale(1) brightness(0.74) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.45));
+    }
+    .profil-medalje-knap.kan-aabnes:hover img {
+        opacity: 0.34;
+        filter: grayscale(0.95) brightness(0.92) drop-shadow(0 6px 9px rgba(245, 208, 113, 0.14));
+    }
+    .profil-medalje.opnaaet {
+        color: #f1dfb4;
+    }
+    .profil-medalje.opnaaet img {
+        opacity: 1;
+        filter: drop-shadow(0 7px 10px rgba(245, 208, 113, 0.25)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.55));
+    }
+    .trofae-info-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 4200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.58);
+        box-sizing: border-box;
+    }
+    .trofae-info-modal {
+        width: min(340px, 100%);
+        border: 1px solid rgba(245, 208, 113, 0.35);
+        border-radius: 8px;
+        background: rgba(18, 18, 18, 0.97);
+        color: #f4efe5;
+        padding: 20px 18px 18px;
+        text-align: center;
+        box-shadow: 0 20px 52px rgba(0, 0, 0, 0.62);
+    }
+    .trofae-info-modal img {
+        width: 92px;
+        aspect-ratio: 1;
+        object-fit: contain;
+        opacity: 0.4;
+        filter: grayscale(1) brightness(0.82) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.5));
+        margin-bottom: 6px;
+    }
+    .trofae-info-modal img.opnaaet {
+        opacity: 1;
+        filter: drop-shadow(0 8px 14px rgba(245, 208, 113, 0.28)) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.5));
+    }
+    .trofae-info-modal h3 {
+        margin: 0 0 8px;
+        font-family: 'Cinzel', serif;
+        font-size: 1.25rem;
+    }
+    .trofae-info-modal p {
+        margin: 0 0 16px;
+        color: #d5c8aa;
+        line-height: 1.35;
+    }
+    .trofae-info-modal .trofae-info-krav {
+        margin-top: -6px;
+        font-size: 0.9rem;
+        color: #a99f89;
+    }
+    .trofae-info-modal button {
+        border: 1px solid rgba(245, 208, 113, 0.45);
+        border-radius: 6px;
+        background: rgba(245, 208, 113, 0.1);
+        color: #f4efe5;
+        padding: 8px 18px;
+        cursor: pointer;
+    }
+    .trofae-info-modal button:hover,
+    .trofae-info-modal button:focus-visible {
+        background: rgba(245, 208, 113, 0.18);
     }
     .konto-login {
         display: flex;
@@ -1668,12 +2043,17 @@
         max-width: 100%;
         max-height: 90dvh;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
         background: #151515;
         border: 1px solid #444;
         border-radius: 8px;
         padding: 20px;
         color: white;
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+    .profil-modal::-webkit-scrollbar {
+        display: none;
     }
     .profil-header {
         display: flex;
@@ -1761,6 +2141,65 @@
     .pergament-billede { width: 100%; height: auto; }
     .score-tekst { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); color: #222; font-size: 2.4rem; font-family: 'Cinzel', serif; font-weight: bold; text-align: center; line-height: 1; width: 100%; margin: 0; }
     .lille-score { font-size: 1.2rem; color: #555; letter-spacing: 2px; margin-right: 10px; }
+    .episk-trofae-panel {
+        width: min(920px, 100%);
+        margin: 18px auto 6px;
+        padding: 28px 24px;
+        border-top: 1px solid rgba(245, 208, 113, 0.58);
+        border-bottom: 1px solid rgba(245, 208, 113, 0.42);
+        background:
+            radial-gradient(circle at 50% 15%, rgba(245, 208, 113, 0.16), transparent 34%),
+            rgba(8, 8, 8, 0.68);
+        box-shadow: 0 20px 70px rgba(0, 0, 0, 0.48);
+        box-sizing: border-box;
+    }
+    .episk-kicker {
+        margin: 0 0 6px;
+        color: #f5d071;
+        font-size: 0.95rem;
+        font-weight: 800;
+        letter-spacing: 0;
+        text-transform: uppercase;
+    }
+    .episk-trofae-panel h2 {
+        margin: 0;
+        color: #fff7d6;
+        font-family: 'Cinzel', serif;
+        font-size: clamp(2rem, 4vw, 4.4rem);
+        line-height: 1;
+        text-shadow: 0 4px 22px rgba(245, 208, 113, 0.28);
+    }
+    .episk-trofae-liste {
+        display: grid;
+        gap: 18px;
+        margin-top: 22px;
+    }
+    .episk-trofae {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        align-items: center;
+        gap: 22px;
+        text-align: left;
+    }
+    .episk-trofae img {
+        width: 180px;
+        height: 180px;
+        object-fit: contain;
+        filter: drop-shadow(0 0 18px rgba(245, 208, 113, 0.28)) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.6));
+    }
+    .episk-trofae strong {
+        display: block;
+        color: #ffe492;
+        font-size: clamp(1.4rem, 2.8vw, 2.5rem);
+        line-height: 1.05;
+    }
+    .episk-trofae span {
+        display: block;
+        margin-top: 8px;
+        color: #e7dfcc;
+        font-size: clamp(1rem, 1.8vw, 1.35rem);
+        line-height: 1.35;
+    }
 
     .spec-paneler {
         display: grid;
@@ -2435,6 +2874,20 @@
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
+        .profil-medaljehylde {
+            --profil-medalje-size: clamp(54px, 17vw, 86px);
+            --profil-medalje-row: clamp(92px, 26vw, 122px);
+            --profil-medalje-row-gap: 20px;
+            gap: var(--profil-medalje-row-gap) 8px;
+            margin: 22px 0 18px;
+            padding-inline: 0;
+        }
+
+        .profil-medalje {
+            gap: 5px;
+            font-size: clamp(0.58rem, 2.45vw, 0.72rem);
+        }
+
         .character-select {
             padding: 14px;
         }
@@ -2463,6 +2916,23 @@
         .highscore-container {
             max-width: 100%;
             box-sizing: border-box;
+        }
+
+        .episk-trofae-panel {
+            padding: 22px 14px;
+            margin-top: 12px;
+        }
+
+        .episk-trofae {
+            grid-template-columns: 1fr;
+            gap: 10px;
+            text-align: center;
+            justify-items: center;
+        }
+
+        .episk-trofae img {
+            width: min(42vw, 150px);
+            height: min(42vw, 150px);
         }
 
         .point-kvittering,

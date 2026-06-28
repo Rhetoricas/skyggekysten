@@ -4,6 +4,7 @@ import { fremtvingKollaps, fremrykTid, udloesBersaerkHvisRelevant } from '$lib/o
 import { brugEnergi } from '$lib/energi';
 import { afslørOmraade, tilfoejTilRygsæk } from '$lib/spilmotor';
 import { startEvent } from '$lib/eventMotor.svelte';
+import { registrerHeling } from '$lib/trofaeer';
 import type { Biome } from './types';
 
 function tilfaeldigtTal(min: number, max: number) {
@@ -182,6 +183,7 @@ export function grav() {
         const aktuelHp = spilTilstand.livspoint;
         spilTilstand.livspoint += harRodhjertet ? livVaerdi * 2 : livVaerdi; 
         const faktiskHeling = spilTilstand.livspoint - aktuelHp;
+        registrerHeling(aktuelHp, spilTilstand.livspoint);
         
         if (faktiskHeling > 0) {
             fundLog = `Du finder en spiselig rod. Du heler ${faktiskHeling} HP.`;

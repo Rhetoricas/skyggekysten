@@ -1,10 +1,19 @@
 import { supabase } from './supabaseClient';
 import { type LydNiveau, lydKontrol, saetLydNiveau } from './lydKontrol.svelte';
+import {
+    gemSupabaseTrofaeIds,
+    gemTrofaeIds,
+    hentGemteTrofaeIds,
+    lavTrofaeOwnerKey,
+    normaliserTrofaeIds,
+    type TrofaeId
+} from './trofaeer';
 
 export interface Profil {
     id: string;
     display_name: string | null;
     sound_level?: LydNiveau | null;
+    trophies?: TrofaeId[] | null;
     created_at?: string;
     updated_at?: string;
 }
@@ -35,6 +44,35 @@ export const authState = $state({
 
 let authStartet = false;
 let authHeartbeatTimer: ReturnType<typeof setInterval> | null = null;
+
+function normaliserProfil(data: (Profil & { trophies?: unknown }) | null) {
+    if (!data) return null;
+    return {
+        ...data,
+        trophies: normaliserTrofaeIds(data.trophies)
+    } satisfies Profil;
+}
+
+async function synkProfilTrofaeerMedLokalCache(profil: Profil | null) {
+    if (!authState.user || !profil) return profil;
+
+    const ownerKey = lavTrofaeOwnerKey(authState.user.id, profil.display_name);
+    const lokaleIds = hentGemteTrofaeIds(ownerKey);
+    const profilIds = normaliserTrofaeIds(profil.trophies);
+    const samledeIds = normaliserTrofaeIds([...profilIds, ...lokaleIds]);
+
+    if (samledeIds.length > 0) gemTrofaeIds(ownerKey, samledeIds);
+
+    const erAendret =
+        samledeIds.length !== profilIds.length ||
+        samledeIds.some((id, index) => id !== profilIds[index]);
+
+    if (erAendret) {
+        await gemSupabaseTrofaeIds(authState.user.id, samledeIds);
+    }
+
+    return { ...profil, trophies: samledeIds } satisfies Profil;
+}
 
 async function vedligeholdLogin() {
     if (!authState.user) return;
@@ -92,13 +130,20 @@ export async function initAuth() {
     if (authState.user) await hentEllerOpretProfil();
 
     supabase.auth.onAuthStateChange(async (_event, session) => {
-        authState.user = session?.user ?? null;
+        const forrigeUserId = authState.user?.id || '';
+        const naesteUser = session?.user ?? null;
+        const naesteUserId = naesteUser?.id || '';
+
+        authState.user = naesteUser;
         authState.besked = '';
-        authState.stats = null;
+        if (forrigeUserId !== naesteUserId) {
+            authState.stats = null;
+        }
         if (authState.user) {
             await hentEllerOpretProfil();
         } else {
             authState.profil = null;
+            authState.stats = null;
         }
     });
 }
@@ -148,7 +193,7 @@ export async function hentEllerOpretProfil() {
 
     const profilResultat = await supabase
         .from('profiles')
-        .select('id, display_name, sound_level, created_at, updated_at')
+        .select('id, display_name, sound_level, trophies, created_at, updated_at')
         .eq('id', authState.user.id)
         .maybeSingle();
     let data = profilResultat.data;
@@ -160,20 +205,20 @@ export async function hentEllerOpretProfil() {
             .eq('id', authState.user.id)
             .maybeSingle();
 
-        data = fallback.data ? { ...fallback.data, sound_level: null } : null;
+        data = fallback.data ? { ...fallback.data, sound_level: null, trophies: [] } : null;
     }
 
     if (data) {
-        authState.profil = data;
+        authState.profil = await synkProfilTrofaeerMedLokalCache(normaliserProfil(data));
         if (data.sound_level) saetLydNiveau(data.sound_level);
-        return data;
+        return authState.profil;
     }
 
     const fallbackNavn = authState.user.email?.split('@')[0]?.slice(0, 15) || 'Spiller';
     const opretResultat = await supabase
         .from('profiles')
-        .insert([{ id: authState.user.id, display_name: fallbackNavn, sound_level: lydKontrol.niveau }])
-        .select('id, display_name, sound_level, created_at, updated_at')
+        .insert([{ id: authState.user.id, display_name: fallbackNavn, sound_level: lydKontrol.niveau, trophies: [] }])
+        .select('id, display_name, sound_level, trophies, created_at, updated_at')
         .single();
     let oprettet = opretResultat.data;
 
@@ -184,10 +229,10 @@ export async function hentEllerOpretProfil() {
             .select('id, display_name, created_at, updated_at')
             .single();
 
-        oprettet = fallback.data ? { ...fallback.data, sound_level: null } : null;
+        oprettet = fallback.data ? { ...fallback.data, sound_level: null, trophies: [] } : null;
     }
 
-    authState.profil = oprettet ?? null;
+    authState.profil = await synkProfilTrofaeerMedLokalCache(normaliserProfil(oprettet));
     return authState.profil;
 }
 
@@ -206,7 +251,7 @@ export async function gemProfilNavn(navn: string) {
     let { data, error } = await supabase
         .from('profiles')
         .upsert({ id: authState.user.id, display_name: rentNavn, updated_at: opdateretTidspunkt })
-        .select('id, display_name, sound_level, created_at, updated_at')
+        .select('id, display_name, sound_level, trophies, created_at, updated_at')
         .single();
 
     if (error) {
@@ -216,12 +261,12 @@ export async function gemProfilNavn(navn: string) {
             .select('id, display_name, created_at, updated_at')
             .single();
 
-        data = fallback.data ? { ...fallback.data, sound_level: authState.profil?.sound_level ?? null } : null;
+        data = fallback.data ? { ...fallback.data, sound_level: authState.profil?.sound_level ?? null, trophies: authState.profil?.trophies ?? [] } : null;
         error = fallback.error;
     }
 
     if (!error && data) {
-        authState.profil = data;
+        authState.profil = normaliserProfil(data);
         authState.besked = 'Profilnavnet er gemt.';
     } else {
         authState.besked = 'Profilnavnet kunne ikke gemmes.';
@@ -233,13 +278,24 @@ export async function gemProfilLydNiveau(niveau: LydNiveau) {
 
     // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const opdateretTidspunkt = new Date().toISOString();
-    const { data, error } = await supabase
+    let { data, error } = await supabase
         .from('profiles')
         .upsert({ id: authState.user.id, sound_level: niveau, updated_at: opdateretTidspunkt })
-        .select('id, display_name, sound_level, created_at, updated_at')
+        .select('id, display_name, sound_level, trophies, created_at, updated_at')
         .single();
 
-    if (!error && data) authState.profil = data;
+    if (error) {
+        const fallback = await supabase
+            .from('profiles')
+            .upsert({ id: authState.user.id, sound_level: niveau, updated_at: opdateretTidspunkt })
+            .select('id, display_name, sound_level, created_at, updated_at')
+            .single();
+
+        data = fallback.data ? { ...fallback.data, trophies: authState.profil?.trophies ?? [] } : null;
+        error = fallback.error;
+    }
+
+    if (!error && data) authState.profil = normaliserProfil(data);
 }
 
 export async function hentProfilStats() {

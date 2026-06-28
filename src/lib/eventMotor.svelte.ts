@@ -4,6 +4,7 @@ import { afslørFalkebueSyn, tilfoejTilRygsæk, brugFraRygsæk, harRygsaekItem, 
 import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremrykTid, udloesBersaerkHvisRelevant } from './overlevelse.svelte';
 import { brugEnergi, visBrugteEnergiKugler } from './energi';
+import { registrerHeling } from './trofaeer';
 import type { Valg } from './eventBibliotek';
 
 export const eventState = $state({
@@ -162,7 +163,9 @@ export function tagValg(valg: Valg) {
 
         if (resultat.maxHpAendring) {
             spilTilstand.maxLivspoint += resultat.maxHpAendring;
+            const foerHp = spilTilstand.livspoint;
             spilTilstand.livspoint += (resultat.maxHpAendring > 0 ? resultat.maxHpAendring : 0);
+            registrerHeling(foerHp, spilTilstand.livspoint);
             kvittering += ` (${resultat.maxHpAendring > 0 ? '+' : ''}${resultat.maxHpAendring} Max HP)`;
         }
 
@@ -175,6 +178,7 @@ export function tagValg(valg: Valg) {
             const foerHp = spilTilstand.livspoint;
             spilTilstand.livspoint += endeligHp;
             const faktiskAendring = spilTilstand.livspoint - foerHp;
+            registrerHeling(foerHp, spilTilstand.livspoint);
             if (faktiskAendring !== 0) kvittering += ` (${faktiskAendring > 0 ? '+' : ''}${faktiskAendring} HP)`;
             if (faktiskAendring < 0) kvittering += udloesBersaerkHvisRelevant(Math.abs(faktiskAendring));
         }
@@ -218,13 +222,16 @@ export function tagValg(valg: Valg) {
 
         if (resultat.maxHpAendring) {
             spilTilstand.maxLivspoint += resultat.maxHpAendring;
+            const foerHp = spilTilstand.livspoint;
             spilTilstand.livspoint += (resultat.maxHpAendring > 0 ? resultat.maxHpAendring : 0);
+            registrerHeling(foerHp, spilTilstand.livspoint);
             kvittering += ` (${resultat.maxHpAendring > 0 ? '+' : ''}${resultat.maxHpAendring} Max HP)`;
         }
 
         if (resultat.hpOp) {
             const foer = spilTilstand.livspoint;
             spilTilstand.livspoint += resultat.hpOp;
+            registrerHeling(foer, spilTilstand.livspoint);
             kvittering += ` (+${spilTilstand.livspoint - foer} HP)`;
         }
         if (resultat.hpNed) {

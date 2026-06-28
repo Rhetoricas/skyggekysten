@@ -8,6 +8,7 @@ import { eventBibliotek } from '$lib/eventBibliotek';
 import { genererUndergrund } from '$lib/undergrund.svelte';
 import { erSpillerITaagen, fremrykTid, fremtvingKollaps, tagSkadeOgTjekDød, udloesBersaerkHvisRelevant } from '$lib/overlevelse.svelte';
 import { brugEnergi, brugResterendeEnergi } from '$lib/energi';
+import { registrerDiamantFund, registrerHeling, registrerOversvoemmelse, registrerTaageBevaegelse } from '$lib/trofaeer';
 import { erAfgroedeModen, erHvedeBlok, erInsektPlageAktiv, hentAfgroedeBlok } from '$lib/afgroeder';
 import type { Biome, Felt, RygsækTing } from '$lib/types';
 import { delNyeKort, startVenteSpil } from '$lib/ventespil.svelte';
@@ -478,6 +479,10 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
         udstyrListe.push(nyTing);
     }
     
+    if (genstandId === 'diamant' && nyeDiamanter.length > 0) {
+        registrerDiamantFund(nyeDiamanter);
+    }
+
     spilTilstand.mitUdstyr = [...spilTilstand.mitUdstyr];
     syncTilDb(); // Ingen `true` her. Rygsæk er personlig.
     return {
@@ -907,6 +912,7 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
 
     spilTilstand.spillerIndex = nytIndeks;
     if (nytIndeks !== gammelIndex) spilTilstand.venteGratisFeltBrugt = null;
+    if (nytIndeks !== gammelIndex && options.erITaagen) registrerTaageBevaegelse();
     if (!spilTilstand.historik) spilTilstand.historik = [];
     spilTilstand.historik.push(nytIndeks);
 
@@ -958,7 +964,9 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
                 felt.hoestetFremTilBlok = nuBlok;
                 ekstraLog += " Græshopperne har spist den modne afgrøde.";
             } else {
+                const foerHp = spilTilstand.livspoint;
                 spilTilstand.livspoint += 3;
+                registrerHeling(foerHp, spilTilstand.livspoint);
                 felt.hoestetFremTilBlok = nuBlok;
             }
         } else {
@@ -987,7 +995,9 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         spilTilstand.guldTotal += 5;
         ekstraLog += " Du opkræver 5 guld i lokal skat.";
     } else if ((charId === 'magician_m' || charId === 'magician_f') && b === 'ritual') {
+        const foerHp = spilTilstand.livspoint;
         spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 5);
+        registrerHeling(foerHp, spilTilstand.livspoint);
         ekstraLog += " Ritualpladsen giver dig 5 HP.";
     }
 
@@ -1003,6 +1013,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         const hpFoer = spilTilstand.livspoint;
         spilTilstand.livspoint += harRodhjertet ? skjultLiv * 2 : skjultLiv;
         const faktiskHeling = spilTilstand.livspoint - hpFoer;
+        registrerHeling(hpFoer, spilTilstand.livspoint);
         const energiBetaling = brugEnergi(1);
         const energiTekst = energiBetaling.gratis ? "bersærkergangen betaler energien" : "-1 energi";
         felt.skjultLiv = 0;
@@ -1329,7 +1340,9 @@ export function hvil() {
     }
 
     const heling = harSilkesovepose ? 40 : 20;
+    const foerHp = spilTilstand.livspoint;
     spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + heling); 
+    registrerHeling(foerHp, spilTilstand.livspoint);
     
     brugResterendeEnergi();
     
@@ -2349,7 +2362,9 @@ export function taendBaal() {
 
     const radius = Math.max(1, spilTilstand.valgtKarakter.synsRadius + spilTilstand.rygsækEffekt.syn) + (erSolfakkel ? 4 : 2);
     afslørOmraade(spilTilstand.spillerIndex, radius);
+    const foerHp = spilTilstand.livspoint;
     spilTilstand.livspoint = spilTilstand.maxLivspoint;
+    registrerHeling(foerHp, spilTilstand.livspoint);
     spilTilstand.guldTotal += erSolfakkel ? 100 : 50;
     
     spilTilstand.logBesked = erSolfakkel
@@ -2526,6 +2541,7 @@ function bevarDragestavEfterOversvoemmelse(havdeDragestav: boolean) {
 }
 
 export async function udloesOversvoemmelse(centerIndex: number) {
+    registrerOversvoemmelse();
     rystSkaerm(1500);
     const havdeDragestav = spilTilstand.mitUdstyr.some((ting) => ting.id === 'dragestav' && ting.maengde > 0);
 

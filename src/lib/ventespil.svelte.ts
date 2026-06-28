@@ -1,5 +1,6 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb } from './netvaerk';
+import { registrerHeling } from './trofaeer';
 
 export const VENTE_MAKS_MS = 60 * 1000;
 export const VENTE_FRI_DAGE = 5;
@@ -163,7 +164,9 @@ export function vendKort(indeks: number) {
 
 function udbetalPulje() {
     if (spilTilstand.ventePuljeLiv > 0 || spilTilstand.ventePuljeGuld > 0) {
+        const foerHp = spilTilstand.livspoint;
         spilTilstand.livspoint += spilTilstand.ventePuljeLiv;
+        registrerHeling(foerHp, spilTilstand.livspoint);
         spilTilstand.guldTotal += spilTilstand.ventePuljeGuld;
         spilTilstand.logBesked = `Du forlod bordet. Du indkasserede ${spilTilstand.ventePuljeGuld} Guld og ${spilTilstand.ventePuljeLiv} HP.`;
         

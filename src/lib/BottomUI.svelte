@@ -5,7 +5,8 @@
     import { grav } from '$lib/undergrund.svelte';
     import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal, aktiverHemmelighed, begaaIndbrud, kanBegaaIndbrudPaaFelt, kanPlyndreFelt, plyndrFelt } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
-    import { diamantSamletVaerdi, diamantStoerrelsesNavn, diamantVaerdier } from '$lib/score';
+import { diamantSamletVaerdi, diamantStoerrelsesNavn, diamantVaerdier } from '$lib/score';
+import { registrerHeling } from '$lib/trofaeer';
     import type { RygsækTing } from '$lib/types';
 
     let aktueltFelt = $derived(
@@ -67,6 +68,7 @@
         const foerHp = spilTilstand.livspoint;
         brugFraRygsæk('mad', 1);
         spilTilstand.livspoint += 20;
+        registrerHeling(foerHp, spilTilstand.livspoint);
         spilTilstand.gratisNaesteBevaegelse = true;
         spilTilstand.gratisBevaegelseKilde = 'mad';
         const faktiskHeling = spilTilstand.livspoint - foerHp;

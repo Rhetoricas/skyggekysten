@@ -31,6 +31,7 @@
     import { eventBibliotek } from '$lib/eventBibliotek';
     import { erAfgroedeModen, hentAfgroedeBlok, hentInsektPlageBlok } from '$lib/afgroeder';
     import { erFeltITaagen } from '$lib/taage';
+    import { findNyeTrofaeer, gemSupabaseTrofaeIds, gemTrofaeIds, hentGemteTrofaeIds, lavTrofaeOwnerKey, normaliserTrofaeIds, nulstilTrofaeStats } from '$lib/trofaeer';
 
     import Skaerme from './Skaerme.svelte';
     import ShopModal from '$lib/ShopModal.svelte';
@@ -366,6 +367,7 @@
                 scoreGemmer = false;
                 scoreGemningFejlet = false;
                 nyGlobalRekord = false;
+                spilTilstand.nyeTrofaeIds = [];
             } else if (
                 state === 'win' || state === 'dead' || state === 'win_map' || state === 'dead_map'
             ) {
@@ -816,6 +818,8 @@
         spilTilstand.mitUdstyr = [];
         spilTilstand.mineKendteFelter = [];
         spilTilstand.mineSkattekortFelter = [];
+        spilTilstand.trofaeStats = nulstilTrofaeStats();
+        spilTilstand.nyeTrofaeIds = [];
         spilTilstand.samletScore = 0;
         spilTilstand.venteGratisFeltBrugt = null;
         spilTilstand.gratisNaesteBevaegelse = false;
@@ -1218,6 +1222,8 @@
         spilTilstand.logHistorik = [];
         spilTilstand.samletScore = 0;
         spilTilstand.doedsAarsag = null;
+        spilTilstand.trofaeStats = nulstilTrofaeStats();
+        spilTilstand.nyeTrofaeIds = [];
         scoreErGemt = false;
         nyGlobalRekord = false;
         initialiserGitter(spilTilstand.kortBredde, spilTilstand.kortHoejde);
@@ -1472,8 +1478,36 @@
         }, erVinder, spilTilstand.kortBredde, spilTilstand.kortHoejde);
     }
 
+    async function opdaterLokaleTrofaeer() {
+        const ownerKey = lavTrofaeOwnerKey(authState.user?.id, spilTilstand.spillerNavn);
+        const gemteIds = normaliserTrofaeIds([
+            ...hentGemteTrofaeIds(ownerKey),
+            ...(authState.profil?.trophies || [])
+        ]);
+        const nyeTrofaeer = findNyeTrofaeer(gemteIds);
+
+        if (nyeTrofaeer.length > 0) {
+            const nyeIds = nyeTrofaeer.map((trofae) => trofae.id);
+            const samledeIds = normaliserTrofaeIds([...gemteIds, ...nyeIds]);
+            gemTrofaeIds(ownerKey, samledeIds);
+            if (authState.user?.id) {
+                const gemtOnline = await gemSupabaseTrofaeIds(authState.user.id, samledeIds);
+                if (gemtOnline && authState.profil) {
+                    authState.profil = { ...authState.profil, trophies: samledeIds };
+                }
+            }
+            spilTilstand.nyeTrofaeIds = nyeIds;
+            return;
+        }
+
+        if (spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map') {
+            spilTilstand.nyeTrofaeIds = [];
+        }
+    }
+
     async function opdaterOgGemHighscore() {
         opdaterSamletScore();
+        await opdaterLokaleTrofaeer();
 
         try {
             await syncTilDb(true);
@@ -1558,6 +1592,8 @@
         spilTilstand.mitUdstyr = [];
         spilTilstand.mineKendteFelter = [];
         spilTilstand.mineSkattekortFelter = [];
+        spilTilstand.trofaeStats = nulstilTrofaeStats();
+        spilTilstand.nyeTrofaeIds = [];
         spilTilstand.gratisNaesteBevaegelse = false;
         spilTilstand.gratisBevaegelseKilde = '';
         spilTilstand.sidsteBersaerkDag = 0;
