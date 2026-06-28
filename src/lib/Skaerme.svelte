@@ -795,6 +795,28 @@
                         {/if}
                     </div>
                 {:else}
+                    <div class="profil-medaljehylde" aria-label="Profilmedaljer">
+                        {#each profilMedaljer() as medalje, index (`profil-hylde-${index}-${medalje.label}`)}
+                            <div class="profil-medalje" class:opnaaet={medalje.opnaaet}>
+                                <button
+                                    type="button"
+                                    class="profil-medalje-knap"
+                                    class:kan-aabnes={!medalje.opnaaet && !medalje.bedste}
+                                    disabled={medalje.opnaaet || medalje.bedste}
+                                    onclick={() => aabnLaastTrofae(medalje)}
+                                    aria-label={medalje.opnaaet || medalje.bedste ? medalje.label : `Se krav for ${medalje.label}`}
+                                >
+                                    <img
+                                        src={medalje.sti}
+                                        alt={medalje.label}
+                                        class:bedste={medalje.bedste}
+                                        draggable="false"
+                                    />
+                                </button>
+                                <span>{medalje.label}</span>
+                            </div>
+                        {/each}
+                    </div>
                     <p class="konto-hint">Ingen statistik endnu. Loggede spil bliver gemt her.</p>
                 {/if}
             </div>
