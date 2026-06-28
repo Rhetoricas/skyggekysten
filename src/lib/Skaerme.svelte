@@ -553,11 +553,9 @@
         void hentProfilStats();
     });
 
-    function aabnProfil() {
+    async function aabnProfil() {
         visProfil = true;
-        void hentProfilStats().catch((error) => {
-            console.warn('Kunne ikke hente profilstats ved profilåbning.', error);
-        });
+        await hentProfilStats();
     }
 
     async function gemProfil() {
@@ -762,32 +760,30 @@
                         <div><strong>{authState.stats.flestMiner}</strong><span>Flest miner</span></div>
                         <div><strong>{authState.stats.favoritKarakter}</strong><span>Mest spillet</span></div>
                     </div>
-                {/if}
 
-                <div class="profil-medaljehylde" aria-label="Profilmedaljer">
-                    {#each profilMedaljer() as medalje, index (`profil-hylde-${index}-${medalje.label}`)}
-                        <div class="profil-medalje" class:opnaaet={medalje.opnaaet}>
-                            <button
-                                type="button"
-                                class="profil-medalje-knap"
-                                class:kan-aabnes={!medalje.opnaaet && !medalje.bedste}
-                                disabled={medalje.opnaaet || medalje.bedste}
-                                onclick={() => aabnLaastTrofae(medalje)}
-                                aria-label={medalje.opnaaet || medalje.bedste ? medalje.label : `Se krav for ${medalje.label}`}
-                            >
-                                <img
-                                    src={medalje.sti}
-                                    alt={medalje.label}
-                                    class:bedste={medalje.bedste}
-                                    draggable="false"
-                                />
-                            </button>
-                            <span>{medalje.label}</span>
-                        </div>
-                    {/each}
-                </div>
+                    <div class="profil-medaljehylde" aria-label="Profilmedaljer">
+                        {#each profilMedaljer() as medalje, index (`profil-hylde-${index}-${medalje.label}`)}
+                            <div class="profil-medalje" class:opnaaet={medalje.opnaaet}>
+                                <button
+                                    type="button"
+                                    class="profil-medalje-knap"
+                                    class:kan-aabnes={!medalje.opnaaet && !medalje.bedste}
+                                    disabled={medalje.opnaaet || medalje.bedste}
+                                    onclick={() => aabnLaastTrofae(medalje)}
+                                    aria-label={medalje.opnaaet || medalje.bedste ? medalje.label : `Se krav for ${medalje.label}`}
+                                >
+                                    <img
+                                        src={medalje.sti}
+                                        alt={medalje.label}
+                                        class:bedste={medalje.bedste}
+                                        draggable="false"
+                                    />
+                                </button>
+                                <span>{medalje.label}</span>
+                            </div>
+                        {/each}
+                    </div>
 
-                {#if authState.stats}
                     <div class="profil-liste">
                         <h3>Sejre pr. karakter</h3>
                         {#if authState.stats.karakterSejre.length === 0}

@@ -25,17 +25,6 @@ export interface ProfilStats {
     karakterSejre: Array<{ karakter: string; sejre: number }>;
 }
 
-type ProfilStatsRaekke = {
-    score?: number | null;
-    is_winner?: boolean | null;
-    days?: number | null;
-    gold?: number | null;
-    max_column?: number | null;
-    known_fields_count?: number | null;
-    mines_owned?: number | null;
-    character?: string | null;
-};
-
 export const authState = $state({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     user: null as any,
@@ -315,42 +304,25 @@ export async function gemProfilTrofaeer(trophies: ProfilTrofae[]) {
 export async function hentProfilStats() {
     if (!authState.user) return null;
 
-    const fuldStats = await supabase
+    const { data, error } = await supabase
         .from('game_results')
         .select('score, is_winner, days, gold, max_column, known_fields_count, mines_owned, character')
         .eq('user_id', authState.user.id);
-    let data = fuldStats.data as ProfilStatsRaekke[] | null;
-    let error = fuldStats.error;
-
-    if (error) {
-        console.warn('Kunne ikke hente fuld profilstats fra Supabase, prøver basisfelter.', error);
-        const fallback = await supabase
-            .from('game_results')
-            .select('score, is_winner, days, gold, max_column, character')
-            .eq('user_id', authState.user.id);
-        data = fallback.data as ProfilStatsRaekke[] | null;
-        error = fallback.error;
-    }
-
-    if (error) {
-        console.warn('Kunne ikke hente profilstats fra Supabase.', error);
-    }
 
     if (error || !data) {
         authState.stats = null;
         return null;
     }
 
-    const raekker = data;
-    const spil = raekker.length;
-    const sejre = raekker.filter((r) => r.is_winner).length;
+    const spil = data.length;
+    const sejre = data.filter((r) => r.is_winner).length;
     const doedsfald = spil - sejre;
-    const samletScore = raekker.reduce((sum, r) => sum + (r.score || 0), 0);
-    const samletGuld = raekker.reduce((sum, r) => sum + (r.gold || 0), 0);
+    const samletScore = data.reduce((sum, r) => sum + (r.score || 0), 0);
+    const samletGuld = data.reduce((sum, r) => sum + (r.gold || 0), 0);
     const karakterTaeller: Record<string, number> = {};
     const karakterSejrTaeller: Record<string, number> = {};
 
-    for (const resultat of raekker) {
+    for (const resultat of data) {
         const karakter = resultat.character || 'Ukendt';
         karakterTaeller[karakter] = (karakterTaeller[karakter] || 0) + 1;
         if (resultat.is_winner) {
@@ -365,12 +337,12 @@ export async function hentProfilStats() {
         spil,
         sejre,
         doedsfald,
-        bedsteScore: Math.max(0, ...raekker.map((r) => r.score || 0)),
+        bedsteScore: Math.max(0, ...data.map((r) => r.score || 0)),
         gennemsnitScore: spil > 0 ? Math.round(samletScore / spil) : 0,
         samletGuld,
-        bedsteDag: Math.max(0, ...raekker.map((r) => r.days || 0)),
-        flestFelter: Math.max(0, ...raekker.map((r) => r.known_fields_count || 0)),
-        flestMiner: Math.max(0, ...raekker.map((r) => r.mines_owned || 0)),
+        bedsteDag: Math.max(0, ...data.map((r) => r.days || 0)),
+        flestFelter: Math.max(0, ...data.map((r) => r.known_fields_count || 0)),
+        flestMiner: Math.max(0, ...data.map((r) => r.mines_owned || 0)),
         favoritKarakter,
         karakterSejre: Object.entries(karakterSejrTaeller)
             .map(([karakter, vundne]) => ({ karakter, sejre: vundne }))
