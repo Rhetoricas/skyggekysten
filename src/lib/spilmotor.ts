@@ -13,7 +13,6 @@ import type { Biome, Felt, RygsækTing } from '$lib/types';
 import { delNyeKort, startVenteSpil } from '$lib/ventespil.svelte';
 import { startEvent } from '$lib/eventMotor.svelte';
 import { erFriskAktivSpiller } from '$lib/aktivSpiller';
-import { registrerDiamantFund } from '$lib/trofaeer';
 
 function eventKanalNavn() {
     return `room:${realtimeRumNoegle(spilTilstand.rumKode)}:events`;
@@ -342,13 +341,9 @@ export function kanModtageItem(genstandId: string) {
     if (genstandId === 'oekse' || genstandId === 'stormoekse') return !harRygsaekItem('oekse');
     if (genstandId === 'koelle' || genstandId === 'koelle_upgr') return !harRygsaekItem('koelle');
     if (genstandId === 'bue' || genstandId === 'mesterbue') return !harRygsaekItem('bue');
-    if (genstandId === 'klude') {
+    if (genstandId === 'klude' || genstandId === 'flot_toej' || genstandId === 'royalt_toej') {
         return !spilTilstand.mitUdstyr.some(ting => ['klude', 'flot_toej', 'royalt_toej'].includes(ting.id) && ting.maengde > 0);
     }
-    if (genstandId === 'flot_toej') {
-        return !spilTilstand.mitUdstyr.some(ting => ['flot_toej', 'royalt_toej'].includes(ting.id) && ting.maengde > 0);
-    }
-    if (genstandId === 'royalt_toej') return !harRygsaekItem('flot_toej');
     if (genstandId === 'fakkel' || genstandId === 'solfakkel') return !harRygsaekItem('fakkel');
     if (genstandId === 'metaldetektor' || genstandId === 'malmviser') return !harRygsaekItem('metaldetektor');
     if (genstandId === 'sovepose' || genstandId === 'silkesovepose') return !harRygsaekItem('sovepose');
@@ -484,9 +479,6 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
     }
     
     spilTilstand.mitUdstyr = [...spilTilstand.mitUdstyr];
-    if (spilTilstand.gameState === 'play') {
-        if (genstandId === 'diamant') registrerDiamantFund(spilTilstand.trofaeStats, nyeDiamanter);
-    }
     syncTilDb(); // Ingen `true` her. Rygsæk er personlig.
     return {
         tilfoejet: true,
@@ -915,7 +907,6 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
 
     spilTilstand.spillerIndex = nytIndeks;
     if (nytIndeks !== gammelIndex) spilTilstand.venteGratisFeltBrugt = null;
-    if (nytIndeks !== gammelIndex && (options.erITaagen || erSpillerITaagen())) spilTilstand.trofaeStats.taageBevaegelser += 1;
     if (!spilTilstand.historik) spilTilstand.historik = [];
     spilTilstand.historik.push(nytIndeks);
 
@@ -978,7 +969,6 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
     }
 
     if (erVandBiome(felt.biome) && !felt.hasBoat) {
-        spilTilstand.trofaeStats.vandskade += 1;
         tagSkadeOgTjekDød(30, `Du ender i åbent vand.`, "Du druknede i det åbne vand.");
         if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'dead') {
             return false;
@@ -2537,7 +2527,6 @@ function bevarDragestavEfterOversvoemmelse(havdeDragestav: boolean) {
 
 export async function udloesOversvoemmelse(centerIndex: number) {
     rystSkaerm(1500);
-    spilTilstand.trofaeStats.oversvoemmelseStartet = true;
     const havdeDragestav = spilTilstand.mitUdstyr.some((ting) => ting.id === 'dragestav' && ting.maengde > 0);
 
     const felter = spilTilstand.gitter;
@@ -2591,7 +2580,6 @@ export async function udloesOversvoemmelse(centerIndex: number) {
     broadcastFelter(paavirkedeArray.map((index) => ({ index, feltData: felter[index] })));
 
     if (paavirkedeArray.includes(spilTilstand.spillerIndex)) {
-        spilTilstand.trofaeStats.vandskade += 1;
         const { mistedeRustning, mistedeFakkel } = fjernUdstyrVedOversvoemmelse();
         const dragestavLog = bevarDragestavEfterOversvoemmelse(havdeDragestav);
         const udstyrsLog = [

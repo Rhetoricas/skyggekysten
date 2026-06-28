@@ -1,12 +1,10 @@
 import { supabase } from './supabaseClient';
 import { type LydNiveau, lydKontrol, saetLydNiveau } from './lydKontrol.svelte';
-import { normaliserProfilTrofaeer, type ProfilTrofae } from './trofaeer';
 
 export interface Profil {
     id: string;
     display_name: string | null;
     sound_level?: LydNiveau | null;
-    trophies?: ProfilTrofae[];
     created_at?: string;
     updated_at?: string;
 }
@@ -37,38 +35,6 @@ export const authState = $state({
 
 let authStartet = false;
 let authHeartbeatTimer: ReturnType<typeof setInterval> | null = null;
-const PROFIL_TROFAE_FALLBACK_PREFIX = 'taage_profile_trophies:';
-
-function harLocalStorage() {
-    return typeof localStorage !== 'undefined';
-}
-
-function profilTrofaeFallbackKey(userId: string) {
-    return `${PROFIL_TROFAE_FALLBACK_PREFIX}${userId}`;
-}
-
-function hentLokaleProfilTrofaeer(userId: string) {
-    if (!harLocalStorage()) return [];
-    try {
-        const gemt = localStorage.getItem(profilTrofaeFallbackKey(userId));
-        return normaliserProfilTrofaeer(gemt ? JSON.parse(gemt) : []);
-    } catch {
-        return [];
-    }
-}
-
-function gemLokaleProfilTrofaeer(userId: string, trophies: ProfilTrofae[]) {
-    if (!harLocalStorage()) return;
-    localStorage.setItem(profilTrofaeFallbackKey(userId), JSON.stringify(trophies));
-}
-
-function medFallbackTrofaeer<T extends { trophies?: unknown } | null>(data: T, userId: string): T {
-    if (!data) return data;
-    const dbTrofaeer = normaliserProfilTrofaeer(data.trophies);
-    const lokaleTrofaeer = hentLokaleProfilTrofaeer(userId);
-    const samlet = normaliserProfilTrofaeer([...dbTrofaeer, ...lokaleTrofaeer]);
-    return { ...data, trophies: samlet };
-}
 
 async function vedligeholdLogin() {
     if (!authState.user) return;
@@ -182,7 +148,7 @@ export async function hentEllerOpretProfil() {
 
     const profilResultat = await supabase
         .from('profiles')
-        .select('id, display_name, sound_level, trophies, created_at, updated_at')
+        .select('id, display_name, sound_level, created_at, updated_at')
         .eq('id', authState.user.id)
         .maybeSingle();
     let data = profilResultat.data;
@@ -194,20 +160,20 @@ export async function hentEllerOpretProfil() {
             .eq('id', authState.user.id)
             .maybeSingle();
 
-        data = fallback.data ? { ...fallback.data, sound_level: null, trophies: [] } : null;
+        data = fallback.data ? { ...fallback.data, sound_level: null } : null;
     }
 
     if (data) {
-        authState.profil = medFallbackTrofaeer(data, authState.user.id);
+        authState.profil = data;
         if (data.sound_level) saetLydNiveau(data.sound_level);
-        return authState.profil;
+        return data;
     }
 
     const fallbackNavn = authState.user.email?.split('@')[0]?.slice(0, 15) || 'Spiller';
     const opretResultat = await supabase
         .from('profiles')
-        .insert([{ id: authState.user.id, display_name: fallbackNavn, sound_level: lydKontrol.niveau, trophies: [] }])
-        .select('id, display_name, sound_level, trophies, created_at, updated_at')
+        .insert([{ id: authState.user.id, display_name: fallbackNavn, sound_level: lydKontrol.niveau }])
+        .select('id, display_name, sound_level, created_at, updated_at')
         .single();
     let oprettet = opretResultat.data;
 
@@ -218,10 +184,10 @@ export async function hentEllerOpretProfil() {
             .select('id, display_name, created_at, updated_at')
             .single();
 
-        oprettet = fallback.data ? { ...fallback.data, sound_level: null, trophies: [] } : null;
+        oprettet = fallback.data ? { ...fallback.data, sound_level: null } : null;
     }
 
-    authState.profil = medFallbackTrofaeer(oprettet ?? null, authState.user.id);
+    authState.profil = oprettet ?? null;
     return authState.profil;
 }
 
@@ -240,7 +206,7 @@ export async function gemProfilNavn(navn: string) {
     let { data, error } = await supabase
         .from('profiles')
         .upsert({ id: authState.user.id, display_name: rentNavn, updated_at: opdateretTidspunkt })
-        .select('id, display_name, sound_level, trophies, created_at, updated_at')
+        .select('id, display_name, sound_level, created_at, updated_at')
         .single();
 
     if (error) {
@@ -250,12 +216,12 @@ export async function gemProfilNavn(navn: string) {
             .select('id, display_name, created_at, updated_at')
             .single();
 
-        data = fallback.data ? { ...fallback.data, sound_level: authState.profil?.sound_level ?? null, trophies: authState.profil?.trophies ?? [] } : null;
+        data = fallback.data ? { ...fallback.data, sound_level: authState.profil?.sound_level ?? null } : null;
         error = fallback.error;
     }
 
     if (!error && data) {
-        authState.profil = medFallbackTrofaeer(data, authState.user.id);
+        authState.profil = data;
         authState.besked = 'Profilnavnet er gemt.';
     } else {
         authState.besked = 'Profilnavnet kunne ikke gemmes.';
@@ -270,35 +236,10 @@ export async function gemProfilLydNiveau(niveau: LydNiveau) {
     const { data, error } = await supabase
         .from('profiles')
         .upsert({ id: authState.user.id, sound_level: niveau, updated_at: opdateretTidspunkt })
-        .select('id, display_name, sound_level, trophies, created_at, updated_at')
+        .select('id, display_name, sound_level, created_at, updated_at')
         .single();
 
-    if (!error && data) authState.profil = medFallbackTrofaeer(data, authState.user.id);
-}
-
-export async function gemProfilTrofaeer(trophies: ProfilTrofae[]) {
-    if (!authState.user) return false;
-
-    const rensede = normaliserProfilTrofaeer(trophies);
-    gemLokaleProfilTrofaeer(authState.user.id, rensede);
-
-    if (authState.profil) {
-        authState.profil = { ...authState.profil, trophies: rensede };
-    }
-
-    const opdateretTidspunkt = new Date().toISOString();
-    const { data, error } = await supabase
-        .from('profiles')
-        .upsert({ id: authState.user.id, trophies: rensede, updated_at: opdateretTidspunkt })
-        .select('id, display_name, sound_level, trophies, created_at, updated_at')
-        .single();
-
-    if (!error && data) {
-        authState.profil = medFallbackTrofaeer(data, authState.user.id);
-        return true;
-    }
-
-    return false;
+    if (!error && data) authState.profil = data;
 }
 
 export async function hentProfilStats() {

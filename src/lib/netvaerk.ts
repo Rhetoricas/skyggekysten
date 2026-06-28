@@ -5,7 +5,6 @@ import { gemOfflineScore, gemOfflineSpil, hentOfflineScores } from './offlineSto
 import { beregnSpillerScore, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from './score';
 import { KORT_VERSION } from './kortDimensioner';
 import { hentKarakterNavneIKlasse } from './spildata';
-import { normaliserTrofaeRunStats } from './trofaeer';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Felt, SpillerData } from './types';
 
@@ -302,7 +301,6 @@ export async function syncTilDb(opdaterKort = false) {
         mitUdstyr: spilTilstand.mitUdstyr,
         kendteFelter: spilTilstand.mineKendteFelter,
         skattekortFelter: spilTilstand.mineSkattekortFelter,
-        trofaeStats: normaliserTrofaeRunStats(spilTilstand.trofaeStats),
         historik: spilTilstand.historik || [],
         tidligereHistorik: spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.tidligereHistorik || [],
         isDead: isDead,
@@ -612,7 +610,6 @@ export async function gemAfsluttetSpillerISession() {
         mitUdstyr: spilTilstand.mitUdstyr,
         kendteFelter: spilTilstand.mineKendteFelter,
         skattekortFelter: spilTilstand.mineSkattekortFelter,
-        trofaeStats: normaliserTrofaeRunStats(spilTilstand.trofaeStats),
         historik: spilTilstand.historik || [],
         tidligereHistorik: eksisterende?.tidligereHistorik || [],
         isDead,

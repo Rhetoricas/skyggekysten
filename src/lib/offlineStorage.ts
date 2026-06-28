@@ -3,7 +3,6 @@ import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 import { taelScoreSpillere } from './score';
 import type { Karakter } from './types';
 import { hentKarakterNavneIKlasse } from './spildata';
-import { normaliserTrofaeRunStats, type TrofaeRunStats } from './trofaeer';
 
 const OFFLINE_GAME_KEY = 'taage_offline_spil';
 const OFFLINE_SCORES_KEY = 'taage_offline_scores';
@@ -52,7 +51,6 @@ interface OfflineSnapshot {
     mitUdstyr: typeof spilTilstand.mitUdstyr;
     mineKendteFelter: number[];
     mineSkattekortFelter?: number[];
-    trofaeStats?: TrofaeRunStats;
     historik: number[];
     nuvaerendeEnergi: number;
     gratisNaesteBevaegelse?: boolean;
@@ -120,7 +118,6 @@ export function gemOfflineSpil() {
         mitUdstyr: spilTilstand.mitUdstyr,
         mineKendteFelter: spilTilstand.mineKendteFelter,
         mineSkattekortFelter: spilTilstand.mineSkattekortFelter,
-        trofaeStats: normaliserTrofaeRunStats(spilTilstand.trofaeStats),
         historik: spilTilstand.historik,
         nuvaerendeEnergi: spilTilstand.nuvaerendeEnergi,
         gratisNaesteBevaegelse: spilTilstand.gratisNaesteBevaegelse,
@@ -165,7 +162,6 @@ export function indlaesOfflineSpil() {
         spilTilstand.mitUdstyr = data.mitUdstyr || [];
         spilTilstand.mineKendteFelter = data.mineKendteFelter || [];
         spilTilstand.mineSkattekortFelter = data.mineSkattekortFelter || [];
-        spilTilstand.trofaeStats = normaliserTrofaeRunStats(data.trofaeStats);
         spilTilstand.historik = data.historik || [];
         spilTilstand.nuvaerendeEnergi = data.nuvaerendeEnergi ?? data.valgtKarakter?.baseEnergi ?? 10;
         spilTilstand.gratisNaesteBevaegelse = data.gratisNaesteBevaegelse ?? false;

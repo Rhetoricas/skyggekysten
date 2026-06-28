@@ -13,9 +13,6 @@ alter table public.profiles
 add column if not exists sound_level text not null default 'fuld'
 check (sound_level in ('fuld', 'lav', 'slukket'));
 
-alter table public.profiles
-add column if not exists trophies jsonb not null default '[]'::jsonb;
-
 create table if not exists public.game_results (
     id bigint generated always as identity primary key,
     user_id uuid not null references auth.users(id) on delete cascade,
@@ -41,16 +38,6 @@ create table if not exists public.game_results (
     game_mode text not null default 'open' check (game_mode in ('open', 'offline')),
     created_at timestamptz not null default now()
 );
-
-alter table public.game_results
-add column if not exists character text,
-add column if not exists is_winner boolean not null default false,
-add column if not exists is_dead boolean not null default false,
-add column if not exists days integer not null default 0,
-add column if not exists gold integer not null default 0,
-add column if not exists max_column integer not null default 0,
-add column if not exists known_fields_count integer not null default 0,
-add column if not exists mines_owned integer not null default 0;
 
 alter table public.game_results
 add column if not exists game_mode text not null default 'open'

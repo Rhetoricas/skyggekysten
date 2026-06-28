@@ -5,7 +5,7 @@
     import { supabase } from '$lib/supabaseClient';
     import type { RealtimeChannel } from '@supabase/supabase-js';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
-    import { authState, gemProfilTrofaeer, initAuth } from '$lib/auth.svelte';
+    import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { M10_SCORE, beregnSpillerScore, beskrivSlutSalg } from '$lib/score';
     import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje } from '$lib/netvaerk';
@@ -31,7 +31,6 @@
     import { eventBibliotek } from '$lib/eventBibliotek';
     import { erAfgroedeModen, hentAfgroedeBlok, hentInsektPlageBlok } from '$lib/afgroeder';
     import { erFeltITaagen } from '$lib/taage';
-    import { findOptjenteTrofaeer, normaliserTrofaeRunStats, nyTrofaeRunStats, tilfoejProfilTrofaeer } from '$lib/trofaeer';
 
     import Skaerme from './Skaerme.svelte';
     import ShopModal from '$lib/ShopModal.svelte';
@@ -817,7 +816,6 @@
         spilTilstand.mitUdstyr = [];
         spilTilstand.mineKendteFelter = [];
         spilTilstand.mineSkattekortFelter = [];
-        spilTilstand.trofaeStats = nyTrofaeRunStats();
         spilTilstand.samletScore = 0;
         spilTilstand.venteGratisFeltBrugt = null;
         spilTilstand.gratisNaesteBevaegelse = false;
@@ -1016,7 +1014,6 @@
                         spilTilstand.mitUdstyr = [];
                         spilTilstand.mineKendteFelter = [];
                         spilTilstand.mineSkattekortFelter = [];
-                        spilTilstand.trofaeStats = nyTrofaeRunStats();
                         spilTilstand.historik = [];
                         if (tidligereRuter.length > 0) {
                             spilTilstand.alleSpillere[fundetNavn] = {
@@ -1057,7 +1054,6 @@
                     spilTilstand.mitUdstyr = eksisterende.mitUdstyr || [];
                     spilTilstand.mineKendteFelter = eksisterende.kendteFelter || [];
                     spilTilstand.mineSkattekortFelter = eksisterende.skattekortFelter || [];
-                    spilTilstand.trofaeStats = normaliserTrofaeRunStats(eksisterende.trofaeStats);
                     spilTilstand.historik = eksisterende.historik || [];
                     spilTilstand.venteGratisFeltBrugt = null;
                     spilTilstand.gratisNaesteBevaegelse = eksisterende.gratisNaesteBevaegelse ?? false;
@@ -1476,40 +1472,10 @@
         }, erVinder, spilTilstand.kortBredde, spilTilstand.kortHoejde);
     }
 
-    async function gemOptjenteTrofaeer() {
-        if (!authState.user) return;
-
-        const aktuelSpiller = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
-        const erDoed = (
-            spilTilstand.gameState === 'dead' ||
-            spilTilstand.gameState === 'dead_map' ||
-            !!aktuelSpiller?.isDead
-        ) && !(spilTilstand.gameState === 'win' || spilTilstand.gameState === 'win_map' || !!aktuelSpiller?.isWinner);
-
-        const optjente = findOptjenteTrofaeer(spilTilstand.trofaeStats, {
-            erDoed,
-            guld: spilTilstand.guldTotal,
-            kendteFelter: spilTilstand.mineKendteFelter?.length || 0,
-            miner: spilTilstand.gitter.filter((felt) => felt.hasGoldmine && felt.mineOwner === spilTilstand.spillerNavn).length,
-            udstyr: spilTilstand.mitUdstyr
-        });
-
-        if (optjente.length === 0) return;
-
-        const opdateredeTrofaeer = tilfoejProfilTrofaeer(authState.profil?.trophies || [], optjente, {
-            score: spilTilstand.samletScore,
-            oeNavn: spilTilstand.rumKode,
-            karakter: spilTilstand.valgtKarakter?.navn
-        });
-
-        await gemProfilTrofaeer(opdateredeTrofaeer);
-    }
-
     async function opdaterOgGemHighscore() {
         opdaterSamletScore();
 
         try {
-            await gemOptjenteTrofaeer();
             await syncTilDb(true);
             let sessionGemt = await flushVentendeSync();
             if (!sessionGemt) {
@@ -1592,7 +1558,6 @@
         spilTilstand.mitUdstyr = [];
         spilTilstand.mineKendteFelter = [];
         spilTilstand.mineSkattekortFelter = [];
-        spilTilstand.trofaeStats = nyTrofaeRunStats();
         spilTilstand.gratisNaesteBevaegelse = false;
         spilTilstand.gratisBevaegelseKilde = '';
         spilTilstand.sidsteBersaerkDag = 0;
@@ -1616,7 +1581,6 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].besoegteMiner = [];
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].harSkattekort = false;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].skattekortFelter = [];
-            spilTilstand.alleSpillere[spilTilstand.spillerNavn].trofaeStats = nyTrofaeRunStats();
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].aktivTracker = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].trackedeSpillere = [];
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIndex = null;

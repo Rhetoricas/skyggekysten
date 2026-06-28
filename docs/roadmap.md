@@ -104,20 +104,20 @@ Nuværende retning:
 
 Roadmap-status:
 
-- Implementeret lokalt: profilen kan gemme og vise de 9 almindelige trofæmedaljer i optjeningsrækkefølge.
-- Nuværende system gemmer stadig standardmedalje ud fra score.
-- Trofæer beregnes ved spilslut ud fra run stats og slutstatistik. Backend/profil gemmer samlingen, men er ikke dommer undervejs.
-- Indtil `profiles.trophies` er live i Supabase, bruger appen localStorage-fallback for trofæsamlingen.
+- Ikke implementeret endnu.
+- Nuværende system gemmer standardmedalje ud fra score.
+- Næste designspor er at give hver afsluttet tur højst én særlig trofævariant oven på standardmedaljen.
+- Trofæet skal vælges ved spilslut ud fra en analyse af turen. Backend skal gemme resultatet, men ikke være dommer undervejs.
 - Toplister må stadig ikke hente log/rute/tung detaljedata, før spilleren klikker på en konkret score.
 
 Grundmodel:
 
 - Spilleren får altid en standardmedalje baseret på score.
-- En tur kan udløse flere samlingstrofæer, hvis flere krav opfyldes i samme spil.
-- Profilen viser optjente trofæer først i den rækkefølge, de blev taget, og derefter låste trofæer som nedtonede medaljer.
-- Trofæmedaljer kræver generelt, at spilleren ikke dør.
+- Hvis turen har en markant særlig bedrift, kan standardmedaljen få en trofævariant.
+- Der vises kun ét trofæ på medaljen pr. spil, så medaljen er let at aflæse.
+- Spillet kan godt beregne flere kandidater, men den stærkeste kandidat vinder.
 - Man skal ikke jage lave medaljeniveauer. Trofætypen samles som bedrift, og score afgør hvor flot versionen bliver.
-- Eksempel: En tur udløser Mineejeren og scorer til medaljeniveau 8. Resultatet bliver "M8 Mineejeren". En senere bedre tur kan blive "M10 Mineejeren".
+- Eksempel: En tur udløser Minekronen og scorer til medaljeniveau 8. Resultatet bliver "M8 Minekronen". En senere bedre tur kan blive "M10 Minekronen".
 
 Mulig teknisk model:
 
@@ -129,39 +129,22 @@ Mulig teknisk model:
 Foreslåede trofætyper:
 
 - Standardmedaljen: fallback når ingen særlig bedrift dominerer.
-- Mineejeren: kræver 12 miner ved spilslut.
-- Tågekonge: kræver 10 bevægelser i tåge.
-- Bølgebæreren: kræver at spilleren starter en oversvømmelse og tager skade fra vand 5 gange i samme spil.
-- Relikviejægeren: kræver 3 ud af 4 magiske genstande i rygsækken ved spilslut: Rodhjertet, Gylden Destillator, Dragestav og Runekvist. Malmviser tæller ikke.
-- Guldfyrsten: kræver 5000 guld ved spilslut. Kun faktisk guldbeholdning tæller, ikke omregnede items, diamanter eller score.
-- Livsvogteren: kræver at spilleren healer mindst 400 HP i samme spil.
-- Korttegneren: kræver 1500 kendte/opdagede felter.
-- Udstyrsmesteren: kræver 10 opgraderede items i rygsækken samtidig ved spilslut. Solgte/tabte opgraderinger tæller ikke.
-- Diamantjægeren: kræver at spilleren finder diamanter for mindst 3000 rå diamantværdi i samme spil. Værdien tælles, når diamanten findes; salg, point og beholdning ved spilslut er ligegyldigt.
+- Minekronen: mange miner, minekontrol, mine-overtagelser eller høj mine-score.
+- Tågevandreren: overlever meget tåge, tågeskade, blodofring eller flugt sent i tågen.
+- Havmærket: vand, hav, druknefare, oversvømmelse eller tabt udstyr i vand.
+- Relikviejægeren: sjældne/magiske ting som Rodhjertet, Gylden Destillator, dragestav, runekvist eller malmviser.
+- Handelsfyrsten: ekstrem guldøkonomi, handel, tøjbonus, salg/køb, tyveri eller indbrud.
+- Blodprisen: lav HP, mange skadeshændelser, livseliksir-redning, kollaps, max-HP-tab eller blodofring.
+- Korttegneren: mange kendte felter, lang rute, høj max-kolonne, kikkert/fakkel/syn eller skattekortspor.
+- Udstyrsmesteren: mange opgraderinger, værkstedsbrug eller stærk gear-progression.
+- Skæbnebruddet: usandsynligt comeback, katastrofer overlevet, ekstrem risiko eller en tur der egentlig burde være mislykkedes.
 
 Åbne designspørgsmål:
 
 - Skal trofæsamling vises på profilsiden som bedste version pr. trofætype?
 - Skal enkelte trofæer have klassebonus i vurderingen, eller skal alle klasser kunne få alle trofæer?
-- Hvordan prioriteres to lige stærke kandidater, fx Mineejeren vs Guldfyrsten?
+- Hvordan prioriteres to lige stærke kandidater, fx Minekronen vs Handelsfyrsten?
 - Skal gamle scores uden `achievementStats` altid vises som standardmedaljer?
-
-### Multiplayer-medaljer
-
-Roadmap-status:
-
-- Ikke implementeret endnu.
-- Multiplayer skal senere have sin egen lille samling på 5 medaljer.
-- De skal være adskilt fra de 9 almindelige trofæmedaljer, så solo-spillere stadig kan samle hovedsættet.
-- Kravene skal designes med fokus på samarbejde/rivalisering uden at belønne griefing eller dårlig forbindelse.
-
-Mulige spor:
-
-- Vinde eller slippe væk i et spil med flere aktive spillere.
-- Overtage miner fra andre spillere.
-- Slippe væk efter at andre allerede er flygtet.
-- Få flere spillere sikkert væk fra samme ø.
-- Klare en markant comeback- eller rivalhistorie i multiplayer.
 
 ## Multiplayer og forbindelse
 
