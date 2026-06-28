@@ -2404,7 +2404,7 @@
     .highscore-detail-overlay {
         position: fixed;
         inset: 0;
-        z-index: 1400;
+        z-index: 4300;
         display: flex;
         align-items: center;
         justify-content: center;
