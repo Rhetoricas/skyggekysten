@@ -750,6 +750,11 @@ interface AnkomstOptions {
     triggerPortal?: boolean;
 }
 
+function ankomstSynsRadius(feltIndex: number, synsRadius: number) {
+    const felt = spilTilstand.gitter[feltIndex];
+    return Math.max(felt?.biome === 'bjerg' ? 2 : 1, synsRadius);
+}
+
 function kanPlacerePortal(index: number) {
     const bredde = hentKortBredde();
     return index % bredde <= bredde - 5;
@@ -917,7 +922,7 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     spilTilstand.historik.push(nytIndeks);
 
     options.onKameraFoelg?.(nytIndeks);
-    afslørOmraade(nytIndeks, Math.max(felt.biome === 'bjerg' ? 2 : 1, options.synsRadius));
+    afslørOmraade(nytIndeks, ankomstSynsRadius(nytIndeks, options.synsRadius));
     const nyKolonne = nytIndeks % hentKortBredde();
     if (nyKolonne > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nyKolonne;
 
@@ -1203,7 +1208,7 @@ function afslorTeleportRute(rute: number[]) {
 
     for (const indeks of rute) {
         const felt = spilTilstand.gitter[indeks];
-        afslørOmraade(indeks, Math.max(felt?.biome === 'bjerg' ? 2 : 1, synsRadius));
+        afslørOmraade(indeks, ankomstSynsRadius(indeks, synsRadius));
     }
 }
 
@@ -1231,7 +1236,7 @@ export function udfoerTeleportMedOptions(options: TeleportOptions) {
     if (!spilTilstand.historik) spilTilstand.historik = [];
     spilTilstand.historik.push(maal.indeks);
     
-    afslørOmraade(maal.indeks, Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn));
+    afslørOmraade(maal.indeks, ankomstSynsRadius(maal.indeks, Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn)));
 
     if (maal.kolonne > spilTilstand.maxKolonne) {
         spilTilstand.maxKolonne = maal.kolonne;

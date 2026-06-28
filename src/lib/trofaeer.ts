@@ -62,13 +62,13 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         id: 'guldfyrsten',
         sti: '/screens/guldfyrsten.webp',
         label: 'Guldfyrsten',
-        krav: 'Overlev spillet med 5000 guld. Kun rå guld tæller.',
+        krav: 'Overlev spillet med 5000 guld. Kun rent guld tæller.',
         episkTekst: 'Du slap væk med 5000 guld i hænderne.'
     },
     {
         id: 'livsvogteren',
         sti: '/screens/livsvogteren.webp',
-        label: 'Livsvogteren',
+        label: 'Livvogteren',
         krav: 'Overlev spillet efter at have healet 400 HP.',
         episkTekst: 'Du helede 400 HP og holdt dig levende hele vejen.'
     },
@@ -90,8 +90,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         id: 'diamantjaegeren',
         sti: '/screens/diamantjægeren.webp',
         label: 'Diamantjægeren',
-        krav: 'Overlev spillet efter at have fundet diamanter for mindst 3000 rå værdi.',
-        episkTekst: 'Du fandt diamanter for 3000 rå guldværdi.'
+        krav: 'Overlev spillet efter at have fundet diamanter med en samlet værdi på mindst 3000.',
+        episkTekst: 'Du fandt diamanter med en samlet værdi på mindst 3000.'
     }
 ];
 

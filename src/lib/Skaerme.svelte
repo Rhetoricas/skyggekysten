@@ -45,10 +45,10 @@
         { sti: '/screens/Bølgebæreren.webp', label: 'Bølgebæreren', krav: 'start en oversvømmelse og tag skade fra vand 5 gange' },
         { sti: '/screens/relikviejægeren.webp', label: 'Relikviejægeren', krav: 'hav 3 af 4 magiske genstande i rygsækken ved spilslut' },
         { sti: '/screens/guldfyrsten.webp', label: 'Guldfyrsten', krav: '5000 guld ved spilslut' },
-        { sti: '/screens/livsvogteren.webp', label: 'Livsvogteren', krav: 'heal 400 HP' },
+        { sti: '/screens/livsvogteren.webp', label: 'Livvogteren', krav: 'heal 400 HP' },
         { sti: '/screens/korttegneren.webp', label: 'Korttegneren', krav: '1500 kendte felter' },
         { sti: '/screens/udstyrsmesteren.webp', label: 'Udstyrsmesteren', krav: '10 opgraderede items i rygsækken samtidig' },
-        { sti: '/screens/diamantjægeren.webp', label: 'Diamantjægeren', krav: 'find diamanter for 3000 rå værdi' }
+        { sti: '/screens/diamantjægeren.webp', label: 'Diamantjægeren', krav: 'find diamanter med en samlet værdi på mindst 3000' }
     ];
 
     let {
