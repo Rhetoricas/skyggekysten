@@ -1850,7 +1850,7 @@
         right: 4px;
         top: 0;
         height: 1px;
-        background: rgba(245, 208, 113, 0.42);
+        background: linear-gradient(90deg, transparent 0%, rgba(245, 208, 113, 0.42) 6%, rgba(245, 208, 113, 0.42) 94%, transparent 100%);
     }
     .konto-medalje-knap {
         appearance: none;
@@ -1917,7 +1917,7 @@
         left: 4px;
         right: 4px;
         height: 1px;
-        background: rgba(245, 208, 113, 0.48);
+        background: linear-gradient(90deg, transparent 0%, rgba(245, 208, 113, 0.48) 6%, rgba(245, 208, 113, 0.48) 94%, transparent 100%);
     }
     .profil-medaljehylde::before {
         top: 0;
