@@ -1232,7 +1232,7 @@
 
             <section class="start-hero" aria-labelledby="start-title">
                 <button type="button" class="boat-btn-wrapper start-boat" onclick={(e) => { e.preventDefault(); startSpilMedLyd(); }}>
-                    <img src="/events/launch.webp" alt="Båd ved tågeøen" class="launch-image clickable-boat" />
+                    <img src="/screens/FogIsland.webp" alt="Båd ved tågeøen" class="launch-image clickable-boat" />
                 </button>
                 <div class="start-copy">
                     <p class="start-eyebrow">En ny ø venter</p>
@@ -1541,6 +1541,8 @@
             linear-gradient(180deg, rgba(8, 10, 9, 0.4) 0%, #111 58%, #160606 100%),
             radial-gradient(ellipse at 50% -8%, rgba(166, 190, 166, 0.28) 0%, rgba(30, 58, 49, 0.12) 34%, transparent 70%),
             linear-gradient(90deg, #080909 0%, #181a17 52%, #080706 100%);
+        padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 18px);
+        padding-top: 0;
         overflow-x: hidden;
     }
     .start-overlay::before {
@@ -1622,19 +1624,19 @@
     .start-shell {
         position: relative;
         z-index: 1;
-        width: min(1120px, 94vw);
+        width: min(1240px, 100vw);
         max-width: none;
-        padding-top: 20px;
+        padding: 0 0 40px;
     }
     .login-main { width: min(100%, 560px); display: flex; flex-direction: column; align-items: center; }
     .start-hero {
         position: relative;
-        width: 100%;
-        min-height: clamp(340px, 46vw, 520px);
-        display: grid;
-        place-items: center;
-        margin: 2px 0 18px;
+        width: min(1240px, 100vw);
+        min-height: 0;
+        display: block;
+        margin: 0;
         isolation: isolate;
+        overflow: hidden;
     }
     .start-hero::before {
         content: "";
@@ -1647,35 +1649,44 @@
         filter: blur(18px);
     }
     .start-hero::after {
-        content: "";
-        position: absolute;
-        left: 9%;
-        right: 9%;
-        bottom: 9%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(216, 190, 118, 0.42), transparent);
+        content: none;
     }
     
     .boat-btn-wrapper { background: none; border: none; padding: 0; margin: 0; cursor: pointer; outline: none; }
     .start-boat {
-        position: absolute;
-        top: 0;
-        width: min(760px, 88vw);
-        opacity: 0.88;
+        position: relative;
+        display: block;
+        width: 100%;
+        opacity: 1;
         filter: drop-shadow(0 28px 36px rgba(0, 0, 0, 0.6));
     }
-    .launch-image { width: 100%; max-width: 100%; height: auto; border-radius: 4px; transition: 0.2s; }
+    .launch-image {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        height: clamp(470px, 54vw, 680px);
+        object-fit: cover;
+        object-position: center top;
+        border-radius: 0 0 4px 4px;
+        transition: 0.2s;
+    }
     .launch-image:hover { transform: scale(1.025); filter: brightness(1.12); }
     .overlay h1 { color: #fff; margin-top: 0; font-size: 2.5rem; text-align: center; font-family: 'Cinzel', serif; }
     .login-box p { color: #ccc; margin-bottom: 20px; line-height: 1.4; }
     .start-copy {
-        position: relative;
+        position: absolute;
+        inset: 0;
         z-index: 1;
         width: 100%;
         box-sizing: border-box;
-        margin-top: clamp(150px, 19vw, 230px);
-        padding: 0 14px;
+        margin-top: 0;
+        padding: 0 16px 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
         text-shadow: 0 4px 18px rgba(0, 0, 0, 0.92);
+        pointer-events: none;
     }
     .start-copy h1 {
         margin: 0;
@@ -1699,20 +1710,20 @@
         font-family: 'Cinzel', serif;
         font-size: clamp(0.9rem, 1.65vw, 1.2rem);
         font-weight: 700;
-        white-space: nowrap;
+        white-space: normal;
     }
     .start-intel {
         width: min(100%, 720px);
         display: grid;
         grid-template-columns: minmax(0, 1fr);
         gap: 4px;
-        margin: -8px 0 18px;
-        padding: 12px 18px;
+        margin: 0 0 18px;
+        padding: 10px 18px 12px;
         color: #d6d0c2;
         text-align: center;
         border-top: 1px solid rgba(245, 208, 113, 0.24);
         border-bottom: 1px solid rgba(195, 65, 53, 0.28);
-        background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.28), transparent);
+        background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.68), transparent);
         box-sizing: border-box;
     }
     .start-intel span {
@@ -2792,6 +2803,10 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        .start-overlay {
+            padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 10px);
+        }
+
         .character-select {
             width: 100%;
             max-width: none;
@@ -2815,7 +2830,7 @@
         }
 
         .start-shell {
-            padding: 12px 6px 26px;
+            padding: 0 0 26px;
         }
 
         .start-fog {
@@ -2824,22 +2839,23 @@
         }
 
         .start-hero {
-            min-height: 315px;
-            margin: 0 0 12px;
+            width: 100vw;
+            min-height: 0;
+            margin: 0;
         }
 
         .start-boat {
-            width: min(520px, 112vw);
-            top: 4px;
+            width: 100%;
         }
 
         .launch-image {
             width: 100%;
+            height: clamp(360px, 78vw, 470px);
         }
 
         .start-copy {
-            margin-top: 142px;
-            padding: 0 6px;
+            margin-top: 0;
+            padding: 0 8px 22px;
         }
 
         .overlay h1 {
@@ -2865,7 +2881,7 @@
         }
 
         .start-intel {
-            margin: -4px 0 12px;
+            margin: 0 0 12px;
             padding: 10px 12px;
         }
 
