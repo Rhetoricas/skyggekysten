@@ -12,7 +12,7 @@
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
     import { TROFAE_DEFINITIONER, findTrofae, gemTrofaeAwards, gemTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, hentSupabaseTrofaeAwards, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, type TrofaeAward } from '$lib/trofaeer';
-    import type { Karakter } from '$lib/types';
+    import type { Karakter, SpillerData } from '$lib/types';
 
     type HighscoreDetaljer = {
         id?: number;
@@ -106,6 +106,8 @@
     let valgtLaastTrofae = $state<{ sti: string; label: string; krav?: string; episkTekst?: string; opnaaet?: boolean } | null>(null);
     let lokaleTrofaeIds = $state<string[]>([]);
     let lokaleTrofaeAwards = $state<TrofaeAward[]>([]);
+    let visJoinLukketModal = $state(false);
+    let karaktervalgStatus = $derived(hentKaraktervalgStatus());
     const HIGHSCORE_SIDE_STOERRELSE = 10;
     const lokaleKortPresets = [
         { label: '20 x 20', bredde: 20, hoejde: 20 },
@@ -151,6 +153,13 @@
             if (lydDoed) lydDoed.pause();
             if (lydSejr) lydSejr.pause();
             spilletSlutLyd = false;
+        }
+    });
+
+    $effect(() => {
+        if (spilTilstand.gameState === 'select' && !karaktervalgStatus.kanJoine) {
+            visJoinLukketModal = true;
+            spilTilstand.gameState = 'start';
         }
     });
 
@@ -604,6 +613,11 @@
         opretEllerDeltag();
     }
 
+    async function startSpilFraHero() {
+        if (!spilTilstand.rumKode.trim()) foreslaaOeNavn();
+        await startSpilMedLyd();
+    }
+
     function fortsaetOfflineMedLyd() {
         if (spilTilstand.musikTaendt && lydStart) {
             lydStart.currentTime = 0;
@@ -710,6 +724,22 @@
             const score = beregnSpillerScore(spilTilstand.gitter, spilTilstand.alleSpillere, navn, data, !!data.isWinner, spilTilstand.kortBredde, spilTilstand.kortHoejde);
             return { navn, data, score };
         }).sort((a, b) => b.score - a.score);
+    }
+
+    function erAktivKaraktervalgSpiller(spiller: SpillerData) {
+        return !spiller.isDead && !spiller.isWinner;
+    }
+
+    function hentKaraktervalgStatus() {
+        const aktiveSpillere = Object.values(spilTilstand.alleSpillere).filter(erAktivKaraktervalgSpiller);
+        const hoejesteDag = aktiveSpillere.length > 0
+            ? Math.max(...aktiveSpillere.map((spiller) => spiller.dag || 1))
+            : (spilTilstand.dag || 1);
+        return {
+            aktiveAntal: aktiveSpillere.length,
+            dag: hoejesteDag,
+            kanJoine: hoejesteDag <= 5
+        };
     }
 
     function hentMinHistorie(erVundet: boolean) {
@@ -1231,7 +1261,7 @@
             {@render topKnapper()}
 
             <section class="start-hero" aria-labelledby="start-title">
-                <button type="button" class="boat-btn-wrapper start-boat" onclick={(e) => { e.preventDefault(); startSpilMedLyd(); }}>
+                <button type="button" class="boat-btn-wrapper start-boat" onclick={(e) => { e.preventDefault(); startSpilFraHero(); }}>
                     <img src="/screens/FogIsland.webp" alt="Båd ved tågeøen" class="launch-image clickable-boat" />
                 </button>
                 <div class="start-copy">
@@ -1328,7 +1358,12 @@
     <div class="overlay">
         <div class="character-select">
             {@render topKnapper()}
-            <h2>Vælg karakter</h2>
+            <h2>Vælg din karakter, inden du går i land på {formaterNavn(spilTilstand.rumKode)}</h2>
+            <div class="select-island-status" class:lukket={!karaktervalgStatus.kanJoine}>
+                <span>{karaktervalgStatus.aktiveAntal === 1 ? '1 på øen' : `${karaktervalgStatus.aktiveAntal} på øen`}</span>
+                <span>Dag {karaktervalgStatus.dag}</span>
+                <strong>{karaktervalgStatus.kanJoine ? 'Åben' : 'Lukket'}</strong>
+            </div>
             <p class="instruktion">
                 {spilTilstand.gameMode === 'offline' ? 'Offline. Spillet gemmes lokalt i denne browser.' : 'Du har fået otte muligheder. Vælg hvem du vil være.'}
             </p>
@@ -1533,6 +1568,16 @@
 {@render profilModal()}
 {@render laastTrofaeModal()}
 {@render highscoreDetaljeModal()}
+
+{#if visJoinLukketModal}
+    <div class="join-lukket-overlay" role="dialog" aria-modal="true" aria-labelledby="join-lukket-title">
+        <div class="join-lukket-modal">
+            <h2 id="join-lukket-title">Spillet er gået i gang</h2>
+            <p>Du nåede ikke at gå i land på {formaterNavn(spilTilstand.rumKode)}, og det er for sent at joine denne ø.</p>
+            <button type="button" onclick={() => visJoinLukketModal = false}>OK</button>
+        </div>
+    </div>
+{/if}
 
 <style>
     .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: #1a1a1a; display: flex; align-items: flex-start; justify-content: center; z-index: 1000; font-family: system-ui, -apple-system, sans-serif; overflow-y: auto; padding: calc(env(safe-area-inset-top, 0px) + 18px) 18px calc(env(safe-area-inset-bottom, 0px) + 18px); box-sizing: border-box; -webkit-overflow-scrolling: touch; }
@@ -2178,6 +2223,77 @@
     }
 
     .character-select { position: relative; background: #1a1a1a; padding: 30px; border-radius: 12px; border: 1px solid #333; max-width: 1100px; width: 95%; max-height: none; overflow: visible; text-align: center; }
+    .select-island-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 2px 0 10px;
+        padding: 8px 14px;
+        border: 1px solid rgba(245, 208, 113, 0.28);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.055);
+        color: #ddd;
+        font-weight: 700;
+    }
+    .select-island-status span {
+        color: #c9c1ae;
+    }
+    .select-island-status strong {
+        color: #d7ead7;
+    }
+    .select-island-status.lukket {
+        border-color: rgba(195, 65, 53, 0.45);
+        background: rgba(80, 20, 20, 0.35);
+    }
+    .select-island-status.lukket strong {
+        color: #f0c0b8;
+    }
+    .join-lukket-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 5000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.72);
+        box-sizing: border-box;
+    }
+    .join-lukket-modal {
+        width: min(430px, 100%);
+        border: 1px solid rgba(245, 208, 113, 0.35);
+        border-radius: 8px;
+        background: #171717;
+        color: #eee;
+        padding: 22px;
+        text-align: center;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.62);
+    }
+    .join-lukket-modal h2 {
+        margin: 0 0 12px;
+        font-family: 'Cinzel', serif;
+        color: #f3ead6;
+    }
+    .join-lukket-modal p {
+        margin: 0 0 18px;
+        color: #ddd;
+        line-height: 1.45;
+    }
+    .join-lukket-modal button {
+        min-width: 96px;
+        border: 1px solid rgba(245, 208, 113, 0.45);
+        border-radius: 6px;
+        background: #2d2d2d;
+        color: #fff;
+        padding: 9px 16px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .join-lukket-modal button:hover {
+        background: #3a3a3a;
+    }
     .character-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
     .char-card { background: #222; border: 2px solid #444; padding: 20px; text-align: center; cursor: pointer; border-radius: 8px; transition: 0.2s; display: flex; flex-direction: column; align-items: center; }
     .char-card:hover { border-color: #fff; transform: scale(1.02); }
