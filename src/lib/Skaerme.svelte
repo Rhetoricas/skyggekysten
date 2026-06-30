@@ -1636,7 +1636,7 @@
         display: block;
         margin: 0;
         isolation: isolate;
-        overflow: hidden;
+        overflow: visible;
     }
     .start-hero::before {
         content: "";
@@ -1664,10 +1664,10 @@
         display: block;
         width: 100%;
         max-width: 100%;
-        height: clamp(470px, 54vw, 680px);
-        object-fit: cover;
+        height: auto;
+        object-fit: contain;
         object-position: center top;
-        border-radius: 0 0 4px 4px;
+        border-radius: 0;
         transition: 0.2s;
     }
     .launch-image:hover { transform: scale(1.025); filter: brightness(1.12); }
@@ -2850,7 +2850,7 @@
 
         .launch-image {
             width: 100%;
-            height: clamp(360px, 78vw, 470px);
+            height: auto;
         }
 
         .start-copy {
