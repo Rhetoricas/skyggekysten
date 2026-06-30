@@ -62,8 +62,9 @@ export const spilTilstand = $state({
             const info = itemDB[slot.id];
             if (!info || slot.maengde <= 0) return acc;
             if (slot.id === 'fakkel' || slot.id === 'solfakkel') return acc;
+            const erRidderIRustning = (this.valgtKarakter?.id === 'knight_m' || this.valgtKarakter?.id === 'knight_f') && (slot.id === 'rustning' || slot.id === 'kongepanser');
             return {
-                move: acc.move + (info.moveMod || 0),
+                move: acc.move + (erRidderIRustning ? 0 : (info.moveMod || 0)),
                 dmg: acc.dmg + (info.dmgMod || 0),
                 syn: acc.syn + (info.synsMod || 0),
                 energi: acc.energi + (info.energiMod || 0),

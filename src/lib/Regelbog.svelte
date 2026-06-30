@@ -100,7 +100,7 @@
                         <li>Ved kollaps mister du halvdelen af dit guld, tiden går, og du vågner kort efter med 10 HP.</li>
                         <li>Hvis HP rammer 0 i tågen eller i vand, dør du, medmindre en livseliksir redder dig først.</li>
                         <li>Livseliksir bruges automatisk ved dødelig skade eller kollaps og giver dig op til 90 HP tilbage, selv om dit max er højere.</li>
-                        <li>Rustning mindsker skade. Kongepanser mindsker skade med 70%, men er stadig tungt. Elverrustning beskytter som almindelig rustning, men er ikke tung. Ridder med rustning eller panser tager ingen skade fra nedgravede fælder.</li>
+                        <li>Rustning mindsker skade. Kongepanser mindsker skade med 70%. Rustning og kongepanser er normalt tunge, men Ridder og Skjoldmø ignorerer vægten og tager ingen skade fra nedgravede fælder. Elverrustning beskytter som almindelig rustning, men er ikke tung.</li>
                         <li>Mad giver +20 HP og gør næste bevægelse gratis. Sovepose kan bruges i vildmarken og giver +20 HP, men bruger resten af dagen. Silkesovepose giver +40 HP og bliver kun nedgraderet til almindelig sovepose af hulefugt.</li>
                         <li>Fakkel udvider synet med +1. Solfakkel udvider synet med +2. Begge kan bruges til bål; solbålet afslører et større område og giver 100 guld i stedet for 50.</li>
                         <li>Viking og valkyrie går automatisk bersærk første gang pr. dag, de tager mindst 5 skade. Næste energikrævende handling koster 0 energi.</li>

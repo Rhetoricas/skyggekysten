@@ -530,9 +530,9 @@
             pris: RUSTNING_OPGRADERING_PRIS,
             harBasis: harRustning && !harKongepanser,
             kanOpgradere: kanOpgradereRustning,
-            kortTekst: '70% skadesreduktion. Stadig tung: +1 energi pr. skridt. Går tabt i vand som almindelig rustning.',
+            kortTekst: '70% skadesreduktion. Normalt tung: +1 energi pr. skridt, men ikke for Ridder/Skjoldmø. Går tabt i vand.',
             helpTitle: 'Rustning-opgradering',
-            helpBody: 'Kræver almindelig rustning og 250 guld. Kongepanseret reducerer skade med 70%, men koster stadig 1 ekstra energi pr. skridt og går tabt i vand.',
+            helpBody: 'Kræver almindelig rustning og 250 guld. Kongepanseret reducerer skade med 70%, men koster normalt 1 ekstra energi pr. skridt. Ridder og Skjoldmø ignorerer vægten. Går tabt i vand.',
             opgrader: opgraderRustning
         },
         {
@@ -849,7 +849,7 @@
             class="opgradering-kort"
             class:inaktiv={!kanOpgradereRustning}
             data-help-title="Rustning-opgradering"
-            data-help-body="Kræver almindelig rustning og 250 guld. Kongepanseret reducerer skade med 70%, men koster stadig 1 ekstra energi pr. skridt."
+            data-help-body="Kræver almindelig rustning og 250 guld. Kongepanseret reducerer skade med 70%, men koster normalt 1 ekstra energi pr. skridt. Ridder og Skjoldmø ignorerer vægten."
         >
             <div class="ikon-par">
                 <img src={itemDB.rustning.billede} alt="Rustning" />
@@ -859,7 +859,7 @@
 
             <div class="tekst">
                 <strong>Rustning til Kongepanser</strong>
-                <p>70% skadesreduktion. Stadig tung: +1 energi pr. skridt. Går tabt i vand som almindelig rustning.</p>
+                <p>70% skadesreduktion. Normalt tung: +1 energi pr. skridt, men ikke for Ridder/Skjoldmø. Går tabt i vand.</p>
                 <span class="pris">{RUSTNING_OPGRADERING_PRIS} Guld</span>
             </div>
 
