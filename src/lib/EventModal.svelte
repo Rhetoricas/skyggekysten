@@ -1,9 +1,11 @@
 <script lang="ts">
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { eventState, kanViseValg, tagValg, startEvent } from '$lib/eventMotor.svelte';
-    import { eventBibliotek, type Valg } from '$lib/eventBibliotek';
+    import { eventBibliotek, eventTitel, valgTekst, type Valg } from '$lib/eventBibliotek';
     import { fremtvingKollaps } from '$lib/overlevelse.svelte';
     import { itemDB } from '$lib/spildata';
+    import { tekst } from '$lib/i18n.svelte';
+    import { itemNavn } from '$lib/spilTekst';
 
     let { lukEvent } = $props<{ lukEvent: () => void }>();
 
@@ -42,14 +44,14 @@
     <div class="event-boks">
         <img
             src={eventState.aktivt.billede || `/events/ev_${grundBiome}.webp`}
-            alt="Event baggrund"
+            alt={tekst('Event baggrund', 'Event background')}
             onerror={(e) => {
                 (e.currentTarget as HTMLImageElement).onerror = null;
                 (e.currentTarget as HTMLImageElement).src = '/events/event.webp';
             }}
         />
 
-        <h2>{eventState.aktivt.titel}</h2>
+        <h2>{eventTitel(eventState.aktivt)}</h2>
 
         <div class="log-container">
             {#each eventState.log as linje, i (i)}
@@ -70,34 +72,34 @@
                         disabled={!harAdgang}
                         onclick={(e) => { e.stopPropagation(); tagValg(valg); }}
                     >
-                        <span class="valg-tekst">{valg.tekst}</span>
+                        <span class="valg-tekst">{valgTekst(valg)}</span>
                         
                         {#if !harAdgang}
                             <div class="manglende-betingelse">
                                 {#if valg.kraeverKarakter}
-                                    <span class="mangel-ikon karakter-mangel" title="Kræver specifik helt"></span>
+                                    <span class="mangel-ikon karakter-mangel" title={tekst('Kræver specifik helt', 'Requires a specific hero')}></span>
                                 {/if}
                                 {#if valg.kraeverItem && itemDB[valg.kraeverItem]}
-                                    <img src={itemDB[valg.kraeverItem].billede} alt="Mangler genstand" class="mangel-ikon" title="Du mangler dette" />
+                                    <img src={itemDB[valg.kraeverItem].billede} alt={tekst('Mangler genstand', 'Missing item')} class="mangel-ikon" title={tekst(`Du mangler ${itemNavn(valg.kraeverItem)}`, `You need ${itemNavn(valg.kraeverItem)}`)} />
                                 {/if}
                                 {#if valg.kraeverEtAfItems?.length}
-                                    <span class="mangel-guld">Kræver våben</span>
+                                    <span class="mangel-guld">{tekst('Kræver våben', 'Requires weapon')}</span>
                                     <div class="mangel-ikon-raekke">
                                         {#each valg.kraeverEtAfItems.slice(0, 3) as itemId (itemId)}
                                             {#if itemDB[itemId]}
-                                                <img src={itemDB[itemId].billede} alt="Muligt våben" class="mangel-ikon lille-mangel-ikon" title="Du mangler et våben" />
+                                                <img src={itemDB[itemId].billede} alt={tekst('Muligt våben', 'Possible weapon')} class="mangel-ikon lille-mangel-ikon" title={tekst('Du mangler et våben', 'You need a weapon')} />
                                             {/if}
                                         {/each}
                                     </div>
                                 {/if}
                                 {#if valg.kosterItem && itemDB[valg.kosterItem]}
-                                    <img src={itemDB[valg.kosterItem].billede} alt="Koster genstand" class="mangel-ikon koster-mangel" title="Du skal betale med dette" />
+                                    <img src={itemDB[valg.kosterItem].billede} alt={tekst('Koster genstand', 'Costs item')} class="mangel-ikon koster-mangel" title={tekst(`Du skal betale med ${itemNavn(valg.kosterItem)}`, `You must pay with ${itemNavn(valg.kosterItem)}`)} />
                                 {/if}
                                 {#if valg.puljeVaerdi}
-                                    <span class="mangel-guld">Mangler {valg.puljeVaerdi} Guld</span>
+                                    <span class="mangel-guld">{tekst('Mangler', 'Need')} {valg.puljeVaerdi} {tekst('Guld', 'Gold')}</span>
                                 {/if}
                                 {#if valg.kosterEnergi}
-                                    <span class="mangel-guld">Mangler {valg.kosterEnergi} Energi</span>
+                                    <span class="mangel-guld">{tekst('Mangler', 'Need')} {valg.kosterEnergi} {tekst('Energi', 'Energy')}</span>
                                 {/if}
                             </div>
                         {/if}
@@ -105,11 +107,11 @@
                 {/each}
                 
                 {#if eventState.aktivt.valg.every((v: Valg) => !kanViseValg(v))}
-                    <button class="valg-btn ulåst flygt-btn" onclick={(e) => { e.stopPropagation(); lukEvent(); }}>Flygt fra faren!</button>
+                    <button class="valg-btn ulåst flygt-btn" onclick={(e) => { e.stopPropagation(); lukEvent(); }}>{tekst('Flygt fra faren!', 'Flee the danger!')}</button>
                 {/if}
             {:else}
                 <button class="fortsaet-btn" onclick={(e) => { e.stopPropagation(); haandterKlikVidere(); }}>
-                    Fortsæt
+                    {tekst('Fortsæt', 'Continue')}
                 </button>
             {/if}
         </div>

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { lydKontrol, lydTitel, skiftLydNiveau } from '$lib/lydKontrol.svelte';
     import { gemProfilLydNiveau } from '$lib/auth.svelte';
+    import { tekst } from '$lib/i18n.svelte';
 
     let { knapClass = '' } = $props<{ knapClass?: string }>();
 
@@ -15,8 +16,8 @@
     class:lyd-lav={lydKontrol.niveau === 'lav'}
     class:lyd-slukket={lydKontrol.niveau === 'slukket'}
     onclick={skiftOgGemLyd}
-    title={`${lydTitel()} - klik for næste niveau`}
-    aria-label={`${lydTitel()} - klik for næste niveau`}
+    title={`${lydTitel()} - ${tekst('klik for næste niveau', 'click for next level')}`}
+    aria-label={`${lydTitel()} - ${tekst('klik for næste niveau', 'click for next level')}`}
 >
     <svg class="lyd-ikon" viewBox="0 0 48 48" aria-hidden="true">
         <path class="lyd-højttaler" d="M7 19h8l11-9v28l-11-9H7z" />

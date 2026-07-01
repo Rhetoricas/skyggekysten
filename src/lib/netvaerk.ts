@@ -5,6 +5,7 @@ import { gemOfflineScore, gemOfflineSpil, hentOfflineScores } from './offlineSto
 import { beregnSpillerScore, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from './score';
 import { KORT_VERSION } from './kortDimensioner';
 import { hentKarakterKlasseNoegle, hentKarakterNavneIKlasse } from './spildata';
+import { tekst } from './i18n.svelte';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Felt, SpillerData } from './types';
 
@@ -81,9 +82,30 @@ type VentendeHighscore = HighscorePayload & {
     created_at: string;
 };
 
+const timeoutLabelsEn: Record<string, string> = {
+    'Gemning af øen': 'Island save',
+    'Hentning af aktuel spillerliste': 'Current player list fetch',
+    'Login-tjek': 'Login check',
+    'Hentning af ø-session': 'Island session fetch',
+    'Gemning af afsluttet spiller': 'Finished player save',
+    'Gemning af score': 'Score save',
+    'Hentning af ø-score': 'Island score fetch',
+    'Hentning af global score': 'Global score fetch',
+    'Hentning af ugens globale score': 'Weekly global score fetch',
+    'Hentning af filtreret highscore': 'Filtered highscore fetch',
+    'Hentning af highscore-resultat': 'Highscore result fetch',
+    'Hentning af topmedalje-spil': 'Top medal game fetch',
+    'Hentning af gemt score-id': 'Saved score id fetch',
+    'Opdatering af highscore-medalje': 'Highscore medal update',
+    'Hentning af global rekord': 'Global record fetch'
+};
+
 function medTimeout<T>(promise: PromiseLike<T>, ms: number, label: string): Promise<T> {
     return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => reject(new Error(`${label} tog for lang tid.`)), ms);
+        const timer = setTimeout(
+            () => reject(new Error(tekst(`${label} tog for lang tid.`, `${timeoutLabelsEn[label] || label} took too long.`))),
+            ms
+        );
         Promise.resolve(promise)
             .then(resolve, reject)
             .finally(() => clearTimeout(timer));
@@ -233,7 +255,10 @@ function logMineEjerskifte(index: number, nytFelt: Felt) {
     if (gammelEjer === nyEjer) return;
 
     if (gammelEjer === spilTilstand.spillerNavn && nyEjer && nyEjer !== spilTilstand.spillerNavn) {
-        spilTilstand.logBesked = `Du mistede en guldmine til ${nyEjer}.`;
+        spilTilstand.logBesked = tekst(
+            `Du mistede en guldmine til ${nyEjer}.`,
+            `You lost a gold mine to ${nyEjer}.`
+        );
     }
 }
 
@@ -274,7 +299,7 @@ export async function flushVentendeSync() {
     kortSkalOpdateres = false;
     return await medTimeout(udfoerDbUpload(sendKort), 12000, 'Gemning af øen').catch((error) => {
         console.error('Kunne ikke gemme ventende sync', error);
-        spilTilstand.statusBesked = error instanceof Error ? error.message : 'Øen kunne ikke gemmes.';
+        spilTilstand.statusBesked = error instanceof Error ? error.message : tekst('Øen kunne ikke gemmes.', 'The island could not be saved.');
         return false;
     });
 }
@@ -455,7 +480,10 @@ async function udfoerDbUpload(sendKort: boolean) {
 
     if (hentError) {
         console.error('Kunne ikke hente aktuel spillerliste', hentError);
-        spilTilstand.statusBesked = `Øen kunne ikke gemmes: ${hentError.message}`;
+        spilTilstand.statusBesked = tekst(
+            `Øen kunne ikke gemmes: ${hentError.message}`,
+            `The island could not be saved: ${hentError.message}`
+        );
         return false;
     }
 
@@ -494,13 +522,19 @@ async function udfoerDbUpload(sendKort: boolean) {
 
     if (error) {
         console.error('Kunne ikke gemme spil-session', error);
-        spilTilstand.statusBesked = `Øen kunne ikke gemmes: ${error.message}`;
+        spilTilstand.statusBesked = tekst(
+            `Øen kunne ikke gemmes: ${error.message}`,
+            `The island could not be saved: ${error.message}`
+        );
         return false;
     }
 
     if (count === 0) {
         console.error('Kunne ikke gemme spil-session: ingen række matchede ø-navnet', spilTilstand.rumKode);
-        spilTilstand.statusBesked = 'Øen kunne ikke gemmes: ingen session matchede ø-navnet.';
+        spilTilstand.statusBesked = tekst(
+            'Øen kunne ikke gemmes: ingen session matchede ø-navnet.',
+            'The island could not be saved: no session matched the island name.'
+        );
         return false;
     }
 
@@ -563,7 +597,10 @@ export async function gemHighscore() {
         markerLoginUdlobet();
         huskVentendeHighscore(lavPayload());
         gemOfflineScore(true);
-        spilTilstand.statusBesked = 'Login mangler eller er udløbet. Scoren er gemt i browseren og sendes, når du logger ind igen.';
+        spilTilstand.statusBesked = tekst(
+            'Login mangler eller er udløbet. Scoren er gemt i browseren og sendes, når du logger ind igen.',
+            'Login is missing or expired. The score is saved in the browser and will be sent when you log in again.'
+        );
         return false;
     }
 
@@ -576,11 +613,17 @@ export async function gemHighscore() {
         console.error('Kunne ikke gemme highscore', error);
         if (error.message.toLowerCase().includes('logget ind')) {
             markerLoginUdlobet();
-            spilTilstand.statusBesked = 'Login mangler eller er udløbet. Scoren er gemt i browseren og sendes, når du logger ind igen.';
+            spilTilstand.statusBesked = tekst(
+                'Login mangler eller er udløbet. Scoren er gemt i browseren og sendes, når du logger ind igen.',
+                'Login is missing or expired. The score is saved in the browser and will be sent when you log in again.'
+            );
             return false;
         }
         gemOfflineScore(true);
-        spilTilstand.statusBesked = `Scoren kunne ikke gemmes globalt: ${error.message} Den prøves igen automatisk fra denne browser.`;
+        spilTilstand.statusBesked = tekst(
+            `Scoren kunne ikke gemmes globalt: ${error.message} Den prøves igen automatisk fra denne browser.`,
+            `The score could not be saved globally: ${error.message} It will be retried automatically from this browser.`
+        );
         return false;
     }
 

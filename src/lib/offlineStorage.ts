@@ -3,6 +3,7 @@ import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 import { taelScoreSpillere } from './score';
 import type { Karakter } from './types';
 import { hentKarakterNavneIKlasse } from './spildata';
+import { tekst } from './i18n.svelte';
 
 const OFFLINE_GAME_KEY = 'taage_offline_spil';
 const OFFLINE_SCORES_KEY = 'taage_offline_scores';
@@ -175,7 +176,7 @@ export function indlaesOfflineSpil() {
         spilTilstand.gratisBevaegelseKilde = data.gratisBevaegelseKilde ?? '';
         spilTilstand.sidsteBersaerkDag = data.sidsteBersaerkDag ?? 0;
         spilTilstand.musikTaendt = data.musikTaendt ?? true;
-        spilTilstand.statusBesked = 'Offline-spil indlæst.';
+        spilTilstand.statusBesked = tekst('Offline-spil indlæst.', 'Offline game loaded.');
 
         return true;
     } catch {

@@ -5,9 +5,11 @@
     import { grav } from '$lib/undergrund.svelte';
     import { hvil, brugFraRygsæk, udfoerTeleport, taendBaal, aktiverHemmelighed, begaaIndbrud, kanBegaaIndbrudPaaFelt, kanPlyndreFelt, plyndrFelt } from '$lib/spilmotor';
     import { syncTilDb } from '$lib/netvaerk';
-import { diamantSamletVaerdi, diamantStoerrelsesNavn, diamantVaerdier } from '$lib/score';
-import { registrerHeling } from '$lib/trofaeer';
-import { markerTutorialHandling } from '$lib/tutorial.svelte';
+    import { diamantSamletVaerdi, diamantStoerrelsesNavn, diamantVaerdier } from '$lib/score';
+    import { registrerHeling } from '$lib/trofaeer';
+    import { markerTutorialHandling } from '$lib/tutorial.svelte';
+    import { tekst } from '$lib/i18n.svelte';
+    import { itemBeskrivelse, itemNavn } from '$lib/spilTekst';
     import type { RygsækTing } from '$lib/types';
 
     let aktueltFelt = $derived(
@@ -22,24 +24,24 @@ import { markerTutorialHandling } from '$lib/tutorial.svelte';
     let harMesterskovl = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'mesterskovl' && ting.maengde > 0) ?? false);
     let harSkovl = $derived(spilTilstand.mitUdstyr?.some((ting) => (ting.id === 'skovl' || ting.id === 'mesterskovl') && ting.maengde > 0) ?? false);
     let graveIkon = $derived(harMesterskovl ? itemDB.mesterskovl.billede : harSkovl ? itemDB.skovl.billede : '/ui/haandgrav.webp');
-    let graveNavn = $derived(harMesterskovl ? 'Mesterskovl' : harSkovl ? 'Skovl' : 'Grav med hænderne');
-    let graveAlt = $derived(kanGrave ? (harSkovl ? `Grav med ${harMesterskovl ? 'mesterskovl' : 'skovl'}` : 'Grav med hænderne') : 'Her kan ikke graves');
+    let graveNavn = $derived(harMesterskovl ? itemNavn('mesterskovl') : harSkovl ? itemNavn('skovl') : tekst('Grav med hænderne', 'Dig with hands'));
+    let graveAlt = $derived(kanGrave ? (harSkovl ? tekst(`Grav med ${harMesterskovl ? 'mesterskovl' : 'skovl'}`, `Dig with ${harMesterskovl ? 'master shovel' : 'shovel'}`) : tekst('Grav med hænderne', 'Dig with hands')) : tekst('Her kan ikke graves', 'You cannot dig here'));
     let graveEnergiPris = $derived(spilTilstand.valgtKarakter?.digCost ?? 3);
     let haandGraveEnergiPris = $derived(graveEnergiPris + 4);
     let haandGraveSkade = $derived(spilTilstand.beregnSkade(4));
-    let hpHjaelp = $derived('Dit helbred. På land kollapser du normalt ved 0 HP. I tåge eller vand dør du, medmindre en livseliksir redder dig først. Mad giver +20 HP.');
+    let hpHjaelp = $derived(tekst('Dit helbred. På land kollapser du normalt ved 0 HP. I tåge eller vand dør du, medmindre en livseliksir redder dig først. Mad giver +20 HP.', 'Your health. On land you normally collapse at 0 HP. In fog or water you die unless a life elixir saves you first. Food gives +20 HP.'));
     let energiHjaelp = $derived(
         spilTilstand.gratisNaesteBevaegelse
             ? (spilTilstand.gratisBevaegelseKilde === 'bersaerk'
-                ? 'Din næste energikrævende handling koster 0 energi på grund af bersærkergang.'
-                : 'Din næste bevægelse koster 0 energi på grund af mad.')
-            : 'Energi bruges på bevægelse, gravning og visse handlinger. Når energien løber tør, går dagen videre efter handlingen.'
+                ? tekst('Din næste energikrævende handling koster 0 energi på grund af bersærkergang.', 'Your next energy-costing action costs 0 energy because of berserk.')
+                : tekst('Din næste bevægelse koster 0 energi på grund af mad.', 'Your next move costs 0 energy because of food.'))
+            : tekst('Energi bruges på bevægelse, gravning og visse handlinger. Når energien løber tør, går dagen videre efter handlingen.', 'Energy is used for movement, digging and some actions. When energy runs out, the day advances after the action.')
     );
     let graveHjaelp = $derived.by(() => {
-        if (!kanGrave) return 'Du kan ikke grave på dette felt lige nu.';
-        if (harMesterskovl) return `Graver for ${graveEnergiPris} energi. Mesterskovlen giver normalt dobbelt guld og finder nedgravede fælder uden skade.`;
-        if (harSkovl) return `Graver for ${graveEnergiPris} energi. Nedgravede fælder udløses stadig.`;
-        return `Graver med hænderne for ${haandGraveEnergiPris} energi og ${haandGraveSkade} HP. Nedgravede fælder kan stadig udløses.`;
+        if (!kanGrave) return tekst('Du kan ikke grave på dette felt lige nu.', 'You cannot dig on this field right now.');
+        if (harMesterskovl) return tekst(`Graver for ${graveEnergiPris} energi. Mesterskovlen giver normalt dobbelt guld og finder nedgravede fælder uden skade.`, `Dig for ${graveEnergiPris} energy. The master shovel normally gives double gold and finds buried traps without damage.`);
+        if (harSkovl) return tekst(`Graver for ${graveEnergiPris} energi. Nedgravede fælder udløses stadig.`, `Dig for ${graveEnergiPris} energy. Buried traps still trigger.`);
+        return tekst(`Graver med hænderne for ${haandGraveEnergiPris} energi og ${haandGraveSkade} HP. Nedgravede fælder kan stadig udløses.`, `Dig with hands for ${haandGraveEnergiPris} energy and ${haandGraveSkade} HP. Buried traps can still trigger.`);
     });
     const hvileBiomer = ['eng', 'skov', 'mark', 'bjerg', 'hoejland'];
 
@@ -62,7 +64,7 @@ import { markerTutorialHandling } from '$lib/tutorial.svelte';
         const harGratisBevaegelse = spilTilstand.gratisNaesteBevaegelse;
 
         if (fuldHp && harGratisBevaegelse) {
-            spilTilstand.logBesked = "Du er allerede mæt og fuldt udhvilet.";
+            spilTilstand.logBesked = tekst('Du er allerede mæt og fuldt udhvilet.', 'You are already fed and fully rested.');
             return;
         }
 
@@ -73,7 +75,10 @@ import { markerTutorialHandling } from '$lib/tutorial.svelte';
         spilTilstand.gratisNaesteBevaegelse = true;
         spilTilstand.gratisBevaegelseKilde = 'mad';
         const faktiskHeling = spilTilstand.livspoint - foerHp;
-        spilTilstand.logBesked = `Du spiser din madration. (+${faktiskHeling} HP, næste bevægelse koster 0 energi)`;
+        spilTilstand.logBesked = tekst(
+            `Du spiser din madration. (+${faktiskHeling} HP, næste bevægelse koster 0 energi)`,
+            `You eat your food ration. (+${faktiskHeling} HP, next move costs 0 energy)`
+        );
         syncTilDb();
     }
 
@@ -145,9 +150,18 @@ import { markerTutorialHandling } from '$lib/tutorial.svelte';
 
     function diamantForklaring(vare: RygsækTing) {
         const vaerdier = diamantVaerdier(vare);
-        if (vaerdier.length === 0) return 'En sjælden ædelsten. Den kan sælges i butikker.';
-        if (vaerdier.length === 1) return `Det er en ${diamantStoerrelsesNavn(vaerdier[0])} diamant til ${vaerdier[0]} guld. I butikker får du 75% af værdien.`;
-        return `${vaerdier.length} diamanter, samlet værdi ${diamantSamletVaerdi(vare)} guld. Størrelser: ${vaerdier.map((vaerdi) => `${diamantStoerrelsesNavn(vaerdi)} ${vaerdi}`).join(', ')}. I butikker sælges de samlet for 75% af værdien.`;
+        if (vaerdier.length === 0) return tekst('En sjælden ædelsten. Den kan sælges i butikker.', 'A rare gem. It can be sold in shops.');
+        if (vaerdier.length === 1) {
+            const stoerrelse = diamantStoerrelsesNavn(vaerdier[0]);
+            const enStoerrelse = stoerrelse === 'enorm' ? 'huge' : stoerrelse === 'stor' ? 'large' : 'small';
+            return tekst(`Det er en ${stoerrelse} diamant til ${vaerdier[0]} guld. I butikker får du 75% af værdien.`, `It is a ${enStoerrelse} diamond worth ${vaerdier[0]} gold. Shops pay 75% of the value.`);
+        }
+        const danskeStoerrelser = vaerdier.map((vaerdi) => `${diamantStoerrelsesNavn(vaerdi)} ${vaerdi}`).join(', ');
+        const engelskeStoerrelser = vaerdier.map((vaerdi) => {
+            const stoerrelse = diamantStoerrelsesNavn(vaerdi);
+            return `${stoerrelse === 'enorm' ? 'huge' : stoerrelse === 'stor' ? 'large' : 'small'} ${vaerdi}`;
+        }).join(', ');
+        return tekst(`${vaerdier.length} diamanter, samlet værdi ${diamantSamletVaerdi(vare)} guld. Størrelser: ${danskeStoerrelser}. I butikker sælges de samlet for 75% af værdien.`, `${vaerdier.length} diamonds, total value ${diamantSamletVaerdi(vare)} gold. Sizes: ${engelskeStoerrelser}. Shops buy them together for 75% of the value.`);
     }
 
     function vareBadgeTekst(vare: RygsækTing) {
@@ -157,31 +171,31 @@ import { markerTutorialHandling } from '$lib/tutorial.svelte';
 
     function forklaringForVare(vareId: string, aktiv: boolean, vare?: RygsækTing) {
         const info = itemDB[vareId];
-        if (!info) return 'Ukendt genstand.';
+        if (!info) return tekst('Ukendt genstand.', 'Unknown item.');
 
         if (vareId === 'metaldetektor' || vareId === 'malmviser') {
-            return `${info.beskrivelse} Den virker passivt, mens du bevæger dig.`;
+            return `${itemBeskrivelse(vareId)} ${tekst('Den virker passivt, mens du bevæger dig.', 'It works passively while you move.')}`;
         }
 
         if (vareId === 'soegekvist' || vareId === 'runekvist') {
-            return `${info.beskrivelse} Den virker passivt, mens du bevæger dig.`;
+            return `${itemBeskrivelse(vareId)} ${tekst('Den virker passivt, mens du bevæger dig.', 'It works passively while you move.')}`;
         }
 
         if (vareId === 'livseliksir') {
-            return `${info.beskrivelse} Den bruges automatisk ved dødelig skade.`;
+            return `${itemBeskrivelse(vareId)} ${tekst('Den bruges automatisk ved dødelig skade.', 'It is used automatically on lethal damage.')}`;
         }
 
         if (vareId === 'diamant') {
-            return vare ? diamantForklaring(vare) : `${info.beskrivelse} Den kan sælges i butikker.`;
+            return vare ? diamantForklaring(vare) : `${itemBeskrivelse(vareId)} ${tekst('Den kan sælges i butikker.', 'It can be sold in shops.')}`;
         }
 
         const status = aktiv
-            ? 'Den kan bruges lige nu.'
+            ? tekst('Den kan bruges lige nu.', 'It can be used right now.')
             : erSituationsVare(vareId)
-                ? 'Den kan ikke bruges i den nuværende situation.'
-                : 'Effekten virker automatisk eller i events; den skal ikke aktiveres fra inventory.';
+                ? tekst('Den kan ikke bruges i den nuværende situation.', 'It cannot be used in the current situation.')
+                : tekst('Effekten virker automatisk eller i events; den skal ikke aktiveres fra inventory.', 'The effect works automatically or in events; it does not need to be activated from the inventory.');
 
-        return `${info.beskrivelse} ${status}`;
+        return `${itemBeskrivelse(vareId)} ${status}`;
     }
 </script>
 
@@ -197,16 +211,16 @@ import { markerTutorialHandling } from '$lib/tutorial.svelte';
     <div class="ui-content">
         <div class="status-row">
             <div class="status-item" class:kritisk={spilTilstand.livspoint < 30} data-help-title="HP" data-help-body={hpHjaelp}>
-                <img src="/inventory/hp.webp" alt="Liv" class="status-icon" />
+                <img src="/inventory/hp.webp" alt={tekst('Liv', 'Health')} class="status-icon" />
                 <span class="status-value">{spilTilstand.livspoint}</span>
             </div>
             
-            <div class="status-item" data-help-title="Guld" data-help-body="Guld bruges i butikker og tæller med i score. Nogle karakterer tjener mere eller mindre guld.">
-                <img src="/inventory/guld.webp" alt="Guld" class="status-icon" />
+            <div class="status-item" data-help-title={tekst('Guld', 'Gold')} data-help-body={tekst('Guld bruges i butikker og tæller med i score. Nogle karakterer tjener mere eller mindre guld.', 'Gold is used in shops and counts toward score. Some characters earn more or less gold.')}>
+                <img src="/inventory/guld.webp" alt={tekst('Guld', 'Gold')} class="status-icon" />
                 <span class="status-value">{spilTilstand.guldTotal}</span>
             </div>
         
-            <div class="energi-sektion" data-help-title="Energi" data-help-body={energiHjaelp}>
+            <div class="energi-sektion" data-help-title={tekst('Energi', 'Energy')} data-help-body={energiHjaelp}>
                 <div class="energi-container">
                     <div class="energi-grid">
                         {#each Array(9) as tomPlads, i (i)}
@@ -243,7 +257,7 @@ import { markerTutorialHandling } from '$lib/tutorial.svelte';
                 {#if dbInfo && vare.id !== 'skovl' && vare.id !== 'mesterskovl'}
                     <div 
                         class="inventory-item {kanBrugeInventoryVare(vare.id) ? 'klikbar' : ''}" 
-                        data-help-title={dbInfo.navn}
+                        data-help-title={itemNavn(vare.id)}
                         data-help-body={forklaringForVare(vare.id, kanBrugeInventoryVare(vare.id), vare)}
                         onclick={() => {
                             if (kanBrugeInventoryVare(vare.id)) {
@@ -263,9 +277,9 @@ import { markerTutorialHandling } from '$lib/tutorial.svelte';
                         <div class="ikon-container">
                             <img 
                                 src={dbInfo.billede} 
-                                alt={dbInfo.navn} 
+                                alt={itemNavn(vare.id)}
                                 class="inventory-icon {erOpgraderetVare(vare.id) ? 'opgraderet' : ''} {erSituationsVare(vare.id) && !kanBrugeInventoryVare(vare.id) ? 'deaktiveret' : ''}" 
-                                data-help-title={dbInfo.navn}
+                                data-help-title={itemNavn(vare.id)}
                                 data-help-body={forklaringForVare(vare.id, kanBrugeInventoryVare(vare.id), vare)}
                             />
                             {#if vareBadgeTekst(vare)}

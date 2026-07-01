@@ -3,6 +3,7 @@ import { type LydNiveau, lydKontrol, saetLydNiveau } from './lydKontrol.svelte';
 import { tilgaengeligeKarakterer } from './spildata';
 import { findMedaljeNiveau } from './score';
 import { hentTitel } from './historieMotor';
+import { normaliserSprog, saetSprog, sprogState, tekst, type AppSprog } from './i18n.svelte';
 import {
     gemTrofaeIds,
     hentGemteTrofaeIds,
@@ -19,6 +20,7 @@ export interface Profil {
     sound_level?: LydNiveau | null;
     trophies?: TrofaeId[] | null;
     profile_character_id?: string | null;
+    language?: AppSprog | null;
     created_at?: string;
     updated_at?: string;
 }
@@ -53,7 +55,7 @@ export const authState = $state({
 let authStartet = false;
 let authHeartbeatTimer: ReturnType<typeof setInterval> | null = null;
 const PROFIL_KARAKTER_KEY = 'taage_profile_character:';
-const PROFIL_SELECT = 'id, display_name, sound_level, trophies, profile_character_id, created_at, updated_at';
+const PROFIL_SELECT = 'id, display_name, sound_level, trophies, profile_character_id, language, created_at, updated_at';
 
 function erGyldigProfilKarakterId(karakterId?: string | null) {
     return !karakterId || tilgaengeligeKarakterer.some((karakter) => karakter.id === karakterId);
@@ -85,8 +87,13 @@ function normaliserProfil(data: (Profil & { trophies?: unknown }) | null) {
     return {
         ...data,
         trophies: normaliserTrofaeIds(data.trophies),
-        profile_character_id: erGyldigProfilKarakterId(data.profile_character_id) ? data.profile_character_id || null : null
+        profile_character_id: erGyldigProfilKarakterId(data.profile_character_id) ? data.profile_character_id || null : null,
+        language: data.language ? normaliserSprog(data.language) : null
     } satisfies Profil;
+}
+
+function anvendProfilSprog(profil: Profil | null) {
+    if (profil?.language) saetSprog(profil.language);
 }
 
 async function synkProfilTrofaeerMedLokalCache(profil: Profil | null) {
@@ -152,10 +159,13 @@ function startAuthHeartbeat() {
 function loginFejlBesked(message: string) {
     const lavere = message.toLowerCase();
     if (lavere.includes('rate') || lavere.includes('security') || lavere.includes('limit') || lavere.includes('seconds') || lavere.includes('minute')) {
-        return 'Supabase holder en kort pause på nye login-mails til den email. Du kan stadig spille offline imens og prøve login igen lidt senere.';
+        return tekst(
+            'Supabase holder en kort pause på nye login-mails til den email. Du kan stadig spille offline imens og prøve login igen lidt senere.',
+            'Supabase is briefly pausing new login emails to that address. You can still play offline meanwhile and try login again a little later.'
+        );
     }
 
-    return `Login-linket kunne ikke sendes: ${message}`;
+    return tekst(`Login-linket kunne ikke sendes: ${message}`, `The login link could not be sent: ${message}`);
 }
 
 export async function initAuth() {
@@ -195,7 +205,7 @@ export async function sendLoginLink(email: string) {
 
     const rentEmail = email.trim();
     if (!rentEmail) {
-        authState.besked = 'Skriv din email.';
+        authState.besked = tekst('Skriv din email.', 'Enter your email.');
         return;
     }
 
@@ -216,10 +226,13 @@ export async function sendLoginLink(email: string) {
             return;
         }
 
-        authState.besked = 'Vi har sendt et login-link til din email. Hvis du allerede har bedt om et link, kan Supabase kræve en kort pause før næste mail.';
+        authState.besked = tekst(
+            'Vi har sendt et login-link til din email. Hvis du allerede har bedt om et link, kan Supabase kræve en kort pause før næste mail.',
+            'We sent a login link to your email. If you already requested a link, Supabase may require a short pause before the next email.'
+        );
     } catch (error) {
         console.error('Login-link kunne ikke sendes:', error);
-        const message = error instanceof Error ? error.message : 'Ukendt fejl';
+        const message = error instanceof Error ? error.message : tekst('Ukendt fejl', 'Unknown error');
         authState.besked = loginFejlBesked(message);
     } finally {
         authState.loader = false;
@@ -247,19 +260,20 @@ export async function hentEllerOpretProfil() {
             .eq('id', authState.user.id)
             .maybeSingle();
 
-        data = fallback.data ? { ...fallback.data, sound_level: null, trophies: [], profile_character_id: hentLokalProfilKarakter(authState.user.id) } : null;
+        data = fallback.data ? { ...fallback.data, sound_level: null, trophies: [], profile_character_id: hentLokalProfilKarakter(authState.user.id), language: sprogState.sprog } : null;
     }
 
     if (data) {
         authState.profil = medLokalProfilKarakterFallback(await synkProfilTrofaeerMedLokalCache(normaliserProfil(data)));
         if (data.sound_level) saetLydNiveau(data.sound_level);
+        anvendProfilSprog(authState.profil);
         return authState.profil;
     }
 
     const fallbackNavn = authState.user.email?.split('@')[0]?.slice(0, 15) || 'Spiller';
     const opretResultat = await supabase
         .from('profiles')
-        .insert([{ id: authState.user.id, display_name: fallbackNavn, sound_level: lydKontrol.niveau, trophies: [], profile_character_id: null }])
+        .insert([{ id: authState.user.id, display_name: fallbackNavn, sound_level: lydKontrol.niveau, trophies: [], profile_character_id: null, language: sprogState.sprog }])
         .select(PROFIL_SELECT)
         .single();
     let oprettet = opretResultat.data;
@@ -271,10 +285,11 @@ export async function hentEllerOpretProfil() {
             .select('id, display_name, created_at, updated_at')
             .single();
 
-        oprettet = fallback.data ? { ...fallback.data, sound_level: null, trophies: [], profile_character_id: hentLokalProfilKarakter(authState.user.id) } : null;
+        oprettet = fallback.data ? { ...fallback.data, sound_level: null, trophies: [], profile_character_id: hentLokalProfilKarakter(authState.user.id), language: sprogState.sprog } : null;
     }
 
     authState.profil = medLokalProfilKarakterFallback(await synkProfilTrofaeerMedLokalCache(normaliserProfil(oprettet)));
+    anvendProfilSprog(authState.profil);
     return authState.profil;
 }
 
@@ -283,7 +298,7 @@ export async function gemProfilNavn(navn: string) {
 
     const rentNavn = navn.replace(/[^a-zA-Z0-9æøåÆØÅ ]/g, '').trim().substring(0, 15);
     if (!rentNavn) {
-        authState.besked = 'Navnet må ikke være tomt.';
+        authState.besked = tekst('Navnet må ikke være tomt.', 'The name cannot be empty.');
         return;
     }
 
@@ -303,15 +318,15 @@ export async function gemProfilNavn(navn: string) {
             .select('id, display_name, created_at, updated_at')
             .single();
 
-        data = fallback.data ? { ...fallback.data, sound_level: authState.profil?.sound_level ?? null, trophies: authState.profil?.trophies ?? [], profile_character_id: authState.profil?.profile_character_id ?? null } : null;
+        data = fallback.data ? { ...fallback.data, sound_level: authState.profil?.sound_level ?? null, trophies: authState.profil?.trophies ?? [], profile_character_id: authState.profil?.profile_character_id ?? null, language: authState.profil?.language ?? sprogState.sprog } : null;
         error = fallback.error;
     }
 
     if (!error && data) {
         authState.profil = medLokalProfilKarakterFallback(normaliserProfil(data));
-        authState.besked = 'Profilnavnet er gemt.';
+        authState.besked = tekst('Profilnavnet er gemt.', 'Profile name saved.');
     } else {
-        authState.besked = 'Profilnavnet kunne ikke gemmes.';
+        authState.besked = tekst('Profilnavnet kunne ikke gemmes.', 'Profile name could not be saved.');
     }
 }
 
@@ -333,7 +348,7 @@ export async function gemProfilLydNiveau(niveau: LydNiveau) {
             .select('id, display_name, sound_level, created_at, updated_at')
             .single();
 
-        data = fallback.data ? { ...fallback.data, trophies: authState.profil?.trophies ?? [], profile_character_id: authState.profil?.profile_character_id ?? null } : null;
+        data = fallback.data ? { ...fallback.data, trophies: authState.profil?.trophies ?? [], profile_character_id: authState.profil?.profile_character_id ?? null, language: authState.profil?.language ?? sprogState.sprog } : null;
         error = fallback.error;
     }
 
@@ -350,6 +365,7 @@ export async function gemProfilKarakter(karakterId: string | null) {
     const naesteProfil = {
         ...(authState.profil || { id: authState.user.id, display_name: null }),
         profile_character_id: rentKarakterId,
+        language: authState.profil?.language ?? sprogState.sprog,
         updated_at: opdateretTidspunkt
     } satisfies Profil;
 
@@ -362,15 +378,44 @@ export async function gemProfilKarakter(karakterId: string | null) {
     if (error) {
         authState.profil = naesteProfil;
         authState.besked = rentKarakterId
-            ? 'Profilbilledet er gemt på denne enhed.'
-            : 'Profilbilledet er sat tilbage til auto på denne enhed.';
+            ? tekst('Profilbilledet er gemt på denne enhed.', 'Profile picture saved on this device.')
+            : tekst('Profilbilledet er sat tilbage til auto på denne enhed.', 'Profile picture reset to auto on this device.');
         return;
     }
 
     if (data) {
         authState.profil = medLokalProfilKarakterFallback(normaliserProfil(data));
-        authState.besked = rentKarakterId ? 'Profilbilledet er gemt.' : 'Profilbilledet er sat tilbage til auto.';
+        authState.besked = rentKarakterId
+            ? tekst('Profilbilledet er gemt.', 'Profile picture saved.')
+            : tekst('Profilbilledet er sat tilbage til auto.', 'Profile picture reset to auto.');
     }
+}
+
+export async function gemProfilSprog(sprog: AppSprog) {
+    const rentSprog = normaliserSprog(sprog);
+    saetSprog(rentSprog);
+    if (!authState.user) return;
+
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
+    const opdateretTidspunkt = new Date().toISOString();
+    const naesteProfil = {
+        ...(authState.profil || { id: authState.user.id, display_name: null }),
+        language: rentSprog,
+        updated_at: opdateretTidspunkt
+    } satisfies Profil;
+
+    const { data, error } = await supabase
+        .from('profiles')
+        .upsert({ id: authState.user.id, language: rentSprog, updated_at: opdateretTidspunkt })
+        .select(PROFIL_SELECT)
+        .single();
+
+    if (error) {
+        authState.profil = naesteProfil;
+        return;
+    }
+
+    if (data) authState.profil = medLokalProfilKarakterFallback(normaliserProfil(data));
 }
 
 export async function hentProfilStats() {

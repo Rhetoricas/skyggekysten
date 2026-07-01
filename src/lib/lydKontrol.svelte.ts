@@ -1,4 +1,5 @@
 import { spilTilstand } from './spilTilstand.svelte';
+import { tekst } from './i18n.svelte';
 
 export type LydNiveau = 'fuld' | 'lav' | 'slukket';
 
@@ -34,9 +35,9 @@ export function saetLydNiveau(niveau: LydNiveau) {
 }
 
 export function lydTitel() {
-    if (lydKontrol.niveau === 'fuld') return 'Fuld lyd';
-    if (lydKontrol.niveau === 'lav') return 'Dæmpet lyd';
-    return 'Lyd slukket';
+    if (lydKontrol.niveau === 'fuld') return tekst('Fuld lyd', 'Full sound');
+    if (lydKontrol.niveau === 'lav') return tekst('Dæmpet lyd', 'Low sound');
+    return tekst('Lyd slukket', 'Sound off');
 }
 
 export function lydIkon() {

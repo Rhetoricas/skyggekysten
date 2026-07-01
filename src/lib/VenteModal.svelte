@@ -3,6 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { VENTE_MAKS_MS, erVenteTidUdlobet, startVenteSpil, vendKort, stopVenteSpil, erNaesteVenteRundeGratis, venteTidTilbageMs } from '$lib/ventespil.svelte';
     import { erFriskAktivSpiller } from '$lib/aktivSpiller';
+    import { tekst } from '$lib/i18n.svelte';
     
     let { kanSpilleIgen } = $props<{ kanSpilleIgen: boolean }>();
     let nu = $state(Date.now());
@@ -49,18 +50,24 @@
 
 <div class="vente-overlay">
     <div class="vente-content">
-        <h2>Tiden står stille</h2>
+        <h2>{tekst('Tiden står stille', 'Time stands still')}</h2>
         <div class="imp-timer" class:udloebet={impTidUdlobet}>
             {#if impTidUdlobet}
-                Impen pakker sammen efter denne runde
+                {tekst('Impen pakker sammen efter denne runde', 'The imp packs up after this round')}
             {:else}
-                Impen bliver i {sekunderTilbage} sekunder
+                {tekst(`Impen bliver i ${sekunderTilbage} sekunder`, `The imp stays for ${sekunderTilbage} seconds`)}
             {/if}
         </div>
         <p class="vente-desc">
-            Du har slået lejr <strong style="color: gold;">{dageForan} {dageForan === 1 ? 'dag' : 'dage'}</strong> foran den langsomste på øen. 
-            En imp dukker pludselig op med et magisk kortspil. <br><br>
-            <strong>Regler:</strong> Impen bliver højst {Math.round(VENTE_MAKS_MS / 1000)} sekunder. Du får én gratis runde pr. felt. Du kan først få en ny gratis runde, når du har flyttet dig. På samme felt kan du selv købe flere runder for 5 guld. Træk kort for at vinde guld eller helbred. Trækker du kraniet, mister du alt det, du har vundet i <em>denne</em> runde.
+            {tekst('Du har slået lejr', 'You have made camp')}
+            <strong style="color: gold;">{dageForan} {dageForan === 1 ? tekst('dag', 'day') : tekst('dage', 'days')}</strong>
+            {tekst('foran den langsomste på øen. En imp dukker pludselig op med et magisk kortspil.', 'ahead of the slowest player on the island. An imp suddenly appears with a magic card game.')}
+            <br><br>
+            <strong>{tekst('Regler:', 'Rules:')}</strong>
+            {tekst(
+                `Impen bliver højst ${Math.round(VENTE_MAKS_MS / 1000)} sekunder. Du får én gratis runde pr. felt. Du kan først få en ny gratis runde, når du har flyttet dig. På samme felt kan du selv købe flere runder for 5 guld. Træk kort for at vinde guld eller helbred. Trækker du kraniet, mister du alt det, du har vundet i denne runde.`,
+                `The imp stays for at most ${Math.round(VENTE_MAKS_MS / 1000)} seconds. You get one free round per field. You can only get a new free round after moving. On the same field, you can buy more rounds for 5 gold. Draw cards to win gold or health. If you draw the skull, you lose everything won in this round.`
+            )}
         </p>
 
         <div class="vente-board">
@@ -85,14 +92,14 @@
         </div>
 
         <div class="pulje-sektion">
-            <span class="pulje-label">Pulje på bordet:</span>
+            <span class="pulje-label">{tekst('Pulje på bordet:', 'Pot on the table:')}</span>
             <span class="pulje-item">
                 <img src="/inventory/hp.webp" alt="HP" />
                 {spilTilstand.ventePuljeLiv}
             </span>
             <span class="pulje-divider">|</span>
             <span class="pulje-item">
-                <img src="/inventory/guld.webp" alt="Guld" />
+                <img src="/inventory/guld.webp" alt={tekst('Guld', 'Gold')} />
                 {spilTilstand.ventePuljeGuld}
             </span>
         </div>
@@ -100,7 +107,7 @@
         <div class="handling-sektion">
             {#if spilTilstand.venteFase === 'spiller' || spilTilstand.venteFase === 'viser_gevinst'}
                 {#if spilTilstand.ventePuljeLiv > 0 || spilTilstand.ventePuljeGuld > 0}
-                    <button class="vente-btn stop-btn" onclick={stopVenteSpil}>Stop og behold puljen</button>
+                    <button class="vente-btn stop-btn" onclick={stopVenteSpil}>{tekst('Stop og behold puljen', 'Stop and keep the pot')}</button>
                 {/if}
             {:else if spilTilstand.venteFase === 'tabt' || spilTilstand.venteFase === 'vundet' || spilTilstand.venteFase === 'venter' || spilTilstand.venteFase === 'trukket'}
                 {#if kanStarteRunde}
@@ -109,11 +116,11 @@
                         disabled={!kanBetaleNaesteRunde}
                         onclick={() => startVenteSpil(true)}
                     >
-                        {naesteRundeErGratis ? 'Start første runde (Gratis)' : 'Start ny runde (Koster 5 Guld)'}
+                        {naesteRundeErGratis ? tekst('Start første runde (Gratis)', 'Start first round (Free)') : tekst('Start ny runde (Koster 5 Guld)', 'Start new round (Costs 5 Gold)')}
                     </button>
                 {:else}
                     <button class="vente-btn udsolgt-btn" disabled>
-                        {impTidUdlobet ? 'Impen pakker sammen.' : 'De andre er ved at pakke bordet sammen.'}
+                        {impTidUdlobet ? tekst('Impen pakker sammen.', 'The imp is packing up.') : tekst('De andre er ved at pakke bordet sammen.', 'The others are packing up the table.')}
                     </button>
                 {/if}
             {/if}

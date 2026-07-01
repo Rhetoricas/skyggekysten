@@ -41,8 +41,10 @@
     import BottomUI from './BottomUI.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
     import LydKnap from '$lib/LydKnap.svelte';
+    import SprogKnap from '$lib/SprogKnap.svelte';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import { erVenteTidUdlobet, lukVenteSpil } from '$lib/ventespil.svelte';
+    import { initSprog, tekst } from '$lib/i18n.svelte';
     import {
         TUTORIAL_BREDDE,
         TUTORIAL_HOEJDE,
@@ -131,8 +133,12 @@
     }
 
     function erForbindelsesStatus() {
-        return spilTilstand.statusBesked === 'Forbinder dig til øen...' ||
-            spilTilstand.statusBesked === 'Øen svarer langsomt. Prøver igen...';
+        return [
+            'Forbinder dig til øen...',
+            'Connecting to the island...',
+            'Øen svarer langsomt. Prøver igen...',
+            'The island is responding slowly. Trying again...'
+        ].includes(spilTilstand.statusBesked);
     }
 
     function planlaegAutoRefreshVedStart(navn: string, rumKode: string) {
@@ -144,7 +150,7 @@
             if (spilTilstand.gameState !== 'start' || !erForbindelsesStatus()) return;
 
             if (pending.refreshes >= 1) {
-                spilTilstand.statusBesked = 'Forbindelsen hænger stadig. Prøv igen eller refresh siden manuelt.';
+                spilTilstand.statusBesked = tekst('Forbindelsen hænger stadig. Prøv igen eller refresh siden manuelt.', 'The connection is still stuck. Try again or refresh the page manually.');
                 return;
             }
 
@@ -325,24 +331,44 @@
             }));
     });
 
-    const biomeForklaringer: Record<string, string> = {
-        mark: 'Mark kan graves og kan senere have afgrøder. Gravefund er ofte små: lidt guld, rod, sjælden fælde eller fakkel.',
-        eng: 'Eng er et let naturfelt. Det kan graves og har små chancer for guld, rod, fælde eller fakkel.',
-        skov: 'Skov kan give gode helende rødder ved gravning og har en lille chance for livseliksir.',
-        bjerg: 'Bjerg er tungt terræn for mange karakterer. Ved gravning finder du ofte guld, men også fælder og fakler.',
-        hule: 'Hule er farligt terræn. Gravefund kan være værdifulde, men fælder og livseliksir er også i puljen.',
-        ritual: 'Ritualfelt er farligt og event-tungt. Gravning kan give guld, rod, fælde eller livseliksir.',
-        ruin: 'Ruin er farligt, men rigt. Gravning kan give mere guld og har også risiko for fælder.',
-        bandit: 'Banditlejr er risikabel. Gravning giver ofte guld, men der er også stor fælderisiko.',
-        hoejland: 'Højland er åbent terræn. Gravning kan give guld, rod, en lille fælderisiko eller fakkel.',
-        blodskov: 'Blodskov er farligt og uroligt. Gravefund ligner andre farlige biomer: guld, rod, fælder og livseliksir.',
-        by: 'Byer kan have butikker, værksteder og indbrudsmuligheder. Spillere med kølle kan smadre dem til ruiner.',
-        hav: 'Hav er farligt uden båd. Du tager skade i åbent vand, og almindelig rustning, kongepanser og fakler går tabt i vandet. Hvis du kollapser i vandet, drukner du, medmindre en livseliksir redder dig først.',
-        soe: 'Sø er indlandsvand. Den er farlig uden båd ligesom hav. Den er ikke kyst, men pirater har lidt lettere ved den.',
-        krystal: 'Krystalfelter er farlige og sjældne. Gravning kan give små guldfund, fælder eller diamanter. Stave viser krystalfelter i nærheden, når du står på krystal.',
-        marked: 'Markeder kan have butikker. Spillere med kølle kan smadre dem til ruiner.',
-        slagmark: 'Slagmark er et farligt gravefelt med guld, rødder, fælder og livseliksir.',
-        meteor: 'Meteor-felter styres af meteor-eventet. Kig efter meteorstenen og eventet på feltet.'
+    const biomeNavne: Record<string, () => string> = {
+        mark: () => tekst('mark', 'field'),
+        eng: () => tekst('eng', 'meadow'),
+        skov: () => tekst('skov', 'forest'),
+        bjerg: () => tekst('bjerg', 'mountain'),
+        hule: () => tekst('hule', 'cave'),
+        ritual: () => tekst('ritualfelt', 'ritual field'),
+        ruin: () => tekst('ruin', 'ruin'),
+        bandit: () => tekst('banditlejr', 'bandit camp'),
+        hoejland: () => tekst('højland', 'highland'),
+        blodskov: () => tekst('blodskov', 'bloodwood'),
+        by: () => tekst('by', 'town'),
+        hav: () => tekst('hav', 'sea'),
+        soe: () => tekst('sø', 'lake'),
+        krystal: () => tekst('krystal', 'crystal'),
+        marked: () => tekst('marked', 'market'),
+        slagmark: () => tekst('slagmark', 'battlefield'),
+        meteor: () => tekst('meteor', 'meteor')
+    };
+
+    const biomeForklaringer: Record<string, () => string> = {
+        mark: () => tekst('Mark kan graves og kan senere have afgrøder. Gravefund er ofte små: lidt guld, rod, sjælden fælde eller fakkel.', 'Fields can be dug and may later grow crops. Finds are often small: a little gold, a root, a rare trap or a torch.'),
+        eng: () => tekst('Eng er et let naturfelt. Det kan graves og har små chancer for guld, rod, fælde eller fakkel.', 'Meadow is easy natural terrain. It can be dug and has small chances for gold, root, trap or torch.'),
+        skov: () => tekst('Skov kan give gode helende rødder ved gravning og har en lille chance for livseliksir.', 'Forest can give good healing roots when dug and has a small chance for a life elixir.'),
+        bjerg: () => tekst('Bjerg er tungt terræn for mange karakterer. Ved gravning finder du ofte guld, men også fælder og fakler.', 'Mountain is heavy terrain for many characters. Digging often finds gold, but also traps and torches.'),
+        hule: () => tekst('Hule er farligt terræn. Gravefund kan være værdifulde, men fælder og livseliksir er også i puljen.', 'Cave is dangerous terrain. Dug finds can be valuable, but traps and life elixirs are also in the pool.'),
+        ritual: () => tekst('Ritualfelt er farligt og event-tungt. Gravning kan give guld, rod, fælde eller livseliksir.', 'Ritual fields are dangerous and event-heavy. Digging can give gold, root, trap or life elixir.'),
+        ruin: () => tekst('Ruin er farligt, men rigt. Gravning kan give mere guld og har også risiko for fælder.', 'Ruins are dangerous but rich. Digging can give more gold and also carries trap risk.'),
+        bandit: () => tekst('Banditlejr er risikabel. Gravning giver ofte guld, men der er også stor fælderisiko.', 'Bandit camp is risky. Digging often gives gold, but the trap risk is high.'),
+        hoejland: () => tekst('Højland er åbent terræn. Gravning kan give guld, rod, en lille fælderisiko eller fakkel.', 'Highland is open terrain. Digging can give gold, root, a small trap risk or torch.'),
+        blodskov: () => tekst('Blodskov er farligt og uroligt. Gravefund ligner andre farlige biomer: guld, rod, fælder og livseliksir.', 'Bloodwood is dangerous and restless. Dug finds resemble other dangerous biomes: gold, root, traps and life elixir.'),
+        by: () => tekst('Byer kan have butikker, værksteder og indbrudsmuligheder. Spillere med kølle kan smadre dem til ruiner.', 'Towns can have shops, workshops and burglary opportunities. Players with a club can smash them into ruins.'),
+        hav: () => tekst('Hav er farligt uden båd. Du tager skade i åbent vand, og almindelig rustning, kongepanser og fakler går tabt i vandet. Hvis du kollapser i vandet, drukner du, medmindre en livseliksir redder dig først.', 'Sea is dangerous without a boat. You take damage in open water, and normal armor, royal armor and torches are lost in the water. If you collapse in water, you drown unless a life elixir saves you first.'),
+        soe: () => tekst('Sø er indlandsvand. Den er farlig uden båd ligesom hav. Den er ikke kyst, men pirater har lidt lettere ved den.', 'Lake is inland water. It is dangerous without a boat like the sea. It is not coast, but pirates handle it a little better.'),
+        krystal: () => tekst('Krystalfelter er farlige og sjældne. Gravning kan give små guldfund, fælder eller diamanter. Stave viser krystalfelter i nærheden, når du står på krystal.', 'Crystal fields are dangerous and rare. Digging can give small gold finds, traps or diamonds. Staffs reveal nearby crystal fields while you stand on crystal.'),
+        marked: () => tekst('Markeder kan have butikker. Spillere med kølle kan smadre dem til ruiner.', 'Markets can have shops. Players with a club can smash them into ruins.'),
+        slagmark: () => tekst('Slagmark er et farligt gravefelt med guld, rødder, fælder og livseliksir.', 'Battlefield is a dangerous digging field with gold, roots, traps and life elixir.'),
+        meteor: () => tekst('Meteor-felter styres af meteor-eventet. Kig efter meteorstenen og eventet på feltet.', 'Meteor fields are controlled by the meteor event. Look for the meteor stone and the event on the field.')
     };
     
     let glHp = $state(0);
@@ -523,21 +549,35 @@
                 const puljeLiv = spilTilstand.ventePuljeLiv;
                 lukVenteSpil();
                 const aarsag = iTaagen
-                    ? 'Tågen vælter ind over lejren.'
-                    : 'Tågen kryber tæt på lejren.';
+                    ? tekst('Tågen vælter ind over lejren.', 'The fog rolls into the camp.')
+                    : tekst('Tågen kryber tæt på lejren.', 'The fog creeps close to the camp.');
                 spilTilstand.logBesked = puljeGuld > 0 || puljeLiv > 0
-                    ? `${aarsag} Impen river kortene til sig og forsvinder. Du tager ${puljeGuld} guld og ${puljeLiv} HP med fra bordet.`
-                    : `${aarsag} Impen river kortene til sig og forsvinder.`;
+                    ? tekst(
+                        `${aarsag} Impen river kortene til sig og forsvinder. Du tager ${puljeGuld} guld og ${puljeLiv} HP med fra bordet.`,
+                        `${aarsag} The imp snatches the cards and vanishes. You take ${puljeGuld} gold and ${puljeLiv} HP from the table.`
+                    )
+                    : tekst(
+                        `${aarsag} Impen river kortene til sig og forsvinder.`,
+                        `${aarsag} The imp snatches the cards and vanishes.`
+                    );
                 return;
             }
             if (!erMidtIRunde && (langsomsteHarIndhentet || impensTidErGaaet)) {
                 const puljeGuld = spilTilstand.ventePuljeGuld;
                 const puljeLiv = spilTilstand.ventePuljeLiv;
-                const aarsag = langsomsteHarIndhentet ? 'De andre har indhentet dig.' : 'Impen pakker bordet sammen.';
+                const aarsag = langsomsteHarIndhentet
+                    ? tekst('De andre har indhentet dig.', 'The others have caught up with you.')
+                    : tekst('Impen pakker bordet sammen.', 'The imp packs up the table.');
                 lukVenteSpil();
                 spilTilstand.logBesked = puljeGuld > 0 || puljeLiv > 0
-                    ? `${aarsag} Du tager ${puljeGuld} guld og ${puljeLiv} HP med fra bordet.`
-                    : `${aarsag} Du kan spille videre.`;
+                    ? tekst(
+                        `${aarsag} Du tager ${puljeGuld} guld og ${puljeLiv} HP med fra bordet.`,
+                        `${aarsag} You take ${puljeGuld} gold and ${puljeLiv} HP from the table.`
+                    )
+                    : tekst(
+                        `${aarsag} Du kan spille videre.`,
+                        `${aarsag} You can keep playing.`
+                    );
             }
         });
     });
@@ -875,7 +915,10 @@
         const aktiveSpillere = Object.values(spilTilstand.alleSpillere).filter(erAktivSessionSpiller);
 
         if (!spilTilstand.offlineMode && aktiveSpillere.length > 0 && spilTilstand.rumKode) {
-            alert('Du kan ikke genstarte øen for alle, mens der stadig er andre aktive spillere ude i tågen.');
+            alert(tekst(
+                'Du kan ikke genstarte øen for alle, mens der stadig er andre aktive spillere ude i tågen.',
+                'You cannot restart the island for everyone while other active players are still out in the fog.'
+            ));
             return;
         }
 
@@ -930,7 +973,7 @@
         }).eq('rum_kode', spilTilstand.rumKode)));
 
         if (resetError) {
-            spilTilstand.statusBesked = `Øen kunne ikke nulstilles: ${resetError.message}`;
+            spilTilstand.statusBesked = tekst(`Øen kunne ikke nulstilles: ${resetError.message}`, `The island could not be reset: ${resetError.message}`);
             spilTilstand.gameState = 'start';
             return;
         }
@@ -943,7 +986,7 @@
         spilTilstand.offlineMode = false;
 
         if (browser && !navigator.onLine) {
-            spilTilstand.statusBesked = 'Du er offline. Tryk START for at spille lokalt på denne enhed.';
+            spilTilstand.statusBesked = tekst('Du er offline. Tryk START for at spille lokalt på denne enhed.', 'You are offline. Press START to play locally on this device.');
             return;
         }
 
@@ -951,7 +994,7 @@
         let renKode = (spilTilstand.rumKode || '').replace(/[^a-zA-Z0-9æøåÆØÅ]/g, '').toLowerCase().substring(0, 20);
 
         if (rentNavn === '' || renKode === '') {
-            spilTilstand.statusBesked = 'Udfyld både dit kaldenavn og dit ø-navn.';
+            spilTilstand.statusBesked = tekst('Udfyld både dit kaldenavn og dit ø-navn.', 'Fill in both your player name and island name.');
             return;
         }
 
@@ -970,7 +1013,7 @@
 
         spilTilstand.spillerNavn = rentNavn;
         spilTilstand.rumKode = renKode;
-        spilTilstand.statusBesked = 'Forbinder dig til øen...';
+        spilTilstand.statusBesked = tekst('Forbinder dig til øen...', 'Connecting to the island...');
         const pendingStart = laesPendingStart();
         const refreshes = pendingStart?.navn === rentNavn && pendingStart.rumKode === renKode ? pendingStart.refreshes : 0;
         gemPendingStart(rentNavn, renKode, refreshes);
@@ -1011,7 +1054,7 @@
             const { data, error } = await hentSpilSession(spilTilstand.rumKode);
             if (error) {
                 console.error("Netværksfejl:", error);
-                spilTilstand.statusBesked = `Kunne ikke forbinde til øen: ${error.message}`;
+                spilTilstand.statusBesked = tekst(`Kunne ikke forbinde til øen: ${error.message}`, `Could not connect to the island: ${error.message}`);
                 return;
             }
 
@@ -1038,12 +1081,12 @@
                         if (!erAktivSessionSpiller(eksisterende)) {
                             delete spilTilstand.alleSpillere[fundetNavn];
                             spilTilstand.gameState = 'select';
-                            spilTilstand.statusBesked = `Den gamle '${fundetNavn}' er udløbet af øen. Vælg karakter for at starte.`;
+                            spilTilstand.statusBesked = tekst(`Den gamle '${fundetNavn}' er udløbet af øen. Vælg karakter for at starte.`, `The old '${fundetNavn}' has expired from the island. Choose a character to start.`);
                             startRealtime();
                             return;
                         }
 
-                        spilTilstand.statusBesked = `Navnet '${fundetNavn}' er allerede i brug af en anden aktiv rejsende.`;
+                        spilTilstand.statusBesked = tekst(`Navnet '${fundetNavn}' er allerede i brug af en anden aktiv rejsende.`, `The name '${fundetNavn}' is already used by another active traveler.`);
                         return;
                     }
 
@@ -1053,7 +1096,7 @@
                         const maxAktivDag = aktiveSpillere.length > 0 ? Math.max(...aktiveSpillere.map((s: SpillerData) => s.dag || 1)) : 1;
 
                         if (aktiveSpillere.length > 0 && maxAktivDag > 5) {
-                            spilTilstand.statusBesked = `Du er for sent på den. Tågen har nået kysten (Dag ${maxAktivDag}).`;
+                            spilTilstand.statusBesked = tekst(`Du er for sent på den. Tågen har nået kysten (Dag ${maxAktivDag}).`, `You are too late. The fog has reached the coast (Day ${maxAktivDag}).`);
                             return;
                         }
 
@@ -1088,7 +1131,7 @@
                             }).eq('rum_kode', spilTilstand.rumKode)));
 
                             if (resetError) {
-                                spilTilstand.statusBesked = `Øen kunne ikke nulstilles: ${resetError.message}`;
+                                spilTilstand.statusBesked = tekst(`Øen kunne ikke nulstilles: ${resetError.message}`, `The island could not be reset: ${resetError.message}`);
                                 return;
                             }
                         }
@@ -1123,8 +1166,8 @@
                         spilTilstand.venteFriIndtilDag = 0;
                         spilTilstand.gameState = 'select';
                         spilTilstand.statusBesked = eksisterende.isWinner
-                            ? 'Den gamle tur var afsluttet. Vælg karakter for at starte rent.'
-                            : 'Den gamle tur var død. Vælg karakter for at starte rent.';
+                            ? tekst('Den gamle tur var afsluttet. Vælg karakter for at starte rent.', 'The old run was finished. Choose a character for a fresh start.')
+                            : tekst('Den gamle tur var død. Vælg karakter for at starte rent.', 'The old run was dead. Choose a character for a fresh start.');
                         startRealtime();
                         return;
                     }
@@ -1156,7 +1199,7 @@
                     
                     if (eksisterende.isDead || eksisterende.isWinner) {
                         spilTilstand.gameState = eksisterende.isWinner ? 'win_map' : 'dead_map';
-                        spilTilstand.statusBesked = eksisterende.isWinner ? 'Du slap væk fra øen.' : 'Du døde i tågen.';
+                        spilTilstand.statusBesked = eksisterende.isWinner ? tekst('Du slap væk fra øen.', 'You escaped the island.') : tekst('Du døde i tågen.', 'You died in the fog.');
                     } else {
                         spilTilstand.gameState = 'play';
                         cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
@@ -1164,7 +1207,7 @@
                 } else {
                     const aktivSammeBruger = findAktivSpillerForBruger();
                     if (aktivSammeBruger) {
-                        spilTilstand.statusBesked = `Du spiller allerede på denne ø som ${aktivSammeBruger.navn}. Log ud eller afslut den karakter først.`;
+                        spilTilstand.statusBesked = tekst(`Du spiller allerede på denne ø som ${aktivSammeBruger.navn}. Log ud eller afslut den karakter først.`, `You are already playing on this island as ${aktivSammeBruger.navn}. Log out or finish that character first.`);
                         return;
                     }
 
@@ -1174,7 +1217,7 @@
                     const maxDag = maxAktivDag;
 
                     if (maxAktivDag > 5) {
-                        spilTilstand.statusBesked = `Du er for sent på den. Tågen har nået kysten (Dag ${maxDag}).`;
+                        spilTilstand.statusBesked = tekst(`Du er for sent på den. Tågen har nået kysten (Dag ${maxDag}).`, `You are too late. The fog has reached the coast (Day ${maxDag}).`);
                         return;
                     }
 
@@ -1207,7 +1250,7 @@
                         }).eq('rum_kode', spilTilstand.rumKode)));
 
                         if (resetError) {
-                            spilTilstand.statusBesked = `Oen kunne ikke nulstilles: ${resetError.message}`;
+                            spilTilstand.statusBesked = tekst(`Øen kunne ikke nulstilles: ${resetError.message}`, `The island could not be reset: ${resetError.message}`);
                             return;
                         }
                     }
@@ -1248,7 +1291,7 @@
                     const { data: eksisterendeSession, error: hentEfterInsertError } = await hentSpilSession(spilTilstand.rumKode);
 
                     if (hentEfterInsertError || !eksisterendeSession) {
-                        spilTilstand.statusBesked = `Øen kunne ikke oprettes: ${insertError.message}`;
+                        spilTilstand.statusBesked = tekst(`Øen kunne ikke oprettes: ${insertError.message}`, `The island could not be created: ${insertError.message}`);
                         spilTilstand.gameState = 'start';
                         return;
                     }
@@ -1266,8 +1309,8 @@
         } catch (err) {
             console.error("Motorfejl:", err);
             spilTilstand.statusBesked = err instanceof Error && err.message === 'timeout'
-                ? 'Forbindelsen til øen tog for lang tid. Prøv igen.'
-                : "Der opstod en fejl under forbindelsen.";
+                ? tekst('Forbindelsen til øen tog for lang tid. Prøv igen.', 'The connection to the island took too long. Try again.')
+                : tekst('Der opstod en fejl under forbindelsen.', 'An error occurred while connecting.');
         } finally {
             if (autoRefreshTimer !== null) {
                 window.clearTimeout(autoRefreshTimer);
@@ -1284,7 +1327,7 @@
         const renKode = (spilTilstand.rumKode || '').replace(/[^a-zA-Z0-9æøåÆØÅ]/g, '').toLowerCase().substring(0, 20);
 
         if (rentNavn === '' || renKode === '') {
-            spilTilstand.statusBesked = 'Udfyld både dit kaldenavn og dit ø-navn.';
+            spilTilstand.statusBesked = tekst('Udfyld både dit kaldenavn og dit ø-navn.', 'Fill in both your player name and island name.');
             return;
         }
 
@@ -1298,7 +1341,7 @@
         spilTilstand.gameMode = 'offline';
         spilTilstand.spillerNavn = rentNavn;
         spilTilstand.rumKode = renKode;
-        spilTilstand.statusBesked = 'Offline. Spillet gemmes lokalt på denne enhed.';
+        spilTilstand.statusBesked = tekst('Offline. Spillet gemmes lokalt på denne enhed.', 'Offline. The game is saved locally on this device.');
         spilTilstand.erHost = true;
         spilTilstand.alleSpillere = {};
         startNyRundeSeed();
@@ -1344,7 +1387,7 @@
         spilTilstand.gameMode = 'tutorial';
         spilTilstand.spillerNavn = navn;
         spilTilstand.rumKode = TUTORIAL_RUMKODE;
-        spilTilstand.statusBesked = 'Tutorialen kører kun lokalt og gemmer ikke score.';
+        spilTilstand.statusBesked = tekst('Tutorialen kører kun lokalt og gemmer ikke score.', 'The tutorial runs locally only and does not save score.');
         spilTilstand.erHost = true;
         spilTilstand.gitter = lavTutorialGitter();
         spilTilstand.spillerIndex = TUTORIAL_START_INDEX;
@@ -1410,7 +1453,7 @@
 
         afslørOmraade(TUTORIAL_START_INDEX, tutorialKarakter.synsRadius);
         spilTilstand.alleSpillere[navn].kendteFelter = [...spilTilstand.mineKendteFelter];
-        spilTilstand.logBesked = 'Du er gået i land på tutorial-øen.';
+        spilTilstand.logBesked = tekst('Du er gået i land på tutorial-øen.', 'You have landed on the tutorial island.');
         scoreErGemt = true;
         scoreGemmer = false;
         scoreGemningFejlet = false;
@@ -1424,7 +1467,7 @@
 
     function fortsaetOfflineSpil() {
         if (!indlaesOfflineSpil()) {
-            spilTilstand.statusBesked = 'Der blev ikke fundet et offline-spil.';
+            spilTilstand.statusBesked = tekst('Der blev ikke fundet et offline-spil.', 'No offline game was found.');
             harGemtOfflineSpil = false;
             offlineSpilInfo = null;
             return;
@@ -1457,6 +1500,7 @@
     }
 
     onMount(() => {
+        initSprog();
         initAuth();
         preloadFiler();
         let genopretterForbindelse = false;
@@ -1465,7 +1509,7 @@
         if (pendingStart && pendingStart.refreshes > 0 && Date.now() - pendingStart.startet < 2 * 60 * 1000) {
             spilTilstand.spillerNavn = pendingStart.navn;
             spilTilstand.rumKode = pendingStart.rumKode;
-            spilTilstand.statusBesked = 'Forbindelsen hang. Starter igen efter refresh...';
+            spilTilstand.statusBesked = tekst('Forbindelsen hang. Starter igen efter refresh...', 'The connection was stuck. Starting again after refresh...');
             window.setTimeout(() => {
                 if (spilTilstand.gameState === 'start') void opretEllerDeltag();
             }, 350);
@@ -1492,7 +1536,7 @@
             if (!harOnlineSession()) return;
 
             if (browser && !navigator.onLine) {
-                spilTilstand.statusBesked = 'Forbindelsen er afbrudt. Spillet fortsætter lokalt indtil videre.';
+                spilTilstand.statusBesked = tekst('Forbindelsen er afbrudt. Spillet fortsætter lokalt indtil videre.', 'The connection is offline. The game continues locally for now.');
                 return;
             }
 
@@ -1501,7 +1545,7 @@
                 await syncTilDb(false);
                 const gemt = await flushVentendeSync();
                 if (!gemt) {
-                    spilTilstand.statusBesked = spilTilstand.statusBesked || 'Forbindelsen til øen driller. Spillet prøver igen.';
+                    spilTilstand.statusBesked = spilTilstand.statusBesked || tekst('Forbindelsen til øen driller. Spillet prøver igen.', 'The island connection is unstable. The game is trying again.');
                 }
             } else {
                 startRealtime(true);
@@ -1542,8 +1586,8 @@
                 scoreErGemt = true;
                 scoreGemningFejlet = false;
                 spilTilstand.statusBesked = gemteVentende === 1
-                    ? 'En ventende score blev gemt efter genoprettet forbindelse.'
-                    : `${gemteVentende} ventende scores blev gemt efter genoprettet forbindelse.`;
+                    ? tekst('En ventende score blev gemt efter genoprettet forbindelse.', 'One pending score was saved after reconnecting.')
+                    : tekst(`${gemteVentende} ventende scores blev gemt efter genoprettet forbindelse.`, `${gemteVentende} pending scores were saved after reconnecting.`);
             }
 
             const klasse = aktuelHighscoreKlasse();
@@ -1585,7 +1629,7 @@
         };
         const haandterOffline = () => {
             if (harOnlineSession()) {
-                spilTilstand.statusBesked = 'Forbindelsen er afbrudt. Spillet fortsætter lokalt indtil videre.';
+                spilTilstand.statusBesked = tekst('Forbindelsen er afbrudt. Spillet fortsætter lokalt indtil videre.', 'The connection is offline. The game continues locally for now.');
             }
         };
 
@@ -1639,8 +1683,8 @@
                     scoreErGemt = true;
                     scoreGemningFejlet = false;
                     spilTilstand.statusBesked = gemteVentende === 1
-                        ? 'En ventende score blev gemt efter genoprettet forbindelse.'
-                        : `${gemteVentende} ventende scores blev gemt efter genoprettet forbindelse.`;
+                        ? tekst('En ventende score blev gemt efter genoprettet forbindelse.', 'One pending score was saved after reconnecting.')
+                        : tekst(`${gemteVentende} ventende scores blev gemt efter genoprettet forbindelse.`, `${gemteVentende} pending scores were saved after reconnecting.`);
                 }
                 const klasse = aktuelHighscoreKlasse();
                 globaleScores = await hentGlobalTopHundrede();
@@ -1822,7 +1866,7 @@
             void opdaterScoreTavlerEfterGemning(highscoreGemt, afslutningGemt);
         } catch (error) {
             console.error('Score-flowet fejlede', error);
-            spilTilstand.statusBesked = error instanceof Error ? error.message : 'Scoren kunne ikke gemmes.';
+            spilTilstand.statusBesked = error instanceof Error ? error.message : tekst('Scoren kunne ikke gemmes.', 'The score could not be saved.');
             scoreGemningFejlet = true;
         } finally {
             scoreGemmer = false;
@@ -1844,7 +1888,7 @@
             if (scoreGemmer && scoreGemningRunId === aktuelGemning) {
                 scoreGemmer = false;
                 scoreGemningFejlet = true;
-                spilTilstand.statusBesked = 'Scoregemningen tog for lang tid. Scoren er gemt lokalt og prøves igen automatisk.';
+                spilTilstand.statusBesked = tekst('Scoregemningen tog for lang tid. Scoren er gemt lokalt og prøves igen automatisk.', 'Saving the score took too long. The score is saved locally and will be retried automatically.');
             }
         }, 45000);
         opdaterOgGemHighscore();
@@ -1853,7 +1897,7 @@
     async function bekræftValg(karakter: Karakter) {
         const aktivSammeBruger = spilTilstand.offlineMode ? null : findAktivSpillerForBruger();
         if (aktivSammeBruger && aktivSammeBruger.navn !== spilTilstand.spillerNavn) {
-            spilTilstand.statusBesked = `Du spiller allerede på denne ø som ${aktivSammeBruger.navn}.`;
+            spilTilstand.statusBesked = tekst(`Du spiller allerede på denne ø som ${aktivSammeBruger.navn}.`, `You are already playing on this island as ${aktivSammeBruger.navn}.`);
             spilTilstand.gameState = 'start';
             return;
         }
@@ -1952,7 +1996,7 @@
                 supabase.from('spil_sessioner').select('rum_kode').eq('rum_kode', spilTilstand.rumKode).maybeSingle()
             );
             if (error) {
-                spilTilstand.statusBesked = `Øen kunne ikke oprettes: ${error.message}`;
+                spilTilstand.statusBesked = tekst(`Øen kunne ikke oprettes: ${error.message}`, `The island could not be created: ${error.message}`);
                 spilTilstand.gameState = 'start';
                 return;
             }
@@ -1968,7 +2012,7 @@
                 }])));
 
                 if (insertError) {
-                    spilTilstand.statusBesked = `Øen kunne ikke oprettes: ${insertError.message}`;
+                    spilTilstand.statusBesked = tekst(`Øen kunne ikke oprettes: ${insertError.message}`, `The island could not be created: ${insertError.message}`);
                     spilTilstand.gameState = 'start';
                     return;
                 }
@@ -1977,7 +2021,10 @@
         
         await syncTilDb(true);
         cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
-        spilTilstand.logBesked = `Du er drevet i land på kysten af ${formaterOeNavn()}. Tågen ligger bag dig og venter på at omslutte dig. Du må prøve at finde en båd på den anden side af ${formaterOeNavn()}.`;
+        spilTilstand.logBesked = tekst(
+            `Du er drevet i land på kysten af ${formaterOeNavn()}. Tågen ligger bag dig og venter på at omslutte dig. Du må prøve at finde en båd på den anden side af ${formaterOeNavn()}.`,
+            `You have washed ashore on the coast of ${formaterOeNavn()}. The fog waits behind you, ready to swallow you. Try to find a boat on the far side of ${formaterOeNavn()}.`
+        );
         spilTilstand.gameState = 'play';
         introAktiv = true;
     }
@@ -2116,7 +2163,7 @@
             }).eq('rum_kode', spilTilstand.rumKode), 8000));
 
             if (error) {
-                spilTilstand.statusBesked = `Øen kunne ikke frigøres: ${error.message}`;
+                spilTilstand.statusBesked = tekst(`Øen kunne ikke frigøres: ${error.message}`, `The island could not be released: ${error.message}`);
                 return false;
             }
 
@@ -2139,7 +2186,7 @@
         }).eq('rum_kode', spilTilstand.rumKode), 8000));
 
         if (error) {
-            spilTilstand.statusBesked = `Gamle spillere kunne ikke ryddes fra øen: ${error.message}`;
+            spilTilstand.statusBesked = tekst(`Gamle spillere kunne ikke ryddes fra øen: ${error.message}`, `Old players could not be cleared from the island: ${error.message}`);
             return false;
         }
 
@@ -2179,7 +2226,7 @@
 
     function gravstenListeForFelt(felt: Felt): GravstenMinde[] {
         if (felt.gravstenListe?.length) return felt.gravstenListe;
-        if (felt.gravstenIkon) return [{ ikon: felt.gravstenIkon, navn: 'Ukendt', dag: 0 }];
+        if (felt.gravstenIkon) return [{ ikon: felt.gravstenIkon, navn: tekst('Ukendt', 'Unknown'), dag: 0 }];
         return [];
     }
 
@@ -2190,14 +2237,14 @@
 
     function gravstenHjaelpetekst(felt: Felt) {
         const liste = gravstenListeForFelt(felt);
-        if (liste.length === 0) return 'Gravstenen bliver liggende som et permanent spor på øen.';
+        if (liste.length === 0) return tekst('Gravstenen bliver liggende som et permanent spor på øen.', 'The gravestone remains as a permanent trace on the island.');
 
         return [...liste]
             .reverse()
             .map((minde) => {
-                const dag = minde.dag > 0 ? `Dag ${minde.dag}` : 'Ukendt dag';
-                const tekst = minde.tekst ? ` - ${minde.tekst}` : '';
-                return `${dag}: ${minde.navn}${tekst}`;
+                const dag = minde.dag > 0 ? tekst(`Dag ${minde.dag}`, `Day ${minde.dag}`) : tekst('Ukendt dag', 'Unknown day');
+                const mindeTekst = minde.tekst ? ` - ${minde.tekst}` : '';
+                return `${dag}: ${minde.navn}${mindeTekst}`;
             })
             .join('\n');
     }
@@ -2209,7 +2256,7 @@
         const liste = gravstenListeForFelt(felt);
         const placering = placerInspectBoble(e.clientX, e.clientY);
         inspectBoble = {
-            titel: liste.length > 1 ? `${liste.length} døde her` : 'Gravsten',
+            titel: liste.length > 1 ? tekst(`${liste.length} døde her`, `${liste.length} died here`) : tekst('Gravsten', 'Gravestone'),
             tekst: gravstenHjaelpetekst(felt),
             ...placering
         };
@@ -2217,8 +2264,8 @@
     }
 
     function formaterBiomeNavn(biome: string | undefined) {
-        if (!biome) return 'felt';
-        return biome.replace('hoejland', 'højland').replace('soe', 'sø');
+        if (!biome) return tekst('felt', 'field');
+        return biomeNavne[biome]?.() ?? biome.replace('hoejland', tekst('højland', 'highland')).replace('soe', tekst('sø', 'lake'));
     }
 
     function tileBaggrundForBiome(biome: string, erOpslugt: boolean) {
@@ -2237,42 +2284,51 @@
     function forklaringForFelt(felt: Felt, index: number, erUdforsket: boolean, erOpslugt: boolean, erSkattekortRygte = false) {
         if (erSkattekortRygte && !erUdforsket) {
             return {
-                titel: 'Skattekortspor',
-                tekst: 'Et gammelt skattekort peger på dette område. Farven og krydset er kun et kortspor: feltet tæller ikke som udforsket, og kortet viser ikke, om kisten stadig er der.'
+                titel: tekst('Skattekortspor', 'Treasure map clue'),
+                tekst: tekst(
+                    'Et gammelt skattekort peger på dette område. Farven og krydset er kun et kortspor: feltet tæller ikke som udforsket, og kortet viser ikke, om kisten stadig er der.',
+                    'An old treasure map points to this area. The color and cross are only a map clue: the field does not count as explored, and the map does not show whether the chest is still there.'
+                )
             };
         }
 
         if (!erUdforsket) {
             return {
-                titel: 'Ukendt felt',
-                tekst: 'Du har ikke udforsket feltet endnu. Bevæg dig tættere på eller brug lys/udsyn for at afsløre det.'
+                titel: tekst('Ukendt felt', 'Unknown field'),
+                tekst: tekst(
+                    'Du har ikke udforsket feltet endnu. Bevæg dig tættere på eller brug lys/udsyn for at afsløre det.',
+                    'You have not explored this field yet. Move closer or use light/vision to reveal it.'
+                )
             };
         }
 
         const biome = String(felt.biome || 'felt');
-        const dele: string[] = [biomeForklaringer[biome] || 'Et udforsket felt på øen.'];
+        const dele: string[] = [biomeForklaringer[biome]?.() || tekst('Et udforsket felt på øen.', 'An explored field on the island.')];
 
-        if (erOpslugt) dele.push('Tågen har taget feltet. Det er farligt at stå her.');
-        if (biome === 'hav') dele.push('Hav kan sluge almindelig rustning og kongepanser samt slukke fakler. Elverrustning går ikke tabt i vand.');
-        if (biome === 'soe') dele.push('Søer er indlandsvand. De er farlige uden båd, men de tæller ikke som havkyst.');
-        if (biome === 'hule') dele.push('Huler kan ødelægge soveposer og fint tøj.');
-        if (biome === 'ruin') dele.push('Ruiner kan koste madrationer.');
-        if (biome === 'krystal') dele.push('Krystaller ødelægger metaldetektor og gylden kikkert. Malmviser bliver til almindelig detektor.');
-        if (biome === 'ritual') dele.push('Ritualfelter kan ødelægge søgekvist. Runekvist bliver til almindelig søgekvist.');
-        if (felt.hasBoat) dele.push(`Der ${felt.boatCount && felt.boatCount > 1 ? `ligger ${felt.boatCount} både` : 'ligger en flugtbåd'} her. Går du ombord, har du vundet.`);
-        if (felt.eventID && !felt.eventFuldført) dele.push('Feltet har et event, som starter når du går ind på det.');
-        if (harKoebbarShop(felt)) dele.push('Feltet har en butik. Dagens varer deles af spillerne og genfyldes næste dag.');
-        if (felt.hasWorkshop) dele.push('Feltet har et værksted, hvor udstyr kan opgraderes. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang.');
-        if (felt.hasGoldmine) dele.push(felt.mineOwner ? `Guldminen ejes af ${felt.mineOwner}.` : 'Der er en guldmine her.');
-        if (felt.hasPortal && !(felt.eventID && !felt.eventFuldført)) dele.push('Portalen kan flytte dig mod øst.');
-        if (felt.taageBlokker) dele.push('Tågeblokkeren kan holde tågen tilbage fra venstre, indtil tågen vender.');
+        if (erOpslugt) dele.push(tekst('Tågen har taget feltet. Det er farligt at stå her.', 'The fog has taken this field. Standing here is dangerous.'));
+        if (biome === 'hav') dele.push(tekst('Hav kan sluge almindelig rustning og kongepanser samt slukke fakler. Elverrustning går ikke tabt i vand.', 'Sea can swallow normal armor and royal armor and put out torches. Elven armor is not lost in water.'));
+        if (biome === 'soe') dele.push(tekst('Søer er indlandsvand. De er farlige uden båd, men de tæller ikke som havkyst.', 'Lakes are inland water. They are dangerous without a boat, but do not count as sea coast.'));
+        if (biome === 'hule') dele.push(tekst('Huler kan ødelægge soveposer og fint tøj.', 'Caves can ruin sleeping bags and fine clothes.'));
+        if (biome === 'ruin') dele.push(tekst('Ruiner kan koste madrationer.', 'Ruins can cost food rations.'));
+        if (biome === 'krystal') dele.push(tekst('Krystaller ødelægger metaldetektor og gylden kikkert. Malmviser bliver til almindelig detektor.', 'Crystals destroy metal detectors and golden binoculars. Ore finders become normal detectors.'));
+        if (biome === 'ritual') dele.push(tekst('Ritualfelter kan ødelægge søgekvist. Runekvist bliver til almindelig søgekvist.', 'Ritual fields can destroy dowsing rods. Rune rods become normal dowsing rods.'));
+        if (felt.hasBoat) dele.push(tekst(
+            `Der ${felt.boatCount && felt.boatCount > 1 ? `ligger ${felt.boatCount} både` : 'ligger en flugtbåd'} her. Går du ombord, har du vundet.`,
+            `${felt.boatCount && felt.boatCount > 1 ? `There are ${felt.boatCount} boats` : 'There is an escape boat'} here. Board it to win.`
+        ));
+        if (felt.eventID && !felt.eventFuldført) dele.push(tekst('Feltet har et event, som starter når du går ind på det.', 'This field has an event that starts when you enter it.'));
+        if (harKoebbarShop(felt)) dele.push(tekst('Feltet har en butik. Dagens varer deles af spillerne og genfyldes næste dag.', 'This field has a shop. The daily stock is shared by players and refills the next day.'));
+        if (felt.hasWorkshop) dele.push(tekst('Feltet har et værksted, hvor udstyr kan opgraderes. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang.', 'This field has a workshop where equipment can be upgraded. If you have a club or wallbreaker, the master only dares to work for you once.'));
+        if (felt.hasGoldmine) dele.push(felt.mineOwner ? tekst(`Guldminen ejes af ${felt.mineOwner}.`, `The gold mine is owned by ${felt.mineOwner}.`) : tekst('Der er en guldmine her.', 'There is a gold mine here.'));
+        if (felt.hasPortal && !(felt.eventID && !felt.eventFuldført)) dele.push(tekst('Portalen kan flytte dig mod øst.', 'The portal can move you east.'));
+        if (felt.taageBlokker) dele.push(tekst('Tågeblokkeren kan holde tågen tilbage fra venstre, indtil tågen vender.', 'The fog blocker can hold back fog from the left until the fog turns around.'));
         const gravstenListe = gravstenListeForFelt(felt);
-        if (gravstenListe.length > 1) dele.push(`Gravstenen rummer ${gravstenListe.length} dødsfald på dette felt.`);
-        else if (gravstenListe.length === 1) dele.push('Gravstenen viser, at en spiller døde her.');
-        if (farvelBaadeForFelt(index).length > 0) dele.push('Den grå farvelbåd viser, at en spiller slap væk fra dette felt.');
-        if (felt.gravet) dele.push('Feltet er allerede gravet op.');
-        else if (felt.kanGraves) dele.push('Feltet kan graves.');
-        else dele.push('Feltet kan ikke graves.');
+        if (gravstenListe.length > 1) dele.push(tekst(`Gravstenen rummer ${gravstenListe.length} dødsfald på dette felt.`, `The gravestone contains ${gravstenListe.length} deaths on this field.`));
+        else if (gravstenListe.length === 1) dele.push(tekst('Gravstenen viser, at en spiller døde her.', 'The gravestone shows that a player died here.'));
+        if (farvelBaadeForFelt(index).length > 0) dele.push(tekst('Den grå farvelbåd viser, at en spiller slap væk fra dette felt.', 'The gray farewell boat shows that a player escaped from this field.'));
+        if (felt.gravet) dele.push(tekst('Feltet er allerede gravet op.', 'This field has already been dug.'));
+        else if (felt.kanGraves) dele.push(tekst('Feltet kan graves.', 'This field can be dug.'));
+        else dele.push(tekst('Feltet kan ikke graves.', 'This field cannot be dug.'));
 
         return {
             titel: formaterBiomeNavn(biome),
@@ -2336,7 +2392,7 @@
         if (cam.harTrukket && target?.closest('.game-container')) return;
         if (target?.closest('.inspect-knap, .inspect-boble, .inspect-luk, .fokus-knap, .regelbog-knap, .musik-toggle-btn')) return;
         const element = target?.closest('[data-help-title]') as HTMLElement | null;
-        if (element?.dataset.helpTitle === 'Ukendt felt') {
+        if (element?.dataset.helpTitle === tekst('Ukendt felt', 'Unknown field')) {
             lukInspect();
             e.preventDefault();
             e.stopPropagation();
@@ -2348,8 +2404,8 @@
 
         const placering = placerInspectBoble(e.clientX, e.clientY);
         inspectBoble = {
-            titel: element?.dataset.helpTitle || 'Hjælp',
-            tekst: element?.dataset.helpBody || 'Tryk på et felt, ikon eller en knap for at få en forklaring.',
+            titel: element?.dataset.helpTitle || tekst('Hjælp', 'Help'),
+            tekst: element?.dataset.helpBody || tekst('Tryk på et felt, ikon eller en knap for at få en forklaring.', 'Tap a field, icon or button to get an explanation.'),
             ...placering
         };
         markerTutorialHandling('help');
@@ -2434,7 +2490,7 @@
             } catch (error) {
                 sidsteFejl = error;
                 if (!(error instanceof Error) || error.message !== 'timeout' || forsoeg === antalForsoeg) break;
-                spilTilstand.statusBesked = 'Øen svarer langsomt. Prøver igen...';
+                spilTilstand.statusBesked = tekst('Øen svarer langsomt. Prøver igen...', 'The island is responding slowly. Trying again...');
                 await vent(800);
             }
         }
@@ -2547,8 +2603,8 @@ function udførBevægelse(nytIndeks: number) {
             type="button"
             class="top-ikon-knap fokus-knap"
             onclick={fokuserPaaSpiller}
-            title="Fokuser på dig"
-            aria-label="Fokuser på dig"
+            title={tekst('Fokuser på dig', 'Focus on you')}
+            aria-label={tekst('Fokuser på dig', 'Focus on you')}
         >
             <svg class="top-ikon-svg fokus-ikon" viewBox="0 0 48 48" aria-hidden="true">
                 <circle cx="24" cy="24" r="9" />
@@ -2560,8 +2616,8 @@ function udførBevægelse(nytIndeks: number) {
             class="top-ikon-knap inspect-knap"
             class:aktiv={inspectAktiv}
             onclick={startInspect}
-            title={inspectAktiv ? 'Slå forklaringsmode fra' : 'Slå forklaringsmode til'}
-            aria-label={inspectAktiv ? 'Slå forklaringsmode fra' : 'Slå forklaringsmode til'}
+            title={inspectAktiv ? tekst('Slå forklaringsmode fra', 'Turn explanation mode off') : tekst('Slå forklaringsmode til', 'Turn explanation mode on')}
+            aria-label={inspectAktiv ? tekst('Slå forklaringsmode fra', 'Turn explanation mode off') : tekst('Slå forklaringsmode til', 'Turn explanation mode on')}
         >
             <svg class="top-ikon-svg inspect-ikon" viewBox="0 0 48 48" aria-hidden="true">
                 <path d="M18 18a6.5 6.5 0 0 1 12.2 3.2c0 5.8-6.2 5.5-6.2 11" />
@@ -2569,19 +2625,20 @@ function udførBevægelse(nytIndeks: number) {
             </svg>
         </button>
         <Regelbog onOpen={() => markerTutorialHandling('rulebook')} />
+        <SprogKnap />
         <LydKnap />
     </div>
-    <div class="zoom-actions" aria-label="Zoom">
-        <button type="button" onclick={() => cam.justerZoom(0.18, !!eventState.aktivt || !!spilTilstand.aktivShop || !!spilTilstand.aktivVaerksted)} aria-label="Zoom ind">+</button>
-        <button type="button" onclick={() => cam.justerZoom(-0.18, !!eventState.aktivt || !!spilTilstand.aktivShop || !!spilTilstand.aktivVaerksted)} aria-label="Zoom ud">-</button>
+    <div class="zoom-actions" aria-label={tekst('Zoom', 'Zoom')}>
+        <button type="button" onclick={() => cam.justerZoom(0.18, !!eventState.aktivt || !!spilTilstand.aktivShop || !!spilTilstand.aktivVaerksted)} aria-label={tekst('Zoom ind', 'Zoom in')}>+</button>
+        <button type="button" onclick={() => cam.justerZoom(-0.18, !!eventState.aktivt || !!spilTilstand.aktivShop || !!spilTilstand.aktivVaerksted)} aria-label={tekst('Zoom ud', 'Zoom out')}>-</button>
     </div>
 {/if}
 
 {#if tutorialState.aktiv && spilTilstand.gameState === 'play'}
     <aside
         class="tutorial-panel"
-        data-help-title="Tutorial"
-        data-help-body="Tutorialboksen viser næste øvelse. Den påvirker ikke rigtige øer eller highscores."
+        data-help-title={tekst('Tutorial', 'Tutorial')}
+        data-help-body={tekst('Tutorialboksen viser næste øvelse. Den påvirker ikke rigtige øer eller highscores.', 'The tutorial box shows the next exercise. It does not affect real islands or highscores.')}
     >
         <span class="tutorial-progress">
             {Math.min(tutorialState.trin + 1, tutorialTrinAntal)} / {tutorialTrinAntal}
@@ -2592,7 +2649,7 @@ function udførBevægelse(nytIndeks: number) {
         </div>
         <div class="tutorial-panel-actions">
             <button type="button" class="tutorial-help" onclick={aabnTutorialPopup}>?</button>
-            <button type="button" class="tutorial-exit" onclick={bedOmTutorialAfslutning}>Afslut</button>
+            <button type="button" class="tutorial-exit" onclick={bedOmTutorialAfslutning}>{tekst('Afslut', 'Exit')}</button>
         </div>
     </aside>
 {/if}
@@ -2612,17 +2669,17 @@ function udførBevægelse(nytIndeks: number) {
                 <img src={tutorialKarakter.ikon} alt="" class="tutorial-popup-avatar" />
                 <div>
                     <p>Tutorial</p>
-                    <h2 id="tutorial-exit-titel">Vil du stoppe tutorialen?</h2>
+                    <h2 id="tutorial-exit-titel">{tekst('Vil du stoppe tutorialen?', 'Do you want to stop the tutorial?')}</h2>
                 </div>
             </header>
 
             <p class="tutorial-popup-tekst">
-                Hvis du afslutter nu, ryger du tilbage til startskærmen, og tutorialknappen skjules. Du kan stadig spille tutorialen igen senere ved at skrive <strong>tutorial</strong> som ø-navn.
+                {@html tekst('Hvis du afslutter nu, ryger du tilbage til startskærmen, og tutorialknappen skjules. Du kan stadig spille tutorialen igen senere ved at skrive <strong>tutorial</strong> som ø-navn.', 'If you exit now, you return to the start screen, and the tutorial button is hidden. You can still play the tutorial later by writing <strong>tutorial</strong> as the island name.')}
             </p>
 
             <div class="tutorial-exit-valg">
-                <button type="button" class="tutorial-popup-ok fortsæt-knap" onclick={fortsætTutorial}>Spil videre</button>
-                <button type="button" class="tutorial-popup-ok afslut-knap" onclick={afslutTutorial}>Afslut tutorial</button>
+                <button type="button" class="tutorial-popup-ok fortsæt-knap" onclick={fortsætTutorial}>{tekst('Spil videre', 'Keep playing')}</button>
+                <button type="button" class="tutorial-popup-ok afslut-knap" onclick={afslutTutorial}>{tekst('Afslut tutorial', 'Exit tutorial')}</button>
             </div>
         </div>
     </div>
@@ -2642,7 +2699,7 @@ function udførBevægelse(nytIndeks: number) {
             <header class="tutorial-popup-header">
                 <img src={tutorialKarakter.ikon} alt="" class="tutorial-popup-avatar" />
                 <div>
-                    <p>Lærling</p>
+                    <p>{tekst('Lærling', 'Apprentice')}</p>
                     <h2 id="tutorial-popup-titel">{aktuelTutorialPopupTrin.popupTitel}</h2>
                 </div>
             </header>
@@ -2717,7 +2774,7 @@ function udførBevægelse(nytIndeks: number) {
                                 <div class="sejr-lys"></div>
                             {/if}
                             {#each Array.from({ length: Math.min(felt.boatCount || 1, 4) }, (_ignore, index) => index) as baadNr (baadNr)}
-                                <img src="/tiles/baad.webp" alt="Flugtbåd" class="escape-boat boat-{baadNr}" data-help-title="Flugtbåd" data-help-body="Gå ind på bådfeltet for at vinde og forlade øen. Hver båd kan bruges én gang." />
+                                <img src="/tiles/baad.webp" alt={tekst('Flugtbåd', 'Escape boat')} class="escape-boat boat-{baadNr}" data-help-title={tekst('Flugtbåd', 'Escape boat')} data-help-body={tekst('Gå ind på bådfeltet for at vinde og forlade øen. Hver båd kan bruges én gang.', 'Enter the boat field to win and leave the island. Each boat can be used once.')} />
                             {/each}
                             {#if (felt.boatCount || 1) > 4}
                                 <span class="boat-count">×{felt.boatCount}</span>
@@ -2732,53 +2789,53 @@ function udførBevægelse(nytIndeks: number) {
                             {@const erHoestet = felt.hoestetFremTilBlok !== undefined && nuBlok <= felt.hoestetFremTilBlok}
 
                             {#if erSmadret}
-                                <img src="/tiles/{felt.afgroede === 'hvede' ? 'brokenwheat.webp' : 'brokenbean.webp'}" class="crop-icon" alt="" data-help-title="Ødelagt afgrøde" data-help-body="Afgrøden er ødelagt og giver ikke længere mad eller heling." />
+                                <img src="/tiles/{felt.afgroede === 'hvede' ? 'brokenwheat.webp' : 'brokenbean.webp'}" class="crop-icon" alt="" data-help-title={tekst('Ødelagt afgrøde', 'Ruined crop')} data-help-body={tekst('Afgrøden er ødelagt og giver ikke længere mad eller heling.', 'The crop is ruined and no longer gives food or healing.')} />
                             {:else if !erHoestet && !erPlageramt}
                                 {#if erModen}
-                                    <img src="/tiles/{felt.afgroede === 'hvede' ? 'wheat.webp' : 'beans.webp'}" class="crop-icon moden" alt="" data-help-title="Moden afgrøde" data-help-body="En moden afgrøde. Når du går ind på feltet, kan den give lidt HP, medmindre en insektplage rammer." />
+                                    <img src="/tiles/{felt.afgroede === 'hvede' ? 'wheat.webp' : 'beans.webp'}" class="crop-icon moden" alt="" data-help-title={tekst('Moden afgrøde', 'Ripe crop')} data-help-body={tekst('En moden afgrøde. Når du går ind på feltet, kan den give lidt HP, medmindre en insektplage rammer.', 'A ripe crop. When you enter the field, it can give a little HP unless an insect plague strikes.')} />
                                 {:else}
-                                    <img src="/tiles/{felt.afgroede === 'hvede' ? 'growingwheat.webp' : 'growingbean.webp'}" class="crop-icon" alt="" data-help-title="Voksende afgrøde" data-help-body="Afgrøden er ikke moden endnu. Hvis du tramper gennem den for tidligt, bliver den skadet." />
+                                    <img src="/tiles/{felt.afgroede === 'hvede' ? 'growingwheat.webp' : 'growingbean.webp'}" class="crop-icon" alt="" data-help-title={tekst('Voksende afgrøde', 'Growing crop')} data-help-body={tekst('Afgrøden er ikke moden endnu. Hvis du tramper gennem den for tidligt, bliver den skadet.', 'The crop is not ripe yet. If you trample through it too early, it is damaged.')} />
                                 {/if}
                             {/if}
                         {/if}
 
                         {#if erUdforsket && !erOpslugt && felt.biome === 'meteor' && felt.hasMeteorStone}
-                            <img src="/tiles/meteorsten.webp" class="meteor-stone-icon" alt="" data-help-title="Meteorsten" data-help-body="Meteorstenen markerer et meteor-event. Feltet styres af meteorens egen belønning og fare." />
+                            <img src="/tiles/meteorsten.webp" class="meteor-stone-icon" alt="" data-help-title={tekst('Meteorsten', 'Meteor stone')} data-help-body={tekst('Meteorstenen markerer et meteor-event. Feltet styres af meteorens egen belønning og fare.', 'The meteor stone marks a meteor event. The field is controlled by the meteor reward and danger.')} />
                         {/if}
 
                         {#if erUdforsket && !erOpslugt && felt.taageBlokker}
-                            <img src="/tiles/blokker.webp" class="taageblokker-icon" class:taageblokker-inaktiv={spilTilstand.fogX < 0} alt="Tågeblokker" data-help-title="Tågeblokker" data-help-body="Holder tågen tilbage fra venstre side. Når tågen vender fra højre, beskytter blokkeren ikke længere." />
+                            <img src="/tiles/blokker.webp" class="taageblokker-icon" class:taageblokker-inaktiv={spilTilstand.fogX < 0} alt={tekst('Tågeblokker', 'Fog blocker')} data-help-title={tekst('Tågeblokker', 'Fog blocker')} data-help-body={tekst('Holder tågen tilbage fra venstre side. Når tågen vender fra højre, beskytter blokkeren ikke længere.', 'Holds the fog back from the left side. When the fog returns from the right, the blocker no longer protects you.')} />
                         {/if}
 
                         {#if (erUdforsket || erSkattekortRygte) && !felt.gravet}
                             {@const erIndenForPejling = regnHexAfstand(spilTilstand.spillerIndex, i, kortBredde) <= pejleRadius}
                             {#if felt.isSkatteKlynge && (erSkattekortRygte || aktiveSkattekortFelter.includes(i))}
-                                <img src="/tiles/treasuremark.webp" alt="Mulig skat" class="treasure-mark-icon" data-help-title="Mulig skat" data-help-body="Skattekortet peger på dette felt som mulig skatteklynge. Kortet viser ikke, om kisten stadig er her." />
+                                <img src="/tiles/treasuremark.webp" alt={tekst('Mulig skat', 'Possible treasure')} class="treasure-mark-icon" data-help-title={tekst('Mulig skat', 'Possible treasure')} data-help-body={tekst('Skattekortet peger på dette felt som mulig skatteklynge. Kortet viser ikke, om kisten stadig er her.', 'The treasure map points to this field as a possible treasure cluster. The map does not show whether the chest is still here.')} />
                             {/if}
                             {#if erUdforsket && harDetektor && erIndenForPejling && (felt.skjultGuld ?? 0) > 0}
-                                <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" data-help-title="Guldspor" data-help-body={harMalmviser ? 'Din malmviser mærker skjult guld på kendte felter inden for radius 3. Grav feltet for at få det frem med malmviserbonus.' : 'Din metaldetektor mærker skjult guld på kendte felter inden for radius 3. Grav feltet for at få det frem.'} style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 80});" />
+                                <img src="/tiles/guldtaage.webp" alt="" class="mist-icon" data-help-title={tekst('Guldspor', 'Gold trace')} data-help-body={harMalmviser ? tekst('Din malmviser mærker skjult guld på kendte felter inden for radius 3. Grav feltet for at få det frem med malmviserbonus.', 'Your ore finder senses hidden gold on known fields within radius 3. Dig the field to reveal it with the ore finder bonus.') : tekst('Din metaldetektor mærker skjult guld på kendte felter inden for radius 3. Grav feltet for at få det frem.', 'Your metal detector senses hidden gold on known fields within radius 3. Dig the field to reveal it.')} style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultGuld ?? 0) / 80});" />
                             {/if}
                             {#if erUdforsket && harKvist && erIndenForPejling && (felt.skjultLiv ?? 0) > 0}
-                                <img src="/tiles/livtaage.webp" alt="" class="mist-icon" data-help-title="Rodspor" data-help-body={harRunekvist ? 'Runekvisten mærker helende rødder på kendte felter inden for radius 3. Hvis du mangler HP, trækkes de automatisk op, når du går ind på feltet.' : 'Søgekvisten mærker helende rødder på kendte felter inden for radius 3. Grav feltet for at finde dem.'} style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultLiv ?? 0) / 40});" />
+                                <img src="/tiles/livtaage.webp" alt="" class="mist-icon" data-help-title={tekst('Rodspor', 'Root trace')} data-help-body={harRunekvist ? tekst('Runekvisten mærker helende rødder på kendte felter inden for radius 3. Hvis du mangler HP, trækkes de automatisk op, når du går ind på feltet.', 'The rune rod senses healing roots on known fields within radius 3. If you are missing HP, they are pulled up automatically when you enter the field.') : tekst('Søgekvisten mærker helende rødder på kendte felter inden for radius 3. Grav feltet for at finde dem.', 'The dowsing rod senses healing roots on known fields within radius 3. Dig the field to find them.')} style="transform: translate(-50%, -50%) scale({0.3 + (felt.skjultLiv ?? 0) / 40});" />
                             {/if}
                         {/if}
                         
                         {#if erUdforsket && felt.gravet}
-                            <img src="/tiles/udgravning.webp" alt="" class="dug-image" data-help-title="Udgravning" data-help-body="Feltet er allerede gravet op. Skjulte fund og fælder her er brugt." />
+                            <img src="/tiles/udgravning.webp" alt="" class="dug-image" data-help-title={tekst('Udgravning', 'Dig site')} data-help-body={tekst('Feltet er allerede gravet op. Skjulte fund og fælder her er brugt.', 'This field has already been dug. Hidden finds and traps here are spent.')} />
                         {/if}
 
                         {#if erUdforsket && felt.tomSkattekiste}
-                            <img src="/tiles/empty_treasure.webp" alt="Tom skattekiste" class="empty-treasure-icon" data-help-title="Tom skattekiste" data-help-body="Skatten er taget. Kisten bliver liggende som spor, men giver ikke mere." />
+                            <img src="/tiles/empty_treasure.webp" alt={tekst('Tom skattekiste', 'Empty treasure chest')} class="empty-treasure-icon" data-help-title={tekst('Tom skattekiste', 'Empty treasure chest')} data-help-body={tekst('Skatten er taget. Kisten bliver liggende som spor, men giver ikke mere.', 'The treasure has been taken. The chest remains as a trace, but gives nothing more.')} />
                         {/if}
                         
                         {#if erUdforsket && felt.hasGoldmine}
-                            <div class="goldmine-container" data-help-title="Guldmine" data-help-body={felt.mineOwner ? `Guldminen ejes af ${felt.mineOwner}. Ejeren får score, og andre kan forsøge at overtage den, hvis den ikke er låst.` : 'Guldmine giver guld og score, når du overtager den. Besøg den igen for at låse den.'}>
-                                <img src="/tiles/goldmine.webp" alt="Guldmine" class="goldmine-icon" />
+                            <div class="goldmine-container" data-help-title={tekst('Guldmine', 'Gold mine')} data-help-body={felt.mineOwner ? tekst(`Guldminen ejes af ${felt.mineOwner}. Ejeren får score, og andre kan forsøge at overtage den, hvis den ikke er låst.`, `The gold mine is owned by ${felt.mineOwner}. The owner gets score, and others can try to take it over if it is not locked.`) : tekst('Guldmine giver guld og score, når du overtager den. Besøg den igen for at låse den.', 'A gold mine gives gold and score when you take it over. Visit it again to lock it.')}>
+                                <img src="/tiles/goldmine.webp" alt={tekst('Guldmine', 'Gold mine')} class="goldmine-icon" />
                                 {#if felt.mineOwner}
                                     <div class="owner-badge" class:locked={felt.mineLocked}>
-                                        <img src={felt.mineOwner === spilTilstand.spillerNavn ? spilTilstand.valgtKarakter?.ikon : (spilTilstand.alleSpillere[felt.mineOwner]?.ikon || '/tiles/player.webp')} alt="Ejer" class="mine-owner-portrait" data-help-title="Mine-ejer" data-help-body={`Denne spiller ejer minen: ${felt.mineOwner}.`} />
+                                        <img src={felt.mineOwner === spilTilstand.spillerNavn ? spilTilstand.valgtKarakter?.ikon : (spilTilstand.alleSpillere[felt.mineOwner]?.ikon || '/tiles/player.webp')} alt={tekst('Ejer', 'Owner')} class="mine-owner-portrait" data-help-title={tekst('Mine-ejer', 'Mine owner')} data-help-body={tekst(`Denne spiller ejer minen: ${felt.mineOwner}.`, `This player owns the mine: ${felt.mineOwner}.`)} />
                                         {#if felt.mineLocked}
-                                            <span class="lock-icon" data-help-title="Låst mine" data-help-body="Minen er låst af ejeren og kan ikke overtages lige nu.">🔒</span>
+                                            <span class="lock-icon" data-help-title={tekst('Låst mine', 'Locked mine')} data-help-body={tekst('Minen er låst af ejeren og kan ikke overtages lige nu.', 'The mine is locked by the owner and cannot be taken over right now.')}>🔒</span>
                                         {/if}
                                     </div>
                                 {/if}
@@ -2787,14 +2844,14 @@ function udførBevægelse(nytIndeks: number) {
 
                         {#if erUdforsket && felt.eventID && !felt.eventFuldført}
                             {#if felt.eventID === 'campfire'}
-                                <img src="/tiles/campfire.webp" alt="" class="campfire-icon" data-help-title="Lejrbål" data-help-body="Lejrbålet er et event eller hvilepunkt. Gå ind på feltet for at aktivere det." />
+                                <img src="/tiles/campfire.webp" alt="" class="campfire-icon" data-help-title={tekst('Lejrbål', 'Campfire')} data-help-body={tekst('Lejrbålet er et event eller hvilepunkt. Gå ind på feltet for at aktivere det.', 'The campfire is an event or resting point. Enter the field to activate it.')} />
                             {:else if felt.eventID !== 'meteor_skat'}
-                                <img src="/tiles/event.png" alt="" class="event-crystal" data-help-title="Event" data-help-body="Feltet har et event. Når du går ind på feltet, åbner et valg eller en situation." />
+                                <img src="/tiles/event.png" alt="" class="event-crystal" data-help-title={tekst('Event', 'Event')} data-help-body={tekst('Feltet har et event. Når du går ind på feltet, åbner et valg eller en situation.', 'This field has an event. When you enter it, a choice or situation opens.')} />
                             {/if}
                         {/if}
 
                         {#if erUdforsket && felt.hasPortal && !(felt.eventID && !felt.eventFuldført)}
-                            <img src="/tiles/portal.webp" alt="Portal" class="portal-icon" data-help-title="Portal" data-help-body="Portalen slynger dig 4, 5 eller 6 felter mod øst. Landingsfeltet aktiveres som et normalt felt." />
+                            <img src="/tiles/portal.webp" alt={tekst('Portal', 'Portal')} class="portal-icon" data-help-title={tekst('Portal', 'Portal')} data-help-body={tekst('Portalen slynger dig 4, 5 eller 6 felter mod øst. Landingsfeltet aktiveres som et normalt felt.', 'The portal throws you 4, 5 or 6 fields east. The landing field activates like a normal field.')} />
                         {/if}
 
                         {#if erUdforsket && harKoebbarShop(felt)}
@@ -2802,8 +2859,8 @@ function udførBevægelse(nytIndeks: number) {
                                 src="/tiles/{felt.biome === 'by' ? 'byshop.webp' : 'markedshop.webp'}" 
                                 alt="" 
                                 class="shop-icon" 
-                                data-help-title={felt.biome === 'by' ? 'Bybutik' : 'Marked'}
-                                data-help-body="Butikken sælger dagens varer for guld. Hylden deles af spillerne og genfyldes med butikkens faste varer næste dag. Har du kølle eller murknuser, stopper købmanden med at handle med dig efter et køb."
+                                data-help-title={felt.biome === 'by' ? tekst('Bybutik', 'Town shop') : tekst('Marked', 'Market')}
+                                data-help-body={tekst("Butikken sælger dagens varer for guld. Hylden deles af spillerne og genfyldes med butikkens faste varer næste dag. Har du kølle eller murknuser, stopper købmanden med at handle med dig efter et køb.", "The shop sells today's goods for gold. The shelf is shared by players and refills with the shop's fixed goods the next day. If you have a club or wallbreaker, the merchant stops trading with you after one purchase.")}
                                 onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')} 
                             />
                         {/if}
@@ -2813,13 +2870,13 @@ function udførBevægelse(nytIndeks: number) {
                                 src="/tiles/vaerksted.webp"
                                 alt=""
                                 class="workshop-icon"
-                                data-help-title="Værksted"
-                                data-help-body="Værkstedet opgraderer udstyr og erstatter den gamle genstand med den nye. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang."
+                                data-help-title={tekst('Værksted', 'Workshop')}
+                                data-help-body={tekst('Værkstedet opgraderer udstyr og erstatter den gamle genstand med den nye. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang.', 'The workshop upgrades equipment and replaces the old item with the new one. If you have a club or wallbreaker, the master only dares to work for you once.')}
                             />
                         {/if}
 
                         {#if erUdforsket && !erOpslugt && felt.indbrudt && felt.biome === 'by'}
-                            <span class="indbrud-marker" aria-label="Indbrudt" data-help-title="Indbrud" data-help-body="Låsen markerer, at der allerede har været indbrud.">
+                            <span class="indbrud-marker" aria-label={tekst('Indbrudt', 'Burgled')} data-help-title={tekst('Indbrud', 'Burglary')} data-help-body={tekst('Låsen markerer, at der allerede har været indbrud.', 'The lock shows that a burglary has already happened here.')}>
                                 <img src="/tiles/openlock.webp" alt="" class="indbrud-icon" />
                             </span>
                         {/if}
@@ -2830,13 +2887,13 @@ function udførBevægelse(nytIndeks: number) {
                             <button
                                 type="button"
                                 class="gravsten-container"
-                                data-help-title="Gravsten"
+                                data-help-title={tekst('Gravsten', 'Gravestone')}
                                 data-help-body={gravstenHjaelpetekst(felt)}
                                 onclick={(e) => visGravsten(e, felt)}
                             >
-                                <img src="/tiles/gravsted.webp" alt="Død" class="gravsten-ikon" />
+                                <img src="/tiles/gravsted.webp" alt={tekst('Død', 'Dead')} class="gravsten-ikon" />
                                 {#if gravsten}
-                                    <img src={gravsten.ikon} alt="Faldet" class="gravsten-portraet" />
+                                    <img src={gravsten.ikon} alt={tekst('Faldet', 'Fallen')} class="gravsten-portraet" />
                                 {/if}
                                 {#if gravstenListe.length > 1}
                                     <span class="gravsten-count">{gravstenListe.length}</span>
@@ -2849,9 +2906,9 @@ function udførBevægelse(nytIndeks: number) {
                             {#if farvelBaade.length > 0}
                                 <div class="farvel-baade-container">
                                     {#each farvelBaade as farvel, farvelNr (farvel.navn)}
-                                    <span class="farvel-baad" data-help-title="Farvelbåd" data-help-body={`${farvel.navn} slap væk fra øen her. Ikonet er kun minde/pynt og forsvinder ved game reset.`} style="--farvel-offset: {(farvelNr - (farvelBaade.length - 1) / 2) * 18}px;">
+                                    <span class="farvel-baad" data-help-title={tekst('Farvelbåd', 'Farewell boat')} data-help-body={tekst(`${farvel.navn} slap væk fra øen her. Ikonet er kun minde/pynt og forsvinder ved game reset.`, `${farvel.navn} escaped the island here. The icon is only a memory/decoration and disappears on game reset.`)} style="--farvel-offset: {(farvelNr - (farvelBaade.length - 1) / 2) * 18}px;">
                                             <img src="/tiles/baad.webp" alt="" class="farvel-baad-ikon" />
-                                            <img src={farvel.ikon} alt="Sluppet vÃ¦k" class="farvel-baad-portraet" />
+                                            <img src={farvel.ikon} alt={tekst('Sluppet væk', 'Escaped')} class="farvel-baad-portraet" />
                                         </span>
                                     {/each}
                                 </div>
@@ -2863,14 +2920,14 @@ function udførBevægelse(nytIndeks: number) {
                                 {@const afstand = regnHexAfstand(spilTilstand.spillerIndex, mod.index, kortBredde)}
                                 {@const tracket = erTrackerAktivPaa(navn)}
                                 {@const synlig = afstand <= aktuelSynsRadius || tracket}
-                                <span class="modstander-icon" data-help-title={synlig ? navn : 'Ukendt spiller'} data-help-body={synlig ? `${navn} står på dette felt.` : (mod.activeAlarm ? 'Du kan høre alarm/lyd fra en spiller her, men kan ikke se hvem det er.' : 'En spiller er tæt på, men uden for dit syn.')} class:alarm-aktiv={mod.activeAlarm && !synlig} class:skjult-lyd={!synlig && !mod.activeAlarm} class:tracker-aktiv={tracket}>
+                                <span class="modstander-icon" data-help-title={synlig ? navn : tekst('Ukendt spiller', 'Unknown player')} data-help-body={synlig ? tekst(`${navn} står på dette felt.`, `${navn} is standing on this field.`) : (mod.activeAlarm ? tekst('Du kan høre alarm/lyd fra en spiller her, men kan ikke se hvem det er.', 'You can hear an alarm/sound from a player here, but cannot see who it is.') : tekst('En spiller er tæt på, men uden for dit syn.', 'A player is nearby, but outside your vision.'))} class:alarm-aktiv={mod.activeAlarm && !synlig} class:skjult-lyd={!synlig && !mod.activeAlarm} class:tracker-aktiv={tracket}>
                                     <img src={synlig ? (mod.ikon || '/tiles/player.webp') : '/tiles/player.webp'} alt="" style="height: {synlig ? '58px' : '70px'};" />
                                 </span>
                             {/if}
                         {/each}
 
                         {#if spilTilstand.spillerIndex === i && sejlendeBaadIndex !== i && spilTilstand.gameState !== 'dead' && spilTilstand.gameState !== 'win'}
-                            <span class="player-icon" data-help-title="Dig" data-help-body="Din karakter står her. Tryk på nabofelter for at bevæge dig." style="position: relative; display: inline-flex; justify-content: center; z-index: 20;">
+                            <span class="player-icon" data-help-title={tekst('Dig', 'You')} data-help-body={tekst('Din karakter står her. Tryk på nabofelter for at bevæge dig.', 'Your character is standing here. Tap neighboring fields to move.')} style="position: relative; display: inline-flex; justify-content: center; z-index: 20;">
                                 <img src={spilTilstand.valgtKarakter?.ikon} alt="" style="height: 58px;" />
                             </span>
                         {/if}
@@ -2886,8 +2943,8 @@ function udførBevægelse(nytIndeks: number) {
                 </div>
 
                 {#if sejlendeBaadIndex === i}
-                    <div class="sailing-container" data-help-title="Afrejse" data-help-body="Du er på vej væk i båden. Om lidt vises slutkortet." style="left: {posX}px; top: {posY}px;">
-                        <img src="/tiles/baad.webp" alt="Flugtbåd" class="escape-boat" />
+                    <div class="sailing-container" data-help-title={tekst('Afrejse', 'Departure')} data-help-body={tekst('Du er på vej væk i båden. Om lidt vises slutkortet.', 'You are leaving in the boat. The result screen will appear shortly.')} style="left: {posX}px; top: {posY}px;">
+                        <img src="/tiles/baad.webp" alt={tekst('Flugtbåd', 'Escape boat')} class="escape-boat" />
                         <img src={spilTilstand.valgtKarakter?.ikon} alt="" class="sejler-ikon" />
                     </div>
                 {/if}
@@ -3048,7 +3105,7 @@ function udførBevægelse(nytIndeks: number) {
         role="dialog"
         aria-live="polite"
     >
-        <button type="button" class="inspect-luk" onclick={lukInspect} aria-label="Luk forklaring">×</button>
+        <button type="button" class="inspect-luk" onclick={lukInspect} aria-label={tekst('Luk forklaring', 'Close explanation')}>×</button>
         <h3>{inspectBoble.titel}</h3>
         <p>{inspectBoble.tekst}</p>
     </div>
@@ -3058,17 +3115,19 @@ function udførBevægelse(nytIndeks: number) {
     <div class="intro-overlay">
         <div class="intro-box">
             <div class="intro-media">
-                <video autoplay muted playsinline aria-label="Startvideo">
+                <video autoplay muted playsinline aria-label={tekst('Startvideo', 'Start video')}>
                     <source src="/video/start_video.mp4" type="video/mp4" />
                 </video>
                 <div class="intro-taage"></div>
             </div>
-            <h2>Dag 1</h2>
+            <h2>{tekst('Dag 1', 'Day 1')}</h2>
         <p>
-            Du er drevet i land på kysten af {formaterOeNavn()}. Tågen ligger bag dig og venter
-            på at omslutte dig. Du må prøve at finde en båd på den anden side af {formaterOeNavn()}.
+            {tekst(
+                `Du er drevet i land på kysten af ${formaterOeNavn()}. Tågen ligger bag dig og venter på at omslutte dig. Du må prøve at finde en båd på den anden side af ${formaterOeNavn()}.`,
+                `You have washed ashore on the coast of ${formaterOeNavn()}. The fog waits behind you, ready to swallow you. Try to find a boat on the far side of ${formaterOeNavn()}.`
+            )}
         </p>
-            <button type="button" class="intro-knap" onclick={afslutIntro}>Gå i land</button>
+            <button type="button" class="intro-knap" onclick={afslutIntro}>{tekst('Gå i land', 'Go ashore')}</button>
         </div>
     </div>
 {/if}
@@ -3081,7 +3140,7 @@ function udførBevægelse(nytIndeks: number) {
 {#if spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'win_map'}
     <div class="slut-panel" class:vundet={spilTilstand.gameState === 'win_map'}>
         <div class="slut-header">
-            <h2>{spilTilstand.gameState === 'win_map' ? 'Du slap væk' : 'Du døde'}</h2>
+            <h2>{spilTilstand.gameState === 'win_map' ? tekst('Du slap væk', 'You escaped') : tekst('Du døde', 'You died')}</h2>
             <p>{spilTilstand.logBesked}</p>
         </div>
         
@@ -3091,23 +3150,23 @@ function udførBevægelse(nytIndeks: number) {
                     <img src={data.ikon || '/tiles/player.webp'} alt="" />
                     <div class="info">
                         <strong>{navn}</strong>
-                        <span>{data.isWinner ? 'Sluppet væk' : (data.isDead ? (data.deathCause ? `Død i ${data.deathCause === 'vand' ? 'vand' : 'tåge'}` : 'Død') : 'I tågen')}</span>
+                        <span>{data.isWinner ? tekst('Sluppet væk', 'Escaped') : (data.isDead ? (data.deathCause ? tekst(`Død i ${data.deathCause === 'vand' ? 'vand' : 'tåge'}`, `Dead in ${data.deathCause === 'vand' ? 'water' : 'fog'}`) : tekst('Død', 'Dead')) : tekst('I tågen', 'In the fog'))}</span>
                     </div>
                     <div class="stats">
                         <span title="Score">{score}</span>
-                        <span title="Guld">🪙 {data.guld}</span>
+                        <span title={tekst('Guld', 'Gold')}>🪙 {data.guld}</span>
                     </div>
                 </div>
             {/each}
         </div>
 
-        <button class="log-ikon-btn" onclick={() => visDoedsLog = true} title="Læs din fulde log">
-            <img src="/ui/log_ikon.webp" alt="Log" />
-            <span>Logbog</span>
+        <button class="log-ikon-btn" onclick={() => visDoedsLog = true} title={tekst('Læs din fulde log', 'Read your full log')}>
+            <img src="/ui/log_ikon.webp" alt={tekst('Log', 'Log')} />
+            <span>{tekst('Logbog', 'Logbook')}</span>
         </button>
 
         <button class="se-resultat-btn" onclick={() => spilTilstand.gameState = spilTilstand.gameState === 'win_map' ? 'win' : 'dead'}>
-            Se point-fordeling
+            {tekst('Se point-fordeling', 'See score breakdown')}
         </button>
 
     </div>
@@ -3116,13 +3175,13 @@ function udførBevægelse(nytIndeks: number) {
 {#if visDoedsLog}
     <div class="log-modal-overlay" onclick={() => visDoedsLog = false} role="presentation">
         <div class="log-modal" onclick={(e) => e.stopPropagation()} role="presentation">
-            <h3>Logbog</h3>
+            <h3>{tekst('Logbog', 'Logbook')}</h3>
             <div class="log-liste">
                 {#each rensedeLogLinjer as linje, index (index)}
                     <p>{linje}</p>
                 {/each}
             </div>
-            <button class="luk-log-btn" onclick={() => visDoedsLog = false}>Luk</button>
+            <button class="luk-log-btn" onclick={() => visDoedsLog = false}>{tekst('Luk', 'Close')}</button>
         </div>
     </div>
 {/if}

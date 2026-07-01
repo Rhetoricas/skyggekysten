@@ -1,3 +1,5 @@
+import { tekst } from './i18n.svelte';
+
 export const offlineAppState = $state({
     understottet: false,
     klar: false,
@@ -62,7 +64,7 @@ export async function tjekOfflineAppKlar() {
     if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
         offlineAppState.understottet = false;
         offlineAppState.klar = false;
-        offlineAppState.besked = 'Denne browser understøtter ikke offline-cache.';
+        offlineAppState.besked = tekst('Denne browser understøtter ikke offline-cache.', 'This browser does not support offline cache.');
         return false;
     }
 
@@ -72,8 +74,8 @@ export async function tjekOfflineAppKlar() {
         const registration = await navigator.serviceWorker.getRegistration();
         offlineAppState.klar = !!registration?.active;
         offlineAppState.besked = offlineAppState.klar
-            ? 'Spillet er klar på denne enhed'
-            : 'Offline-cache er ikke klar endnu.';
+            ? tekst('Spillet er klar på denne enhed', 'The game is ready on this device')
+            : tekst('Offline-cache er ikke klar endnu.', 'Offline cache is not ready yet.');
         return offlineAppState.klar;
     } catch {
         offlineAppState.klar = false;
@@ -86,29 +88,29 @@ export async function goerOfflineAppKlar() {
     if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
         offlineAppState.understottet = false;
         offlineAppState.klar = false;
-        offlineAppState.besked = 'Denne browser understøtter ikke offline-cache.';
+        offlineAppState.besked = tekst('Denne browser understøtter ikke offline-cache.', 'This browser does not support offline cache.');
         return false;
     }
 
     offlineAppState.understottet = true;
     offlineAppState.arbejder = true;
-    offlineAppState.besked = 'Downloader spillet til offline brug...';
+    offlineAppState.besked = tekst('Downloader spillet til offline brug...', 'Downloading the game for offline use...');
     const langsomBesked = setTimeout(() => {
         if (offlineAppState.arbejder) {
-            offlineAppState.besked = 'Downloader stadig. Firefox kan være lidt langsom første gang...';
+            offlineAppState.besked = tekst('Downloader stadig. Firefox kan være lidt langsom første gang...', 'Still downloading. Firefox can be a little slow the first time...');
         }
     }, 8000);
 
     try {
         const registration = await hentServiceWorkerRegistration();
         offlineAppState.klar = !!registration.active;
-        offlineAppState.besked = 'Spillet er klar på denne enhed';
+        offlineAppState.besked = tekst('Spillet er klar på denne enhed', 'The game is ready on this device');
         return true;
     } catch (error) {
         offlineAppState.klar = false;
         offlineAppState.besked = error instanceof Error && error.message === 'timeout'
-            ? 'Offline-cache tog for lang tid. Genindlæs siden online og prøv igen.'
-            : 'Offline-cache kunne ikke gøres klar. Genindlæs siden online og prøv igen.';
+            ? tekst('Offline-cache tog for lang tid. Genindlæs siden online og prøv igen.', 'Offline cache took too long. Reload the page online and try again.')
+            : tekst('Offline-cache kunne ikke gøres klar. Genindlæs siden online og prøv igen.', 'Offline cache could not be prepared. Reload the page online and try again.');
         return false;
     } finally {
         clearTimeout(langsomBesked);

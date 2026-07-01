@@ -1,4 +1,5 @@
 import { spilTilstand } from '$lib/spilTilstand.svelte';
+import { tekst } from '$lib/i18n.svelte';
 
 export function skabKamera() {
     let x = $state(0);
@@ -52,7 +53,10 @@ export function skabKamera() {
         const harForbandelse = spilTilstand.mitUdstyr?.some(i => i.id === 'kikkert_250' || i.id === 'kikkert_45');
         
         if (harForbandelse) {
-            spilTilstand.logBesked = "Forbandelsen tvinger dit syn ud af fokus. Du kan ikke ændre afstanden.";
+            spilTilstand.logBesked = tekst(
+                "Forbandelsen tvinger dit syn ud af fokus. Du kan ikke ændre afstanden.",
+                "The curse forces your vision out of focus. You cannot change the distance."
+            );
             return;
         }
         
@@ -92,7 +96,10 @@ function foelgSpiller(index: number, bredde: number, hexW: number, rowH: number)
         const harForbandelse = spilTilstand.mitUdstyr?.some(i => i.id === 'kikkert_250' || i.id === 'kikkert_45');
 
         if (harForbandelse) {
-            spilTilstand.logBesked = "Forbandelsen tvinger dit syn ud af fokus. Du kan ikke ændre afstanden.";
+            spilTilstand.logBesked = tekst(
+                "Forbandelsen tvinger dit syn ud af fokus. Du kan ikke ændre afstanden.",
+                "The curse forces your vision out of focus. You cannot change the distance."
+            );
             return;
         }
 

@@ -2,17 +2,20 @@
     import { onMount } from 'svelte';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { authState, gemProfilKarakter, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
-    import { hentKarakterKlasseNavn, hentKarakterKlasseNoegle, tilgaengeligeKarakterer } from '$lib/spildata';
+    import { hentKarakterKlasseNoegle, tilgaengeligeKarakterer } from '$lib/spildata';
+    import { karakterFordel, karakterKlasseNavn as visKarakterKlasseNavn, karakterNavn, karakterUlempe, titelNavn } from '$lib/spilTekst';
     import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
     import LydKnap from '$lib/LydKnap.svelte';
+    import SprogKnap from '$lib/SprogKnap.svelte';
+    import { tekst } from '$lib/i18n.svelte';
     import { hentBedsteHighscoreForBruger, hentGlobalHighscoresForFilter, hentHighscoreDetaljer, hentHighscoreResultat } from '$lib/netvaerk';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
     import { TROFAE_DEFINITIONER, findTrofae, gemTrofaeAwards, gemTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, hentSupabaseTrofaeAwards, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, type TrofaeAward } from '$lib/trofaeer';
-    import { TUTORIAL_RANGTRIN, TUTORIAL_RUMKODE, erTutorialKnapSkjult, hentTutorialRang } from '$lib/tutorial.svelte';
+    import { TUTORIAL_RUMKODE, erTutorialKnapSkjult, hentTutorialRang, hentTutorialRangtrin } from '$lib/tutorial.svelte';
     import type { Karakter, SpillerData } from '$lib/types';
 
     type HighscoreDetaljer = {
@@ -198,7 +201,7 @@
         spilTilstand.kortBredde = bredde;
         spilTilstand.kortHoejde = hoejde;
         spilTilstand.devVisHeleKort = false;
-        spilTilstand.statusBesked = `Testkort valgt: ${bredde} x ${hoejde}.`;
+        spilTilstand.statusBesked = tekst(`Testkort valgt: ${bredde} x ${hoejde}.`, `Test map selected: ${bredde} x ${hoejde}.`);
     }
 
     function findNiveau(score: number) {
@@ -316,18 +319,18 @@
     }
 
     function profilTitelMedLevelForKarakter(karakterId?: string | null) {
-        if (!karakterId) return 'Mest spillet';
+        if (!karakterId) return tekst('Mest spillet', 'Most played');
         const titelData = authState.stats?.karakterBedsteTitler.find((række) => række.karakterId === karakterId);
         if (!titelData || titelData.score <= 0 || titelData.titel === 'Ingen titel endnu') return '(0)';
-        return `${titelData.titel} (${findMedaljeNiveau(titelData.score) + 1})`;
+        return `${titelNavn(titelData.titel)} (${findMedaljeNiveau(titelData.score) + 1})`;
     }
 
     function profilMestSpilletTitelTekst() {
         const karakter = profilValgtKarakter();
         const titel = profilTitelForKarakter(karakter?.id);
-        if (karakter && titel && titel !== 'Ingen titel endnu') return `${karakter.navn} - ${titel}`;
-        if (karakter) return karakter.navn;
-        return 'Min profil';
+        if (karakter && titel && titel !== 'Ingen titel endnu') return `${karakterNavn(karakter)} - ${titelNavn(titel)}`;
+        if (karakter) return karakterNavn(karakter);
+        return tekst('Min profil', 'My profile');
     }
 
     async function aabnLaastTrofae(medalje: { id?: string; sti: string; label: string; bedste: boolean; opnaaet?: boolean; krav?: string; episkTekst?: string; award?: TrofaeAward | null }) {
@@ -383,7 +386,7 @@
     }
 
     function highscoreKlasseNavn() {
-        return hentKarakterKlasseNavn(spilTilstand.valgtKarakter);
+        return visKarakterKlasseNavn(spilTilstand.valgtKarakter);
     }
 
     function highscoreSideAntal(scores: Array<unknown>) {
@@ -454,19 +457,23 @@
     }
 
     function talEllerUkendt(v?: number) {
-        return v === undefined || v === null ? 'Ukendt' : `${v}`;
+        return v === undefined || v === null ? tekst('Ukendt', 'Unknown') : `${v}`;
     }
 
     function highscoreStatus(score: HighscoreDetaljer) {
-        if (score.erVinder) return 'Sluppet væk';
-        if (score.erDoed) return score.doedsAarsag ? `Død i ${score.doedsAarsag === 'vand' ? 'vand' : 'tåge'}` : 'Død';
-        return 'Ukendt';
+        if (score.erVinder) return tekst('Sluppet væk', 'Escaped');
+        if (score.erDoed) return score.doedsAarsag
+            ? tekst(`Død i ${score.doedsAarsag === 'vand' ? 'vand' : 'tåge'}`, `Dead in ${score.doedsAarsag === 'vand' ? 'water' : 'fog'}`)
+            : tekst('Død', 'Dead');
+        return tekst('Ukendt', 'Unknown');
     }
 
     function spillerStatus(data: { isWinner?: boolean; isDead?: boolean; deathCause?: 'vand' | 'taage' | null }) {
-        if (data.isWinner) return 'Sluppet væk';
-        if (!data.isDead) return 'I tågen';
-        return data.deathCause ? `Død i ${data.deathCause === 'vand' ? 'vand' : 'tåge'}` : 'Død';
+        if (data.isWinner) return tekst('Sluppet væk', 'Escaped');
+        if (!data.isDead) return tekst('I tågen', 'In the fog');
+        return data.deathCause
+            ? tekst(`Død i ${data.deathCause === 'vand' ? 'vand' : 'tåge'}`, `Dead in ${data.deathCause === 'vand' ? 'water' : 'fog'}`)
+            : tekst('Død', 'Dead');
     }
 
     function highscoreMineBasis(score: HighscoreDetaljer) {
@@ -475,7 +482,7 @@
     }
 
     function highscoreSpillerAntal(score: HighscoreDetaljer) {
-        if (score.antalSpillere === undefined || score.antalSpillere === null) return 'Ukendt';
+        if (score.antalSpillere === undefined || score.antalSpillere === null) return tekst('Ukendt', 'Unknown');
         return score.antalSpillere <= 1 ? 'Solo' : `Multiplayer (${score.antalSpillere})`;
     }
 
@@ -575,13 +582,16 @@
     function aabnKarakterHighscoreFilter() {
         if (!valgtHighscore?.karakter) return;
         const klasseNoegle = hentKarakterKlasseNoegle(valgtHighscore.karakter);
-        const klasseNavn = hentKarakterKlasseNavn(valgtHighscore.karakter);
+        const klasseNavn = visKarakterKlasseNavn(valgtHighscore.karakter);
         void aabnHighscoreFilter(`Top ${HIGHSCORE_DRILLDOWN_ANTAL}: ${klasseNavn}`, { karakterKlasse: klasseNoegle });
     }
 
     function aabnOeHighscoreFilter() {
         if (!valgtHighscore?.oeNavn) return;
-        void aabnHighscoreFilter(`Top ${HIGHSCORE_DRILLDOWN_ANTAL} på ${formaterNavn(valgtHighscore.oeNavn)}`, { oeNavn: valgtHighscore.oeNavn });
+        void aabnHighscoreFilter(
+            tekst(`Top ${HIGHSCORE_DRILLDOWN_ANTAL} på ${formaterNavn(valgtHighscore.oeNavn)}`, `Top ${HIGHSCORE_DRILLDOWN_ANTAL} on ${formaterNavn(valgtHighscore.oeNavn)}`),
+            { oeNavn: valgtHighscore.oeNavn }
+        );
     }
 
     function naesteGlobalHighscoreSide() {
@@ -842,9 +852,9 @@
 {#snippet episkeTrofaeer()}
     {@const trofaeer = nyeTrofaeer()}
     {#if trofaeer.length > 0}
-        <section class="episk-trofae-panel" aria-label="Nye trofæmedaljer">
-            <p class="episk-kicker">Ny trofæmedalje</p>
-            <h2>{trofaeer.length === 1 ? trofaeer[0].label : `${trofaeer.length} episke trofæer`}</h2>
+        <section class="episk-trofae-panel" aria-label={tekst('Nye trofæmedaljer', 'New trophy medals')}>
+            <p class="episk-kicker">{tekst('Ny trofæmedalje', 'New trophy medal')}</p>
+            <h2>{trofaeer.length === 1 ? trofaeer[0].label : tekst(`${trofaeer.length} episke trofæer`, `${trofaeer.length} epic trophies`)}</h2>
             <div class="episk-trofae-liste">
                 {#each trofaeer as trofae (trofae.id)}
                     <div class="episk-trofae">
@@ -862,34 +872,34 @@
 
 {#snippet pointSpecifikation()}
     <div class="point-kvittering">
-        <h4>Opgørelse</h4>
-        <div class="kvittering-linje"><span>Indsamlet guld:</span> <span>{spilTilstand.guldTotal}</span></div>
+        <h4>{tekst('Opgørelse', 'Breakdown')}</h4>
+        <div class="kvittering-linje"><span>{tekst('Indsamlet guld:', 'Collected gold:')}</span> <span>{spilTilstand.guldTotal}</span></div>
         <div class="kvittering-linje">
-            <span>{hentPointSpec().erVinder ? 'Overlevelses-bonus' : 'Fremdrift'}:</span>
+            <span>{hentPointSpec().erVinder ? tekst('Overlevelses-bonus', 'Survival bonus') : tekst('Fremdrift', 'Progress')}:</span>
             <span>{hentPointSpec().fremdriftPoint}</span>
         </div>
-        <div class="kvittering-linje"><span>Udforskning:</span> <span>{hentPointSpec().udforskning}</span></div>
+        <div class="kvittering-linje"><span>{tekst('Udforskning:', 'Exploration:')}</span> <span>{hentPointSpec().udforskning}</span></div>
         <div class="kvittering-linje">
-            <span>Territorium (miner):</span>
+            <span>{tekst('Territorium (miner):', 'Territory (mines):')}</span>
             <span>{hentPointSpec().minePoint}</span>
         </div>
-        <div class="kvittering-linje"><span>Udstyr:</span> <span>{hentPointSpec().udstyrPoint}</span></div>
+        <div class="kvittering-linje"><span>{tekst('Udstyr:', 'Equipment:')}</span> <span>{hentPointSpec().udstyrPoint}</span></div>
         {#if hentPointSpec().hpMult > 1 || hentPointSpec().multiplayerModifier > 1}
             <div class="kvittering-skiller"></div>
         {/if}
         {#if hentPointSpec().hpMult > 1}
-            <div class="kvittering-linje mult"><span>Helbreds-bonus (HP):</span> <span>x {hentPointSpec().hpMult.toFixed(3)}</span></div>
+            <div class="kvittering-linje mult"><span>{tekst('Helbreds-bonus (HP):', 'Health bonus (HP):')}</span> <span>x {hentPointSpec().hpMult.toFixed(3)}</span></div>
         {/if}
         {#if hentPointSpec().multiplayerModifier > 1}
             <div class="kvittering-linje mult"><span>Multiplayer:</span> <span>x {hentPointSpec().multiplayerModifier.toFixed(1)}</span></div>
         {/if}
-        <div class="kvittering-total"><span>Total Score:</span> <span>{spilTilstand.samletScore}</span></div>
+        <div class="kvittering-total"><span>{tekst('Total Score:', 'Total Score:')}</span> <span>{spilTilstand.samletScore}</span></div>
     </div>
 {/snippet}
 
 {#snippet sessionTavle()}
     <div class="session-tavle">
-        <h3>Alle karakterer</h3>
+        <h3>{tekst('Alle karakterer', 'All Characters')}</h3>
         <div class="session-liste">
             {#each hentSessionSpillere() as { navn, data, score } (navn)}
                 <div class="session-raekke" class:aktiv-mig={navn === spilTilstand.spillerNavn}>
@@ -913,13 +923,13 @@
     {@const vurdering = hentTutorialRang(spilTilstand.samletScore)}
     <section class="tutorial-resultat" aria-label="Tutorial-resultat">
         <div class="tutorial-resultat-top">
-            <span>Tutorialrang</span>
+            <span>{tekst('Tutorialrang', 'Tutorial rank')}</span>
             <strong>{vurdering.aktuel.titel}</strong>
             <p>{vurdering.aktuel.tekst}</p>
         </div>
 
         <div class="tutorial-rangliste">
-            {#each TUTORIAL_RANGTRIN as trin (trin.point)}
+            {#each hentTutorialRangtrin() as trin (trin.point)}
                 <div class="tutorial-rangtrin" class:opnaaet={spilTilstand.samletScore >= trin.point}>
                     <span>{trin.point}</span>
                     <strong>{trin.titel}</strong>
@@ -928,11 +938,11 @@
         </div>
 
         {#if vurdering.naeste}
-            <p class="tutorial-naeste">Næste rang: {vurdering.naeste.titel} ved {vurdering.naeste.point} point.</p>
+            <p class="tutorial-naeste">{tekst('Næste rang:', 'Next rank:')} {vurdering.naeste.titel} {tekst('ved', 'at')} {vurdering.naeste.point} {tekst('point.', 'points.')}</p>
         {:else}
-            <p class="tutorial-naeste">Du har nået højeste tutorialrang.</p>
+            <p class="tutorial-naeste">{tekst('Du har nået højeste tutorialrang.', 'You have reached the highest tutorial rank.')}</p>
         {/if}
-        <p class="tutorial-resultat-note">Dette er kun en øvelsesvurdering. Den bliver ikke gemt og tæller ikke på rigtige øer.</p>
+        <p class="tutorial-resultat-note">{tekst('Dette er kun en øvelsesvurdering. Den bliver ikke gemt og tæller ikke på rigtige øer.', 'This is only a practice rating. It is not saved and does not count on real islands.')}</p>
     </section>
 {/snippet}
 
@@ -945,20 +955,20 @@
                         <img src={profilValgtKarakter()?.ikon} alt="" />
                     {/if}
                     <span>
-                        <strong>{authState.profil?.display_name || 'Logget ind'}</strong>
+                        <strong>{authState.profil?.display_name || tekst('Logget ind', 'Logged in')}</strong>
                         <em>{profilMestSpilletTitelTekst()}</em>
                     </span>
                 </button>
-                <button type="button" class="konto-aabn-profil-knap" onclick={aabnProfil}>Åbn Profil</button>
+                <button type="button" class="konto-aabn-profil-knap" onclick={aabnProfil}>{tekst('Åbn Profil', 'Open Profile')}</button>
             </div>
-            <div class="konto-medaljer" aria-label="Dine medaljer">
+            <div class="konto-medaljer" aria-label={tekst('Dine medaljer', 'Your medals')}>
                 {#each profilMedaljer() as medalje, index (`profil-medalje-${index}-${medalje.sti}`)}
                     <button
                         type="button"
                         class="konto-medalje-knap"
                         class:kan-aabnes={true}
                         onclick={() => aabnLaastTrofae(medalje)}
-                        aria-label={medalje.bedste ? medalje.label : medalje.opnaaet ? `Se ${medalje.label}` : `Se krav for ${medalje.label}`}
+                        aria-label={medalje.bedste ? medalje.label : medalje.opnaaet ? tekst(`Se ${medalje.label}`, `View ${medalje.label}`) : tekst(`Se krav for ${medalje.label}`, `View requirement for ${medalje.label}`)}
                     >
                         <img
                             src={medalje.sti}
@@ -972,14 +982,14 @@
                 {/each}
             </div>
         {:else}
-            <p class="konto-hint">Login er valgfrit. Uden login spiller du kun med på den ø, du åbner nu, og din score og profil bliver ikke gemt.</p>
-            <div class="konto-medaljer konto-medaljer-login-teaser" aria-label="Medaljer du kan gemme med login">
+            <p class="konto-hint">{tekst('Login er valgfrit. Uden login spiller du kun med på den ø, du åbner nu, og din score og profil bliver ikke gemt.', 'Login is optional. Without login, you only play on the island you open now, and your score and profile are not saved.')}</p>
+            <div class="konto-medaljer konto-medaljer-login-teaser" aria-label={tekst('Medaljer du kan gemme med login', 'Medals you can save with login')}>
                 {#each loginTeaserMedaljer() as medalje, index (`login-teaser-medalje-${index}-${medalje.sti}`)}
                     <button
                         type="button"
                         class="konto-medalje-knap kan-aabnes"
                         onclick={() => aabnLaastTrofae(medalje)}
-                        aria-label={`Se krav for ${medalje.label}`}
+                        aria-label={tekst(`Se krav for ${medalje.label}`, `View requirement for ${medalje.label}`)}
                     >
                         <img
                             src={medalje.sti}
@@ -998,7 +1008,7 @@
                     onkeydown={(e) => { if (e.key === 'Enter') sendLoginLink(authState.email); }}
                 />
                 <button type="button" onclick={() => sendLoginLink(authState.email)} disabled={authState.loader}>
-                    {authState.loader ? 'Sender...' : 'Log ind'}
+                    {authState.loader ? tekst('Sender...', 'Sending...') : tekst('Log ind', 'Log in')}
                 </button>
             </div>
         {/if}
@@ -1029,11 +1039,11 @@
                 <h3 id="trofae-info-titel">{valgtLaastTrofae.label}</h3>
                 {#if valgtLaastTrofae.opnaaet && valgtLaastTrofae.episkTekst}
                     <p>{valgtLaastTrofae.episkTekst}</p>
-                    <p class="trofae-info-krav">Krav: {valgtLaastTrofae.krav}</p>
+                    <p class="trofae-info-krav">{tekst('Krav:', 'Requirement:')} {valgtLaastTrofae.krav}</p>
                 {:else}
                     <p>{valgtLaastTrofae.krav}</p>
                 {/if}
-                <button type="button" onclick={lukLaastTrofae}>Luk</button>
+                <button type="button" onclick={lukLaastTrofae}>{tekst('Luk', 'Close')}</button>
             </div>
         </div>
     {/if}
@@ -1049,8 +1059,8 @@
                             type="button"
                             class="profil-karakter-knap"
                             onclick={() => visProfilKarakterValg = !visProfilKarakterValg}
-                            aria-label="Vælg profilkarakter"
-                            title="Vælg profilkarakter"
+                            aria-label={tekst('Vælg profilkarakter', 'Choose profile character')}
+                            title={tekst('Vælg profilkarakter', 'Choose profile character')}
                         >
                             {#if profilValgtKarakter()}
                                 <img src={profilValgtKarakter()?.ikon} alt="" />
@@ -1059,7 +1069,7 @@
                             {/if}
                         </button>
                         <div>
-                        <h2>Min profil</h2>
+                        <h2>{tekst('Min profil', 'My Profile')}</h2>
                         {#if maskeretEmail(authState.user.email)}
                             <p>{maskeretEmail(authState.user.email)}</p>
                         {/if}
@@ -1067,19 +1077,19 @@
                     </div>
                     <button type="button" class="profil-luk-knap" onclick={() => visProfil = false}>
                         <span aria-hidden="true">×</span>
-                        <span>Luk</span>
+                        <span>{tekst('Luk', 'Close')}</span>
                     </button>
                 </div>
 
                 {#if visProfilKarakterValg}
-                    <div class="profil-karaktervalg" aria-label="Profilkarakter">
+                    <div class="profil-karaktervalg" aria-label={tekst('Profilkarakter', 'Profile character')}>
                         <button
                             type="button"
                             class:valgt={!authState.profil?.profile_character_id}
                             onclick={() => vaelgProfilKarakter(null)}
                         >
-                            <span>Auto</span>
-                            <em>Mest spillet</em>
+                            <span>{tekst('Auto', 'Auto')}</span>
+                            <em>{tekst('Mest spillet', 'Most played')}</em>
                         </button>
                         {#each tilgaengeligeKarakterer as karakter (karakter.id)}
                             <button
@@ -1088,7 +1098,7 @@
                                 onclick={() => vaelgProfilKarakter(karakter.id)}
                             >
                                 <img src={karakter.ikon} alt="" />
-                                <span>{karakter.navn}</span>
+                                <span>{karakterNavn(karakter)}</span>
                                 <em>{profilTitelMedLevelForKarakter(karakter.id)}</em>
                             </button>
                         {/each}
@@ -1096,29 +1106,29 @@
                 {/if}
 
                 <label class="profil-felt">
-                    <span>Ret spillernavn</span>
+                    <span>{tekst('Ret spillernavn', 'Edit player name')}</span>
                     <div>
                         <input bind:value={profilNavnInput} maxlength="15" />
-                        <button type="button" onclick={gemProfil}>Gem</button>
+                        <button type="button" onclick={gemProfil}>{tekst('Gem', 'Save')}</button>
                     </div>
                 </label>
 
                 {#if authState.stats}
                     <div class="profil-grid">
-                        <div><strong>{authState.stats.spil}</strong><span>Spil</span></div>
-                        <div><strong>{authState.stats.sejre}</strong><span>Sejre</span></div>
-                        <div><strong>{authState.stats.doedsfald}</strong><span>Dødsfald</span></div>
-                        <div><strong>{authState.stats.bedsteScore}</strong><span>Bedste score</span></div>
-                        <div><strong>{authState.stats.gennemsnitScore}</strong><span>Gns. score</span></div>
-                        <div><strong>{authState.stats.mestGuld}</strong><span>Mest guld</span></div>
-                        <div><strong>{authState.stats.bedsteDag}</strong><span>Længste spil</span></div>
-                        <div><strong>{authState.stats.flestFelter}</strong><span>Flest felter</span></div>
-                        <div><strong>{authState.stats.flestMiner}</strong><span>Flest miner</span></div>
-                        <div><strong>{authState.stats.favoritKarakter}</strong><span>Mest spillet</span></div>
+                        <div><strong>{authState.stats.spil}</strong><span>{tekst('Spil', 'Games')}</span></div>
+                        <div><strong>{authState.stats.sejre}</strong><span>{tekst('Sejre', 'Wins')}</span></div>
+                        <div><strong>{authState.stats.doedsfald}</strong><span>{tekst('Dødsfald', 'Deaths')}</span></div>
+                        <div><strong>{authState.stats.bedsteScore}</strong><span>{tekst('Bedste score', 'Best score')}</span></div>
+                        <div><strong>{authState.stats.gennemsnitScore}</strong><span>{tekst('Gns. score', 'Avg. score')}</span></div>
+                        <div><strong>{authState.stats.mestGuld}</strong><span>{tekst('Mest guld', 'Most gold')}</span></div>
+                        <div><strong>{authState.stats.bedsteDag}</strong><span>{tekst('Længste spil', 'Longest game')}</span></div>
+                        <div><strong>{authState.stats.flestFelter}</strong><span>{tekst('Flest felter', 'Most fields')}</span></div>
+                        <div><strong>{authState.stats.flestMiner}</strong><span>{tekst('Flest miner', 'Most mines')}</span></div>
+                        <div><strong>{karakterNavn(authState.stats.favoritKarakter)}</strong><span>{tekst('Mest spillet', 'Most played')}</span></div>
                     </div>
                 {/if}
 
-                <div class="profil-medaljehylde" aria-label="Profilmedaljer">
+                <div class="profil-medaljehylde" aria-label={tekst('Profilmedaljer', 'Profile medals')}>
                     {#each profilMedaljer() as medalje, index (`profil-hylde-${index}-${medalje.sti}`)}
                         <div class="profil-medalje" class:opnaaet={medalje.bedste || medalje.opnaaet}>
                             <button
@@ -1126,7 +1136,7 @@
                                 class="profil-medalje-knap"
                                 class:kan-aabnes={true}
                                 onclick={() => aabnLaastTrofae(medalje)}
-                                aria-label={medalje.bedste ? medalje.label : medalje.opnaaet ? `Se ${medalje.label}` : `Se krav for ${medalje.label}`}
+                                aria-label={medalje.bedste ? medalje.label : medalje.opnaaet ? tekst(`Se ${medalje.label}`, `View ${medalje.label}`) : tekst(`Se krav for ${medalje.label}`, `View requirement for ${medalje.label}`)}
                             >
                                 <img
                                     src={medalje.sti}
@@ -1143,17 +1153,17 @@
 
                 {#if authState.stats}
                     <div class="profil-liste">
-                        <h3>Sejre pr. karakter</h3>
+                        <h3>{tekst('Sejre pr. karakter', 'Wins per character')}</h3>
                         {#if authState.stats.karakterSejre.length === 0}
-                            <p>Ingen sejre endnu.</p>
+                            <p>{tekst('Ingen sejre endnu.', 'No wins yet.')}</p>
                         {:else}
                             {#each authState.stats.karakterSejre as række (række.karakter)}
-                                <div><span>{række.karakter}</span><strong>{række.sejre}</strong></div>
+                                <div><span>{karakterNavn(række.karakter)}</span><strong>{række.sejre}</strong></div>
                             {/each}
                         {/if}
                     </div>
                 {:else}
-                    <p class="konto-hint">Ingen statistik endnu. Loggede spil bliver gemt her.</p>
+                    <p class="konto-hint">{tekst('Ingen statistik endnu. Loggede spil bliver gemt her.', 'No statistics yet. Logged-in games are saved here.')}</p>
                 {/if}
             </div>
         </div>
@@ -1163,7 +1173,7 @@
 {#snippet highscoreDetaljeModal()}
     {#if valgtHighscore}
         <div class="highscore-detail-overlay" role="presentation">
-            <button type="button" class="highscore-detail-backdrop" onclick={lukHighscoreDetaljer} aria-label="Luk scoreopgørelse"></button>
+            <button type="button" class="highscore-detail-backdrop" onclick={lukHighscoreDetaljer} aria-label={tekst('Luk scoreopgørelse', 'Close score breakdown')}></button>
             <div class="highscore-detail-modal" role="dialog" aria-modal="true" aria-labelledby="highscore-detail-title" tabindex="-1">
                 <div class="highscore-detail-header">
                     <div>
@@ -1181,10 +1191,10 @@
                                     class="highscore-filter-link"
                                     onclick={aabnKarakterHighscoreFilter}
                                 >
-                                    {valgtHighscore.karakter}
+                                    {karakterNavn(valgtHighscore.karakter)}
                                 </button>
                             {:else}
-                                Ukendt
+                                {tekst('Ukendt', 'Unknown')}
                             {/if}
                             {#if valgtHighscore.oeNavn}
                                 <span>, </span>
@@ -1198,35 +1208,35 @@
                             {/if}
                         </p>
                     </div>
-                    <button type="button" onclick={lukHighscoreDetaljer}>Luk</button>
+                    <button type="button" onclick={lukHighscoreDetaljer}>{tekst('Luk', 'Close')}</button>
                 </div>
 
                 <div class="highscore-detail-total">
                     <span>TOTAL SCORE</span>
                     <strong>{valgtHighscore.point}</strong>
-                    <img src={findHighscoreMedalje(valgtHighscore)} alt="Medalje" />
+                    <img src={findHighscoreMedalje(valgtHighscore)} alt={tekst('Medalje', 'Medal')} />
                 </div>
 
                 {#if valgtHighscore.henterDetaljer}
-                    <p class="highscore-detail-note">Henter opgørelse...</p>
+                    <p class="highscore-detail-note">{tekst('Henter opgørelse...', 'Loading breakdown...')}</p>
                 {:else if harHighscoreDetaljer(valgtHighscore)}
                     <div class="highscore-detail-grid">
                         <div><span>Status</span><strong>{highscoreStatus(valgtHighscore)}</strong></div>
                         <div class="highscore-days-card">
-                            <span>Dage</span>
+                            <span>{tekst('Dage', 'Days')}</span>
                             <strong>{talEllerUkendt(valgtHighscore.dage)}</strong>
-                            <button type="button" class="highscore-log-button" onclick={() => visHighscoreLog = true} aria-label="Åbn logbog" title="Åbn logbog">
+                            <button type="button" class="highscore-log-button" onclick={() => visHighscoreLog = true} aria-label={tekst('Åbn logbog', 'Open logbook')} title={tekst('Åbn logbog', 'Open logbook')}>
                                 <img src="/ui/logbog.webp" alt="" />
                             </button>
                         </div>
-                        <div><span>Guld</span><strong>{talEllerUkendt(valgtHighscore.guld)}</strong></div>
-                        <div><span>Udforskning</span><strong>{talEllerUkendt(valgtHighscore.kendteFelter)}</strong></div>
-                        <div><span>Miner</span><strong>{valgtHighscore.miner ?? 'Ukendt'}</strong></div>
-                        <div><span>Spilform</span><strong>{highscoreSpillerAntal(valgtHighscore)}</strong></div>
+                        <div><span>{tekst('Guld', 'Gold')}</span><strong>{talEllerUkendt(valgtHighscore.guld)}</strong></div>
+                        <div><span>{tekst('Udforskning', 'Exploration')}</span><strong>{talEllerUkendt(valgtHighscore.kendteFelter)}</strong></div>
+                        <div><span>{tekst('Miner', 'Mines')}</span><strong>{valgtHighscore.miner ?? tekst('Ukendt', 'Unknown')}</strong></div>
+                        <div><span>{tekst('Spilform', 'Mode')}</span><strong>{highscoreSpillerAntal(valgtHighscore)}</strong></div>
                     </div>
                     {@const miniRute = highscoreMiniRute(valgtHighscore)}
                     {#if miniRute}
-                        <div class="highscore-route-preview" aria-label="Rute">
+                        <div class="highscore-route-preview" aria-label={tekst('Rute', 'Route')}>
                             <svg viewBox={miniRute.viewBox} preserveAspectRatio="xMidYMid meet">
                                 <polyline
                                     points={miniRute.points}
@@ -1243,19 +1253,19 @@
                         </div>
                     {/if}
                 {:else}
-                    <p class="highscore-detail-note">Denne score er gemt før detaljeopgørelsen, så kun totalscoren er tilgængelig.</p>
+                    <p class="highscore-detail-note">{tekst('Denne score er gemt før detaljeopgørelsen, så kun totalscoren er tilgængelig.', 'This score was saved before detailed breakdowns, so only the total score is available.')}</p>
                 {/if}
 
                 {#if highscoreDrilldown}
                     <div class="highscore-filter-panel">
                         <div class="highscore-filter-header">
                             <h3>{highscoreDrilldown.titel}</h3>
-                            <button type="button" onclick={() => highscoreDrilldown = null}>Skjul</button>
+                            <button type="button" onclick={() => highscoreDrilldown = null}>{tekst('Skjul', 'Hide')}</button>
                         </div>
                         {#if highscoreDrilldown.henter}
-                            <p class="highscore-detail-note">Henter liste...</p>
+                            <p class="highscore-detail-note">{tekst('Henter liste...', 'Loading list...')}</p>
                         {:else if highscoreDrilldown.scores.length === 0}
-                            <p class="highscore-detail-note">Ingen scores fundet.</p>
+                            <p class="highscore-detail-note">{tekst('Ingen scores fundet.', 'No scores found.')}</p>
                         {:else}
                             <ol class="highscore-filter-list">
                                 {#each highscoreDrilldown.scores as score, i (score.id || `${score.spillerNavn}-${score.point}-${score.oeNavn}-${i}`)}
@@ -1263,7 +1273,7 @@
                                         <button type="button" onclick={() => aabnHighscoreFraFilter(score)}>
                                             <span>{i + 1}.</span>
                                             <strong>{formaterHighscoreNavn(score.spillerNavn)}</strong>
-                                            <em>{score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)}</em>
+                                            <em>{karakterNavn(score.karakter)}, {formaterNavn(score.oeNavn)}</em>
                                             <b>{score.point}</b>
                                         </button>
                                     </li>
@@ -1277,11 +1287,11 @@
 
             {#if visHighscoreLog}
                 <div class="highscore-log-overlay" role="presentation">
-                    <button type="button" class="highscore-log-backdrop" onclick={() => visHighscoreLog = false} aria-label="Luk logbog"></button>
+                    <button type="button" class="highscore-log-backdrop" onclick={() => visHighscoreLog = false} aria-label={tekst('Luk logbog', 'Close logbook')}></button>
                     <div class="highscore-log-modal" role="dialog" aria-modal="true" aria-labelledby="highscore-log-title" tabindex="-1">
                         <div class="highscore-log-header">
-                            <h3 id="highscore-log-title">Logbog</h3>
-                            <button type="button" onclick={() => visHighscoreLog = false} aria-label="Luk logbog">Luk</button>
+                            <h3 id="highscore-log-title">{tekst('Logbog', 'Logbook')}</h3>
+                            <button type="button" onclick={() => visHighscoreLog = false} aria-label={tekst('Luk logbog', 'Close logbook')}>{tekst('Luk', 'Close')}</button>
                         </div>
                         <div class="highscore-log-list">
                             {#if highscoreLogLinjer(valgtHighscore).length > 0}
@@ -1289,7 +1299,7 @@
                                     <p>{linje}</p>
                                 {/each}
                             {:else}
-                                <p>Logbogen er ikke gemt for denne score endnu.</p>
+                                <p>{tekst('Logbogen er ikke gemt for denne score endnu.', 'The logbook has not been saved for this score yet.')}</p>
                             {/if}
                         </div>
                     </div>
@@ -1303,20 +1313,20 @@
     {#if scoreGemmer || scoreGemningFejlet}
         <div class="score-save-status" class:fejl={scoreGemningFejlet}>
             {#if scoreGemmer}
-                <span>Gemmer score...</span>
+                <span>{tekst('Gemmer score...', 'Saving score...')}</span>
             {:else}
-                <span>{spilTilstand.statusBesked || 'Scoren blev ikke gemt.'}</span>
-                <button type="button" onclick={gemScoreIgen}>Prøv igen</button>
+                <span>{spilTilstand.statusBesked || tekst('Scoren blev ikke gemt.', 'The score was not saved.')}</span>
+                <button type="button" onclick={gemScoreIgen}>{tekst('Prøv igen', 'Try again')}</button>
                 {#if !authState.user}
                     <div class="score-login-redning">
                         <input
                             type="email"
                             bind:value={authState.email}
-                            placeholder="Email til login-link"
+                            placeholder={tekst('Email til login-link', 'Email for login link')}
                             onkeydown={(e) => { if (e.key === 'Enter') sendLoginLink(authState.email); }}
                         />
                         <button type="button" onclick={() => sendLoginLink(authState.email)} disabled={authState.loader}>
-                            {authState.loader ? 'Sender...' : 'Log ind igen'}
+                            {authState.loader ? tekst('Sender...', 'Sending...') : tekst('Log ind igen', 'Log in again')}
                         </button>
                     </div>
                     {#if authState.besked}
@@ -1331,18 +1341,18 @@
 {#snippet ugensGlobalHighscoreTavle()}
     {@const sideStart = highscoreSideStart(ugensGlobalHighscoreSide, ugensGlobaleScores)}
     <div class="tavle">
-        <img src="/screens/boardglobal.webp" alt="Ugens globale tavle" class="tavle-billede" />
+        <img src="/screens/boardglobal.webp" alt={tekst('Ugens globale tavle', 'This week global board')} class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
-            <h3>Toplisten i uge {aktuelIsoUge()}</h3>
+            <h3>{tekst('Toplisten i uge', 'Leaderboard week')} {aktuelIsoUge()}</h3>
             {#if ugensGlobaleScores.length === 0}
-                <p class="tom-liste">Ingen resultater endnu i denne uge</p>
+                <p class="tom-liste">{tekst('Ingen resultater endnu i denne uge', 'No results yet this week')}</p>
             {:else}
                 <ol start={sideStart + 1}>
                     {#each highscoreSide(ugensGlobaleScores, ugensGlobalHighscoreSide) as score, i (sideStart + i)}
                         <li>
-                            <button type="button" class="highscore-række" onclick={() => aabnGlobalHighscore(score)} aria-label={`Vis scoreopgørelse for ${score.spillerNavn}`}>
+                            <button type="button" class="highscore-række" onclick={() => aabnGlobalHighscore(score)} aria-label={tekst(`Vis scoreopgørelse for ${score.spillerNavn}`, `Show score breakdown for ${score.spillerNavn}`)}>
                                 <span class="placering">{sideStart + i + 1}.</span>
-                                <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
+                                <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({karakterNavn(score.karakter)}, {formaterNavn(score.oeNavn)})</span></span>
                                 <span class="point">{score.point}</span>
                             </button>
                         </li>
@@ -1352,10 +1362,10 @@
         </div>
         {#if ugensGlobaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
             <div class="highscore-pager">
-                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeUgensGlobalHighscoreSide} aria-label="Vis forrige 10 highscores i denne uge">
+                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeUgensGlobalHighscoreSide} aria-label={tekst('Vis forrige 10 highscores i denne uge', 'Show previous 10 highscores this week')}>
                     &lt;
                 </button>
-                <button type="button" class="highscore-naeste" onclick={naesteUgensGlobalHighscoreSide} aria-label="Vis næste 10 highscores i denne uge">
+                <button type="button" class="highscore-naeste" onclick={naesteUgensGlobalHighscoreSide} aria-label={tekst('Vis næste 10 highscores i denne uge', 'Show next 10 highscores this week')}>
                     &gt;
                 </button>
             </div>
@@ -1366,18 +1376,18 @@
 {#snippet globalHighscoreTavle()}
     {@const sideStart = highscoreSideStart(globalHighscoreSide, globaleScores)}
     <div class="tavle">
-        <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
+        <img src="/screens/boardglobal.webp" alt={tekst('Global tavle', 'Global board')} class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
-            <h3>Toplisten global</h3>
+            <h3>{tekst('Toplisten global', 'Global leaderboard')}</h3>
             {#if globaleScores.length === 0}
-                <p class="tom-liste">Ingen data endnu</p>
+                <p class="tom-liste">{tekst('Ingen data endnu', 'No data yet')}</p>
             {:else}
                 <ol start={sideStart + 1}>
                     {#each highscoreSide(globaleScores, globalHighscoreSide) as score, i (sideStart + i)}
                         <li>
-                            <button type="button" class="highscore-række" onclick={() => aabnGlobalHighscore(score)} aria-label={`Vis scoreopgørelse for ${score.spillerNavn}`}>
+                            <button type="button" class="highscore-række" onclick={() => aabnGlobalHighscore(score)} aria-label={tekst(`Vis scoreopgørelse for ${score.spillerNavn}`, `Show score breakdown for ${score.spillerNavn}`)}>
                                 <span class="placering">{sideStart + i + 1}.</span>
-                                <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
+                                <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({karakterNavn(score.karakter)}, {formaterNavn(score.oeNavn)})</span></span>
                                 <span class="point">{score.point}</span>
                             </button>
                         </li>
@@ -1387,10 +1397,10 @@
         </div>
         {#if globaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
             <div class="highscore-pager">
-                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeGlobalHighscoreSide} aria-label="Vis forrige 10 globale highscores">
+                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeGlobalHighscoreSide} aria-label={tekst('Vis forrige 10 globale highscores', 'Show previous 10 global highscores')}>
                     &lt;
                 </button>
-                <button type="button" class="highscore-naeste" onclick={naesteGlobalHighscoreSide} aria-label="Vis næste 10 globale highscores">
+                <button type="button" class="highscore-naeste" onclick={naesteGlobalHighscoreSide} aria-label={tekst('Vis næste 10 globale highscores', 'Show next 10 global highscores')}>
                     &gt;
                 </button>
             </div>
@@ -1401,18 +1411,18 @@
 {#snippet klasseHighscoreTavle()}
     {@const sideStart = highscoreSideStart(klasseHighscoreSide, klasseScores)}
     <div class="tavle klasse-tavle">
-        <img src="/screens/boardglobal.webp" alt="Karakterklasse tavle" class="tavle-billede" />
+        <img src="/screens/boardglobal.webp" alt={tekst('Karakterklasse tavle', 'Character class board')} class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
-            <h3>Toplisten {highscoreKlasseNavn()}</h3>
+            <h3>{tekst('Toplisten', 'Leaderboard')} {highscoreKlasseNavn()}</h3>
             {#if klasseScores.length === 0}
-                <p class="tom-liste">Ingen data endnu</p>
+                <p class="tom-liste">{tekst('Ingen data endnu', 'No data yet')}</p>
             {:else}
                 <ol start={sideStart + 1}>
                     {#each highscoreSide(klasseScores, klasseHighscoreSide) as score, i (sideStart + i)}
                         <li>
-                            <button type="button" class="highscore-række" onclick={() => aabnGlobalHighscore(score)} aria-label={`Vis scoreopgørelse for ${score.spillerNavn}`}>
+                            <button type="button" class="highscore-række" onclick={() => aabnGlobalHighscore(score)} aria-label={tekst(`Vis scoreopgørelse for ${score.spillerNavn}`, `Show score breakdown for ${score.spillerNavn}`)}>
                                 <span class="placering">{sideStart + i + 1}.</span>
-                                <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
+                                <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({karakterNavn(score.karakter)}, {formaterNavn(score.oeNavn)})</span></span>
                                 <span class="point">{score.point}</span>
                             </button>
                         </li>
@@ -1422,10 +1432,10 @@
         </div>
         {#if klasseScores.length > HIGHSCORE_SIDE_STOERRELSE}
             <div class="highscore-pager">
-                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeKlasseHighscoreSide} aria-label="Vis forrige 10 highscores for karakterklassen">
+                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeKlasseHighscoreSide} aria-label={tekst('Vis forrige 10 highscores for karakterklassen', 'Show previous 10 highscores for the character class')}>
                     &lt;
                 </button>
-                <button type="button" class="highscore-naeste" onclick={naesteKlasseHighscoreSide} aria-label="Vis næste 10 highscores for karakterklassen">
+                <button type="button" class="highscore-naeste" onclick={naesteKlasseHighscoreSide} aria-label={tekst('Vis næste 10 highscores for karakterklassen', 'Show next 10 highscores for the character class')}>
                     &gt;
                 </button>
             </div>
@@ -1436,6 +1446,7 @@
 {#snippet topKnapper()}
     <div class="screen-top-actions">
         <Regelbog />
+        <SprogKnap />
         <LydKnap knapClass="screen-sound-btn" />
     </div>
 {/snippet}
@@ -1449,18 +1460,18 @@
 
             <section class="start-hero" aria-labelledby="start-title">
                 <button type="button" class="boat-btn-wrapper start-boat" onclick={(e) => { e.preventDefault(); startSpilFraHero(); }}>
-                    <img src="/screens/FogIsland.webp" alt="Båd ved tågeøen" class="launch-image clickable-boat" />
+                    <img src="/screens/FogIsland.webp" alt={tekst('Båd ved tågeøen', 'Boat by the fog island')} class="launch-image clickable-boat" />
                 </button>
                 <div class="start-copy">
-                    <p class="start-eyebrow">En ny ø venter</p>
-                    <h1 id="start-title">Tågeøerne</h1>
-                    <p class="start-tagline">Udforsk, overlev, og find en båd før tågen tager dig.</p>
+                    <p class="start-eyebrow">{tekst('En ny ø venter', 'A new island awaits')}</p>
+                    <h1 id="start-title">{tekst('Tågeøerne', 'Fog Isles')}</h1>
+                    <p class="start-tagline">{tekst('Udforsk, overlev, og find en båd før tågen tager dig.', 'Explore, survive, and find a boat before the fog takes you.')}</p>
                 </div>
             </section>
 
             <div class="start-intel">
-                <span>Samme ø-navn giver samme ø igen og igen</span>
-                <strong>De første fem dage afgør, hvem der når med.</strong>
+                <span>{tekst('Samme ø-navn giver samme ø igen og igen', 'The same island name gives the same island again and again')}</span>
+                <strong>{tekst('De første fem dage afgør, hvem der når med.', 'The first five days decide who can join.')}</strong>
             </div>
 
             <div class="login-main start-form">
@@ -1471,7 +1482,7 @@
                         type="text" 
                         bind:value={spilTilstand.spillerNavn} 
                         maxlength="15" 
-                        placeholder="Spillernavn" 
+                        placeholder={tekst('Spillernavn', 'Player name')}
                         class="large-input" 
                         oninput={planlaegProfilNavnGem}
                         onkeydown={trykEnter}
@@ -1483,11 +1494,11 @@
                         type="text" 
                         bind:value={spilTilstand.rumKode} 
                         maxlength="10" 
-                        placeholder="Øens navn" 
+                        placeholder={tekst('Øens navn', 'Island name')}
                         class="large-input oe-input" 
                         onkeydown={trykEnter}
                     />
-                    <button type="button" class="autonavn-knap" onclick={foreslaaOeNavn} aria-label="Foreslå ønavn" title="Foreslå ønavn">↻</button>
+                    <button type="button" class="autonavn-knap" onclick={foreslaaOeNavn} aria-label={tekst('Foreslå ønavn', 'Suggest island name')} title={tekst('Foreslå ønavn', 'Suggest island name')}>↻</button>
                 </div>
                 
                 <div class="start-knap-raekke">
@@ -1495,7 +1506,7 @@
                         <span class="knap-tekst">START</span>
                     </button>
                     {#if visTutorialStartKnap}
-                        <button type="button" class="tutorial-start-knap" onclick={(e) => { e.preventDefault(); startTutorialMedLyd(); }} aria-label="Start tutorial">
+                        <button type="button" class="tutorial-start-knap" onclick={(e) => { e.preventDefault(); startTutorialMedLyd(); }} aria-label={tekst('Start tutorial', 'Start tutorial')}>
                             <img src="/screens/tutorialstart.webp" alt="" class="tutorial-start-ikon" />
                             <span>Tutorial</span>
                         </button>
@@ -1531,10 +1542,10 @@
                     aria-label="Offline / Flightmode"
                 >
                     <img src="/ui/flight.webp" alt="" class="flight-ikon" />
-                    <span>{offlineAppState.arbejder ? 'Downloader...' : 'Offline / Flightmode'}</span>
+                    <span>{offlineAppState.arbejder ? tekst('Downloader...', 'Downloading...') : 'Offline / Flightmode'}</span>
                 </button>
                 {#if !offlineAppState.klar}
-                    <p class="fly-hint">tryk inden du går offline</p>
+                    <p class="fly-hint">{tekst('tryk inden du går offline', 'tap before going offline')}</p>
                 {/if}
                 {#if offlineAppState.besked}
                     <p class="offline-besked">{offlineAppState.besked}</p>
@@ -1542,11 +1553,11 @@
 
                 {#if harGemtOfflineSpil}
                     <button type="button" class="offline-continue" onclick={(e) => { e.preventDefault(); fortsaetOfflineMedLyd(); }}>
-                        Fortsæt offline{offlineSpilInfo ? `: ${formaterNavn(offlineSpilInfo.rumKode)} dag ${offlineSpilInfo.dag}` : ''}
+                        {tekst('Fortsæt offline', 'Continue offline')}{offlineSpilInfo ? `: ${formaterNavn(offlineSpilInfo.rumKode)} ${tekst('dag', 'day')} ${offlineSpilInfo.dag}` : ''}
                     </button>
                 {/if}
                 {#if authState.user}
-                    <button type="button" class="start-logud-knap" onclick={logUd}>Log ud</button>
+                    <button type="button" class="start-logud-knap" onclick={logUd}>{tekst('Log ud', 'Log out')}</button>
                 {/if}
             </div>
         </div>
@@ -1556,14 +1567,14 @@
     <div class="overlay">
         <div class="character-select">
             {@render topKnapper()}
-            <h2>Vælg din karakter, inden du går i land på {formaterNavn(spilTilstand.rumKode)}</h2>
+            <h2>{tekst('Vælg din karakter, inden du går i land på', 'Choose your character before landing on')} {formaterNavn(spilTilstand.rumKode)}</h2>
             <div class="select-island-status" class:lukket={!karaktervalgStatus.kanJoine}>
-                <span>{karaktervalgStatus.aktiveAntal === 1 ? '1 på øen' : `${karaktervalgStatus.aktiveAntal} på øen`}</span>
-                <span>Dag {karaktervalgStatus.dag}</span>
-                <strong>{karaktervalgStatus.kanJoine ? 'Åben' : 'Lukket'}</strong>
+                <span>{karaktervalgStatus.aktiveAntal === 1 ? tekst('1 på øen', '1 on the island') : tekst(`${karaktervalgStatus.aktiveAntal} på øen`, `${karaktervalgStatus.aktiveAntal} on the island`)}</span>
+                <span>{tekst('Dag', 'Day')} {karaktervalgStatus.dag}</span>
+                <strong>{karaktervalgStatus.kanJoine ? tekst('Åben', 'Open') : tekst('Lukket', 'Closed')}</strong>
             </div>
             <p class="instruktion">
-                {spilTilstand.gameMode === 'offline' ? 'Offline. Spillet gemmes lokalt i denne browser.' : 'Du har fået otte muligheder. Vælg hvem du vil være.'}
+                {spilTilstand.gameMode === 'offline' ? tekst('Offline. Spillet gemmes lokalt i denne browser.', 'Offline. The game is saved locally in this browser.') : tekst('Du har fået otte muligheder. Vælg hvem du vil være.', 'You have been given eight options. Choose who you want to be.')}
             </p>
             
             <div class="character-gallery">
@@ -1575,11 +1586,11 @@
                         onclick={() => bekræftValg(k)}
                         onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') bekræftValg(k); }}
                     >
-                        <img src={k.ikon} alt={k.navn} class="char-icon" />
-                        <h3>{k.navn}</h3>
-                        <p class="stats">HP: {k.startHp} | Guld: {k.startGuld}</p>
-                        <p class="desc positive">{k.fordel}</p>
-                        <p class="desc negative">{k.ulempe}</p>
+                        <img src={k.ikon} alt={karakterNavn(k)} class="char-icon" />
+                        <h3>{karakterNavn(k)}</h3>
+                        <p class="stats">HP: {k.startHp} | {tekst('Guld', 'Gold')}: {k.startGuld}</p>
+                        <p class="desc positive">{karakterFordel(k)}</p>
+                        <p class="desc negative">{karakterUlempe(k)}</p>
                     </div>
                 {/each}
             </div>
@@ -1591,27 +1602,27 @@
         <div class="slut-scroll">
             <div class="medalje-sektion">
                 {#if authState.user}
-                    <button type="button" class="medalje-profil-knap" onclick={aabnProfil} aria-label="Åbn din profil">
-                        <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" draggable="false" />
+                    <button type="button" class="medalje-profil-knap" onclick={aabnProfil} aria-label={tekst('Åbn din profil', 'Open your profile')}>
+                        <img src={findMedalje(spilTilstand.samletScore)} alt={tekst('Medalje', 'Medal')} class="stor-medalje" draggable="false" />
                     </button>
                 {:else}
-                    <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" draggable="false" />
+                    <img src={findMedalje(spilTilstand.samletScore)} alt={tekst('Medalje', 'Medal')} class="stor-medalje" draggable="false" />
                 {/if}
             </div>
             
-            <h1 class="doeds-titel">{formaterNavn(spilTilstand.spillerNavn)} døde på {formaterNavn(spilTilstand.rumKode)}</h1>
+            <h1 class="doeds-titel">{tekst(`${formaterNavn(spilTilstand.spillerNavn)} døde på ${formaterNavn(spilTilstand.rumKode)}`, `${formaterNavn(spilTilstand.spillerNavn)} died on ${formaterNavn(spilTilstand.rumKode)}`)}</h1>
             <p class="beskrivelse">
                 {spilTilstand.logBesked} {hentMinHistorie(false)}
             </p>
             
             <div class="score-container">
-                <img src="/screens/pergament.webp" alt="Pergament" class="pergament-billede" />
+                <img src="/screens/pergament.webp" alt={tekst('Pergament', 'Parchment')} class="pergament-billede" />
                 <h2 class="score-tekst">
                     <span class="lille-score">Score:</span> {spilTilstand.samletScore}
                 </h2>
             </div>
 
-            <img src="/screens/death.webp" alt="Døden" class="doeds-symbol" />
+            <img src="/screens/death.webp" alt={tekst('Døden', 'Death')} class="doeds-symbol" />
 
             <div class="spec-paneler">
                 {@render pointSpecifikation()}
@@ -1620,10 +1631,10 @@
             
             <div class="slut-knapper">
                 <button class="spil-knap slut-knap-styled" onclick={genstartBane}>
-                    <span class="knap-tekst">Samme ø igen</span>
+                    <span class="knap-tekst">{tekst('Samme ø igen', 'Same island again')}</span>
                 </button>
                 <button class="spil-knap slut-knap-styled" onclick={nulstilHukommelse}>
-                    <span class="knap-tekst">Til start</span>
+                    <span class="knap-tekst">{tekst('Til start', 'Start screen')}</span>
                 </button>
             </div>
             
@@ -1635,18 +1646,18 @@
             <div class="highscore-container">
                 {@render scoreGemStatus()}
                 <div class="tavle">
-                    <img src="/screens/boardlocal.webp" alt="Lokal tavle" class="tavle-billede" />
+                    <img src="/screens/boardlocal.webp" alt={tekst('Lokal tavle', 'Local board')} class="tavle-billede" />
                     <div class="tavle-indhold lokal-indhold">
-                        <h3>Toplisten på {formaterNavn(spilTilstand.rumKode)}</h3>
+                        <h3>{tekst('Toplisten på', 'Leaderboard on')} {formaterNavn(spilTilstand.rumKode)}</h3>
                         {#if lokaleScores.length === 0}
-                            <p class="tom-liste">Ingen resultater endnu</p>
+                            <p class="tom-liste">{tekst('Ingen resultater endnu', 'No results yet')}</p>
                         {:else}
                             <ol start={highscoreSideStart(lokalHighscoreSide, lokaleScores) + 1}>
                                 {#each lokalHighscoreSideScores(lokaleScores, lokalHighscoreSide) as hs, i (highscoreSideStart(lokalHighscoreSide, lokaleScores) + i)}
                                     <li>
-                                        <button type="button" class="highscore-række" onclick={() => aabnLokalHighscore(hs)} aria-label={`Vis scoreopgørelse for ${hs.navn}`}>
+                                        <button type="button" class="highscore-række" onclick={() => aabnLokalHighscore(hs)} aria-label={tekst(`Vis scoreopgørelse for ${hs.navn}`, `Show score breakdown for ${hs.navn}`)}>
                                             <span class="placering">{highscoreSideStart(lokalHighscoreSide, lokaleScores) + i + 1}.</span>
-                                            <span class="navn">{formaterHighscoreNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
+                                            <span class="navn">{formaterHighscoreNavn(hs.navn)} <span class="karakter-navn">({karakterNavn(hs.karakter)})</span></span>
                                             <span class="point">{hs.score}</span>
                                         </button>
                                     </li>
@@ -1654,17 +1665,17 @@
                             </ol>
                         {/if}
                         {#if spilTilstand.offlineMode}
-                            <p class="global-note tavle-note-bund">Gemt lokalt i browseren.</p>
+                            <p class="global-note tavle-note-bund">{tekst('Gemt lokalt i browseren.', 'Saved locally in the browser.')}</p>
                         {:else if !authState.user}
-                            <p class="global-note tavle-note-bund">Login kræves for at gemme score.</p>
+                            <p class="global-note tavle-note-bund">{tekst('Login kræves for at gemme score.', 'Login is required to save score.')}</p>
                         {/if}
                     </div>
                     {#if lokaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
                         <div class="highscore-pager">
-                            <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeLokalHighscoreSide} aria-label="Vis forrige 10 highscores på øen">
+                            <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeLokalHighscoreSide} aria-label={tekst('Vis forrige 10 highscores på øen', 'Show previous 10 highscores on the island')}>
                                 &lt;
                             </button>
-                            <button type="button" class="highscore-naeste" onclick={naesteLokalHighscoreSide} aria-label="Vis næste 10 highscores på øen">
+                            <button type="button" class="highscore-naeste" onclick={naesteLokalHighscoreSide} aria-label={tekst('Vis næste 10 highscores på øen', 'Show next 10 highscores on the island')}>
                                 &gt;
                             </button>
                         </div>
@@ -1686,21 +1697,21 @@
         <div class="slut-scroll">
             <div class="medalje-sektion">
                 {#if authState.user}
-                    <button type="button" class="medalje-profil-knap" onclick={aabnProfil} aria-label="Åbn din profil">
-                        <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" draggable="false" />
+                    <button type="button" class="medalje-profil-knap" onclick={aabnProfil} aria-label={tekst('Åbn din profil', 'Open your profile')}>
+                        <img src={findMedalje(spilTilstand.samletScore)} alt={tekst('Medalje', 'Medal')} class="stor-medalje" draggable="false" />
                     </button>
                 {:else}
-                    <img src={findMedalje(spilTilstand.samletScore)} alt="Medalje" class="stor-medalje" draggable="false" />
+                    <img src={findMedalje(spilTilstand.samletScore)} alt={tekst('Medalje', 'Medal')} class="stor-medalje" draggable="false" />
                 {/if}
             </div>
-            <h1 class="sejr-titel">{formaterNavn(spilTilstand.spillerNavn)}, du slap væk fra {formaterNavn(spilTilstand.rumKode)}</h1>
+            <h1 class="sejr-titel">{tekst(`${formaterNavn(spilTilstand.spillerNavn)}, du slap væk fra ${formaterNavn(spilTilstand.rumKode)}`, `${formaterNavn(spilTilstand.spillerNavn)}, you escaped from ${formaterNavn(spilTilstand.rumKode)}`)}</h1>
             <p class="beskrivelse">
                 {hentMinHistorie(true)}
             </p>
             {@render episkeTrofaeer()}
             
             <div class="score-container">
-                <img src="/screens/pergament.webp" alt="Pergament" class="pergament-billede" />
+                <img src="/screens/pergament.webp" alt={tekst('Pergament', 'Parchment')} class="pergament-billede" />
                 <h2 class="score-tekst">
                     <span class="lille-score">Score:</span> {spilTilstand.samletScore}
                 </h2>
@@ -1713,10 +1724,10 @@
             
             <div class="slut-knapper">
                 <button class="spil-knap slut-knap-styled" onclick={genstartBane}>
-                    <span class="knap-tekst">Samme ø igen</span>
+                    <span class="knap-tekst">{tekst('Samme ø igen', 'Same island again')}</span>
                 </button>
                 <button class="spil-knap slut-knap-styled" onclick={nulstilHukommelse}>
-                    <span class="knap-tekst">Til start</span>
+                    <span class="knap-tekst">{tekst('Til start', 'Start screen')}</span>
                 </button>
             </div>
             
@@ -1728,18 +1739,18 @@
             <div class="highscore-container">
                 {@render scoreGemStatus()}
                 <div class="tavle">
-                    <img src="/screens/boardlocal.webp" alt="Lokal tavle" class="tavle-billede" />
+                    <img src="/screens/boardlocal.webp" alt={tekst('Lokal tavle', 'Local board')} class="tavle-billede" />
                     <div class="tavle-indhold lokal-indhold">
-                        <h3>Toplisten på {formaterNavn(spilTilstand.rumKode)}</h3>
+                        <h3>{tekst('Toplisten på', 'Leaderboard on')} {formaterNavn(spilTilstand.rumKode)}</h3>
                         {#if lokaleScores.length === 0}
-                            <p class="tom-liste">Ingen resultater endnu</p>
+                            <p class="tom-liste">{tekst('Ingen resultater endnu', 'No results yet')}</p>
                         {:else}
                             <ol start={highscoreSideStart(lokalHighscoreSide, lokaleScores) + 1}>
                                 {#each lokalHighscoreSideScores(lokaleScores, lokalHighscoreSide) as hs, i (highscoreSideStart(lokalHighscoreSide, lokaleScores) + i)}
                                     <li>
-                                        <button type="button" class="highscore-række" onclick={() => aabnLokalHighscore(hs)} aria-label={`Vis scoreopgørelse for ${hs.navn}`}>
+                                        <button type="button" class="highscore-række" onclick={() => aabnLokalHighscore(hs)} aria-label={tekst(`Vis scoreopgørelse for ${hs.navn}`, `Show score breakdown for ${hs.navn}`)}>
                                             <span class="placering">{highscoreSideStart(lokalHighscoreSide, lokaleScores) + i + 1}.</span>
-                                            <span class="navn">{formaterHighscoreNavn(hs.navn)} <span class="karakter-navn">({hs.karakter || 'Ukendt'})</span></span>
+                                            <span class="navn">{formaterHighscoreNavn(hs.navn)} <span class="karakter-navn">({karakterNavn(hs.karakter)})</span></span>
                                             <span class="point">{hs.score}</span>
                                         </button>
                                     </li>
@@ -1747,17 +1758,17 @@
                             </ol>
                         {/if}
                         {#if spilTilstand.offlineMode}
-                            <p class="global-note tavle-note-bund">Gemt lokalt i browseren.</p>
+                            <p class="global-note tavle-note-bund">{tekst('Gemt lokalt i browseren.', 'Saved locally in the browser.')}</p>
                         {:else if !authState.user}
-                            <p class="global-note tavle-note-bund">Login kræves for at gemme score.</p>
+                            <p class="global-note tavle-note-bund">{tekst('Login kræves for at gemme score.', 'Login is required to save score.')}</p>
                         {/if}
                     </div>
                     {#if lokaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
                         <div class="highscore-pager">
-                            <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeLokalHighscoreSide} aria-label="Vis forrige 10 highscores på øen">
+                            <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeLokalHighscoreSide} aria-label={tekst('Vis forrige 10 highscores på øen', 'Show previous 10 highscores on the island')}>
                                 &lt;
                             </button>
-                            <button type="button" class="highscore-naeste" onclick={naesteLokalHighscoreSide} aria-label="Vis næste 10 highscores på øen">
+                            <button type="button" class="highscore-naeste" onclick={naesteLokalHighscoreSide} aria-label={tekst('Vis næste 10 highscores på øen', 'Show next 10 highscores on the island')}>
                                 &gt;
                             </button>
                         </div>
@@ -1782,8 +1793,8 @@
 {#if visJoinLukketModal}
     <div class="join-lukket-overlay" role="dialog" aria-modal="true" aria-labelledby="join-lukket-title">
         <div class="join-lukket-modal">
-            <h2 id="join-lukket-title">Spillet er gået i gang</h2>
-            <p>Du nåede ikke at gå i land på {formaterNavn(spilTilstand.rumKode)}, og det er for sent at joine denne ø.</p>
+            <h2 id="join-lukket-title">{tekst('Spillet er gået i gang', 'The game has started')}</h2>
+            <p>{tekst(`Du nåede ikke at gå i land på ${formaterNavn(spilTilstand.rumKode)}, og det er for sent at joine denne ø.`, `You did not land on ${formaterNavn(spilTilstand.rumKode)} in time, and it is too late to join this island.`)}</p>
             <button type="button" onclick={() => visJoinLukketModal = false}>OK</button>
         </div>
     </div>

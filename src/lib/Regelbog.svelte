@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { sprogState, tekst } from '$lib/i18n.svelte';
+
     let { knapClass = '', knapTekst = '', onOpen } = $props<{ knapClass?: string; knapTekst?: string; onOpen?: () => void }>();
 
     let visRegler = $state(false);
@@ -24,8 +26,8 @@
     type="button"
     class="regelbog-knap {knapClass}"
     onclick={aabnRegler}
-    title="Regelbog"
-    aria-label="Åbn regelbog"
+    title={tekst('Regelbog', 'Rulebook')}
+    aria-label={tekst('Åbn regelbog', 'Open rulebook')}
 >
     {#if knapTekst}
         {knapTekst}
@@ -52,13 +54,171 @@
         >
             <header class="regelbog-header">
                 <div>
-                    <p class="regelbog-kicker">Tågeøerne</p>
-                    <h2 id="regelbog-titel">Regelbog</h2>
+                    <p class="regelbog-kicker">{tekst('Tågeøerne', 'Fog Isles')}</p>
+                    <h2 id="regelbog-titel">{tekst('Regelbog', 'Rulebook')}</h2>
                 </div>
-                <button type="button" class="regelbog-luk" onclick={lukRegler} aria-label="Luk regelbog">×</button>
+                <button type="button" class="regelbog-luk" onclick={lukRegler} aria-label={tekst('Luk regelbog', 'Close rulebook')}>×</button>
             </header>
 
             <div class="regelbog-indhold">
+                {#if sprogState.sprog === 'en'}
+                <section>
+                    <h3>Goal</h3>
+                    <p>You wash ashore on an island. The fog comes from behind. Find an escape boat toward the east and board it before the fog closes around you.</p>
+                    <p class="eksempel">Example: If a boat appears far east, you do not need to explore everything. The main thing is reaching it before fog or sea makes the route impossible.</p>
+                </section>
+
+                <section>
+                    <h3>Start And Island Name</h3>
+                    <p>Everyone who writes the same island name plays on the same island. New players can join as long as the active players have not gone past day 5. Offline games are saved only in the browser on that device.</p>
+                    <p class="eksempel">Example: If both of you enter "Sortoe", you land on the same island. If active players have reached day 6, it is too late for a new player to land on that run.</p>
+                </section>
+
+                <section>
+                    <h3>Turns, Energy And Movement</h3>
+                    <ul>
+                        <li>Each move costs energy. The cost depends on character, equipment, terrain and terrain bonuses.</li>
+                        <li>You may spend more energy than you have left. The action still happens, then the day advances and you get new energy.</li>
+                        <li>Moving in fog costs 2 extra energy.</li>
+                        <li>Food can make the next move free. Berserk can make the next energy-costing action free.</li>
+                        <li>If you get at least 5 days ahead of the slowest active multiplayer character, the waiting game opens. The table closes when the slowest reaches your day, when fog is close to the field, or after at most 60 seconds. When it closes, you can play at least 5 days before another waiting game. You get one free waiting-game round on the field you stand on; more rounds on the same field cost 5 gold.</li>
+                    </ul>
+                    <p class="eksempel">Example: If you have 3 energy left and a mountain costs 6, you can still enter it. You end on negative energy, the field activates, and then time advances to the next day.</p>
+                </section>
+
+                <section>
+                    <h3>Sight And Fog</h3>
+                    <ul>
+                        <li>You reveal fields around you when moving. Sight radius comes from your character and equipment such as torches.</li>
+                        <li>Mountains block sight unless you stand on a mountain. Mountain fields give at least radius 2 when you climb up.</li>
+                        <li>The fog starts moving after day 6. If you stand in fog when time passes, you take damage. You cannot camp in fog.</li>
+                        <li>Some rare events can hold fog back, block it behind a field or reveal a boat for everyone.</li>
+                    </ul>
+                    <p class="eksempel">Example: Hunters, archers, explorers and adventurers see farther than most. If a mountain stands between you and the coast, unknown danger can still hide behind it until you get better sight.</p>
+                </section>
+
+                <section>
+                    <h3>HP, Damage And Rest</h3>
+                    <ul>
+                        <li>HP is your health. When HP reaches 0 outside fog and sea, you normally collapse instead of dying.</li>
+                        <li>On collapse you lose half your gold, time passes, and you wake shortly after with 10 HP.</li>
+                        <li>If HP reaches 0 in fog or water, you die unless a life elixir saves you first.</li>
+                        <li>Life elixir is used automatically on lethal damage or collapse and restores you to up to 90 HP, even if your max is higher.</li>
+                        <li>Armor reduces damage. Royal armor reduces damage by 70%. Armor and royal armor are normally heavy, but Knight and Shieldmaiden ignore the weight and take no damage from buried traps. Elven armor protects like normal armor, but is not heavy.</li>
+                        <li>Food gives +20 HP and makes the next move free. Sleeping bag can be used in the wild and gives +20 HP, but uses the rest of the day. Silk sleeping bag gives +40 HP and is only downgraded by cave damp.</li>
+                        <li>Torch gives +1 sight. Sun torch gives +2 sight. Both can light campfires; sunfire reveals a larger area and gives 100 gold instead of 50.</li>
+                        <li>Viking and Valkyrie automatically go berserk the first time each day they take at least 5 damage. The next energy-costing action costs 0 energy.</li>
+                        <li>Water and floods extinguish torches. Normal armor and royal armor are lost in water; elven armor is not.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Digging</h3>
+                    <ul>
+                        <li>If a field can be dug, the dig icon in the inventory row becomes active.</li>
+                        <li>If you have a shovel or master shovel, you dig with it. Otherwise you dig with your hands and lose extra energy and HP.</li>
+                        <li>A master shovel counts as a shovel, gives double digging gold and finds buried traps without triggering them.</li>
+                        <li>The Golden Destillator is a rare relic. It doubles dug-up gold. With master shovel, digging gold is tripled, not quadrupled.</li>
+                        <li>Hidden traps, gold, roots and loot trigger only when you dig. The field is marked as dug immediately.</li>
+                        <li>Detector and dowsing rod reveal signs of hidden gold or life on known fields within radius 3 of your character. Ore Finder also gives 25% extra when hidden gold is dug up, and gold mines within radius 2 become known fields even through mountains.</li>
+                        <li>Rune Rod is an upgraded dowsing rod. When you lack HP and enter an undug field with hidden life, it pulls the roots up automatically for 1 energy without marking the field as dug.</li>
+                        <li>When Rune Rod works, the field's hidden gold, loot, trap and life are emptied. Others can still dig the field, but only stones and worms remain.</li>
+                        <li>Root Heart is a rare relic. It doubles HP from healing roots, both by digging and Rune Rod.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Fields</h3>
+                    <ul>
+                        <li>Towns and markets can have shops. Towns can also have workshops. Empty town fields can be broken into with a lockpick.</li>
+                        <li>Shops refill fixed goods after a new day has passed. If you have club or wallbreaker, the merchant stops trading with you after one purchase.</li>
+                        <li>Fields ripen in ten-day blocks. Ripe crops give a little HP, but can be harvested once per block or ruined by locusts and disasters.</li>
+                        <li>Gold mines give gold and points. An unlocked mine can be taken over by other players.</li>
+                        <li>The first time you take over a mine, you get gold. If you later take back a mine you have visited before, it locks.</li>
+                        <li>A locked mine cannot be taken over, but disasters can still destroy it.</li>
+                        <li>Escape boats normally appear on the east coast from day 6. The number follows living players. Each boat can be used once. When you board, you win.</li>
+                        <li>Portals throw you 4, 5 or 6 fields east. The landing field is handled like a normal field.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Inventory And Equipment</h3>
+                    <ul>
+                        <li>Tap an item at the bottom to use it when it is active.</li>
+                        <li>Shovel, sleeping bag/silk sleeping bag, food, lockpick and club are active only when they can be used in the current situation.</li>
+                        <li>Food, life elixir, torches, treasure maps and diamonds can stack. Diamonds are worth 250-600 gold: below 375 is small, 375-499 is large, and 500+ is huge. Most other weapons, tools, clothes and special items can exist only once at a time.</li>
+                        <li>Large tools, weapons and clothes exist in only one version at a time. Upgrade pairs such as shovel/master shovel, staff/dragon staff, detector/ore finder and clothes/fine/royal clothes count as the same type.</li>
+                        <li>Torch and sun torch can light fires. Staff and dragon staff can teleport. Treasure maps show an old treasure cluster as a sepia map trail. Some islands hide several treasures, and the map does not reveal whether the chest has already been taken.</li>
+                        <li>Treasure map trails do not count as normal exploration and give no exploration points until you personally get close enough to the field.</li>
+                        <li>Some items can be bought, others are found only in events. Elven armor, upgraded items and relics cannot be bought in ordinary shops.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Workshops</h3>
+                    <p>Workshops are found in larger towns. They do not sell ordinary goods, but rebuild your existing equipment into a better version. You do not keep the old item beside the new one.</p>
+                    <p class="eksempel">Example: With a shovel and 150 gold, a workshop can make it a master shovel. With a sleeping bag and 150 gold, it can become a silk sleeping bag. Clothes can become fine clothes, and fine clothes can become royal clothes.</p>
+                </section>
+
+                <section>
+                    <h3>Events</h3>
+                    <p>Events are encounters on the island. Some are small choices. Others can change large parts of the map. Weapons, class and equipment can open better or more dangerous choices.</p>
+                    <ul>
+                        <li>Natural disasters can change terrain around you and can remove mines, boats, crops, shops and events on affected fields.</li>
+                        <li>Damage from events can normally lead to collapse if you hit 0 HP. Sea, flood and fog can kill you outright.</li>
+                        <li>Some events are rare or unique. They can give relics that cannot be bought in shops.</li>
+                        <li>Subevents are continuations of the same event and are not drawn as ordinary events.</li>
+                        <li>If an event requires or spends an ordinary item, an upgraded version often counts as the same type. If paid, the upgraded item is lost too.</li>
+                        <li>Storm Axe improves axe choices in events with more gold and less damage. Falcon Bow improves bow choices and reveals three fields east after the shot.</li>
+                        <li>The meteor stone can be opened with hands or tools like shovel, axe, club and sword. If opened with a tool, the tool is lost and you get gold and a diamond. Master shovel gives the best reward. The gold is event gold and is affected by gold modifier.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Theft</h3>
+                    <p>The lockpick can be used for burglary on empty town fields without shops. It costs half your base energy rounded up. The reward is 35-50 gold, with a risk of being caught and beaten. Master Lockpick gives double reward, but does not make burglary safer.</p>
+                </section>
+
+                <section>
+                    <h3>Smashing</h3>
+                    <p>The club can smash markets and ordinary town fields into ruins. Markets cost 8 energy and 20 base damage. Town fields cost 16 energy and 30 base damage. Workshops cost 24 energy, 50 base damage and require Wallbreaker. Base loot is 45-75, 90-150 or 225 gold plus two thirds of the cash box, affected by gold modifier. Nearby merchants refuse to trade with you afterwards.</p>
+                </section>
+
+                <section>
+                    <h3>Multiplayer</h3>
+                    <ul>
+                        <li>You see the same island and change the same world.</li>
+                        <li>You do not see each other's final routes before you finish.</li>
+                        <li>The same login user cannot play multiple characters on the same island at the same time.</li>
+                        <li>Only active players slow the tempo. Dead, escaped or inactive players stop holding others back.</li>
+                        <li>Hunters can place a tracker when standing on the same field as another active player. For 10 days they see the fields that player knows.</li>
+                        <li>Gold mines give more score in multiplayer because they are harder to hold. Mine points rise with player count up to a limit.</li>
+                        <li>Total score also gets multiplayer modifier: 1 player x1.0, 2 players x1.1, 3 players x1.2, 4 players x1.3, 5 players x1.4 and 6+ players x1.5.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Score</h3>
+                    <ul>
+                        <li>Score is built from gold, exploration, mines, equipment, progress or escape bonus, plus HP and multiplayer multipliers.</li>
+                        <li>Exploration gives 2 points per known field.</li>
+                        <li>Sepia fields from treasure maps are only map trails and do not count as known fields in score.</li>
+                        <li>Progress gives 2 points per column east. If you escape, you get 1000 points instead.</li>
+                        <li>Mines give 100 points per mine multiplied by the mine modifier for player count.</li>
+                        <li>Equipment gives points equal to 2/3 of the sale price.</li>
+                        <li>Finally, the sum is multiplied by 1 + HP/1000. With 100 HP, the sum is multiplied by 1.100.</li>
+                        <li>Global highscore requires login. The end screen shows local island score, global character-class score and global overall score. Offline score is saved only locally.</li>
+                        <li>If the connection fails, the game tries to save pending scores again later.</li>
+                        <li>Medal 11 is awarded only if you score at least 12500 and place in the first ten spots on the weekly leaderboard.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Offline</h3>
+                    <p>To play on a plane, the game must first be made flight-ready on the same device and in the same browser. Open the game online, tap Download, start or continue an offline game, and then test the map in flight mode.</p>
+                    <p class="eksempel">Example: Downloading the game in Chrome on a phone does not help Safari on the same phone. Offline saves and offline scores belong to the browser where they were made.</p>
+                </section>
+                {:else}
                 <section>
                     <h3>Målet</h3>
                     <p>Du er drevet i land på en ø. Tågen kommer bagfra. Find en flugtbåd mod øst og gå ombord, før tågen lukker sig om dig.</p>
@@ -224,6 +384,7 @@
                     <p>For at spille i et fly skal spillet først gøres fly-klar på samme enhed og i samme browser. Åbn spillet online, tryk Download, start eller fortsæt et offline-spil, og test derefter kort i flytilstand.</p>
                     <p class="eksempel">Eksempel: Downloader du spillet i Chrome på en telefon, hjælper det ikke i Safari på samme telefon. Offline-gem og offline-score hører til den browser, de blev lavet i.</p>
                 </section>
+                {/if}
             </div>
         </div>
     </div>

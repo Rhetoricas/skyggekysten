@@ -1,5 +1,5 @@
 import { spilTilstand } from './spilTilstand.svelte';
-import { eventBibliotek } from './eventBibliotek';
+import { effektLog, eventBibliotek, eventTekst, eventTitel, udfaldLog } from './eventBibliotek';
 import { afslørFalkebueSyn, tilfoejTilRygsæk, brugFraRygsæk, harRygsaekItem, findRygsaekItemTilKrav } from './spilmotor';
 import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremrykTid, udloesBersaerkHvisRelevant } from './overlevelse.svelte';
@@ -7,6 +7,8 @@ import { brugEnergi, visBrugteEnergiKugler } from './energi';
 import { registrerHeling } from './trofaeer';
 import { markerTutorialHandling } from './tutorial.svelte';
 import type { Valg } from './eventBibliotek';
+import { tekst } from './i18n.svelte';
+import { itemNavn } from './spilTekst';
 
 export const eventState = $state({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,10 +32,10 @@ export function startEvent(eventID: string) {
     }
     
     eventState.aktivt = evt;
-    eventState.log = [evt.tekst];
+    eventState.log = [eventTekst(evt)];
     
-    spilTilstand.logBesked = `--- ${evt.titel.toUpperCase()} ---`;
-    spilTilstand.logBesked = evt.tekst;
+    spilTilstand.logBesked = `--- ${eventTitel(evt).toUpperCase()} ---`;
+    spilTilstand.logBesked = eventTekst(evt);
     
     eventState.valgLåst = false;
     eventState.naesteTrin = null;
@@ -115,7 +117,7 @@ export function tagValg(valg: Valg) {
     const afsluttetFeltIndex = eventState.rootFeltIndex ?? spilTilstand.spillerIndex;
 
     if (!kanViseValg(valg)) {
-        eventState.log = [...eventState.log, "Du har ikke det nødvendige udstyr eller guld."];
+        eventState.log = [...eventState.log, tekst('Du har ikke det nødvendige udstyr eller guld.', 'You do not have the required equipment or gold.')];
         return;
     }
 
@@ -126,7 +128,7 @@ export function tagValg(valg: Valg) {
     let gratisEnergiKvittering = "";
     if (valg.kosterEnergi) {
         const energiBetaling = brugEnergi(valg.kosterEnergi);
-        if (energiBetaling.gratis) gratisEnergiKvittering = " (Bersærkergangen betaler energien)";
+        if (energiBetaling.gratis) gratisEnergiKvittering = tekst(' (Bersærkergangen betaler energien)', ' (Berserk pays the energy)');
     }
 
     eventState.valgLåst = true;
@@ -160,7 +162,7 @@ export function tagValg(valg: Valg) {
                 resultat.hpAendring = Math.round(resultat.hpAendring * 0.5);
             }
         }
-        samletLogTekst = resultat.log;
+        samletLogTekst = udfaldLog(resultat);
 
         if (resultat.maxHpAendring) {
             spilTilstand.maxLivspoint += resultat.maxHpAendring;
@@ -190,7 +192,7 @@ export function tagValg(valg: Valg) {
             const foerGuld = spilTilstand.guldTotal;
             spilTilstand.guldTotal += endeligGuld;
             const faktiskGuld = spilTilstand.guldTotal - foerGuld;
-            if (faktiskGuld !== 0) kvittering += ` (${faktiskGuld > 0 ? '+' : ''}${faktiskGuld} Guld)`;
+            if (faktiskGuld !== 0) kvittering += ` (${faktiskGuld > 0 ? '+' : ''}${faktiskGuld} ${tekst('Guld', 'Gold')})`;
         }
 
         if (resultat.givItem) {
@@ -198,8 +200,8 @@ export function tagValg(valg: Valg) {
                 const id = item.trim();
                 const itemFund = tilfoejTilRygsæk(id, 1);
                 kvittering += id === 'diamant'
-                    ? ` (+${itemFund?.diamantBeskrivelse || 'diamant'})`
-                    : ` (+${id})`;
+                    ? ` (+${itemFund?.diamantBeskrivelse || itemNavn('diamant')})`
+                    : ` (+${itemNavn(id)})`;
             });
         }
         if (resultat.mistItem) {
@@ -207,7 +209,7 @@ export function tagValg(valg: Valg) {
                 const id = item.trim();
                 const betaltId = findRygsaekItemTilKrav(id) ?? id;
                 brugFraRygsæk(betaltId, 1);
-                kvittering += ` (-${betaltId})`;
+                kvittering += ` (-${itemNavn(betaltId)})`;
             });
         }
         
@@ -219,7 +221,7 @@ export function tagValg(valg: Valg) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const valgMedEffekt = valg as any;
         const resultat = valgMedEffekt.effekt(betaltItem);
-        samletLogTekst = resultat.logBesked;
+        samletLogTekst = effektLog(resultat);
 
         if (resultat.maxHpAendring) {
             spilTilstand.maxLivspoint += resultat.maxHpAendring;
@@ -249,28 +251,28 @@ export function tagValg(valg: Valg) {
             if (brugerMesterbue) grundIndkomst = Math.round(grundIndkomst * 1.25);
             const indkomst = spilTilstand.beregnGuldIndkomst(grundIndkomst);
             spilTilstand.guldTotal += indkomst;
-            kvittering += ` (+${indkomst} Guld)`;
+            kvittering += ` (+${indkomst} ${tekst('Guld', 'Gold')})`;
         }
         if (resultat.guldNed) {
             spilTilstand.guldTotal -= resultat.guldNed;
-            kvittering += ` (-${resultat.guldNed} Guld)`;
+            kvittering += ` (-${resultat.guldNed} ${tekst('Guld', 'Gold')})`;
         }
         if (resultat.energiOp) {
             spilTilstand.nuvaerendeEnergi += resultat.energiOp;
-            kvittering += ` (+${resultat.energiOp} Energi)`;
+            kvittering += ` (+${resultat.energiOp} ${tekst('Energi', 'Energy')})`;
         }
         if (resultat.energiNed) {
             spilTilstand.nuvaerendeEnergi -= resultat.energiNed;
             visBrugteEnergiKugler(resultat.energiNed);
-            kvittering += ` (-${resultat.energiNed} Energi)`;
+            kvittering += ` (-${resultat.energiNed} ${tekst('Energi', 'Energy')})`;
         }
         if (resultat.itemUd) {
             resultat.itemUd.split(',').forEach((item: string) => {
                 const id = item.trim();
                 const itemFund = tilfoejTilRygsæk(id, 1);
                 kvittering += id === 'diamant'
-                    ? ` (+${itemFund?.diamantBeskrivelse || 'diamant'})`
-                    : ` (+${id})`;
+                    ? ` (+${itemFund?.diamantBeskrivelse || itemNavn('diamant')})`
+                    : ` (+${itemNavn(id)})`;
             });
         }
 
@@ -279,7 +281,7 @@ export function tagValg(valg: Valg) {
 
     if (brugerMesterbue) {
         afslørFalkebueSyn(spilTilstand.spillerIndex);
-        kvittering += ` (Falkebuen afslører tre felter mod øst)`;
+        kvittering += tekst(' (Falkebuen afslører tre felter mod øst)', ' (The falcon bow reveals three fields east)');
     }
 
     const fuldBesked = samletLogTekst + kvittering;
