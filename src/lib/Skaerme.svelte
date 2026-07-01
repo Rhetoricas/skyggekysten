@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
-    import { authState, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
+    import { authState, gemProfilKarakter, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
     import { hentKarakterKlasseNavn, hentKarakterKlasseNoegle, tilgaengeligeKarakterer } from '$lib/spildata';
     import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
@@ -97,6 +97,7 @@
     let forrigeState = spilTilstand.gameState;
     let spilletSlutLyd = false;
     let visProfil = $state(false);
+    let visProfilKarakterValg = $state(false);
     let profilNavnInput = $state('');
     let visLokaleTestKnapper = $state(false);
     let visTutorialStartKnap = $state(!erTutorialKnapSkjult());
@@ -304,9 +305,19 @@
         return tilgaengeligeKarakterer.find((karakter) => karakter.navn === karakterNavn) || null;
     }
 
+    function profilValgtKarakter() {
+        const valgtId = authState.profil?.profile_character_id || '';
+        return tilgaengeligeKarakterer.find((karakter) => karakter.id === valgtId) || profilMestSpilledeKarakter();
+    }
+
+    function profilTitelForKarakter(karakterId?: string | null) {
+        if (!karakterId) return authState.stats?.favoritKarakterBedsteTitel || 'Ingen titel endnu';
+        return authState.stats?.karakterBedsteTitler.find((række) => række.karakterId === karakterId)?.titel || 'Ingen titel endnu';
+    }
+
     function profilMestSpilletTitelTekst() {
-        const karakter = profilMestSpilledeKarakter();
-        const titel = authState.stats?.favoritKarakterBedsteTitel;
+        const karakter = profilValgtKarakter();
+        const titel = profilTitelForKarakter(karakter?.id);
         if (karakter && titel && titel !== 'Ingen titel endnu') return `${karakter.navn} - ${titel}`;
         if (karakter) return karakter.navn;
         return 'Min profil';
@@ -758,6 +769,11 @@
         }
     }
 
+    async function vaelgProfilKarakter(karakterId: string | null) {
+        await gemProfilKarakter(karakterId);
+        visProfilKarakterValg = false;
+    }
+
     function trykEnter(e: KeyboardEvent) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -918,8 +934,8 @@
         {#if authState.user}
             <div class="konto-linje">
                 <button type="button" class="konto-profil-identitet" onclick={aabnProfil}>
-                    {#if profilMestSpilledeKarakter()}
-                        <img src={profilMestSpilledeKarakter()?.ikon} alt="" />
+                    {#if profilValgtKarakter()}
+                        <img src={profilValgtKarakter()?.ikon} alt="" />
                     {/if}
                     <span>
                         <strong>{authState.profil?.display_name || 'Logget ind'}</strong>
@@ -1022,9 +1038,19 @@
             <div class="profil-modal" role="presentation" onclick={(e) => e.stopPropagation()}>
                 <div class="profil-header">
                     <div class="profil-header-identitet">
-                        {#if profilMestSpilledeKarakter()}
-                            <img src={profilMestSpilledeKarakter()?.ikon} alt="" />
-                        {/if}
+                        <button
+                            type="button"
+                            class="profil-karakter-knap"
+                            onclick={() => visProfilKarakterValg = !visProfilKarakterValg}
+                            aria-label="Vælg profilkarakter"
+                            title="Vælg profilkarakter"
+                        >
+                            {#if profilValgtKarakter()}
+                                <img src={profilValgtKarakter()?.ikon} alt="" />
+                            {:else}
+                                <span>?</span>
+                            {/if}
+                        </button>
                         <div>
                         <h2>Min profil</h2>
                         {#if maskeretEmail(authState.user.email)}
@@ -1037,6 +1063,30 @@
                         <span>Luk</span>
                     </button>
                 </div>
+
+                {#if visProfilKarakterValg}
+                    <div class="profil-karaktervalg" aria-label="Profilkarakter">
+                        <button
+                            type="button"
+                            class:valgt={!authState.profil?.profile_character_id}
+                            onclick={() => vaelgProfilKarakter(null)}
+                        >
+                            <span>Auto</span>
+                            <em>Mest spillet</em>
+                        </button>
+                        {#each tilgaengeligeKarakterer as karakter (karakter.id)}
+                            <button
+                                type="button"
+                                class:valgt={authState.profil?.profile_character_id === karakter.id}
+                                onclick={() => vaelgProfilKarakter(karakter.id)}
+                            >
+                                <img src={karakter.ikon} alt="" />
+                                <span>{karakter.navn}</span>
+                                <em>{profilTitelForKarakter(karakter.id)}</em>
+                            </button>
+                        {/each}
+                    </div>
+                {/if}
 
                 <label class="profil-felt">
                     <span>Ret spillernavn</span>
@@ -2447,9 +2497,86 @@
         flex: 0 0 auto;
         filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.58));
     }
+    .profil-header .profil-karakter-knap {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        border-radius: 6px;
+        flex: 0 0 auto;
+    }
+    .profil-header .profil-karakter-knap:hover,
+    .profil-header .profil-karakter-knap:focus-visible {
+        background: rgba(255, 255, 255, 0.08);
+        outline: 1px solid rgba(245, 208, 113, 0.45);
+    }
+    .profil-header .profil-karakter-knap img {
+        display: block;
+    }
+    .profil-header .profil-karakter-knap > span {
+        width: 108px;
+        height: 108px;
+        display: grid;
+        place-items: center;
+        color: #d9cfb8;
+        font-size: 2.4rem;
+        font-family: 'Cinzel', serif;
+    }
     .profil-header h2 {
         margin: 0;
         font-family: 'Cinzel', serif;
+    }
+    .profil-karaktervalg {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+        gap: 8px;
+        margin: -2px 0 18px;
+        padding: 10px;
+        border: 1px solid #333;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.04);
+    }
+    .profil-karaktervalg button {
+        min-height: 118px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.28);
+        color: #eee;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        cursor: pointer;
+        text-align: center;
+    }
+    .profil-karaktervalg button:hover,
+    .profil-karaktervalg button:focus-visible,
+    .profil-karaktervalg button.valgt {
+        border-color: rgba(245, 208, 113, 0.64);
+        background: rgba(245, 208, 113, 0.1);
+        outline: none;
+    }
+    .profil-karaktervalg img {
+        width: 54px;
+        height: 54px;
+        object-fit: contain;
+        filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.5));
+    }
+    .profil-karaktervalg span,
+    .profil-karaktervalg em {
+        display: block;
+    }
+    .profil-karaktervalg span {
+        font-weight: 800;
+    }
+    .profil-karaktervalg em {
+        color: #bbb;
+        font-size: 0.78rem;
+        font-style: normal;
     }
     .profil-felt {
         display: flex;
@@ -3450,6 +3577,11 @@
         }
 
         .profil-header-identitet img {
+            width: 82px;
+            height: 82px;
+        }
+
+        .profil-header .profil-karakter-knap > span {
             width: 82px;
             height: 82px;
         }
