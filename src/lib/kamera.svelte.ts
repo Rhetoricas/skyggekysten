@@ -60,7 +60,7 @@ export function skabKamera() {
         e.preventDefault(); 
 
         baseZoom -= e.deltaY * 0.001; 
-        baseZoom = Math.max(0.3, Math.min(baseZoom, 3.0));
+        baseZoom = Math.max(0.2, Math.min(baseZoom, 3.0));
     }
 
     function centrerPåHex(index: number, bredde: number, hexW: number, rowH: number) {
@@ -97,7 +97,7 @@ function foelgSpiller(index: number, bredde: number, hexW: number, rowH: number)
         }
 
         if (blokeret) return;
-        baseZoom = Math.max(0.3, Math.min(baseZoom + delta, 3.0));
+        baseZoom = Math.max(0.2, Math.min(baseZoom + delta, 3.0));
     }
 
     function saetZoom(nyVaerdi: number) {

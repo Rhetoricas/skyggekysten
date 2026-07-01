@@ -1623,7 +1623,7 @@
                     <span class="knap-tekst">Samme ø igen</span>
                 </button>
                 <button class="spil-knap slut-knap-styled" onclick={nulstilHukommelse}>
-                    <span class="knap-tekst">Prøv en anden ø</span>
+                    <span class="knap-tekst">Til start</span>
                 </button>
             </div>
             
@@ -1716,7 +1716,7 @@
                     <span class="knap-tekst">Samme ø igen</span>
                 </button>
                 <button class="spil-knap slut-knap-styled" onclick={nulstilHukommelse}>
-                    <span class="knap-tekst">Prøv en anden ø</span>
+                    <span class="knap-tekst">Til start</span>
                 </button>
             </div>
             
