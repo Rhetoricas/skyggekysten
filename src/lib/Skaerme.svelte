@@ -1058,7 +1058,6 @@
                         <div><strong>{authState.stats.flestFelter}</strong><span>Flest felter</span></div>
                         <div><strong>{authState.stats.flestMiner}</strong><span>Flest miner</span></div>
                         <div><strong>{authState.stats.favoritKarakter}</strong><span>Mest spillet</span></div>
-                        <div><strong>{authState.stats.favoritKarakterBedsteTitel}</strong><span>Bedste titel med mest spillet</span></div>
                     </div>
                 {/if}
 
