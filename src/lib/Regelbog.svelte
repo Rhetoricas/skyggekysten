@@ -54,7 +54,7 @@
         >
             <header class="regelbog-header">
                 <div>
-                    <p class="regelbog-kicker">{tekst('Tågeøerne', 'Fog Isles')}</p>
+                    <p class="regelbog-kicker">{tekst('Tågeøerne', 'Fog Island')}</p>
                     <h2 id="regelbog-titel">{tekst('Regelbog', 'Rulebook')}</h2>
                 </div>
                 <button type="button" class="regelbog-luk" onclick={lukRegler} aria-label={tekst('Luk regelbog', 'Close rulebook')}>×</button>

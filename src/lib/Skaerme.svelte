@@ -6,7 +6,7 @@
     import { karakterFordel, karakterKlasseNavn as visKarakterKlasseNavn, karakterNavn, karakterUlempe, titelNavn } from '$lib/spilTekst';
     import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
-    import { goerOfflineAppKlar, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
+    import { goerOfflineAppKlar, offlineAppBesked, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
     import Regelbog from '$lib/Regelbog.svelte';
     import LydKnap from '$lib/LydKnap.svelte';
     import SprogKnap from '$lib/SprogKnap.svelte';
@@ -43,18 +43,6 @@
     type HighscoreDrilldown = { titel: string; scores: GlobalScore[]; henter: boolean };
     const HIGHSCORE_DRILLDOWN_ANTAL = 10;
     const PROFIL_BEDSTE_SCORE_PREFIX = 'taage_profile_best_score:';
-    const TROFAE_MEDALJER = [
-        { sti: '/screens/mineejeren.webp', label: 'Mineejer', krav: '12 miner ved spilslut' },
-        { sti: '/screens/taagekonge.webp', label: 'Tågekonge', krav: '20 bevægelser i tåge' },
-        { sti: '/screens/Bølgebæreren.webp', label: 'Bølgebærer', krav: 'start en oversvømmelse og tag skade fra vand 5 gange' },
-        { sti: '/screens/relikviejægeren.webp', label: 'Relikviejæger', krav: 'hav 3 af 4 magiske genstande i rygsækken ved spilslut' },
-        { sti: '/screens/guldfyrsten.webp', label: 'Guldfyrste', krav: '5000 guld ved spilslut' },
-        { sti: '/screens/livsvogteren.webp', label: 'Livvogter', krav: 'heal 400 HP' },
-        { sti: '/screens/korttegneren.webp', label: 'Korttegner', krav: '1500 kendte felter' },
-        { sti: '/screens/udstyrsmesteren.webp', label: 'Udstyrsmester', krav: '10 opgraderede items i rygsækken samtidig' },
-        { sti: '/screens/diamantjægeren.webp', label: 'Diamantjæger', krav: 'find diamanter med en samlet værdi på mindst 3000' }
-    ];
-
     let {
         opretEllerDeltag,
         startOfflineSpil,
@@ -114,7 +102,7 @@
     let highscoreDrilldown = $state<HighscoreDrilldown | null>(null);
     let statsHentetForUser = $state('');
     let gemtProfilBedsteScore = $state(0);
-    let valgtLaastTrofae = $state<{ sti: string; label: string; krav?: string; episkTekst?: string; opnaaet?: boolean } | null>(null);
+    let valgtLaastTrofae = $state<{ sti: string; label: string; labelEn?: string; krav?: string; kravEn?: string; episkTekst?: string; episkTekstEn?: string; opnaaet?: boolean } | null>(null);
     let lokaleTrofaeIds = $state<string[]>([]);
     let lokaleTrofaeAwards = $state<TrofaeAward[]>([]);
     let visJoinLukketModal = $state(false);
@@ -282,7 +270,9 @@
             {
                 sti: `/screens/m${bedsteNiveau + 1}.webp`,
                 label: 'Topmedalje',
+                labelEn: 'Top Medal',
                 krav: 'Den medalje har du fået for din højeste score.',
+                kravEn: 'You earned this medal for your highest score.',
                 bedste: true,
                 opnaaet: true
             },
@@ -295,7 +285,9 @@
             {
                 sti: '/screens/m1.webp',
                 label: 'Topmedalje',
+                labelEn: 'Top Medal',
                 krav: 'Log ind for at gemme din bedste scoremedalje på profilen.',
+                kravEn: 'Log in to save your best score medal on your profile.',
                 bedste: false,
                 opnaaet: false
             },
@@ -333,7 +325,19 @@
         return tekst('Min profil', 'My profile');
     }
 
-    async function aabnLaastTrofae(medalje: { id?: string; sti: string; label: string; bedste: boolean; opnaaet?: boolean; krav?: string; episkTekst?: string; award?: TrofaeAward | null }) {
+    function medaljeLabel(medalje: { label: string; labelEn?: string }) {
+        return tekst(medalje.label, medalje.labelEn || medalje.label);
+    }
+
+    function medaljeKrav(medalje: { krav?: string; kravEn?: string }) {
+        return tekst(medalje.krav || '', medalje.kravEn || medalje.krav || '');
+    }
+
+    function medaljeEpiskTekst(medalje: { episkTekst?: string; episkTekstEn?: string }) {
+        return tekst(medalje.episkTekst || '', medalje.episkTekstEn || medalje.episkTekst || '');
+    }
+
+    async function aabnLaastTrofae(medalje: { id?: string; sti: string; label: string; labelEn?: string; bedste: boolean; opnaaet?: boolean; krav?: string; kravEn?: string; episkTekst?: string; episkTekstEn?: string; award?: TrofaeAward | null }) {
         if (medalje.bedste && authState.user?.id) {
             const bedsteSpil = await hentBedsteHighscoreForBruger(authState.user.id);
             if (bedsteSpil) {
@@ -854,14 +858,14 @@
     {#if trofaeer.length > 0}
         <section class="episk-trofae-panel" aria-label={tekst('Nye trofæmedaljer', 'New trophy medals')}>
             <p class="episk-kicker">{tekst('Ny trofæmedalje', 'New trophy medal')}</p>
-            <h2>{trofaeer.length === 1 ? trofaeer[0].label : tekst(`${trofaeer.length} episke trofæer`, `${trofaeer.length} epic trophies`)}</h2>
+            <h2>{trofaeer.length === 1 ? medaljeLabel(trofaeer[0]) : tekst(`${trofaeer.length} episke trofæer`, `${trofaeer.length} epic trophies`)}</h2>
             <div class="episk-trofae-liste">
                 {#each trofaeer as trofae (trofae.id)}
                     <div class="episk-trofae">
-                        <img src={trofae.sti} alt={trofae.label} draggable="false" />
+                        <img src={trofae.sti} alt={medaljeLabel(trofae)} draggable="false" />
                         <div>
-                            <strong>{trofae.label}</strong>
-                            <span>{trofae.episkTekst}</span>
+                            <strong>{medaljeLabel(trofae)}</strong>
+                            <span>{medaljeEpiskTekst(trofae)}</span>
                         </div>
                     </div>
                 {/each}
@@ -968,11 +972,11 @@
                         class="konto-medalje-knap"
                         class:kan-aabnes={true}
                         onclick={() => aabnLaastTrofae(medalje)}
-                        aria-label={medalje.bedste ? medalje.label : medalje.opnaaet ? tekst(`Se ${medalje.label}`, `View ${medalje.label}`) : tekst(`Se krav for ${medalje.label}`, `View requirement for ${medalje.label}`)}
+                        aria-label={medalje.bedste ? medaljeLabel(medalje) : medalje.opnaaet ? tekst(`Se ${medaljeLabel(medalje)}`, `View ${medaljeLabel(medalje)}`) : tekst(`Se krav for ${medaljeLabel(medalje)}`, `View requirement for ${medaljeLabel(medalje)}`)}
                     >
                         <img
                             src={medalje.sti}
-                            alt={medalje.label}
+                            alt={medaljeLabel(medalje)}
                             class:bedste={medalje.bedste}
                             class:trofae-opnaaet={medalje.opnaaet}
                             class:trofae-placeholder={!medalje.bedste && !medalje.opnaaet}
@@ -989,11 +993,11 @@
                         type="button"
                         class="konto-medalje-knap kan-aabnes"
                         onclick={() => aabnLaastTrofae(medalje)}
-                        aria-label={tekst(`Se krav for ${medalje.label}`, `View requirement for ${medalje.label}`)}
+                        aria-label={tekst(`Se krav for ${medaljeLabel(medalje)}`, `View requirement for ${medaljeLabel(medalje)}`)}
                     >
                         <img
                             src={medalje.sti}
-                            alt={medalje.label}
+                            alt={medaljeLabel(medalje)}
                             class:trofae-placeholder={true}
                             draggable="false"
                         />
@@ -1032,16 +1036,16 @@
             >
                 <img
                     src={valgtLaastTrofae.sti}
-                    alt={valgtLaastTrofae.label}
+                    alt={medaljeLabel(valgtLaastTrofae)}
                     class:opnaaet={valgtLaastTrofae.opnaaet}
                     draggable="false"
                 />
-                <h3 id="trofae-info-titel">{valgtLaastTrofae.label}</h3>
+                <h3 id="trofae-info-titel">{medaljeLabel(valgtLaastTrofae)}</h3>
                 {#if valgtLaastTrofae.opnaaet && valgtLaastTrofae.episkTekst}
-                    <p>{valgtLaastTrofae.episkTekst}</p>
-                    <p class="trofae-info-krav">{tekst('Krav:', 'Requirement:')} {valgtLaastTrofae.krav}</p>
+                    <p>{medaljeEpiskTekst(valgtLaastTrofae)}</p>
+                    <p class="trofae-info-krav">{tekst('Krav:', 'Requirement:')} {medaljeKrav(valgtLaastTrofae)}</p>
                 {:else}
-                    <p>{valgtLaastTrofae.krav}</p>
+                    <p>{medaljeKrav(valgtLaastTrofae)}</p>
                 {/if}
                 <button type="button" onclick={lukLaastTrofae}>{tekst('Luk', 'Close')}</button>
             </div>
@@ -1136,17 +1140,17 @@
                                 class="profil-medalje-knap"
                                 class:kan-aabnes={true}
                                 onclick={() => aabnLaastTrofae(medalje)}
-                                aria-label={medalje.bedste ? medalje.label : medalje.opnaaet ? tekst(`Se ${medalje.label}`, `View ${medalje.label}`) : tekst(`Se krav for ${medalje.label}`, `View requirement for ${medalje.label}`)}
+                                aria-label={medalje.bedste ? medaljeLabel(medalje) : medalje.opnaaet ? tekst(`Se ${medaljeLabel(medalje)}`, `View ${medaljeLabel(medalje)}`) : tekst(`Se krav for ${medaljeLabel(medalje)}`, `View requirement for ${medaljeLabel(medalje)}`)}
                             >
                                 <img
                                     src={medalje.sti}
-                                    alt={medalje.label}
+                                    alt={medaljeLabel(medalje)}
                                     class:bedste={medalje.bedste}
                                     class:trofae-opnaaet={medalje.opnaaet}
                                     draggable="false"
                                 />
                             </button>
-                            <span>{medalje.label}</span>
+                            <span>{medaljeLabel(medalje)}</span>
                         </div>
                     {/each}
                 </div>
@@ -1464,7 +1468,7 @@
                 </button>
                 <div class="start-copy">
                     <p class="start-eyebrow">{tekst('En ny ø venter', 'A new island awaits')}</p>
-                    <h1 id="start-title">{tekst('Tågeøerne', 'Fog Isles')}</h1>
+                    <h1 id="start-title">{tekst('Tågeøerne', 'Fog Island')}</h1>
                     <p class="start-tagline">{tekst('Udforsk, overlev, og find en båd før tågen tager dig.', 'Explore, survive, and find a boat before the fog takes you.')}</p>
                 </div>
             </section>
@@ -1538,17 +1542,17 @@
                     class:klar={offlineAppState.klar}
                     onclick={goerOfflineAppKlar}
                     disabled={offlineAppState.arbejder || offlineAppState.klar}
-                    title="Offline / Flightmode"
-                    aria-label="Offline / Flightmode"
+                    title={tekst('Offline / Flytilstand', 'Offline / Flight mode')}
+                    aria-label={tekst('Offline / Flytilstand', 'Offline / Flight mode')}
                 >
                     <img src="/ui/flight.webp" alt="" class="flight-ikon" />
-                    <span>{offlineAppState.arbejder ? tekst('Downloader...', 'Downloading...') : 'Offline / Flightmode'}</span>
+                    <span>{offlineAppState.arbejder ? tekst('Downloader...', 'Downloading...') : tekst('Offline / Flytilstand', 'Offline / Flight mode')}</span>
                 </button>
                 {#if !offlineAppState.klar}
                     <p class="fly-hint">{tekst('tryk inden du går offline', 'tap before going offline')}</p>
                 {/if}
-                {#if offlineAppState.besked}
-                    <p class="offline-besked">{offlineAppState.besked}</p>
+                {#if offlineAppBesked()}
+                    <p class="offline-besked">{offlineAppBesked()}</p>
                 {/if}
 
                 {#if harGemtOfflineSpil}

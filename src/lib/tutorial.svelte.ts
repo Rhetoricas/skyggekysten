@@ -262,7 +262,7 @@ const tutorialTrinEngelsk: Record<TutorialTrinId, Partial<TutorialTrin>> = {
         titel: '1. Land',
         tekst: 'The tutorial island is 20 fields wide and 10 fields high. Tap a neighboring field to move.',
         popupTitel: 'Welcome, Apprentice',
-        popupTekst: 'Here you try the most important parts of Fog Isles without affecting real islands, saved games or highscores.',
+        popupTekst: 'Here you try the most important parts of Fog Island without affecting real islands, saved games or highscores.',
         popupPunkter: [
             'The map is 20 fields wide and 10 fields high. Real islands are about 100 x 20.',
             'Tap a field right next to the Apprentice to move.',
@@ -347,7 +347,7 @@ const tutorialTrinEngelsk: Record<TutorialTrinId, Partial<TutorialTrin>> = {
         titel: '8. Find The Boat',
         tekst: 'Continue east to the escape boat. When you board, the island is cleared.',
         popupTitel: 'The Goal Is Not To See Everything',
-        popupTekst: 'Fog Isles is about surviving long enough to reach an escape boat. On real islands, boats usually come toward the east, and the fog presses from behind.',
+        popupTekst: 'Fog Island is about surviving long enough to reach an escape boat. On real islands, boats usually come toward the east, and the fog presses from behind.',
         popupPunkter: [
             'You win by boarding a boat.',
             'Real islands are larger, so route choice and tempo matter more.',

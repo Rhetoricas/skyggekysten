@@ -17,8 +17,11 @@ export interface TrofaeDefinition {
     id: TrofaeId;
     sti: string;
     label: string;
+    labelEn: string;
     krav: string;
+    kravEn: string;
     episkTekst: string;
+    episkTekstEn: string;
 }
 
 export interface TrofaeStats {
@@ -41,64 +44,91 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         id: 'mineejeren',
         sti: '/screens/mineejeren.webp',
         label: 'Mineejer',
+        labelEn: 'Mine Owner',
         krav: 'Overlev spillet med 12 miner ved spilslut.',
-        episkTekst: 'Du ejede 12 miner og slap levende væk.'
+        kravEn: 'Survive the game with 12 mines at game end.',
+        episkTekst: 'Du ejede 12 miner og slap levende væk.',
+        episkTekstEn: 'You owned 12 mines and escaped alive.'
     },
     {
         id: 'taagekonge',
         sti: '/screens/taagekonge.webp',
         label: 'Tågekonge',
+        labelEn: 'Fog King',
         krav: 'Overlev spillet efter 20 bevægelser i tåge.',
-        episkTekst: 'Du gik 20 gange i tågen og kom ud igen.'
+        kravEn: 'Survive the game after 20 moves in the fog.',
+        episkTekst: 'Du gik 20 gange i tågen og kom ud igen.',
+        episkTekstEn: 'You walked into the fog 20 times and came back out.'
     },
     {
         id: 'boelgebaereren',
         sti: '/screens/Bølgebæreren.webp',
         label: 'Bølgebærer',
+        labelEn: 'Wavebearer',
         krav: 'Overlev spillet efter at have startet en oversvømmelse og taget skade fra vand 5 gange.',
-        episkTekst: 'Du startede en oversvømmelse, bar vandets straf og overlevede.'
+        kravEn: 'Survive the game after starting a flood and taking water damage 5 times.',
+        episkTekst: 'Du startede en oversvømmelse, bar vandets straf og overlevede.',
+        episkTekstEn: 'You started a flood, bore the water’s punishment and survived.'
     },
     {
         id: 'relikviejaegeren',
         sti: '/screens/relikviejægeren.webp',
         label: 'Relikviejæger',
+        labelEn: 'Relic Hunter',
         krav: 'Overlev spillet med 3 af 4 magiske genstande i rygsækken: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.',
-        episkTekst: 'Du bar tre magiske genstande ud af tågen.'
+        kravEn: 'Survive the game with 3 of 4 magical items in your backpack: Rootheart, Golden Distiller, Dragon Staff and Rune Rod.',
+        episkTekst: 'Du bar tre magiske genstande ud af tågen.',
+        episkTekstEn: 'You carried three magical items out of the fog.'
     },
     {
         id: 'guldfyrsten',
         sti: '/screens/guldfyrsten.webp',
         label: 'Guldfyrste',
+        labelEn: 'Gold Prince',
         krav: 'Overlev spillet med 5000 guld. Kun rent guld tæller.',
-        episkTekst: 'Du slap væk med 5000 guld i hænderne.'
+        kravEn: 'Survive the game with 5000 gold. Only pure gold counts.',
+        episkTekst: 'Du slap væk med 5000 guld i hænderne.',
+        episkTekstEn: 'You escaped with 5000 gold in your hands.'
     },
     {
         id: 'livsvogteren',
         sti: '/screens/livsvogteren.webp',
         label: 'Livvogter',
+        labelEn: 'Life Warden',
         krav: 'Overlev spillet efter at have healet 400 HP.',
-        episkTekst: 'Du helede 400 HP og holdt dig levende hele vejen.'
+        kravEn: 'Survive the game after healing 400 HP.',
+        episkTekst: 'Du helede 400 HP og holdt dig levende hele vejen.',
+        episkTekstEn: 'You healed 400 HP and kept yourself alive all the way.'
     },
     {
         id: 'korttegneren',
         sti: '/screens/korttegneren.webp',
         label: 'Korttegner',
+        labelEn: 'Cartographer',
         krav: 'Overlev spillet med 1500 kendte felter.',
-        episkTekst: 'Du kortlagde 1500 felter og fandt hjem.'
+        kravEn: 'Survive the game with 1500 known fields.',
+        episkTekst: 'Du kortlagde 1500 felter og fandt hjem.',
+        episkTekstEn: 'You mapped 1500 fields and found your way home.'
     },
     {
         id: 'udstyrsmesteren',
         sti: '/screens/udstyrsmesteren.webp',
         label: 'Udstyrsmester',
+        labelEn: 'Equipment Master',
         krav: 'Overlev spillet med 10 opgraderede items i rygsækken på samme tid.',
-        episkTekst: 'Du bar 10 mesterlige stykker udstyr på samme tid.'
+        kravEn: 'Survive the game with 10 upgraded items in your backpack at the same time.',
+        episkTekst: 'Du bar 10 mesterlige stykker udstyr på samme tid.',
+        episkTekstEn: 'You carried 10 masterwork pieces of equipment at the same time.'
     },
     {
         id: 'diamantjaegeren',
         sti: '/screens/diamantjægeren.webp',
         label: 'Diamantjæger',
+        labelEn: 'Diamond Hunter',
         krav: 'Overlev spillet efter at have fundet diamanter med en samlet værdi på mindst 3000.',
-        episkTekst: 'Du fandt diamanter med en samlet værdi på mindst 3000.'
+        kravEn: 'Survive the game after finding diamonds with a total value of at least 3000.',
+        episkTekst: 'Du fandt diamanter med en samlet værdi på mindst 3000.',
+        episkTekstEn: 'You found diamonds with a total value of at least 3000.'
     }
 ];
 

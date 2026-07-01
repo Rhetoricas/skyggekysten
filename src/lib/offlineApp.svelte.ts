@@ -4,6 +4,7 @@ export const offlineAppState = $state({
     understottet: false,
     klar: false,
     arbejder: false,
+    beskedKey: '' as '' | 'unsupported' | 'ready' | 'not-ready' | 'downloading' | 'still-downloading' | 'timeout' | 'failed',
     besked: ''
 });
 
@@ -64,7 +65,7 @@ export async function tjekOfflineAppKlar() {
     if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
         offlineAppState.understottet = false;
         offlineAppState.klar = false;
-        offlineAppState.besked = tekst('Denne browser understøtter ikke offline-cache.', 'This browser does not support offline cache.');
+        saetOfflineBesked('unsupported');
         return false;
     }
 
@@ -73,13 +74,11 @@ export async function tjekOfflineAppKlar() {
     try {
         const registration = await navigator.serviceWorker.getRegistration();
         offlineAppState.klar = !!registration?.active;
-        offlineAppState.besked = offlineAppState.klar
-            ? tekst('Spillet er klar på denne enhed', 'The game is ready on this device')
-            : tekst('Offline-cache er ikke klar endnu.', 'Offline cache is not ready yet.');
+        saetOfflineBesked(offlineAppState.klar ? 'ready' : 'not-ready');
         return offlineAppState.klar;
     } catch {
         offlineAppState.klar = false;
-        offlineAppState.besked = '';
+        saetOfflineBesked('');
         return false;
     }
 }
@@ -88,32 +87,60 @@ export async function goerOfflineAppKlar() {
     if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
         offlineAppState.understottet = false;
         offlineAppState.klar = false;
-        offlineAppState.besked = tekst('Denne browser understøtter ikke offline-cache.', 'This browser does not support offline cache.');
+        saetOfflineBesked('unsupported');
         return false;
     }
 
     offlineAppState.understottet = true;
     offlineAppState.arbejder = true;
-    offlineAppState.besked = tekst('Downloader spillet til offline brug...', 'Downloading the game for offline use...');
+    saetOfflineBesked('downloading');
     const langsomBesked = setTimeout(() => {
         if (offlineAppState.arbejder) {
-            offlineAppState.besked = tekst('Downloader stadig. Firefox kan være lidt langsom første gang...', 'Still downloading. Firefox can be a little slow the first time...');
+            saetOfflineBesked('still-downloading');
         }
     }, 8000);
 
     try {
         const registration = await hentServiceWorkerRegistration();
         offlineAppState.klar = !!registration.active;
-        offlineAppState.besked = tekst('Spillet er klar på denne enhed', 'The game is ready on this device');
+        saetOfflineBesked('ready');
         return true;
     } catch (error) {
         offlineAppState.klar = false;
-        offlineAppState.besked = error instanceof Error && error.message === 'timeout'
-            ? tekst('Offline-cache tog for lang tid. Genindlæs siden online og prøv igen.', 'Offline cache took too long. Reload the page online and try again.')
-            : tekst('Offline-cache kunne ikke gøres klar. Genindlæs siden online og prøv igen.', 'Offline cache could not be prepared. Reload the page online and try again.');
+        saetOfflineBesked(error instanceof Error && error.message === 'timeout' ? 'timeout' : 'failed');
         return false;
     } finally {
         clearTimeout(langsomBesked);
         offlineAppState.arbejder = false;
     }
+}
+
+function offlineBeskedTekst(key: typeof offlineAppState.beskedKey) {
+    switch (key) {
+        case 'unsupported':
+            return tekst('Denne browser understøtter ikke offline-cache.', 'This browser does not support offline cache.');
+        case 'ready':
+            return tekst('Spillet er klar på denne enhed', 'The game is ready on this device');
+        case 'not-ready':
+            return tekst('Offline-cache er ikke klar endnu.', 'Offline cache is not ready yet.');
+        case 'downloading':
+            return tekst('Downloader spillet til offline brug...', 'Downloading the game for offline use...');
+        case 'still-downloading':
+            return tekst('Downloader stadig. Firefox kan være lidt langsom første gang...', 'Still downloading. Firefox can be a little slow the first time...');
+        case 'timeout':
+            return tekst('Offline-cache tog for lang tid. Genindlæs siden online og prøv igen.', 'Offline cache took too long. Reload the page online and try again.');
+        case 'failed':
+            return tekst('Offline-cache kunne ikke gøres klar. Genindlæs siden online og prøv igen.', 'Offline cache could not be prepared. Reload the page online and try again.');
+        default:
+            return '';
+    }
+}
+
+function saetOfflineBesked(key: typeof offlineAppState.beskedKey) {
+    offlineAppState.beskedKey = key;
+    offlineAppState.besked = offlineBeskedTekst(key);
+}
+
+export function offlineAppBesked() {
+    return offlineBeskedTekst(offlineAppState.beskedKey) || offlineAppState.besked;
 }
