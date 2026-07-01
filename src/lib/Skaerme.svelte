@@ -1402,7 +1402,7 @@
             </section>
 
             <div class="start-intel">
-                <span>Samme ø-navn giver samme ø</span>
+                <span>Samme ø-navn giver samme ø igen og igen</span>
                 <strong>De første fem dage afgør, hvem der når med.</strong>
             </div>
 
