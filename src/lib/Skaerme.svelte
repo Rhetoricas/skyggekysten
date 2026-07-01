@@ -1254,7 +1254,7 @@
     <div class="tavle">
         <img src="/screens/boardglobal.webp" alt="Ugens globale tavle" class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
-            <h3>Top 100 i uge {aktuelIsoUge()}</h3>
+            <h3>Toplisten i uge {aktuelIsoUge()}</h3>
             {#if ugensGlobaleScores.length === 0}
                 <p class="tom-liste">Ingen resultater endnu i denne uge</p>
             {:else}
