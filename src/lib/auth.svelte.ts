@@ -3,7 +3,7 @@ import { type LydNiveau, lydKontrol, saetLydNiveau } from './lydKontrol.svelte';
 import { tilgaengeligeKarakterer } from './spildata';
 import { findMedaljeNiveau } from './score';
 import { hentTitel } from './historieMotor';
-import { normaliserSprog, saetSprog, sprogState, tekst, type AppSprog } from './i18n.svelte';
+import { harUrlSprogOverride, normaliserSprog, saetSprog, sprogState, tekst, type AppSprog } from './i18n.svelte';
 import {
     gemTrofaeIds,
     hentGemteTrofaeIds,
@@ -93,6 +93,7 @@ function normaliserProfil(data: (Profil & { trophies?: unknown }) | null) {
 }
 
 function anvendProfilSprog(profil: Profil | null) {
+    if (harUrlSprogOverride()) return;
     if (profil?.language) saetSprog(profil.language);
 }
 

@@ -361,7 +361,7 @@ const tutorialTrinEngelsk: Record<TutorialTrinId, Partial<TutorialTrin>> = {
         popupTitel: 'You Are Ready For A Real Island',
         popupTekst: 'You tried movement, help, rulebook, digging, backpack, shop, event and escape boat.',
         popupPunkter: [
-            'On the start screen you can write an island name or get a random one.',
+            'On the main menu you can write an island name or get a random one.',
             'The same island name gives the same island, so others can land in the same place at the start.',
             'Use ? and the rulebook along the way when the game starts to open up.'
         ],

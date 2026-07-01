@@ -1638,7 +1638,7 @@
                     <span class="knap-tekst">{tekst('Samme ø igen', 'Same island again')}</span>
                 </button>
                 <button class="spil-knap slut-knap-styled" onclick={nulstilHukommelse}>
-                    <span class="knap-tekst">{tekst('Til start', 'Start screen')}</span>
+                    <span class="knap-tekst">{tekst('Til start', 'Main menu')}</span>
                 </button>
             </div>
             
@@ -1731,7 +1731,7 @@
                     <span class="knap-tekst">{tekst('Samme ø igen', 'Same island again')}</span>
                 </button>
                 <button class="spil-knap slut-knap-styled" onclick={nulstilHukommelse}>
-                    <span class="knap-tekst">{tekst('Til start', 'Start screen')}</span>
+                    <span class="knap-tekst">{tekst('Til start', 'Main menu')}</span>
                 </button>
             </div>
             

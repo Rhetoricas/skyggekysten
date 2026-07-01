@@ -1,6 +1,7 @@
 export type AppSprog = 'da' | 'en';
 
 const SPROG_KEY = 'taage_language';
+let urlSprogOverride = false;
 
 export const sprogState = $state({
     sprog: 'da' as AppSprog
@@ -11,6 +12,12 @@ export function normaliserSprog(sprog?: string | null): AppSprog {
 }
 
 export function initSprog() {
+    const urlSprog = hentUrlSprog();
+    urlSprogOverride = !!urlSprog;
+    if (urlSprog) {
+        saetSprog(urlSprog);
+        return;
+    }
     if (typeof localStorage === 'undefined') return;
     sprogState.sprog = normaliserSprog(localStorage.getItem(SPROG_KEY));
 }
@@ -28,4 +35,15 @@ export function tekst(da: string, en: string) {
 
 export function sprogLabel() {
     return sprogState.sprog === 'en' ? 'English' : 'Dansk';
+}
+
+export function harUrlSprogOverride() {
+    return urlSprogOverride;
+}
+
+function hentUrlSprog(): AppSprog | null {
+    if (typeof window === 'undefined') return null;
+    const params = new URLSearchParams(window.location.search);
+    const sprog = params.get('lang') || params.get('sprog');
+    return sprog === 'da' || sprog === 'en' ? sprog : null;
 }

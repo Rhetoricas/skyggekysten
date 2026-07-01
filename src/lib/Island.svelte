@@ -2674,7 +2674,7 @@ function udførBevægelse(nytIndeks: number) {
             </header>
 
             <p class="tutorial-popup-tekst">
-                {@html tekst('Hvis du afslutter nu, ryger du tilbage til startskærmen, og tutorialknappen skjules. Du kan stadig spille tutorialen igen senere ved at skrive <strong>tutorial</strong> som ø-navn.', 'If you exit now, you return to the start screen, and the tutorial button is hidden. You can still play the tutorial later by writing <strong>tutorial</strong> as the island name.')}
+                {@html tekst('Hvis du afslutter nu, ryger du tilbage til startskærmen, og tutorialknappen skjules. Du kan stadig spille tutorialen igen senere ved at skrive <strong>tutorial</strong> som ø-navn.', 'If you exit now, you return to the main menu, and the tutorial button is hidden. You can still play the tutorial later by writing <strong>tutorial</strong> as the island name.')}
             </p>
 
             <div class="tutorial-exit-valg">
