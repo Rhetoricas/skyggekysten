@@ -63,6 +63,7 @@
         lokaleScores,
         klasseScores,
         globaleScores,
+        ugensGlobaleScores,
         nyGlobalRekord,
         harGemtOfflineSpil,
         offlineSpilInfo,
@@ -80,6 +81,7 @@
         lokaleScores: LokalScore[];
         klasseScores: GlobalScore[];
         globaleScores: GlobalScore[];
+        ugensGlobaleScores: GlobalScore[];
         nyGlobalRekord: boolean;
         harGemtOfflineSpil: boolean;
         offlineSpilInfo: { spillerNavn: string; rumKode: string; gameState: string; dag: number; savedAt: string } | null;
@@ -99,6 +101,7 @@
     let visLokaleTestKnapper = $state(false);
     let visTutorialStartKnap = $state(!erTutorialKnapSkjult());
     let globalHighscoreSide = $state(0);
+    let ugensGlobalHighscoreSide = $state(0);
     let klasseHighscoreSide = $state(0);
     let lokalHighscoreSide = $state(0);
     let valgtHighscore = $state<ValgtHighscore | null>(null);
@@ -374,6 +377,15 @@
         return scores.slice(start, start + HIGHSCORE_SIDE_STOERRELSE);
     }
 
+    function aktuelIsoUge() {
+        const dato = new Date();
+        const utcDato = new Date(Date.UTC(dato.getFullYear(), dato.getMonth(), dato.getDate()));
+        const dag = utcDato.getUTCDay() || 7;
+        utcDato.setUTCDate(utcDato.getUTCDate() + 4 - dag);
+        const aarStart = new Date(Date.UTC(utcDato.getUTCFullYear(), 0, 1));
+        return Math.ceil((((utcDato.getTime() - aarStart.getTime()) / 86400000) + 1) / 7);
+    }
+
     function lokalHighscoreSideScores(scores: LokalScore[], side: number): LokalScore[] {
         const start = highscoreSideStart(side, scores);
         return scores.slice(start, start + HIGHSCORE_SIDE_STOERRELSE);
@@ -547,6 +559,14 @@
 
     function forrigeGlobalHighscoreSide() {
         globalHighscoreSide = normaliserHighscoreSide(globalHighscoreSide, globaleScores) - 1;
+    }
+
+    function naesteUgensGlobalHighscoreSide() {
+        ugensGlobalHighscoreSide = (normaliserHighscoreSide(ugensGlobalHighscoreSide, ugensGlobaleScores) + 1) % highscoreSideAntal(ugensGlobaleScores);
+    }
+
+    function forrigeUgensGlobalHighscoreSide() {
+        ugensGlobalHighscoreSide = normaliserHighscoreSide(ugensGlobalHighscoreSide, ugensGlobaleScores) - 1;
     }
 
     function naesteKlasseHighscoreSide() {
@@ -1229,6 +1249,41 @@
     {/if}
 {/snippet}
 
+{#snippet ugensGlobalHighscoreTavle()}
+    {@const sideStart = highscoreSideStart(ugensGlobalHighscoreSide, ugensGlobaleScores)}
+    <div class="tavle">
+        <img src="/screens/boardglobal.webp" alt="Ugens globale tavle" class="tavle-billede" />
+        <div class="tavle-indhold global-indhold">
+            <h3>Top 100 i uge {aktuelIsoUge()}</h3>
+            {#if ugensGlobaleScores.length === 0}
+                <p class="tom-liste">Ingen resultater endnu i denne uge</p>
+            {:else}
+                <ol start={sideStart + 1}>
+                    {#each highscoreSide(ugensGlobaleScores, ugensGlobalHighscoreSide) as score, i (sideStart + i)}
+                        <li>
+                            <button type="button" class="highscore-række" onclick={() => aabnGlobalHighscore(score)} aria-label={`Vis scoreopgørelse for ${score.spillerNavn}`}>
+                                <span class="placering">{sideStart + i + 1}.</span>
+                                <span class="navn">{formaterHighscoreNavn(score.spillerNavn)} <span class="karakter-navn">({score.karakter || 'Ukendt'}, {formaterNavn(score.oeNavn)})</span></span>
+                                <span class="point">{score.point}</span>
+                            </button>
+                        </li>
+                    {/each}
+                </ol>
+            {/if}
+        </div>
+        {#if ugensGlobaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
+            <div class="highscore-pager">
+                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeUgensGlobalHighscoreSide} aria-label="Vis forrige 10 highscores i denne uge">
+                    &lt;
+                </button>
+                <button type="button" class="highscore-naeste" onclick={naesteUgensGlobalHighscoreSide} aria-label="Vis næste 10 highscores i denne uge">
+                    &gt;
+                </button>
+            </div>
+        {/if}
+    </div>
+{/snippet}
+
 {#snippet globalHighscoreTavle()}
     {@const sideStart = highscoreSideStart(globalHighscoreSide, globaleScores)}
     <div class="tavle">
@@ -1381,7 +1436,7 @@
             <p class="status larger-status">{spilTilstand.statusBesked}</p>
             
             <div class="start-tavle">
-                {@render globalHighscoreTavle()}
+                {@render ugensGlobalHighscoreTavle()}
             </div>
 
             <div class="offline-bottom">

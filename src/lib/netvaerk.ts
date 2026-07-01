@@ -4,7 +4,7 @@ import { authState } from './auth.svelte';
 import { gemOfflineScore, gemOfflineSpil, hentOfflineScores } from './offlineStorage';
 import { beregnSpillerScore, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from './score';
 import { KORT_VERSION } from './kortDimensioner';
-import { hentKarakterNavneIKlasse } from './spildata';
+import { hentKarakterKlasseNoegle, hentKarakterNavneIKlasse } from './spildata';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Felt, SpillerData } from './types';
 
@@ -14,6 +14,8 @@ let dbSaveKoe: ReturnType<typeof setTimeout> | null = null;
 let kortSaveKoe: ReturnType<typeof setTimeout> | null = null;
 let subRumKode = '';
 const VENTENDE_HIGHSCORE_KEY = 'taage_pending_highscores';
+const HIGHSCORE_MAX_PR_NAVN = 3;
+const HIGHSCORE_MAX_PR_NAVN_KLASSE = 1;
 
 export function realtimeRumNoegle(rumKode: string) {
     const normaliseret = (rumKode || '').trim().toLowerCase();
@@ -782,13 +784,39 @@ async function highscoreFindes(payload: HighscorePayload) {
     return !!data?.length;
 }
 
+function normaliserHighscoreNavn(navn?: string | null) {
+    return (navn || '').trim().toLowerCase() || 'ukendt';
+}
+
+function highscoreKlasseNoegle(karakter?: string | null) {
+    return hentKarakterKlasseNoegle(karakter || null) || (karakter || 'ukendt').trim().toLowerCase();
+}
+
+function kanVisesPaaTopliste(
+    navn: string | null | undefined,
+    karakter: string | null | undefined,
+    antalPrNavn: Map<string, number>,
+    klassePrNavn: Set<string>
+) {
+    const navnNoegle = normaliserHighscoreNavn(navn);
+    const klasseNoegle = highscoreKlasseNoegle(karakter);
+    const antalForNavn = antalPrNavn.get(navnNoegle) || 0;
+    const navnKlasseNoegle = `${navnNoegle}:${klasseNoegle}`;
+
+    if (antalForNavn >= HIGHSCORE_MAX_PR_NAVN) return false;
+    if (klassePrNavn.has(navnKlasseNoegle)) return false;
+
+    antalPrNavn.set(navnNoegle, antalForNavn + 1);
+    klassePrNavn.add(navnKlasseNoegle);
+    return true;
+}
+
 function formaterTopScores(data: ScoreRaekke[] | null | undefined, antal = 10) {
     const unikke = [];
-    const fundne = new Set();
+    const antalPrNavn = new Map<string, number>();
+    const klassePrNavn = new Set<string>();
     for (const raekke of data || []) {
-        const noegle = `${raekke.player_name}-${raekke.score}-${raekke.room_code || ''}-${raekke.character}`;
-        if (!fundne.has(noegle)) {
-            fundne.add(noegle);
+        if (kanVisesPaaTopliste(raekke.player_name, raekke.character, antalPrNavn, klassePrNavn)) {
             unikke.push({
                 id: raekke.id,
                 spillerNavn: raekke.player_name,
@@ -804,6 +832,46 @@ function formaterTopScores(data: ScoreRaekke[] | null | undefined, antal = 10) {
                 kendteFelter: raekke.known_fields_count,
                 miner: raekke.mines_owned
             });
+            if (unikke.length === antal) break;
+        }
+    }
+    return unikke;
+}
+
+function formaterOeScores(data: ScoreRaekke[] | null | undefined, antal = 100) {
+    const unikke = [];
+    const antalPrNavn = new Map<string, number>();
+    const klassePrNavn = new Set<string>();
+    for (const raekke of data || []) {
+        if (kanVisesPaaTopliste(raekke.player_name, raekke.character, antalPrNavn, klassePrNavn)) {
+            unikke.push({
+                id: raekke.id,
+                navn: raekke.player_name,
+                score: raekke.score,
+                karakter: raekke.character,
+                erVinder: raekke.is_winner,
+                erDoed: raekke.is_dead,
+                doedsAarsag: raekke.death_cause,
+                dage: raekke.days,
+                guld: raekke.gold,
+                maxKolonne: raekke.max_column,
+                kendteFelter: raekke.known_fields_count,
+                miner: raekke.mines_owned,
+                antalSpillere: raekke.player_count
+            });
+            if (unikke.length === antal) break;
+        }
+    }
+    return unikke;
+}
+
+function filtrerOfflineScoresTilTopliste<T extends { navn?: string; karakter?: string }>(scores: T[], antal = 100) {
+    const antalPrNavn = new Map<string, number>();
+    const klassePrNavn = new Set<string>();
+    const unikke = [];
+    for (const score of scores) {
+        if (kanVisesPaaTopliste(score.navn, score.karakter, antalPrNavn, klassePrNavn)) {
+            unikke.push(score);
             if (unikke.length === antal) break;
         }
     }
@@ -837,10 +905,19 @@ function formaterHighscoreResultat(data: ScoreRaekke | null | undefined) {
     };
 }
 
+function startPaaAktuelIsoUge() {
+    const nu = new Date();
+    const start = new Date(nu);
+    const dag = start.getDay() || 7;
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - dag + 1);
+    return start;
+}
+
 export async function hentHighscores(karakterKlasse?: string | null) {
     const klasseNavne = hentKarakterNavneIKlasse(karakterKlasse);
     if (spilTilstand.offlineMode) {
-        return hentOfflineScores(spilTilstand.rumKode, karakterKlasse).slice(0, 100).map((score) => ({
+        return filtrerOfflineScoresTilTopliste(hentOfflineScores(spilTilstand.rumKode, karakterKlasse), 100).map((score) => ({
             navn: score.navn,
             score: score.score,
             karakter: score.karakter,
@@ -866,7 +943,7 @@ export async function hentHighscores(karakterKlasse?: string | null) {
     const { data } = await medTimeout(
         query
             .order('score', { ascending: false })
-            .limit(160),
+            .limit(500),
         8000,
         'Hentning af ø-score'
     ).catch((error) => {
@@ -874,25 +951,7 @@ export async function hentHighscores(karakterKlasse?: string | null) {
         return { data: [] };
     });
 
-    const unikke = [];
-    const fundne = new Set();
-    for (const raekke of data || []) {
-        const noegle = `${raekke.player_name}-${raekke.score}-${raekke.character}`;
-        if (!fundne.has(noegle)) {
-            fundne.add(noegle);
-            unikke.push({
-                id: raekke.id,
-                navn: raekke.player_name,
-                score: raekke.score,
-                karakter: raekke.character,
-                erVinder: raekke.is_winner,
-                erDoed: raekke.is_dead,
-                doedsAarsag: raekke.death_cause
-            });
-            if (unikke.length === 100) break;
-        }
-    }
-    return unikke;
+    return formaterOeScores(data, 100);
 }
 
 export async function hentGlobalTopTi(karakterKlasse?: string | null) {
@@ -912,11 +971,37 @@ export async function hentGlobalTopHundrede(karakterKlasse?: string | null) {
     const { data } = await medTimeout(
         query
             .order('score', { ascending: false })
-            .limit(160),
+            .limit(500),
         8000,
         'Hentning af global score'
     ).catch((error) => {
         console.warn('Kunne ikke hente global top 100', error);
+        return { data: [] };
+    });
+
+    return formaterTopScores(data, 100);
+}
+
+export async function hentGlobalTopHundredeIUgen(karakterKlasse?: string | null) {
+    if (spilTilstand.offlineMode) return [];
+    const klasseNavne = hentKarakterNavneIKlasse(karakterKlasse);
+    const ugeStart = startPaaAktuelIsoUge().toISOString();
+
+    let query = supabase
+        .from('game_results')
+        .select('id, player_name, room_code, score, character, is_winner, is_dead, death_cause')
+        .gte('created_at', ugeStart);
+
+    if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
+
+    const { data } = await medTimeout(
+        query
+            .order('score', { ascending: false })
+            .limit(500),
+        8000,
+        'Hentning af ugens globale score'
+    ).catch((error) => {
+        console.warn('Kunne ikke hente ugens globale top 100', error);
         return { data: [] };
     });
 
@@ -939,7 +1024,7 @@ export async function hentGlobalHighscoresForFilter(filter: { spillerNavn?: stri
     const { data } = await medTimeout(
         query
             .order('score', { ascending: false })
-            .limit(Math.max(10, antal + 60)),
+            .limit(Math.max(50, antal * 5)),
         8000,
         'Hentning af filtreret highscore'
     ).catch((error) => {

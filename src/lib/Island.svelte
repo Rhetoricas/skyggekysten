@@ -8,7 +8,7 @@
     import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { M10_SCORE, beregnSpillerScore, beskrivSlutSalg } from '$lib/score';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje, hentAktueltHighscoreResultatId } from '$lib/netvaerk';
+    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, hentGlobalTopHundredeIUgen, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje, hentAktueltHighscoreResultatId } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
     import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
@@ -73,6 +73,7 @@
     let lokaleScores = $state<Array<{ navn: string; score: number; karakter?: string }>>([]);
     let klasseScores = $state<Array<{ id?: number; spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);
     let globaleScores = $state<Array<{ id?: number; spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);    
+    let ugensGlobaleScores = $state<Array<{ id?: number; spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);
     
     let flytterNu = false;
     let sejlendeBaadIndex = $state<number | null>(null);
@@ -1546,13 +1547,15 @@
             }
 
             const klasse = aktuelHighscoreKlasse();
-            const [nyeLokaleScores, nyeGlobaleScores, nyeKlasseScores] = await Promise.all([
+            const [nyeLokaleScores, nyeGlobaleScores, nyeUgensGlobaleScores, nyeKlasseScores] = await Promise.all([
                 hentHighscores(),
                 hentGlobalTopHundrede(),
+                hentGlobalTopHundredeIUgen(),
                 klasse ? hentGlobalTopHundrede(klasse) : Promise.resolve([])
             ]);
             lokaleScores = nyeLokaleScores;
             globaleScores = nyeGlobaleScores;
+            ugensGlobaleScores = nyeUgensGlobaleScores;
             klasseScores = nyeKlasseScores;
         };
 
@@ -1602,6 +1605,7 @@
             offlineSpilInfo = hentOfflineSpilInfo();
             lokaleScores = await hentHighscores();
             globaleScores = await hentGlobalTopHundrede();
+            ugensGlobaleScores = await hentGlobalTopHundredeIUgen();
         })();
 
         return () => {
@@ -1640,6 +1644,7 @@
                 }
                 const klasse = aktuelHighscoreKlasse();
                 globaleScores = await hentGlobalTopHundrede();
+                ugensGlobaleScores = await hentGlobalTopHundredeIUgen();
                 klasseScores = klasse ? await hentGlobalTopHundrede(klasse) : [];
                 lokaleScores = await hentHighscores();
             })();
@@ -1746,19 +1751,21 @@
 
             if (spilTilstand.gameMode === 'offline') return;
 
-            const [nyeKlasseScores, nyeGlobaleScores] = await medTimeout(
+            const [nyeKlasseScores, nyeGlobaleScores, nyeUgensGlobaleScores] = await medTimeout(
                 Promise.all([
                     klasse ? hentGlobalTopHundrede(klasse) : Promise.resolve([]),
-                    hentGlobalTopHundrede()
+                    hentGlobalTopHundrede(),
+                    hentGlobalTopHundredeIUgen()
                 ]),
                 12000
             ).catch((error) => {
                 console.warn('Kunne ikke genhente globale highscores efter score', error);
-                return [klasseScores, globaleScores] as const;
+                return [klasseScores, globaleScores, ugensGlobaleScores] as const;
             });
 
             klasseScores = nyeKlasseScores;
             globaleScores = nyeGlobaleScores;
+            ugensGlobaleScores = nyeUgensGlobaleScores;
 
             const kanTjekkeTopTi = highscoreGemt && !!authState.user;
             const highscoreNavn = authState.profil?.display_name || spilTilstand.spillerNavn;
@@ -2520,6 +2527,7 @@ function udførBevægelse(nytIndeks: number) {
     {lokaleScores} 
     {klasseScores}
     {globaleScores}
+    {ugensGlobaleScores}
     {nyGlobalRekord}
     {harGemtOfflineSpil}
     {offlineSpilInfo}
