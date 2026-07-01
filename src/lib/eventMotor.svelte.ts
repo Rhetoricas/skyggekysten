@@ -5,6 +5,7 @@ import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremrykTid, udloesBersaerkHvisRelevant } from './overlevelse.svelte';
 import { brugEnergi, visBrugteEnergiKugler } from './energi';
 import { registrerHeling } from './trofaeer';
+import { markerTutorialHandling } from './tutorial.svelte';
 import type { Valg } from './eventBibliotek';
 
 export const eventState = $state({
@@ -300,6 +301,7 @@ export function tagValg(valg: Valg) {
         }
         fremrykTid();
         eventState.erFaerdig = true;
+        markerTutorialHandling('event');
         syncTilDb();
         syncKortTilDbSenere();
     }

@@ -5,6 +5,8 @@ import { brugEnergi } from '$lib/energi';
 import { afslørOmraade, tilfoejTilRygsæk } from '$lib/spilmotor';
 import { startEvent } from '$lib/eventMotor.svelte';
 import { registrerHeling } from '$lib/trofaeer';
+import { markerTutorialHandling } from '$lib/tutorial.svelte';
+import { kanGravesIBiome } from '$lib/graveRegler';
 import type { Biome } from './types';
 
 function tilfaeldigtTal(min: number, max: number) {
@@ -20,18 +22,16 @@ function ridderPanserStopperNedgravetFaelde() {
 
 export function genererUndergrund(biome: Biome | string) {
     const farlige = ['ruin', 'blodskov', 'hule', 'slagmark', 'ritual'];
-    const civilisation = ['by', 'marked'];
 
     const feltData: { kanGraves: boolean; skjultGuld: number; skjultLiv: number; skjultFaelde: boolean; skjultLoot: string | null } = { 
-        kanGraves: true, 
+        kanGraves: kanGravesIBiome(biome),
         skjultGuld: 0, 
         skjultLiv: 0, 
         skjultFaelde: false,
         skjultLoot: null
     };
 
-    if (civilisation.includes(biome) || biome === 'hav' || biome === 'soe') {
-        feltData.kanGraves = false;
+    if (!feltData.kanGraves) {
         return feltData;
     }
 
@@ -198,6 +198,7 @@ export function grav() {
     }
 
     spilTilstand.logBesked = fundLog + udstyrsLog;
+    markerTutorialHandling('dig');
     broadcastFelt(spilTilstand.spillerIndex, felt);
     syncTilDb();
     syncKortTilDbSenere();

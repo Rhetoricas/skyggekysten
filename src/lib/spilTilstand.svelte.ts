@@ -33,7 +33,7 @@ export const spilTilstand = $state({
     spillerNavn: '',
     rumKode: '',
     rundeSeed: '',
-    gameMode: 'open' as 'open' | 'offline',
+    gameMode: 'open' as 'open' | 'offline' | 'tutorial',
     offlineMode: false,
     erHost: false,
     gameState: 'start' as 'start' | 'select' | 'play' | 'dead' | 'dead_map' | 'win' | 'win_map',

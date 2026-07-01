@@ -12,6 +12,7 @@
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
     import { TROFAE_DEFINITIONER, findTrofae, gemTrofaeAwards, gemTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, hentSupabaseTrofaeAwards, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, type TrofaeAward } from '$lib/trofaeer';
+    import { TUTORIAL_RANGTRIN, TUTORIAL_RUMKODE, erTutorialKnapSkjult, hentTutorialRang } from '$lib/tutorial.svelte';
     import type { Karakter, SpillerData } from '$lib/types';
 
     type HighscoreDetaljer = {
@@ -54,6 +55,7 @@
     let {
         opretEllerDeltag,
         startOfflineSpil,
+        startTutorialSpil,
         fortsaetOfflineSpil,
         bekræftValg,
         genstartBane,
@@ -70,6 +72,7 @@
     } = $props<{
         opretEllerDeltag: () => void;
         startOfflineSpil: () => void;
+        startTutorialSpil: () => void;
         fortsaetOfflineSpil: () => void;
         bekræftValg: (k: Karakter) => void;
         genstartBane: () => void;
@@ -94,6 +97,7 @@
     let visProfil = $state(false);
     let profilNavnInput = $state('');
     let visLokaleTestKnapper = $state(false);
+    let visTutorialStartKnap = $state(!erTutorialKnapSkjult());
     let globalHighscoreSide = $state(0);
     let klasseHighscoreSide = $state(0);
     let lokalHighscoreSide = $state(0);
@@ -160,6 +164,12 @@
         if (spilTilstand.gameState === 'select' && !karaktervalgStatus.kanJoine) {
             visJoinLukketModal = true;
             spilTilstand.gameState = 'start';
+        }
+    });
+
+    $effect(() => {
+        if (spilTilstand.gameState === 'start') {
+            visTutorialStartKnap = !erTutorialKnapSkjult();
         }
     });
 
@@ -606,6 +616,10 @@
             lydStart.volume = hentLydVolumen();
             lydStart.play().catch(() => {});
         }
+        if (spilTilstand.rumKode.trim().toLowerCase() === TUTORIAL_RUMKODE) {
+            startTutorialSpil();
+            return;
+        }
         if (erBrowserOffline()) {
             startOfflineSpil();
             return;
@@ -616,6 +630,18 @@
     async function startSpilFraHero() {
         if (!spilTilstand.rumKode.trim()) foreslaaOeNavn();
         await startSpilMedLyd();
+    }
+
+    async function startTutorialMedLyd() {
+        await gemProfilNavnFraStartfelt();
+
+        if (spilTilstand.musikTaendt && lydStart) {
+            lydStart.currentTime = 0;
+            lydStart.volume = hentLydVolumen();
+            lydStart.play().catch(() => {});
+        }
+
+        startTutorialSpil();
     }
 
     function fortsaetOfflineMedLyd() {
@@ -825,6 +851,33 @@
             {/each}
         </div>
     </div>
+{/snippet}
+
+{#snippet tutorialResultatTavle()}
+    {@const vurdering = hentTutorialRang(spilTilstand.samletScore)}
+    <section class="tutorial-resultat" aria-label="Tutorial-resultat">
+        <div class="tutorial-resultat-top">
+            <span>Tutorialrang</span>
+            <strong>{vurdering.aktuel.titel}</strong>
+            <p>{vurdering.aktuel.tekst}</p>
+        </div>
+
+        <div class="tutorial-rangliste">
+            {#each TUTORIAL_RANGTRIN as trin (trin.point)}
+                <div class="tutorial-rangtrin" class:opnaaet={spilTilstand.samletScore >= trin.point}>
+                    <span>{trin.point}</span>
+                    <strong>{trin.titel}</strong>
+                </div>
+            {/each}
+        </div>
+
+        {#if vurdering.naeste}
+            <p class="tutorial-naeste">Næste rang: {vurdering.naeste.titel} ved {vurdering.naeste.point} point.</p>
+        {:else}
+            <p class="tutorial-naeste">Du har nået højeste tutorialrang.</p>
+        {/if}
+        <p class="tutorial-resultat-note">Dette er kun en øvelsesvurdering. Den bliver ikke gemt og tæller ikke på rigtige øer.</p>
+    </section>
 {/snippet}
 
 {#snippet kontoPanel()}
@@ -1305,6 +1358,12 @@
                     <button type="button" class="spil-knap login-boat-btn" onclick={(e) => { e.preventDefault(); startSpilMedLyd(); }}>
                         <span class="knap-tekst">START</span>
                     </button>
+                    {#if visTutorialStartKnap}
+                        <button type="button" class="tutorial-start-knap" onclick={(e) => { e.preventDefault(); startTutorialMedLyd(); }} aria-label="Start tutorial">
+                            <img src="/screens/tutorialstart.webp" alt="" class="tutorial-start-ikon" />
+                            <span>Tutorial</span>
+                        </button>
+                    {/if}
                 </div>
 
                 {#if visLokaleTestKnapper}
@@ -1429,6 +1488,11 @@
                 </button>
             </div>
             
+            {#if spilTilstand.gameMode === 'tutorial'}
+                <div class="tutorial-resultat-container">
+                    {@render tutorialResultatTavle()}
+                </div>
+            {:else}
             <div class="highscore-container">
                 {@render scoreGemStatus()}
                 <div class="tavle">
@@ -1474,6 +1538,7 @@
                     {@render globalHighscoreTavle()}
                 {/if}
             </div>
+            {/if}
         </div>
     </div>
 
@@ -1516,6 +1581,11 @@
                 </button>
             </div>
             
+            {#if spilTilstand.gameMode === 'tutorial'}
+                <div class="tutorial-resultat-container">
+                    {@render tutorialResultatTavle()}
+                </div>
+            {:else}
             <div class="highscore-container">
                 {@render scoreGemStatus()}
                 <div class="tavle">
@@ -1561,6 +1631,7 @@
                     {@render globalHighscoreTavle()}
                 {/if}
             </div>
+            {/if}
         </div>
     </div>
 {/if}
@@ -1808,6 +1879,44 @@
     .knap-tekst { color: #fcebd5; font-weight: bold; font-size: 1.1rem; padding-bottom: 2px; pointer-events: none; font-family: 'Cinzel', serif; }
     .start-knap-raekke { display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap; }
     .login-boat-btn { width: 220px; height: 65px; margin-top: 10px; }
+    .tutorial-start-knap {
+        width: 104px;
+        min-height: 92px;
+        margin-top: 10px;
+        border: none;
+        background: transparent;
+        color: #f3ead6;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        letter-spacing: 0;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        padding: 0;
+    }
+    .tutorial-start-knap:hover {
+        transform: translateY(-1px);
+    }
+    .tutorial-start-ikon {
+        width: 82px;
+        aspect-ratio: 1;
+        object-fit: contain;
+        filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.42));
+        transition: transform 0.18s ease, filter 0.18s ease;
+    }
+    .tutorial-start-knap:hover .tutorial-start-ikon {
+        transform: scale(1.04);
+        filter: brightness(1.08) drop-shadow(0 10px 16px rgba(0, 0, 0, 0.5));
+    }
+    .tutorial-start-knap span {
+        color: #f3ead6;
+        font-size: 0.8rem;
+        line-height: 1;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.82);
+    }
     .offline-continue {
         margin-top: 8px;
         background: rgba(255, 255, 255, 0.06);
@@ -2419,6 +2528,90 @@
     
     .slut-knapper { display: flex; gap: 20px; margin-top: 40px; padding-bottom: 60px; justify-content: center; width: 100%; max-width: 900px; }
     .highscore-container { display: flex; gap: 2rem; justify-content: center; align-items: flex-start; flex-wrap: wrap; width: 100%; max-width: 1120px; margin-top: 20px; }
+    .tutorial-resultat-container {
+        width: min(760px, 100%);
+        margin: 10px auto 0;
+        padding-bottom: 50px;
+        box-sizing: border-box;
+    }
+    .tutorial-resultat {
+        border: 1px solid rgba(231, 199, 130, 0.45);
+        background:
+            linear-gradient(180deg, rgba(255, 244, 205, 0.08), rgba(0, 0, 0, 0.22)),
+            rgba(11, 24, 16, 0.76);
+        box-shadow: 0 18px 38px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 22px;
+        color: #f3ecd9;
+        text-align: center;
+    }
+    .tutorial-resultat-top span {
+        display: block;
+        color: #d9bf7b;
+        font-family: 'Cinzel', serif;
+        font-size: 0.88rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .tutorial-resultat-top strong {
+        display: block;
+        margin-top: 4px;
+        color: #fff7dc;
+        font-family: 'Cinzel', serif;
+        font-size: clamp(1.7rem, 4vw, 2.5rem);
+        line-height: 1.1;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    .tutorial-resultat-top p,
+    .tutorial-naeste,
+    .tutorial-resultat-note {
+        margin: 8px auto 0;
+        max-width: 560px;
+        color: rgba(243, 236, 217, 0.86);
+        line-height: 1.45;
+    }
+    .tutorial-rangliste {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 20px;
+    }
+    .tutorial-rangtrin {
+        min-height: 74px;
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.18);
+        padding: 10px 6px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        opacity: 0.5;
+    }
+    .tutorial-rangtrin.opnaaet {
+        opacity: 1;
+        border-color: rgba(232, 203, 117, 0.72);
+        background: rgba(121, 91, 32, 0.32);
+        box-shadow: inset 0 0 18px rgba(232, 203, 117, 0.1);
+    }
+    .tutorial-rangtrin span {
+        color: #d9bf7b;
+        font-family: monospace;
+        font-size: 0.9rem;
+    }
+    .tutorial-rangtrin strong {
+        color: #fff;
+        font-family: 'Cinzel', serif;
+        font-size: 0.86rem;
+        line-height: 1.15;
+    }
+    .tutorial-resultat-note {
+        color: rgba(216, 222, 211, 0.7);
+        font-size: 0.9rem;
+    }
     .score-save-status {
         width: 100%;
         border: 1px solid #555;
@@ -3100,7 +3293,8 @@
         .score-container,
         .spec-paneler,
         .slut-knapper,
-        .highscore-container {
+        .highscore-container,
+        .tutorial-resultat-container {
             max-width: 100%;
             box-sizing: border-box;
         }
@@ -3124,9 +3318,26 @@
 
         .point-kvittering,
         .session-tavle,
+        .tutorial-resultat,
         .score-save-status {
             width: 100%;
             box-sizing: border-box;
+        }
+
+        .tutorial-resultat {
+            padding: 18px 12px;
+        }
+
+        .tutorial-rangliste {
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        .tutorial-rangtrin {
+            min-height: 52px;
+            flex-direction: row;
+            justify-content: space-between;
+            padding: 10px 12px;
         }
 
         .slut-knapper {

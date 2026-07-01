@@ -7,6 +7,7 @@
     import { syncTilDb } from '$lib/netvaerk';
 import { diamantSamletVaerdi, diamantStoerrelsesNavn, diamantVaerdier } from '$lib/score';
 import { registrerHeling } from '$lib/trofaeer';
+import { markerTutorialHandling } from '$lib/tutorial.svelte';
     import type { RygsækTing } from '$lib/types';
 
     let aktueltFelt = $derived(
@@ -93,6 +94,10 @@ import { registrerHeling } from '$lib/trofaeer';
             begaaIndbrud();
         } else if (vareId === 'koelle' || vareId === 'koelle_upgr') {
             plyndrFelt();
+        }
+
+        if (vareId !== 'skovl' && vareId !== 'mesterskovl') {
+            markerTutorialHandling('item');
         }
     }
 

@@ -5,6 +5,7 @@
     import { syncTilDb } from '$lib/netvaerk';
     import { fremtvingKollaps } from '$lib/overlevelse.svelte';
     import { beregnSalgspris, diamantSalgspris } from '$lib/score';
+    import { markerTutorialHandling } from '$lib/tutorial.svelte';
 
     let { lukShop } = $props<{ lukShop: () => void }>();
 
@@ -78,6 +79,7 @@
                 ? `Du købte ${vareData.navn} for ${pris} guld. Købmanden tog dit gamle tøj som ${kludeRabat} guld i rabat.`
                 : `Du købte ${vareData.navn} for ${vareData.pris} guld.`;
             tilfoejTilRygsæk(id, 1);
+            markerTutorialHandling('shop');
             if (spilTilstand.mitUdstyr.some((ting) => (ting.id === 'koelle' || ting.id === 'koelle_upgr') && ting.maengde > 0)) {
                 naegtHandelForAktuelSpillerPaaAktueltFelt();
                 spilTilstand.logBesked = brugerKludeSomRabat

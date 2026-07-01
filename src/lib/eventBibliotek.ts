@@ -123,6 +123,35 @@ export const eventBibliotek: Record<string, SpilEvent> = {
     ...vaabenEvents,
     ...specialItemEvents,
 
+    'tutorial_lejr': {
+        id: 'tutorial_lejr',
+        titel: 'Den Forladte Lejr',
+        tekst: 'En lille lejr ligger mellem sammenstyrtede sten. Her kan du prøve, hvordan events giver valg og konsekvenser uden at tutorialen bliver farlig.',
+        biome: 'ruin',
+        billede: '/events/event.webp',
+        erSubTrin: true,
+        valg: [
+            {
+                tekst: 'Undersøg tasken ved bålet.',
+                udfaldListe: [
+                    {
+                        log: 'Du finder en tør fakkel og pakker den roligt ned.',
+                        givItem: 'fakkel'
+                    }
+                ]
+            },
+            {
+                tekst: 'Led efter mønter mellem stenene.',
+                udfaldListe: [
+                    {
+                        log: 'Du får fingrene under en løs sten og finder en lille pung.',
+                        guldAendring: 60
+                    }
+                ]
+            }
+        ]
+    },
+
     'den_toerstige_alkymist': {
         id: 'den_toerstige_alkymist',
         titel: 'Den Tørstige Alkymist',

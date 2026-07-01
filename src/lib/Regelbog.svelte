@@ -1,10 +1,11 @@
 <script lang="ts">
-    let { knapClass = '', knapTekst = '' } = $props<{ knapClass?: string; knapTekst?: string }>();
+    let { knapClass = '', knapTekst = '', onOpen } = $props<{ knapClass?: string; knapTekst?: string; onOpen?: () => void }>();
 
     let visRegler = $state(false);
 
     function aabnRegler() {
         visRegler = true;
+        onOpen?.();
     }
 
     function lukRegler() {

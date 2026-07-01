@@ -91,6 +91,7 @@ export function hentOfflineSpilInfo() {
 
 export function gemOfflineSpil() {
     if (!harLocalStorage() || !spilTilstand.offlineMode) return;
+    if (spilTilstand.gameMode === 'tutorial') return;
     if (!spilTilstand.spillerNavn || !spilTilstand.rumKode) return;
 
     const snapshot: OfflineSnapshot = {
@@ -189,6 +190,7 @@ export function sletOfflineSpil() {
 
 export function gemOfflineScore(force = false) {
     if (!harLocalStorage() || (!force && !spilTilstand.offlineMode) || spilTilstand.samletScore <= 0) return;
+    if (spilTilstand.gameMode === 'tutorial') return;
 
     const scores = hentOfflineScores();
     const score: OfflineScore = {
