@@ -299,6 +299,11 @@
         ];
     }
 
+    function profilMestSpilledeKarakter() {
+        const karakterNavn = authState.stats?.favoritKarakter || '';
+        return tilgaengeligeKarakterer.find((karakter) => karakter.navn === karakterNavn) || null;
+    }
+
     async function aabnLaastTrofae(medalje: { id?: string; sti: string; label: string; bedste: boolean; opnaaet?: boolean; krav?: string; episkTekst?: string; award?: TrofaeAward | null }) {
         if (medalje.bedste && authState.user?.id) {
             const bedsteSpil = await hentBedsteHighscoreForBruger(authState.user.id);
@@ -904,16 +909,16 @@
     <div class="konto-panel">
         {#if authState.user}
             <div class="konto-linje">
-                <div>
-                    <strong>{authState.profil?.display_name || 'Logget ind'}</strong>
-                    <span>Logget ind</span>
-                </div>
-                <div class="konto-actions">
-                    <button type="button" onclick={aabnProfil}>Profil</button>
-                    <button type="button" onclick={logUd}>Log ud</button>
-                </div>
+                <button type="button" class="konto-profil-identitet" onclick={aabnProfil}>
+                    {#if profilMestSpilledeKarakter()}
+                        <img src={profilMestSpilledeKarakter()?.ikon} alt="" />
+                    {/if}
+                    <span>
+                        <strong>{authState.profil?.display_name || 'Logget ind'}</strong>
+                        <em>Min profil</em>
+                    </span>
+                </button>
             </div>
-            <p class="konto-hint">Din score og statistik bliver gemt.</p>
             <div class="konto-medaljer" aria-label="Dine medaljer">
                 {#each profilMedaljer() as medalje, index (`profil-medalje-${index}-${medalje.sti}`)}
                     <button
@@ -1007,17 +1012,25 @@
         <div class="profil-overlay" role="presentation" onclick={() => visProfil = false}>
             <div class="profil-modal" role="presentation" onclick={(e) => e.stopPropagation()}>
                 <div class="profil-header">
-                    <div>
-                        <h2>Din profil</h2>
+                    <div class="profil-header-identitet">
+                        {#if profilMestSpilledeKarakter()}
+                            <img src={profilMestSpilledeKarakter()?.ikon} alt="" />
+                        {/if}
+                        <div>
+                        <h2>Min profil</h2>
                         {#if maskeretEmail(authState.user.email)}
                             <p>{maskeretEmail(authState.user.email)}</p>
                         {/if}
+                        </div>
                     </div>
-                    <button type="button" onclick={() => visProfil = false}>Luk</button>
+                    <button type="button" class="profil-luk-knap" onclick={() => visProfil = false}>
+                        <span aria-hidden="true">×</span>
+                        <span>Luk</span>
+                    </button>
                 </div>
 
                 <label class="profil-felt">
-                    <span>Spillernavn</span>
+                    <span>Ret spillernavn</span>
                     <div>
                         <input bind:value={profilNavnInput} maxlength="15" />
                         <button type="button" onclick={gemProfil}>Gem</button>
@@ -1031,7 +1044,7 @@
                         <div><strong>{authState.stats.doedsfald}</strong><span>Dødsfald</span></div>
                         <div><strong>{authState.stats.bedsteScore}</strong><span>Bedste score</span></div>
                         <div><strong>{authState.stats.gennemsnitScore}</strong><span>Gns. score</span></div>
-                        <div><strong>{authState.stats.samletGuld}</strong><span>Samlet guld</span></div>
+                        <div><strong>{authState.stats.mestGuld}</strong><span>Mest guld</span></div>
                         <div><strong>{authState.stats.bedsteDag}</strong><span>Længste spil</span></div>
                         <div><strong>{authState.stats.flestFelter}</strong><span>Flest felter</span></div>
                         <div><strong>{authState.stats.flestMiner}</strong><span>Flest miner</span></div>
@@ -1289,7 +1302,7 @@
     <div class="tavle">
         <img src="/screens/boardglobal.webp" alt="Global tavle" class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
-            <h3>Top 100 global</h3>
+            <h3>Toplisten global</h3>
             {#if globaleScores.length === 0}
                 <p class="tom-liste">Ingen data endnu</p>
             {:else}
@@ -1324,7 +1337,7 @@
     <div class="tavle klasse-tavle">
         <img src="/screens/boardglobal.webp" alt="Karakterklasse tavle" class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
-            <h3>Top 100 {highscoreKlasseNavn()}</h3>
+            <h3>Toplisten {highscoreKlasseNavn()}</h3>
             {#if klasseScores.length === 0}
                 <p class="tom-liste">Ingen data endnu</p>
             {:else}
@@ -1464,6 +1477,9 @@
                         Fortsæt offline{offlineSpilInfo ? `: ${formaterNavn(offlineSpilInfo.rumKode)} dag ${offlineSpilInfo.dag}` : ''}
                     </button>
                 {/if}
+                {#if authState.user}
+                    <button type="button" class="start-logud-knap" onclick={logUd}>Log ud</button>
+                {/if}
             </div>
         </div>
     </div>
@@ -1553,7 +1569,7 @@
                 <div class="tavle">
                     <img src="/screens/boardlocal.webp" alt="Lokal tavle" class="tavle-billede" />
                     <div class="tavle-indhold lokal-indhold">
-                        <h3>Top 100 på {formaterNavn(spilTilstand.rumKode)}</h3>
+                        <h3>Toplisten på {formaterNavn(spilTilstand.rumKode)}</h3>
                         {#if lokaleScores.length === 0}
                             <p class="tom-liste">Ingen resultater endnu</p>
                         {:else}
@@ -1646,7 +1662,7 @@
                 <div class="tavle">
                     <img src="/screens/boardlocal.webp" alt="Lokal tavle" class="tavle-billede" />
                     <div class="tavle-indhold lokal-indhold">
-                        <h3>Top 100 på {formaterNavn(spilTilstand.rumKode)}</h3>
+                        <h3>Toplisten på {formaterNavn(spilTilstand.rumKode)}</h3>
                         {#if lokaleScores.length === 0}
                             <p class="tom-liste">Ingen resultater endnu</p>
                         {:else}
@@ -2268,7 +2284,6 @@
         padding: 9px;
     }
     .konto-login button,
-    .konto-actions button,
     .profil-header button,
     .profil-felt button {
         background: #2d2d2d;
@@ -2278,6 +2293,15 @@
         padding: 8px 10px;
         cursor: pointer;
     }
+    .profil-luk-knap {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .profil-luk-knap span:first-child {
+        font-size: 1.25rem;
+        line-height: 0.8;
+    }
     .konto-login button:disabled { opacity: 0.5; cursor: default; }
     .konto-besked { margin: 8px 0 0; color: #ddd; font-size: 0.85rem; }
     .konto-linje {
@@ -2285,21 +2309,66 @@
         justify-content: space-between;
         gap: 12px;
         align-items: center;
-        margin-bottom: 8px;
+        margin-bottom: 14px;
     }
-    .konto-linje strong,
-    .konto-linje span {
+    .konto-profil-identitet {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        padding: 0;
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+        text-align: left;
+        cursor: pointer;
+    }
+    .konto-profil-identitet:hover,
+    .konto-profil-identitet:focus-visible {
+        background: transparent;
+        outline: none;
+    }
+    .konto-profil-identitet img {
+        width: 78px;
+        height: 78px;
+        flex: 0 0 auto;
+        object-fit: contain;
+        filter: drop-shadow(0 6px 9px rgba(0, 0, 0, 0.55));
+    }
+    .konto-profil-identitet span,
+    .konto-profil-identitet strong,
+    .konto-profil-identitet em {
         display: block;
     }
-    .konto-linje span {
+    .konto-profil-identitet strong {
+        font-family: 'Cinzel', serif;
+        font-size: 1.34rem;
+        line-height: 1.1;
+        color: #f4efe4;
+        letter-spacing: 0;
+    }
+    .konto-profil-identitet em {
         color: #aaa;
-        font-size: 0.8rem;
+        font-size: 0.9rem;
+        font-style: normal;
         overflow-wrap: anywhere;
     }
-    .konto-actions {
-        display: flex;
-        gap: 6px;
-        flex-shrink: 0;
+    .start-logud-knap {
+        margin-top: 12px;
+        border: 0;
+        background: transparent;
+        color: #999;
+        padding: 4px 0;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+    .start-logud-knap:hover,
+    .start-logud-knap:focus-visible {
+        color: #ddd;
+        text-decoration: underline;
+        outline: none;
     }
 
     .profil-overlay {
@@ -2333,9 +2402,22 @@
     .profil-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
         gap: 12px;
         margin-bottom: 18px;
+    }
+    .profil-header-identitet {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+    }
+    .profil-header-identitet img {
+        width: 108px;
+        height: 108px;
+        object-fit: contain;
+        flex: 0 0 auto;
+        filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.58));
     }
     .profil-header h2 {
         margin: 0;
@@ -3148,7 +3230,7 @@
     .screen-top-actions {
         position: fixed;
         top: calc(env(safe-area-inset-top, 0px) + 14px);
-        right: 14px;
+        right: calc(env(safe-area-inset-right, 0px) + 22px);
         z-index: 1200;
         display: flex;
         align-items: center;
@@ -3298,15 +3380,31 @@
             max-width: 320px;
         }
 
-        .konto-login,
-        .konto-linje,
-        .konto-actions {
+        .konto-login {
             flex-direction: column;
             align-items: stretch;
         }
 
+        .konto-linje {
+            align-items: center;
+        }
+
+        .konto-profil-identitet img {
+            width: 66px;
+            height: 66px;
+        }
+
         .profil-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .profil-header-identitet {
+            gap: 10px;
+        }
+
+        .profil-header-identitet img {
+            width: 82px;
+            height: 82px;
         }
 
         .profil-medaljehylde {
@@ -3423,7 +3521,7 @@
 
         .screen-top-actions {
             top: 10px;
-            right: 10px;
+            right: calc(env(safe-area-inset-right, 0px) + 16px);
             gap: 8px;
         }
 

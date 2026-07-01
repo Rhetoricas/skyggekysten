@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { type LydNiveau, lydKontrol, saetLydNiveau } from './lydKontrol.svelte';
+import { tilgaengeligeKarakterer } from './spildata';
 import {
     gemTrofaeIds,
     hentGemteTrofaeIds,
@@ -25,7 +26,7 @@ export interface ProfilStats {
     doedsfald: number;
     bedsteScore: number;
     gennemsnitScore: number;
-    samletGuld: number;
+    mestGuld: number;
     bedsteDag: number;
     flestFelter: number;
     flestMiner: number;
@@ -322,12 +323,12 @@ export async function hentProfilStats() {
     const sejre = data.filter((r) => r.is_winner).length;
     const doedsfald = spil - sejre;
     const samletScore = data.reduce((sum, r) => sum + (r.score || 0), 0);
-    const samletGuld = data.reduce((sum, r) => sum + (r.gold || 0), 0);
+    const mestGuld = Math.max(0, ...data.map((r) => r.gold || 0));
     const karakterTaeller: Record<string, number> = {};
     const karakterSejrTaeller: Record<string, number> = {};
 
     for (const resultat of data) {
-        const karakter = resultat.character || 'Ukendt';
+        const karakter = tilgaengeligeKarakterer.find((k) => k.navn === resultat.character || k.id === resultat.character)?.navn || resultat.character || 'Ukendt';
         karakterTaeller[karakter] = (karakterTaeller[karakter] || 0) + 1;
         if (resultat.is_winner) {
             karakterSejrTaeller[karakter] = (karakterSejrTaeller[karakter] || 0) + 1;
@@ -343,7 +344,7 @@ export async function hentProfilStats() {
         doedsfald,
         bedsteScore: Math.max(0, ...data.map((r) => r.score || 0)),
         gennemsnitScore: spil > 0 ? Math.round(samletScore / spil) : 0,
-        samletGuld,
+        mestGuld,
         bedsteDag: Math.max(0, ...data.map((r) => r.days || 0)),
         flestFelter: Math.max(0, ...data.map((r) => r.known_fields_count || 0)),
         flestMiner: Math.max(0, ...data.map((r) => r.mines_owned || 0)),

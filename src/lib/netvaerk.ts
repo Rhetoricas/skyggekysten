@@ -975,7 +975,7 @@ export async function hentGlobalTopHundrede(karakterKlasse?: string | null) {
         8000,
         'Hentning af global score'
     ).catch((error) => {
-        console.warn('Kunne ikke hente global top 100', error);
+        console.warn('Kunne ikke hente global topliste', error);
         return { data: [] };
     });
 
@@ -1001,7 +1001,7 @@ export async function hentGlobalTopHundredeIUgen(karakterKlasse?: string | null)
         8000,
         'Hentning af ugens globale score'
     ).catch((error) => {
-        console.warn('Kunne ikke hente ugens globale top 100', error);
+        console.warn('Kunne ikke hente ugens globale topliste', error);
         return { data: [] };
     });
 

@@ -1770,14 +1770,19 @@
             const kanTjekkeTopTi = highscoreGemt && !!authState.user;
             const highscoreNavn = authState.profil?.display_name || spilTilstand.spillerNavn;
             nyGlobalRekord = !!kanTjekkeTopTi &&
-                spilTilstand.samletScore > M10_SCORE &&
-                globaleScores.slice(0, 10).some((score) =>
+                spilTilstand.samletScore >= M10_SCORE &&
+                ugensGlobaleScores.slice(0, 10).some((score) =>
                     score.point === spilTilstand.samletScore &&
                     score.spillerNavn === highscoreNavn &&
                     score.oeNavn === spilTilstand.rumKode &&
                     score.karakter === spilTilstand.valgtKarakter?.navn
                 );
-            const gemtScore = globaleScores.find((score) =>
+            const gemtScore = ugensGlobaleScores.find((score) =>
+                score.point === spilTilstand.samletScore &&
+                score.spillerNavn === highscoreNavn &&
+                score.oeNavn === spilTilstand.rumKode &&
+                score.karakter === spilTilstand.valgtKarakter?.navn
+            ) || globaleScores.find((score) =>
                 score.point === spilTilstand.samletScore &&
                 score.spillerNavn === highscoreNavn &&
                 score.oeNavn === spilTilstand.rumKode &&

@@ -214,7 +214,7 @@
                         <li>Til sidst ganges summen med 1 + HP/1000. Har du 100 HP, bliver summen ganget med 1,100.</li>
                         <li>Global highscore kræver login. Slutskærmen viser lokal ø-score, global karakterklasse-score og global samlet score. Offline-score gemmes kun lokalt.</li>
                         <li>Hvis forbindelsen svigter, forsøger spillet at gemme ventende scores igen senere.</li>
-                        <li>Medalje 11 gives kun, hvis du kommer på global top 10 og scorer over 12500.</li>
+                        <li>Medalje 11 gives kun, hvis du scorer mindst 12500 og kommer på en af de første ti pladser på ugens topliste.</li>
                     </ul>
                     <p class="eksempel">Eksempel: 1000 guld, 200 udforskningspoint, 300 minepoint og 1000 flugtpoint bliver 2500 før HP. Med 80 HP ender det på 2700 point.</p>
                 </section>
