@@ -1,6 +1,8 @@
 import { supabase } from './supabaseClient';
 import { type LydNiveau, lydKontrol, saetLydNiveau } from './lydKontrol.svelte';
 import { tilgaengeligeKarakterer } from './spildata';
+import { findMedaljeNiveau } from './score';
+import { hentTitel } from './historieMotor';
 import {
     gemTrofaeIds,
     hentGemteTrofaeIds,
@@ -31,6 +33,8 @@ export interface ProfilStats {
     flestFelter: number;
     flestMiner: number;
     favoritKarakter: string;
+    favoritKarakterBedsteScore: number;
+    favoritKarakterBedsteTitel: string;
     karakterSejre: Array<{ karakter: string; sejre: number }>;
 }
 
@@ -326,10 +330,12 @@ export async function hentProfilStats() {
     const mestGuld = Math.max(0, ...data.map((r) => r.gold || 0));
     const karakterTaeller: Record<string, number> = {};
     const karakterSejrTaeller: Record<string, number> = {};
+    const karakterBedsteScore: Record<string, number> = {};
 
     for (const resultat of data) {
         const karakter = tilgaengeligeKarakterer.find((k) => k.navn === resultat.character || k.id === resultat.character)?.navn || resultat.character || 'Ukendt';
         karakterTaeller[karakter] = (karakterTaeller[karakter] || 0) + 1;
+        karakterBedsteScore[karakter] = Math.max(karakterBedsteScore[karakter] || 0, resultat.score || 0);
         if (resultat.is_winner) {
             karakterSejrTaeller[karakter] = (karakterSejrTaeller[karakter] || 0) + 1;
         }
@@ -337,6 +343,11 @@ export async function hentProfilStats() {
 
     const favoritKarakter =
         Object.entries(karakterTaeller).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Ingen endnu';
+    const favoritKarakterBedsteScore = favoritKarakter === 'Ingen endnu' ? 0 : karakterBedsteScore[favoritKarakter] || 0;
+    const favoritKarakterData = tilgaengeligeKarakterer.find((karakter) => karakter.navn === favoritKarakter);
+    const favoritKarakterBedsteTitel = favoritKarakterBedsteScore > 0
+        ? hentTitel(favoritKarakterData?.id || 'explorer', findMedaljeNiveau(favoritKarakterBedsteScore) + 1)
+        : 'Ingen titel endnu';
 
     authState.stats = {
         spil,
@@ -349,6 +360,8 @@ export async function hentProfilStats() {
         flestFelter: Math.max(0, ...data.map((r) => r.known_fields_count || 0)),
         flestMiner: Math.max(0, ...data.map((r) => r.mines_owned || 0)),
         favoritKarakter,
+        favoritKarakterBedsteScore,
+        favoritKarakterBedsteTitel,
         karakterSejre: Object.entries(karakterSejrTaeller)
             .map(([karakter, vundne]) => ({ karakter, sejre: vundne }))
             .sort((a, b) => b.sejre - a.sejre)

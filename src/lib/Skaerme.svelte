@@ -304,6 +304,14 @@
         return tilgaengeligeKarakterer.find((karakter) => karakter.navn === karakterNavn) || null;
     }
 
+    function profilMestSpilletTitelTekst() {
+        const karakter = profilMestSpilledeKarakter();
+        const titel = authState.stats?.favoritKarakterBedsteTitel;
+        if (karakter && titel && titel !== 'Ingen titel endnu') return `${karakter.navn} - ${titel}`;
+        if (karakter) return karakter.navn;
+        return 'Min profil';
+    }
+
     async function aabnLaastTrofae(medalje: { id?: string; sti: string; label: string; bedste: boolean; opnaaet?: boolean; krav?: string; episkTekst?: string; award?: TrofaeAward | null }) {
         if (medalje.bedste && authState.user?.id) {
             const bedsteSpil = await hentBedsteHighscoreForBruger(authState.user.id);
@@ -915,9 +923,10 @@
                     {/if}
                     <span>
                         <strong>{authState.profil?.display_name || 'Logget ind'}</strong>
-                        <em>Min profil</em>
+                        <em>{profilMestSpilletTitelTekst()}</em>
                     </span>
                 </button>
+                <button type="button" class="konto-aabn-profil-knap" onclick={aabnProfil}>Åbn Profil</button>
             </div>
             <div class="konto-medaljer" aria-label="Dine medaljer">
                 {#each profilMedaljer() as medalje, index (`profil-medalje-${index}-${medalje.sti}`)}
@@ -1049,6 +1058,7 @@
                         <div><strong>{authState.stats.flestFelter}</strong><span>Flest felter</span></div>
                         <div><strong>{authState.stats.flestMiner}</strong><span>Flest miner</span></div>
                         <div><strong>{authState.stats.favoritKarakter}</strong><span>Mest spillet</span></div>
+                        <div><strong>{authState.stats.favoritKarakterBedsteTitel}</strong><span>Bedste titel med mest spillet</span></div>
                     </div>
                 {/if}
 
@@ -1400,15 +1410,17 @@
             <div class="login-main start-form">
                 {@render kontoPanel()}
                 
-                <input 
-                    type="text" 
-                    bind:value={spilTilstand.spillerNavn} 
-                    maxlength="15" 
-                    placeholder="Spillernavn" 
-                    class="large-input" 
-                    oninput={planlaegProfilNavnGem}
-                    onkeydown={trykEnter}
-                />
+                {#if !authState.user}
+                    <input 
+                        type="text" 
+                        bind:value={spilTilstand.spillerNavn} 
+                        maxlength="15" 
+                        placeholder="Spillernavn" 
+                        class="large-input" 
+                        oninput={planlaegProfilNavnGem}
+                        onkeydown={trykEnter}
+                    />
+                {/if}
                 
                 <div class="oe-input-wrap">
                     <input 
@@ -2310,13 +2322,14 @@
         gap: 12px;
         align-items: center;
         margin-bottom: 14px;
+        width: 100%;
     }
     .konto-profil-identitet {
         appearance: none;
         border: 0;
         background: transparent;
         color: inherit;
-        padding: 0;
+        padding: 0 0 0 14px;
         margin: 0;
         display: inline-flex;
         align-items: center;
@@ -2344,16 +2357,32 @@
     }
     .konto-profil-identitet strong {
         font-family: 'Cinzel', serif;
-        font-size: 1.34rem;
+        font-size: 1.52rem;
         line-height: 1.1;
         color: #f4efe4;
         letter-spacing: 0;
     }
     .konto-profil-identitet em {
         color: #aaa;
-        font-size: 0.9rem;
+        font-size: 1rem;
         font-style: normal;
         overflow-wrap: anywhere;
+    }
+    .konto-aabn-profil-knap {
+        flex: 0 0 auto;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #f4efe4;
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .konto-aabn-profil-knap:hover,
+    .konto-aabn-profil-knap:focus-visible {
+        background: rgba(255, 255, 255, 0.14);
+        border-color: rgba(255, 255, 255, 0.36);
+        outline: none;
     }
     .start-logud-knap {
         margin-top: 12px;
@@ -3387,11 +3416,30 @@
 
         .konto-linje {
             align-items: center;
+            gap: 8px;
+        }
+
+        .konto-profil-identitet {
+            padding-left: 8px;
+            gap: 10px;
         }
 
         .konto-profil-identitet img {
             width: 66px;
             height: 66px;
+        }
+
+        .konto-profil-identitet strong {
+            font-size: 1.24rem;
+        }
+
+        .konto-profil-identitet em {
+            font-size: 0.9rem;
+        }
+
+        .konto-aabn-profil-knap {
+            padding: 9px 10px;
+            font-size: 0.86rem;
         }
 
         .profil-grid {
