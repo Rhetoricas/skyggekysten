@@ -315,6 +315,13 @@
         return authState.stats?.karakterBedsteTitler.find((række) => række.karakterId === karakterId)?.titel || 'Ingen titel endnu';
     }
 
+    function profilTitelMedLevelForKarakter(karakterId?: string | null) {
+        if (!karakterId) return 'Mest spillet';
+        const titelData = authState.stats?.karakterBedsteTitler.find((række) => række.karakterId === karakterId);
+        if (!titelData || titelData.score <= 0 || titelData.titel === 'Ingen titel endnu') return '(0)';
+        return `${titelData.titel} (${findMedaljeNiveau(titelData.score) + 1})`;
+    }
+
     function profilMestSpilletTitelTekst() {
         const karakter = profilValgtKarakter();
         const titel = profilTitelForKarakter(karakter?.id);
@@ -1082,7 +1089,7 @@
                             >
                                 <img src={karakter.ikon} alt="" />
                                 <span>{karakter.navn}</span>
-                                <em>{profilTitelForKarakter(karakter.id)}</em>
+                                <em>{profilTitelMedLevelForKarakter(karakter.id)}</em>
                             </button>
                         {/each}
                     </div>
