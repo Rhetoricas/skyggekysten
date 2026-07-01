@@ -232,6 +232,9 @@ import { markerTutorialHandling } from '$lib/tutorial.svelte';
             >
                 <div class="ikon-container">
                     <img src={graveIkon} alt={graveAlt} class="inventory-icon grave-icon {harMesterskovl ? 'opgraderet' : ''} {kanGrave ? '' : 'deaktiveret'}" data-help-title={graveNavn} data-help-body={graveHjaelp} />
+                    {#if kanGrave}
+                        <span class="brugbar-prik" aria-hidden="true"></span>
+                    {/if}
                 </div>
             </div>
 
@@ -267,6 +270,9 @@ import { markerTutorialHandling } from '$lib/tutorial.svelte';
                             />
                             {#if vareBadgeTekst(vare)}
                                 <span class="maengde-badge {vare.id === 'diamant' ? 'diamant-badge' : ''}">{vareBadgeTekst(vare)}</span>
+                            {/if}
+                            {#if kanBrugeInventoryVare(vare.id)}
+                                <span class="brugbar-prik" aria-hidden="true"></span>
                             {/if}
                         </div>
                     </div>
@@ -395,6 +401,21 @@ import { markerTutorialHandling } from '$lib/tutorial.svelte';
     }
     .inventory-item.klikbar:hover {
         transform: scale(1.05);
+    }
+    .ikon-container {
+        position: relative;
+    }
+    .brugbar-prik {
+        position: absolute;
+        left: 50%;
+        bottom: -9px;
+        transform: translateX(-50%);
+        width: 5px;
+        height: 5px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.65), 0 0 8px rgba(255, 255, 255, 0.5);
+        pointer-events: none;
     }
     :global(body.inspect-global) .ui,
     :global(body.inspect-global) .ui *,
@@ -577,6 +598,12 @@ import { markerTutorialHandling } from '$lib/tutorial.svelte';
             right: 2px;
             font-size: 0.68rem;
             padding: 1px 4px;
+        }
+
+        .brugbar-prik {
+            bottom: -7px;
+            width: 4px;
+            height: 4px;
         }
 
     }
