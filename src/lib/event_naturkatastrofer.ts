@@ -221,11 +221,10 @@ export const naturkatastrofeEvents: Record<string, SpilEvent> = {
                 tekstEn: 'Throw a torch into the crack',
                 kosterItem: 'fakkel',
                 effekt: () => {
-                    udloesJordskaelv(spilTilstand.spillerIndex);
+                    udloesJordskaelv(spilTilstand.spillerIndex, true);
                     return {
-                        logBesked: 'Faklen forsvinder. Jorden rykker sig kort efter, og en begravet kiste bliver brudt op.',
-                        logBeskedEn: 'The torch disappears. The earth shifts shortly after, and a buried chest is broken open.',
-                        guldOp: 160
+                        logBesked: 'Faklen forsvinder. Jorden rykker sig kort efter, og en begravet kiste bliver klemt ind i et af de nye bjergfelter.',
+                        logBeskedEn: 'The torch disappears. The earth shifts shortly after, and a buried chest is squeezed into one of the new mountain tiles.'
                     };
                 }
             },

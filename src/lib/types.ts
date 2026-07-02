@@ -77,6 +77,8 @@ export interface SpillerData {
         slutterDag: number;
     } | null;
     trackedeSpillere?: string[];
+    royalSkatDage?: Record<string, number>;
+    piratRovDage?: Record<string, number>;
     gratisNaesteBevaegelse?: boolean;
     gratisBevaegelseKilde?: '' | 'mad' | 'bersaerk';
     sidsteBersaerkDag?: number;

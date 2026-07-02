@@ -176,7 +176,7 @@
 
                 <section>
                     <h3>Theft</h3>
-                    <p>The lockpick can be used for burglary on empty town fields without shops. It costs half your base energy rounded up. The reward is 35-50 gold, with a risk of being caught and beaten. Master Lockpick gives double reward, but does not make burglary safer.</p>
+                    <p>The lockpick can be used for burglary on empty town fields without shops. It costs half your base energy rounded up. If you get away, the reward is 35-50 gold. If you are caught, you are beaten and get no gold. Master Lockpick gives double reward, but does not make burglary safer.</p>
                 </section>
 
                 <section>
@@ -191,7 +191,9 @@
                         <li>You do not see each other's final routes before you finish.</li>
                         <li>The same login user cannot play multiple characters on the same island at the same time.</li>
                         <li>Only active players slow the tempo. Dead, escaped or inactive players stop holding others back.</li>
-                        <li>Hunters can place a tracker when standing on the same field as another active player. For 10 days they see the fields that player knows.</li>
+                        <li>Hunters can place a tracker when standing on the same field as another active player. For 20 days they see the fields that player knows.</li>
+                        <li>Royals collect 10% tax from another player when they enter the same field. They cannot tax pirates; if a royal meets a pirate, the pirate robs them instead. The same player cannot be taxed again for the next 20 days.</li>
+                        <li>Pirates with a sabre rob royals, magicians, hunters, jokers and explorers on the same field for 10% of their gold. The same player cannot be robbed again for the next 20 days.</li>
                         <li>Gold mines give more score in multiplayer because they are harder to hold. Mine points rise with player count up to a limit.</li>
                         <li>Total score also gets multiplayer modifier: 1 player x1.0, 2 players x1.1, 3 players x1.2, 4 players x1.3, 5 players x1.4 and 6+ players x1.5.</li>
                     </ul>
@@ -338,7 +340,7 @@
 
                 <section>
                     <h3>Tyveri</h3>
-                    <p>Dirken kan bruges til indbrud på tomme byfelter uden butik. Det koster halvdelen af din baseenergi rundet op. Udbyttet er 35-50 guld, og der er risiko for at blive opdaget og få tæv. Mesterdirken giver dobbelt udbytte, men gør ikke indbruddet sikrere.</p>
+                    <p>Dirken kan bruges til indbrud på tomme byfelter uden butik. Det koster halvdelen af din baseenergi rundet op. Hvis du slipper væk, er udbyttet 35-50 guld. Hvis du bliver opdaget, får du tæv og intet guld. Mesterdirken giver dobbelt udbytte, men gør ikke indbruddet sikrere.</p>
                     <p class="eksempel">Eksempel: Hvis du mangler lidt guld til en opgradering, kan indbrud være fristende. Tyve bliver sjældnere opdaget end andre, mens tunge krigere larmer mere.</p>
                 </section>
 
@@ -355,7 +357,9 @@
                         <li>I ser ikke hinandens slutruter, før I selv er færdige.</li>
                         <li>Den samme loginbruger må ikke spille flere karakterer på samme ø samtidig.</li>
                         <li>Kun aktive spillere tæller som tempo-bremse. Hvis en spiller er død, sluppet væk eller inaktiv i flere minutter, holder de ikke de andre tilbage.</li>
-                        <li>Jægere kan sætte en tracker, hvis de står på samme felt som en anden aktiv spiller. I 10 dage ser de de felter, den spiller kender.</li>
+                        <li>Jægere kan sætte en tracker, hvis de står på samme felt som en anden aktiv spiller. I 20 dage ser de de felter, den spiller kender.</li>
+                        <li>Royale opkræver 10% skat fra en anden spiller, når de rammer samme felt. De kan ikke opkræve skat fra pirater; hvis en royal møder en pirat, bliver den royale røvet i stedet. Den samme spiller kan ikke beskattes igen de næste 20 dage.</li>
+                        <li>Pirater med sabel overfalder royale, troldmænd, jægere/skytter, jokere og opdagere på samme felt og tager 10% af deres guld. Den samme spiller kan ikke plyndres igen de næste 20 dage.</li>
                         <li>Guldminer giver mere score i multiplayer, fordi de er sværere at holde. Minepoint stiger med antal spillere, op til en grænse.</li>
                         <li>Den samlede score får også multiplayer-modifier: 1 spiller x1.0, 2 spillere x1.1, 3 spillere x1.2, 4 spillere x1.3, 5 spillere x1.4 og 6+ spillere x1.5.</li>
                     </ul>

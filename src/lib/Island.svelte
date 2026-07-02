@@ -10,7 +10,7 @@
     import { M10_SCORE, beregnSpillerScore, beskrivSlutSalg } from '$lib/score';
     import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, hentGlobalTopHundredeIUgen, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje, hentAktueltHighscoreResultatId } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
-    import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
+    import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, tjekAutoSpillerMoede, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
     import { erSpillerITaagen } from '$lib/overlevelse.svelte';    
     import { eventState, startEvent, lukEvent as motorLukEvent } from '$lib/eventMotor.svelte';
@@ -507,9 +507,15 @@
         const dag = spilTilstand.dag;
         const tracker = spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.aktivTracker;
         const target = tracker ? spilTilstand.alleSpillere[tracker.targetNavn] : null;
+        const egetIndex = spilTilstand.spillerIndex;
+        const spillerMoedeStatus = Object.entries(spilTilstand.alleSpillere)
+            .map(([navn, spiller]) => `${navn}:${spiller.index}:${spiller.guld}:${spiller.ikon}`)
+            .join('|');
         const targetIndex = target?.index;
         const targetSyn = target?.kendteFelter?.length || 0;
         void dag;
+        void egetIndex;
+        void spillerMoedeStatus;
         void targetIndex;
         void targetSyn;
 
@@ -517,6 +523,7 @@
             if (state === 'play') {
                 opdaterTrackerSyn();
                 tjekAutoTracker();
+                tjekAutoSpillerMoede();
             }
         });
     });
@@ -1942,6 +1949,8 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].skattekortFelter = [];
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].aktivTracker = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].trackedeSpillere = [];
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].royalSkatDage = {};
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].piratRovDage = {};
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIndex = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].escapeIcon = null;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisNaesteBevaegelse = false;

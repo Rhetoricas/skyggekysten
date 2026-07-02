@@ -1,6 +1,6 @@
 import { spilTilstand } from '$lib/spilTilstand.svelte';
 import { syncTilDb, broadcastFelt, broadcastFelter, syncKortTilDbSenere, realtimeRumNoegle } from '$lib/netvaerk';
-import { HEX_W, biomeVægte, biomeTerraenCost, itemDB, markedVarePool } from '$lib/spildata';
+import { HEX_W, biomeVægte, biomeTerraenCost, itemDB, markedVarePool, hentKarakterKlasseNoegle, tilgaengeligeKarakterer } from '$lib/spildata';
 import { KORT_VERSION, normaliserKortDimensioner, STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from '$lib/kortDimensioner';
 import { beskrivDiamantFund, rulDiamantVaerdi } from '$lib/score';
 import { supabase } from '$lib/supabaseClient';
@@ -10,7 +10,7 @@ import { erSpillerITaagen, fremrykTid, fremtvingKollaps, tagSkadeOgTjekDød, udl
 import { brugEnergi, brugResterendeEnergi } from '$lib/energi';
 import { registrerDiamantFund, registrerHeling, registrerOversvoemmelse, registrerTaageBevaegelse } from '$lib/trofaeer';
 import { erAfgroedeModen, erHvedeBlok, erInsektPlageAktiv, hentAfgroedeBlok } from '$lib/afgroeder';
-import type { Biome, Felt, RygsækTing } from '$lib/types';
+import type { Biome, Felt, RygsækTing, SpillerData } from '$lib/types';
 import { delNyeKort, startVenteSpil } from '$lib/ventespil.svelte';
 import { startEvent } from '$lib/eventMotor.svelte';
 import { erFriskAktivSpiller } from '$lib/aktivSpiller';
@@ -67,6 +67,7 @@ export function erVandBiome(biome: string | Biome | null | undefined) {
 interface FaellesEventEffekt {
     senderNavn: string;
     besked: string;
+    targetNavn?: string;
     guldAendring?: number;
     skade?: number;
 }
@@ -205,10 +206,11 @@ export async function sendAnonymAlarm() {
 
 export function anvendFaellesEventEffekt(payload: FaellesEventEffekt) {
     if (!payload || payload.senderNavn === spilTilstand.spillerNavn) return;
+    if (payload.targetNavn && payload.targetNavn !== spilTilstand.spillerNavn) return;
     if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'win_map') return;
 
     if (payload.guldAendring) {
-        spilTilstand.guldTotal += payload.guldAendring;
+        spilTilstand.guldTotal = Math.max(0, spilTilstand.guldTotal + payload.guldAendring);
     }
 
     if (payload.skade && payload.skade > 0) {
@@ -225,7 +227,7 @@ export function udloesFaellesEventEffekt(effekt: Omit<FaellesEventEffekt, 'sende
     const payload: FaellesEventEffekt = { ...effekt, senderNavn };
 
     if (payload.guldAendring) {
-        spilTilstand.guldTotal += payload.guldAendring;
+        spilTilstand.guldTotal = Math.max(0, spilTilstand.guldTotal + payload.guldAendring);
     }
     if (payload.skade && payload.skade > 0) {
         tagSkadeOgTjekDød(payload.skade, payload.besked);
@@ -1533,22 +1535,43 @@ function erHunter() {
     return id === 'hunter_m' || id === 'hunter_f';
 }
 
+function erRoyal() {
+    return hentKarakterKlasseNoegle(spilTilstand.valgtKarakter) === 'royal';
+}
+
+function erPirat() {
+    return hentKarakterKlasseNoegle(spilTilstand.valgtKarakter) === 'pirate';
+}
+
+function spillerKlasse(spiller?: Partial<SpillerData> | null) {
+    const karakter = tilgaengeligeKarakterer.find((k) => k.ikon === spiller?.ikon);
+    return hentKarakterKlasseNoegle(karakter?.id || null);
+}
+
+function harSabel() {
+    return spilTilstand.mitUdstyr.some((ting) => ting.id === 'sabel' && ting.maengde > 0);
+}
+
+function kanBrugeMoedeCooldown(sidsteDag: number | undefined, nuDag: number) {
+    return !sidsteDag || sidsteDag + 20 < nuDag;
+}
+
+function hentAktiveSpillerePaaSammeFelt() {
+    return Object.entries(spilTilstand.alleSpillere)
+        .filter(([navn, spiller]) => {
+            if (navn === spilTilstand.spillerNavn) return false;
+            if (!erFriskAktivSpiller(spiller)) return false;
+            return spiller.index === spilTilstand.spillerIndex;
+        });
+}
+
 function hentMuligeTrackerMaal() {
     if (!erHunter() || spilTilstand.gameState !== 'play') return [] as string[];
 
     const mig = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
     if (mig?.aktivTracker && mig.aktivTracker.slutterDag >= spilTilstand.dag) return [];
 
-    const trackede = new Set(mig?.trackedeSpillere || []);
-
-    return Object.entries(spilTilstand.alleSpillere)
-        .filter(([navn, spiller]) => {
-            if (navn === spilTilstand.spillerNavn) return false;
-            if (trackede.has(navn)) return false;
-            if (!erFriskAktivSpiller(spiller)) return false;
-            return spiller.index === spilTilstand.spillerIndex;
-        })
-        .map(([navn]) => navn);
+    return hentAktiveSpillerePaaSammeFelt().map(([navn]) => navn);
 }
 
 export function erTrackerAktivPaa(navn: string) {
@@ -1572,19 +1595,10 @@ function saetTracker(targetNavn: string, visLog = true) {
     }
 
     const mig = spilTilstand.alleSpillere[spilTilstand.spillerNavn] || {};
-    const trackede = mig.trackedeSpillere || [];
     if (mig.aktivTracker && mig.aktivTracker.slutterDag >= spilTilstand.dag) {
         spilTilstand.logBesked = tekst(
             `Du følger allerede ${mig.aktivTracker.targetNavn}s spor.`,
             `You are already following ${mig.aktivTracker.targetNavn}'s trail.`
-        );
-        return;
-    }
-
-    if (trackede.includes(targetNavn)) {
-        spilTilstand.logBesked = tekst(
-            `Du har allerede fulgt ${targetNavn}s spor på denne ø.`,
-            `You have already followed ${targetNavn}'s trail on this island.`
         );
         return;
     }
@@ -1602,16 +1616,15 @@ function saetTracker(targetNavn: string, visLog = true) {
         turNummer: mig.turNummer || 0,
         aktivTracker: {
             targetNavn,
-            slutterDag: spilTilstand.dag + 10
-        },
-        trackedeSpillere: [...trackede, targetNavn]
+            slutterDag: spilTilstand.dag + 20
+        }
     };
 
     opdaterTrackerSyn();
     if (visLog) {
         spilTilstand.logBesked = tekst(
-            `Du følger ${targetNavn}s spor. I ti dage ser du de felter, spilleren ser.`,
-            `You follow ${targetNavn}'s trail. For ten days, you see the tiles that player sees.`
+            `Du følger ${targetNavn}s spor. I tyve dage ser du de felter, spilleren ser.`,
+            `You follow ${targetNavn}'s trail. For twenty days, you see the tiles that player sees.`
         );
     }
     syncTilDb();
@@ -1622,6 +1635,118 @@ export function tjekAutoTracker() {
     if (maal.length === 0) return false;
 
     saetTracker(maal[0], true);
+    return true;
+}
+
+function sendMaalrettetGuldEffekt(targetNavn: string, guldAendring: number, besked: string) {
+    if (!spilTilstand.offlineMode && spilTilstand.rumKode) {
+        void supabase.channel(eventKanalNavn()).send({
+            type: 'broadcast',
+            event: 'faelles_event',
+            payload: {
+                ...eventKanalPayload(),
+                senderNavn: spilTilstand.spillerNavn || 'En spiller',
+                targetNavn,
+                guldAendring,
+                besked
+            }
+        }).catch((error) => console.warn('Målrettet guld-event kunne ikke sendes', error));
+    }
+}
+
+function overfoerGuldFraSpiller(targetNavn: string, target: Partial<SpillerData>, procent: number, beskedTilTarget: string) {
+    const beloeb = Math.floor(Math.max(0, target.guld || 0) * procent);
+    if (beloeb <= 0) return 0;
+
+    spilTilstand.guldTotal += beloeb;
+    const lokalTarget = spilTilstand.alleSpillere[targetNavn];
+    if (lokalTarget) {
+        spilTilstand.alleSpillere[targetNavn] = {
+            ...lokalTarget,
+            guld: Math.max(0, (lokalTarget.guld || 0) - beloeb)
+        };
+    }
+    sendMaalrettetGuldEffekt(targetNavn, -beloeb, beskedTilTarget);
+    return beloeb;
+}
+
+export function tjekAutoSpillerMoede() {
+    if (spilTilstand.gameState !== 'play' || !spilTilstand.spillerNavn || !spilTilstand.valgtKarakter) return false;
+
+    const mig = spilTilstand.alleSpillere[spilTilstand.spillerNavn] || {};
+    const sammeFelt = hentAktiveSpillerePaaSammeFelt();
+    if (sammeFelt.length === 0) return false;
+
+    const beskeder: string[] = [];
+    let aendret = false;
+
+    if (erRoyal()) {
+        const royalSkatDage = { ...(mig.royalSkatDage || {}) };
+        for (const [navn, spiller] of sammeFelt) {
+            if (spillerKlasse(spiller) === 'pirate') continue;
+            if (!kanBrugeMoedeCooldown(royalSkatDage[navn], spilTilstand.dag)) continue;
+            const beloeb = overfoerGuldFraSpiller(
+                navn,
+                spiller,
+                0.1,
+                tekst(
+                    `${spilTilstand.spillerNavn} opkræver 10% i skat fra dig.`,
+                    `${spilTilstand.spillerNavn} collects 10% tax from you.`
+                )
+            );
+            if (beloeb <= 0) continue;
+            royalSkatDage[navn] = spilTilstand.dag;
+            beskeder.push(tekst(
+                `Du opkræver ${beloeb} guld i skat fra ${navn}.`,
+                `You collect ${beloeb} gold in tax from ${navn}.`
+            ));
+            aendret = true;
+        }
+        if (aendret) {
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn] = {
+                ...mig,
+                guld: spilTilstand.guldTotal,
+                royalSkatDage
+            };
+        }
+    }
+
+    if (erPirat() && harSabel()) {
+        const aktuelMig = spilTilstand.alleSpillere[spilTilstand.spillerNavn] || mig;
+        const piratRovDage = { ...(aktuelMig.piratRovDage || {}) };
+        const rovKlasser = new Set(['royal', 'magician', 'hunter', 'joker', 'explorer']);
+        for (const [navn, spiller] of sammeFelt) {
+            if (!rovKlasser.has(spillerKlasse(spiller) || '')) continue;
+            if (!kanBrugeMoedeCooldown(piratRovDage[navn], spilTilstand.dag)) continue;
+            const beloeb = overfoerGuldFraSpiller(
+                navn,
+                spiller,
+                0.1,
+                tekst(
+                    `${spilTilstand.spillerNavn} overfalder dig og stjæler 10% af dit guld.`,
+                    `${spilTilstand.spillerNavn} attacks you and steals 10% of your gold.`
+                )
+            );
+            if (beloeb <= 0) continue;
+            piratRovDage[navn] = spilTilstand.dag;
+            beskeder.push(tekst(
+                `Du overfalder ${navn} og stjæler ${beloeb} guld.`,
+                `You attack ${navn} and steal ${beloeb} gold.`
+            ));
+            aendret = true;
+        }
+        if (aendret) {
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn] = {
+                ...aktuelMig,
+                guld: spilTilstand.guldTotal,
+                piratRovDage
+            };
+        }
+    }
+
+    if (!aendret) return false;
+    spilTilstand.logBesked = beskeder.join(' ');
+    syncTilDb();
     return true;
 }
 
@@ -1688,7 +1813,6 @@ export function begaaIndbrud() {
         ? tekst("Bersærkergangen betaler energien.", "Berserk pays the energy.")
         : tekst(`Det koster ${energiPris} energi.`, `It costs ${energiPris} energy.`);
     felt.indbrudt = true;
-    spilTilstand.guldTotal += udbytte;
     spilTilstand.gitter[indeks] = { ...felt };
 
     if (opdaget) {
@@ -1696,12 +1820,13 @@ export function begaaIndbrud() {
         tagSkadeOgTjekDød(
             grundSkade,
             tekst(
-                `Du begår indbrud${harMesterdirk ? ' med mesterdirken' : ''} og finder ${udbytte} guld. ${energiLog} Du bliver opdaget og får tæv.`,
-                `You break in${harMesterdirk ? ' with the master lockpick' : ''} and find ${udbytte} gold. ${energiLog} You are discovered and beaten up.`
+                `Du begår indbrud${harMesterdirk ? ' med mesterdirken' : ''}. ${energiLog} Du bliver opdaget, får tæv og når ikke at få guldet med.`,
+                `You break in${harMesterdirk ? ' with the master lockpick' : ''}. ${energiLog} You are discovered, beaten up, and do not get away with the gold.`
             ),
             tekst("Vagterne slog dig ihjel.", "The guards killed you.")
         );
     } else {
+        spilTilstand.guldTotal += udbytte;
         spilTilstand.logBesked = tekst(
             `Du begår indbrud${harMesterdirk ? ' med mesterdirken' : ''} og finder ${udbytte} guld. ${energiLog} Ingen når at stoppe dig.`,
             `You break in${harMesterdirk ? ' with the master lockpick' : ''} and find ${udbytte} gold. ${energiLog} No one stops you in time.`
@@ -2598,7 +2723,7 @@ export async function udloesNaturkatastrofe(centerIndex: number) {
     syncTilDb(true); // Massiv meteor der smadrer tyve felter permanent. Her skal databasen æde det hele.
 }
 
-export async function udloesJordskaelv(centerIndex: number) {
+export function udloesJordskaelv(centerIndex: number, gemSkatIKlippe = false) {
     rystSkaerm(2000);
 
     const felter = spilTilstand.gitter;
@@ -2625,12 +2750,14 @@ export async function udloesJordskaelv(centerIndex: number) {
 
     const paavirkedeArray = Array.from(paavirkede);
     const fraBiomer = new Map<number, string | Biome>();
+    const nyeBjergFelter: number[] = [];
 
     for (const idx of paavirkedeArray) {
         if (erVandBiome(felter[idx].biome)) continue; 
         
         fraBiomer.set(idx, felter[idx].biome);
         felter[idx].biome = Math.random() < 0.2 ? 'ruin' : 'bjerg';
+        if (felter[idx].biome === 'bjerg') nyeBjergFelter.push(idx);
         felter[idx].hasGoldmine = false;
         felter[idx].hasBoat = false;
         felter[idx].boatCount = undefined;
@@ -2647,6 +2774,15 @@ export async function udloesJordskaelv(centerIndex: number) {
         if (!spilTilstand.mineKendteFelter.includes(idx)) {
             spilTilstand.mineKendteFelter.push(idx);
         }
+    }
+
+    if (gemSkatIKlippe && nyeBjergFelter.length > 0) {
+        const skatIndex = nyeBjergFelter[Math.floor(Math.random() * nyeBjergFelter.length)];
+        felter[skatIndex].skjultLoot = 'skattekiste';
+        felter[skatIndex].skjultGuld = 0;
+        felter[skatIndex].skjultLiv = 0;
+        felter[skatIndex].skjultFaelde = false;
+        felter[skatIndex].kanGraves = true;
     }
 
     spilTilstand.gitter = [...felter];
