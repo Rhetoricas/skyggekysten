@@ -137,11 +137,13 @@ export function grav() {
     const livVaerdi = felt.skjultLiv ?? 0;
     const faelde = felt.skjultFaelde;
     const fundetLoot = felt.skjultLoot;
+    const jordskredsSkatSpor = !!felt.jordskredsSkatSpor;
 
     felt.skjultGuld = 0;
     felt.skjultLiv = 0;
     felt.skjultFaelde = false;
     felt.skjultLoot = null;
+    felt.jordskredsSkatSpor = false;
     
     if (felt.biome === 'mark') {
         felt.afgroede = undefined;
@@ -153,7 +155,19 @@ export function grav() {
 
     let fundLog = tekst('Du finder ikke noget brugbart.', 'You find nothing useful.');
 
-    if (faelde && harMesterskovl) {
+    if (faelde && jordskredsSkatSpor && ridderPanserStopperNedgravetFaelde()) {
+        fundLog = tekst(
+            'Du graver under krydset, og klippen styrter sammen. Panseret tager slaget, mens ridderens træning holder benene fri.',
+            'You dig beneath the mark, and the rock collapses. Your armor takes the blow while knight training keeps your legs free.'
+        );
+    } else if (faelde && jordskredsSkatSpor) {
+        const faeldeSkade = spilTilstand.beregnSkade(8);
+        spilTilstand.livspoint -= faeldeSkade;
+        fundLog = tekst(
+            `Du graver under krydset, men klippen er stadig løs efter jordskælvet. Det styrter sammen om benene på dig (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`,
+            `You dig beneath the mark, but the rock is still loose after the earthquake. It collapses around your legs (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`
+        );
+    } else if (faelde && harMesterskovl) {
         fundLog = tekst('Mesterskovlen finder fælden, før den klapper. Du får den gravet fri uden skade.', 'The master shovel finds the trap before it snaps. You dig it free without damage.');
     } else if (faelde && ridderPanserStopperNedgravetFaelde()) {
         fundLog = tekst('KLIK. Den nedgravede fælde klapper om dit panser, men ridderens træning holder benet fri.', 'CLICK. The buried trap snaps around your armor, but knight training keeps your leg free.');

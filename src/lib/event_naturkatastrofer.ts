@@ -223,8 +223,8 @@ export const naturkatastrofeEvents: Record<string, SpilEvent> = {
                 effekt: () => {
                     udloesJordskaelv(spilTilstand.spillerIndex, true);
                     return {
-                        logBesked: 'Faklen forsvinder. Jorden rykker sig kort efter, og en begravet kiste bliver klemt ind i et af de nye bjergfelter.',
-                        logBeskedEn: 'The torch disappears. The earth shifts shortly after, and a buried chest is squeezed into one of the new mountain tiles.'
+                        logBesked: 'Faklen forsvinder. Jorden rykker sig kort efter. De nye bjergfelter får krydser, men kun ét af dem skjuler den begravede kiste.',
+                        logBeskedEn: 'The torch disappears. The earth shifts shortly after. The new mountain tiles are marked with crosses, but only one of them hides the buried chest.'
                     };
                 }
             },

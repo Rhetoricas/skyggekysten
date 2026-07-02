@@ -133,6 +133,7 @@ export interface Felt {
     skjultLoot?: string | null;
     tomSkattekiste?: boolean;
     isSkatteKlynge?: boolean;
+    jordskredsSkatSpor?: boolean;
     skatId?: number;
 
     afgroede?: 'hvede' | 'boenner';

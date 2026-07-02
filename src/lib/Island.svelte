@@ -2816,6 +2816,10 @@ function udførBevægelse(nytIndeks: number) {
                             <img src="/tiles/blokker.webp" class="taageblokker-icon" class:taageblokker-inaktiv={spilTilstand.fogX < 0} alt={tekst('Tågeblokker', 'Fog blocker')} data-help-title={tekst('Tågeblokker', 'Fog blocker')} data-help-body={tekst('Holder tågen tilbage fra venstre side. Når tågen vender fra højre, beskytter blokkeren ikke længere.', 'Holds the fog back from the left side. When the fog returns from the right, the blocker no longer protects you.')} />
                         {/if}
 
+                        {#if !erOpslugt && !felt.gravet && felt.jordskredsSkatSpor}
+                            <img src="/tiles/treasuremark.webp" alt={tekst('Jordskælvskryds', 'Earthquake mark')} class="treasure-mark-icon jordskreds-skat-icon" data-help-title={tekst('Jordskælvskryds', 'Earthquake mark')} data-help-body={tekst('Sprækken har markeret dette nye bjergfelt. Én af markeringerne skjuler en kiste; de andre kan være løse og farlige sammenstyrtninger.', 'The crack has marked this new mountain tile. One of the marks hides a chest; the others may be loose and dangerous collapses.')} />
+                        {/if}
+
                         {#if (erUdforsket || erSkattekortRygte) && !felt.gravet}
                             {@const erIndenForPejling = regnHexAfstand(spilTilstand.spillerIndex, i, kortBredde) <= pejleRadius}
                             {#if felt.isSkatteKlynge && (erSkattekortRygte || aktiveSkattekortFelter.includes(i))}
@@ -3897,6 +3901,11 @@ function udførBevægelse(nytIndeks: number) {
     .treasure-mark-icon {
         position: absolute; width: 35px; height: auto; top: 65%; left: 50%;
         transform: translate(-50%, -50%); pointer-events: none; z-index: 13; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+    }
+    .jordskreds-skat-icon {
+        top: 45%;
+        z-index: 15;
+        filter: sepia(45%) saturate(1.25) drop-shadow(0 0 7px rgba(255, 222, 125, 0.95)) drop-shadow(0 3px 5px rgba(0,0,0,0.9));
     }
     .dug-image {
         position: absolute; width: 90px; height: 52px; top: 58%; left: 50%;

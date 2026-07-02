@@ -2061,6 +2061,7 @@ export function plantSkat(gitter: Felt[]) {
     gitter.forEach(f => {
         f.isSkatteKlynge = false;
         f.tomSkattekiste = false;
+        f.jordskredsSkatSpor = false;
         f.skatId = undefined;
     });
 
@@ -2756,7 +2757,8 @@ export function udloesJordskaelv(centerIndex: number, gemSkatIKlippe = false) {
         if (erVandBiome(felter[idx].biome)) continue; 
         
         fraBiomer.set(idx, felter[idx].biome);
-        felter[idx].biome = Math.random() < 0.2 ? 'ruin' : 'bjerg';
+        const bliverBjerg = gemSkatIKlippe && idx === centerIndex ? true : Math.random() >= 0.2;
+        felter[idx].biome = bliverBjerg ? 'bjerg' : 'ruin';
         if (felter[idx].biome === 'bjerg') nyeBjergFelter.push(idx);
         felter[idx].hasGoldmine = false;
         felter[idx].hasBoat = false;
@@ -2777,6 +2779,14 @@ export function udloesJordskaelv(centerIndex: number, gemSkatIKlippe = false) {
     }
 
     if (gemSkatIKlippe && nyeBjergFelter.length > 0) {
+        for (const idx of nyeBjergFelter) {
+            felter[idx].jordskredsSkatSpor = true;
+            felter[idx].kanGraves = true;
+            felter[idx].skjultGuld = 0;
+            felter[idx].skjultLiv = 0;
+            felter[idx].skjultLoot = null;
+            felter[idx].skjultFaelde = true;
+        }
         const skatIndex = nyeBjergFelter[Math.floor(Math.random() * nyeBjergFelter.length)];
         felter[skatIndex].skjultLoot = 'skattekiste';
         felter[skatIndex].skjultGuld = 0;
