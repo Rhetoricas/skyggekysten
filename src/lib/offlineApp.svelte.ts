@@ -8,7 +8,7 @@ export const offlineAppState = $state({
     besked: ''
 });
 
-const SERVICE_WORKER_URL = '/service-worker.js';
+const SERVICE_WORKER_URL = 'service-worker.js';
 const OFFLINE_TIMEOUT_MS = 45000;
 const SERVICE_WORKER_OPTIONS: RegistrationOptions = { updateViaCache: 'none' };
 

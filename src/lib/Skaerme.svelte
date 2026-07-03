@@ -43,6 +43,8 @@
     type HighscoreDrilldown = { titel: string; scores: GlobalScore[]; henter: boolean };
     const HIGHSCORE_DRILLDOWN_ANTAL = 10;
     const PROFIL_BEDSTE_SCORE_PREFIX = 'taage_profile_best_score:';
+    const ER_ITCH_BUILD = __ITCH_BUILD__;
+    const LIVE_APP_URL = __LIVE_APP_URL__;
     let {
         opretEllerDeltag,
         startOfflineSpil,
@@ -783,6 +785,11 @@
         void hentProfilStats();
     }
 
+    function aabnLiveVersion() {
+        if (typeof window === 'undefined') return;
+        window.open(LIVE_APP_URL, '_blank', 'noopener,noreferrer');
+    }
+
     async function gemProfil() {
         await gemProfilNavn(profilNavnInput);
         if (authState.profil?.display_name) {
@@ -986,6 +993,37 @@
                 {/each}
             </div>
         {:else}
+            {#if ER_ITCH_BUILD}
+                <p class="konto-hint">
+                    {tekst(
+                        'Du er velkommen til at prøve spillet her på itch. Hvis du vil logge ind, spille den nyeste version, gemme profil og være med på de globale toplister, skal du spille live-versionen.',
+                        'You are welcome to try the game here on itch. To log in, play the latest version, save your profile, and join the global leaderboards, play the live version.'
+                    )}
+                </p>
+                <div class="konto-medaljer konto-medaljer-login-teaser" aria-label={tekst('Medaljer du kan gemme med login', 'Medals you can save with login')}>
+                    {#each loginTeaserMedaljer() as medalje, index (`itch-login-teaser-medalje-${index}-${medalje.sti}`)}
+                        <button
+                            type="button"
+                            class="konto-medalje-knap kan-aabnes"
+                            onclick={() => aabnLaastTrofae(medalje)}
+                            aria-label={tekst(`Se krav for ${medaljeLabel(medalje)}`, `View requirement for ${medaljeLabel(medalje)}`)}
+                        >
+                            <img
+                                src={medalje.sti}
+                                alt={medaljeLabel(medalje)}
+                                class:trofae-placeholder={true}
+                                draggable="false"
+                            />
+                        </button>
+                    {/each}
+                </div>
+                <div class="konto-live-link">
+                    <button type="button" onclick={aabnLiveVersion}>
+                        {tekst('Spil nyeste version og opret konto', 'Play latest version and create an account')}
+                    </button>
+                    <span>{tekst('Itch-versionen kan bruges til at teste spillet uden konto.', 'The itch version is for trying the game without an account.')}</span>
+                </div>
+            {:else}
             <p class="konto-hint">{tekst('Login er valgfrit. Uden login spiller du kun med på den ø, du åbner nu, og din score og profil bliver ikke gemt.', 'Login is optional. Without login, you only play on the island you open now, and your score and profile are not saved.')}</p>
             <div class="konto-medaljer konto-medaljer-login-teaser" aria-label={tekst('Medaljer du kan gemme med login', 'Medals you can save with login')}>
                 {#each loginTeaserMedaljer() as medalje, index (`login-teaser-medalje-${index}-${medalje.sti}`)}
@@ -1015,6 +1053,7 @@
                     {authState.loader ? tekst('Sender...', 'Sending...') : tekst('Log ind', 'Log in')}
                 </button>
             </div>
+            {/if}
         {/if}
         {#if authState.besked}
             <p class="konto-besked">{authState.besked}</p>
@@ -1321,7 +1360,13 @@
             {:else}
                 <span>{spilTilstand.statusBesked || tekst('Scoren blev ikke gemt.', 'The score was not saved.')}</span>
                 <button type="button" onclick={gemScoreIgen}>{tekst('Prøv igen', 'Try again')}</button>
-                {#if !authState.user}
+                {#if !authState.user && ER_ITCH_BUILD}
+                    <div class="score-login-redning konto-live-link">
+                        <button type="button" onclick={aabnLiveVersion}>
+                            {tekst('Spil nyeste version og opret konto', 'Play latest version and create an account')}
+                        </button>
+                    </div>
+                {:else if !authState.user}
                     <div class="score-login-redning">
                         <input
                             type="email"
@@ -2355,6 +2400,30 @@
     .konto-login {
         display: flex;
         gap: 8px;
+    }
+    .konto-live-link {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .konto-live-link button {
+        background: rgba(245, 208, 113, 0.92);
+        color: #171100;
+        border: 1px solid rgba(255, 232, 154, 0.85);
+        border-radius: 6px;
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .konto-live-link button:hover,
+    .konto-live-link button:focus-visible {
+        background: #ffd75a;
+    }
+    .konto-live-link span {
+        color: #aaa;
+        font-size: 0.84rem;
+        line-height: 1.35;
     }
     .konto-login input,
     .profil-felt input {

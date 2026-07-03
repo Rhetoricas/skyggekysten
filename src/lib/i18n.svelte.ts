@@ -1,10 +1,11 @@
 export type AppSprog = 'da' | 'en';
 
-const SPROG_KEY = 'taage_language';
+const SPROG_KEY = __ITCH_BUILD__ ? 'taage_language_itch' : 'taage_language';
+const DEFAULT_SPROG = __ITCH_BUILD__ ? 'en' : 'da';
 let urlSprogOverride = false;
 
 export const sprogState = $state({
-    sprog: 'da' as AppSprog
+    sprog: DEFAULT_SPROG as AppSprog
 });
 
 export function normaliserSprog(sprog?: string | null): AppSprog {
@@ -19,7 +20,7 @@ export function initSprog() {
         return;
     }
     if (typeof localStorage === 'undefined') return;
-    sprogState.sprog = normaliserSprog(localStorage.getItem(SPROG_KEY));
+    sprogState.sprog = normaliserSprog(localStorage.getItem(SPROG_KEY) || DEFAULT_SPROG);
 }
 
 export function saetSprog(sprog: AppSprog) {

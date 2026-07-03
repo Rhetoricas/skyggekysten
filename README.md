@@ -39,4 +39,15 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
+## Itch.io build
+
+To build a static HTML5 upload for itch.io:
+
+```sh
+npm run build:itch
+npm run package:itch
+```
+
+Upload `dist/skyggekysten-itch.zip` as an HTML5 build on itch.io and set `index.html` as the launch file. The normal `npm run build` path still uses the Vercel/auto adapter.
+
 > To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
