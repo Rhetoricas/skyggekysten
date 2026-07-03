@@ -2,6 +2,8 @@ import type { Felt, SpillerData } from './types';
 import type { RygsækTing } from './types';
 import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 import { itemDB } from './spildata';
+import { tekst } from './i18n.svelte';
+import { itemNavn } from './spilTekst';
 
 export const DIAMANT_MIN_VAERDI = 250;
 export const DIAMANT_MAX_VAERDI = 600;
@@ -112,8 +114,8 @@ export function beskrivSlutSalg(udstyr: RygsækTing[] = []) {
             const salgspris = beregnSlutSalgspris(ting);
             if (salgspris <= 0) return '';
             const antal = Math.max(0, Math.floor(Number(ting.maengde) || 0));
-            const navn = itemDB[ting.id]?.navn || ting.id;
-            return `${antal > 1 ? `${antal} x ` : ''}${navn} (${salgspris} point)`;
+            const navn = itemNavn(ting.id);
+            return `${antal > 1 ? `${antal} x ` : ''}${navn} (${salgspris} ${tekst('point', 'points')})`;
         })
         .filter(Boolean);
 
@@ -121,7 +123,10 @@ export function beskrivSlutSalg(udstyr: RygsækTing[] = []) {
     return {
         total,
         tekst: total > 0
-            ? `Dit resterende udstyr og dine diamanter omregnes til ${total} point: ${poster.join(', ')}.`
+            ? tekst(
+                `Dit resterende udstyr og dine diamanter omregnes til ${total} point: ${poster.join(', ')}.`,
+                `Your remaining equipment and diamonds are converted into ${total} points: ${poster.join(', ')}.`
+            )
             : ''
     };
 }

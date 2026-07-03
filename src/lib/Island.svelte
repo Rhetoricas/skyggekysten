@@ -1715,7 +1715,10 @@
             !!spilTilstand.alleSpillere[spilTilstand.spillerNavn]?.isWinner;
         const slutSalg = beskrivSlutSalg(spilTilstand.mitUdstyr);
 
-        if (slutSalg.tekst && !spilTilstand.logHistorik.some((linje) => linje.includes('Dit resterende udstyr og dine diamanter omregnes'))) {
+        if (slutSalg.tekst && !spilTilstand.logHistorik.some((linje) =>
+            linje.includes('Dit resterende udstyr og dine diamanter omregnes') ||
+            linje.includes('Your remaining equipment and diamonds are converted')
+        )) {
             spilTilstand.logBesked = slutSalg.tekst;
         }
 

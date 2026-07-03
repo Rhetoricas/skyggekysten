@@ -2,6 +2,7 @@ import type { Felt, Karakter, SpillerData, RygsækTing } from './types';
 import { itemDB } from './spildata';
 import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 import type { TrofaeId, TrofaeStats } from './trofaeer';
+import { tekst } from './i18n.svelte';
 
 interface FlydendeTal {
     id: number;
@@ -111,7 +112,7 @@ export const spilTilstand = $state({
     },
     set logBesked(v: string) { 
         const rensetV = v.trim();
-        const prefix = `DAG ${this.dag}`;
+        const prefix = `${tekst('DAG', 'DAY')} ${this.dag}`;
         const fuldBesked = rensetV === '' ? prefix : `${prefix} - ${rensetV}`;
         
         const sidsteIndex = this.logHistorik.length - 1;
