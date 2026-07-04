@@ -71,6 +71,8 @@
     const SESSION_SELECT = 'rum_kode,kort,start_index,spillere,fog_x,kort_bredde,kort_hoejde,kort_version';
     const START_AUTO_REFRESH_MS = 10000;
     const START_AUTO_REFRESH_KEY = 'taage_pending_start';
+    const RUTE_ARKIV_STORAGE_PREFIX = 'taage_route_archive';
+    const RUTE_ARKIV_MAX_RUNS = 50;
 
     let lokaleScores = $state<Array<{ navn: string; score: number; karakter?: string }>>([]);
     let klasseScores = $state<Array<{ id?: number; spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);
@@ -677,8 +679,47 @@
         return navn.trim().toLowerCase();
     }
 
+    function ruteArkivStorageNoegle(navn = spilTilstand.spillerNavn, rumKode = spilTilstand.rumKode) {
+        const oeNoegle = encodeURIComponent((rumKode || '').trim().toLowerCase() || 'oe');
+        const spillerNoegle = encodeURIComponent(ruteArkivNoegle(navn) || 'spiller');
+        return `${RUTE_ARKIV_STORAGE_PREFIX}:${oeNoegle}:${spillerNoegle}`;
+    }
+
     function ruteSignatur(rute: number[]) {
         return rute.join(',');
+    }
+
+    function normaliserRute(rute: unknown) {
+        if (!Array.isArray(rute)) return [];
+        return rute
+            .map((index) => Number(index))
+            .filter((index) => Number.isInteger(index) && index >= 0);
+    }
+
+    function normaliserRuteListe(ruter: unknown) {
+        if (!Array.isArray(ruter)) return [];
+        return ruter
+            .map(normaliserRute)
+            .filter((rute) => rute.length > 1);
+    }
+
+    function laesGemteRuter(navn = spilTilstand.spillerNavn) {
+        if (!browser) return [];
+        try {
+            return normaliserRuteListe(JSON.parse(localStorage.getItem(ruteArkivStorageNoegle(navn)) || '[]'));
+        } catch {
+            return [];
+        }
+    }
+
+    function gemRuteArkiv(navn: string, ruter: number[][]) {
+        if (!browser || !navn) return;
+        const unikke = samlUnikkeRuter(ruter).slice(-RUTE_ARKIV_MAX_RUNS);
+        try {
+            localStorage.setItem(ruteArkivStorageNoegle(navn), JSON.stringify(unikke));
+        } catch {
+            // Hvis browseren blokerer localStorage, virker sessions-ruterne stadig.
+        }
     }
 
     function samlTidligereRuter(spiller?: SpillerData | null) {
@@ -708,15 +749,27 @@
 
     function arkiverRuterForNaesteTur(navn: string, spiller?: SpillerData | null) {
         const noegle = ruteArkivNoegle(navn);
-        const ruter = samlUnikkeRuter(ruteArkivForNaesteTur[noegle], samlTidligereRuter(spiller));
+        const ruter = samlUnikkeRuter(laesGemteRuter(navn), ruteArkivForNaesteTur[noegle], samlTidligereRuter(spiller));
         if (ruter.length > 0) {
             ruteArkivForNaesteTur = { ...ruteArkivForNaesteTur, [noegle]: ruter };
+            gemRuteArkiv(navn, ruter);
         }
         return ruter;
     }
 
     function hentArkiveredeRuter(navn = spilTilstand.spillerNavn) {
-        return ruteArkivForNaesteTur[ruteArkivNoegle(navn)] || [];
+        return samlUnikkeRuter(laesGemteRuter(navn), ruteArkivForNaesteTur[ruteArkivNoegle(navn)]);
+    }
+
+    function arkiverAktuelleRuterForNaesteTur(navn = spilTilstand.spillerNavn) {
+        if (!navn) return [];
+        const eksisterende = spilTilstand.alleSpillere[navn];
+        const spiller = {
+            ...(eksisterende || {}),
+            historik: spilTilstand.historik?.length > 1 ? spilTilstand.historik : eksisterende?.historik,
+            tidligereHistorik: samlUnikkeRuter(hentArkiveredeRuter(navn), eksisterende?.tidligereHistorik)
+        } as SpillerData;
+        return arkiverRuterForNaesteTur(navn, spiller);
     }
 
     function genererRundeSeed() {
@@ -931,6 +984,7 @@
 
         stopRealtime();
         annullerVentendeNetvaerkSync();
+        arkiverAktuelleRuterForNaesteTur();
 
         spilTilstand.logHistorik = [];
         spilTilstand.logBesked = '';
@@ -1498,6 +1552,7 @@
     }
 
     function nulstilHukommelse() {
+        arkiverAktuelleRuterForNaesteTur();
         if (spilTilstand.offlineMode) {
             sletOfflineSpil();
             harGemtOfflineSpil = false;
