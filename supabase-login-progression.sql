@@ -17,6 +17,9 @@ alter table public.profiles
 add column if not exists trophies jsonb not null default '[]'::jsonb;
 
 alter table public.profiles
+add column if not exists mythic_trophies jsonb not null default '[]'::jsonb;
+
+alter table public.profiles
 add column if not exists profile_character_id text;
 
 alter table public.profiles
@@ -101,11 +104,43 @@ create index if not exists game_results_mode_score_idx on public.game_results (g
 create table if not exists public.profile_trophies (
     user_id uuid not null references auth.users(id) on delete cascade,
     trophy_id text not null,
+    trophy_tier text not null default 'normal' check (trophy_tier in ('normal', 'mythic')),
     game_result_id bigint references public.game_results(id) on delete set null,
     award_data jsonb not null default '{}'::jsonb,
     awarded_at timestamptz not null default now(),
-    primary key (user_id, trophy_id)
+    primary key (user_id, trophy_id, trophy_tier)
 );
+
+alter table public.profile_trophies
+add column if not exists trophy_tier text not null default 'normal';
+
+do $$
+begin
+    alter table public.profile_trophies
+    drop constraint if exists profile_trophies_trophy_tier_check;
+
+    if not exists (
+        select 1
+        from pg_constraint
+        where conrelid = 'public.profile_trophies'::regclass
+          and conname = 'profile_trophies_trophy_tier_check'
+    ) then
+        alter table public.profile_trophies
+        add constraint profile_trophies_trophy_tier_check
+        check (trophy_tier in ('normal', 'mythic'));
+    end if;
+
+    if exists (
+        select 1
+        from pg_constraint
+        where conrelid = 'public.profile_trophies'::regclass
+          and conname = 'profile_trophies_pkey'
+          and pg_get_constraintdef(oid) = 'PRIMARY KEY (user_id, trophy_id)'
+    ) then
+        alter table public.profile_trophies drop constraint profile_trophies_pkey;
+        alter table public.profile_trophies add constraint profile_trophies_pkey primary key (user_id, trophy_id, trophy_tier);
+    end if;
+end $$;
 
 create index if not exists profile_trophies_user_idx on public.profile_trophies (user_id, awarded_at);
 create index if not exists profile_trophies_game_result_idx on public.profile_trophies (game_result_id);

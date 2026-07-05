@@ -138,6 +138,7 @@ export const spilTilstand = $state({
     mineSkattekortFelter: [] as number[],
     trofaeStats: null as TrofaeStats | null,
     nyeTrofaeIds: [] as TrofaeId[],
+    nyeMytiskeTrofaeIds: [] as TrofaeId[],
     historik: [] as number[],
     aktivShop: null as string[] | null,
     aktivVaerksted: false,

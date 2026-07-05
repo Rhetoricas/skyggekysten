@@ -31,7 +31,7 @@
     import { eventBibliotek } from '$lib/eventBibliotek';
     import { erAfgroedeModen, hentAfgroedeBlok, hentInsektPlageBlok } from '$lib/afgroeder';
     import { erFeltITaagen } from '$lib/taage';
-    import { findNyeTrofaeer, gemSupabaseTrofaeAwards, gemTrofaeAwards, gemTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, huskVentendeSupabaseTrofaeer, lavTrofaeAwardData, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, nulstilTrofaeStats, retryVentendeSupabaseTrofaeer } from '$lib/trofaeer';
+    import { findNyeMytiskeTrofaeer, findNyeTrofaeer, gemMytiskeTrofaeIds, gemSupabaseTrofaeAwards, gemTrofaeAwards, gemTrofaeIds, hentGemteMytiskeTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, huskVentendeSupabaseMytiskeTrofaeer, huskVentendeSupabaseTrofaeer, lavTrofaeAwardData, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, nulstilTrofaeStats, retryVentendeSupabaseMytiskeTrofaeer, retryVentendeSupabaseTrofaeer } from '$lib/trofaeer';
 
     import Skaerme from './Skaerme.svelte';
     import ShopModal from '$lib/ShopModal.svelte';
@@ -421,6 +421,7 @@
                 scoreGemningFejlet = false;
                 nyGlobalRekord = false;
                 spilTilstand.nyeTrofaeIds = [];
+                spilTilstand.nyeMytiskeTrofaeIds = [];
             } else if (
                 state === 'win' || state === 'dead' || state === 'win_map' || state === 'dead_map'
             ) {
@@ -1010,6 +1011,7 @@
         spilTilstand.mineSkattekortFelter = [];
         spilTilstand.trofaeStats = nulstilTrofaeStats();
         spilTilstand.nyeTrofaeIds = [];
+        spilTilstand.nyeMytiskeTrofaeIds = [];
         spilTilstand.samletScore = 0;
         spilTilstand.venteGratisFeltBrugt = null;
         spilTilstand.gratisNaesteBevaegelse = false;
@@ -1414,6 +1416,7 @@
         spilTilstand.doedsAarsag = null;
         spilTilstand.trofaeStats = nulstilTrofaeStats();
         spilTilstand.nyeTrofaeIds = [];
+        spilTilstand.nyeMytiskeTrofaeIds = [];
         scoreErGemt = false;
         nyGlobalRekord = false;
         initialiserGitter(spilTilstand.kortBredde, spilTilstand.kortHoejde);
@@ -1469,6 +1472,7 @@
         spilTilstand.mineSkattekortFelter = [];
         spilTilstand.trofaeStats = nulstilTrofaeStats();
         spilTilstand.nyeTrofaeIds = [];
+        spilTilstand.nyeMytiskeTrofaeIds = [];
         spilTilstand.gratisNaesteBevaegelse = false;
         spilTilstand.gratisBevaegelseKilde = '';
         spilTilstand.sidsteBersaerkDag = 0;
@@ -1793,32 +1797,45 @@
             ...hentGemteTrofaeIds(ownerKey),
             ...(authState.profil?.trophies || [])
         ]);
+        const gemteMytiskeIds = normaliserTrofaeIds([
+            ...hentGemteMytiskeTrofaeIds(ownerKey),
+            ...(authState.profil?.mythic_trophies || [])
+        ]);
         const nyeTrofaeer = findNyeTrofaeer(gemteIds);
+        const nyeIds = nyeTrofaeer.map((trofae) => trofae.id);
+        const samledeIds = normaliserTrofaeIds([...gemteIds, ...nyeIds]);
+        const nyeMytiskeTrofaeer = findNyeMytiskeTrofaeer(gemteMytiskeIds, samledeIds);
+        const nyeMytiskeIds = nyeMytiskeTrofaeer.map((trofae) => trofae.id);
+        const samledeMytiskeIds = normaliserTrofaeIds([...gemteMytiskeIds, ...nyeMytiskeIds]);
 
-        if (nyeTrofaeer.length > 0) {
-            const nyeIds = nyeTrofaeer.map((trofae) => trofae.id);
-            const samledeIds = normaliserTrofaeIds([...gemteIds, ...nyeIds]);
+        if (nyeIds.length > 0 || nyeMytiskeIds.length > 0) {
             gemTrofaeIds(ownerKey, samledeIds);
+            gemMytiskeTrofaeIds(ownerKey, samledeMytiskeIds);
             if (authState.user?.id) {
                 huskVentendeSupabaseTrofaeer(authState.user.id, samledeIds);
+                huskVentendeSupabaseMytiskeTrofaeer(authState.user.id, samledeMytiskeIds);
                 void retryVentendeSupabaseTrofaeer(authState.user.id);
+                void retryVentendeSupabaseMytiskeTrofaeer(authState.user.id);
             }
             if (authState.profil) {
-                authState.profil = { ...authState.profil, trophies: samledeIds };
+                authState.profil = { ...authState.profil, trophies: samledeIds, mythic_trophies: samledeMytiskeIds };
             }
             spilTilstand.nyeTrofaeIds = nyeIds;
+            spilTilstand.nyeMytiskeTrofaeIds = nyeMytiskeIds;
             return;
         }
 
         if (spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map') {
             spilTilstand.nyeTrofaeIds = [];
+            spilTilstand.nyeMytiskeTrofaeIds = [];
         }
     }
 
     async function gemNyeTrofaeAwardsForHighscore(highscoreGemt: boolean) {
         if (!highscoreGemt || !authState.user?.id || spilTilstand.offlineMode) return;
         const nyeIds = normaliserTrofaeIds(spilTilstand.nyeTrofaeIds || []);
-        if (nyeIds.length === 0) return;
+        const nyeMytiskeIds = normaliserTrofaeIds(spilTilstand.nyeMytiskeTrofaeIds || []);
+        if (nyeIds.length === 0 && nyeMytiskeIds.length === 0) return;
 
         const gameResultId = await medTimeout(hentAktueltHighscoreResultatId(), 10000).catch((error) => {
             console.warn('Kunne ikke finde highscore-id til trofae-award', error);
@@ -1828,12 +1845,22 @@
 
         const ownerKey = lavTrofaeOwnerKey(authState.user.id, spilTilstand.spillerNavn);
         const eksisterendeAwards = hentGemteTrofaeAwards(ownerKey);
-        const nyeAwards = nyeIds.map((id) => ({
-            id,
-            gameResultId,
-            awardedAt: new Date().toISOString(),
-            awardData: lavTrofaeAwardData(id)
-        }));
+        const nyeAwards = [
+            ...nyeIds.map((id) => ({
+                id,
+                tier: 'normal' as const,
+                gameResultId,
+                awardedAt: new Date().toISOString(),
+                awardData: lavTrofaeAwardData(id)
+            })),
+            ...nyeMytiskeIds.map((id) => ({
+                id,
+                tier: 'mythic' as const,
+                gameResultId,
+                awardedAt: new Date().toISOString(),
+                awardData: lavTrofaeAwardData(id)
+            }))
+        ];
         const samledeAwards = normaliserTrofaeAwards([...eksisterendeAwards, ...nyeAwards]);
         gemTrofaeAwards(ownerKey, samledeAwards);
         void gemSupabaseTrofaeAwards(authState.user.id, nyeAwards);
@@ -1981,6 +2008,7 @@
         spilTilstand.mineSkattekortFelter = [];
         spilTilstand.trofaeStats = nulstilTrofaeStats();
         spilTilstand.nyeTrofaeIds = [];
+        spilTilstand.nyeMytiskeTrofaeIds = [];
         spilTilstand.gratisNaesteBevaegelse = false;
         spilTilstand.gratisBevaegelseKilde = '';
         spilTilstand.sidsteBersaerkDag = 0;

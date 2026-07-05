@@ -20,6 +20,9 @@ export interface TrofaeDefinition {
     labelEn: string;
     krav: string;
     kravEn: string;
+    mytiskSti?: string;
+    mytiskKrav: string;
+    mytiskKravEn: string;
     episkTekst: string;
     episkTekstEn: string;
 }
@@ -34,6 +37,7 @@ export interface TrofaeStats {
 
 export interface TrofaeAward {
     id: TrofaeId;
+    tier?: 'normal' | 'mythic';
     gameResultId?: number | null;
     awardedAt?: string;
     awardData?: Record<string, unknown>;
@@ -47,6 +51,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Mine Owner',
         krav: 'Overlev spillet med 12 miner ved spilslut.',
         kravEn: 'Survive the game with 12 mines at game end.',
+        mytiskKrav: 'Overlev spillet med 16 miner ved spilslut.',
+        mytiskKravEn: 'Survive the game with 16 mines at game end.',
         episkTekst: 'Du ejede 12 miner og slap levende væk.',
         episkTekstEn: 'You owned 12 mines and escaped alive.'
     },
@@ -57,6 +63,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Fog King',
         krav: 'Overlev spillet efter 20 bevægelser i tåge.',
         kravEn: 'Survive the game after 20 moves in the fog.',
+        mytiskKrav: 'Overlev spillet efter 60 bevægelser i tåge.',
+        mytiskKravEn: 'Survive the game after 60 moves in the fog.',
         episkTekst: 'Du gik 20 gange i tågen og kom ud igen.',
         episkTekstEn: 'You walked into the fog 20 times and came back out.'
     },
@@ -67,6 +75,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Wavebearer',
         krav: 'Overlev spillet efter at have startet en oversvømmelse og taget skade fra vand 5 gange.',
         kravEn: 'Survive the game after starting a flood and taking water damage 5 times.',
+        mytiskKrav: 'Overlev spillet efter at have startet en oversvømmelse og taget skade fra vand 15 gange.',
+        mytiskKravEn: 'Survive the game after starting a flood and taking water damage 15 times.',
         episkTekst: 'Du startede en oversvømmelse, bar vandets straf og overlevede.',
         episkTekstEn: 'You started a flood, bore the water’s punishment and survived.'
     },
@@ -77,6 +87,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Relic Hunter',
         krav: 'Overlev spillet med 3 af 4 magiske genstande i rygsækken: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.',
         kravEn: 'Survive the game with 3 of 4 magical items in your backpack: Rootheart, Golden Distiller, Dragon Staff and Rune Rod.',
+        mytiskKrav: 'Overlev spillet med alle 4 magiske genstande i rygsækken: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.',
+        mytiskKravEn: 'Survive the game with all 4 magical items in your backpack: Rootheart, Golden Distiller, Dragon Staff and Rune Rod.',
         episkTekst: 'Du bar tre magiske genstande ud af tågen.',
         episkTekstEn: 'You carried three magical items out of the fog.'
     },
@@ -87,6 +99,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Gold Prince',
         krav: 'Overlev spillet med 5000 guld. Kun rent guld tæller.',
         kravEn: 'Survive the game with 5000 gold. Only pure gold counts.',
+        mytiskKrav: 'Overlev spillet med 8000 guld. Kun rent guld tæller.',
+        mytiskKravEn: 'Survive the game with 8000 gold. Only pure gold counts.',
         episkTekst: 'Du slap væk med 5000 guld i hænderne.',
         episkTekstEn: 'You escaped with 5000 gold in your hands.'
     },
@@ -97,6 +111,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Life Warden',
         krav: 'Overlev spillet efter at have healet 400 HP.',
         kravEn: 'Survive the game after healing 400 HP.',
+        mytiskKrav: 'Overlev spillet efter at have healet 1000 HP.',
+        mytiskKravEn: 'Survive the game after healing 1000 HP.',
         episkTekst: 'Du helede 400 HP og holdt dig levende hele vejen.',
         episkTekstEn: 'You healed 400 HP and kept yourself alive all the way.'
     },
@@ -107,6 +123,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Cartographer',
         krav: 'Overlev spillet med 1500 kendte felter.',
         kravEn: 'Survive the game with 1500 known fields.',
+        mytiskKrav: 'Overlev spillet med 2000 kendte felter.',
+        mytiskKravEn: 'Survive the game with 2000 known fields.',
         episkTekst: 'Du kortlagde 1500 felter og fandt hjem.',
         episkTekstEn: 'You mapped 1500 fields and found your way home.'
     },
@@ -117,6 +135,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Equipment Master',
         krav: 'Overlev spillet med 10 opgraderede items i rygsækken på samme tid.',
         kravEn: 'Survive the game with 10 upgraded items in your backpack at the same time.',
+        mytiskKrav: 'Overlev spillet med 14 opgraderingspoint i rygsækken på samme tid.',
+        mytiskKravEn: 'Survive the game with 14 upgrade points in your backpack at the same time.',
         episkTekst: 'Du bar 10 mesterlige stykker udstyr på samme tid.',
         episkTekstEn: 'You carried 10 masterwork pieces of equipment at the same time.'
     },
@@ -127,14 +147,19 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Diamond Hunter',
         krav: 'Overlev spillet efter at have fundet diamanter med en samlet værdi på mindst 3000.',
         kravEn: 'Survive the game after finding diamonds with a total value of at least 3000.',
+        mytiskSti: '/screens/diamantjægeren_myth.webp',
+        mytiskKrav: 'Overlev spillet efter at have fundet diamanter med en samlet værdi på mindst 6000.',
+        mytiskKravEn: 'Survive the game after finding diamonds with a total value of at least 6000.',
         episkTekst: 'Du fandt diamanter med en samlet værdi på mindst 3000.',
         episkTekstEn: 'You found diamonds with a total value of at least 3000.'
     }
 ];
 
 const TROFAE_STORAGE_PREFIX = 'taage_trofaeer:';
+const MYTISK_TROFAE_STORAGE_PREFIX = 'taage_mytiske_trofaeer:';
 const TROFAE_AWARD_STORAGE_PREFIX = 'taage_trofae_awards:';
 const TROFAE_PENDING_SYNC_KEY = 'taage_pending_trofaeer';
+const MYTISK_TROFAE_PENDING_SYNC_KEY = 'taage_pending_mytiske_trofaeer';
 const TROFAE_SUPABASE_TIMEOUT_MS = 8000;
 const TROFAE_KRAV = {
     miner: 12,
@@ -146,6 +171,17 @@ const TROFAE_KRAV = {
     kendteFelter: 1500,
     opgraderedeItems: 10,
     diamantRaavaerdi: 3000
+};
+const MYTISK_TROFAE_KRAV = {
+    miner: 16,
+    taageBevaegelser: 60,
+    vandSkader: 15,
+    magiskeGenstande: 4,
+    guld: 8000,
+    healetHp: 1000,
+    kendteFelter: 2000,
+    opgraderedeItems: 14,
+    diamantRaavaerdi: 6000
 };
 const OPGRADEREDE_ITEMS = new Set([
     'mesterskovl',
@@ -201,6 +237,10 @@ function storageKey(ownerKey: string) {
     return `${TROFAE_STORAGE_PREFIX}${ownerKey}`;
 }
 
+function mytiskStorageKey(ownerKey: string) {
+    return `${MYTISK_TROFAE_STORAGE_PREFIX}${ownerKey}`;
+}
+
 function awardStorageKey(ownerKey: string) {
     return `${TROFAE_AWARD_STORAGE_PREFIX}${ownerKey}`;
 }
@@ -236,6 +276,28 @@ function gemVentendeTrofaeSyncs(syncs: VentendeTrofaeSync[]) {
     localStorage.setItem(TROFAE_PENDING_SYNC_KEY, JSON.stringify(syncs));
 }
 
+function hentVentendeMytiskeTrofaeSyncs(): VentendeTrofaeSync[] {
+    if (typeof localStorage === 'undefined') return [];
+    try {
+        const data = JSON.parse(localStorage.getItem(MYTISK_TROFAE_PENDING_SYNC_KEY) || '[]');
+        if (!Array.isArray(data)) return [];
+        return data
+            .map((sync) => ({
+                userId: typeof sync?.userId === 'string' ? sync.userId : '',
+                ids: normaliserTrofaeIds(sync?.ids),
+                updatedAt: typeof sync?.updatedAt === 'string' ? sync.updatedAt : new Date().toISOString()
+            }))
+            .filter((sync) => sync.userId && sync.ids.length > 0);
+    } catch {
+        return [];
+    }
+}
+
+function gemVentendeMytiskeTrofaeSyncs(syncs: VentendeTrofaeSync[]) {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.setItem(MYTISK_TROFAE_PENDING_SYNC_KEY, JSON.stringify(syncs));
+}
+
 export function huskVentendeSupabaseTrofaeer(userId: string | null | undefined, ids: TrofaeId[]) {
     if (!userId) return;
     const nyeIds = normaliserTrofaeIds(ids);
@@ -252,6 +314,22 @@ export function huskVentendeSupabaseTrofaeer(userId: string | null | undefined, 
     gemVentendeTrofaeSyncs(syncs);
 }
 
+export function huskVentendeSupabaseMytiskeTrofaeer(userId: string | null | undefined, ids: TrofaeId[]) {
+    if (!userId) return;
+    const nyeIds = normaliserTrofaeIds(ids);
+    if (nyeIds.length === 0) return;
+
+    const syncs = hentVentendeMytiskeTrofaeSyncs();
+    const eksisterende = syncs.find((sync) => sync.userId === userId);
+    if (eksisterende) {
+        eksisterende.ids = normaliserTrofaeIds([...eksisterende.ids, ...nyeIds]);
+        eksisterende.updatedAt = new Date().toISOString();
+    } else {
+        syncs.push({ userId, ids: nyeIds, updatedAt: new Date().toISOString() });
+    }
+    gemVentendeMytiskeTrofaeSyncs(syncs);
+}
+
 function sammeTrofaeIds(a: TrofaeId[], b: TrofaeId[]) {
     return a.length === b.length && a.every((id, index) => id === b[index]);
 }
@@ -260,6 +338,15 @@ function fjernVentendeSupabaseTrofaeer(userId: string, ids: TrofaeId[]) {
     const sendteIds = normaliserTrofaeIds(ids);
     gemVentendeTrofaeSyncs(
         hentVentendeTrofaeSyncs().filter((sync) =>
+            sync.userId !== userId || !sammeTrofaeIds(sync.ids, sendteIds)
+        )
+    );
+}
+
+function fjernVentendeSupabaseMytiskeTrofaeer(userId: string, ids: TrofaeId[]) {
+    const sendteIds = normaliserTrofaeIds(ids);
+    gemVentendeMytiskeTrofaeSyncs(
+        hentVentendeMytiskeTrofaeSyncs().filter((sync) =>
             sync.userId !== userId || !sammeTrofaeIds(sync.ids, sendteIds)
         )
     );
@@ -278,6 +365,21 @@ export function gemTrofaeIds(ownerKey: string, ids: TrofaeId[]) {
     if (typeof localStorage === 'undefined') return;
     const unikke = normaliserTrofaeIds(ids);
     localStorage.setItem(storageKey(ownerKey), JSON.stringify(unikke));
+}
+
+export function hentGemteMytiskeTrofaeIds(ownerKey: string): TrofaeId[] {
+    if (typeof localStorage === 'undefined') return [];
+    try {
+        return normaliserTrofaeIds(JSON.parse(localStorage.getItem(mytiskStorageKey(ownerKey)) || '[]'));
+    } catch {
+        return [];
+    }
+}
+
+export function gemMytiskeTrofaeIds(ownerKey: string, ids: TrofaeId[]) {
+    if (typeof localStorage === 'undefined') return;
+    const unikke = normaliserTrofaeIds(ids);
+    localStorage.setItem(mytiskStorageKey(ownerKey), JSON.stringify(unikke));
 }
 
 export function hentGemteTrofaeAwards(ownerKey: string): TrofaeAward[] {
@@ -304,7 +406,7 @@ export function normaliserTrofaeIds(ids: unknown): TrofaeId[] {
 export function normaliserTrofaeAwards(awards: unknown): TrofaeAward[] {
     if (!Array.isArray(awards)) return [];
     const kendteIds = new Set(TROFAE_DEFINITIONER.map((trofae) => trofae.id));
-    const seneste = new Map<TrofaeId, TrofaeAward>();
+    const seneste = new Map<string, TrofaeAward>();
 
     for (const award of awards) {
         const id = typeof award?.id === 'string' && kendteIds.has(award.id as TrofaeId)
@@ -312,14 +414,18 @@ export function normaliserTrofaeAwards(awards: unknown): TrofaeAward[] {
             : null;
         if (!id) continue;
 
+        const tier = award?.tier === 'mythic' || award?.trophy_tier === 'mythic' || award?.mytisk === true
+            ? 'mythic'
+            : 'normal';
         const gameResultId = Number(award?.gameResultId ?? award?.game_result_id);
         const awardData = award?.awardData && typeof award.awardData === 'object'
             ? award.awardData as Record<string, unknown>
             : award?.award_data && typeof award.award_data === 'object'
                 ? award.award_data as Record<string, unknown>
                 : {};
-        seneste.set(id, {
+        seneste.set(`${id}:${tier}`, {
             id,
+            tier,
             gameResultId: Number.isFinite(gameResultId) && gameResultId > 0 ? gameResultId : null,
             awardedAt: typeof award?.awardedAt === 'string'
                 ? award.awardedAt
@@ -364,6 +470,37 @@ export async function gemSupabaseTrofaeIds(userId: string | null | undefined, id
     return true;
 }
 
+export async function gemSupabaseMytiskeTrofaeIds(userId: string | null | undefined, ids: TrofaeId[]) {
+    if (!userId) return false;
+
+    let error: { message?: string } | null = null;
+
+    try {
+        const resultat = await medTimeout(
+            supabase
+                .from('profiles')
+                .update({
+                    mythic_trophies: normaliserTrofaeIds(ids),
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', userId),
+            TROFAE_SUPABASE_TIMEOUT_MS,
+            'Gemning af mytiske trofaeer'
+        );
+        error = resultat.error;
+    } catch (fangetFejl) {
+        console.warn('Mytiske trofaeer kunne ikke gemmes i Supabase:', fangetFejl);
+        return false;
+    }
+
+    if (error) {
+        console.warn('Mytiske trofaeer kunne ikke gemmes i Supabase:', error);
+        return false;
+    }
+
+    return true;
+}
+
 export async function retryVentendeSupabaseTrofaeer(userId?: string | null) {
     const syncs = hentVentendeTrofaeSyncs().filter((sync) => !userId || sync.userId === userId);
     let gemt = 0;
@@ -372,6 +509,21 @@ export async function retryVentendeSupabaseTrofaeer(userId?: string | null) {
         const gemtOnline = await gemSupabaseTrofaeIds(sync.userId, sync.ids);
         if (gemtOnline) {
             fjernVentendeSupabaseTrofaeer(sync.userId, sync.ids);
+            gemt++;
+        }
+    }
+
+    return gemt;
+}
+
+export async function retryVentendeSupabaseMytiskeTrofaeer(userId?: string | null) {
+    const syncs = hentVentendeMytiskeTrofaeSyncs().filter((sync) => !userId || sync.userId === userId);
+    let gemt = 0;
+
+    for (const sync of syncs) {
+        const gemtOnline = await gemSupabaseMytiskeTrofaeIds(sync.userId, sync.ids);
+        if (gemtOnline) {
+            fjernVentendeSupabaseMytiskeTrofaeer(sync.userId, sync.ids);
             gemt++;
         }
     }
@@ -392,11 +544,12 @@ export async function gemSupabaseTrofaeAwards(userId: string | null | undefined,
                     reneAwards.map((award) => ({
                         user_id: userId,
                         trophy_id: award.id,
+                        trophy_tier: award.tier || 'normal',
                         game_result_id: award.gameResultId,
                         award_data: award.awardData || {},
                         awarded_at: award.awardedAt || new Date().toISOString()
                     })),
-                    { onConflict: 'user_id,trophy_id' }
+                    { onConflict: 'user_id,trophy_id,trophy_tier' }
                 ),
             TROFAE_SUPABASE_TIMEOUT_MS,
             'Gemning af trofae-awards'
@@ -419,7 +572,7 @@ export async function hentSupabaseTrofaeAwards(userId: string | null | undefined
         const { data, error } = await medTimeout(
             supabase
                 .from('profile_trophies')
-                .select('trophy_id, game_result_id, award_data, awarded_at')
+                .select('trophy_id, trophy_tier, game_result_id, award_data, awarded_at')
                 .eq('user_id', userId)
                 .order('awarded_at', { ascending: true }),
             TROFAE_SUPABASE_TIMEOUT_MS,
@@ -431,12 +584,43 @@ export async function hentSupabaseTrofaeAwards(userId: string | null | undefined
         }
         return normaliserTrofaeAwards((data || []).map((award) => ({
             id: award.trophy_id,
+            tier: award.trophy_tier,
             gameResultId: award.game_result_id,
             awardData: award.award_data,
             awardedAt: award.awarded_at
         })));
     } catch (error) {
         console.warn('Trofae-awards kunne ikke hentes fra Supabase:', error);
+        return [];
+    }
+}
+
+export async function hentSupabaseTrofaeAwardsForHighscore(gameResultId: number | null | undefined) {
+    if (!gameResultId) return [];
+
+    try {
+        const { data, error } = await medTimeout(
+            supabase
+                .from('profile_trophies')
+                .select('trophy_id, trophy_tier, game_result_id, award_data, awarded_at')
+                .eq('game_result_id', gameResultId)
+                .order('awarded_at', { ascending: true }),
+            TROFAE_SUPABASE_TIMEOUT_MS,
+            'Hentning af trofae-awards for highscore'
+        );
+        if (error) {
+            console.warn('Trofae-awards kunne ikke hentes for highscore:', error);
+            return [];
+        }
+        return normaliserTrofaeAwards((data || []).map((award) => ({
+            id: award.trophy_id,
+            tier: award.trophy_tier,
+            gameResultId: award.game_result_id,
+            awardData: award.award_data,
+            awardedAt: award.awarded_at
+        })));
+    } catch (error) {
+        console.warn('Trofae-awards kunne ikke hentes for highscore:', error);
         return [];
     }
 }
@@ -507,14 +691,10 @@ function overlevedeSpillet() {
         spilTilstand.livspoint > 0;
 }
 
-export function findNyeTrofaeer(tidligereIds: TrofaeId[] = []) {
-    if (!overlevedeSpillet()) return [];
-
-    const tidligere = new Set(tidligereIds);
+function opnaaedeTrofaeIds(krav: typeof TROFAE_KRAV) {
     const t = stats();
     const items = spilTilstand.mitUdstyr || [];
     const opnaaede = new Set<TrofaeId>();
-    const krav = TROFAE_KRAV;
 
     if (antalMiner() >= krav.miner) opnaaede.add('mineejeren');
     if (t.taageBevaegelser >= krav.taageBevaegelser) opnaaede.add('taagekonge');
@@ -526,5 +706,28 @@ export function findNyeTrofaeer(tidligereIds: TrofaeId[] = []) {
     if (antalOpgraderingsPoint(items) >= krav.opgraderedeItems) opnaaede.add('udstyrsmesteren');
     if (t.diamantRaavaerdiFundet >= krav.diamantRaavaerdi) opnaaede.add('diamantjaegeren');
 
+    return opnaaede;
+}
+
+export function findNyeTrofaeer(tidligereIds: TrofaeId[] = []) {
+    if (!overlevedeSpillet()) return [];
+
+    const tidligere = new Set(tidligereIds);
+    const opnaaede = opnaaedeTrofaeIds(TROFAE_KRAV);
+
     return TROFAE_DEFINITIONER.filter((trofae) => opnaaede.has(trofae.id) && !tidligere.has(trofae.id));
+}
+
+export function findNyeMytiskeTrofaeer(tidligereMytiskeIds: TrofaeId[] = [], normaleIdsEfterRun: TrofaeId[] = []) {
+    if (!overlevedeSpillet()) return [];
+
+    const tidligere = new Set(tidligereMytiskeIds);
+    const normale = new Set(normaliserTrofaeIds(normaleIdsEfterRun));
+    const opnaaede = opnaaedeTrofaeIds(MYTISK_TROFAE_KRAV);
+
+    return TROFAE_DEFINITIONER.filter((trofae) =>
+        normale.has(trofae.id) &&
+        opnaaede.has(trofae.id) &&
+        !tidligere.has(trofae.id)
+    );
 }

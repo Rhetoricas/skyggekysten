@@ -5,11 +5,15 @@ import { findMedaljeNiveau } from './score';
 import { hentTitel } from './historieMotor';
 import { harUrlSprogOverride, normaliserSprog, saetSprog, sprogState, tekst, type AppSprog } from './i18n.svelte';
 import {
+    gemMytiskeTrofaeIds,
     gemTrofaeIds,
+    hentGemteMytiskeTrofaeIds,
     hentGemteTrofaeIds,
+    huskVentendeSupabaseMytiskeTrofaeer,
     huskVentendeSupabaseTrofaeer,
     lavTrofaeOwnerKey,
     normaliserTrofaeIds,
+    retryVentendeSupabaseMytiskeTrofaeer,
     retryVentendeSupabaseTrofaeer,
     type TrofaeId
 } from './trofaeer';
@@ -19,6 +23,7 @@ export interface Profil {
     display_name: string | null;
     sound_level?: LydNiveau | null;
     trophies?: TrofaeId[] | null;
+    mythic_trophies?: TrofaeId[] | null;
     profile_character_id?: string | null;
     language?: AppSprog | null;
     created_at?: string;
@@ -55,7 +60,7 @@ export const authState = $state({
 let authStartet = false;
 let authHeartbeatTimer: ReturnType<typeof setInterval> | null = null;
 const PROFIL_KARAKTER_KEY = 'taage_profile_character:';
-const PROFIL_SELECT = 'id, display_name, sound_level, trophies, profile_character_id, language, created_at, updated_at';
+const PROFIL_SELECT = 'id, display_name, sound_level, trophies, mythic_trophies, profile_character_id, language, created_at, updated_at';
 
 function erGyldigProfilKarakterId(karakterId?: string | null) {
     return !karakterId || tilgaengeligeKarakterer.some((karakter) => karakter.id === karakterId);
@@ -82,11 +87,12 @@ function medLokalProfilKarakterFallback(profil: Profil | null) {
     return { ...profil, profile_character_id: hentLokalProfilKarakter(authState.user.id) } satisfies Profil;
 }
 
-function normaliserProfil(data: (Profil & { trophies?: unknown }) | null) {
+function normaliserProfil(data: (Profil & { trophies?: unknown; mythic_trophies?: unknown }) | null) {
     if (!data) return null;
     return {
         ...data,
         trophies: normaliserTrofaeIds(data.trophies),
+        mythic_trophies: normaliserTrofaeIds(data.mythic_trophies),
         profile_character_id: erGyldigProfilKarakterId(data.profile_character_id) ? data.profile_character_id || null : null,
         language: data.language ? normaliserSprog(data.language) : null
     } satisfies Profil;
@@ -102,21 +108,32 @@ async function synkProfilTrofaeerMedLokalCache(profil: Profil | null) {
 
     const ownerKey = lavTrofaeOwnerKey(authState.user.id, profil.display_name);
     const lokaleIds = hentGemteTrofaeIds(ownerKey);
+    const lokaleMytiskeIds = hentGemteMytiskeTrofaeIds(ownerKey);
     const profilIds = normaliserTrofaeIds(profil.trophies);
+    const profilMytiskeIds = normaliserTrofaeIds(profil.mythic_trophies);
     const samledeIds = normaliserTrofaeIds([...profilIds, ...lokaleIds]);
+    const samledeMytiskeIds = normaliserTrofaeIds([...profilMytiskeIds, ...lokaleMytiskeIds]);
 
     if (samledeIds.length > 0) gemTrofaeIds(ownerKey, samledeIds);
+    if (samledeMytiskeIds.length > 0) gemMytiskeTrofaeIds(ownerKey, samledeMytiskeIds);
 
     const erAendret =
         samledeIds.length !== profilIds.length ||
         samledeIds.some((id, index) => id !== profilIds[index]);
+    const mytiskErAendret =
+        samledeMytiskeIds.length !== profilMytiskeIds.length ||
+        samledeMytiskeIds.some((id, index) => id !== profilMytiskeIds[index]);
 
     if (erAendret) {
         huskVentendeSupabaseTrofaeer(authState.user.id, samledeIds);
         void retryVentendeSupabaseTrofaeer(authState.user.id);
     }
+    if (mytiskErAendret) {
+        huskVentendeSupabaseMytiskeTrofaeer(authState.user.id, samledeMytiskeIds);
+        void retryVentendeSupabaseMytiskeTrofaeer(authState.user.id);
+    }
 
-    return { ...profil, trophies: samledeIds } satisfies Profil;
+    return { ...profil, trophies: samledeIds, mythic_trophies: samledeMytiskeIds } satisfies Profil;
 }
 
 async function vedligeholdLogin() {
@@ -132,6 +149,7 @@ async function vedligeholdLogin() {
 
     authState.user = session.user;
     void retryVentendeSupabaseTrofaeer(authState.user.id);
+    void retryVentendeSupabaseMytiskeTrofaeer(authState.user.id);
 
     const sekunderTilUdlob = (session.expires_at ?? 0) - Math.floor(Date.now() / 1000);
     if (sekunderTilUdlob > 5 * 60) return;
@@ -179,6 +197,7 @@ export async function initAuth() {
     if (authState.user) {
         await hentEllerOpretProfil();
         void retryVentendeSupabaseTrofaeer(authState.user.id);
+        void retryVentendeSupabaseMytiskeTrofaeer(authState.user.id);
     }
 
     supabase.auth.onAuthStateChange(async (_event, session) => {
@@ -194,6 +213,7 @@ export async function initAuth() {
         if (authState.user) {
             await hentEllerOpretProfil();
             void retryVentendeSupabaseTrofaeer(authState.user.id);
+            void retryVentendeSupabaseMytiskeTrofaeer(authState.user.id);
         } else {
             authState.profil = null;
             authState.stats = null;
@@ -261,7 +281,7 @@ export async function hentEllerOpretProfil() {
             .eq('id', authState.user.id)
             .maybeSingle();
 
-        data = fallback.data ? { ...fallback.data, sound_level: null, trophies: [], profile_character_id: hentLokalProfilKarakter(authState.user.id), language: sprogState.sprog } : null;
+        data = fallback.data ? { ...fallback.data, sound_level: null, trophies: [], mythic_trophies: [], profile_character_id: hentLokalProfilKarakter(authState.user.id), language: sprogState.sprog } : null;
     }
 
     if (data) {
@@ -274,7 +294,7 @@ export async function hentEllerOpretProfil() {
     const fallbackNavn = authState.user.email?.split('@')[0]?.slice(0, 15) || 'Spiller';
     const opretResultat = await supabase
         .from('profiles')
-        .insert([{ id: authState.user.id, display_name: fallbackNavn, sound_level: lydKontrol.niveau, trophies: [], profile_character_id: null, language: sprogState.sprog }])
+        .insert([{ id: authState.user.id, display_name: fallbackNavn, sound_level: lydKontrol.niveau, trophies: [], mythic_trophies: [], profile_character_id: null, language: sprogState.sprog }])
         .select(PROFIL_SELECT)
         .single();
     let oprettet = opretResultat.data;
@@ -286,7 +306,7 @@ export async function hentEllerOpretProfil() {
             .select('id, display_name, created_at, updated_at')
             .single();
 
-        oprettet = fallback.data ? { ...fallback.data, sound_level: null, trophies: [], profile_character_id: hentLokalProfilKarakter(authState.user.id), language: sprogState.sprog } : null;
+        oprettet = fallback.data ? { ...fallback.data, sound_level: null, trophies: [], mythic_trophies: [], profile_character_id: hentLokalProfilKarakter(authState.user.id), language: sprogState.sprog } : null;
     }
 
     authState.profil = medLokalProfilKarakterFallback(await synkProfilTrofaeerMedLokalCache(normaliserProfil(oprettet)));
@@ -319,7 +339,7 @@ export async function gemProfilNavn(navn: string) {
             .select('id, display_name, created_at, updated_at')
             .single();
 
-        data = fallback.data ? { ...fallback.data, sound_level: authState.profil?.sound_level ?? null, trophies: authState.profil?.trophies ?? [], profile_character_id: authState.profil?.profile_character_id ?? null, language: authState.profil?.language ?? sprogState.sprog } : null;
+        data = fallback.data ? { ...fallback.data, sound_level: authState.profil?.sound_level ?? null, trophies: authState.profil?.trophies ?? [], mythic_trophies: authState.profil?.mythic_trophies ?? [], profile_character_id: authState.profil?.profile_character_id ?? null, language: authState.profil?.language ?? sprogState.sprog } : null;
         error = fallback.error;
     }
 
@@ -349,7 +369,7 @@ export async function gemProfilLydNiveau(niveau: LydNiveau) {
             .select('id, display_name, sound_level, created_at, updated_at')
             .single();
 
-        data = fallback.data ? { ...fallback.data, trophies: authState.profil?.trophies ?? [], profile_character_id: authState.profil?.profile_character_id ?? null, language: authState.profil?.language ?? sprogState.sprog } : null;
+        data = fallback.data ? { ...fallback.data, trophies: authState.profil?.trophies ?? [], mythic_trophies: authState.profil?.mythic_trophies ?? [], profile_character_id: authState.profil?.profile_character_id ?? null, language: authState.profil?.language ?? sprogState.sprog } : null;
         error = fallback.error;
     }
 
