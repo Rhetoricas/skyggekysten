@@ -1876,16 +1876,15 @@
             globaleScores = nyeGlobaleScores;
             ugensGlobaleScores = nyeUgensGlobaleScores;
 
-            const kanTjekkeTopTi = highscoreGemt && !!authState.user;
+            const kanTjekkeUgeTop = highscoreGemt && !!authState.user;
             const highscoreNavn = authState.profil?.display_name || spilTilstand.spillerNavn;
-            nyGlobalRekord = !!kanTjekkeTopTi &&
+            const ugensTopScore = ugensGlobaleScores[0];
+            nyGlobalRekord = !!kanTjekkeUgeTop &&
                 spilTilstand.samletScore >= M10_SCORE &&
-                ugensGlobaleScores.slice(0, 10).some((score) =>
-                    score.point === spilTilstand.samletScore &&
-                    score.spillerNavn === highscoreNavn &&
-                    score.oeNavn === spilTilstand.rumKode &&
-                    score.karakter === spilTilstand.valgtKarakter?.navn
-                );
+                ugensTopScore?.point === spilTilstand.samletScore &&
+                ugensTopScore.spillerNavn === highscoreNavn &&
+                ugensTopScore.oeNavn === spilTilstand.rumKode &&
+                ugensTopScore.karakter === spilTilstand.valgtKarakter?.navn;
             const gemtScore = ugensGlobaleScores.find((score) =>
                 score.point === spilTilstand.samletScore &&
                 score.spillerNavn === highscoreNavn &&
@@ -4096,21 +4095,21 @@ function udførBevægelse(nytIndeks: number) {
     
     .modstander-icon { position: absolute; top: 10px; z-index: 16; display: flex; justify-content: center; width: 100%; }
     .gravsten-container {
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; z-index: 13;
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 46px; z-index: 13;
         display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto;
-        height: 60px; border: 0; padding: 0; margin: 0; background: transparent; cursor: pointer;
+        height: 46px; border: 0; padding: 0; margin: 0; background: transparent; cursor: pointer;
     }
     .gravsten-ikon { position: absolute; width: 100%; height: auto; z-index: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
     .gravsten-portraet {
-        position: relative; z-index: 2; width: 38px; margin-top: -8px;
+        position: relative; z-index: 2; width: 29px; margin-top: -6px;
         filter: grayscale(100%) sepia(10%) brightness(0.6) contrast(1.2); opacity: 0.85;
     }
     .gravsten-count {
         position: absolute; right: 1px; bottom: 0; z-index: 3;
-        min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box;
+        min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box;
         display: inline-flex; align-items: center; justify-content: center;
         border-radius: 999px; background: rgba(20, 20, 20, 0.88); color: #f1f1f1;
-        font-size: 0.72rem; font-weight: 800; line-height: 1;
+        font-size: 0.64rem; font-weight: 800; line-height: 1;
         border: 1px solid rgba(255, 255, 255, 0.5);
     }
 
