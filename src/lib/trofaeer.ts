@@ -47,6 +47,7 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     {
         id: 'mineejeren',
         sti: '/screens/mineejeren.webp',
+        mytiskSti: '/screens/mineejeren_myth.webp',
         label: 'Mineejer',
         labelEn: 'Mine Owner',
         krav: 'Overlev spillet med 12 miner ved spilslut.',
@@ -59,6 +60,7 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     {
         id: 'taagekonge',
         sti: '/screens/taagekonge.webp',
+        mytiskSti: '/screens/taagekonge_myth.webp',
         label: 'Tågekonge',
         labelEn: 'Fog King',
         krav: 'Overlev spillet efter 20 bevægelser i tåge.',
@@ -71,6 +73,7 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     {
         id: 'boelgebaereren',
         sti: '/screens/Bølgebæreren.webp',
+        mytiskSti: '/screens/Bølgebæreren_myth.webp',
         label: 'Bølgebærer',
         labelEn: 'Wavebearer',
         krav: 'Overlev spillet efter at have startet en oversvømmelse og taget skade fra vand 5 gange.',
@@ -119,6 +122,7 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     {
         id: 'korttegneren',
         sti: '/screens/korttegneren.webp',
+        mytiskSti: '/screens/korttegneren_myth.webp',
         label: 'Korttegner',
         labelEn: 'Cartographer',
         krav: 'Overlev spillet med 1500 kendte felter.',
@@ -131,6 +135,7 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     {
         id: 'udstyrsmesteren',
         sti: '/screens/udstyrsmesteren.webp',
+        mytiskSti: '/screens/udstyrsmesteren_myth.webp',
         label: 'Udstyrsmester',
         labelEn: 'Equipment Master',
         krav: 'Overlev spillet med 10 opgraderede items i rygsækken på samme tid.',
