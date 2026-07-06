@@ -86,6 +86,7 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     {
         id: 'relikviejaegeren',
         sti: '/screens/relikviejægeren.webp',
+        mytiskSti: '/screens/relikviejægeren_myth.webp',
         label: 'Relikviejæger',
         labelEn: 'Relic Hunter',
         krav: 'Overlev spillet med 3 af 4 magiske genstande i rygsækken: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.',
@@ -98,6 +99,7 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     {
         id: 'guldfyrsten',
         sti: '/screens/guldfyrsten.webp',
+        mytiskSti: '/screens/guldfyrsten_myth.webp',
         label: 'Guldfyrste',
         labelEn: 'Gold Prince',
         krav: 'Overlev spillet med 5000 guld. Kun rent guld tæller.',
@@ -110,6 +112,7 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     {
         id: 'livsvogteren',
         sti: '/screens/livsvogteren.webp',
+        mytiskSti: '/screens/livsvogteren_myth.webp',
         label: 'Livvogter',
         labelEn: 'Life Warden',
         krav: 'Overlev spillet efter at have healet 400 HP.',
