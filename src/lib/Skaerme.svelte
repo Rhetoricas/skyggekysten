@@ -233,20 +233,24 @@
 
     function opdaterLokaleTrofaeIds() {
         const ownerKey = trofaeOwnerKey();
-        const gemte = normaliserTrofaeIds([
-            ...hentGemteTrofaeIds(ownerKey),
-            ...(authState.profil?.trophies || [])
-        ]);
-        const gemteMytiske = normaliserTrofaeIds([
-            ...hentGemteMytiskeTrofaeIds(ownerKey),
-            ...(authState.profil?.mythic_trophies || [])
-        ]);
+        const gemte = authState.user?.id
+            ? normaliserTrofaeIds(authState.profil?.trophies || [])
+            : normaliserTrofaeIds([
+                ...hentGemteTrofaeIds(ownerKey),
+                ...(authState.profil?.trophies || [])
+            ]);
+        const gemteMytiske = authState.user?.id
+            ? normaliserTrofaeIds(authState.profil?.mythic_trophies || [])
+            : normaliserTrofaeIds([
+                ...hentGemteMytiskeTrofaeIds(ownerKey),
+                ...(authState.profil?.mythic_trophies || [])
+            ]);
         const nye = spilTilstand.nyeTrofaeIds || [];
         const nyeMytiske = spilTilstand.nyeMytiskeTrofaeIds || [];
         const samlede = normaliserTrofaeIds([...gemte, ...nye]);
         const samledeMytiske = normaliserTrofaeIds([...gemteMytiske, ...nyeMytiske]);
-        if (samlede.length > 0) gemTrofaeIds(ownerKey, samlede);
-        if (samledeMytiske.length > 0) gemMytiskeTrofaeIds(ownerKey, samledeMytiske);
+        gemTrofaeIds(ownerKey, samlede);
+        gemMytiskeTrofaeIds(ownerKey, samledeMytiske);
         lokaleTrofaeIds = samlede;
         lokaleMytiskeTrofaeIds = samledeMytiske;
     }

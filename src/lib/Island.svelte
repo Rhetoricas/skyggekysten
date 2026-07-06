@@ -1779,14 +1779,18 @@
 
     function opdaterLokaleTrofaeer() {
         const ownerKey = lavTrofaeOwnerKey(authState.user?.id, spilTilstand.spillerNavn);
-        const gemteIds = normaliserTrofaeIds([
-            ...hentGemteTrofaeIds(ownerKey),
-            ...(authState.profil?.trophies || [])
-        ]);
-        const gemteMytiskeIds = normaliserTrofaeIds([
-            ...hentGemteMytiskeTrofaeIds(ownerKey),
-            ...(authState.profil?.mythic_trophies || [])
-        ]);
+        const gemteIds = authState.user?.id
+            ? normaliserTrofaeIds(authState.profil?.trophies || [])
+            : normaliserTrofaeIds([
+                ...hentGemteTrofaeIds(ownerKey),
+                ...(authState.profil?.trophies || [])
+            ]);
+        const gemteMytiskeIds = authState.user?.id
+            ? normaliserTrofaeIds(authState.profil?.mythic_trophies || [])
+            : normaliserTrofaeIds([
+                ...hentGemteMytiskeTrofaeIds(ownerKey),
+                ...(authState.profil?.mythic_trophies || [])
+            ]);
         const nyeTrofaeer = findNyeTrofaeer(gemteIds);
         const nyeIds = nyeTrofaeer.map((trofae) => trofae.id);
         const samledeIds = normaliserTrofaeIds([...gemteIds, ...nyeIds]);
@@ -1798,8 +1802,8 @@
             gemTrofaeIds(ownerKey, samledeIds);
             gemMytiskeTrofaeIds(ownerKey, samledeMytiskeIds);
             if (authState.user?.id) {
-                huskVentendeSupabaseTrofaeer(authState.user.id, samledeIds);
-                huskVentendeSupabaseMytiskeTrofaeer(authState.user.id, samledeMytiskeIds);
+                huskVentendeSupabaseTrofaeer(authState.user.id, samledeIds, nyeIds);
+                huskVentendeSupabaseMytiskeTrofaeer(authState.user.id, samledeMytiskeIds, nyeMytiskeIds);
                 void retryVentendeSupabaseTrofaeer(authState.user.id);
                 void retryVentendeSupabaseMytiskeTrofaeer(authState.user.id);
             }

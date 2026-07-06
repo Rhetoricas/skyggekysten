@@ -215,6 +215,7 @@ const MAGISKE_GENSTANDE = new Set(['rodhjertet', 'gylden_destillator', 'dragesta
 type VentendeTrofaeSync = {
     userId: string;
     ids: TrofaeId[];
+    nyeIds: TrofaeId[];
     updatedAt: string;
 };
 
@@ -271,6 +272,7 @@ function hentVentendeTrofaeSyncs(): VentendeTrofaeSync[] {
             .map((sync) => ({
                 userId: typeof sync?.userId === 'string' ? sync.userId : '',
                 ids: normaliserTrofaeIds(sync?.ids),
+                nyeIds: normaliserTrofaeIds(sync?.nyeIds),
                 updatedAt: typeof sync?.updatedAt === 'string' ? sync.updatedAt : new Date().toISOString()
             }))
             .filter((sync) => sync.userId && sync.ids.length > 0);
@@ -293,6 +295,7 @@ function hentVentendeMytiskeTrofaeSyncs(): VentendeTrofaeSync[] {
             .map((sync) => ({
                 userId: typeof sync?.userId === 'string' ? sync.userId : '',
                 ids: normaliserTrofaeIds(sync?.ids),
+                nyeIds: normaliserTrofaeIds(sync?.nyeIds),
                 updatedAt: typeof sync?.updatedAt === 'string' ? sync.updatedAt : new Date().toISOString()
             }))
             .filter((sync) => sync.userId && sync.ids.length > 0);
@@ -306,34 +309,38 @@ function gemVentendeMytiskeTrofaeSyncs(syncs: VentendeTrofaeSync[]) {
     localStorage.setItem(MYTISK_TROFAE_PENDING_SYNC_KEY, JSON.stringify(syncs));
 }
 
-export function huskVentendeSupabaseTrofaeer(userId: string | null | undefined, ids: TrofaeId[]) {
+export function huskVentendeSupabaseTrofaeer(userId: string | null | undefined, ids: TrofaeId[], nyeIds: TrofaeId[] = []) {
     if (!userId) return;
-    const nyeIds = normaliserTrofaeIds(ids);
-    if (nyeIds.length === 0) return;
+    const alleIds = normaliserTrofaeIds(ids);
+    const nyeTrofaeIds = normaliserTrofaeIds(nyeIds);
+    if (alleIds.length === 0 || nyeTrofaeIds.length === 0) return;
 
     const syncs = hentVentendeTrofaeSyncs();
     const eksisterende = syncs.find((sync) => sync.userId === userId);
     if (eksisterende) {
-        eksisterende.ids = normaliserTrofaeIds([...eksisterende.ids, ...nyeIds]);
+        eksisterende.ids = normaliserTrofaeIds([...eksisterende.ids, ...alleIds]);
+        eksisterende.nyeIds = normaliserTrofaeIds([...eksisterende.nyeIds, ...nyeTrofaeIds]);
         eksisterende.updatedAt = new Date().toISOString();
     } else {
-        syncs.push({ userId, ids: nyeIds, updatedAt: new Date().toISOString() });
+        syncs.push({ userId, ids: alleIds, nyeIds: nyeTrofaeIds, updatedAt: new Date().toISOString() });
     }
     gemVentendeTrofaeSyncs(syncs);
 }
 
-export function huskVentendeSupabaseMytiskeTrofaeer(userId: string | null | undefined, ids: TrofaeId[]) {
+export function huskVentendeSupabaseMytiskeTrofaeer(userId: string | null | undefined, ids: TrofaeId[], nyeIds: TrofaeId[] = []) {
     if (!userId) return;
-    const nyeIds = normaliserTrofaeIds(ids);
-    if (nyeIds.length === 0) return;
+    const alleIds = normaliserTrofaeIds(ids);
+    const nyeTrofaeIds = normaliserTrofaeIds(nyeIds);
+    if (alleIds.length === 0 || nyeTrofaeIds.length === 0) return;
 
     const syncs = hentVentendeMytiskeTrofaeSyncs();
     const eksisterende = syncs.find((sync) => sync.userId === userId);
     if (eksisterende) {
-        eksisterende.ids = normaliserTrofaeIds([...eksisterende.ids, ...nyeIds]);
+        eksisterende.ids = normaliserTrofaeIds([...eksisterende.ids, ...alleIds]);
+        eksisterende.nyeIds = normaliserTrofaeIds([...eksisterende.nyeIds, ...nyeTrofaeIds]);
         eksisterende.updatedAt = new Date().toISOString();
     } else {
-        syncs.push({ userId, ids: nyeIds, updatedAt: new Date().toISOString() });
+        syncs.push({ userId, ids: alleIds, nyeIds: nyeTrofaeIds, updatedAt: new Date().toISOString() });
     }
     gemVentendeMytiskeTrofaeSyncs(syncs);
 }
@@ -514,6 +521,10 @@ export async function retryVentendeSupabaseTrofaeer(userId?: string | null) {
     let gemt = 0;
 
     for (const sync of syncs) {
+        if (sync.nyeIds.length === 0) {
+            fjernVentendeSupabaseTrofaeer(sync.userId, sync.ids);
+            continue;
+        }
         const gemtOnline = await gemSupabaseTrofaeIds(sync.userId, sync.ids);
         if (gemtOnline) {
             fjernVentendeSupabaseTrofaeer(sync.userId, sync.ids);
@@ -529,6 +540,10 @@ export async function retryVentendeSupabaseMytiskeTrofaeer(userId?: string | nul
     let gemt = 0;
 
     for (const sync of syncs) {
+        if (sync.nyeIds.length === 0) {
+            fjernVentendeSupabaseMytiskeTrofaeer(sync.userId, sync.ids);
+            continue;
+        }
         const gemtOnline = await gemSupabaseMytiskeTrofaeIds(sync.userId, sync.ids);
         if (gemtOnline) {
             fjernVentendeSupabaseMytiskeTrofaeer(sync.userId, sync.ids);

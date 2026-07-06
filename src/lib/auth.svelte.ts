@@ -7,10 +7,6 @@ import { harUrlSprogOverride, normaliserSprog, saetSprog, sprogState, tekst, typ
 import {
     gemMytiskeTrofaeIds,
     gemTrofaeIds,
-    hentGemteMytiskeTrofaeIds,
-    hentGemteTrofaeIds,
-    huskVentendeSupabaseMytiskeTrofaeer,
-    huskVentendeSupabaseTrofaeer,
     lavTrofaeOwnerKey,
     normaliserTrofaeIds,
     retryVentendeSupabaseMytiskeTrofaeer,
@@ -107,33 +103,13 @@ async function synkProfilTrofaeerMedLokalCache(profil: Profil | null) {
     if (!authState.user || !profil) return profil;
 
     const ownerKey = lavTrofaeOwnerKey(authState.user.id, profil.display_name);
-    const lokaleIds = hentGemteTrofaeIds(ownerKey);
-    const lokaleMytiskeIds = hentGemteMytiskeTrofaeIds(ownerKey);
     const profilIds = normaliserTrofaeIds(profil.trophies);
     const profilMytiskeIds = normaliserTrofaeIds(profil.mythic_trophies);
-    const samledeIds = normaliserTrofaeIds([...profilIds, ...lokaleIds]);
-    const samledeMytiskeIds = normaliserTrofaeIds([...profilMytiskeIds, ...lokaleMytiskeIds]);
 
-    if (samledeIds.length > 0) gemTrofaeIds(ownerKey, samledeIds);
-    if (samledeMytiskeIds.length > 0) gemMytiskeTrofaeIds(ownerKey, samledeMytiskeIds);
+    gemTrofaeIds(ownerKey, profilIds);
+    gemMytiskeTrofaeIds(ownerKey, profilMytiskeIds);
 
-    const erAendret =
-        samledeIds.length !== profilIds.length ||
-        samledeIds.some((id, index) => id !== profilIds[index]);
-    const mytiskErAendret =
-        samledeMytiskeIds.length !== profilMytiskeIds.length ||
-        samledeMytiskeIds.some((id, index) => id !== profilMytiskeIds[index]);
-
-    if (erAendret) {
-        huskVentendeSupabaseTrofaeer(authState.user.id, samledeIds);
-        void retryVentendeSupabaseTrofaeer(authState.user.id);
-    }
-    if (mytiskErAendret) {
-        huskVentendeSupabaseMytiskeTrofaeer(authState.user.id, samledeMytiskeIds);
-        void retryVentendeSupabaseMytiskeTrofaeer(authState.user.id);
-    }
-
-    return { ...profil, trophies: samledeIds, mythic_trophies: samledeMytiskeIds } satisfies Profil;
+    return { ...profil, trophies: profilIds, mythic_trophies: profilMytiskeIds } satisfies Profil;
 }
 
 async function vedligeholdLogin() {
