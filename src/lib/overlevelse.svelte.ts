@@ -1,5 +1,5 @@
 import { spilTilstand } from './spilTilstand.svelte';
-import { syncTilDb, broadcastFelt } from './netvaerk';
+import { syncTilDb, broadcastFelt, broadcastFelter } from './netvaerk';
 import { HEX_W } from './spildata';
 import { brugFraRygsæk, hentKortBredde, hentKortHoejde, hentNaboIRetning } from './spilmotor';
 import { erFeltITaagen } from './taage';
@@ -14,6 +14,37 @@ function erVandBiome(biome: string | null | undefined) {
 
 export function erSpillerITaagen() {
     return erFeltITaagen(spilTilstand.gitter, spilTilstand.spillerIndex, spilTilstand.fogX, hentKortBredde());
+}
+
+function rydTaageramteRodderOgBaal() {
+    const bredde = hentKortBredde();
+    const aendredeFelter: Array<{ index: number; feltData: Felt }> = [];
+
+    spilTilstand.gitter.forEach((felt, index) => {
+        if (!erFeltITaagen(spilTilstand.gitter, index, spilTilstand.fogX, bredde)) return;
+
+        let aendret = false;
+        if ((felt.skjultLiv ?? 0) > 0) {
+            felt.skjultLiv = 0;
+            aendret = true;
+        }
+
+        if (felt.isCampfire || felt.eventID === 'campfire') {
+            felt.isCampfire = false;
+            felt.eventID = undefined;
+            aendret = true;
+        }
+
+        if (aendret) aendredeFelter.push({ index, feltData: felt });
+    });
+
+    if (aendredeFelter.length > 0) {
+        spilTilstand.gitter = [...spilTilstand.gitter];
+        broadcastFelter(aendredeFelter);
+        return true;
+    }
+
+    return false;
 }
 
 let sidstBrugtEliksir = 0;
@@ -300,6 +331,7 @@ export function fremrykTid() {
     
     const gammelDag = spilTilstand.dag || 1;
     let taagenVendte = false;
+    let taagenRykkede = false;
 
     while (spilTilstand.nuvaerendeEnergi <= 0) {
         spilTilstand.dag++;
@@ -311,6 +343,7 @@ export function fremrykTid() {
             const dynamiskFart = 0.5 + Math.pow(spilTilstand.dag / 100, 2);
             const fremrykning = (HEX_W * dynamiskFart) / antalLevende;
             const oestkant = hentKortBredde() * HEX_W;
+            taagenRykkede = true;
 
             if (spilTilstand.fogX >= oestkant) {
                 spilTilstand.fogX = -fremrykning;
@@ -328,7 +361,7 @@ export function fremrykTid() {
     }
 
     const nyDag = spilTilstand.dag || 1;
-    let kortAendret = false;
+    let kortAendret = taagenRykkede ? rydTaageramteRodderOgBaal() : false;
 
     if (nyDag > gammelDag) {
         let samletLog = "";
@@ -355,6 +388,7 @@ export function fremrykTid() {
 
     if (erSpillerITaagen()) {
         tagSkadeOgTjekDød(30, tekst('Tågens syre ætsede dine lunger.', 'The fog acid burned your lungs.'));
+        if (kortAendret && spilTilstand.gameState === 'play') syncTilDb(true);
     } else {
         syncTilDb(kortAendret);
     }

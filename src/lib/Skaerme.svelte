@@ -999,7 +999,8 @@
     function nyeMytiskeTrofaeer() {
         return (spilTilstand.nyeMytiskeTrofaeIds || [])
             .map((id) => findTrofae(id))
-            .filter((trofae): trofae is NonNullable<ReturnType<typeof findTrofae>> => !!trofae);
+            .filter((trofae): trofae is NonNullable<ReturnType<typeof findTrofae>> => !!trofae)
+            .map((trofae) => ({ ...trofae, sti: trofae.mytiskSti || trofae.sti }));
     }
 
 </script>
@@ -1014,7 +1015,7 @@
             <p class="episk-kicker">{mytiskeTrofaeer.length > 0 ? tekst('Mytisk niveau', 'Mythic tier') : tekst('Ny trofæmedalje', 'New trophy medal')}</p>
             <h2>
                 {#if mytiskeTrofaeer.length > 0 && almindeligeTrofaeer.length === 0}
-                    {mytiskeTrofaeer.length === 1 ? tekst(`${medaljeLabel(mytiskeTrofaeer[0])} er mytisk`, `${medaljeLabel(mytiskeTrofaeer[0])} is mythic`) : tekst(`${mytiskeTrofaeer.length} mytiske trofæer`, `${mytiskeTrofaeer.length} mythic trophies`)}
+                    {mytiskeTrofaeer.length === 1 ? tekst(`Mytisk ${medaljeLabel(mytiskeTrofaeer[0])}`, `Mythic ${medaljeLabel(mytiskeTrofaeer[0])}`) : tekst(`${mytiskeTrofaeer.length} mytiske trofæer`, `${mytiskeTrofaeer.length} mythic trophies`)}
                 {:else if almindeligeTrofaeer.length === 1 && mytiskeTrofaeer.length === 0}
                     {medaljeLabel(almindeligeTrofaeer[0])}
                 {:else}
@@ -1024,11 +1025,6 @@
             <div class="episk-trofae-liste">
                 {#each almindeligeTrofaeer as trofae (trofae.id)}
                     <div class="episk-trofae">
-                        <span class="mytisk-ring-lag" aria-hidden="true">
-                            {#each [0, 1, 2, 3, 4] as _}
-                                <span></span>
-                            {/each}
-                        </span>
                         <img src={trofae.sti} alt={medaljeLabel(trofae)} draggable="false" />
                         <div>
                             <strong>{medaljeLabel(trofae)}</strong>
@@ -1038,11 +1034,6 @@
                 {/each}
                 {#each mytiskeTrofaeer as trofae (`mytisk-${trofae.id}`)}
                     <div class="episk-trofae">
-                        <span class="mytisk-ring-lag" aria-hidden="true">
-                            {#each [0, 1, 2, 3, 4] as _}
-                                <span></span>
-                            {/each}
-                        </span>
                         <img src={trofae.sti} alt={medaljeLabel(trofae)} draggable="false" />
                         <div>
                             <strong>{tekst(`${medaljeLabel(trofae)} - mytisk`, `${medaljeLabel(trofae)} - mythic`)}</strong>
@@ -2438,32 +2429,6 @@
         height: 1px;
         background: linear-gradient(90deg, transparent 0%, rgba(245, 208, 113, 0.42) 6%, rgba(245, 208, 113, 0.42) 94%, transparent 100%);
     }
-    @keyframes mytiskTrofaeSkive {
-        0% {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.16);
-        }
-        12% {
-            opacity: 0.78;
-        }
-        62% {
-            opacity: 0.58;
-        }
-        100% {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(3.15);
-        }
-    }
-    @keyframes mytiskTrofaeIndhold {
-        0%, 100% {
-            opacity: 0.22;
-            transform: translate(-50%, -50%) scale(0.72);
-        }
-        50% {
-            opacity: 0.6;
-            transform: translate(-50%, -50%) scale(1.08);
-        }
-    }
     @keyframes mytiskMedaljePuls {
         0%, 100% {
             transform: scale(1);
@@ -2485,65 +2450,6 @@
         position: relative;
         isolation: isolate;
         overflow: visible;
-    }
-    .mytisk-ring-lag {
-        position: absolute;
-        left: 50%;
-        top: 64%;
-        z-index: 0;
-        width: 46%;
-        height: 46%;
-        pointer-events: none;
-        transform: translate(-50%, -50%);
-    }
-    .mytisk-ring-lag span {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 100%;
-        height: 100%;
-        border-radius: 999px;
-        background:
-            radial-gradient(circle, rgba(255, 255, 255, 0.27) 0 30%, rgba(255, 255, 255, 0.19) 54%, rgba(255, 255, 255, 0.15) 68%, rgba(255, 255, 255, 0.38) 73%, rgba(255, 255, 255, 0.25) 80%, rgba(255, 255, 255, 0.12) 88%, rgba(255, 255, 255, 0.035) 96%, transparent 100%);
-        transform: translate(-50%, -50%) scale(0.16);
-        animation: mytiskTrofaeSkive 10s linear infinite;
-    }
-    .mytisk-ring-lag span::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 62%;
-        height: 62%;
-        border-radius: inherit;
-        background:
-            radial-gradient(circle, rgba(255, 255, 255, 0.44) 0 22%, rgba(255, 255, 255, 0.2) 46%, transparent 74%);
-        transform: translate(-50%, -50%) scale(0.72);
-        animation: mytiskTrofaeIndhold 3.8s ease-in-out infinite;
-    }
-    .mytisk-ring-lag span:nth-child(2) {
-        animation-delay: -2s;
-    }
-    .mytisk-ring-lag span:nth-child(2)::after {
-        animation-delay: -0.76s;
-    }
-    .mytisk-ring-lag span:nth-child(3) {
-        animation-delay: -4s;
-    }
-    .mytisk-ring-lag span:nth-child(3)::after {
-        animation-delay: -1.52s;
-    }
-    .mytisk-ring-lag span:nth-child(4) {
-        animation-delay: -6s;
-    }
-    .mytisk-ring-lag span:nth-child(4)::after {
-        animation-delay: -2.28s;
-    }
-    .mytisk-ring-lag span:nth-child(5) {
-        animation-delay: -8s;
-    }
-    .mytisk-ring-lag span:nth-child(5)::after {
-        animation-delay: -3.04s;
     }
     .konto-medalje-knap.kan-aabnes {
         cursor: pointer;
@@ -3210,6 +3116,7 @@
         width: min(920px, 100%);
         margin: 18px auto 6px;
         padding: 28px 24px;
+        text-align: center;
         border-top: 1px solid rgba(245, 208, 113, 0.58);
         border-bottom: 1px solid rgba(245, 208, 113, 0.42);
         background:
@@ -3230,7 +3137,7 @@
         margin: 0;
         color: #fff7d6;
         font-family: 'Cinzel', serif;
-        font-size: clamp(2rem, 4vw, 4.4rem);
+        font-size: clamp(2rem, 4vw, 3.9rem);
         line-height: 1;
         text-shadow: 0 4px 22px rgba(245, 208, 113, 0.28);
     }
@@ -3249,15 +3156,11 @@
         isolation: isolate;
         overflow: visible;
     }
-    .episk-trofae .mytisk-ring-lag {
-        left: 90px;
-        top: 116px;
-        width: 74px;
-        height: 74px;
-    }
-    .episk-trofae .mytisk-ring-lag span {
-        background:
-            radial-gradient(circle, rgba(255, 255, 255, 0.29) 0 30%, rgba(255, 255, 255, 0.2) 54%, rgba(255, 255, 255, 0.16) 68%, rgba(255, 255, 255, 0.42) 73%, rgba(255, 255, 255, 0.27) 80%, rgba(255, 255, 255, 0.12) 88%, rgba(255, 255, 255, 0.035) 96%, transparent 100%);
+    .episk-trofae:only-child {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+        gap: 12px;
     }
     .episk-trofae img {
         width: 180px;
@@ -3266,6 +3169,10 @@
         filter: drop-shadow(0 0 18px rgba(245, 208, 113, 0.28)) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.6));
         position: relative;
         z-index: 1;
+    }
+    .episk-trofae:only-child img {
+        width: min(240px, 44vw);
+        height: min(240px, 44vw);
     }
     .episk-trofae strong {
         display: block;
@@ -4253,13 +4160,6 @@
             gap: 10px;
             text-align: center;
             justify-items: center;
-        }
-
-        .episk-trofae .mytisk-ring-lag {
-            left: 50%;
-            top: min(27vw, 96px);
-            width: min(20vw, 68px);
-            height: min(20vw, 68px);
         }
 
         .episk-trofae img {
