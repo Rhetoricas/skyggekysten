@@ -52,8 +52,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Mine Owner',
         krav: 'Overlev spillet med 12 miner ved spilslut.',
         kravEn: 'Survive the game with 12 mines at game end.',
-        mytiskKrav: 'Overlev spillet med 16 miner ved spilslut.',
-        mytiskKravEn: 'Survive the game with 16 mines at game end.',
+        mytiskKrav: 'Overlev spillet med 15 miner ved spilslut.',
+        mytiskKravEn: 'Survive the game with 15 mines at game end.',
         episkTekst: 'Du ejede 12 miner og slap levende væk.',
         episkTekstEn: 'You owned 12 mines and escaped alive.'
     },
@@ -143,8 +143,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Equipment Master',
         krav: 'Overlev spillet med 10 opgraderede items i rygsækken på samme tid.',
         kravEn: 'Survive the game with 10 upgraded items in your backpack at the same time.',
-        mytiskKrav: 'Overlev spillet med 14 opgraderingspoint i rygsækken på samme tid.',
-        mytiskKravEn: 'Survive the game with 14 upgrade points in your backpack at the same time.',
+        mytiskKrav: 'Overlev spillet med 13 opgraderingspoint i rygsækken på samme tid.',
+        mytiskKravEn: 'Survive the game with 13 upgrade points in your backpack at the same time.',
         episkTekst: 'Du bar 10 mesterlige stykker udstyr på samme tid.',
         episkTekstEn: 'You carried 10 masterwork pieces of equipment at the same time.'
     },
@@ -181,14 +181,14 @@ const TROFAE_KRAV = {
     diamantRaavaerdi: 3000
 };
 const MYTISK_TROFAE_KRAV = {
-    miner: 16,
+    miner: 15,
     taageBevaegelser: 60,
     vandSkader: 15,
     magiskeGenstande: 4,
     guld: 8000,
     healetHp: 1000,
     kendteFelter: 2000,
-    opgraderedeItems: 14,
+    opgraderedeItems: 13,
     diamantRaavaerdi: 6000
 };
 const OPGRADEREDE_ITEMS = new Set([
