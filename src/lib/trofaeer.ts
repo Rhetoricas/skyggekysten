@@ -65,8 +65,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Fog King',
         krav: 'Overlev spillet efter 20 bevægelser i tåge.',
         kravEn: 'Survive the game after 20 moves in the fog.',
-        mytiskKrav: 'Overlev spillet efter 60 bevægelser i tåge.',
-        mytiskKravEn: 'Survive the game after 60 moves in the fog.',
+        mytiskKrav: 'Overlev spillet efter 100 bevægelser i tåge.',
+        mytiskKravEn: 'Survive the game after 100 moves in the fog.',
         episkTekst: 'Du gik 20 gange i tågen og kom ud igen.',
         episkTekstEn: 'You walked into the fog 20 times and came back out.'
     },
@@ -182,7 +182,7 @@ const TROFAE_KRAV = {
 };
 const MYTISK_TROFAE_KRAV = {
     miner: 15,
-    taageBevaegelser: 60,
+    taageBevaegelser: 100,
     vandSkader: 15,
     magiskeGenstande: 4,
     guld: 8000,

@@ -3269,7 +3269,7 @@ function udførBevægelse(nytIndeks: number) {
     }
     .inspect-cursor-follow {
         position: fixed;
-        z-index: 9000;
+        z-index: 4200;
         width: 64px;
         height: 64px;
         transform: translate(1px, 1px);
@@ -3484,10 +3484,7 @@ function udførBevægelse(nytIndeks: number) {
         background: rgba(20, 20, 20, 0.94);
         color: #f2f2f2;
         box-shadow: 0 18px 55px rgba(0,0,0,0.62);
-        cursor: none !important;
-    }
-    .inspect-boble * {
-        cursor: none !important;
+        cursor: auto;
     }
     .inspect-boble h3 {
         margin: 0 0 7px;
@@ -3514,7 +3511,7 @@ function udførBevægelse(nytIndeks: number) {
         color: #fff;
         font-size: 1.2rem;
         line-height: 1;
-        cursor: none !important;
+        cursor: pointer;
     }
     .zoom-actions {
         position: fixed;
