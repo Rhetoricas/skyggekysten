@@ -51,11 +51,8 @@
         TUTORIAL_RUMKODE,
         TUTORIAL_SPILLERNAVN,
         TUTORIAL_START_INDEX,
-        aabnTutorialPopup,
-        hentAktuelTutorialPopupTrin,
         hentAktueltTutorialTrin,
         lavTutorialGitter,
-        lukTutorialPopup,
         markerTutorialHandling,
         nulstilTutorialState,
         skjulTutorialKnap,
@@ -87,7 +84,6 @@
     let ruteOverblikState = '';
     let venteUrTick = $state(Date.now());
     let sidstAutoUdfyldtProfilNavn = '';
-    let visTutorialAfslutAdvarsel = $state(false);
 
     function aktuelHighscoreKlasse() {
         return hentKarakterKlasseNoegle(spilTilstand.valgtKarakter);
@@ -186,7 +182,6 @@
     let kortBredde = $derived(spilTilstand.kortBredde || BREDDE);
     let kortHoejde = $derived(spilTilstand.kortHoejde || HOEJDE);
     let aktuelTutorialTrin = $derived(hentAktueltTutorialTrin());
-    let aktuelTutorialPopupTrin = $derived(hentAktuelTutorialPopupTrin());
     let tutorialTrinAntal = $derived(Math.max(1, tutorialTrin.length - 1));
     const erLocalhost = () => browser && ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
@@ -918,16 +913,7 @@
         cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
     }
 
-    function bedOmTutorialAfslutning() {
-        visTutorialAfslutAdvarsel = true;
-    }
-
-    function fortsætTutorial() {
-        visTutorialAfslutAdvarsel = false;
-    }
-
     function afslutTutorial() {
-        visTutorialAfslutAdvarsel = false;
         skjulTutorialKnap();
         stopTutorial();
         stopRealtime();
@@ -2735,86 +2721,26 @@ function udførBevægelse(nytIndeks: number) {
         data-help-body={tekst('Tutorialboksen viser næste øvelse. Den påvirker ikke rigtige øer eller highscores.', 'The tutorial box shows the next exercise. It does not affect real islands or highscores.')}
     >
         <span class="tutorial-progress">
-            {Math.min(tutorialState.trin + 1, tutorialTrinAntal)} / {tutorialTrinAntal}
+            {Math.min(tutorialState.trin + 1, tutorialTrinAntal)}/{tutorialTrinAntal}
         </span>
         <div class="tutorial-copy">
             <h2>{aktuelTutorialTrin.titel}</h2>
             <p>{aktuelTutorialTrin.tekst}</p>
-        </div>
-        <div class="tutorial-panel-actions">
-            <button type="button" class="tutorial-help" onclick={aabnTutorialPopup}>?</button>
-            <button type="button" class="tutorial-exit" onclick={bedOmTutorialAfslutning}>{tekst('Afslut', 'Exit')}</button>
-        </div>
-    </aside>
-{/if}
-
-{#if tutorialState.aktiv && visTutorialAfslutAdvarsel && spilTilstand.gameState === 'play'}
-    <div class="tutorial-popup-backdrop" role="presentation" onclick={fortsætTutorial}>
-        <div
-            class="tutorial-popup tutorial-exit-popup"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="tutorial-exit-titel"
-            tabindex="-1"
-            onclick={(e) => e.stopPropagation()}
-            onkeydown={(e) => e.stopPropagation()}
-        >
-            <header class="tutorial-popup-header">
-                <img src={tutorialKarakter.ikon} alt="" class="tutorial-popup-avatar" />
-                <div>
-                    <p>Tutorial</p>
-                    <h2 id="tutorial-exit-titel">{tekst('Vil du stoppe tutorialen?', 'Do you want to stop the tutorial?')}</h2>
-                </div>
-            </header>
-
-            <p class="tutorial-popup-tekst">
-                {@html tekst('Hvis du afslutter nu, ryger du tilbage til startskærmen, og tutorialknappen skjules. Du kan stadig spille tutorialen igen senere ved at skrive <strong>tutorial</strong> som ø-navn.', 'If you exit now, you return to the main menu, and the tutorial button is hidden. You can still play the tutorial later by writing <strong>tutorial</strong> as the island name.')}
-            </p>
-
-            <div class="tutorial-exit-valg">
-                <button type="button" class="tutorial-popup-ok fortsæt-knap" onclick={fortsætTutorial}>{tekst('Spil videre', 'Keep playing')}</button>
-                <button type="button" class="tutorial-popup-ok afslut-knap" onclick={afslutTutorial}>{tekst('Afslut tutorial', 'Exit tutorial')}</button>
-            </div>
-        </div>
-    </div>
-{/if}
-
-{#if tutorialState.aktiv && tutorialState.popupSynlig && spilTilstand.gameState === 'play'}
-    <div class="tutorial-popup-backdrop" role="presentation" onclick={lukTutorialPopup}>
-        <div
-            class="tutorial-popup"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="tutorial-popup-titel"
-            tabindex="-1"
-            onclick={(e) => e.stopPropagation()}
-            onkeydown={(e) => e.stopPropagation()}
-        >
-            <header class="tutorial-popup-header">
-                <img src={tutorialKarakter.ikon} alt="" class="tutorial-popup-avatar" />
-                <div>
-                    <p>{tekst('Lærling', 'Apprentice')}</p>
-                    <h2 id="tutorial-popup-titel">{aktuelTutorialPopupTrin.popupTitel}</h2>
-                </div>
-            </header>
-
-            <p class="tutorial-popup-tekst">{aktuelTutorialPopupTrin.popupTekst}</p>
-
-            {#if aktuelTutorialPopupTrin.popupPunkter?.length}
-                <ul class="tutorial-popup-punkter">
-                    {#each aktuelTutorialPopupTrin.popupPunkter as punkt}
+            {#if aktuelTutorialTrin.popupTekst}
+                <p class="tutorial-detail">{aktuelTutorialTrin.popupTekst}</p>
+            {/if}
+            {#if aktuelTutorialTrin.popupPunkter?.length}
+                <ul class="tutorial-points">
+                    {#each aktuelTutorialTrin.popupPunkter as punkt}
                         <li>{punkt}</li>
                     {/each}
                 </ul>
             {/if}
-
-            {#if aktuelTutorialPopupTrin.laesMere}
-                <p class="tutorial-popup-laes-mere">{aktuelTutorialPopupTrin.laesMere}</p>
+            {#if aktuelTutorialTrin.laesMere}
+                <p class="tutorial-more">{aktuelTutorialTrin.laesMere}</p>
             {/if}
-
-            <button type="button" class="tutorial-popup-ok" onclick={lukTutorialPopup}>OK</button>
         </div>
-    </div>
+    </aside>
 {/if}
 
 <div class="game-container" class:inspect-mode={inspectAktiv}>
@@ -3322,37 +3248,6 @@ function udførBevægelse(nytIndeks: number) {
             padding: 11px 12px;
         }
 
-        .tutorial-panel-actions {
-            grid-column: 1 / -1;
-            justify-self: end;
-        }
-
-        .tutorial-exit,
-        .tutorial-help {
-            height: 32px;
-        }
-
-        .tutorial-popup-backdrop {
-            align-items: flex-end;
-            padding: 12px 10px calc(env(safe-area-inset-bottom, 0px) + 148px);
-        }
-
-        .tutorial-popup {
-            width: 100%;
-            padding: 16px;
-            max-height: calc(100dvh - 190px);
-            overflow-y: auto;
-        }
-
-        .tutorial-popup-header {
-            grid-template-columns: 54px minmax(0, 1fr);
-        }
-
-        .tutorial-popup-avatar {
-            width: 54px;
-            height: 54px;
-        }
-
         .top-ikon-knap {
             width: 42px;
             height: 42px;
@@ -3416,17 +3311,18 @@ function udførBevægelse(nytIndeks: number) {
     }
     .tutorial-panel {
         position: fixed;
-        top: calc(env(safe-area-inset-top, 0px) + 16px);
-        left: 16px;
+        top: clamp(96px, calc(50dvh - 310px), 250px);
+        left: 50%;
+        transform: translateX(-50%);
         z-index: 2120;
-        width: min(390px, calc(100vw - 132px));
+        width: min(620px, calc(100vw - 132px));
         min-height: 86px;
         box-sizing: border-box;
         display: grid;
-        grid-template-columns: auto minmax(0, 1fr) auto;
-        align-items: center;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: start;
         gap: 12px;
-        padding: 12px 12px 12px 14px;
+        padding: 12px 14px;
         border: 1px solid rgba(245, 208, 113, 0.45);
         border-radius: 8px;
         background: rgba(14, 18, 16, 0.9);
@@ -3464,197 +3360,39 @@ function udførBevægelse(nytIndeks: number) {
         font-size: 0.88rem;
         line-height: 1.28;
     }
-    .tutorial-panel-actions {
-        display: flex;
-        align-items: center;
-        gap: 8px;
+    .tutorial-copy .tutorial-detail {
+        margin-top: 8px;
+        color: #e5dbc7;
     }
-    .tutorial-help,
-    .tutorial-exit {
-        align-self: start;
-        height: 34px;
-        border: 1px solid rgba(255, 255, 255, 0.24);
-        border-radius: 6px;
-        background: rgba(255, 255, 255, 0.08);
-        color: #eee;
-        cursor: pointer;
-        font-weight: 700;
+    .tutorial-points {
+        margin: 8px 0 0;
+        padding-left: 18px;
+        color: #e9dfcc;
+        font-size: 0.84rem;
+        line-height: 1.28;
     }
-    .tutorial-help {
-        width: 34px;
-        min-width: 34px;
-        border-radius: 50%;
-        color: #ffd66f;
-        font-family: 'Cinzel', Georgia, serif;
-        font-size: 1rem;
+    .tutorial-points li + li {
+        margin-top: 4px;
     }
-    .tutorial-exit {
-        min-width: 58px;
-    }
-    .tutorial-help:hover,
-    .tutorial-exit:hover {
-        background: rgba(255, 255, 255, 0.14);
-    }
-    .tutorial-popup-backdrop {
-        position: fixed;
-        inset: 0;
-        z-index: 3600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 18px;
-        background: rgba(0, 0, 0, 0.28);
-        pointer-events: auto;
-    }
-    .tutorial-popup {
-        width: min(520px, 100%);
-        box-sizing: border-box;
-        border: 1px solid rgba(245, 208, 113, 0.5);
-        border-radius: 8px;
-        background: rgba(15, 18, 16, 0.96);
-        color: #f5efe2;
-        padding: 20px;
-        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.58);
-    }
-    .tutorial-popup-header {
-        display: grid;
-        grid-template-columns: 66px minmax(0, 1fr);
-        gap: 14px;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-    .tutorial-popup-avatar {
-        width: 66px;
-        height: 66px;
-        object-fit: contain;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-    .tutorial-popup-header p {
-        margin: 0 0 3px;
-        color: #ffd66f;
-        font-family: 'Cinzel', Georgia, serif;
-        font-size: 0.85rem;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-    .tutorial-popup-header h2 {
-        margin: 0;
-        color: #fff8e8;
-        font-family: 'Cinzel', Georgia, serif;
-        font-size: 1.28rem;
-        line-height: 1.15;
-    }
-    .tutorial-popup-tekst,
-    .tutorial-popup-laes-mere {
-        margin: 0 0 12px;
-        color: #e4d8c0;
-        line-height: 1.42;
-    }
-    .tutorial-popup-punkter {
-        margin: 0 0 14px;
-        padding-left: 20px;
-        color: #f0e8d7;
-        line-height: 1.35;
-    }
-    .tutorial-popup-punkter li + li {
-        margin-top: 6px;
-    }
-    .tutorial-popup-laes-mere {
+    .tutorial-copy .tutorial-more {
+        margin-top: 8px;
         color: #b9cbbf;
-        font-size: 0.92rem;
+        font-size: 0.82rem;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
-        padding-top: 11px;
-    }
-    .tutorial-popup-ok {
-        display: block;
-        min-width: 86px;
-        min-height: 40px;
-        margin-left: auto;
-        border: 1px solid rgba(245, 208, 113, 0.5);
-        border-radius: 6px;
-        background: rgba(195, 65, 53, 0.25);
-        color: #fff4df;
-        font-weight: 800;
-        cursor: pointer;
-    }
-    .tutorial-popup-ok:hover {
-        background: rgba(195, 65, 53, 0.38);
-    }
-    .tutorial-exit-valg {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 16px;
-    }
-    .tutorial-exit-valg .tutorial-popup-ok {
-        margin-left: 0;
-    }
-    .tutorial-exit-valg .fortsæt-knap {
-        background: rgba(58, 91, 67, 0.42);
-        border-color: rgba(157, 211, 169, 0.5);
-    }
-    .tutorial-exit-valg .fortsæt-knap:hover {
-        background: rgba(58, 91, 67, 0.58);
-    }
-    .tutorial-exit-valg .afslut-knap {
-        background: rgba(92, 32, 29, 0.36);
-        border-color: rgba(220, 105, 92, 0.5);
-    }
-    .tutorial-exit-valg .afslut-knap:hover {
-        background: rgba(112, 38, 34, 0.52);
+        padding-top: 8px;
     }
     @media (max-width: 700px) {
         .tutorial-panel {
             top: auto;
             left: 10px;
             right: 10px;
+            transform: none;
             bottom: calc(env(safe-area-inset-bottom, 0px) + 146px);
             width: auto;
             grid-template-columns: auto minmax(0, 1fr);
             padding: 11px 12px;
         }
 
-        .tutorial-panel-actions {
-            grid-column: 1 / -1;
-            justify-self: end;
-        }
-
-        .tutorial-exit,
-        .tutorial-help {
-            height: 32px;
-        }
-
-        .tutorial-popup-backdrop {
-            align-items: flex-end;
-            padding: 12px 10px calc(env(safe-area-inset-bottom, 0px) + 148px);
-        }
-
-        .tutorial-popup {
-            width: 100%;
-            padding: 16px;
-            max-height: calc(100dvh - 190px);
-            overflow-y: auto;
-        }
-
-        .tutorial-popup-header {
-            grid-template-columns: 54px minmax(0, 1fr);
-        }
-
-        .tutorial-popup-avatar {
-            width: 54px;
-            height: 54px;
-        }
-
-        .tutorial-exit-valg {
-            justify-content: stretch;
-        }
-
-        .tutorial-exit-valg .tutorial-popup-ok {
-            flex: 1 1 140px;
-        }
     }
     .top-ikon-knap {
         width: 48px;

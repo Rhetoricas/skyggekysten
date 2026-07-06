@@ -153,11 +153,11 @@ export const tutorialTrin: TutorialTrin[] = [
     {
         id: 'help',
         titel: '2. Brug spørgsmålstegnet',
-        tekst: 'Tryk på ? øverst og derefter på et felt, ikon eller statusfelt for at få en forklaring.',
+        tekst: 'Tryk på ? øverst i højre hjørne og derefter på et felt, ikon eller statusfelt for at få en forklaring.',
         popupTitel: 'Få hjælp på selve skærmen',
         popupTekst: 'Spørgsmålstegnet er den hurtigste måde at forstå interface og felter på, mens du spiller.',
         popupPunkter: [
-            'Tryk på ? for at slå forklaringsmode til.',
+            'Tryk på ? øverst i højre hjørne for at slå forklaringsmode til.',
             'Tryk derefter på et felt, HP, guld, energi, graveknappen eller en genstand.',
             'Tryk på ? igen, når du vil tilbage til normal styring.'
         ],
@@ -218,11 +218,11 @@ export const tutorialTrin: TutorialTrin[] = [
     {
         id: 'event',
         titel: '7. Prøv et event',
-        tekst: 'Gå til kærren på ruten og vælg en handling. Der er også et ekstra tutorialevent tæt ved.',
+        tekst: 'Gå til prismet på ruten og vælg en handling. Der er også et ekstra tutorialevent tæt ved.',
         popupTitel: 'Events er øens små historier',
-        popupTekst: 'Events giver valg. På tutorial-øen ligger der både kærren fra det rigtige eventbibliotek og et ekstra tutorialevent, så du kan se, at felter kan gemme forskellige situationer.',
+        popupTekst: 'Events giver valg. På tutorial-øen ligger der både prismet fra det rigtige eventbibliotek og et ekstra tutorialevent, så du kan se, at felter kan gemme forskellige situationer.',
         popupPunkter: [
-            'Kærren kan have låste valg, hvis du mangler bestemte genstande.',
+            'Prismet kan have låste valg, hvis du mangler bestemte genstande.',
             'Tutorialeventet er mere roligt og viser samme grundidé uden så meget risiko.',
             'Et godt item kan ofte åbne en bedre eller mere sikker løsning.',
             'Når eventet er færdigt, går tiden normalt videre.'
@@ -272,11 +272,11 @@ const tutorialTrinEngelsk: Record<TutorialTrinId, Partial<TutorialTrin>> = {
     },
     help: {
         titel: '2. Use The Question Mark',
-        tekst: 'Tap ? at the top and then tap a field, icon or status field to get an explanation.',
+        tekst: 'Tap ? in the top right corner and then tap a field, icon or status field to get an explanation.',
         popupTitel: 'Get Help On The Screen',
         popupTekst: 'The question mark is the fastest way to understand the interface and fields while playing.',
         popupPunkter: [
-            'Tap ? to turn explanation mode on.',
+            'Tap ? in the top right corner to turn explanation mode on.',
             'Then tap a field, HP, gold, energy, the dig button or an item.',
             'Tap ? again when you want normal control back.'
         ],
@@ -332,11 +332,11 @@ const tutorialTrinEngelsk: Record<TutorialTrinId, Partial<TutorialTrin>> = {
     },
     event: {
         titel: '7. Try An Event',
-        tekst: 'Go to the cart on the route and choose an action. There is also an extra tutorial event nearby.',
+        tekst: 'Go to the prism on the route and choose an action. There is also an extra tutorial event nearby.',
         popupTitel: 'Events Are The Island Stories',
-        popupTekst: 'Events give choices. On the tutorial island there is both the cart from the real event library and an extra tutorial event, so you can see that fields can hide different situations.',
+        popupTekst: 'Events give choices. On the tutorial island there is both the prism from the real event library and an extra tutorial event, so you can see that fields can hide different situations.',
         popupPunkter: [
-            'The cart may have locked choices if you lack specific items.',
+            'The prism may have locked choices if you lack specific items.',
             'The tutorial event is calmer and shows the same basic idea with less risk.',
             'A good item can often open a better or safer solution.',
             'When the event is finished, time normally advances.'
@@ -392,9 +392,7 @@ export const tutorialState = $state({
     item: false,
     shop: false,
     event: false,
-    boat: false,
-    popupSynlig: false,
-    popupTrin: 0
+    boat: false
 });
 
 export function tutorialIndex(kolonne: number, raekke: number) {
@@ -414,8 +412,6 @@ export function nulstilTutorialState(aktiv = true) {
     tutorialState.shop = false;
     tutorialState.event = false;
     tutorialState.boat = false;
-    tutorialState.popupSynlig = aktiv;
-    tutorialState.popupTrin = 0;
 }
 
 export function stopTutorial() {
@@ -428,13 +424,8 @@ function erFuldført(id: TutorialTrinId) {
 }
 
 function opdaterTutorialTrin() {
-    const forrigeTrin = tutorialState.trin;
     while (tutorialState.trin < tutorialTrin.length - 1 && erFuldført(tutorialTrin[tutorialState.trin].id)) {
         tutorialState.trin++;
-    }
-    if (tutorialState.trin !== forrigeTrin) {
-        tutorialState.popupTrin = tutorialState.trin;
-        tutorialState.popupSynlig = true;
     }
 }
 
@@ -446,20 +437,6 @@ export function markerTutorialHandling(handling: TutorialHandling) {
 
 export function hentAktueltTutorialTrin() {
     return oversaetTutorialTrin(tutorialTrin[Math.min(tutorialState.trin, tutorialTrin.length - 1)]);
-}
-
-export function hentAktuelTutorialPopupTrin() {
-    return oversaetTutorialTrin(tutorialTrin[Math.min(tutorialState.popupTrin, tutorialTrin.length - 1)]);
-}
-
-export function aabnTutorialPopup() {
-    if (!tutorialState.aktiv) return;
-    tutorialState.popupTrin = tutorialState.trin;
-    tutorialState.popupSynlig = true;
-}
-
-export function lukTutorialPopup() {
-    tutorialState.popupSynlig = false;
 }
 
 function lavFelt(index: number, biome: Felt['biome'] = 'eng'): Felt {
