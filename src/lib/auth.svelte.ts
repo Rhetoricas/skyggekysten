@@ -26,6 +26,20 @@ export interface Profil {
     updated_at?: string;
 }
 
+export interface ProfilSpil {
+    id: number;
+    playerName: string;
+    roomCode: string;
+    score: number;
+    character?: string | null;
+    isWinner: boolean;
+    isDead: boolean;
+    deathCause?: 'vand' | 'taage' | null;
+    days: number;
+    gold: number;
+    createdAt?: string | null;
+}
+
 export interface ProfilStats {
     spil: number;
     sejre: number;
@@ -40,7 +54,7 @@ export interface ProfilStats {
     favoritKarakterBedsteScore: number;
     favoritKarakterBedsteTitel: string;
     karakterBedsteTitler: Array<{ karakter: string; karakterId: string; score: number; titel: string }>;
-    karakterSejre: Array<{ karakter: string; sejre: number }>;
+    spilHistorik: ProfilSpil[];
 }
 
 export const authState = $state({
@@ -420,8 +434,9 @@ export async function hentProfilStats() {
 
     const { data, error } = await supabase
         .from('game_results')
-        .select('score, is_winner, days, gold, max_column, known_fields_count, mines_owned, character')
-        .eq('user_id', authState.user.id);
+        .select('id, player_name, room_code, score, character, is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, created_at')
+        .eq('user_id', authState.user.id)
+        .order('created_at', { ascending: false });
 
     if (error || !data) {
         authState.stats = null;
@@ -434,16 +449,12 @@ export async function hentProfilStats() {
     const samletScore = data.reduce((sum, r) => sum + (r.score || 0), 0);
     const mestGuld = Math.max(0, ...data.map((r) => r.gold || 0));
     const karakterTaeller: Record<string, number> = {};
-    const karakterSejrTaeller: Record<string, number> = {};
     const karakterBedsteScore: Record<string, number> = {};
 
     for (const resultat of data) {
         const karakter = tilgaengeligeKarakterer.find((k) => k.navn === resultat.character || k.id === resultat.character)?.navn || resultat.character || 'Ukendt';
         karakterTaeller[karakter] = (karakterTaeller[karakter] || 0) + 1;
         karakterBedsteScore[karakter] = Math.max(karakterBedsteScore[karakter] || 0, resultat.score || 0);
-        if (resultat.is_winner) {
-            karakterSejrTaeller[karakter] = (karakterSejrTaeller[karakter] || 0) + 1;
-        }
     }
 
     const favoritKarakter =
@@ -479,9 +490,21 @@ export async function hentProfilStats() {
         favoritKarakterBedsteScore,
         favoritKarakterBedsteTitel,
         karakterBedsteTitler,
-        karakterSejre: Object.entries(karakterSejrTaeller)
-            .map(([karakter, vundne]) => ({ karakter, sejre: vundne }))
-            .sort((a, b) => b.sejre - a.sejre)
+        spilHistorik: data
+            .filter((resultat) => typeof resultat.id === 'number')
+            .map((resultat) => ({
+                id: resultat.id as number,
+                playerName: resultat.player_name || '',
+                roomCode: resultat.room_code || '',
+                score: resultat.score || 0,
+                character: resultat.character,
+                isWinner: !!resultat.is_winner,
+                isDead: !!resultat.is_dead,
+                deathCause: resultat.death_cause,
+                days: resultat.days || 0,
+                gold: resultat.gold || 0,
+                createdAt: resultat.created_at
+            }))
     };
 
     return authState.stats;

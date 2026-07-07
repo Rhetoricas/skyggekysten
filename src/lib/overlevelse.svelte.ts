@@ -16,7 +16,7 @@ export function erSpillerITaagen() {
     return erFeltITaagen(spilTilstand.gitter, spilTilstand.spillerIndex, spilTilstand.fogX, hentKortBredde());
 }
 
-function rydTaageramteRodderOgBaal() {
+function rydTaageramteFelter() {
     const bredde = hentKortBredde();
     const aendredeFelter: Array<{ index: number; feltData: Felt }> = [];
 
@@ -32,6 +32,20 @@ function rydTaageramteRodderOgBaal() {
         if (felt.isCampfire || felt.eventID === 'campfire') {
             felt.isCampfire = false;
             felt.eventID = undefined;
+            aendret = true;
+        }
+
+        if (felt.shopItems || felt.shopBasisItems || felt.shopGenopfyldtDag) {
+            felt.shopItems = undefined;
+            felt.shopBasisItems = undefined;
+            felt.shopGenopfyldtDag = undefined;
+            if (index === spilTilstand.spillerIndex) spilTilstand.aktivShop = null;
+            aendret = true;
+        }
+
+        if (felt.hasWorkshop) {
+            felt.hasWorkshop = false;
+            if (index === spilTilstand.spillerIndex) spilTilstand.aktivVaerksted = false;
             aendret = true;
         }
 
@@ -361,7 +375,7 @@ export function fremrykTid() {
     }
 
     const nyDag = spilTilstand.dag || 1;
-    let kortAendret = taagenRykkede ? rydTaageramteRodderOgBaal() : false;
+    let kortAendret = taagenRykkede ? rydTaageramteFelter() : false;
 
     if (nyDag > gammelDag) {
         let samletLog = "";

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
-    import { authState, gemProfilKarakter, gemProfilNavn, hentProfilStats, logUd, sendLoginLink } from '$lib/auth.svelte';
+    import { authState, gemProfilKarakter, gemProfilNavn, hentProfilStats, logUd, sendLoginLink, type ProfilSpil } from '$lib/auth.svelte';
     import { hentKarakterKlasseNoegle, tilgaengeligeKarakterer } from '$lib/spildata';
     import { karakterFordel, karakterKlasseNavn as visKarakterKlasseNavn, karakterNavn, karakterUlempe, titelNavn } from '$lib/spilTekst';
     import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
@@ -15,7 +15,7 @@
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
     import { TROFAE_DEFINITIONER, findTrofae, gemMytiskeTrofaeIds, gemTrofaeAwards, gemTrofaeIds, hentGemteMytiskeTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, hentSupabaseTrofaeAwards, hentSupabaseTrofaeAwardsForHighscore, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, type TrofaeAward } from '$lib/trofaeer';
-    import { TUTORIAL_RUMKODE, erTutorialKnapSkjult, hentTutorialRang, hentTutorialRangtrin } from '$lib/tutorial.svelte';
+    import { TUTORIAL_RUMKODE, erTutorialKnapSkjult, hentTutorialRang, hentTutorialRangtrin, tutorialKarakter } from '$lib/tutorial.svelte';
     import type { Karakter, SpillerData } from '$lib/types';
 
     type HighscoreDetaljer = {
@@ -93,6 +93,7 @@
     let visProfil = $state(false);
     let visProfilKarakterValg = $state(false);
     let profilNavnInput = $state('');
+    let profilSpilSoegning = $state('');
     let visLokaleTestKnapper = $state(false);
     let visTutorialStartKnap = $state(!erTutorialKnapSkjult());
     let globalHighscoreSide = $state(0);
@@ -318,8 +319,9 @@
     }
 
     function profilMestSpilledeKarakter() {
+        if (!authState.stats || authState.stats.spil <= 0) return tutorialKarakter;
         const karakterNavn = authState.stats?.favoritKarakter || '';
-        return tilgaengeligeKarakterer.find((karakter) => karakter.navn === karakterNavn) || null;
+        return tilgaengeligeKarakterer.find((karakter) => karakter.navn === karakterNavn) || tutorialKarakter;
     }
 
     function profilValgtKarakter() {
@@ -543,6 +545,68 @@
         return data.deathCause
             ? tekst(`Død i ${data.deathCause === 'vand' ? 'vand' : 'tåge'}`, `Dead in ${data.deathCause === 'vand' ? 'water' : 'fog'}`)
             : tekst('Død', 'Dead');
+    }
+
+    function formaterProfilSpilDato(createdAt?: string | null) {
+        if (!createdAt) return tekst('Ukendt dato', 'Unknown date');
+        const dato = new Date(createdAt);
+        if (Number.isNaN(dato.getTime())) return tekst('Ukendt dato', 'Unknown date');
+        return new Intl.DateTimeFormat(tekst('da-DK', 'en-US'), {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(dato);
+    }
+
+    function profilSpilSoegeresultater() {
+        const historik = authState.stats?.spilHistorik || [];
+        const soegning = profilSpilSoegning.trim().toLowerCase();
+        const minimumScore = /^\d+$/.test(soegning) ? Number(soegning) : null;
+        if (minimumScore !== null) {
+            return historik
+                .filter((spil) => spil.score >= minimumScore)
+                .slice(0, 60);
+        }
+
+        const resultater = soegning
+            ? historik.filter((spil) => {
+                const tekstblok = [
+                    spil.playerName,
+                    spil.roomCode,
+                    karakterNavn(spil.character || ''),
+                    `${spil.score}`,
+                    `${spil.days}`,
+                    `${spil.gold}`,
+                    spillerStatus({ isWinner: spil.isWinner, isDead: spil.isDead, deathCause: spil.deathCause }),
+                    formaterProfilSpilDato(spil.createdAt)
+                ].join(' ').toLowerCase();
+                return tekstblok.includes(soegning);
+            })
+            : historik;
+
+        return resultater.slice(0, soegning ? 60 : 30);
+    }
+
+    async function aabnProfilSpil(spil: ProfilSpil) {
+        visHighscoreLog = false;
+        highscoreDrilldown = null;
+        valgtLaastTrofae = null;
+        valgtHighscore = {
+            id: spil.id,
+            navn: spil.playerName,
+            point: spil.score,
+            karakter: spil.character || undefined,
+            oeNavn: spil.roomCode,
+            erVinder: spil.isWinner,
+            erDoed: spil.isDead,
+            doedsAarsag: spil.deathCause,
+            dage: spil.days,
+            guld: spil.gold,
+            henterDetaljer: true
+        };
+        await hentOgVisHighscoreDetaljer(spil.id);
     }
 
     function highscoreMineBasis(score: HighscoreDetaljer) {
@@ -1385,13 +1449,41 @@
 
                 {#if authState.stats}
                     <div class="profil-liste">
-                        <h3>{tekst('Sejre pr. karakter', 'Wins per character')}</h3>
-                        {#if authState.stats.karakterSejre.length === 0}
-                            <p>{tekst('Ingen sejre endnu.', 'No wins yet.')}</p>
+                        <div class="profil-spil-header">
+                            <h3>{tekst('Find dine spil', 'Find Your Runs')}</h3>
+                            <span>{tekst('Søg eller filtrér på minimumsscore.', 'Search or filter by minimum score.')}</span>
+                        </div>
+                        <input
+                            class="profil-spil-soeg"
+                            bind:value={profilSpilSoegning}
+                            placeholder={tekst('Søg på ø, karakter, dato - eller skriv min. score...', 'Search island, character, date - or type min. score...')}
+                            aria-label={tekst('Søg i dine gemte spil', 'Search your saved runs')}
+                        />
+                        {#if authState.stats.spilHistorik.length === 0}
+                            <p>{tekst('Ingen gemte spil endnu.', 'No saved runs yet.')}</p>
+                        {:else if profilSpilSoegeresultater().length === 0}
+                            <p>{tekst('Ingen spil matcher din søgning.', 'No runs match your search.')}</p>
                         {:else}
-                            {#each authState.stats.karakterSejre as række (række.karakter)}
-                                <div><span>{karakterNavn(række.karakter)}</span><strong>{række.sejre}</strong></div>
-                            {/each}
+                            <div class="profil-spil-resultater">
+                                {#each profilSpilSoegeresultater() as spil (spil.id)}
+                                    <button type="button" class="profil-spil-row" onclick={() => aabnProfilSpil(spil)}>
+                                        <span class="profil-spil-main">
+                                            <strong>{formaterNavn(spil.roomCode || tekst('Ukendt ø', 'Unknown island'))}</strong>
+                                            <em>{formaterProfilSpilDato(spil.createdAt)}</em>
+                                        </span>
+                                        <span class="profil-spil-meta">
+                                            <span>{karakterNavn(spil.character || tekst('Ukendt', 'Unknown'))}</span>
+                                            <span>{spillerStatus({ isWinner: spil.isWinner, isDead: spil.isDead, deathCause: spil.deathCause })}</span>
+                                            <span>{tekst(`${spil.days} dage`, `${spil.days} days`)}</span>
+                                            <span>{tekst(`${spil.gold} guld`, `${spil.gold} gold`)}</span>
+                                        </span>
+                                        <strong class="profil-spil-score">{spil.score}</strong>
+                                    </button>
+                                {/each}
+                            </div>
+                            {#if profilSpilSoegeresultater().length < authState.stats.spilHistorik.length}
+                                <p class="profil-spil-hint">{tekst('Viser de første resultater. Søg mere præcist for at finde ældre spil.', 'Showing the first results. Search more precisely to find older runs.')}</p>
+                            {/if}
                         {/if}
                     </div>
                 {:else}
@@ -3005,14 +3097,97 @@
         margin-top: 14px;
     }
     .profil-liste h3 {
-        margin: 0 0 10px;
+        margin: 0;
         font-size: 1rem;
     }
-    .profil-liste div {
+    .profil-spil-header {
         display: flex;
         justify-content: space-between;
-        border-top: 1px solid #333;
-        padding: 8px 0;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+    .profil-spil-header span {
+        color: #aaa;
+        font-size: 0.78rem;
+    }
+    .profil-spil-soeg {
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+        background: rgba(0, 0, 0, 0.32);
+        border: 1px solid #444;
+        border-radius: 5px;
+        color: #eee;
+        padding: 9px 10px;
+        font: inherit;
+    }
+    .profil-spil-soeg:focus {
+        outline: 1px solid rgba(245, 208, 113, 0.55);
+        border-color: rgba(245, 208, 113, 0.45);
+    }
+    .profil-spil-resultater {
+        display: grid;
+        gap: 6px;
+        max-height: 360px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+    .profil-spil-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 6px 12px;
+        width: 100%;
+        text-align: left;
+        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 5px;
+        color: inherit;
+        cursor: pointer;
+        font: inherit;
+        padding: 9px 10px;
+    }
+    .profil-spil-row:hover,
+    .profil-spil-row:focus-visible {
+        background: rgba(245, 208, 113, 0.1);
+        border-color: rgba(245, 208, 113, 0.28);
+    }
+    .profil-spil-main {
+        min-width: 0;
+    }
+    .profil-spil-main strong,
+    .profil-spil-main em {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .profil-spil-main strong {
+        color: #fff;
+    }
+    .profil-spil-main em {
+        color: #aaa;
+        font-size: 0.78rem;
+        font-style: normal;
+    }
+    .profil-spil-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px 10px;
+        grid-column: 1 / -1;
+        color: #aaa;
+        font-size: 0.78rem;
+    }
+    .profil-spil-score {
+        color: #f5d071;
+        font-variant-numeric: tabular-nums;
+        font-size: 1.05rem;
+        align-self: start;
+    }
+    .profil-spil-hint {
+        color: #aaa;
+        font-size: 0.8rem;
+        margin: 9px 0 0;
     }
 
     .character-select { position: relative; background: #1a1a1a; padding: 30px; border-radius: 12px; border: 1px solid #333; max-width: 1100px; width: 95%; max-height: none; overflow: visible; text-align: center; }
