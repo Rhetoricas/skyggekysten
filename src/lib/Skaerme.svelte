@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
-    import { authState, gemProfilKarakter, gemProfilNavn, hentProfilStats, logUd, sendLoginLink, type ProfilSpil } from '$lib/auth.svelte';
+    import { authState, erAnonymBruger, gemProfilKarakter, gemProfilNavn, hentProfilStats, logUd, sendEmailTilAnonymProfil, sendLoginLink, startAnonymProfil, type ProfilSpil } from '$lib/auth.svelte';
     import { hentKarakterKlasseNoegle, tilgaengeligeKarakterer } from '$lib/spildata';
     import { karakterFordel, karakterKlasseNavn as visKarakterKlasseNavn, karakterNavn, karakterUlempe, titelNavn } from '$lib/spilTekst';
     import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
@@ -884,6 +884,18 @@
         }
     }
 
+    async function forsoegAutomatiskProfilFoerOnlineStart() {
+        if (ER_ITCH_BUILD) return;
+        if (!authState.user) {
+            await startAnonymProfil(spilTilstand.spillerNavn);
+        }
+        await gemProfilNavnFraStartfelt();
+        if (authState.profil?.display_name) {
+            profilNavnInput = authState.profil.display_name;
+            spilTilstand.spillerNavn = authState.profil.display_name;
+        }
+    }
+
     function planlaegProfilNavnGem() {
         if (!authState.user) return;
         if (profilNavnGemTimer) clearTimeout(profilNavnGemTimer);
@@ -895,8 +907,6 @@
     }
 
     async function startSpilMedLyd() {
-        await gemProfilNavnFraStartfelt();
-
         if (spilTilstand.musikTaendt && lydStart) {
             lydStart.currentTime = 0;
             lydStart.volume = hentLydVolumen();
@@ -910,6 +920,7 @@
             startOfflineSpil();
             return;
         }
+        await forsoegAutomatiskProfilFoerOnlineStart();
         opretEllerDeltag();
     }
 
@@ -1213,7 +1224,7 @@
                     {/if}
                     <span>
                         <strong>{authState.profil?.display_name || tekst('Logget ind', 'Logged in')}</strong>
-                        <em>{profilMestSpilletTitelTekst()}</em>
+                        <em>{erAnonymBruger() ? tekst('Anonym profil i denne browser', 'Anonymous profile in this browser') : profilMestSpilletTitelTekst()}</em>
                     </span>
                 </button>
                 <button type="button" class="konto-aabn-profil-knap" onclick={aabnProfil}>{tekst('Åbn Profil', 'Open Profile')}</button>
@@ -1238,6 +1249,20 @@
                     </button>
                 {/each}
             </div>
+            {#if erAnonymBruger()}
+                <p class="konto-hint konto-hint-anonym">{tekst('Profilen gemmes på denne browser. Tilknyt og gem med din email, hvis du vil kunne finde din profil igen på en anden enhed.', 'This profile is saved in this browser. Add and save it with your email if you want to find your profile again on another device.')}</p>
+                <div class="konto-login konto-login-anonym">
+                    <input
+                        type="email"
+                        bind:value={authState.email}
+                        placeholder="Email"
+                        onkeydown={(e) => { if (e.key === 'Enter') sendEmailTilAnonymProfil(authState.email); }}
+                    />
+                    <button type="button" onclick={() => sendEmailTilAnonymProfil(authState.email)} disabled={authState.loader}>
+                        {authState.loader ? tekst('Sender...', 'Sending...') : tekst('Tilknyt email', 'Add email')}
+                    </button>
+                </div>
+            {/if}
         {:else}
             {#if ER_ITCH_BUILD}
                 <p class="konto-hint">
@@ -1270,7 +1295,7 @@
                     <span>{tekst('Itch-versionen kan bruges til at teste spillet uden konto.', 'The itch version is for trying the game without an account.')}</span>
                 </div>
             {:else}
-            <p class="konto-hint">{tekst('Login er valgfrit. Uden login spiller du kun med på den ø, du åbner nu, og din score og profil bliver ikke gemt.', 'Login is optional. Without login, you only play on the island you open now, and your score and profile are not saved.')}</p>
+            <p class="konto-hint">{tekst('Start med at skrive dit spillernavn (kan ændres i profil senere) og et navn på en ø. Du kan spille i denne browser uden at tilknytte en email. Senere kan du gemme din profil med din email, hvis du vil sikre den og spille på andre devices.', 'Start by entering your player name (you can change it in your profile later) and an island name. You can play in this browser without adding an email. Later, you can save your profile with your email if you want to secure it and play on other devices.')}</p>
             <div class="konto-medaljer konto-medaljer-login-teaser" aria-label={tekst('Medaljer du kan gemme med login', 'Medals you can save with login')}>
                 {#each loginTeaserMedaljer() as medalje, index (`login-teaser-medalje-${index}-${medalje.sti}`)}
                     <button
@@ -1296,7 +1321,7 @@
                     onkeydown={(e) => { if (e.key === 'Enter') sendLoginLink(authState.email); }}
                 />
                 <button type="button" onclick={() => sendLoginLink(authState.email)} disabled={authState.loader}>
-                    {authState.loader ? tekst('Sender...', 'Sending...') : tekst('Log ind', 'Log in')}
+                    {authState.loader ? tekst('Sender...', 'Sending...') : tekst('Email-login', 'Email login')}
                 </button>
             </div>
             {/if}
@@ -1374,6 +1399,8 @@
                         <h2>{tekst('Min profil', 'My Profile')}</h2>
                         {#if maskeretEmail(authState.user.email)}
                             <p>{maskeretEmail(authState.user.email)}</p>
+                        {:else if erAnonymBruger()}
+                            <p>{tekst('Anonym profil i denne browser', 'Anonymous profile in this browser')}</p>
                         {/if}
                         </div>
                     </div>
@@ -1928,7 +1955,7 @@
                         {tekst('Fortsæt offline', 'Continue offline')}{offlineSpilInfo ? `: ${formaterNavn(offlineSpilInfo.rumKode)} ${tekst('dag', 'day')} ${offlineSpilInfo.dag}` : ''}
                     </button>
                 {/if}
-                {#if authState.user}
+                {#if authState.user && !erAnonymBruger()}
                     <button type="button" class="start-logud-knap" onclick={logUd}>{tekst('Log ud', 'Log out')}</button>
                 {/if}
             </div>
@@ -2811,6 +2838,19 @@
     .konto-login {
         display: flex;
         gap: 8px;
+    }
+    .konto-hint-anonym {
+        margin: 8px 0 8px;
+        font-size: 0.78rem;
+        line-height: 1.35;
+    }
+    .konto-login-anonym {
+        max-width: 520px;
+    }
+    .konto-login-anonym input,
+    .konto-login-anonym button {
+        padding: 7px 9px;
+        font-size: 0.82rem;
     }
     .konto-live-link {
         display: flex;

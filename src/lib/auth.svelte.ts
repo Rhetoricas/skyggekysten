@@ -73,6 +73,10 @@ let authHeartbeatTimer: ReturnType<typeof setInterval> | null = null;
 const PROFIL_KARAKTER_KEY = 'taage_profile_character:';
 const PROFIL_SELECT = 'id, display_name, sound_level, trophies, mythic_trophies, profile_character_id, language, created_at, updated_at';
 
+function rensProfilNavn(navn?: string | null) {
+    return (navn || '').replace(/[^a-zA-Z0-9æøåÆØÅ ]/g, '').trim().substring(0, 15);
+}
+
 function erGyldigProfilKarakterId(karakterId?: string | null) {
     return !karakterId || tilgaengeligeKarakterer.some((karakter) => karakter.id === karakterId);
 }
@@ -178,6 +182,46 @@ function loginFejlBesked(message: string) {
     return tekst(`Login-linket kunne ikke sendes: ${message}`, `The login link could not be sent: ${message}`);
 }
 
+function anonymLoginFejlBesked(message: string) {
+    const lavere = message.toLowerCase();
+    if (lavere.includes('anonymous') || lavere.includes('disabled') || lavere.includes('not enabled')) {
+        return tekst(
+            'Automatisk profil uden email er ikke slået til i Supabase endnu. Du kan stadig spille, men spillet bliver ikke gemt på profilen.',
+            'Automatic profile saving without email is not enabled in Supabase yet. You can still play, but this run will not be saved to your profile.'
+        );
+    }
+    if (lavere.includes('rate') || lavere.includes('security') || lavere.includes('limit') || lavere.includes('seconds') || lavere.includes('minute')) {
+        return tekst(
+            'Supabase holder en kort pause på nye profiler. Du kan stadig spille nu, men prøv igen lidt senere for at gemme på profilen.',
+            'Supabase is briefly pausing new profiles. You can still play now, but try again a little later to save to your profile.'
+        );
+    }
+
+    return tekst(
+        `Automatisk profil kunne ikke oprettes: ${message}`,
+        `Automatic profile could not be created: ${message}`
+    );
+}
+
+function emailTilknytningFejlBesked(message: string) {
+    const lavere = message.toLowerCase();
+    if (lavere.includes('rate') || lavere.includes('security') || lavere.includes('limit') || lavere.includes('seconds') || lavere.includes('minute')) {
+        return tekst(
+            'Supabase holder en kort pause på nye email-links. Din profil er stadig gemt i denne browser, og du kan prøve igen lidt senere.',
+            'Supabase is briefly pausing new email links. Your profile is still saved in this browser, and you can try again a little later.'
+        );
+    }
+
+    return tekst(
+        `Email kunne ikke tilknyttes profilen: ${message}`,
+        `Email could not be added to the profile: ${message}`
+    );
+}
+
+export function erAnonymBruger(user = authState.user) {
+    return !!user?.is_anonymous;
+}
+
 export async function initAuth() {
     if (authStartet) return;
     authStartet = true;
@@ -251,11 +295,93 @@ export async function sendLoginLink(email: string) {
     }
 }
 
+export async function startAnonymProfil(navn?: string) {
+    if (authState.user) {
+        if (navn) await gemProfilNavn(navn);
+        return true;
+    }
+    if (authState.loader) return false;
+
+    authState.loader = true;
+    authState.besked = '';
+
+    try {
+        const { data, error } = await supabase.auth.signInAnonymously();
+        if (error) {
+            console.error('Anonym profil kunne ikke oprettes:', error);
+            authState.besked = anonymLoginFejlBesked(error.message);
+            return false;
+        }
+
+        authState.user = data.user ?? data.session?.user ?? null;
+        if (!authState.user) {
+            authState.besked = tekst(
+                'Automatisk profil kunne ikke oprettes. Du kan stadig spille, men spillet bliver ikke gemt på profilen.',
+                'Automatic profile could not be created. You can still play, but this run will not be saved to your profile.'
+            );
+            return false;
+        }
+
+        await hentEllerOpretProfil(navn);
+        void retryVentendeSupabaseTrofaeer(authState.user.id);
+        void retryVentendeSupabaseMytiskeTrofaeer(authState.user.id);
+        return true;
+    } catch (error) {
+        console.error('Anonym profil kunne ikke oprettes:', error);
+        const message = error instanceof Error ? error.message : tekst('Ukendt fejl', 'Unknown error');
+        authState.besked = anonymLoginFejlBesked(message);
+        return false;
+    } finally {
+        authState.loader = false;
+    }
+}
+
+export async function sendEmailTilAnonymProfil(email: string) {
+    if (!authState.user || !erAnonymBruger()) {
+        await sendLoginLink(email);
+        return;
+    }
+    if (authState.loader) return;
+
+    const rentEmail = email.trim();
+    if (!rentEmail) {
+        authState.besked = tekst('Skriv din email.', 'Enter your email.');
+        return;
+    }
+
+    authState.loader = true;
+    authState.besked = '';
+
+    try {
+        const { error } = await supabase.auth.updateUser(
+            { email: rentEmail },
+            { emailRedirectTo: window.location.origin }
+        );
+
+        if (error) {
+            console.error('Email kunne ikke knyttes til anonym profil:', error);
+            authState.besked = emailTilknytningFejlBesked(error.message);
+            return;
+        }
+
+        authState.besked = tekst(
+            'Vi har sendt et link til din email. Når du bekræfter den, bliver denne profil gemt på emailen.',
+            'We sent a link to your email. When you confirm it, this profile will be saved to that email.'
+        );
+    } catch (error) {
+        console.error('Email kunne ikke knyttes til anonym profil:', error);
+        const message = error instanceof Error ? error.message : tekst('Ukendt fejl', 'Unknown error');
+        authState.besked = emailTilknytningFejlBesked(message);
+    } finally {
+        authState.loader = false;
+    }
+}
+
 export async function logUd() {
     await supabase.auth.signOut();
 }
 
-export async function hentEllerOpretProfil() {
+export async function hentEllerOpretProfil(foretrukketNavn?: string) {
     if (!authState.user) return null;
 
     const profilResultat = await supabase
@@ -275,6 +401,17 @@ export async function hentEllerOpretProfil() {
         data = fallback.data ? { ...fallback.data, sound_level: null, trophies: [], mythic_trophies: [], profile_character_id: hentLokalProfilKarakter(authState.user.id), language: sprogState.sprog } : null;
     }
 
+    const rentForetrukketNavn = rensProfilNavn(foretrukketNavn);
+    if (data && rentForetrukketNavn && data.display_name !== rentForetrukketNavn) {
+        const opdateretTidspunkt = new Date().toISOString();
+        const opdateret = await supabase
+            .from('profiles')
+            .upsert({ id: authState.user.id, display_name: rentForetrukketNavn, updated_at: opdateretTidspunkt })
+            .select(PROFIL_SELECT)
+            .single();
+        if (!opdateret.error && opdateret.data) data = opdateret.data;
+    }
+
     if (data) {
         authState.profil = medLokalProfilKarakterFallback(await synkProfilTrofaeerMedLokalCache(normaliserProfil(data)));
         if (data.sound_level) saetLydNiveau(data.sound_level);
@@ -282,7 +419,7 @@ export async function hentEllerOpretProfil() {
         return authState.profil;
     }
 
-    const fallbackNavn = authState.user.email?.split('@')[0]?.slice(0, 15) || 'Spiller';
+    const fallbackNavn = rentForetrukketNavn || authState.user.email?.split('@')[0]?.slice(0, 15) || tekst('Spiller', 'Player');
     const opretResultat = await supabase
         .from('profiles')
         .insert([{ id: authState.user.id, display_name: fallbackNavn, sound_level: lydKontrol.niveau, trophies: [], mythic_trophies: [], profile_character_id: null, language: sprogState.sprog }])
@@ -308,7 +445,7 @@ export async function hentEllerOpretProfil() {
 export async function gemProfilNavn(navn: string) {
     if (!authState.user) return;
 
-    const rentNavn = navn.replace(/[^a-zA-Z0-9æøåÆØÅ ]/g, '').trim().substring(0, 15);
+    const rentNavn = rensProfilNavn(navn);
     if (!rentNavn) {
         authState.besked = tekst('Navnet må ikke være tomt.', 'The name cannot be empty.');
         return;
