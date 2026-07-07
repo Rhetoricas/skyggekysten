@@ -51,18 +51,19 @@ function rydTaageramteFelter() {
             aendret = true;
         }
 
-        if (felt.shopItems || felt.shopBasisItems || felt.shopGenopfyldtDag) {
-            felt.shopItems = undefined;
-            felt.shopBasisItems = undefined;
-            felt.shopGenopfyldtDag = undefined;
-            if (index === spilTilstand.spillerIndex) spilTilstand.aktivShop = null;
+        if (!felt.taageLukketShop && ((felt.shopBasisItems || []).length > 0 || (felt.shopItems || []).length > 0)) {
+            felt.taageLukketShop = true;
             aendret = true;
         }
 
-        if (felt.hasWorkshop) {
-            felt.hasWorkshop = false;
-            if (index === spilTilstand.spillerIndex) spilTilstand.aktivVaerksted = false;
+        if (!felt.taageLukketVaerksted && felt.hasWorkshop) {
+            felt.taageLukketVaerksted = true;
             aendret = true;
+        }
+
+        if (index === spilTilstand.spillerIndex) {
+            spilTilstand.aktivShop = null;
+            spilTilstand.aktivVaerksted = false;
         }
 
         if (aendret) aendredeFelter.push({ index, feltData: felt });

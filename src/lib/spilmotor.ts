@@ -778,7 +778,11 @@ function erKoebbarShopVare(id: string) {
 }
 
 function harShop(felt: Felt | null | undefined) {
-    return !!felt && (((felt.shopBasisItems || []).length > 0) || ((felt.shopItems || []).length > 0));
+    return !!felt && !felt.taageLukketShop && (((felt.shopBasisItems || []).length > 0) || ((felt.shopItems || []).length > 0));
+}
+
+function harAktivtVaerksted(felt: Felt | null | undefined) {
+    return !!felt?.hasWorkshop && !felt.taageLukketVaerksted;
 }
 
 function hentKoebbareShopItems(shopItems: string[] | undefined) {
@@ -834,7 +838,7 @@ export function naegtHandelForAktuelSpillerPaaAktueltFelt() {
     const felt = spilTilstand.gitter[indeks];
     if (!felt) return false;
 
-    const harHandel = felt.hasWorkshop || harShop(felt);
+    const harHandel = harAktivtVaerksted(felt) || harShop(felt);
     if (!harHandel) return false;
 
     const naegter = new Set(felt.naegterHandelFor || []);
@@ -862,7 +866,7 @@ function skraemNaboHandlende(centerIndeks: number) {
         const nabo = spilTilstand.gitter[naboIndeks];
         if (!nabo) continue;
 
-        const harHandel = nabo.hasWorkshop || harShop(nabo);
+        const harHandel = harAktivtVaerksted(nabo) || harShop(nabo);
         if (!harHandel) continue;
 
         const naegter = new Set(nabo.naegterHandelFor || []);
@@ -1149,7 +1153,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         mapAendret = true;
     }
 
-    if (options.triggerPortal !== false && felt.hasPortal && !harVentendeEvent && !harShop(felt) && !felt.hasWorkshop) {
+    if (options.triggerPortal !== false && felt.hasPortal && !harVentendeEvent && !harShop(felt) && !harAktivtVaerksted(felt)) {
         udfoerPortalTeleport();
         spilTilstand.gitter = [...spilTilstand.gitter];
         syncTilDb(mapAendret);
@@ -1191,7 +1195,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
             startEvent(felt.eventID);
             mapAendret = true;
         }
-        else if (felt.hasWorkshop) {
+        else if (harAktivtVaerksted(felt)) {
             if (naegterHandelTilAktuelSpiller(felt)) {
                 spilTilstand.logBesked = handelNaegtelseBesked(felt, 'vaerksted');
             } else {
@@ -1521,12 +1525,12 @@ function erTungKrigerklasse() {
 export function kanBegaaIndbrudPaaFelt(felt: Felt | null | undefined) {
     if (!felt || felt.indbrudt) return false;
     if (felt.biome !== 'by') return false;
-    return !felt.hasWorkshop && !harShop(felt);
+    return !harAktivtVaerksted(felt) && !harShop(felt);
 }
 
 export function kanPlyndreFelt(felt: Felt | null | undefined) {
     if (!felt || felt.plyndret || !harRygsaekItem('koelle')) return false;
-    if (felt.hasWorkshop && !harRygsaekItem('koelle_upgr')) return false;
+    if (harAktivtVaerksted(felt) && !harRygsaekItem('koelle_upgr')) return false;
     return felt.biome === 'by' || felt.biome === 'marked';
 }
 
@@ -1855,7 +1859,7 @@ export function plyndrFelt() {
         return;
     }
 
-    if (felt?.hasWorkshop && !harRygsaekItem('koelle_upgr')) {
+    if (harAktivtVaerksted(felt) && !harRygsaekItem('koelle_upgr')) {
         spilTilstand.logBesked = tekst(
             "Værkstedets murværk holder. Du skal bruge en opgraderet kølle for at smadre det.",
             "The workshop masonry holds. You need an upgraded club to smash it."
@@ -1870,7 +1874,7 @@ export function plyndrFelt() {
 
     const varMarked = felt.biome === 'marked';
     const havdeButik = harShop(felt);
-    const havdeVaerksted = !!felt.hasWorkshop;
+    const havdeVaerksted = harAktivtVaerksted(felt);
     const energiPris = varMarked ? 8 : havdeVaerksted ? 24 : 16;
     const skadePris = varMarked ? 20 : havdeVaerksted ? 50 : 30;
     const kasseIndhold = Math.max(0, felt.kasseGuld || 0);
@@ -2447,8 +2451,13 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
     plantSkat(nytGitter);
 
     for (let i = 0; i < antal; i++) {
-        nytGitter[i].grundBiome = nytGitter[i].biome;
-        nytGitter[i].grundEvent = nytGitter[i].eventID;
+        const felt = nytGitter[i];
+        felt.grundBiome = felt.biome;
+        felt.grundEvent = felt.eventID;
+        felt.grundIsCampfire = !!felt.isCampfire;
+        felt.grundHasWorkshop = !!felt.hasWorkshop;
+        felt.grundShopItems = felt.shopItems ? [...felt.shopItems] : undefined;
+        felt.grundShopBasisItems = felt.shopBasisItems ? [...felt.shopBasisItems] : undefined;
     }
 
     spilTilstand.gitter = nytGitter;
@@ -3089,6 +3098,8 @@ export function nulstilKort() {
         felt.kasseGuld = undefined;
         felt.naegterHandelFor = undefined;
         felt.naegterHandelGrundFor = undefined;
+        felt.taageLukketShop = undefined;
+        felt.taageLukketVaerksted = undefined;
         felt.mineOwner = undefined;
         felt.mineLocked = undefined;
         felt.hasMeteorStone = false;
@@ -3096,8 +3107,29 @@ export function nulstilKort() {
         felt.taageBlokker = undefined;
 
         if (felt.grundBiome) {
+            const grundIsCampfire = felt.grundIsCampfire ?? (felt.grundEvent === 'campfire' || !!felt.isCampfire);
+            const grundHasWorkshop = felt.grundHasWorkshop ?? !!felt.hasWorkshop;
+            const grundShopBasisItems = felt.grundShopBasisItems || felt.shopBasisItems;
+            const grundShopItems = felt.grundShopItems || grundShopBasisItems;
+
+            felt.grundIsCampfire = grundIsCampfire;
+            felt.grundHasWorkshop = grundHasWorkshop;
+            felt.grundShopBasisItems = grundShopBasisItems ? [...grundShopBasisItems] : undefined;
+            felt.grundShopItems = grundShopItems ? [...grundShopItems] : undefined;
             felt.biome = felt.grundBiome;
             felt.eventID = felt.grundEvent;
+            felt.isCampfire = grundIsCampfire;
+            felt.hasWorkshop = grundHasWorkshop;
+
+            if (grundShopBasisItems && grundShopBasisItems.length > 0) {
+                felt.shopBasisItems = [...grundShopBasisItems];
+                felt.shopItems = [...(grundShopItems || grundShopBasisItems)];
+                felt.shopGenopfyldtDag = 1;
+            } else {
+                felt.shopItems = undefined;
+                felt.shopBasisItems = undefined;
+                felt.shopGenopfyldtDag = undefined;
+            }
             
             const hemmeligheder = genererUndergrund(felt.grundBiome as string);
             felt.skjultGuld = hemmeligheder.skjultGuld;

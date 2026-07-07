@@ -2362,6 +2362,7 @@
     }
 
     function harKoebbarShop(felt: Felt) {
+        if (felt.taageLukketShop) return false;
         return (felt.shopBasisItems || []).length > 0 || (felt.shopItems || []).some((itemId) => itemDB[itemId]?.kanKoebes !== false);
     }
 
@@ -2402,7 +2403,7 @@
         ));
         if (felt.eventID && !felt.eventFuldført) dele.push(tekst('Feltet har et event, som starter når du går ind på det.', 'This field has an event that starts when you enter it.'));
         if (harKoebbarShop(felt)) dele.push(tekst('Feltet har en butik. Dagens varer deles af spillerne og genfyldes næste dag.', 'This field has a shop. The daily stock is shared by players and refills the next day.'));
-        if (felt.hasWorkshop) dele.push(tekst('Feltet har et værksted, hvor udstyr kan opgraderes. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang.', 'This field has a workshop where equipment can be upgraded. If you have a club or wallbreaker, the master only dares to work for you once.'));
+        if (felt.hasWorkshop && !felt.taageLukketVaerksted) dele.push(tekst('Feltet har et værksted, hvor udstyr kan opgraderes. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang.', 'This field has a workshop where equipment can be upgraded. If you have a club or wallbreaker, the master only dares to work for you once.'));
         if (felt.hasGoldmine) dele.push(felt.mineOwner ? tekst(`Guldminen ejes af ${felt.mineOwner}.`, `The gold mine is owned by ${felt.mineOwner}.`) : tekst('Der er en guldmine her.', 'There is a gold mine here.'));
         if (felt.hasPortal && !(felt.eventID && !felt.eventFuldført)) dele.push(tekst('Portalen kan flytte dig mod øst.', 'The portal can move you east.'));
         if (felt.taageBlokker) dele.push(tekst('Tågeblokkeren kan holde tågen tilbage fra venstre, indtil tågen vender.', 'The fog blocker can hold back fog from the left until the fog turns around.'));
@@ -2560,6 +2561,8 @@
             !!felt.eventFuldført ||
             !!felt.indbrudt ||
             !!felt.plyndret ||
+            !!felt.taageLukketShop ||
+            !!felt.taageLukketVaerksted ||
             (felt.naegterHandelFor?.length || 0) > 0 ||
             !!felt.shopGenopfyldtDag
         );
@@ -2893,7 +2896,7 @@ function udførBevægelse(nytIndeks: number) {
                             />
                         {/if}
 
-                        {#if erUdforsket && felt.hasWorkshop}
+                        {#if erUdforsket && felt.hasWorkshop && !felt.taageLukketVaerksted}
                             <img
                                 src="/tiles/vaerksted.webp"
                                 alt=""

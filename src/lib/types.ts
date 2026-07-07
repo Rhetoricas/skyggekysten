@@ -114,6 +114,8 @@ export interface Felt {
     shopItems?: string[]; 
     shopBasisItems?: string[];
     shopGenopfyldtDag?: number;
+    taageLukketShop?: boolean;
+    taageLukketVaerksted?: boolean;
     indbrudt?: boolean;
     plyndret?: boolean;
     kasseGuld?: number;
@@ -150,6 +152,10 @@ export interface Felt {
 
     grundBiome?: string | Biome;
     grundEvent?: string;
+    grundIsCampfire?: boolean;
+    grundHasWorkshop?: boolean;
+    grundShopItems?: string[];
+    grundShopBasisItems?: string[];
     katastrofeFraBiome?: string | Biome;
     katastrofeVisuelAktiv?: boolean;
     katastrofeVisuelId?: number;
