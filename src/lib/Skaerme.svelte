@@ -205,6 +205,14 @@
         return findMedaljeSti(score, nyGlobalRekord);
     }
 
+    function erM11Medalje(sti?: string | null) {
+        return !!sti && sti.endsWith('/m11.webp');
+    }
+
+    function medaljePulsStyle(index = 0) {
+        return `--puls-delay: -${((index * 3.7) % 12.8).toFixed(2)}s; --puls-duration: ${(12.4 + ((index * 0.83) % 3.6)).toFixed(2)}s;`;
+    }
+
     function findHighscoreMedalje(score: ValgtHighscore) {
         return score.medalPath || findMedaljeSti(score.point, false);
     }
@@ -226,6 +234,12 @@
 
     function profilMedaljeScore() {
         return Math.max(gemtProfilBedsteScore, authState.stats?.bedsteScore || 0);
+    }
+
+    function profilTopMedaljeSti() {
+        const score = profilMedaljeScore();
+        if (authState.stats?.bedsteScore === score && authState.stats?.bedsteMedalPath) return authState.stats.bedsteMedalPath;
+        return `/screens/m${findMedaljeNiveau(score) + 1}.webp`;
     }
 
     function trofaeOwnerKey() {
@@ -286,10 +300,9 @@
     }
 
     function profilMedaljer() {
-        const bedsteNiveau = findMedaljeNiveau(profilMedaljeScore());
         return [
             {
-                sti: `/screens/m${bedsteNiveau + 1}.webp`,
+                sti: profilTopMedaljeSti(),
                 label: 'Topmedalje',
                 labelEn: 'Top Medal',
                 krav: 'Den medalje har du fået for din højeste score.',
@@ -1300,6 +1313,7 @@
             <div
                 class="trofae-info-modal"
                 class:naeste-krav={valgtLaastTrofae.visNaesteKrav}
+                class:mytisk-opnaaet={valgtLaastTrofae.mytisk && !valgtLaastTrofae.visNaesteKrav}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="trofae-info-titel"
@@ -1320,7 +1334,6 @@
                     {/if}
                     <p class="trofae-info-krav">{mytiskKravSaetning(valgtLaastTrofae)}</p>
                 {:else if valgtLaastTrofae.mytisk}
-                    <p class="trofae-info-niveau">({medaljeNiveauLabel(valgtLaastTrofae)})</p>
                     <p>{tekst('Mytisk niveau opnået.', 'Mythic tier achieved.')}</p>
                     <p class="trofae-info-krav">{tekst('Mytisk krav:', 'Mythic requirement:')} {medaljeMytiskKrav(valgtLaastTrofae)}</p>
                 {:else if valgtLaastTrofae.opnaaet && valgtLaastTrofae.episkTekst}
@@ -1432,8 +1445,8 @@
                                     alt={medaljeLabel(medalje)}
                                     class:bedste={medalje.bedste}
                                     class:trofae-opnaaet={medalje.opnaaet}
-                                    class:mytiskPuls={medalje.mytisk}
-                                    style={medalje.mytisk ? `--puls-delay: -${((index * 3.7) % 12.8).toFixed(2)}s; --puls-duration: ${(12.4 + ((index * 0.83) % 3.6)).toFixed(2)}s;` : undefined}
+                                    class:mytiskPuls={medalje.mytisk || erM11Medalje(medalje.sti)}
+                                    style={medalje.mytisk || erM11Medalje(medalje.sti) ? medaljePulsStyle(index) : undefined}
                                     draggable="false"
                                 />
                             </button>
@@ -1538,7 +1551,12 @@
                 <div class="highscore-detail-total">
                     <span>TOTAL SCORE</span>
                     <strong>{valgtHighscore.point}</strong>
-                    <img src={findHighscoreMedalje(valgtHighscore)} alt={tekst('Medalje', 'Medal')} />
+                    <img
+                        src={findHighscoreMedalje(valgtHighscore)}
+                        alt={tekst('Medalje', 'Medal')}
+                        class:mytiskPuls={erM11Medalje(findHighscoreMedalje(valgtHighscore))}
+                        style={erM11Medalje(findHighscoreMedalje(valgtHighscore)) ? medaljePulsStyle(0) : undefined}
+                    />
                 </div>
 
                 {#if highscoreTrofaeer(valgtHighscore).length > 0}
@@ -1957,10 +1975,10 @@
             <div class="medalje-sektion">
                 {#if authState.user}
                     <button type="button" class="medalje-profil-knap" onclick={aabnProfil} aria-label={tekst('Åbn din profil', 'Open your profile')}>
-                        <img src={findMedalje(spilTilstand.samletScore)} alt={tekst('Medalje', 'Medal')} class="stor-medalje" draggable="false" />
+                        <img src={findMedalje(spilTilstand.samletScore)} alt={tekst('Medalje', 'Medal')} class="stor-medalje" class:mytiskPuls={erM11Medalje(findMedalje(spilTilstand.samletScore))} style={erM11Medalje(findMedalje(spilTilstand.samletScore)) ? medaljePulsStyle(0) : undefined} draggable="false" />
                     </button>
                 {:else}
-                    <img src={findMedalje(spilTilstand.samletScore)} alt={tekst('Medalje', 'Medal')} class="stor-medalje" draggable="false" />
+                    <img src={findMedalje(spilTilstand.samletScore)} alt={tekst('Medalje', 'Medal')} class="stor-medalje" class:mytiskPuls={erM11Medalje(findMedalje(spilTilstand.samletScore))} style={erM11Medalje(findMedalje(spilTilstand.samletScore)) ? medaljePulsStyle(0) : undefined} draggable="false" />
                 {/if}
             </div>
             
@@ -2052,10 +2070,10 @@
             <div class="medalje-sektion">
                 {#if authState.user}
                     <button type="button" class="medalje-profil-knap" onclick={aabnProfil} aria-label={tekst('Åbn din profil', 'Open your profile')}>
-                        <img src={findMedalje(spilTilstand.samletScore)} alt={tekst('Medalje', 'Medal')} class="stor-medalje" draggable="false" />
+                        <img src={findMedalje(spilTilstand.samletScore)} alt={tekst('Medalje', 'Medal')} class="stor-medalje" class:mytiskPuls={erM11Medalje(findMedalje(spilTilstand.samletScore))} style={erM11Medalje(findMedalje(spilTilstand.samletScore)) ? medaljePulsStyle(0) : undefined} draggable="false" />
                     </button>
                 {:else}
-                    <img src={findMedalje(spilTilstand.samletScore)} alt={tekst('Medalje', 'Medal')} class="stor-medalje" draggable="false" />
+                    <img src={findMedalje(spilTilstand.samletScore)} alt={tekst('Medalje', 'Medal')} class="stor-medalje" class:mytiskPuls={erM11Medalje(findMedalje(spilTilstand.samletScore))} style={erM11Medalje(findMedalje(spilTilstand.samletScore)) ? medaljePulsStyle(0) : undefined} draggable="false" />
                 {/if}
             </div>
             <h1 class="sejr-titel">{tekst(`${formaterNavn(spilTilstand.spillerNavn)}, du slap væk fra ${formaterNavn(spilTilstand.rumKode)}`, `${formaterNavn(spilTilstand.spillerNavn)}, you escaped from ${formaterNavn(spilTilstand.rumKode)}`)}</h1>
@@ -2682,7 +2700,9 @@
         opacity: 1;
         filter: drop-shadow(0 7px 10px rgba(245, 208, 113, 0.25)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.55));
     }
-    .profil-medalje.opnaaet img.mytiskPuls {
+    .profil-medalje.opnaaet img.mytiskPuls,
+    .stor-medalje.mytiskPuls,
+    .highscore-detail-total img.mytiskPuls {
         transform-origin: 50% 0%;
         transform: scale(1);
         animation: mytiskMedaljePuls var(--puls-duration, 6.8s) ease-in-out infinite;
@@ -2710,7 +2730,8 @@
         text-align: center;
         box-shadow: 0 20px 52px rgba(0, 0, 0, 0.62);
     }
-    .trofae-info-modal.naeste-krav {
+    .trofae-info-modal.naeste-krav,
+    .trofae-info-modal.mytisk-opnaaet {
         padding: 0 28px 28px;
         width: min(420px, 100%);
     }
@@ -2722,8 +2743,9 @@
         filter: grayscale(1) brightness(0.82) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.5));
         margin-bottom: 6px;
     }
-    .trofae-info-modal.naeste-krav img {
-        width: 170px;
+    .trofae-info-modal.naeste-krav img,
+    .trofae-info-modal.mytisk-opnaaet img {
+        width: 200px;
         margin: -1px auto 12px;
         object-position: top center;
     }
@@ -2736,7 +2758,8 @@
         font-family: 'Cinzel', serif;
         font-size: 1.25rem;
     }
-    .trofae-info-modal.naeste-krav h3 {
+    .trofae-info-modal.naeste-krav h3,
+    .trofae-info-modal.mytisk-opnaaet h3 {
         margin-bottom: 6px;
         color: #f5d071;
         font-size: 1.55rem;
@@ -2745,13 +2768,6 @@
         margin: 0 0 16px;
         color: #d5c8aa;
         line-height: 1.35;
-    }
-    .trofae-info-modal .trofae-info-niveau {
-        margin-top: -3px;
-        color: #f5d071;
-        font-size: 0.86rem;
-        font-style: italic;
-        opacity: 0.9;
     }
     .trofae-info-modal .trofae-info-krav {
         margin-top: -6px;
@@ -2765,7 +2781,8 @@
         font-weight: 700;
         text-align: center;
     }
-    .trofae-info-modal.naeste-krav .trofae-info-krav {
+    .trofae-info-modal.naeste-krav .trofae-info-krav,
+    .trofae-info-modal.mytisk-opnaaet .trofae-info-krav {
         margin: 0 auto;
         max-width: 330px;
         color: #f5d071;
@@ -2781,7 +2798,8 @@
         padding: 8px 18px;
         cursor: pointer;
     }
-    .trofae-info-modal.naeste-krav .trofae-info-luk {
+    .trofae-info-modal.naeste-krav .trofae-info-luk,
+    .trofae-info-modal.mytisk-opnaaet .trofae-info-luk {
         position: absolute;
         right: 12px;
         top: 12px;

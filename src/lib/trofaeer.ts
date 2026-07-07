@@ -78,8 +78,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Wavebearer',
         krav: 'Overlev spillet efter at have startet en oversvømmelse og taget skade fra vand 5 gange.',
         kravEn: 'Survive the game after starting a flood and taking water damage 5 times.',
-        mytiskKrav: 'Overlev spillet efter at have startet en oversvømmelse og taget skade fra vand 15 gange.',
-        mytiskKravEn: 'Survive the game after starting a flood and taking water damage 15 times.',
+        mytiskKrav: 'Overlev spillet efter at have startet en oversvømmelse og taget skade fra vand 30 gange.',
+        mytiskKravEn: 'Survive the game after starting a flood and taking water damage 30 times.',
         episkTekst: 'Du startede en oversvømmelse, bar vandets straf og overlevede.',
         episkTekstEn: 'You started a flood, bore the water’s punishment and survived.'
     },
@@ -117,8 +117,8 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         labelEn: 'Life Warden',
         krav: 'Overlev spillet efter at have healet 400 HP.',
         kravEn: 'Survive the game after healing 400 HP.',
-        mytiskKrav: 'Overlev spillet efter at have healet 1000 HP.',
-        mytiskKravEn: 'Survive the game after healing 1000 HP.',
+        mytiskKrav: 'Overlev spillet efter at have healet 1200 HP.',
+        mytiskKravEn: 'Survive the game after healing 1200 HP.',
         episkTekst: 'Du helede 400 HP og holdt dig levende hele vejen.',
         episkTekstEn: 'You healed 400 HP and kept yourself alive all the way.'
     },
@@ -183,10 +183,10 @@ const TROFAE_KRAV = {
 const MYTISK_TROFAE_KRAV = {
     miner: 15,
     taageBevaegelser: 100,
-    vandSkader: 15,
+    vandSkader: 30,
     magiskeGenstande: 4,
     guld: 8000,
-    healetHp: 1000,
+    healetHp: 1200,
     kendteFelter: 2000,
     opgraderedeItems: 13,
     diamantRaavaerdi: 6000

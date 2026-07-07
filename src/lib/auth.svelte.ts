@@ -45,6 +45,7 @@ export interface ProfilStats {
     sejre: number;
     doedsfald: number;
     bedsteScore: number;
+    bedsteMedalPath?: string | null;
     gennemsnitScore: number;
     mestGuld: number;
     bedsteDag: number;
@@ -434,7 +435,7 @@ export async function hentProfilStats() {
 
     const { data, error } = await supabase
         .from('game_results')
-        .select('id, player_name, room_code, score, character, is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, created_at')
+        .select('id, player_name, room_code, score, character, is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, medal_path, created_at')
         .eq('user_id', authState.user.id)
         .order('created_at', { ascending: false });
 
@@ -476,11 +477,19 @@ export async function hentProfilStats() {
         })
         .sort((a, b) => b.score - a.score);
 
+    const bedsteScore = Math.max(0, ...data.map((r) => r.score || 0));
+    const bedsteResultater = data.filter((r) => (r.score || 0) === bedsteScore);
+    const bedsteMedalPath =
+        bedsteResultater.find((r) => r.medal_path === '/screens/m11.webp')?.medal_path ||
+        bedsteResultater[0]?.medal_path ||
+        null;
+
     authState.stats = {
         spil,
         sejre,
         doedsfald,
-        bedsteScore: Math.max(0, ...data.map((r) => r.score || 0)),
+        bedsteScore,
+        bedsteMedalPath,
         gennemsnitScore: spil > 0 ? Math.round(samletScore / spil) : 0,
         mestGuld,
         bedsteDag: Math.max(0, ...data.map((r) => r.days || 0)),
