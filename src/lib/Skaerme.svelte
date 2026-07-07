@@ -1433,7 +1433,7 @@
                                     class:bedste={medalje.bedste}
                                     class:trofae-opnaaet={medalje.opnaaet}
                                     class:mytiskPuls={medalje.mytisk}
-                                    style={medalje.mytisk ? `--puls-delay: -${((index * 2.13) % 6.4).toFixed(2)}s; --puls-duration: ${(6.2 + ((index * 0.47) % 2.2)).toFixed(2)}s;` : undefined}
+                                    style={medalje.mytisk ? `--puls-delay: -${((index * 3.7) % 12.8).toFixed(2)}s; --puls-duration: ${(12.4 + ((index * 0.83) % 3.6)).toFixed(2)}s;` : undefined}
                                     draggable="false"
                                 />
                             </button>
