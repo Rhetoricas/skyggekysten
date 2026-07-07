@@ -92,6 +92,7 @@
                         <li>You reveal fields around you when moving. Sight radius comes from your character and equipment such as torches.</li>
                         <li>Mountains block sight unless you stand on a mountain. Mountain fields give at least radius 2 when you climb up.</li>
                         <li>The fog starts moving after day 6. If you stand in fog when time passes, you take damage. You cannot camp in fog.</li>
+                        <li>When the fog returns from the east, it deals double damage. If it crosses the island and comes again from the west, it deals triple damage. Fog blockers reduce this to normal fog damage on protected fields.</li>
                         <li>When fog reaches a field, hidden roots wither, campfires go out, and shops, markets and workshops close.</li>
                         <li>Some rare events can hold fog back, block it behind a field or reveal a boat for everyone.</li>
                     </ul>
@@ -252,6 +253,7 @@
                         <li>Du afslører felter omkring dig, når du bevæger dig. Din synsradius kommer fra karakteren og udstyr som fakkel.</li>
                         <li>Bjerge blokerer udsyn, medmindre du selv står på et bjerg. Bjergfelter giver mindst radius 2, når du kommer derop.</li>
                         <li>Tågen begynder først at rykke efter dag 6. Hvis du står i tågen, når tiden går, tager du skade. Du kan ikke slå lejr i tågen.</li>
+                        <li>Når tågen vender fra øst, giver den dobbelt skade. Hvis den krydser øen og kommer igen fra vest, giver den tredobbelt skade. Tågeblokkere sænker det til normal tågeskade på beskyttede felter.</li>
                         <li>Når tågen rammer et felt, visner skjulte rødder, lejrbål går ud, og butikker, markeder og værksteder lukker.</li>
                         <li>Nogle sjældne events kan holde tågen tilbage, blokere den bag et felt eller vise en båd for alle.</li>
                     </ul>

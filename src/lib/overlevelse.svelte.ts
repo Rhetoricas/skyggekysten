@@ -2,7 +2,7 @@ import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb, broadcastFelt, broadcastFelter } from './netvaerk';
 import { HEX_W } from './spildata';
 import { brugFraRygsæk, hentKortBredde, hentKortHoejde, hentNaboIRetning } from './spilmotor';
-import { erFeltITaagen } from './taage';
+import { erBeskyttetAfTaageblokker, erFeltITaagen } from './taage';
 import { erFriskAktivSpiller } from './aktivSpiller';
 import { registrerHeling, registrerVandSkade } from './trofaeer';
 import type { Felt, GravstenMinde } from './types';
@@ -14,6 +14,22 @@ function erVandBiome(biome: string | null | undefined) {
 
 export function erSpillerITaagen() {
     return erFeltITaagen(spilTilstand.gitter, spilTilstand.spillerIndex, spilTilstand.fogX, hentKortBredde());
+}
+
+function erOestTaageAktiv() {
+    return spilTilstand.fogX < 0;
+}
+
+function erTaagenVendtTilbageFraVest() {
+    return spilTilstand.fogX <= -(hentKortBredde() * HEX_W);
+}
+
+function erSpillerBeskyttetAfTaageblokker() {
+    return erBeskyttetAfTaageblokker(
+        spilTilstand.gitter,
+        spilTilstand.spillerIndex,
+        hentKortBredde()
+    );
 }
 
 function rydTaageramteFelter() {
@@ -401,7 +417,17 @@ export function fremrykTid() {
     }
 
     if (erSpillerITaagen()) {
-        tagSkadeOgTjekDød(30, tekst('Tågens syre ætsede dine lunger.', 'The fog acid burned your lungs.'));
+        const beskyttetAfBlokker = erSpillerBeskyttetAfTaageblokker();
+        const tredobbeltTaage = erTaagenVendtTilbageFraVest() && !beskyttetAfBlokker;
+        const dobbeltTaage = erOestTaageAktiv() && !beskyttetAfBlokker;
+        tagSkadeOgTjekDød(
+            tredobbeltTaage ? 90 : dobbeltTaage ? 60 : 30,
+            tredobbeltTaage
+                ? tekst('Tågen har krydset øen og kommer igen fra vest. Den lægger sig tre gange så tungt om dig.', 'The fog has crossed the island and comes again from the west. It settles three times as heavily around you.')
+                : dobbeltTaage
+                ? tekst('Tågen kommer fra øst og lægger sig dobbelt tungt om dig.', 'The fog comes from the east and settles twice as heavily around you.')
+                : tekst('Tågens syre ætsede dine lunger.', 'The fog acid burned your lungs.')
+        );
         if (kortAendret && spilTilstand.gameState === 'play') syncTilDb(true);
     } else {
         syncTilDb(kortAendret);
