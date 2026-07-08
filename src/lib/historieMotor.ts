@@ -3,17 +3,17 @@ import { tekst } from './i18n.svelte';
 import { titelNavn } from './spilTekst';
 
 const titelKatalog: Record<string, string[]> = {
-    knight: ['Væbner', 'Fodsoldat', 'Lejesvend', 'Kaptajn', 'Ridder', 'Bannerfører', 'Hærfører', 'Krigsherre', 'Paladin', 'Konge'],
-    magician: ['Lærling', 'Novice', 'Akolyt', 'Illusionist', 'Elementalist', 'Besværger', 'Magister', 'Ærkemagiker', 'Runemester', 'Halvgud'],
-    thief: ['Lommetyv', 'Røver', 'Indbrudstyv', 'Snigmorder', 'Skygge', 'Lurendrejer', 'Bandeleder', 'Syndikatboss', 'Fantom', 'Skyggekonge'],
-    explorer: ['Vildfaren', 'Spejder', 'Stifinder', 'Kortlægger', 'Vandrer', 'Banebryder', 'Pioner', 'Opdagelsesrejsende', 'Erobrer', 'Legende'],
-    viking: ['Træl', 'Bådsmand', 'Plyndrer', 'Øksebærer', 'Bersærk', 'Skjoldbryder', 'Høvding', 'Jarl', 'Søkonge', 'Einherjer'],
-    royal: ['Arving', 'Hofsnog', 'Baron', 'Greve', 'Markis', 'Hertug', 'Storfyrste', 'Kronprins', 'Enevældshersker', 'Kejser'],
-    hunter: ['Krybskytte', 'Sporhund', 'Flåer', 'Bueskytte', 'Jæger', 'Skarpskytte', 'Falkeøje', 'Udyrsbetvinger', 'Skovløber', 'Jagtmester'],
-    pirate: ['Dæksdreng', 'Matros', 'Bådsmand', 'Skytte', 'Rorsmand', 'Styrmand', 'Kaptajn', 'Korsar', 'Piratkonge', 'Havets Hersker'],
+    knight: ['Væbner', 'Fodsoldat', 'Lejesvend', 'Kompagnifører', 'Lansefører', 'Bannerfører', 'Hærfører', 'Hærmester', 'Paladin', 'Konge'],
+    magician: ['Aspirant', 'Novice', 'Akolyt', 'Illusionist', 'Elementalist', 'Besværger', 'Magister', 'Ærkemagiker', 'Runemester', 'Halvgud'],
+    thief: ['Lommetyv', 'Røver', 'Indbrudstyv', 'Snigmorder', 'Nattegænger', 'Lurendrejer', 'Bandeleder', 'Syndikatboss', 'Fantom', 'Skyggekonge'],
+    explorer: ['Vildfaren', 'Forløber', 'Stifinder', 'Kortlægger', 'Vandrer', 'Banebryder', 'Pioner', 'Opdagelsesrejsende', 'Erobrer', 'Legende'],
+    viking: ['Træl', 'Langskibsroer', 'Plyndrer', 'Øksebærer', 'Bersærk', 'Skjoldbryder', 'Høvding', 'Jarl', 'Søkonge', 'Einherjer'],
+    royal: ['Arving', 'Hofsnog', 'Baron', 'Greve', 'Markis', 'Lensherre', 'Storfyrste', 'Kronprins', 'Enevældshersker', 'Kejser'],
+    hunter: ['Krybskytte', 'Sporhund', 'Flåer', 'Langbueskytte', 'Vildtsporer', 'Skarpskytte', 'Falkeøje', 'Udyrsbetvinger', 'Skovløber', 'Jagtmester'],
+    pirate: ['Dæksdreng', 'Matros', 'Bådsmand', 'Kanonér', 'Rorsmand', 'Styrmand', 'Skibsfører', 'Fribytter', 'Piratkonge', 'Havets Hersker'],
     dwarf: ['Støvbider', 'Stenknuser', 'Grubebisse', 'Klippebryder', 'Smeltemester', 'Tunnelherre', 'Malmbaron', 'Guldherre', 'Bjergkonge', 'Dybdens Hersker'],
-    orc: ['Kryb', 'Pjalt', 'Grønskolling', 'Kriger', 'Blodtørster', 'Krigsråber', 'Klanleder', 'Høvding', 'Krigsherre', 'Ødelægger'],
-    joker: ['Nar', 'Gøgler', 'Taskenspiller', 'Jonglør', 'Trickster', 'Illusionist', 'Lykkejæger', 'Dæmon', 'Kaosfyrste', 'Skæbnemager']
+    orc: ['Kryb', 'Pjalt', 'Grønskolling', 'Stridsmand', 'Blodtørster', 'Krigsråber', 'Klanleder', 'Klanherre', 'Blodherre', 'Ødelægger'],
+    joker: ['Nar', 'Gøgler', 'Taskenspiller', 'Jonglør', 'Trickster', 'Maskemager', 'Lykkejæger', 'Dæmon', 'Kaosfyrste', 'Skæbnemager']
 };
 
 export function hentTitel(karakterId: string, niveau: number): string {

@@ -88,17 +88,17 @@ export const tilgaengeligeKarakterer: Karakter[] = [
 ];
 
 export const karakterKlasseNavne: Record<string, string> = {
-    knight: 'Ridder',
+    knight: 'Ordenen',
     magician: 'Magikere',
-    thief: 'Tyv',
+    thief: 'Lovløse',
     explorer: 'Udforsker',
-    viking: 'Viking',
+    viking: 'Nordboere',
     royal: 'Adel',
-    hunter: 'Jæger',
-    pirate: 'Pirat',
-    dwarf: 'Dværg',
-    orc: 'Ork',
-    joker: 'Joker'
+    hunter: 'Spejdere',
+    pirate: 'Sørøvere',
+    dwarf: 'Bjergfolk',
+    orc: 'Klanfolk',
+    joker: 'Fantaster'
 };
 
 export function hentKarakterKlasseNoegle(karakter?: Pick<Karakter, 'id' | 'navn'> | string | null) {
