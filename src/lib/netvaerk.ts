@@ -1163,7 +1163,7 @@ export async function hentOffentligProfil(userId: string | null | undefined) {
     const { data, error } = await medTimeout(
         supabase
             .from('profiles')
-            .select('display_name, profile_character_id')
+            .select('display_name, profile_character_id, trophies, mythic_trophies')
             .eq('id', userId)
             .maybeSingle(),
         8000,
@@ -1177,7 +1177,9 @@ export async function hentOffentligProfil(userId: string | null | undefined) {
 
     return {
         displayName: typeof data?.display_name === 'string' ? data.display_name : '',
-        profileCharacterId: typeof data?.profile_character_id === 'string' ? data.profile_character_id : ''
+        profileCharacterId: typeof data?.profile_character_id === 'string' ? data.profile_character_id : '',
+        trophies: Array.isArray(data?.trophies) ? data.trophies : [],
+        mythicTrophies: Array.isArray(data?.mythic_trophies) ? data.mythic_trophies : []
     };
 }
 

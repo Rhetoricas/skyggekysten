@@ -664,7 +664,9 @@
         return trofaeMedaljerFraAwards(score?.trofaeAwards || []);
     }
 
-    function trofaeMedaljerFraAwards(awards: TrofaeAward[]) {
+    function trofaeMedaljerFraAwards(awards: TrofaeAward[], trofaeRaekkefoelge?: string[], mytiskeIds?: string[]) {
+        const trofaeOrden = new Map((trofaeRaekkefoelge?.length ? trofaeRaekkefoelge : TROFAE_DEFINITIONER.map((trofae) => trofae.id)).map((id, index) => [id, index]));
+        const mytiskeFraProfil = new Set(mytiskeIds || []);
         const awardsEfterNiveau = new Map<string, TrofaeAward>();
         for (const award of normaliserTrofaeAwards(awards)) {
             const eksisterende = awardsEfterNiveau.get(award.id);
@@ -675,10 +677,11 @@
         return Array.from(awardsEfterNiveau.values())
             .map((award) => {
                 const trofae = findTrofae(award.id);
-                const mytisk = award.tier === 'mythic';
+                const mytisk = award.tier === 'mythic' || mytiskeFraProfil.has(award.id);
                 return trofae ? { ...trofae, sti: mytisk ? trofae.mytiskSti || trofae.sti : trofae.sti, award, mytisk } : null;
             })
-            .filter((trofae): trofae is NonNullable<ReturnType<typeof findTrofae>> & { award: TrofaeAward; mytisk: boolean } => !!trofae);
+            .filter((trofae): trofae is NonNullable<ReturnType<typeof findTrofae>> & { award: TrofaeAward; mytisk: boolean } => !!trofae)
+            .sort((a, b) => (trofaeOrden.get(a.id) ?? 999) - (trofaeOrden.get(b.id) ?? 999));
     }
 
     function offentligProfilBedsteScore(profil: OffentligSpillerProfil | null) {
@@ -691,6 +694,8 @@
     }
 
     function offentligProfilKarakter(profil: OffentligSpillerProfil | null) {
+        if (profil?.profilKarakterId === PROFIL_AUTO_BEDSTE_SCORE_ID) return karakterFraScore(offentligProfilBedsteScore(profil));
+        if (profil?.profilKarakterId === PROFIL_TUTORIAL_KARAKTER_ID) return tutorialKarakter;
         if (profil?.profilKarakterId) {
             return tilgaengeligeKarakterer.find((karakter) => karakter.id === profil.profilKarakterId) || karakterFraScore(offentligProfilBedsteScore(profil));
         }
@@ -699,7 +704,10 @@
 
     function offentligProfilTitel(profil: OffentligSpillerProfil | null) {
         const karakter = offentligProfilKarakter(profil);
-        const titelScore = profil?.profilKarakterId
+        if (profil?.profilKarakterId === PROFIL_TUTORIAL_KARAKTER_ID) {
+            return `${karakterNavn(karakter.navn)} - ${tekst('Nybegynder', 'Newbie')}`;
+        }
+        const titelScore = profil?.profilKarakterId && profil.profilKarakterId !== PROFIL_AUTO_BEDSTE_SCORE_ID
             ? profil.profilTitelScore || 0
             : offentligProfilBedsteScore(profil)?.point || 0;
         if (titelScore <= 0) return `${karakterNavn(karakter.navn)} - ${tekst('Ingen titel endnu', 'No title yet')}`;
@@ -751,12 +759,14 @@
                 ? hentSupabaseTrofaeAwards(profilUserId)
                 : normaliserTrofaeAwards((await Promise.all(scores.map((score) => hentHighscoreTrofaeAwards(score.id)))).flat())
         ]);
-        const profilKarakter = offentligProfil?.profileCharacterId
+        const profilKarakter = offentligProfil?.profileCharacterId && offentligProfil.profileCharacterId !== PROFIL_AUTO_BEDSTE_SCORE_ID && offentligProfil.profileCharacterId !== PROFIL_TUTORIAL_KARAKTER_ID
             ? tilgaengeligeKarakterer.find((karakter) => karakter.id === offentligProfil.profileCharacterId)
             : null;
         const profilTitelScore = profilUserId && profilKarakter
             ? (await hentBedsteHighscoreForBrugerKarakter(profilUserId, profilKarakter.navn))?.point || 0
             : 0;
+        const profilTrofaeOrden = normaliserTrofaeIds(offentligProfil?.trophies || []);
+        const profilMytiskeTrofaeer = normaliserTrofaeIds(offentligProfil?.mythicTrophies || []);
 
         const aktuelNoegle = offentligSpillerProfil?.userId || offentligSpillerProfil?.navn;
         if (aktuelNoegle !== profilNoegle) return;
@@ -767,7 +777,7 @@
             profilKarakterId: offentligProfil?.profileCharacterId || undefined,
             profilTitelScore,
             scores,
-            trofaeer: trofaeMedaljerFraAwards(awards),
+            trofaeer: trofaeMedaljerFraAwards(awards, profilTrofaeOrden, profilMytiskeTrofaeer),
             henter: false
         };
     }
@@ -1863,47 +1873,6 @@
                     <p class="highscore-detail-note">{tekst('Henter opgørelse...', 'Loading breakdown...')}</p>
                 {:else if harHighscoreDetaljer(valgtHighscore)}
                     {@const miniRute = highscoreMiniRute(valgtHighscore)}
-                    <section class="highscore-detail-logbog" aria-label={tekst('Logbog', 'Logbook')}>
-                        <span>{tekst('Logbog', 'Logbook')}</span>
-                        <button type="button" class="highscore-log-button" onclick={() => visHighscoreLog = true} aria-label={tekst('Åbn logbog', 'Open logbook')} title={tekst('Åbn logbog', 'Open logbook')}>
-                            <img src="/ui/logbog.webp" alt="" />
-                        </button>
-                    </section>
-
-                    {#if miniRute}
-                        <section class="highscore-detail-rute" aria-label={tekst('Rute', 'Route')}>
-                            <span>{tekst('Rute', 'Route')}</span>
-                            <div class="highscore-route-preview">
-                                <svg viewBox={miniRute.viewBox} preserveAspectRatio="xMidYMid meet">
-                                    <polyline
-                                        points={miniRute.points}
-                                        fill="none"
-                                        stroke="rgba(255, 255, 255, 0.88)"
-                                        stroke-width="8"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        class="highscore-route-line"
-                                    />
-                                    <circle cx={miniRute.start.x} cy={miniRute.start.y} r="7" class="highscore-route-start" />
-                                    <circle cx={miniRute.slut.x} cy={miniRute.slut.y} r="9" class="highscore-route-end" />
-                                </svg>
-                            </div>
-                        </section>
-                    {/if}
-
-                    {#if highscoreTrofaeMaalinger(valgtHighscore).length > 0}
-                        <section class="highscore-detail-maalinger" aria-label={tekst('Trofæmålinger', 'Trophy measurements')}>
-                            <p class="highscore-detail-maalinger-meta">
-                                {highscoreStatus(valgtHighscore)} · {talEllerUkendt(valgtHighscore.dage)} {tekst('dage', 'days')} · {highscoreSpillerAntal(valgtHighscore)}
-                            </p>
-                            <div>
-                                {#each highscoreTrofaeMaalinger(valgtHighscore) as maaling (maaling.key)}
-                                    <p><span>{maaling.label}</span><strong>{maaling.value}</strong></p>
-                                {/each}
-                            </div>
-                        </section>
-                    {/if}
-
                     {#if highscoreTrofaeer(valgtHighscore).length > 0}
                         <section class="highscore-detail-trofaeer" aria-label={tekst('Trofæmedaljer opnået i dette run', 'Trophy medals earned in this run')}>
                             <span>{tekst('Trofæmedaljer opnået', 'Trophy medals earned')}</span>
@@ -1924,6 +1893,47 @@
                                         </button>
                                     </figure>
                                 {/each}
+                            </div>
+                        </section>
+                    {/if}
+
+                    <section class="highscore-detail-logbog" aria-label={tekst('Logbog', 'Logbook')}>
+                        <span>{tekst('Logbog', 'Logbook')}</span>
+                        <button type="button" class="highscore-log-button" onclick={() => visHighscoreLog = true} aria-label={tekst('Åbn logbog', 'Open logbook')} title={tekst('Åbn logbog', 'Open logbook')}>
+                            <img src="/ui/logbog.webp" alt="" />
+                        </button>
+                    </section>
+
+                    {#if highscoreTrofaeMaalinger(valgtHighscore).length > 0}
+                        <section class="highscore-detail-maalinger" aria-label={tekst('Trofæmålinger', 'Trophy measurements')}>
+                            <p class="highscore-detail-maalinger-meta">
+                                {highscoreStatus(valgtHighscore)} · {talEllerUkendt(valgtHighscore.dage)} {tekst('dage', 'days')} · {highscoreSpillerAntal(valgtHighscore)}
+                            </p>
+                            <div>
+                                {#each highscoreTrofaeMaalinger(valgtHighscore) as maaling (maaling.key)}
+                                    <p><span>{maaling.label}</span><strong>{maaling.value}</strong></p>
+                                {/each}
+                            </div>
+                        </section>
+                    {/if}
+
+                    {#if miniRute}
+                        <section class="highscore-detail-rute" aria-label={tekst('Rute', 'Route')}>
+                            <span>{tekst('Rute', 'Route')}</span>
+                            <div class="highscore-route-preview">
+                                <svg viewBox={miniRute.viewBox} preserveAspectRatio="xMidYMid meet">
+                                    <polyline
+                                        points={miniRute.points}
+                                        fill="none"
+                                        stroke="rgba(255, 255, 255, 0.88)"
+                                        stroke-width="8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="highscore-route-line"
+                                    />
+                                    <circle cx={miniRute.start.x} cy={miniRute.start.y} r="7" class="highscore-route-start" />
+                                    <circle cx={miniRute.slut.x} cy={miniRute.slut.y} r="9" class="highscore-route-end" />
+                                </svg>
                             </div>
                         </section>
                     {/if}
@@ -4228,7 +4238,7 @@
         filter: drop-shadow(0 10px 18px rgba(245, 208, 113, 0.22));
     }
     .highscore-detail-trofaeer {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
         margin: -2px 0 14px;
         padding: 0;
         position: relative;
@@ -4300,7 +4310,7 @@
         object-position: top center;
         position: absolute;
         right: 22px;
-        top: -13px;
+        top: -1px;
         width: 92px;
     }
     .highscore-detail-trofae-navn {
@@ -4339,7 +4349,6 @@
         top: 64px;
     }
     .highscore-detail-maalinger {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
         margin-top: 16px;
         padding-top: 16px;
     }
