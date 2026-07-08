@@ -692,7 +692,7 @@
             ? profil.profilTitelScore || 0
             : offentligProfilBedsteScore(profil)?.point || 0;
         if (titelScore <= 0) return `${karakterNavn(karakter.navn)} - ${tekst('Ingen titel endnu', 'No title yet')}`;
-        const titel = hentTitel(karakter.id, findMedaljeNiveau(titelScore));
+        const titel = hentTitel(karakter.id, findMedaljeNiveau(titelScore) + 1);
         return `${karakterNavn(karakter.navn)} - ${titelNavn(titel)}`;
     }
 
