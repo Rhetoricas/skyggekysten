@@ -3957,8 +3957,7 @@
         grid-template-columns: 92px minmax(0, 1fr) auto;
         gap: 18px;
         align-items: center;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-        padding-bottom: 18px;
+        padding-bottom: 12px;
     }
     .offentlig-profil-header img {
         width: 88px;
