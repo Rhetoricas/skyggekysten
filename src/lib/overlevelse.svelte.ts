@@ -413,7 +413,10 @@ export function fremrykTid() {
         }
 
         if (taagenVendte) {
-            spilTilstand.logBesked = tekst('Vinden vender ved østkysten. Tågen begynder at æde øen fra den anden side.', 'The wind turns at the east coast. The fog begins eating the island from the other side.');
+            spilTilstand.logBesked = tekst(
+                'Vinden vender ved østkysten. Tågen stiger til niveau 2 og giver dobbelt skade, medmindre en tågeblokker holder den nede.',
+                'The wind turns at the east coast. The fog rises to level 2 and deals double damage unless a fog blocker holds it down.'
+            );
         }
     }
 
@@ -424,9 +427,9 @@ export function fremrykTid() {
         tagSkadeOgTjekDød(
             tredobbeltTaage ? 90 : dobbeltTaage ? 60 : 30,
             tredobbeltTaage
-                ? tekst('Tågen har krydset øen og kommer igen fra vest. Den lægger sig tre gange så tungt om dig.', 'The fog has crossed the island and comes again from the west. It settles three times as heavily around you.')
+                ? tekst('Tågen har krydset hele øen og stiger til niveau 3. Den lægger sig tre gange så tungt om dig.', 'The fog has crossed the whole island and rises to level 3. It settles three times as heavily around you.')
                 : dobbeltTaage
-                ? tekst('Tågen kommer fra øst og lægger sig dobbelt tungt om dig.', 'The fog comes from the east and settles twice as heavily around you.')
+                ? tekst('Tågen er på niveau 2 og lægger sig dobbelt tungt om dig.', 'The fog is level 2 and settles twice as heavily around you.')
                 : tekst('Tågens syre ætsede dine lunger.', 'The fog acid burned your lungs.')
         );
         if (kortAendret && spilTilstand.gameState === 'play') syncTilDb(true);

@@ -303,6 +303,9 @@ const titelTekster: Record<string, string> = {
 
 export function karakterNavn(karakter?: Pick<Karakter, 'id' | 'navn'> | string | null) {
     const fundet = findKarakter(karakter);
+    if (!fundet && typeof karakter === 'object' && karakter?.id === 'tutorial_laerling') {
+        return tekst(karakter.navn || 'Lærling', karakterTekster.tutorial_laerling?.navn || 'Apprentice');
+    }
     if (!fundet && typeof karakter === 'string' && karakter) return karakter;
     return tekst(fundet?.navn || 'Ukendt', fundet ? karakterTekster[fundet.id]?.navn || fundet.navn : 'Unknown');
 }

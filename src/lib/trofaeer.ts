@@ -694,6 +694,23 @@ export function lavTrofaeAwardData(id: TrofaeId): Record<string, unknown> {
     return data[id] || {};
 }
 
+export function lavTrofaeMaalinger(): Record<string, unknown> {
+    const t = stats();
+    const items = spilTilstand.mitUdstyr || [];
+    return {
+        miner: antalMiner(),
+        taageBevaegelser: t.taageBevaegelser,
+        oversvoemmelseStartet: t.oversvoemmelseStartet,
+        vandSkader: t.vandSkader,
+        magiskeGenstande: antalItemsFraSet(items, MAGISKE_GENSTANDE),
+        guld: spilTilstand.guldTotal,
+        healetHp: t.healetHp,
+        kendteFelter: spilTilstand.mineKendteFelter?.length || 0,
+        opgraderingsPoint: antalOpgraderingsPoint(items),
+        diamantRaavaerdiFundet: t.diamantRaavaerdiFundet
+    };
+}
+
 function antalMiner() {
     return spilTilstand.gitter.filter((felt) => felt.hasGoldmine && felt.mineOwner === spilTilstand.spillerNavn).length;
 }

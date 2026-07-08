@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { spilTilstand } from '$lib/spilTilstand.svelte';
-    import { authState, erAnonymBruger, gemProfilKarakter, gemProfilNavn, hentProfilStats, logUd, sendEmailTilAnonymProfil, sendLoginLink, startAnonymProfil, type ProfilSpil } from '$lib/auth.svelte';
+    import { PROFIL_AUTO_BEDSTE_SCORE_ID, PROFIL_TUTORIAL_KARAKTER_ID, authState, erAnonymBruger, gemProfilKarakter, gemProfilNavn, hentProfilStats, logUd, sendEmailTilAnonymProfil, sendLoginLink, startAnonymProfil, type ProfilSpil } from '$lib/auth.svelte';
     import { hentKarakterKlasseNoegle, tilgaengeligeKarakterer } from '$lib/spildata';
     import { karakterFordel, karakterKlasseNavn as visKarakterKlasseNavn, karakterNavn, karakterUlempe, titelNavn } from '$lib/spilTekst';
     import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
@@ -35,6 +35,7 @@
         rute?: number[];
         ruteBredde?: number | null;
         ruteHoejde?: number | null;
+        trophyStats?: Record<string, unknown>;
         trofaeAwards?: TrofaeAward[];
     };
 
@@ -340,17 +341,27 @@
         return tilgaengeligeKarakterer.find((karakter) => karakter.navn === karakterNavn) || tutorialKarakter;
     }
 
+    function profilBedsteScoreKarakter() {
+        if (!authState.stats || authState.stats.spil <= 0) return tutorialKarakter;
+        const bedste = authState.stats.karakterBedsteTitler[0];
+        return tilgaengeligeKarakterer.find((karakter) => karakter.id === bedste?.karakterId || karakter.navn === bedste?.karakter) || tutorialKarakter;
+    }
+
     function profilValgtKarakter() {
         const valgtId = authState.profil?.profile_character_id || '';
+        if (valgtId === PROFIL_AUTO_BEDSTE_SCORE_ID) return profilBedsteScoreKarakter();
+        if (valgtId === PROFIL_TUTORIAL_KARAKTER_ID) return tutorialKarakter;
         return tilgaengeligeKarakterer.find((karakter) => karakter.id === valgtId) || profilMestSpilledeKarakter();
     }
 
     function profilTitelForKarakter(karakterId?: string | null) {
+        if (karakterId === PROFIL_TUTORIAL_KARAKTER_ID) return tekst('Nybegynder', 'Newbie');
         if (!karakterId) return authState.stats?.favoritKarakterBedsteTitel || 'Ingen titel endnu';
         return authState.stats?.karakterBedsteTitler.find((række) => række.karakterId === karakterId)?.titel || 'Ingen titel endnu';
     }
 
     function profilTitelMedLevelForKarakter(karakterId?: string | null) {
+        if (karakterId === PROFIL_TUTORIAL_KARAKTER_ID) return tekst('Nybegynder', 'Newbie');
         if (!karakterId) return tekst('Mest spillet', 'Most played');
         const titelData = authState.stats?.karakterBedsteTitler.find((række) => række.karakterId === karakterId);
         if (!titelData || titelData.score <= 0 || titelData.titel === 'Ingen titel endnu') return '(0)';
@@ -779,6 +790,29 @@
     function awardTal(data: Record<string, unknown> | undefined, key: string) {
         const vaerdi = Number(data?.[key]);
         return Number.isFinite(vaerdi) ? Math.round(vaerdi) : null;
+    }
+
+    function highscoreTrofaeData(score: HighscoreDetaljer | null) {
+        return score?.trophyStats || {};
+    }
+
+    function highscoreTrofaeMaalinger(score: HighscoreDetaljer | null) {
+        const data = highscoreTrofaeData(score);
+        const maalinger = [
+            { key: 'miner', label: tekst('Miner', 'Mines') },
+            { key: 'taageBevaegelser', label: tekst('Bevægelser i tågen', 'Fog moves') },
+            { key: 'vandSkader', label: tekst('Vandskader', 'Water hits') },
+            { key: 'magiskeGenstande', label: tekst('Magiske genstande', 'Magical items') },
+            { key: 'guld', label: tekst('Guld', 'Gold') },
+            { key: 'healetHp', label: tekst('HP healet', 'HP healed') },
+            { key: 'kendteFelter', label: tekst('Kendte felter', 'Known fields') },
+            { key: 'opgraderingsPoint', label: tekst('Opgraderingspoint', 'Upgrade points') },
+            { key: 'diamantRaavaerdiFundet', label: tekst('Diamantværdi', 'Diamond value') }
+        ];
+
+        return maalinger
+            .map((maaling) => ({ ...maaling, value: awardTal(data, maaling.key) }))
+            .filter((maaling) => maaling.value !== null);
     }
 
     function trofaeAwardDetalje(trofae: { id?: string; award?: TrofaeAward | null }) {
@@ -1587,6 +1621,23 @@
                             <span>{tekst('Auto', 'Auto')}</span>
                             <em>{tekst('Mest spillet', 'Most played')}</em>
                         </button>
+                        <button
+                            type="button"
+                            class:valgt={authState.profil?.profile_character_id === PROFIL_AUTO_BEDSTE_SCORE_ID}
+                            onclick={() => vaelgProfilKarakter(PROFIL_AUTO_BEDSTE_SCORE_ID)}
+                        >
+                            <span>{tekst('Auto', 'Auto')}</span>
+                            <em>{tekst('Højeste score', 'Highest score')}</em>
+                        </button>
+                        <button
+                            type="button"
+                            class:valgt={authState.profil?.profile_character_id === PROFIL_TUTORIAL_KARAKTER_ID}
+                            onclick={() => vaelgProfilKarakter(PROFIL_TUTORIAL_KARAKTER_ID)}
+                        >
+                            <img src={tutorialKarakter.ikon} alt="" />
+                            <span>{karakterNavn(tutorialKarakter)}</span>
+                            <em>{profilTitelMedLevelForKarakter(tutorialKarakter.id)}</em>
+                        </button>
                         {#each tilgaengeligeKarakterer as karakter (karakter.id)}
                             <button
                                 type="button"
@@ -1808,64 +1859,73 @@
                     />
                 </div>
 
-                {#if highscoreTrofaeer(valgtHighscore).length > 0}
-                    <section class="highscore-detail-trofaeer" aria-label={tekst('Trofæmedaljer opnået i dette run', 'Trophy medals earned in this run')}>
-                        <span>{tekst('Trofæmedaljer opnået', 'Trophy medals earned')}</span>
-                        <div class="highscore-detail-trofae-liste">
-                            {#each highscoreTrofaeer(valgtHighscore) as trofae (trofae.id)}
-                                <figure>
-                                    <button
-                                        type="button"
-                                        class="highscore-detail-trofae-knap"
-                                        onclick={() => aabnHighscoreTrofaeInfo(trofae)}
-                                        aria-label={tekst(`Se mytisk krav for ${medaljeLabel(trofae)}`, `View Mythic requirement for ${medaljeLabel(trofae)}`)}
-                                    >
-                                        <span class="highscore-detail-trofae-navn">{medaljeLabel(trofae)}</span>
-                                        {#if trofaeAwardDetalje(trofae)}
-                                            <p>{trofaeAwardDetalje(trofae)}</p>
-                                        {/if}
-                                        <img src={trofae.sti} alt={medaljeLabel(trofae)} draggable="false" />
-                                    </button>
-                                </figure>
-                            {/each}
-                        </div>
-                    </section>
-                {/if}
-
                 {#if valgtHighscore.henterDetaljer}
                     <p class="highscore-detail-note">{tekst('Henter opgørelse...', 'Loading breakdown...')}</p>
                 {:else if harHighscoreDetaljer(valgtHighscore)}
-                    <div class="highscore-detail-grid">
-                        <div><span>Status</span><strong>{highscoreStatus(valgtHighscore)}</strong></div>
-                        <div class="highscore-days-card">
-                            <span>{tekst('Dage', 'Days')}</span>
-                            <strong>{talEllerUkendt(valgtHighscore.dage)}</strong>
-                            <button type="button" class="highscore-log-button" onclick={() => visHighscoreLog = true} aria-label={tekst('Åbn logbog', 'Open logbook')} title={tekst('Åbn logbog', 'Open logbook')}>
-                                <img src="/ui/logbog.webp" alt="" />
-                            </button>
-                        </div>
-                        <div><span>{tekst('Guld', 'Gold')}</span><strong>{talEllerUkendt(valgtHighscore.guld)}</strong></div>
-                        <div><span>{tekst('Udforskning', 'Exploration')}</span><strong>{talEllerUkendt(valgtHighscore.kendteFelter)}</strong></div>
-                        <div><span>{tekst('Miner', 'Mines')}</span><strong>{valgtHighscore.miner ?? tekst('Ukendt', 'Unknown')}</strong></div>
-                        <div><span>{tekst('Spilform', 'Mode')}</span><strong>{highscoreSpillerAntal(valgtHighscore)}</strong></div>
-                    </div>
                     {@const miniRute = highscoreMiniRute(valgtHighscore)}
+                    <section class="highscore-detail-logbog" aria-label={tekst('Logbog', 'Logbook')}>
+                        <span>{tekst('Logbog', 'Logbook')}</span>
+                        <button type="button" class="highscore-log-button" onclick={() => visHighscoreLog = true} aria-label={tekst('Åbn logbog', 'Open logbook')} title={tekst('Åbn logbog', 'Open logbook')}>
+                            <img src="/ui/logbog.webp" alt="" />
+                        </button>
+                    </section>
+
                     {#if miniRute}
-                        <div class="highscore-route-preview" aria-label={tekst('Rute', 'Route')}>
-                            <svg viewBox={miniRute.viewBox} preserveAspectRatio="xMidYMid meet">
-                                <polyline
-                                    points={miniRute.points}
-                                    fill="none"
-                                    stroke="rgba(255, 255, 255, 0.88)"
-                                    stroke-width="8"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    class="highscore-route-line"
-                                />
-                                <circle cx={miniRute.start.x} cy={miniRute.start.y} r="7" class="highscore-route-start" />
-                                <circle cx={miniRute.slut.x} cy={miniRute.slut.y} r="9" class="highscore-route-end" />
-                            </svg>
-                        </div>
+                        <section class="highscore-detail-rute" aria-label={tekst('Rute', 'Route')}>
+                            <span>{tekst('Rute', 'Route')}</span>
+                            <div class="highscore-route-preview">
+                                <svg viewBox={miniRute.viewBox} preserveAspectRatio="xMidYMid meet">
+                                    <polyline
+                                        points={miniRute.points}
+                                        fill="none"
+                                        stroke="rgba(255, 255, 255, 0.88)"
+                                        stroke-width="8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="highscore-route-line"
+                                    />
+                                    <circle cx={miniRute.start.x} cy={miniRute.start.y} r="7" class="highscore-route-start" />
+                                    <circle cx={miniRute.slut.x} cy={miniRute.slut.y} r="9" class="highscore-route-end" />
+                                </svg>
+                            </div>
+                        </section>
+                    {/if}
+
+                    {#if highscoreTrofaeMaalinger(valgtHighscore).length > 0}
+                        <section class="highscore-detail-maalinger" aria-label={tekst('Trofæmålinger', 'Trophy measurements')}>
+                            <p class="highscore-detail-maalinger-meta">
+                                {highscoreStatus(valgtHighscore)} · {talEllerUkendt(valgtHighscore.dage)} {tekst('dage', 'days')} · {highscoreSpillerAntal(valgtHighscore)}
+                            </p>
+                            <div>
+                                {#each highscoreTrofaeMaalinger(valgtHighscore) as maaling (maaling.key)}
+                                    <p><span>{maaling.label}</span><strong>{maaling.value}</strong></p>
+                                {/each}
+                            </div>
+                        </section>
+                    {/if}
+
+                    {#if highscoreTrofaeer(valgtHighscore).length > 0}
+                        <section class="highscore-detail-trofaeer" aria-label={tekst('Trofæmedaljer opnået i dette run', 'Trophy medals earned in this run')}>
+                            <span>{tekst('Trofæmedaljer opnået', 'Trophy medals earned')}</span>
+                            <div class="highscore-detail-trofae-liste">
+                                {#each highscoreTrofaeer(valgtHighscore) as trofae (trofae.id)}
+                                    <figure>
+                                        <button
+                                            type="button"
+                                            class="highscore-detail-trofae-knap"
+                                            onclick={() => aabnHighscoreTrofaeInfo(trofae)}
+                                            aria-label={tekst(`Se mytisk krav for ${medaljeLabel(trofae)}`, `View Mythic requirement for ${medaljeLabel(trofae)}`)}
+                                        >
+                                            <span class="highscore-detail-trofae-navn">{medaljeLabel(trofae)}</span>
+                                            {#if trofaeAwardDetalje(trofae)}
+                                                <p>{trofaeAwardDetalje(trofae)}</p>
+                                            {/if}
+                                            <img src={trofae.sti} alt={medaljeLabel(trofae)} draggable="false" />
+                                        </button>
+                                    </figure>
+                                {/each}
+                            </div>
+                        </section>
                     {/if}
                 {:else}
                     <p class="highscore-detail-note">{tekst('Denne score er gemt før detaljeopgørelsen, så kun totalscoren er tilgængelig.', 'This score was saved before detailed breakdowns, so only the total score is available.')}</p>
@@ -4131,7 +4191,6 @@
         justify-content: center;
         min-height: 116px;
         border-top: 1px solid rgba(255, 255, 255, 0.12);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         padding: 14px 122px 14px 150px;
         margin-bottom: 14px;
     }
@@ -4279,31 +4338,72 @@
     .highscore-detail-trofaeer figure + figure p {
         top: 64px;
     }
-    .highscore-detail-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
+    .highscore-detail-maalinger {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 16px;
+        padding-top: 16px;
     }
-    .highscore-detail-grid div {
-        position: relative;
-        background: rgba(255, 255, 255, 0.055);
-        border: 1px solid rgba(255, 255, 255, 0.09);
-        border-radius: 6px;
-        padding: 10px;
-        min-width: 0;
+    .highscore-detail-rute,
+    .highscore-detail-logbog {
+        margin-top: 10px;
+        padding-top: 0;
     }
-    .highscore-detail-grid span {
+    .highscore-detail-rute > span,
+    .highscore-detail-logbog > span {
+        color: #c8c0aa;
         display: block;
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+    }
+    .highscore-detail-rute > span {
+        margin-bottom: -10px;
+    }
+    .highscore-detail-logbog {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: flex-start;
+        gap: 0;
+        text-align: left;
+    }
+    .highscore-detail-logbog > span {
+        grid-column: 1;
+    }
+    .highscore-detail-maalinger-meta {
+        color: #c8c0aa;
+        font-size: 0.88rem;
+        line-height: 1.25;
+        margin: 0 0 10px;
+        text-align: center;
+    }
+    .highscore-detail-maalinger > div {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+    }
+    .highscore-detail-maalinger p {
+        background: rgba(255, 255, 255, 0.045);
+        border: 1px solid rgba(255, 255, 255, 0.075);
+        border-radius: 5px;
+        margin: 0;
+        min-width: 0;
+        padding: 8px 9px;
+    }
+    .highscore-detail-maalinger p span {
         color: #aeb8b0;
-        font-size: 0.78rem;
-        margin-bottom: 4px;
+        display: block;
+        font-size: 0.72rem;
+        line-height: 1.15;
+        margin-bottom: 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
-    .highscore-detail-grid strong {
-        color: #fff;
+    .highscore-detail-maalinger p strong {
+        color: #f5d071;
+        font-size: 1rem;
         font-variant-numeric: tabular-nums;
-    }
-    .highscore-days-card {
-        min-height: 86px;
     }
     .highscore-detail-note {
         color: #cfc8b7;
@@ -4313,9 +4413,9 @@
     }
     .highscore-route-preview {
         height: 118px;
-        margin-top: 8px;
-        margin-bottom: -8px;
-        background: radial-gradient(circle at 50% 40%, rgba(245, 208, 113, 0.055), transparent 62%);
+        margin-top: -18px;
+        margin-bottom: 0;
+        background: transparent;
         overflow: hidden;
         pointer-events: none;
     }
@@ -4340,12 +4440,11 @@
         filter: drop-shadow(0 0 6px rgba(245, 208, 113, 0.45));
     }
     .highscore-log-button {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -42%);
-        width: min(82px, calc(100% - 34px));
-        height: min(82px, calc(100% - 12px));
+        grid-column: 2;
+        width: 64px;
+        height: 64px;
+        flex: 0 0 auto;
+        margin-top: -8px;
         border: 0;
         border-radius: 0;
         background: transparent;
@@ -4776,6 +4875,10 @@
             width: min(430px, 100%);
             margin: 0;
             padding: 14px;
+        }
+
+        .highscore-detail-maalinger > div {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .offentlig-profil-overlay {

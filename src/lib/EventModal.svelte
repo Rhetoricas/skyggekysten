@@ -32,6 +32,38 @@
             lukEvent();
         }
     }
+
+    type ItemMarkoerType = 'kraever' | 'risikerer' | 'mister';
+
+    function splitItemListe(itemListe: string | undefined) {
+        return itemListe
+            ? itemListe.split(',').map((itemId) => itemId.trim()).filter(Boolean)
+            : [];
+    }
+
+    function mistedeItemsFraValg(valg: Valg) {
+        const itemIds = valg.udfaldListe?.flatMap((udfald) => splitItemListe(udfald.mistItem)) ?? [];
+        return [...new Set(itemIds)];
+    }
+
+    function itemMarkoererForValg(valg: Valg) {
+        if (valg.kosterItem) return [{ itemId: valg.kosterItem, type: 'mister' as ItemMarkoerType }];
+
+        const risikoItems = mistedeItemsFraValg(valg);
+        if (risikoItems.length) {
+            return risikoItems.map((itemId) => ({ itemId, type: 'risikerer' as ItemMarkoerType }));
+        }
+
+        if (valg.kraeverItem) return [{ itemId: valg.kraeverItem, type: 'kraever' as ItemMarkoerType }];
+
+        return (valg.kraeverEtAfItems ?? []).map((itemId) => ({ itemId, type: 'kraever' as ItemMarkoerType }));
+    }
+
+    function itemMarkoerTitel(type: ItemMarkoerType, itemId: string) {
+        if (type === 'mister') return tekst(`Mister ${itemNavn(itemId)}`, `Consumes ${itemNavn(itemId)}`);
+        if (type === 'risikerer') return tekst(`Risikerer ${itemNavn(itemId)}`, `May lose ${itemNavn(itemId)}`);
+        return tekst(`Kræver ${itemNavn(itemId)}`, `Requires ${itemNavn(itemId)}`);
+    }
 </script>
 
 {#if eventState.aktivt}
@@ -64,6 +96,7 @@
             {#if !eventState.valgLåst}
                 {#each eventState.aktivt.valg as valg (valg.tekst)}
                     {@const harAdgang = kanViseValg(valg)}
+                    {@const itemMarkoerer = itemMarkoererForValg(valg)}
                     
                     <button 
                         class="valg-btn" 
@@ -74,15 +107,32 @@
                     >
                         <span class="valg-tekst">{valgTekst(valg)}</span>
                         
-                        {#if !harAdgang}
+                        {#if itemMarkoerer.length || !harAdgang}
                             <div class="manglende-betingelse">
+                                {#if itemMarkoerer.length}
+                                    <div class="mangel-ikon-raekke">
+                                        {#each itemMarkoerer.slice(0, 3) as markoer (`${markoer.type}-${markoer.itemId}`)}
+                                            {#if itemDB[markoer.itemId]}
+                                                <span
+                                                    class="item-markoer"
+                                                    class:kraever-markoer={markoer.type === 'kraever'}
+                                                    class:risikerer-markoer={markoer.type === 'risikerer'}
+                                                    class:mister-markoer={markoer.type === 'mister'}
+                                                    title={itemMarkoerTitel(markoer.type, markoer.itemId)}
+                                                >
+                                                    <img src={itemDB[markoer.itemId].billede} alt={itemMarkoerTitel(markoer.type, markoer.itemId)} class="mangel-ikon" />
+                                                </span>
+                                            {/if}
+                                        {/each}
+                                    </div>
+                                {/if}
                                 {#if valg.kraeverKarakter}
                                     <span class="mangel-ikon karakter-mangel" title={tekst('Kræver specifik helt', 'Requires a specific hero')}></span>
                                 {/if}
-                                {#if valg.kraeverItem && itemDB[valg.kraeverItem]}
+                                {#if !itemMarkoerer.length && valg.kraeverItem && itemDB[valg.kraeverItem]}
                                     <img src={itemDB[valg.kraeverItem].billede} alt={tekst('Mangler genstand', 'Missing item')} class="mangel-ikon" title={tekst(`Du mangler ${itemNavn(valg.kraeverItem)}`, `You need ${itemNavn(valg.kraeverItem)}`)} />
                                 {/if}
-                                {#if valg.kraeverEtAfItems?.length}
+                                {#if !itemMarkoerer.length && valg.kraeverEtAfItems?.length}
                                     <span class="mangel-guld">{tekst('Kræver våben', 'Requires weapon')}</span>
                                     <div class="mangel-ikon-raekke">
                                         {#each valg.kraeverEtAfItems.slice(0, 3) as itemId (itemId)}
@@ -92,7 +142,7 @@
                                         {/each}
                                     </div>
                                 {/if}
-                                {#if valg.kosterItem && itemDB[valg.kosterItem]}
+                                {#if !itemMarkoerer.length && valg.kosterItem && itemDB[valg.kosterItem]}
                                     <img src={itemDB[valg.kosterItem].billede} alt={tekst('Koster genstand', 'Costs item')} class="mangel-ikon koster-mangel" title={tekst(`Du skal betale med ${itemNavn(valg.kosterItem)}`, `You must pay with ${itemNavn(valg.kosterItem)}`)} />
                                 {/if}
                                 {#if valg.puljeVaerdi}
@@ -228,13 +278,15 @@
         gap: 4px;
         align-items: center;
         justify-content: center;
-        opacity: 0.65;
-        filter: grayscale(100%);
         min-width: 50px;
-        max-width: 60px;
+        max-width: 140px;
         flex-shrink: 0;
         border-left: 1px solid #333;
         padding-left: 10px;
+    }
+
+    .låst .manglende-betingelse {
+        opacity: 0.8;
     }
 
     .mangel-ikon {
@@ -248,8 +300,43 @@
 
     .mangel-ikon-raekke {
         display: flex;
-        gap: 2px;
+        gap: 5px;
         justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .item-markoer {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid #72d07b;
+        display: grid;
+        place-items: center;
+        background: rgba(0, 0, 0, 0.34);
+        box-shadow: 0 0 10px rgba(114, 208, 123, 0.28), inset 0 0 8px rgba(255, 255, 255, 0.06);
+        flex: 0 0 auto;
+    }
+
+    .item-markoer .mangel-ikon {
+        width: 28px !important;
+        height: 28px !important;
+        max-width: 28px !important;
+        max-height: 28px !important;
+    }
+
+    .kraever-markoer {
+        border-color: #60c46f;
+        box-shadow: 0 0 10px rgba(96, 196, 111, 0.32), inset 0 0 8px rgba(96, 196, 111, 0.1);
+    }
+
+    .risikerer-markoer {
+        border-color: #e0bf45;
+        box-shadow: 0 0 12px rgba(224, 191, 69, 0.34), inset 0 0 8px rgba(224, 191, 69, 0.12);
+    }
+
+    .mister-markoer {
+        border-color: #c94f4f;
+        box-shadow: 0 0 12px rgba(201, 79, 79, 0.36), inset 0 0 8px rgba(201, 79, 79, 0.13);
     }
 
     .lille-mangel-ikon {

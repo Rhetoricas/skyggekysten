@@ -30,7 +30,7 @@
     import type { Felt, GravstenMinde, Karakter, SpillerData } from '$lib/types';
     import { eventBibliotek } from '$lib/eventBibliotek';
     import { erAfgroedeModen, hentAfgroedeBlok, hentInsektPlageBlok } from '$lib/afgroeder';
-    import { erFeltITaagen } from '$lib/taage';
+    import { erBeskyttetAfTaageblokker, erFeltITaagen } from '$lib/taage';
     import { findNyeMytiskeTrofaeer, findNyeTrofaeer, gemMytiskeTrofaeIds, gemSupabaseTrofaeAwards, gemTrofaeAwards, gemTrofaeIds, hentGemteMytiskeTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, huskVentendeSupabaseMytiskeTrofaeer, huskVentendeSupabaseTrofaeer, lavTrofaeAwardData, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, nulstilTrofaeStats, retryVentendeSupabaseMytiskeTrofaeer, retryVentendeSupabaseTrofaeer } from '$lib/trofaeer';
 
     import Skaerme from './Skaerme.svelte';
@@ -189,6 +189,15 @@
     const SKATTEKORT_MIN_LINJE_LAENGDE = 40;
 
     let harSkattekortAktivt = $derived((spilTilstand.mineSkattekortFelter?.length || 0) > 0);
+
+    function taageNiveauForFelt(index: number, erOpslugt: boolean) {
+        if (!erOpslugt) return 0;
+        if (erBeskyttetAfTaageblokker(spilTilstand.gitter, index, kortBredde)) return 1;
+        if (spilTilstand.fogX <= -(kortBredde * HEX_W)) return 3;
+        if (spilTilstand.fogX < 0) return 2;
+        return 1;
+    }
+
     function hexMidtpunkt(index: number) {
         const raekke = Math.floor(index / kortBredde);
         const kolonne = index % kortBredde;
@@ -1813,6 +1822,9 @@
     }
 
     function opdaterLokaleTrofaeer() {
+        spilTilstand.nyeTrofaeIds = [];
+        spilTilstand.nyeMytiskeTrofaeIds = [];
+
         const ownerKey = lavTrofaeOwnerKey(authState.user?.id, spilTilstand.spillerNavn);
         const gemteIds = authState.user?.id
             ? normaliserTrofaeIds(authState.profil?.trophies || [])
@@ -1848,11 +1860,6 @@
             spilTilstand.nyeTrofaeIds = nyeIds;
             spilTilstand.nyeMytiskeTrofaeIds = nyeMytiskeIds;
             return;
-        }
-
-        if (spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map') {
-            spilTilstand.nyeTrofaeIds = [];
-            spilTilstand.nyeMytiskeTrofaeIds = [];
         }
     }
 
@@ -2441,7 +2448,7 @@
         if (felt.hasWorkshop && !felt.taageLukketVaerksted) dele.push(tekst('Feltet har et værksted, hvor udstyr kan opgraderes. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang.', 'This field has a workshop where equipment can be upgraded. If you have a club or wallbreaker, the master only dares to work for you once.'));
         if (felt.hasGoldmine) dele.push(felt.mineOwner ? tekst(`Guldminen ejes af ${felt.mineOwner}.`, `The gold mine is owned by ${felt.mineOwner}.`) : tekst('Der er en guldmine her.', 'There is a gold mine here.'));
         if (felt.hasPortal && !(felt.eventID && !felt.eventFuldført)) dele.push(tekst('Portalen kan flytte dig mod øst.', 'The portal can move you east.'));
-        if (felt.taageBlokker) dele.push(tekst('Tågeblokkeren kan holde tågen tilbage fra venstre, indtil tågen vender.', 'The fog blocker can hold back fog from the left until the fog turns around.'));
+        if (felt.taageBlokker) dele.push(tekst('Tågeblokkeren holder tågen nede på niveau 1 omkring sig, også når resten af tågen bliver tungere.', 'The fog blocker keeps the fog at level 1 around it, even when the rest of the fog grows heavier.'));
         const gravstenListe = gravstenListeForFelt(felt);
         if (gravstenListe.length > 1) dele.push(tekst(`Gravstenen rummer ${gravstenListe.length} dødsfald på dette felt.`, `The gravestone contains ${gravstenListe.length} deaths on this field.`));
         else if (gravstenListe.length === 1) dele.push(tekst('Gravstenen viser, at en spiller døde her.', 'The gravestone shows that a player died here.'));
@@ -2816,6 +2823,7 @@ function udførBevægelse(nytIndeks: number) {
                 {@const erUdforsket = spilTilstand.devVisHeleKort || spilTilstand.mineKendteFelter.includes(i)}
                 {@const erSkattekortRygte = !erUdforsket && aktiveSkattekortFelter.includes(i)}
                 {@const erOpslugt = !spilTilstand.devVisHeleKort && erFeltITaagen(spilTilstand.gitter, i, spilTilstand.fogX, kortBredde)}
+                {@const taageNiveau = taageNiveauForFelt(i, erOpslugt)}
                 {@const vistBiome = felt.katastrofeVisuelAktiv && felt.katastrofeFraBiome ? felt.katastrofeFraBiome : felt.biome}
                 {@const baggrund = !erUdforsket && !erSkattekortRygte ? 'none' : tileBaggrundForBiome(String(vistBiome), erOpslugt)}
                 {@const feltHjaelp = forklaringForFelt(felt, i, erUdforsket, erOpslugt, erSkattekortRygte)}
@@ -2830,7 +2838,7 @@ function udførBevægelse(nytIndeks: number) {
                     role="button" tabindex="0"
                     style="{erSkattekortRygte ? `--rygte-bg: ${baggrund};` : `background-image: ${baggrund};`} left: {posX}px; top: {posY}px;"
                 >
-                    <div class="inner" class:opslugt={erOpslugt}>
+                    <div class="inner" class:opslugt={erOpslugt} class:taageNiveau1={taageNiveau === 1} class:taageNiveau2={taageNiveau === 2} class:taageNiveau3={taageNiveau === 3}>
                         {#if erUdforsket && felt.hasBoat}
                             {#if !erOpslugt}
                                 <div class="sejr-lys"></div>
@@ -2861,12 +2869,12 @@ function udførBevægelse(nytIndeks: number) {
                             {/if}
                         {/if}
 
-                        {#if erUdforsket && !erOpslugt && felt.biome === 'meteor' && felt.hasMeteorStone}
-                            <img src="/tiles/meteorsten.webp" class="meteor-stone-icon" alt="" data-help-title={tekst('Meteorsten', 'Meteor stone')} data-help-body={tekst('Meteorstenen markerer et meteor-event. Feltet styres af meteorens egen belønning og fare.', 'The meteor stone marks a meteor event. The field is controlled by the meteor reward and danger.')} />
+                        {#if erUdforsket && felt.biome === 'meteor' && felt.hasMeteorStone}
+                            <img src="/tiles/meteorsten.webp" class="meteor-stone-icon" class:meteor-stone-icon-taage={erOpslugt} alt="" data-help-title={tekst('Meteorsten', 'Meteor stone')} data-help-body={tekst('Meteorstenen markerer et meteor-event. Feltet styres af meteorens egen belønning og fare.', 'The meteor stone marks a meteor event. The field is controlled by the meteor reward and danger.')} />
                         {/if}
 
                         {#if erUdforsket && !erOpslugt && felt.taageBlokker}
-                            <img src="/tiles/blokker.webp" class="taageblokker-icon" class:taageblokker-inaktiv={spilTilstand.fogX < 0} alt={tekst('Tågeblokker', 'Fog blocker')} data-help-title={tekst('Tågeblokker', 'Fog blocker')} data-help-body={tekst('Holder tågen tilbage fra venstre side. Når tågen vender fra højre, beskytter blokkeren ikke længere.', 'Holds the fog back from the left side. When the fog returns from the right, the blocker no longer protects you.')} />
+                            <img src="/tiles/blokker.webp" class="taageblokker-icon" alt={tekst('Tågeblokker', 'Fog blocker')} data-help-title={tekst('Tågeblokker', 'Fog blocker')} data-help-body={tekst('Holder tågen nede på niveau 1 omkring sig, også når resten af tågen bliver tungere.', 'Keeps the fog at level 1 around it, even when the rest of the fog grows heavier.')} />
                         {/if}
 
                         {#if !erOpslugt && !felt.gravet && felt.jordskredsSkatSpor}
@@ -3683,6 +3691,10 @@ function udførBevægelse(nytIndeks: number) {
         position: absolute; bottom: 38%; left: 50%; transform: translateX(-50%);
         height: 50px; z-index: 13; pointer-events: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
     }
+    .meteor-stone-icon-taage {
+        opacity: 0.85;
+        filter: grayscale(0.25) brightness(0.85) drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+    }
     .taageblokker-icon {
         position: absolute;
         width: 54px;
@@ -3695,11 +3707,6 @@ function udførBevægelse(nytIndeks: number) {
         filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8)) saturate(0.8);
         opacity: 0.92;
     }
-    .taageblokker-icon.taageblokker-inaktiv {
-        filter: grayscale(1) brightness(0.65) drop-shadow(0 3px 6px rgba(0,0,0,0.8));
-        opacity: 0.55;
-    }
-    
     .sailing-container {
         position: absolute; width: 96px; height: 110px; z-index: 100; display: flex;
         justify-content: center; align-items: center;
@@ -4004,6 +4011,14 @@ function udførBevægelse(nytIndeks: number) {
         100% { opacity: 0; transform: translate(-50%, calc(-50% - 48px)) scale(0.78); }
     }
     .opslugt { opacity: 0.8; filter: grayscale(0.8) brightness(0.6); }
+    .opslugt.taageNiveau2 {
+        opacity: 0.86;
+        filter: grayscale(0.68) sepia(0.22) hue-rotate(126deg) saturate(1.08) brightness(0.47) contrast(1.13);
+    }
+    .opslugt.taageNiveau3 {
+        opacity: 0.94;
+        filter: grayscale(1) sepia(0.42) hue-rotate(-24deg) saturate(1.35) brightness(0.22) contrast(1.45) blur(0.7px);
+    }
 
     .slut-panel {
         position: fixed; bottom: 20px; right: 20px; width: 350px; max-width: 90vw;

@@ -72,13 +72,18 @@ let authStartet = false;
 let authHeartbeatTimer: ReturnType<typeof setInterval> | null = null;
 const PROFIL_KARAKTER_KEY = 'taage_profile_character:';
 const PROFIL_SELECT = 'id, display_name, sound_level, trophies, mythic_trophies, profile_character_id, language, created_at, updated_at';
+export const PROFIL_AUTO_BEDSTE_SCORE_ID = 'auto_best_score';
+export const PROFIL_TUTORIAL_KARAKTER_ID = 'tutorial_laerling';
 
 function rensProfilNavn(navn?: string | null) {
     return (navn || '').replace(/[^a-zA-Z0-9æøåÆØÅ ]/g, '').trim().substring(0, 15);
 }
 
 function erGyldigProfilKarakterId(karakterId?: string | null) {
-    return !karakterId || tilgaengeligeKarakterer.some((karakter) => karakter.id === karakterId);
+    return !karakterId ||
+        karakterId === PROFIL_AUTO_BEDSTE_SCORE_ID ||
+        karakterId === PROFIL_TUTORIAL_KARAKTER_ID ||
+        tilgaengeligeKarakterer.some((karakter) => karakter.id === karakterId);
 }
 
 function profilKarakterKey(userId: string) {

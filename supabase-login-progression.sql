@@ -48,6 +48,7 @@ create table if not exists public.game_results (
     route_indices jsonb,
     route_width integer,
     route_height integer,
+    trophy_stats jsonb not null default '{}'::jsonb,
     game_mode text not null default 'open' check (game_mode in ('open', 'offline')),
     created_at timestamptz not null default now()
 );
@@ -73,6 +74,9 @@ add column if not exists route_width integer;
 
 alter table public.game_results
 add column if not exists route_height integer;
+
+alter table public.game_results
+add column if not exists trophy_stats jsonb not null default '{}'::jsonb;
 
 alter table public.game_results
 add column if not exists death_cause text
