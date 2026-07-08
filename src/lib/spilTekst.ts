@@ -150,7 +150,7 @@ const itemTekster: Record<string, TekstPar> = {
     stav: { navn: 'Staff', beskrivelse: 'Can teleport you 4 fields east. Costs base energy. The landing field activates normally. If you stand on crystal, the staff reveals crystal fields within radius 4.' },
     dragestav: { navn: 'Dragon Staff', beskrivelse: 'Upgraded staff. Teleports you 5 fields east and reveals the route in between. If it would send you into open water, it saves you on the last safe field and becomes an ordinary staff. On crystal, it reveals crystal fields within radius 5.' },
     bue: { navn: 'Bow', beskrivelse: 'A weapon for events where distance matters.' },
-    mesterbue: { navn: 'Falcon Bow', beskrivelse: 'Upgraded bow. Counts as a bow in events. Bow choices give a little more gold, less damage and reveal three fields east after the shot.' },
+    mesterbue: { navn: 'Falcon Bow', beskrivelse: 'Upgraded bow. Counts as a bow in events. Bow choices give a little more gold and less damage. When you move, it reveals a small fan just beyond your sight in the direction you went.' },
     oekse: { navn: 'Axe', beskrivelse: 'A heavy weapon. Used in some events.' },
     stormoekse: { navn: 'Storm Axe', beskrivelse: 'Upgraded axe. Counts as an axe in events. Axe choices give more gold and less damage because it can chop obstacles away in one blow.' },
     koelle: { navn: 'Club', beskrivelse: 'A brutal weapon. Can smash markets and ordinary town fields into ruins for a lot of energy and HP.' },

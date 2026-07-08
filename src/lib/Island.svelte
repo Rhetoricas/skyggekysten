@@ -863,9 +863,44 @@
         });
     }
 
-    function håndterTastatur(ev: KeyboardEvent) {
-        if (inspectAktiv && ev.key === 'Escape') {
+    function lukAktivModalMedEscape() {
+        if (document.querySelector('.regelbog-overlay')) return false;
+
+        if (visDoedsLog) {
+            visDoedsLog = false;
+            return true;
+        }
+
+        if (spilTilstand.venteSpilAktiv) {
+            lukVenteSpil();
+            return true;
+        }
+
+        if (spilTilstand.aktivVaerksted || spilTilstand.aktivShop) {
+            lukEventOgShop();
+            return true;
+        }
+
+        if (eventState.aktivt && eventState.erFaerdig) {
+            lukEventOgShop();
+            return true;
+        }
+
+        if (introAktiv) {
+            afslutIntro();
+            return true;
+        }
+
+        if (inspectAktiv || inspectBoble) {
             lukInspect();
+            return true;
+        }
+
+        return false;
+    }
+
+    function håndterTastatur(ev: KeyboardEvent) {
+        if (ev.key === 'Escape' && lukAktivModalMedEscape()) {
             ev.preventDefault();
             return;
         }
@@ -2475,7 +2510,7 @@
         if (!inspectAktiv) return;
         const target = e.target as HTMLElement | null;
         if (cam.harTrukket && target?.closest('.game-container')) return;
-        if (target?.closest('.inspect-knap, .inspect-boble, .inspect-luk, .fokus-knap, .regelbog-knap, .musik-toggle-btn')) return;
+        if (target?.closest('.inspect-knap, .inspect-boble, .fokus-knap, .regelbog-knap, .musik-toggle-btn')) return;
         const element = target?.closest('[data-help-title]') as HTMLElement | null;
         if (element?.dataset.helpTitle === tekst('Ukendt felt', 'Unknown field')) {
             lukInspect();
@@ -3136,7 +3171,6 @@ function udførBevægelse(nytIndeks: number) {
         role="dialog"
         aria-live="polite"
     >
-        <button type="button" class="inspect-luk" onclick={lukInspect} aria-label={tekst('Luk forklaring', 'Close explanation')}>×</button>
         <h3>{inspectBoble.titel}</h3>
         <p>{inspectBoble.tekst}</p>
     </div>
@@ -3481,7 +3515,7 @@ function udførBevægelse(nytIndeks: number) {
         max-height: min(52dvh, 260px);
         overflow-y: auto;
         box-sizing: border-box;
-        padding: 14px 38px 14px 14px;
+        padding: 14px;
         border: 1px solid rgba(255, 255, 255, 0.28);
         border-radius: 8px;
         background: rgba(20, 20, 20, 0.94);
@@ -3501,20 +3535,6 @@ function udførBevægelse(nytIndeks: number) {
         font-size: 0.92rem;
         line-height: 1.4;
         white-space: pre-line;
-    }
-    .inspect-luk {
-        position: absolute;
-        top: 7px;
-        right: 7px;
-        width: 26px;
-        height: 26px;
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 6px;
-        background: rgba(255, 255, 255, 0.06);
-        color: #fff;
-        font-size: 1.2rem;
-        line-height: 1;
-        cursor: pointer;
     }
     .zoom-actions {
         position: fixed;

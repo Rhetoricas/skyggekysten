@@ -37,6 +37,9 @@ const RETNINGER = {
     'NW': [[-1, -1], [0, -1]]
 } as const;
 
+type HexRetning = keyof typeof RETNINGER;
+const RETNINGS_LISTE = Object.keys(RETNINGER) as HexRetning[];
+
 export function hentKortBredde() {
     return spilTilstand.kortBredde || STANDARD_KORT_BREDDE;
 }
@@ -160,6 +163,25 @@ export function hentNaboIRetning(index: number, retning: keyof typeof RETNINGER,
     if (nyKolonne < 0 || nyKolonne >= bredde || nyRaekke < 0 || nyRaekke >= (maxFelter / bredde)) return null;
     
     return nyRaekke * bredde + nyKolonne;
+}
+
+function findRetningMellem(fraIndex: number, tilIndex: number): HexRetning | null {
+    return RETNINGS_LISTE.find((retning) => hentNaboIRetning(fraIndex, retning) === tilIndex) ?? null;
+}
+
+function drejRetning(retning: HexRetning, trin: -1 | 1): HexRetning {
+    const index = RETNINGS_LISTE.indexOf(retning);
+    const naesteIndex = (index + trin + RETNINGS_LISTE.length) % RETNINGS_LISTE.length;
+    return RETNINGS_LISTE[naesteIndex];
+}
+
+function gaaIRetning(startIndex: number, retning: HexRetning, afstand: number) {
+    let indeks: number | null = startIndex;
+    for (let trin = 0; trin < afstand; trin++) {
+        if (indeks === null) return null;
+        indeks = hentNaboIRetning(indeks, retning);
+    }
+    return indeks;
 }
 
 export function regnHexAfstand(indexEn: number, indexTo: number, bredde = hentKortBredde()): number {
@@ -665,16 +687,30 @@ function afslørKrystalResonans(centerIndex: number) {
     return antal;
 }
 
-export function afslørFalkebueSyn(centerIndex: number) {
-    let indeks: number | null = centerIndex;
+function afslørFalkebueFremadsyn(fraIndex: number, tilIndex: number, synsRadius: number) {
+    if (!spilTilstand.mitUdstyr.some((ting) => ting.id === 'mesterbue' && ting.maengde > 0)) return;
 
-    for (let afstand = 1; afstand <= 3; afstand++) {
-        indeks = hentNaboIRetning(indeks, 'E');
-        if (indeks === null) break;
+    const retning = findRetningMellem(fraIndex, tilIndex);
+    if (!retning) return;
 
-        if (spilTilstand.gitter[indeks] && !spilTilstand.mineKendteFelter.includes(indeks)) {
-            spilTilstand.mineKendteFelter.push(indeks);
-        }
+    const vifteBase = gaaIRetning(tilIndex, retning, Math.max(1, synsRadius));
+    if (vifteBase === null) return;
+
+    const vifteRetninger = [drejRetning(retning, -1), retning, drejRetning(retning, 1)];
+    const kendte = new Set(spilTilstand.mineKendteFelter || []);
+    const staarPaaBjerg = spilTilstand.gitter[tilIndex]?.biome === 'bjerg';
+    let afslørede = 0;
+
+    for (const vifteRetning of vifteRetninger) {
+        const indeks = hentNaboIRetning(vifteBase, vifteRetning);
+        if (indeks === null || !spilTilstand.gitter[indeks] || kendte.has(indeks)) continue;
+        if (!staarPaaBjerg && erSynBlokeretAfBjerg(tilIndex, indeks)) continue;
+        kendte.add(indeks);
+        afslørede++;
+    }
+
+    if (afslørede > 0) {
+        spilTilstand.mineKendteFelter = Array.from(kendte);
     }
 }
 
@@ -942,7 +978,9 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     spilTilstand.historik.push(nytIndeks);
 
     options.onKameraFoelg?.(nytIndeks);
-    afslørOmraade(nytIndeks, ankomstSynsRadius(nytIndeks, options.synsRadius));
+    const synsRadiusVedAnkomst = ankomstSynsRadius(nytIndeks, options.synsRadius);
+    afslørOmraade(nytIndeks, synsRadiusVedAnkomst);
+    if (nytIndeks !== gammelIndex) afslørFalkebueFremadsyn(gammelIndex, nytIndeks, synsRadiusVedAnkomst);
     const nyKolonne = nytIndeks % hentKortBredde();
     if (nyKolonne > spilTilstand.maxKolonne) spilTilstand.maxKolonne = nyKolonne;
 

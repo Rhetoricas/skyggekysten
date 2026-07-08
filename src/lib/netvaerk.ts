@@ -33,6 +33,7 @@ export function realtimeRumNoegle(rumKode: string) {
 
 type ScoreRaekke = {
     id?: number;
+    user_id?: string;
     player_name: string;
     room_code?: string;
     score: number;
@@ -95,6 +96,7 @@ const timeoutLabelsEn: Record<string, string> = {
     'Hentning af filtreret highscore': 'Filtered highscore fetch',
     'Hentning af highscore-resultat': 'Highscore result fetch',
     'Hentning af topmedalje-spil': 'Top medal game fetch',
+    'Hentning af offentlig profil': 'Public profile fetch',
     'Hentning af gemt score-id': 'Saved score id fetch',
     'Opdatering af highscore-medalje': 'Highscore medal update',
     'Hentning af global rekord': 'Global record fetch'
@@ -866,6 +868,7 @@ function formaterTopScores(data: ScoreRaekke[] | null | undefined, antal = 10) {
         if (kanVisesPaaTopliste(raekke.player_name, raekke.character, antalPrNavn, klassePrNavn)) {
             unikke.push({
                 id: raekke.id,
+                userId: raekke.user_id,
                 spillerNavn: raekke.player_name,
                 oeNavn: raekke.room_code || '',
                 point: raekke.score,
@@ -885,6 +888,27 @@ function formaterTopScores(data: ScoreRaekke[] | null | undefined, antal = 10) {
     return unikke;
 }
 
+function formaterSpillerScores(data: ScoreRaekke[] | null | undefined) {
+    return (data || []).map((raekke) => ({
+        id: raekke.id,
+        userId: raekke.user_id,
+        spillerNavn: raekke.player_name,
+        oeNavn: raekke.room_code || '',
+        point: raekke.score,
+        karakter: raekke.character,
+        erVinder: raekke.is_winner,
+        erDoed: raekke.is_dead,
+        doedsAarsag: raekke.death_cause,
+        medalPath: raekke.medal_path,
+        medalLevel: raekke.medal_level,
+        dage: raekke.days,
+        guld: raekke.gold,
+        maxKolonne: raekke.max_column,
+        kendteFelter: raekke.known_fields_count,
+        miner: raekke.mines_owned
+    }));
+}
+
 function formaterOeScores(data: ScoreRaekke[] | null | undefined, antal = 100) {
     const unikke = [];
     const antalPrNavn = new Map<string, number>();
@@ -893,6 +917,7 @@ function formaterOeScores(data: ScoreRaekke[] | null | undefined, antal = 100) {
         if (kanVisesPaaTopliste(raekke.player_name, raekke.character, antalPrNavn, klassePrNavn)) {
             unikke.push({
                 id: raekke.id,
+                userId: raekke.user_id,
                 navn: raekke.player_name,
                 score: raekke.score,
                 karakter: raekke.character,
@@ -929,6 +954,7 @@ function formaterHighscoreResultat(data: ScoreRaekke | null | undefined) {
     if (!data) return null;
     return {
         id: data.id,
+        userId: data.user_id,
         navn: data.player_name,
         spillerNavn: data.player_name,
         oeNavn: data.room_code || '',
@@ -982,7 +1008,7 @@ export async function hentHighscores(karakterKlasse?: string | null) {
 
     let query = supabase
         .from('game_results')
-        .select('id, player_name, score, character, is_winner, is_dead, death_cause')
+        .select('id, user_id, player_name, score, character, is_winner, is_dead, death_cause')
         .eq('room_code', spilTilstand.rumKode);
 
     if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
@@ -1011,7 +1037,7 @@ export async function hentGlobalTopHundrede(karakterKlasse?: string | null) {
 
     let query = supabase
         .from('game_results')
-        .select('id, player_name, room_code, score, character, is_winner, is_dead, death_cause');
+        .select('id, user_id, player_name, room_code, score, character, is_winner, is_dead, death_cause');
 
     if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
 
@@ -1036,7 +1062,7 @@ export async function hentGlobalTopHundredeIUgen(karakterKlasse?: string | null)
 
     let query = supabase
         .from('game_results')
-        .select('id, player_name, room_code, score, character, is_winner, is_dead, death_cause')
+        .select('id, user_id, player_name, room_code, score, character, is_winner, is_dead, death_cause')
         .gte('created_at', ugeStart);
 
     if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
@@ -1055,15 +1081,16 @@ export async function hentGlobalTopHundredeIUgen(karakterKlasse?: string | null)
     return formaterTopScores(data, 100);
 }
 
-export async function hentGlobalHighscoresForFilter(filter: { spillerNavn?: string; karakter?: string; karakterKlasse?: string | null; oeNavn?: string }, antal = 100) {
+export async function hentGlobalHighscoresForFilter(filter: { spillerNavn?: string; brugerId?: string; karakter?: string; karakterKlasse?: string | null; oeNavn?: string }, antal = 100) {
     if (spilTilstand.offlineMode) return [];
     const klasseNavne = filter.karakterKlasse ? hentKarakterNavneIKlasse(filter.karakterKlasse) : [];
 
     let query = supabase
         .from('game_results')
-        .select('id, player_name, room_code, score, character, is_winner, is_dead, death_cause');
+        .select('id, user_id, player_name, room_code, score, character, is_winner, is_dead, death_cause');
 
     if (filter.spillerNavn) query = query.eq('player_name', filter.spillerNavn);
+    if (filter.brugerId) query = query.eq('user_id', filter.brugerId);
     if (filter.karakter) query = query.eq('character', filter.karakter);
     if (klasseNavne.length > 0) query = query.in('character', klasseNavne);
     if (filter.oeNavn) query = query.eq('room_code', filter.oeNavn);
@@ -1080,6 +1107,56 @@ export async function hentGlobalHighscoresForFilter(filter: { spillerNavn?: stri
     });
 
     return formaterTopScores(data, antal);
+}
+
+export async function hentSpillerTopScores(filter: { spillerNavn?: string; brugerId?: string }, antal = 3) {
+    if (spilTilstand.offlineMode) return [];
+
+    let query = supabase
+        .from('game_results')
+        .select('id, user_id, player_name, room_code, score, character, is_winner, is_dead, death_cause, medal_path, medal_level');
+
+    if (filter.brugerId) query = query.eq('user_id', filter.brugerId);
+    else if (filter.spillerNavn) query = query.eq('player_name', filter.spillerNavn);
+    else return [];
+
+    const { data } = await medTimeout(
+        query
+            .order('score', { ascending: false })
+            .order('created_at', { ascending: false })
+            .limit(Math.max(1, antal)),
+        8000,
+        'Hentning af filtreret highscore'
+    ).catch((error) => {
+        console.warn('Kunne ikke hente spillerens top-scores', error);
+        return { data: [] };
+    });
+
+    return formaterSpillerScores(data).slice(0, antal);
+}
+
+export async function hentOffentligProfil(userId: string | null | undefined) {
+    if (!userId || spilTilstand.offlineMode) return null;
+
+    const { data, error } = await medTimeout(
+        supabase
+            .from('profiles')
+            .select('display_name, profile_character_id')
+            .eq('id', userId)
+            .maybeSingle(),
+        8000,
+        'Hentning af offentlig profil'
+    ).catch((fangetFejl) => ({ data: null, error: fangetFejl }));
+
+    if (error) {
+        console.warn('Kunne ikke hente offentlig profil', error);
+        return null;
+    }
+
+    return {
+        displayName: typeof data?.display_name === 'string' ? data.display_name : '',
+        profileCharacterId: typeof data?.profile_character_id === 'string' ? data.profile_character_id : ''
+    };
 }
 
 export async function hentHighscoreDetaljer(id: number) {
@@ -1131,7 +1208,7 @@ export async function hentHighscoreResultat(id: number) {
     let { data, error }: { data: ScoreRaekke | null; error: any } = await medTimeout(
         supabase
             .from('game_results')
-            .select('id, player_name, room_code, score, character, is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count, final_log, medal_path, medal_level, route_indices, route_width, route_height')
+            .select('id, user_id, player_name, room_code, score, character, is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count, final_log, medal_path, medal_level, route_indices, route_width, route_height')
             .eq('id', id)
             .single(),
         8000,
@@ -1142,7 +1219,7 @@ export async function hentHighscoreResultat(id: number) {
         const fallback = await medTimeout(
             supabase
                 .from('game_results')
-                .select('id, player_name, room_code, score, character, is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count, final_log')
+                .select('id, user_id, player_name, room_code, score, character, is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count, final_log')
                 .eq('id', id)
                 .single(),
             8000,
@@ -1166,7 +1243,7 @@ export async function hentBedsteHighscoreForBruger(userId: string | null | undef
     const { data, error } = await medTimeout(
         supabase
             .from('game_results')
-            .select('id, player_name, room_code, score, character, is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count, final_log, medal_path, medal_level, route_indices, route_width, route_height')
+            .select('id, user_id, player_name, room_code, score, character, is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count, final_log, medal_path, medal_level, route_indices, route_width, route_height')
             .eq('user_id', userId)
             .order('score', { ascending: false })
             .order('created_at', { ascending: false })
@@ -1178,6 +1255,31 @@ export async function hentBedsteHighscoreForBruger(userId: string | null | undef
 
     if (error || !data) {
         if (error) console.warn('Kunne ikke hente topmedalje-spil', error);
+        return null;
+    }
+
+    return formaterHighscoreResultat(data as ScoreRaekke);
+}
+
+export async function hentBedsteHighscoreForBrugerKarakter(userId: string | null | undefined, karakterNavn: string | null | undefined) {
+    if (!userId || !karakterNavn || spilTilstand.offlineMode) return null;
+
+    const { data, error } = await medTimeout(
+        supabase
+            .from('game_results')
+            .select('id, user_id, player_name, room_code, score, character, is_winner, is_dead, death_cause, medal_path, medal_level')
+            .eq('user_id', userId)
+            .eq('character', karakterNavn)
+            .order('score', { ascending: false })
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+        8000,
+        'Hentning af topmedalje-spil'
+    ).catch((fangetFejl) => ({ data: null, error: fangetFejl }));
+
+    if (error || !data) {
+        if (error) console.warn('Kunne ikke hente karakterens topmedalje-spil', error);
         return null;
     }
 

@@ -57,7 +57,7 @@
     let kanOpgradereFintToej = $derived(harFintToej && !harRoyaltToej && spilTilstand.guldTotal >= ROYALT_TOEJ_OPGRADERING_PRIS);
     let harFakkel = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'fakkel' && ting.maengde > 0));
     let harSolfakkel = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'solfakkel' && ting.maengde > 0));
-    let kanOpgradereFakkel = $derived(harFakkel && !harSolfakkel && spilTilstand.guldTotal >= FAKKEL_OPGRADERING_PRIS);
+    let kanOpgradereFakkel = $derived(harFakkel && spilTilstand.guldTotal >= FAKKEL_OPGRADERING_PRIS);
     let harDetektor = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'metaldetektor' && ting.maengde > 0));
     let harMalmviser = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'malmviser' && ting.maengde > 0));
     let kanOpgradereDetektor = $derived(harDetektor && !harMalmviser && spilTilstand.guldTotal >= DETEKTOR_OPGRADERING_PRIS);
@@ -84,6 +84,23 @@
         }
 
         syncTilDb();
+    }
+
+    function brugEnFakkelOgTilfoejSolfakkel() {
+        const fakkel = spilTilstand.mitUdstyr.find(ting => ting.id === 'fakkel' && ting.maengde > 0);
+        if (!fakkel) return false;
+
+        fakkel.maengde -= 1;
+        const solfakkel = spilTilstand.mitUdstyr.find(ting => ting.id === 'solfakkel');
+        if (solfakkel) {
+            solfakkel.maengde = Math.max(0, solfakkel.maengde || 0) + 1;
+            solfakkel.anskaffetDag = Math.min(solfakkel.anskaffetDag ?? spilTilstand.dag, spilTilstand.dag);
+        } else {
+            spilTilstand.mitUdstyr.push({ id: 'solfakkel', maengde: 1, anskaffetDag: spilTilstand.dag });
+        }
+
+        spilTilstand.mitUdstyr = spilTilstand.mitUdstyr.filter(ting => ting.maengde > 0);
+        return true;
     }
 
     function opgraderSkovl() {
@@ -373,11 +390,6 @@
     }
 
     function opgraderFakkel() {
-        if (harSolfakkel) {
-            spilTilstand.logBesked = tekst('Din fakkel er allerede en solfakkel.', 'Your torch is already a sun torch.');
-            return;
-        }
-
         if (!harFakkel) {
             spilTilstand.logBesked = tekst('Værkstedet kan ikke forgylde en fakkel, du ikke har.', 'The workshop cannot gild a torch you do not have.');
             return;
@@ -389,11 +401,12 @@
             return;
         }
 
+        if (!brugEnFakkelOgTilfoejSolfakkel()) {
+            spilTilstand.logBesked = tekst('Værkstedet kan ikke forgylde en fakkel, du ikke har.', 'The workshop cannot gild a torch you do not have.');
+            return;
+        }
+
         betalTilVaerksted(FAKKEL_OPGRADERING_PRIS);
-        spilTilstand.mitUdstyr = [
-            ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'fakkel' && ting.id !== 'solfakkel'),
-            { id: 'solfakkel', maengde: 1, anskaffetDag: spilTilstand.dag }
-        ];
         spilTilstand.logBesked = tekst('Værkstedet binder ildstenen i faklens krone. Din fakkel er nu en solfakkel.', 'The workshop binds the firestone into the torch crown. Your torch is now a sun torch.');
         afslutOpgradering();
     }
@@ -590,7 +603,7 @@
             fraId: 'fakkel',
             tilId: 'solfakkel',
             pris: FAKKEL_OPGRADERING_PRIS,
-            harBasis: harFakkel && !harSolfakkel,
+            harBasis: harFakkel,
             kanOpgradere: kanOpgradereFakkel,
             kortTekst: tekst('+2 syn. Solbålet afslører et større område for alle, giver fuld HP og 100 guld.', '+2 vision. The sunfire reveals a larger area for everyone, gives full HP and 100 gold.'),
             helpTitle: tekst('Fakkel-opgradering', 'Torch upgrade'),
@@ -628,9 +641,9 @@
             pris: BUE_OPGRADERING_PRIS,
             harBasis: harBue && !harMesterbue,
             kanOpgradere: kanOpgradereBue,
-            kortTekst: tekst('Tæller som bue i events. Buevalg giver 25% mere guld, halverer skade og afslører tre felter mod øst.', 'Counts as a bow in events. Bow choices give 25% more gold, halve damage and reveal three fields east.'),
+            kortTekst: tekst('Tæller som bue i events. Buevalg giver 25% mere guld og halverer skade. Når du går, afslører den en lille vifte lige uden for dit syn i bevægelsesretningen.', 'Counts as a bow in events. Bow choices give 25% more gold and halve damage. When you move, it reveals a small fan just beyond your sight in the direction you went.'),
             helpTitle: tekst('Bue-opgradering', 'Bow upgrade'),
-            helpBody: tekst('Kræver en almindelig bue og 175 guld. Falkebuen tæller som bue, forbedrer buevalg og afslører tre felter mod øst efter skuddet.', 'Requires a normal bow and 175 gold. The falcon bow counts as a bow, improves bow choices and reveals three fields east after the shot.'),
+            helpBody: tekst('Kræver en almindelig bue og 175 guld. Falkebuen tæller som bue, forbedrer buevalg og afslører en lille vifte foran dig, når du går.', 'Requires a normal bow and 175 gold. The falcon bow counts as a bow, improves bow choices and reveals a small fan ahead of you when you move.'),
             opgrader: opgraderBue
         }
     ].filter(opgradering => opgradering.harBasis));
@@ -986,9 +999,9 @@
                 onclick={opgraderFakkel}
                 disabled={!kanOpgradereFakkel}
                 data-help-title="Opgrader"
-                data-help-body={harSolfakkel ? 'Du har allerede solfaklen.' : harFakkel ? 'Bruger 225 guld og erstatter din fakkel med en solfakkel.' : 'Du skal først have en almindelig fakkel.'}
+                data-help-body={harFakkel ? 'Bruger 225 guld og opgraderer én fakkel til én solfakkel.' : 'Du skal først have en almindelig fakkel.'}
             >
-                {harSolfakkel ? 'Opgraderet' : harFakkel ? 'Opgrader' : 'Kræver fakkel'}
+                {harFakkel ? 'Opgrader' : 'Kræver fakkel'}
             </button>
         </div>
 
@@ -1025,7 +1038,7 @@
             class="opgradering-kort"
             class:inaktiv={!kanOpgradereBue}
             data-help-title="Bue-opgradering"
-            data-help-body="Kræver en almindelig bue og 175 guld. Falkebuen tæller som bue, forbedrer buevalg og afslører tre felter mod øst efter skuddet."
+            data-help-body="Kræver en almindelig bue og 175 guld. Falkebuen tæller som bue, forbedrer buevalg og afslører en lille vifte foran dig, når du går."
         >
             <div class="ikon-par">
                 <img src={itemDB.bue.billede} alt="Bue" />
@@ -1035,7 +1048,7 @@
 
             <div class="tekst">
                 <strong>Bue til Falkebue</strong>
-                <p>Tæller som bue i events. Buevalg giver 25% mere guld, halverer skade og afslører tre felter mod øst.</p>
+                <p>Tæller som bue i events. Buevalg giver 25% mere guld og halverer skade. Når du går, afslører den en lille vifte lige uden for dit syn i bevægelsesretningen.</p>
                 <span class="pris">{BUE_OPGRADERING_PRIS} Guld</span>
             </div>
 

@@ -1,6 +1,6 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { effektLog, eventBibliotek, eventTekst, eventTitel, udfaldLog } from './eventBibliotek';
-import { afslørFalkebueSyn, tilfoejTilRygsæk, brugFraRygsæk, harRygsaekItem, findRygsaekItemTilKrav } from './spilmotor';
+import { tilfoejTilRygsæk, brugFraRygsæk, harRygsaekItem, findRygsaekItemTilKrav } from './spilmotor';
 import { syncTilDb, broadcastFelt, syncKortTilDbSenere } from './netvaerk';
 import { fremrykTid, udloesBersaerkHvisRelevant } from './overlevelse.svelte';
 import { brugEnergi, visBrugteEnergiKugler } from './energi';
@@ -277,11 +277,6 @@ export function tagValg(valg: Valg) {
         }
 
         if (resultat.naesteEvent) eventState.naesteTrin = resultat.naesteEvent;
-    }
-
-    if (brugerMesterbue) {
-        afslørFalkebueSyn(spilTilstand.spillerIndex);
-        kvittering += tekst(' (Falkebuen afslører tre felter mod øst)', ' (The falcon bow reveals three fields east)');
     }
 
     const fuldBesked = samletLogTekst + kvittering;

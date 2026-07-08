@@ -16,7 +16,11 @@
 
     function haandterTast(e: KeyboardEvent) {
         if (!visRegler) return;
-        if (e.key === 'Escape') lukRegler();
+        if (e.key === 'Escape') {
+            lukRegler();
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
     }
 </script>
 
@@ -171,7 +175,7 @@
                         <li>Some events are rare or unique. They can give relics that cannot be bought in shops.</li>
                         <li>Subevents are continuations of the same event and are not drawn as ordinary events.</li>
                         <li>If an event requires or spends an ordinary item, an upgraded version often counts as the same type. If paid, the upgraded item is lost too.</li>
-                        <li>Storm Axe improves axe choices in events with more gold and less damage. Falcon Bow improves bow choices and reveals three fields east after the shot.</li>
+                        <li>Storm Axe improves axe choices in events with more gold and less damage. Falcon Bow improves bow choices, and when you move it reveals a small fan just beyond your sight in the direction you went.</li>
                         <li>The meteor stone can be opened with hands or tools like shovel, axe, club and sword. If opened with a tool, the tool is lost and you get gold and a diamond. Master shovel gives the best reward. The gold is event gold and is affected by gold modifier.</li>
                     </ul>
                 </section>
@@ -336,7 +340,7 @@
                         <li>Nogle events er sjældne eller unikke. De kan give relikvier, som ikke kan købes i butikker.</li>
                         <li>Subevents er fortsættelser af samme event og bliver ikke trukket som almindelige events.</li>
                         <li>Hvis et event kræver eller bruger en almindelig genstand, kan en opgraderet version ofte tælle som samme type. Betales den, ryger den opgraderede genstand også.</li>
-                        <li>Stormøksen forbedrer øksevalg i events med mere guld og mindre skade. Falkebuen forbedrer buevalg og afslører tre felter mod øst efter skuddet.</li>
+                        <li>Stormøksen forbedrer øksevalg i events med mere guld og mindre skade. Falkebuen forbedrer buevalg, og når du går afslører den en lille vifte lige uden for dit syn i bevægelsesretningen.</li>
                         <li>Meteorstenen kan åbnes med hænderne eller med udstyr som skovl, økse, kølle og sværd. Åbner du den med et værktøj, går værktøjet tabt, og du får guld og en diamant. Mesterskovlen giver det største udbytte. Guldet behandles som event-guld og påvirkes af guldmodifier.</li>
                     </ul>
                     <p class="eksempel">Eksempel: Et jordskælv kan gøre en eng til bjerg eller ruin. Hvis der lå en guldmine, butik, båd eller et værksted på feltet, er det væk bagefter. Et eventvalg kan altså være godt for dig her og nu, men dyrt for kortet.</p>

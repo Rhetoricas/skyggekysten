@@ -11,7 +11,7 @@
     import LydKnap from '$lib/LydKnap.svelte';
     import SprogKnap from '$lib/SprogKnap.svelte';
     import { tekst } from '$lib/i18n.svelte';
-    import { hentBedsteHighscoreForBruger, hentGlobalHighscoresForFilter, hentHighscoreDetaljer, hentHighscoreResultat } from '$lib/netvaerk';
+    import { hentBedsteHighscoreForBruger, hentBedsteHighscoreForBrugerKarakter, hentGlobalHighscoresForFilter, hentHighscoreDetaljer, hentHighscoreResultat, hentOffentligProfil, hentSpillerTopScores } from '$lib/netvaerk';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
     import { TROFAE_DEFINITIONER, findTrofae, gemMytiskeTrofaeIds, gemTrofaeAwards, gemTrofaeIds, hentGemteMytiskeTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, hentSupabaseTrofaeAwards, hentSupabaseTrofaeAwardsForHighscore, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, type TrofaeAward } from '$lib/trofaeer';
@@ -39,10 +39,12 @@
     };
 
     type LokalScore = HighscoreDetaljer & { navn: string; score: number; karakter?: string };
-    type GlobalScore = HighscoreDetaljer & { spillerNavn: string; oeNavn: string; point: number; karakter?: string };
-    type ValgtHighscore = HighscoreDetaljer & { navn: string; point: number; karakter?: string; oeNavn?: string; henterDetaljer?: boolean };
+    type GlobalScore = HighscoreDetaljer & { userId?: string; spillerNavn: string; oeNavn: string; point: number; karakter?: string };
+    type ValgtHighscore = HighscoreDetaljer & { userId?: string; navn: string; point: number; karakter?: string; oeNavn?: string; henterDetaljer?: boolean };
     type HighscoreDrilldown = { titel: string; scores: GlobalScore[]; henter: boolean };
-    const HIGHSCORE_DRILLDOWN_ANTAL = 10;
+    type OffentligProfilMedalje = { id?: string; sti: string; label: string; labelEn?: string; mytisk?: boolean; opnaaet?: boolean; bedste?: boolean; krav?: string; kravEn?: string; mytiskKrav?: string; mytiskKravEn?: string; episkTekst?: string; episkTekstEn?: string; award?: TrofaeAward | null };
+    type OffentligSpillerProfil = { navn: string; userId?: string; profilKarakterId?: string; profilTitelScore?: number; scores: GlobalScore[]; trofaeer: OffentligProfilMedalje[]; henter: boolean };
+    const HIGHSCORE_DRILLDOWN_ANTAL = 3;
     const PROFIL_BEDSTE_SCORE_PREFIX = 'taage_profile_best_score:';
     const ER_ITCH_BUILD = __ITCH_BUILD__;
     const LIVE_APP_URL = __LIVE_APP_URL__;
@@ -104,6 +106,7 @@
     let visHighscoreLog = $state(false);
     let profilNavnGemTimer: ReturnType<typeof setTimeout> | null = null;
     let highscoreDrilldown = $state<HighscoreDrilldown | null>(null);
+    let offentligSpillerProfil = $state<OffentligSpillerProfil | null>(null);
     let statsHentetForUser = $state('');
     let gemtProfilBedsteScore = $state(0);
     let valgtLaastTrofae = $state<{ id?: string; sti: string; label: string; labelEn?: string; krav?: string; kravEn?: string; mytiskKrav?: string; mytiskKravEn?: string; episkTekst?: string; episkTekstEn?: string; opnaaet?: boolean; mytisk?: boolean; visNaesteKrav?: boolean; award?: TrofaeAward | null } | null>(null);
@@ -512,6 +515,7 @@
     async function aabnGlobalHighscore(score: GlobalScore) {
         visHighscoreLog = false;
         highscoreDrilldown = null;
+        offentligSpillerProfil = null;
         valgtHighscore = {
             ...score,
             navn: score.spillerNavn,
@@ -525,6 +529,7 @@
     async function aabnLokalHighscore(score: LokalScore) {
         visHighscoreLog = false;
         highscoreDrilldown = null;
+        offentligSpillerProfil = null;
         valgtHighscore = {
             ...score,
             navn: score.navn,
@@ -605,6 +610,7 @@
     async function aabnProfilSpil(spil: ProfilSpil) {
         visHighscoreLog = false;
         highscoreDrilldown = null;
+        offentligSpillerProfil = null;
         valgtLaastTrofae = null;
         valgtHighscore = {
             id: spil.id,
@@ -644,8 +650,12 @@
     }
 
     function highscoreTrofaeer(score: HighscoreDetaljer | null) {
+        return trofaeMedaljerFraAwards(score?.trofaeAwards || []);
+    }
+
+    function trofaeMedaljerFraAwards(awards: TrofaeAward[]) {
         const awardsEfterNiveau = new Map<string, TrofaeAward>();
-        for (const award of normaliserTrofaeAwards(score?.trofaeAwards || [])) {
+        for (const award of normaliserTrofaeAwards(awards)) {
             const eksisterende = awardsEfterNiveau.get(award.id);
             if (!eksisterende || award.tier === 'mythic') {
                 awardsEfterNiveau.set(award.id, award);
@@ -658,6 +668,112 @@
                 return trofae ? { ...trofae, sti: mytisk ? trofae.mytiskSti || trofae.sti : trofae.sti, award, mytisk } : null;
             })
             .filter((trofae): trofae is NonNullable<ReturnType<typeof findTrofae>> & { award: TrofaeAward; mytisk: boolean } => !!trofae);
+    }
+
+    function offentligProfilBedsteScore(profil: OffentligSpillerProfil | null) {
+        return profil?.scores[0] || null;
+    }
+
+    function karakterFraScore(score: { karakter?: string } | null | undefined) {
+        const navn = score?.karakter || '';
+        return tilgaengeligeKarakterer.find((karakter) => karakter.navn === navn || karakter.id === navn) || tutorialKarakter;
+    }
+
+    function offentligProfilKarakter(profil: OffentligSpillerProfil | null) {
+        if (profil?.profilKarakterId) {
+            return tilgaengeligeKarakterer.find((karakter) => karakter.id === profil.profilKarakterId) || karakterFraScore(offentligProfilBedsteScore(profil));
+        }
+        return karakterFraScore(offentligProfilBedsteScore(profil));
+    }
+
+    function offentligProfilTitel(profil: OffentligSpillerProfil | null) {
+        const karakter = offentligProfilKarakter(profil);
+        const titelScore = profil?.profilKarakterId
+            ? profil.profilTitelScore || 0
+            : offentligProfilBedsteScore(profil)?.point || 0;
+        if (titelScore <= 0) return `${karakterNavn(karakter.navn)} - ${tekst('Ingen titel endnu', 'No title yet')}`;
+        const titel = hentTitel(karakter.id, findMedaljeNiveau(titelScore));
+        return `${karakterNavn(karakter.navn)} - ${titelNavn(titel)}`;
+    }
+
+    function offentligProfilScoreMedalje(profil: OffentligSpillerProfil | null) {
+        const score = offentligProfilBedsteScore(profil);
+        if (!score) return null;
+        return {
+            sti: score.medalPath || findMedaljeSti(score.point, false),
+            label: 'Topmedalje',
+            labelEn: 'Top Medal',
+            score
+        };
+    }
+
+    function offentligProfilMedaljer(profil: OffentligSpillerProfil | null) {
+        const scoreMedalje = offentligProfilScoreMedalje(profil);
+        return [
+            ...(scoreMedalje ? [{ ...scoreMedalje, bedste: true, opnaaet: true, mytisk: erM11Medalje(scoreMedalje.sti) }] : []),
+            ...(profil?.trofaeer || []).map((medalje) => ({ ...medalje, bedste: false, opnaaet: true }))
+        ];
+    }
+
+    async function aabnOffentligProfilMedalje(medalje: OffentligProfilMedalje & { score?: GlobalScore }) {
+        if (medalje.score) {
+            await aabnOffentligProfilScore(medalje.score);
+            return;
+        }
+        await aabnOffentligProfilTrofae(medalje);
+    }
+
+    async function aabnSpillerProfil(navn: string, userId?: string | null) {
+        const rentNavn = navn.trim();
+        if (!rentNavn && !userId) return;
+
+        const profilNoegle = userId || rentNavn;
+        highscoreDrilldown = null;
+        offentligSpillerProfil = { navn: rentNavn, userId: userId || undefined, scores: [], trofaeer: [], henter: true };
+
+        const scores = await hentSpillerTopScores(userId ? { brugerId: userId } : { spillerNavn: rentNavn }, HIGHSCORE_DRILLDOWN_ANTAL);
+        const profilNavn = scores[0]?.spillerNavn || rentNavn;
+        const profilUserId = userId || scores[0]?.userId;
+        const [offentligProfil, awards] = await Promise.all([
+            profilUserId ? hentOffentligProfil(profilUserId) : Promise.resolve(null),
+            profilUserId
+                ? hentSupabaseTrofaeAwards(profilUserId)
+                : normaliserTrofaeAwards((await Promise.all(scores.map((score) => hentHighscoreTrofaeAwards(score.id)))).flat())
+        ]);
+        const profilKarakter = offentligProfil?.profileCharacterId
+            ? tilgaengeligeKarakterer.find((karakter) => karakter.id === offentligProfil.profileCharacterId)
+            : null;
+        const profilTitelScore = profilUserId && profilKarakter
+            ? (await hentBedsteHighscoreForBrugerKarakter(profilUserId, profilKarakter.navn))?.point || 0
+            : 0;
+
+        const aktuelNoegle = offentligSpillerProfil?.userId || offentligSpillerProfil?.navn;
+        if (aktuelNoegle !== profilNoegle) return;
+
+        offentligSpillerProfil = {
+            navn: offentligProfil?.displayName || profilNavn,
+            userId: profilUserId,
+            profilKarakterId: offentligProfil?.profileCharacterId || undefined,
+            profilTitelScore,
+            scores,
+            trofaeer: trofaeMedaljerFraAwards(awards),
+            henter: false
+        };
+    }
+
+    function aabnSpillerProfilFraHighscore() {
+        if (!valgtHighscore) return;
+        void aabnSpillerProfil(valgtHighscore.navn, valgtHighscore.userId);
+    }
+
+    async function aabnOffentligProfilScore(score: GlobalScore) {
+        offentligSpillerProfil = null;
+        await aabnGlobalHighscore(score);
+    }
+
+    async function aabnOffentligProfilTrofae(medalje: OffentligProfilMedalje) {
+        offentligSpillerProfil = null;
+        await aabnLaastTrofae({ ...medalje, bedste: false, opnaaet: true });
     }
 
     function awardTal(data: Record<string, unknown> | undefined, key: string) {
@@ -710,6 +826,7 @@
     function lukHighscoreDetaljer() {
         visHighscoreLog = false;
         highscoreDrilldown = null;
+        offentligSpillerProfil = null;
         valgtHighscore = null;
     }
 
@@ -797,11 +914,6 @@
     async function aabnHighscoreFraFilter(score: GlobalScore) {
         highscoreDrilldown = null;
         await aabnGlobalHighscore(score);
-    }
-
-    function aabnSpillerHighscoreFilter() {
-        if (!valgtHighscore) return;
-        void aabnHighscoreFilter(`Top ${HIGHSCORE_DRILLDOWN_ANTAL}: ${formaterNavn(valgtHighscore.navn)}`, { spillerNavn: valgtHighscore.navn });
     }
 
     function aabnKarakterHighscoreFilter() {
@@ -1095,7 +1207,62 @@
             .map((trofae) => ({ ...trofae, sti: trofae.mytiskSti || trofae.sti }));
     }
 
+    function lukAktivModalMedEscape() {
+        if (document.querySelector('.regelbog-overlay')) return false;
+
+        if (valgtLaastTrofae) {
+            lukLaastTrofae();
+            return true;
+        }
+
+        if (visHighscoreLog) {
+            visHighscoreLog = false;
+            return true;
+        }
+
+        if (offentligSpillerProfil) {
+            offentligSpillerProfil = null;
+            return true;
+        }
+
+        if (highscoreDrilldown) {
+            highscoreDrilldown = null;
+            return true;
+        }
+
+        if (valgtHighscore) {
+            lukHighscoreDetaljer();
+            return true;
+        }
+
+        if (visProfilKarakterValg) {
+            visProfilKarakterValg = false;
+            return true;
+        }
+
+        if (visProfil) {
+            visProfil = false;
+            return true;
+        }
+
+        if (visJoinLukketModal) {
+            visJoinLukketModal = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    function haandterEscape(e: KeyboardEvent) {
+        if (e.key !== 'Escape') return;
+        if (!lukAktivModalMedEscape()) return;
+
+        e.preventDefault();
+    }
+
 </script>
+
+<svelte:window onkeydown={haandterEscape} />
 
 {#snippet episkeTrofaeer()}
     {@const trofaeer = nyeTrofaeer()}
@@ -1534,6 +1701,61 @@
     {/if}
 {/snippet}
 
+{#snippet offentligSpillerProfilModal()}
+    {#if offentligSpillerProfil}
+        <div class="offentlig-profil-overlay" role="presentation">
+            <button type="button" class="offentlig-profil-backdrop" onclick={() => offentligSpillerProfil = null} aria-label={tekst('Luk spillerprofil', 'Close player profile')}></button>
+            <div class="offentlig-profil-modal" role="dialog" aria-modal="true" aria-labelledby="offentlig-profil-title" tabindex="-1">
+                <div class="offentlig-profil-header">
+                    <img src={offentligProfilKarakter(offentligSpillerProfil).ikon} alt="" />
+                    <div>
+                        <h2 id="offentlig-profil-title">{formaterNavn(offentligSpillerProfil.navn)}</h2>
+                        <p>{offentligProfilTitel(offentligSpillerProfil)}</p>
+                    </div>
+                    <button type="button" onclick={() => offentligSpillerProfil = null}>{tekst('Luk', 'Close')}</button>
+                </div>
+
+                {#if offentligSpillerProfil.henter}
+                    <p class="offentlig-profil-note">{tekst('Henter spillerprofil...', 'Loading player profile...')}</p>
+                {:else}
+                    <section class="offentlig-profil-medaljer" aria-label={tekst('Spillerens medaljer', 'Player medals')}>
+                        <div class="profil-medaljehylde offentlig-profil-medaljehylde">
+                            {#each offentligProfilMedaljer(offentligSpillerProfil) as medalje, i (`offentlig-profil-hylde-${i}-${medalje.sti}`)}
+                                <div class="profil-medalje opnaaet" class:mytisk={medalje.mytisk}>
+                                    <button
+                                        type="button"
+                                        class="profil-medalje-knap kan-aabnes"
+                                        onclick={() => aabnOffentligProfilMedalje(medalje)}
+                                        aria-label={tekst(`Se ${medaljeLabel(medalje)}`, `View ${medaljeLabel(medalje)}`)}
+                                    >
+                                        <img
+                                            src={medalje.sti}
+                                            alt={medaljeLabel(medalje)}
+                                            class:bedste={medalje.bedste}
+                                            class:mytiskPuls={medalje.mytisk}
+                                            style={medalje.mytisk ? medaljePulsStyle(i) : undefined}
+                                            draggable="false"
+                                        />
+                                    </button>
+                                    <div class="profil-medalje-tekst">
+                                        <span>{medaljeLabel(medalje)}</span>
+                                        {#if medaljeNiveauLabel(medalje)}
+                                            <span class="profil-medalje-niveau">({medaljeNiveauLabel(medalje)})</span>
+                                        {/if}
+                                    </div>
+                                </div>
+                            {/each}
+                        </div>
+                        {#if offentligProfilMedaljer(offentligSpillerProfil).length === 0}
+                            <p class="offentlig-profil-note">{tekst('Ingen gemte medaljer endnu.', 'No saved medals yet.')}</p>
+                        {/if}
+                    </section>
+                {/if}
+            </div>
+        </div>
+    {/if}
+{/snippet}
+
 {#snippet highscoreDetaljeModal()}
     {#if valgtHighscore}
         <div class="highscore-detail-overlay" role="presentation">
@@ -1544,7 +1766,7 @@
                         <button
                             type="button"
                             class="highscore-filter-link highscore-name-link"
-                            onclick={aabnSpillerHighscoreFilter}
+                            onclick={aabnSpillerProfilFraHighscore}
                         >
                             <h2 id="highscore-detail-title">{formaterNavn(valgtHighscore.navn)}</h2>
                         </button>
@@ -2188,6 +2410,7 @@
 {@render profilModal()}
 {@render laastTrofaeModal()}
 {@render highscoreDetaljeModal()}
+{@render offentligSpillerProfilModal()}
 
 {#if visJoinLukketModal}
     <div class="join-lukket-overlay" role="dialog" aria-modal="true" aria-labelledby="join-lukket-title">
@@ -3693,6 +3916,90 @@
         box-shadow: 0 22px 70px rgba(0, 0, 0, 0.55);
         font-family: system-ui, -apple-system, sans-serif;
     }
+    .offentlig-profil-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 4400;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .offentlig-profil-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.78);
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+    }
+    .offentlig-profil-modal {
+        position: relative;
+        z-index: 1;
+        width: min(720px, 100%);
+        margin: auto 0;
+        background:
+            radial-gradient(circle at 76% 0%, rgba(245, 208, 113, 0.1), transparent 34%),
+            #181818;
+        color: #eee;
+        border: 1px solid rgba(245, 208, 113, 0.38);
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.62);
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, sans-serif;
+    }
+    .offentlig-profil-header {
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr) auto;
+        gap: 18px;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        padding-bottom: 18px;
+    }
+    .offentlig-profil-header img {
+        width: 88px;
+        height: 88px;
+        object-fit: contain;
+        filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
+    }
+    .offentlig-profil-header h2 {
+        margin: 0;
+        color: #fff;
+        font-family: 'Cinzel', serif;
+        font-size: clamp(1.6rem, 4vw, 2.25rem);
+        line-height: 1;
+    }
+    .offentlig-profil-header p {
+        margin: 6px 0 0;
+        color: #aeb8b0;
+        font-size: 1rem;
+    }
+    .offentlig-profil-header button {
+        align-self: start;
+        background: #2b2b2b;
+        color: #eee;
+        border: 1px solid #555;
+        border-radius: 6px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-weight: 700;
+    }
+    .offentlig-profil-medaljer {
+        margin-top: 18px;
+    }
+    .offentlig-profil-medaljehylde {
+        margin-bottom: 0;
+    }
+    .offentlig-profil-note {
+        color: #cfc8b7;
+        font-size: 0.92rem;
+        line-height: 1.35;
+        margin: 10px 0 0;
+    }
     .highscore-detail-header {
         display: flex;
         justify-content: space-between;
@@ -4470,6 +4777,32 @@
             width: min(430px, 100%);
             margin: 0;
             padding: 14px;
+        }
+
+        .offentlig-profil-overlay {
+            align-items: flex-start;
+            justify-content: center;
+            padding: calc(env(safe-area-inset-top, 0px) + 12px) 10px calc(env(safe-area-inset-bottom, 0px) + 28px);
+        }
+
+        .offentlig-profil-modal {
+            margin: 0;
+            padding: 14px;
+        }
+
+        .offentlig-profil-header {
+            grid-template-columns: 70px minmax(0, 1fr);
+            gap: 10px;
+        }
+
+        .offentlig-profil-header img {
+            width: 66px;
+            height: 66px;
+        }
+
+        .offentlig-profil-header button {
+            grid-column: 1 / -1;
+            justify-self: end;
         }
 
         .highscore-log-overlay {

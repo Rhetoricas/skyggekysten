@@ -151,9 +151,9 @@ alter table public.profile_trophies enable row level security;
 
 drop policy if exists "Profiles are readable by everyone" on public.profiles;
 drop policy if exists "Users can read their own profile" on public.profiles;
-create policy "Users can read their own profile"
+create policy "Profiles are readable by everyone"
 on public.profiles for select
-using ((select auth.uid()) = id);
+using (true);
 
 drop policy if exists "Users can insert their own profile" on public.profiles;
 create policy "Users can insert their own profile"
@@ -183,9 +183,10 @@ using ((select auth.uid()) = user_id)
 with check ((select auth.uid()) = user_id);
 
 drop policy if exists "Users can read their own trophies" on public.profile_trophies;
-create policy "Users can read their own trophies"
+drop policy if exists "Trophies are readable by everyone" on public.profile_trophies;
+create policy "Trophies are readable by everyone"
 on public.profile_trophies for select
-using ((select auth.uid()) = user_id);
+using (true);
 
 drop policy if exists "Users can insert their own trophies" on public.profile_trophies;
 create policy "Users can insert their own trophies"
