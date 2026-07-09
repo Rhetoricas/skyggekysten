@@ -375,6 +375,7 @@ export async function syncTilDb(opdaterKort = false) {
         gratisNaesteBevaegelse: spilTilstand.gratisNaesteBevaegelse,
         gratisBevaegelseKilde: spilTilstand.gratisBevaegelseKilde,
         sidsteBersaerkDag: spilTilstand.sidsteBersaerkDag,
+        harEnergisyn: spilTilstand.harEnergisyn,
         venteFriIndtilDag: spilTilstand.venteFriIndtilDag || 0
     };
     const scoreData = {
@@ -707,6 +708,7 @@ export async function gemAfsluttetSpillerISession() {
         gratisNaesteBevaegelse: false,
         gratisBevaegelseKilde: '',
         sidsteBersaerkDag: spilTilstand.sidsteBersaerkDag,
+        harEnergisyn: spilTilstand.harEnergisyn,
         venteFriIndtilDag: spilTilstand.venteFriIndtilDag || 0
     };
 

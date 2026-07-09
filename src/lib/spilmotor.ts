@@ -286,6 +286,34 @@ export function hentNaboIndices(index: number) {
         .filter((i): i is number => i !== null);
 }
 
+function beregnBevaegelsesGrundPris(felt: Felt) {
+    if (!spilTilstand.valgtKarakter) return null;
+    const grundPris = biomeTerraenCost[felt.biome as Biome] || 1;
+    const biomeRabat = spilTilstand.valgtKarakter.biomeMod?.[felt.biome as string] || 0;
+    return Math.max(1, spilTilstand.valgtKarakter.moveCost + spilTilstand.rygsækEffekt.move + grundPris + biomeRabat);
+}
+
+export function beregnBevaegelsesEnergiPris(nytIndeks: number, erITaagen = false, medGratisBevaegelse = false) {
+    const felt = spilTilstand.gitter[nytIndeks];
+    if (!felt) return null;
+
+    const grundPris = beregnBevaegelsesGrundPris(felt);
+    if (grundPris === null) return null;
+
+    const pris = grundPris + (erITaagen ? 2 : 0);
+    const kilde = spilTilstand.gratisBevaegelseKilde;
+    if (
+        medGratisBevaegelse &&
+        pris > 0 &&
+        spilTilstand.gratisNaesteBevaegelse &&
+        (kilde === 'bersaerk' || kilde === 'mad')
+    ) {
+        return 0;
+    }
+
+    return pris;
+}
+
 export function harRygsaekItem(genstandId: string) {
     const itemIds = genstandId === 'skovl'
         ? ['skovl', 'mesterskovl']
@@ -313,7 +341,9 @@ export function harRygsaekItem(genstandId: string) {
                                                     ? ['metaldetektor', 'malmviser']
                                                     : genstandId === 'sovepose'
                                                         ? ['sovepose', 'silkesovepose']
-                                                        : [genstandId];
+                                                        : genstandId === 'alle_toej'
+                                                            ? ['klude', 'flot_toej', 'royalt_toej']
+                                                            : [genstandId];
     return spilTilstand.mitUdstyr.some(ting => itemIds.includes(ting.id) && ting.maengde > 0);
 }
 
@@ -344,7 +374,9 @@ export function findRygsaekItemTilKrav(genstandId: string) {
                                                     ? ['metaldetektor', 'malmviser']
                                                     : genstandId === 'sovepose'
                                                         ? ['sovepose', 'silkesovepose']
-                                                        : [genstandId];
+                                                        : genstandId === 'alle_toej'
+                                                            ? ['klude', 'flot_toej', 'royalt_toej']
+                                                            : [genstandId];
     return spilTilstand.mitUdstyr.find(ting => itemIds.includes(ting.id) && ting.maengde > 0)?.id ?? null;
 }
 
@@ -961,12 +993,11 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     const felt = spilTilstand.gitter[nytIndeks];
     if (!felt) return false;
 
-    const grundPris = biomeTerraenCost[felt.biome as Biome] || 1;
-    const biomeRabat = spilTilstand.valgtKarakter.biomeMod?.[felt.biome as string] || 0;
-    const pris = Math.max(1, spilTilstand.valgtKarakter.moveCost + spilTilstand.rygsækEffekt.move + grundPris + biomeRabat);
+    const pris = beregnBevaegelsesEnergiPris(nytIndeks, options.erITaagen);
+    if (pris === null) return false;
 
     const gammelIndex = spilTilstand.spillerIndex;
-    const energiBetaling = brugEnergi(options.erITaagen ? pris + 2 : pris, 'bevaegelse', {
+    const energiBetaling = brugEnergi(pris, 'bevaegelse', {
         fraFeltIndex: gammelIndex,
         tilFeltIndex: nytIndeks
     });
@@ -1005,6 +1036,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
     const nulHp = ['mark', 'by', 'eng', 'marked', 'hoejland', 'skov'];
     const toHp = ['hule', 'meteor'];
     const erDvaerg = charId === 'dwarf_m' || charId === 'dwarf_f';
+    const erMagiker = charId === 'magician_m' || charId === 'magician_f';
     let hpStraf = 0;
     
     if (nulHp.includes(felt.biome as string)) hpStraf = 0;
@@ -1076,6 +1108,19 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 5);
         registrerHeling(foerHp, spilTilstand.livspoint);
         ekstraLog += tekst(" Ritualpladsen giver dig 5 HP.", " The ritual site gives you 5 HP.");
+    }
+
+    if (erMagiker && b === 'krystal') {
+        const foerHp = spilTilstand.livspoint;
+        spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 3);
+        const faktiskHeling = spilTilstand.livspoint - foerHp;
+        if (faktiskHeling > 0) {
+            registrerHeling(foerHp, spilTilstand.livspoint);
+            ekstraLog += tekst(
+                ` Krystallet nærer din magi. (+${faktiskHeling} HP)`,
+                ` The crystal feeds your magic. (+${faktiskHeling} HP)`
+            );
+        }
     }
 
     const krystallerAfsloret = afslørKrystalResonans(nytIndeks);

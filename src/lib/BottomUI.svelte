@@ -226,7 +226,7 @@
                         {#each Array(9) as tomPlads, i (i)}
                             <div
                                 data-dummy={tomPlads}
-                                class="lysprik {i >= spilTilstand.maxEnergi ? 'inaktiv' : i < (spilTilstand.nuvaerendeEnergi || 0) ? 'taendt' : ''}"
+                                class="lysprik {i < (spilTilstand.nuvaerendeEnergi || 0) ? 'taendt' : i >= spilTilstand.maxEnergi ? 'inaktiv' : ''}"
                             ></div>
                         {/each}
                     </div>

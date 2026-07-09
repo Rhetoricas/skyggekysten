@@ -42,8 +42,10 @@ export interface Valg {
         guldOp?: number;
         guldNed?: number;
         energiOp?: number;    
+        energiTil?: number;
         energiNed?: number;   
         maxHpAendring?: number; 
+        energisyn?: boolean;
         itemUd?: string;
         naesteEvent?: string;
     };
@@ -479,32 +481,32 @@ export const eventBibliotek: Record<string, SpilEvent> = {
         biome: ['bjerg', 'skov', 'hoejland'],
         unik: false,
         billede: '/events/ev_kilde.webp',
-        tekst: "En lille gejser sender varm damp op gennem jorden. Luften svier i halsen, men kroppen reagerer med et uroligt overskud.",
-        tekstEn: "A small geyser sends hot steam up through the earth. The air burns in your throat, but your body reacts with restless surplus.",
+        tekst: "En lille gejser sprøjter særligt energifyldt vand op gennem jorden. Dampen sitrer over stenene, og hvert skridt omkring dig virker pludselig lettere at aflæse.",
+        tekstEn: "A small geyser sprays unusually energy-rich water through the earth. The steam trembles over the stones, and every step around you suddenly seems easier to read.",
         valg: [
             { 
                 tekst: "Indånd dampen direkte", 
                 tekstEn: "Inhale the steam directly",
                 effekt: () => {
-                    const energi = Math.floor(Math.random() * 3) + 3;
                     return { 
-                        logBesked: "Dampen svier i brystet. Du får energi, men det koster liv.", 
-                        logBeskedEn: "The steam burns in your chest. You gain energy, but it costs life.",
-                        hpNed: 5,
-                        energiOp: energi
+                        logBesked: "Dampen svier i brystet. Du får energi, og et klart energisyn lægger sig over terrænet omkring dig.", 
+                        logBeskedEn: "The steam burns in your chest. You gain energy, and a clear energy sight settles over the terrain around you.",
+                        hpNed: 10,
+                        energiTil: 9,
+                        energisyn: true
                     };
                 } 
             },
             { 
-                tekst: "Filtrér dampen gennem beskidt tøj", 
-                tekstEn: "Filter the steam through dirty clothes",
-                kosterItem: 'klude', 
+                tekst: "Filtrér dampen gennem tøj", 
+                tekstEn: "Filter the steam through clothes",
+                kosterItem: 'alle_toej', 
                 effekt: () => {
-                    const energi = Math.floor(Math.random() * 3) + 3;
                     return { 
-                        logBesked: "Tøjet tager noget af giften. Du får energi uden at tage skade.", 
-                        logBeskedEn: "The cloth catches some of the poison. You gain energy without taking damage.",
-                        energiOp: energi
+                        logBesked: "Tøjet filtrerer dampen. Du får energi uden at tage skade, og terrænets energiforbrug står klart for dig.", 
+                        logBeskedEn: "The cloth filters the steam. You gain energy without taking damage, and the terrain's energy cost becomes clear to you.",
+                        energiTil: 9,
+                        energisyn: true
                     };
                 } 
             },
@@ -512,12 +514,12 @@ export const eventBibliotek: Record<string, SpilEvent> = {
                 tekst: "Drik vandet fra pølen", 
                 tekstEn: "Drink the water from the pool",
                 effekt: () => {
-                    const energi = Math.floor(Math.random() * 3) + 3;
                     return { 
-                        logBesked: "Vandet smager af metal. Du får energi, men kroppen tager varig skade.", 
-                        logBeskedEn: "The water tastes of metal. You gain energy, but your body takes lasting harm.",
-                        energiOp: energi,
-                        maxHpAendring: -2
+                        logBesked: "Vandet smager af metal og brænder klart i kroppen. Du får energi og energisyn, men kroppen tager varig skade.", 
+                        logBeskedEn: "The water tastes of metal and burns bright in your body. You gain energy and energy sight, but your body takes lasting harm.",
+                        energiTil: 9,
+                        maxHpAendring: -2,
+                        energisyn: true
                     };
                 } 
             },

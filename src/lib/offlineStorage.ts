@@ -60,6 +60,7 @@ interface OfflineSnapshot {
     gratisNaesteBevaegelse?: boolean;
     gratisBevaegelseKilde?: '' | 'mad' | 'bersaerk';
     sidsteBersaerkDag?: number;
+    harEnergisyn?: boolean;
     musikTaendt: boolean;
 }
 
@@ -131,6 +132,7 @@ export function gemOfflineSpil() {
         gratisNaesteBevaegelse: spilTilstand.gratisNaesteBevaegelse,
         gratisBevaegelseKilde: spilTilstand.gratisBevaegelseKilde,
         sidsteBersaerkDag: spilTilstand.sidsteBersaerkDag,
+        harEnergisyn: spilTilstand.harEnergisyn,
         musikTaendt: spilTilstand.musikTaendt
     };
 
@@ -178,6 +180,7 @@ export function indlaesOfflineSpil() {
         spilTilstand.gratisNaesteBevaegelse = data.gratisNaesteBevaegelse ?? false;
         spilTilstand.gratisBevaegelseKilde = data.gratisBevaegelseKilde ?? '';
         spilTilstand.sidsteBersaerkDag = data.sidsteBersaerkDag ?? 0;
+        spilTilstand.harEnergisyn = data.harEnergisyn ?? false;
         spilTilstand.musikTaendt = data.musikTaendt ?? true;
         spilTilstand.statusBesked = tekst('Offline-spil indlæst.', 'Offline game loaded.');
 

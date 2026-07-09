@@ -17,12 +17,12 @@ const karakterTekster: Record<string, TekstPar> = {
     },
     magician_m: {
         navn: 'Wizard',
-        fordel: 'Mobile magic: staff jumps east, life elixir can save lethal damage, and sleeping bag gives healing. Crystal costs -2 energy; staff on crystal reveals crystal fields.',
+        fordel: 'Mobile magic: staff jumps east, life elixir can save lethal damage, and sleeping bag gives healing. Crystal costs -2 energy, gives +3 HP and lets the staff reveal crystal fields.',
         ulempe: 'Only 80 HP, 0 gold, 50% more damage and expensive digging at 8 energy. Very little room for mistakes.'
     },
     magician_f: {
         navn: 'Seeress',
-        fordel: 'Mobile magic: staff jumps east, life elixir can save lethal damage, and sleeping bag gives healing. Crystal costs -2 energy; staff on crystal reveals crystal fields.',
+        fordel: 'Mobile magic: staff jumps east, life elixir can save lethal damage, and sleeping bag gives healing. Crystal costs -2 energy, gives +3 HP and lets the staff reveal crystal fields.',
         ulempe: 'Only 80 HP, 0 gold, 50% more damage and expensive digging at 8 energy. Very little room for mistakes.'
     },
     thief_m: {

@@ -60,9 +60,18 @@
     }
 
     function itemMarkoerTitel(type: ItemMarkoerType, itemId: string) {
+        if (itemId === 'alle_toej') {
+            if (type === 'mister') return tekst('Mister tøj', 'Consumes clothes');
+            if (type === 'risikerer') return tekst('Risikerer tøj', 'May lose clothes');
+            return tekst('Kræver tøj', 'Requires clothes');
+        }
         if (type === 'mister') return tekst(`Mister ${itemNavn(itemId)}`, `Consumes ${itemNavn(itemId)}`);
         if (type === 'risikerer') return tekst(`Risikerer ${itemNavn(itemId)}`, `May lose ${itemNavn(itemId)}`);
         return tekst(`Kræver ${itemNavn(itemId)}`, `Requires ${itemNavn(itemId)}`);
+    }
+
+    function itemMarkoerIkonId(itemId: string) {
+        return itemId === 'alle_toej' ? 'klude' : itemId;
     }
 </script>
 
@@ -112,7 +121,8 @@
                                 {#if itemMarkoerer.length}
                                     <div class="mangel-ikon-raekke">
                                         {#each itemMarkoerer.slice(0, 3) as markoer (`${markoer.type}-${markoer.itemId}`)}
-                                            {#if itemDB[markoer.itemId]}
+                                            {@const ikonId = itemMarkoerIkonId(markoer.itemId)}
+                                            {#if itemDB[ikonId]}
                                                 <span
                                                     class="item-markoer"
                                                     class:kraever-markoer={markoer.type === 'kraever'}
@@ -120,7 +130,7 @@
                                                     class:mister-markoer={markoer.type === 'mister'}
                                                     title={itemMarkoerTitel(markoer.type, markoer.itemId)}
                                                 >
-                                                    <img src={itemDB[markoer.itemId].billede} alt={itemMarkoerTitel(markoer.type, markoer.itemId)} class="mangel-ikon" />
+                                                    <img src={itemDB[ikonId].billede} alt={itemMarkoerTitel(markoer.type, markoer.itemId)} class="mangel-ikon" />
                                                 </span>
                                             {/if}
                                         {/each}

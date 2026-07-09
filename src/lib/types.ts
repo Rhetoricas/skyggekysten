@@ -82,6 +82,7 @@ export interface SpillerData {
     gratisNaesteBevaegelse?: boolean;
     gratisBevaegelseKilde?: '' | 'mad' | 'bersaerk';
     sidsteBersaerkDag?: number;
+    harEnergisyn?: boolean;
     venteFriIndtilDag?: number;
 }
 

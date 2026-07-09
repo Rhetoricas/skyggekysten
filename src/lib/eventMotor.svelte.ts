@@ -54,17 +54,27 @@ export function lukEvent() {
     eventState.rootFeltIndex = null;
 }
 
+function erFantast() {
+    return spilTilstand.valgtKarakter?.id === 'joker_m' || spilTilstand.valgtKarakter?.id === 'joker_f';
+}
+
+function kanFantastIgnorereAdgangskrav(valg: Valg) {
+    return erFantast() && !valg.kosterItem;
+}
+
 export function kanViseValg(valg: Valg) {
-    if (valg.kraeverKarakter && spilTilstand.valgtKarakter?.id !== valg.kraeverKarakter) return false;
+    const ignorerAdgangskrav = kanFantastIgnorereAdgangskrav(valg);
+
+    if (valg.kraeverKarakter && spilTilstand.valgtKarakter?.id !== valg.kraeverKarakter && !ignorerAdgangskrav) return false;
     if (valg.puljeVaerdi && spilTilstand.guldTotal < valg.puljeVaerdi) return false;
 
     if (valg.kraeverItem) {
-        if (!harRygsaekItem(valg.kraeverItem)) return false;
+        if (!harRygsaekItem(valg.kraeverItem) && !ignorerAdgangskrav) return false;
     }
 
     if (valg.kraeverEtAfItems?.length) {
         const harEtAfDem = valg.kraeverEtAfItems.some(itemId => harRygsaekItem(itemId));
-        if (!harEtAfDem) return false;
+        if (!harEtAfDem && !ignorerAdgangskrav) return false;
     }
 
     if (valg.kosterItem) {
@@ -258,13 +268,25 @@ export function tagValg(valg: Valg) {
             kvittering += ` (-${resultat.guldNed} ${tekst('Guld', 'Gold')})`;
         }
         if (resultat.energiOp) {
+            const foerEnergi = spilTilstand.nuvaerendeEnergi;
             spilTilstand.nuvaerendeEnergi += resultat.energiOp;
-            kvittering += ` (+${resultat.energiOp} ${tekst('Energi', 'Energy')})`;
+            const faktiskEnergi = spilTilstand.nuvaerendeEnergi - foerEnergi;
+            if (faktiskEnergi > 0) kvittering += ` (+${faktiskEnergi} ${tekst('Energi', 'Energy')})`;
+        }
+        if (resultat.energiTil !== undefined) {
+            const foerEnergi = spilTilstand.nuvaerendeEnergi;
+            spilTilstand._nuvaerendeEnergi = Math.max(spilTilstand.nuvaerendeEnergi, resultat.energiTil);
+            const faktiskEnergi = spilTilstand.nuvaerendeEnergi - foerEnergi;
+            if (faktiskEnergi > 0) kvittering += ` (+${faktiskEnergi} ${tekst('Energi', 'Energy')})`;
         }
         if (resultat.energiNed) {
             spilTilstand.nuvaerendeEnergi -= resultat.energiNed;
             visBrugteEnergiKugler(resultat.energiNed);
             kvittering += ` (-${resultat.energiNed} ${tekst('Energi', 'Energy')})`;
+        }
+        if (resultat.energisyn) {
+            if (!spilTilstand.harEnergisyn) kvittering += ` (${tekst('Energisyn', 'Energy sight')})`;
+            spilTilstand.harEnergisyn = true;
         }
         if (resultat.itemUd) {
             resultat.itemUd.split(',').forEach((item: string) => {

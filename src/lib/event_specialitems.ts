@@ -29,10 +29,10 @@ export const specialItemEvents: Record<string, SpilEvent> = {
                 tekstEn: 'Aim the golden spyglass at the mirror and turn the fog against itself',
                 kraeverItem: 'kikkert_45',
                 effekt: () => {
-                    rykTaagenTilbage(2);
+                    rykTaagenTilbage(3);
                     return {
-                        logBesked: 'Kikkerten viser tågen dens egen bagside. Disen folder sig væk fra øen og giver jer lidt mere tid.',
-                        logBeskedEn: 'The spyglass shows the fog its own backside. The haze folds away from the island and gives you all a little more time.'
+                        logBesked: 'Kikkerten viser tågen dens egen bagside. Disen folder sig tre felter væk fra øen og giver jer mere tid.',
+                        logBeskedEn: 'The spyglass shows the fog its own backside. The haze folds three tiles away from the island and gives you all more time.'
                     };
                 }
             },
@@ -41,10 +41,10 @@ export const specialItemEvents: Record<string, SpilEvent> = {
                 tekstEn: 'Force the mirror open with the staff and push the fog away',
                 kraeverItem: 'stav',
                 effekt: () => {
-                    rykTaagenTilbage(2);
+                    rykTaagenTilbage(3);
                     return {
-                        logBesked: 'Staven slår en ren linje gennem glasset. Tågen viger, men spejlet klapper hårdt i og tager kræfter med sig.',
-                        logBeskedEn: 'The staff strikes a clean line through the glass. The fog recedes, but the mirror snaps shut hard and takes strength with it.',
+                        logBesked: 'Staven slår en ren linje gennem glasset. Tågen viger tre felter, men spejlet klapper hårdt i og tager kræfter med sig.',
+                        logBeskedEn: 'The staff strikes a clean line through the glass. The fog recedes three tiles, but the mirror snaps shut hard and takes strength with it.',
                         energiNed: 2
                     };
                 }
@@ -54,10 +54,11 @@ export const specialItemEvents: Record<string, SpilEvent> = {
                 tekstEn: 'Hold the torch before the glass and read the folds of the fog',
                 kraeverItem: 'fakkel',
                 effekt: () => {
-                    afslørOmraade(spilTilstand.spillerIndex, 2);
+                    const synsRadius = Math.max(1, (spilTilstand.valgtKarakter?.synsRadius || 1) + spilTilstand.rygsækEffekt.syn) + 2;
+                    afslørOmraade(spilTilstand.spillerIndex, synsRadius);
                     return {
-                        logBesked: 'Lyset gør ikke tågen bange, men spejlet tegner landskabet omkring dig tydeligere.',
-                        logBeskedEn: 'The light does not frighten the fog, but the mirror draws the landscape around you more clearly.'
+                        logBesked: 'Lyset får spejlet til at åbne sig et øjeblik. Landskabet omkring dig står skarpere.',
+                        logBeskedEn: 'The light makes the mirror open for a moment. The landscape around you sharpens.'
                     };
                 }
             },

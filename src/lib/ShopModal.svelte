@@ -8,6 +8,7 @@
     import { markerTutorialHandling } from '$lib/tutorial.svelte';
     import { tekst } from '$lib/i18n.svelte';
     import { itemBeskrivelse, itemNavn } from '$lib/spilTekst';
+    import { kanBetaleMedRoyalPres, kanRoyalPressePris, royalBetaling } from '$lib/royalHandel';
 
     let { lukShop } = $props<{ lukShop: () => void }>();
 
@@ -71,22 +72,34 @@
 
         const kludeRabat = brugerKludeSomRabat ? beregnSalgspris('klude') : 0;
         const pris = Math.max(0, vareData.pris - kludeRabat);
+        const royalPrisPresset = kanRoyalPressePris(spilTilstand.valgtKarakter?.id, spilTilstand.guldTotal, pris);
 
-        if (spilTilstand.guldTotal >= pris) {
-            spilTilstand.guldTotal -= pris;
-            laegGuldIKasseForAktueltFelt(pris);
+        if (kanBetaleMedRoyalPres(spilTilstand.valgtKarakter?.id, spilTilstand.guldTotal, pris)) {
+            const betaltPris = royalBetaling(spilTilstand.valgtKarakter?.id, spilTilstand.guldTotal, pris);
+            spilTilstand.guldTotal -= betaltPris;
+            laegGuldIKasseForAktueltFelt(betaltPris);
             fjernVareFraAktuelShop(id);
             if (brugerKludeSomRabat) brugFraRygsæk('klude', 1);
-            spilTilstand.logBesked = brugerKludeSomRabat
-                ? tekst(`Du købte ${itemNavn(id)} for ${pris} guld. Købmanden tog dit gamle tøj som ${kludeRabat} guld i rabat.`, `You bought ${itemNavn(id)} for ${pris} gold. The merchant took your old clothes as a ${kludeRabat} gold discount.`)
-                : tekst(`Du købte ${itemNavn(id)} for ${vareData.pris} guld.`, `You bought ${itemNavn(id)} for ${vareData.pris} gold.`);
+            spilTilstand.logBesked = royalPrisPresset
+                ? tekst(
+                    `Du købte ${itemNavn(id)} for ${betaltPris} guld. Købmanden ser på dit navn og lader som om resten af prisen aldrig fandtes.`,
+                    `You bought ${itemNavn(id)} for ${betaltPris} gold. The merchant looks at your name and pretends the rest of the price never existed.`
+                )
+                : brugerKludeSomRabat
+                    ? tekst(`Du købte ${itemNavn(id)} for ${pris} guld. Købmanden tog dit gamle tøj som ${kludeRabat} guld i rabat.`, `You bought ${itemNavn(id)} for ${pris} gold. The merchant took your old clothes as a ${kludeRabat} gold discount.`)
+                    : tekst(`Du købte ${itemNavn(id)} for ${vareData.pris} guld.`, `You bought ${itemNavn(id)} for ${vareData.pris} gold.`);
             tilfoejTilRygsæk(id, 1);
             markerTutorialHandling('shop');
             if (spilTilstand.mitUdstyr.some((ting) => (ting.id === 'koelle' || ting.id === 'koelle_upgr') && ting.maengde > 0)) {
                 naegtHandelForAktuelSpillerPaaAktueltFelt();
-                spilTilstand.logBesked = brugerKludeSomRabat
-                    ? tekst(`Du købte ${itemNavn(id)} for ${pris} guld med dit gamle tøj som rabat. Købmanden får øje på køllen og tør ikke handle mere med dig.`, `You bought ${itemNavn(id)} for ${pris} gold with your old clothes as discount. The merchant notices the club and no longer dares to trade with you.`)
-                    : tekst(`Du købte ${itemNavn(id)} for ${vareData.pris} guld. Købmanden får øje på køllen og tør ikke handle mere med dig.`, `You bought ${itemNavn(id)} for ${vareData.pris} gold. The merchant notices the club and no longer dares to trade with you.`);
+                spilTilstand.logBesked = royalPrisPresset
+                    ? tekst(
+                        `Du købte ${itemNavn(id)} for ${betaltPris} guld. Købmanden tør hverken kræve resten af prisen eller handle mere, da han får øje på køllen.`,
+                        `You bought ${itemNavn(id)} for ${betaltPris} gold. The merchant dares neither demand the rest of the price nor keep trading when he notices the club.`
+                    )
+                    : brugerKludeSomRabat
+                        ? tekst(`Du købte ${itemNavn(id)} for ${pris} guld med dit gamle tøj som rabat. Købmanden får øje på køllen og tør ikke handle mere med dig.`, `You bought ${itemNavn(id)} for ${pris} gold with your old clothes as discount. The merchant notices the club and no longer dares to trade with you.`)
+                        : tekst(`Du købte ${itemNavn(id)} for ${vareData.pris} guld. Købmanden får øje på køllen og tør ikke handle mere med dig.`, `You bought ${itemNavn(id)} for ${vareData.pris} gold. The merchant notices the club and no longer dares to trade with you.`);
                 lukShop();
             }
         } else {

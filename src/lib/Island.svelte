@@ -10,7 +10,7 @@
     import { M10_SCORE, beregnSpillerScore, beskrivSlutSalg } from '$lib/score';
     import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, hentGlobalTopHundredeIUgen, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje, hentAktueltHighscoreResultatId } from '$lib/netvaerk';
     import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
-    import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, tjekAutoSpillerMoede, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
+    import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, beregnBevaegelsesEnergiPris, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, tjekAutoSpillerMoede, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
     import { grav } from '$lib/undergrund.svelte';
     import { erSpillerITaagen } from '$lib/overlevelse.svelte';    
     import { eventState, startEvent, lukEvent as motorLukEvent } from '$lib/eventMotor.svelte';
@@ -183,6 +183,9 @@
     let kortHoejde = $derived(spilTilstand.kortHoejde || HOEJDE);
     let aktuelTutorialTrin = $derived(hentAktueltTutorialTrin());
     let tutorialTrinAntal = $derived(Math.max(1, tutorialTrin.length - 1));
+    let bevaegelsesNaboer = $derived(new Set(
+        spilTilstand.gameState === 'play' ? hentNaboIndices(spilTilstand.spillerIndex) : []
+    ));
     const erLocalhost = () => browser && ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
     const SKATTEKORT_STOP_AFSTAND = 200;
@@ -216,6 +219,16 @@
             x: fra.x + (til.x - fra.x) * andel,
             y: fra.y + (til.y - fra.y) * andel
         };
+    }
+
+    function energiPrisForNabofelt(index: number, erUdforsket: boolean) {
+        if (!erUdforsket) return null;
+        if (spilTilstand.gameState !== 'play') return null;
+        if (!spilTilstand.harEnergisyn) return null;
+        if (introAktiv || eventState.aktivt || spilTilstand.aktivShop || spilTilstand.aktivVaerksted) return null;
+        if (spilTilstand.erBevidstløs) return null;
+        if (!bevaegelsesNaboer.has(index)) return null;
+        return beregnBevaegelsesEnergiPris(index, erITågen, true);
     }
 
     function findSkatteKlyngeCenter(klynge: number[]) {
@@ -992,6 +1005,7 @@
         spilTilstand.doedsAarsag = null;
         spilTilstand.gratisNaesteBevaegelse = false;
         spilTilstand.gratisBevaegelseKilde = '';
+        spilTilstand.harEnergisyn = false;
         scoreErGemt = false;
         scoreGemmer = false;
         scoreGemningFejlet = false;
@@ -1047,6 +1061,7 @@
         spilTilstand.gratisNaesteBevaegelse = false;
         spilTilstand.gratisBevaegelseKilde = '';
         spilTilstand.sidsteBersaerkDag = 0;
+        spilTilstand.harEnergisyn = false;
         spilTilstand.venteFriIndtilDag = 0;
         
         nulstilKort();
@@ -1207,6 +1222,7 @@
                             spilTilstand.gratisNaesteBevaegelse = false;
                             spilTilstand.gratisBevaegelseKilde = '';
                             spilTilstand.sidsteBersaerkDag = 0;
+                            spilTilstand.harEnergisyn = false;
                             spilTilstand.venteSpilAktiv = false;
                             spilTilstand.ventePuljeGuld = 0;
                             spilTilstand.ventePuljeLiv = 0;
@@ -1256,6 +1272,7 @@
                         spilTilstand.gratisNaesteBevaegelse = false;
                         spilTilstand.gratisBevaegelseKilde = '';
                         spilTilstand.sidsteBersaerkDag = 0;
+                        spilTilstand.harEnergisyn = false;
                         spilTilstand.venteFriIndtilDag = 0;
                         spilTilstand.gameState = 'select';
                         spilTilstand.statusBesked = eksisterende.isWinner
@@ -1285,6 +1302,7 @@
                     spilTilstand.gratisNaesteBevaegelse = eksisterende.gratisNaesteBevaegelse ?? false;
                     spilTilstand.gratisBevaegelseKilde = eksisterende.gratisBevaegelseKilde ?? '';
                     spilTilstand.sidsteBersaerkDag = eksisterende.sidsteBersaerkDag ?? 0;
+                    spilTilstand.harEnergisyn = eksisterende.harEnergisyn ?? false;
                     spilTilstand.venteFriIndtilDag = eksisterende.venteFriIndtilDag ?? 0;
 
                     afslørOmraade(spilTilstand.spillerIndex, aktuelSynsRadius);
@@ -1326,6 +1344,7 @@
                         spilTilstand.gratisNaesteBevaegelse = false;
                         spilTilstand.gratisBevaegelseKilde = '';
                         spilTilstand.sidsteBersaerkDag = 0;
+                        spilTilstand.harEnergisyn = false;
                         spilTilstand.venteSpilAktiv = false;
                         spilTilstand.ventePuljeGuld = 0;
                         spilTilstand.ventePuljeLiv = 0;
@@ -1447,6 +1466,7 @@
         spilTilstand.trofaeStats = nulstilTrofaeStats();
         spilTilstand.nyeTrofaeIds = [];
         spilTilstand.nyeMytiskeTrofaeIds = [];
+        spilTilstand.harEnergisyn = false;
         scoreErGemt = false;
         nyGlobalRekord = false;
         initialiserGitter(spilTilstand.kortBredde, spilTilstand.kortHoejde);
@@ -1506,6 +1526,7 @@
         spilTilstand.gratisNaesteBevaegelse = false;
         spilTilstand.gratisBevaegelseKilde = '';
         spilTilstand.sidsteBersaerkDag = 0;
+        spilTilstand.harEnergisyn = false;
         spilTilstand.venteSpilAktiv = false;
         spilTilstand.venteGratisFeltBrugt = null;
         spilTilstand.venteFriIndtilDag = 0;
@@ -2044,6 +2065,7 @@
         spilTilstand.gratisNaesteBevaegelse = false;
         spilTilstand.gratisBevaegelseKilde = '';
         spilTilstand.sidsteBersaerkDag = 0;
+        spilTilstand.harEnergisyn = false;
         
         spilTilstand.logHistorik = []; 
 
@@ -2073,6 +2095,7 @@
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisNaesteBevaegelse = false;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].gratisBevaegelseKilde = '';
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].sidsteBersaerkDag = 0;
+            spilTilstand.alleSpillere[spilTilstand.spillerNavn].harEnergisyn = false;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].venteFriIndtilDag = 0;
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].rundeSeed = spilTilstand.rundeSeed;
         } else if (arkiveredeRuter.length > 0) {
@@ -2272,6 +2295,7 @@
             spilTilstand.gratisNaesteBevaegelse = false;
             spilTilstand.gratisBevaegelseKilde = '';
             spilTilstand.sidsteBersaerkDag = 0;
+            spilTilstand.harEnergisyn = false;
             spilTilstand.venteSpilAktiv = false;
             spilTilstand.ventePuljeGuld = 0;
             spilTilstand.ventePuljeLiv = 0;
@@ -2827,6 +2851,7 @@ function udførBevægelse(nytIndeks: number) {
                 {@const vistBiome = felt.katastrofeVisuelAktiv && felt.katastrofeFraBiome ? felt.katastrofeFraBiome : felt.biome}
                 {@const baggrund = !erUdforsket && !erSkattekortRygte ? 'none' : tileBaggrundForBiome(String(vistBiome), erOpslugt)}
                 {@const feltHjaelp = forklaringForFelt(felt, i, erUdforsket, erOpslugt, erSkattekortRygte)}
+                {@const energiPris = energiPrisForNabofelt(i, erUdforsket)}
 
                 <div class="hex" class:active={spilTilstand.spillerIndex === i} class:unexplored={!erUdforsket && !erSkattekortRygte}
                     class:skattekort-rygte={erSkattekortRygte}
@@ -3013,6 +3038,10 @@ function udførBevægelse(nytIndeks: number) {
                                 </div>
                             {/if}
                         {/each}
+
+                        {#if energiPris !== null}
+                            <span class="move-energy-cost" aria-hidden="true">{energiPris}</span>
+                        {/if}
                     </div>
                 </div>
 
@@ -3680,6 +3709,25 @@ function udførBevægelse(nytIndeks: number) {
     }
     .hex.unexplored { background-color: #000; }
     .inner { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+    .move-energy-cost {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #8ee8ff;
+        font-family: 'Cinzel', serif;
+        font-size: 1.15rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: 0;
+        pointer-events: none;
+        text-shadow: 0 0 7px rgba(87, 218, 255, 0.95), 0 0 14px rgba(55, 160, 255, 0.55), 0 2px 4px rgba(0, 0, 0, 0.95);
+        transform: translate(-50%, -50%);
+    }
     
     .crop-icon {
         position: absolute; bottom: 22px; right: 18px; width: 40px; height: auto;

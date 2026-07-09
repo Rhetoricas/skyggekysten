@@ -5,6 +5,7 @@
     import { syncTilDb } from '$lib/netvaerk';
     import { tekst } from '$lib/i18n.svelte';
     import { itemNavn } from '$lib/spilTekst';
+    import { kanBetaleMedRoyalPres, kanRoyalPressePris, royalBetaling } from '$lib/royalHandel';
 
     let { lukVaerksted } = $props<{ lukVaerksted: () => void }>();
 
@@ -25,49 +26,60 @@
 
     let harSkovl = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'skovl' && ting.maengde > 0));
     let harMesterskovl = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'mesterskovl' && ting.maengde > 0));
-    let kanOpgradereSkovl = $derived(harSkovl && !harMesterskovl && spilTilstand.guldTotal >= SKOVL_OPGRADERING_PRIS);
+    let kanOpgradereSkovl = $derived(harSkovl && !harMesterskovl && kanBetaleVaerkstedPris(SKOVL_OPGRADERING_PRIS));
     let harStav = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'stav' && ting.maengde > 0));
     let harDragestav = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'dragestav' && ting.maengde > 0));
-    let kanOpgradereStav = $derived(harStav && !harDragestav && spilTilstand.guldTotal >= STAV_OPGRADERING_PRIS);
+    let kanOpgradereStav = $derived(harStav && !harDragestav && kanBetaleVaerkstedPris(STAV_OPGRADERING_PRIS));
     let harKvist = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'soegekvist' && ting.maengde > 0));
     let harRunekvist = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'runekvist' && ting.maengde > 0));
-    let kanOpgradereKvist = $derived(harKvist && !harRunekvist && spilTilstand.guldTotal >= KVIST_OPGRADERING_PRIS);
+    let kanOpgradereKvist = $derived(harKvist && !harRunekvist && kanBetaleVaerkstedPris(KVIST_OPGRADERING_PRIS));
     let harDirk = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'dirk' && ting.maengde > 0));
     let harMesterdirk = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'mesterdirk' && ting.maengde > 0));
-    let kanOpgradereDirk = $derived(harDirk && !harMesterdirk && spilTilstand.guldTotal >= DIRK_OPGRADERING_PRIS);
+    let kanOpgradereDirk = $derived(harDirk && !harMesterdirk && kanBetaleVaerkstedPris(DIRK_OPGRADERING_PRIS));
     let harKniv = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'kniv' && ting.maengde > 0));
     let harMesterkniv = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'mesterkniv' && ting.maengde > 0));
-    let kanOpgradereKniv = $derived(harKniv && !harMesterkniv && spilTilstand.guldTotal >= KNIV_OPGRADERING_PRIS);
+    let kanOpgradereKniv = $derived(harKniv && !harMesterkniv && kanBetaleVaerkstedPris(KNIV_OPGRADERING_PRIS));
     let harRustning = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'rustning' && ting.maengde > 0));
     let harKongepanser = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'kongepanser' && ting.maengde > 0));
-    let kanOpgradereRustning = $derived(harRustning && !harKongepanser && spilTilstand.guldTotal >= RUSTNING_OPGRADERING_PRIS);
+    let kanOpgradereRustning = $derived(harRustning && !harKongepanser && kanBetaleVaerkstedPris(RUSTNING_OPGRADERING_PRIS));
     let harOekse = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'oekse' && ting.maengde > 0));
     let harStormoekse = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'stormoekse' && ting.maengde > 0));
-    let kanOpgradereOekse = $derived(harOekse && !harStormoekse && spilTilstand.guldTotal >= OEKSE_OPGRADERING_PRIS);
+    let kanOpgradereOekse = $derived(harOekse && !harStormoekse && kanBetaleVaerkstedPris(OEKSE_OPGRADERING_PRIS));
     let harKoelle = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'koelle' && ting.maengde > 0));
     let harOpgraderetKoelle = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'koelle_upgr' && ting.maengde > 0));
-    let kanOpgradereKoelle = $derived(harKoelle && !harOpgraderetKoelle && spilTilstand.guldTotal >= KOELLE_OPGRADERING_PRIS);
+    let kanOpgradereKoelle = $derived(harKoelle && !harOpgraderetKoelle && kanBetaleVaerkstedPris(KOELLE_OPGRADERING_PRIS));
     let harBue = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'bue' && ting.maengde > 0));
     let harMesterbue = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'mesterbue' && ting.maengde > 0));
-    let kanOpgradereBue = $derived(harBue && !harMesterbue && spilTilstand.guldTotal >= BUE_OPGRADERING_PRIS);
+    let kanOpgradereBue = $derived(harBue && !harMesterbue && kanBetaleVaerkstedPris(BUE_OPGRADERING_PRIS));
     let harKlude = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'klude' && ting.maengde > 0));
     let harFintToej = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'flot_toej' && ting.maengde > 0));
     let harRoyaltToej = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'royalt_toej' && ting.maengde > 0));
-    let kanOpgradereKlude = $derived(harKlude && !harFintToej && !harRoyaltToej && spilTilstand.guldTotal >= KLUDER_OPGRADERING_PRIS);
-    let kanOpgradereFintToej = $derived(harFintToej && !harRoyaltToej && spilTilstand.guldTotal >= ROYALT_TOEJ_OPGRADERING_PRIS);
+    let kanOpgradereKlude = $derived(harKlude && !harFintToej && !harRoyaltToej && kanBetaleVaerkstedPris(KLUDER_OPGRADERING_PRIS));
+    let kanOpgradereFintToej = $derived(harFintToej && !harRoyaltToej && kanBetaleVaerkstedPris(ROYALT_TOEJ_OPGRADERING_PRIS));
     let harFakkel = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'fakkel' && ting.maengde > 0));
     let harSolfakkel = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'solfakkel' && ting.maengde > 0));
-    let kanOpgradereFakkel = $derived(harFakkel && spilTilstand.guldTotal >= FAKKEL_OPGRADERING_PRIS);
+    let kanOpgradereFakkel = $derived(harFakkel && kanBetaleVaerkstedPris(FAKKEL_OPGRADERING_PRIS));
     let harDetektor = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'metaldetektor' && ting.maengde > 0));
     let harMalmviser = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'malmviser' && ting.maengde > 0));
-    let kanOpgradereDetektor = $derived(harDetektor && !harMalmviser && spilTilstand.guldTotal >= DETEKTOR_OPGRADERING_PRIS);
+    let kanOpgradereDetektor = $derived(harDetektor && !harMalmviser && kanBetaleVaerkstedPris(DETEKTOR_OPGRADERING_PRIS));
     let harSovepose = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'sovepose' && ting.maengde > 0));
     let harSilkesovepose = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'silkesovepose' && ting.maengde > 0));
-    let kanOpgradereSovepose = $derived(harSovepose && !harSilkesovepose && spilTilstand.guldTotal >= SOVEPOSE_OPGRADERING_PRIS);
+    let kanOpgradereSovepose = $derived(harSovepose && !harSilkesovepose && kanBetaleVaerkstedPris(SOVEPOSE_OPGRADERING_PRIS));
+
+    let royalPrisPressetLog = '';
+
+    function kanBetaleVaerkstedPris(pris: number) {
+        return kanBetaleMedRoyalPres(spilTilstand.valgtKarakter?.id, spilTilstand.guldTotal, pris);
+    }
 
     function betalTilVaerksted(pris: number) {
-        spilTilstand.guldTotal -= pris;
-        laegGuldIKasseForAktueltFelt(pris);
+        const royalPrisPresset = kanRoyalPressePris(spilTilstand.valgtKarakter?.id, spilTilstand.guldTotal, pris);
+        const betaltPris = royalBetaling(spilTilstand.valgtKarakter?.id, spilTilstand.guldTotal, pris);
+        spilTilstand.guldTotal -= betaltPris;
+        laegGuldIKasseForAktueltFelt(betaltPris);
+        royalPrisPressetLog = royalPrisPresset
+            ? tekst(' Mesteren bukker for titlen og lader resten af betalingen ligge.', ' The master bows to the title and lets the rest of the payment go.')
+            : '';
     }
 
     function harKoelleEllerMurknuser() {
@@ -75,6 +87,12 @@
     }
 
     function afslutOpgradering() {
+        if (royalPrisPressetLog) {
+            const senesteBesked = spilTilstand.logBesked.replace(/^DAG \d+ - /, '');
+            spilTilstand.logBesked = `${senesteBesked}${royalPrisPressetLog}`;
+            royalPrisPressetLog = '';
+        }
+
         if (harKoelleEllerMurknuser()) {
             naegtHandelForAktuelSpillerPaaAktueltFelt();
             const senesteBesked = spilTilstand.logBesked.replace(/^DAG \d+ - /, '');
@@ -114,7 +132,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < SKOVL_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(SKOVL_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren ryster på hovedet. Du har ikke guld nok til arbejdet.', 'The master shakes his head. You do not have enough gold for the work.');
             syncTilDb();
             return;
@@ -140,7 +158,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < STAV_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(STAV_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren peger på guldet. Dragestaven kræver mere arbejde.', 'The master points at the gold. The dragon staff requires more work.');
             syncTilDb();
             return;
@@ -166,7 +184,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < KVIST_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(KVIST_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren mangler guld til runerne.', 'The master needs more gold for the runes.');
             syncTilDb();
             return;
@@ -192,7 +210,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < DIRK_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(DIRK_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren kræver mere guld for det fine låsearbejde.', 'The master demands more gold for the delicate lockwork.');
             syncTilDb();
             return;
@@ -218,7 +236,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < KNIV_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(KNIV_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren mangler guld til hærdning og indlæg.', 'The master needs more gold for hardening and inlay.');
             syncTilDb();
             return;
@@ -244,7 +262,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < RUSTNING_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(RUSTNING_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren kræver mere guld til panserplader og ædelstensfatninger.', 'The master demands more gold for armor plates and gem settings.');
             syncTilDb();
             return;
@@ -270,7 +288,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < OEKSE_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(OEKSE_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren kræver mere guld til runer og hærdet æg.', 'The master demands more gold for runes and a hardened edge.');
             syncTilDb();
             return;
@@ -296,7 +314,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < KOELLE_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(KOELLE_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren kræver mere guld til jernbånd, blykerne og nitter.', 'The master demands more gold for iron bands, lead core and rivets.');
             syncTilDb();
             return;
@@ -322,7 +340,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < BUE_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(BUE_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren kræver mere guld til horn, sene og afbalancering.', 'The master demands more gold for horn, string and balancing.');
             syncTilDb();
             return;
@@ -348,7 +366,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < KLUDER_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(KLUDER_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren kræver mere guld til stof, tråd og syning.', 'The master demands more gold for cloth, thread and sewing.');
             syncTilDb();
             return;
@@ -374,7 +392,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < ROYALT_TOEJ_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(ROYALT_TOEJ_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren kræver mere guld til hermelin, brokade og guldbroderi.', 'The master demands more gold for ermine, brocade and gold embroidery.');
             syncTilDb();
             return;
@@ -395,7 +413,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < FAKKEL_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(FAKKEL_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren kræver mere guld til olie, guldtråd og ildsten.', 'The master demands more gold for oil, gold thread and firestone.');
             syncTilDb();
             return;
@@ -422,7 +440,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < DETEKTOR_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(DETEKTOR_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren kræver mere guld til linser, spoler og malmkalibrering.', 'The master demands more gold for lenses, coils and ore calibration.');
             syncTilDb();
             return;
@@ -449,7 +467,7 @@
             return;
         }
 
-        if (spilTilstand.guldTotal < SOVEPOSE_OPGRADERING_PRIS) {
+        if (!kanBetaleVaerkstedPris(SOVEPOSE_OPGRADERING_PRIS)) {
             spilTilstand.logBesked = tekst('Mesteren kræver mere guld til silke, dun og guldsyning.', 'The master demands more gold for silk, down and golden stitching.');
             syncTilDb();
             return;

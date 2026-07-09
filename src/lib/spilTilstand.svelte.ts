@@ -156,6 +156,7 @@ export const spilTilstand = $state({
     gratisNaesteBevaegelse: false,
     gratisBevaegelseKilde: '' as '' | 'mad' | 'bersaerk',
     sidsteBersaerkDag: 0,
+    harEnergisyn: false,
     
     erBevidstløs: false,
     aktiveTal: [] as FlydendeTal[],
