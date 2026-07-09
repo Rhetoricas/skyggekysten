@@ -671,6 +671,61 @@
         };
     }
 
+    function rutePunkt(index: number) {
+        const raekke = Math.floor(index / kortBredde);
+        const kolonne = index % kortBredde;
+        return {
+            x: kolonne * HEX_W + (raekke % 2 !== 0 ? HEX_W / 2 : 0) + (HEX_W / 2),
+            y: raekke * ROW_H + 55
+        };
+    }
+
+    function ruteSegmentNoegle(a: number, b: number) {
+        return a < b ? `${a}-${b}` : `${b}-${a}`;
+    }
+
+    function bygGamleRuteSegmenter(ruter: number[][] = []) {
+        const segmenter = new Map<string, { fraIndex: number; tilIndex: number; antal: number }>();
+        for (const rute of ruter) {
+            for (let i = 1; i < rute.length; i++) {
+                const fraIndex = rute[i - 1];
+                const tilIndex = rute[i];
+                if (!Number.isInteger(fraIndex) || !Number.isInteger(tilIndex) || fraIndex === tilIndex) continue;
+                const noegle = ruteSegmentNoegle(fraIndex, tilIndex);
+                const eksisterende = segmenter.get(noegle);
+                if (eksisterende) {
+                    eksisterende.antal++;
+                } else {
+                    segmenter.set(noegle, { fraIndex, tilIndex, antal: 1 });
+                }
+            }
+        }
+
+        return Array.from(segmenter.entries()).map(([noegle, segment]) => ({
+            noegle,
+            antal: segment.antal,
+            fra: rutePunkt(segment.fraIndex),
+            til: rutePunkt(segment.tilIndex)
+        }));
+    }
+
+    const gamleRuteSpor = [
+        { bredde: 1.1, opacity: 0.3 },
+        { bredde: 1.42, opacity: 0.34 },
+        { bredde: 1.74, opacity: 0.38 },
+        { bredde: 2.07, opacity: 0.42 },
+        { bredde: 2.39, opacity: 0.46 },
+        { bredde: 2.71, opacity: 0.5 },
+        { bredde: 3.03, opacity: 0.54 },
+        { bredde: 3.36, opacity: 0.59 },
+        { bredde: 3.68, opacity: 0.64 },
+        { bredde: 4, opacity: 0.7 }
+    ];
+
+    function gammeltRuteSporStil(antal: number) {
+        return gamleRuteSpor[Math.min(Math.max(antal, 1), 10) - 1];
+    }
+
     function visRuteOverblik() {
         const rute = spilTilstand.historik?.length > 1
             ? spilTilstand.historik
@@ -3101,27 +3156,21 @@ function udførBevægelse(nytIndeks: number) {
                 <svg class="rute-canvas">
                     {#each Object.entries(spilTilstand.alleSpillere) as [navn, data] (navn)}
                         {#if navn === spilTilstand.spillerNavn}
-                            {#each data.tidligereHistorik || [] as gammelRute, ruteIndex (`${navn}-${ruteIndex}`)}
-                                {#if gammelRute.length > 1}
-                                    {@const oldPointsArray = gammelRute.map((idx: number) => {
-                                        const raekke = Math.floor(idx / kortBredde);
-                                        const kolonne = idx % kortBredde;
-                                        const posX = kolonne * HEX_W + (raekke % 2 !== 0 ? HEX_W / 2 : 0) + (HEX_W / 2);
-                                        const posY = raekke * ROW_H + 55;
-                                        return {x: posX, y: posY};
-                                    })}
-                                    {@const oldPoints = oldPointsArray.map(p => `${p.x},${p.y}`).join(' ')}
-
-                                    <polyline
-                                        points={oldPoints}
-                                        fill="none"
-                                        stroke="rgba(255, 255, 255, 0.5)"
-                                        stroke-width="1.35"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        class="flugtrute-gammel"
-                                    />
-                                {/if}
+                            {#each bygGamleRuteSegmenter(data.tidligereHistorik || []) as segment (segment.noegle)}
+                                {@const spor = gammeltRuteSporStil(segment.antal)}
+                                <line
+                                    x1={segment.fra.x}
+                                    y1={segment.fra.y}
+                                    x2={segment.til.x}
+                                    y2={segment.til.y}
+                                    stroke="rgb(255, 255, 255)"
+                                    stroke-opacity={spor.opacity}
+                                    stroke-width={spor.bredde}
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class:flugtrute-gammel-staerk={segment.antal >= 8}
+                                    class="flugtrute-gammel"
+                                />
                             {/each}
                         {/if}
 
@@ -3142,7 +3191,7 @@ function udførBevægelse(nytIndeks: number) {
                                 points={points} 
                                 fill="none" 
                                 stroke={erMig ? '#ffffff' : 'rgba(192, 238, 78, 0.82)'} 
-                                stroke-width={erMig ? "6" : "4"}
+                                stroke-width={erMig ? "8" : "4"}
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 class={erMig ? 'flugtrute' : 'flugtrute flugtrute-modspiller'}
@@ -3872,9 +3921,16 @@ function udførBevægelse(nytIndeks: number) {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         pointer-events: none; z-index: 18; overflow: visible;
     }
-    .flugtrute { animation: tegnRute 3s linear forwards; filter: drop-shadow(0 0 5px rgba(255,255,255,0.4)); }
+    .flugtrute {
+        animation: tegnRute 3s linear forwards;
+        filter:
+            drop-shadow(0 0 3px rgba(255,255,255,0.95))
+            drop-shadow(0 0 10px rgba(255,255,255,0.62))
+            drop-shadow(0 0 18px rgba(255,255,255,0.28));
+    }
     .flugtrute-modspiller { filter: drop-shadow(0 0 6px rgba(190, 238, 78, 0.55)); }
     .flugtrute-gammel { pointer-events: none; }
+    .flugtrute-gammel-staerk { filter: drop-shadow(0 0 4px rgba(255,255,255,0.18)); }
     @keyframes tegnRute { from { stroke-dashoffset: 2000; } to { stroke-dashoffset: 0; } }
     
     .rute-end-icon {
