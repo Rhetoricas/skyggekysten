@@ -8,32 +8,32 @@ const karakterTekster: Record<string, TekstPar> = {
     knight_m: {
         navn: 'Knight',
         fordel: 'The Order: You take 10% less damage, ignore armor weight and avoid buried traps.',
-        ulempe: 'You start with no gold and can see only 1 tile. Digging costs 6 energy, and your armor is lost in water.'
+        ulempe: 'You start with no gold and can see only 1 tile. Digging costs 5 energy, and your armor is lost in water.'
     },
     knight_f: {
         navn: 'Shieldmaiden',
         fordel: 'The Order: You take 10% less damage, ignore armor weight and avoid buried traps.',
-        ulempe: 'You start with no gold and can see only 1 tile. Digging costs 6 energy, and your armor is lost in water.'
+        ulempe: 'You start with no gold and can see only 1 tile. Digging costs 5 energy, and your armor is lost in water.'
     },
     magician_m: {
         navn: 'Wizard',
         fordel: 'Mages: Your staff moves you east. Crystals heal you and let the staff reveal other crystal tiles.',
-        ulempe: 'You start with 80 HP and no gold, take 50% more damage and spend 8 energy to dig. There is little room for mistakes.'
+        ulempe: 'You start with 80 HP and no gold, take 50% more damage and spend 7 energy to dig. There is little room for mistakes.'
     },
     magician_f: {
         navn: 'Seeress',
         fordel: 'Mages: Your staff moves you east. Crystals heal you and let the staff reveal other crystal tiles.',
-        ulempe: 'You start with 80 HP and no gold, take 50% more damage and spend 8 energy to dig. There is little room for mistakes.'
+        ulempe: 'You start with 80 HP and no gold, take 50% more damage and spend 7 energy to dig. There is little room for mistakes.'
     },
     thief_m: {
         navn: 'Thief',
         fordel: 'Outlaws: You can burgle empty town tiles with a lockpick and gain 10% more from all gold.',
-        ulempe: 'You take 20% more damage and can see only 1 tile. Digging costs 5 energy.'
+        ulempe: 'You take 20% more damage and can see only 1 tile. Digging costs 4 energy.'
     },
     thief_f: {
         navn: 'Shadow',
         fordel: 'Outlaws: You can burgle empty town tiles with a lockpick and gain 10% more from all gold.',
-        ulempe: 'You take 20% more damage and can see only 1 tile. Digging costs 5 energy.'
+        ulempe: 'You take 20% more damage and can see only 1 tile. Digging costs 4 energy.'
     },
     explorer_m: {
         navn: 'Explorer',
@@ -58,22 +58,22 @@ const karakterTekster: Record<string, TekstPar> = {
     royal_m: {
         navn: 'Duke',
         fordel: 'Nobility: You gain 20% more gold, can pressure merchants on price and collect tax from other players in multiplayer.',
-        ulempe: 'You have only 6 energy, take 10% more damage and start without a weapon. Digging costs a full 10 energy.'
+        ulempe: 'You have only 6 energy, take 10% more damage and start without a weapon. Digging costs a full 9 energy.'
     },
     royal_f: {
         navn: 'Queen',
         fordel: 'Nobility: You gain 20% more gold, can pressure merchants on price and collect tax from other players in multiplayer.',
-        ulempe: 'You have only 6 energy, take 10% more damage and start without a weapon. Digging costs a full 10 energy.'
+        ulempe: 'You have only 6 energy, take 10% more damage and start without a weapon. Digging costs a full 9 energy.'
     },
     hunter_m: {
         navn: 'Hunter',
         fordel: 'Scouts: You can see farther than most. In multiplayer, you can track a player on the same tile for 20 days.',
-        ulempe: 'You start with 90 HP and 20 gold and take 10% more damage. Digging costs 6 energy.'
+        ulempe: 'You start with 90 HP and 20 gold and take 10% more damage. Digging costs 5 energy.'
     },
     hunter_f: {
         navn: 'Archer',
         fordel: 'Scouts: You can see farther than most. In multiplayer, you can track a player on the same tile for 20 days.',
-        ulempe: 'You start with 90 HP and 20 gold and take 10% more damage. Digging costs 6 energy.'
+        ulempe: 'You start with 90 HP and 20 gold and take 10% more damage. Digging costs 5 energy.'
     },
     pirate_m: {
         navn: 'Captain',
@@ -98,12 +98,12 @@ const karakterTekster: Record<string, TekstPar> = {
     orc_m: {
         navn: 'Orc',
         fordel: 'Clansfolk: You take 20% less damage and can smash towns and markets with your club.',
-        ulempe: 'You start without gold, clothes or a sleeping bag and gain 20% less from all gold. Digging costs 6 energy.'
+        ulempe: 'You start without gold, clothes or a sleeping bag and gain 20% less from all gold. Digging costs 5 energy.'
     },
     orc_f: {
         navn: 'Warrior',
         fordel: 'Clansfolk: You take 20% less damage and can smash towns and markets with your club.',
-        ulempe: 'You start without gold, clothes or a sleeping bag and gain 20% less from all gold. Digging costs 6 energy.'
+        ulempe: 'You start without gold, clothes or a sleeping bag and gain 20% less from all gold. Digging costs 5 energy.'
     },
     joker_m: {
         navn: 'Joker',

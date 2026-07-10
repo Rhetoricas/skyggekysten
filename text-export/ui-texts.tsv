@@ -1788,22 +1788,22 @@ src/lib/score.ts:2690:2712:string:1h0in5s	src/lib/score.ts	string	string @ 67:71
 src/lib/score.ts:6042:6086:text:16ledfj	src/lib/score.ts	text	markup @ 152:55	,\n    spillerNavn: string,\n    data: Partial
 src/lib/spilTekst.ts:368:374:string:1kwlcgs	src/lib/spilTekst.ts	string	string @ 9:16	Knight
 src/lib/spilTekst.ts:394:474:string:tieapc	src/lib/spilTekst.ts	string	string @ 10:18	The Order: You take 10% less damage, ignore armor weight and avoid buried traps.
-src/lib/spilTekst.ts:494:598:string:1ulyqcs	src/lib/spilTekst.ts	string	string @ 11:18	You start with no gold and can see only 1 tile. Digging costs 6 energy, and your armor is lost in water.
+src/lib/spilTekst.ts:494:598:string:19r9crb	src/lib/spilTekst.ts	string	string @ 11:18	You start with no gold and can see only 1 tile. Digging costs 5 energy, and your armor is lost in water.
 src/lib/spilTekst.ts:638:650:string:e5ymg0	src/lib/spilTekst.ts	string	string @ 14:16	Shieldmaiden
 src/lib/spilTekst.ts:670:750:string:tieapc	src/lib/spilTekst.ts	string	string @ 15:18	The Order: You take 10% less damage, ignore armor weight and avoid buried traps.
-src/lib/spilTekst.ts:770:874:string:1ulyqcs	src/lib/spilTekst.ts	string	string @ 16:18	You start with no gold and can see only 1 tile. Digging costs 6 energy, and your armor is lost in water.
+src/lib/spilTekst.ts:770:874:string:19r9crb	src/lib/spilTekst.ts	string	string @ 16:18	You start with no gold and can see only 1 tile. Digging costs 5 energy, and your armor is lost in water.
 src/lib/spilTekst.ts:916:922:string:ic72ga	src/lib/spilTekst.ts	string	string @ 19:16	Wizard
 src/lib/spilTekst.ts:942:1039:string:i97lqo	src/lib/spilTekst.ts	string	string @ 20:18	Mages: Your staff moves you east. Crystals heal you and let the staff reveal other crystal tiles.
-src/lib/spilTekst.ts:1059:1175:string:7w1vf2	src/lib/spilTekst.ts	string	string @ 21:18	You start with 80 HP and no gold, take 50% more damage and spend 8 energy to dig. There is little room for mistakes.
+src/lib/spilTekst.ts:1059:1175:string:1qen11j	src/lib/spilTekst.ts	string	string @ 21:18	You start with 80 HP and no gold, take 50% more damage and spend 7 energy to dig. There is little room for mistakes.
 src/lib/spilTekst.ts:1217:1224:string:16vzs7b	src/lib/spilTekst.ts	string	string @ 24:16	Seeress
 src/lib/spilTekst.ts:1244:1341:string:i97lqo	src/lib/spilTekst.ts	string	string @ 25:18	Mages: Your staff moves you east. Crystals heal you and let the staff reveal other crystal tiles.
-src/lib/spilTekst.ts:1361:1477:string:7w1vf2	src/lib/spilTekst.ts	string	string @ 26:18	You start with 80 HP and no gold, take 50% more damage and spend 8 energy to dig. There is little room for mistakes.
+src/lib/spilTekst.ts:1361:1477:string:1qen11j	src/lib/spilTekst.ts	string	string @ 26:18	You start with 80 HP and no gold, take 50% more damage and spend 7 energy to dig. There is little room for mistakes.
 src/lib/spilTekst.ts:1516:1521:string:9g9co3	src/lib/spilTekst.ts	string	string @ 29:16	Thief
 src/lib/spilTekst.ts:1541:1630:string:1bnq1ax	src/lib/spilTekst.ts	string	string @ 30:18	Outlaws: You can burgle empty town tiles with a lockpick and gain 10% more from all gold.
-src/lib/spilTekst.ts:1650:1723:string:1hdmjtf	src/lib/spilTekst.ts	string	string @ 31:18	You take 20% more damage and can see only 1 tile. Digging costs 5 energy.
+src/lib/spilTekst.ts:1650:1723:string:1um4ylg	src/lib/spilTekst.ts	string	string @ 31:18	You take 20% more damage and can see only 1 tile. Digging costs 4 energy.
 src/lib/spilTekst.ts:1762:1768:string:10appq9	src/lib/spilTekst.ts	string	string @ 34:16	Shadow
 src/lib/spilTekst.ts:1788:1877:string:1bnq1ax	src/lib/spilTekst.ts	string	string @ 35:18	Outlaws: You can burgle empty town tiles with a lockpick and gain 10% more from all gold.
-src/lib/spilTekst.ts:1897:1970:string:1hdmjtf	src/lib/spilTekst.ts	string	string @ 36:18	You take 20% more damage and can see only 1 tile. Digging costs 5 energy.
+src/lib/spilTekst.ts:1897:1970:string:1um4ylg	src/lib/spilTekst.ts	string	string @ 36:18	You take 20% more damage and can see only 1 tile. Digging costs 4 energy.
 src/lib/spilTekst.ts:2012:2020:string:1ptqmzu	src/lib/spilTekst.ts	string	string @ 39:16	Explorer
 src/lib/spilTekst.ts:2040:2141:string:1ja5mtv	src/lib/spilTekst.ts	string	string @ 40:18	Explorers: You can see farther than most. Caves and ruins cost 2 less energy, and you dig for only 3.
 src/lib/spilTekst.ts:2161:2273:string:b6f2xk	src/lib/spilTekst.ts	string	string @ 41:18	You start without gold or a weapon and gain 10% less from all gold. Build your economy by exploring and digging.
@@ -1818,286 +1818,286 @@ src/lib/spilTekst.ts:2954:3064:string:sdrzi7	src/lib/spilTekst.ts	string	string 
 src/lib/spilTekst.ts:3084:3196:string:1u09zuz	src/lib/spilTekst.ts	string	string @ 56:18	You start without a sleeping bag and gain 10% less from all gold. Healing must be found or bought along the way.
 src/lib/spilTekst.ts:3235:3239:string:mxbgze	src/lib/spilTekst.ts	string	string @ 59:16	Duke
 src/lib/spilTekst.ts:3259:3375:string:t0uyc6	src/lib/spilTekst.ts	string	string @ 60:18	Nobility: You gain 20% more gold, can pressure merchants on price and collect tax from other players in multiplayer.
-src/lib/spilTekst.ts:3395:3499:string:4k400x	src/lib/spilTekst.ts	string	string @ 61:18	You have only 6 energy, take 10% more damage and start without a weapon. Digging costs a full 10 energy.
-src/lib/spilTekst.ts:3538:3543:string:1ecfm95	src/lib/spilTekst.ts	string	string @ 64:16	Queen
-src/lib/spilTekst.ts:3563:3679:string:t0uyc6	src/lib/spilTekst.ts	string	string @ 65:18	Nobility: You gain 20% more gold, can pressure merchants on price and collect tax from other players in multiplayer.
-src/lib/spilTekst.ts:3699:3803:string:4k400x	src/lib/spilTekst.ts	string	string @ 66:18	You have only 6 energy, take 10% more damage and start without a weapon. Digging costs a full 10 energy.
-src/lib/spilTekst.ts:3843:3849:string:egc1w3	src/lib/spilTekst.ts	string	string @ 69:16	Hunter
-src/lib/spilTekst.ts:3869:3976:string:nm0j1h	src/lib/spilTekst.ts	string	string @ 70:18	Scouts: You can see farther than most. In multiplayer, you can track a player on the same tile for 20 days.
-src/lib/spilTekst.ts:3996:4078:string:1x7979v	src/lib/spilTekst.ts	string	string @ 71:18	You start with 90 HP and 20 gold and take 10% more damage. Digging costs 6 energy.
-src/lib/spilTekst.ts:4118:4124:string:1a4zi5e	src/lib/spilTekst.ts	string	string @ 74:16	Archer
-src/lib/spilTekst.ts:4144:4251:string:nm0j1h	src/lib/spilTekst.ts	string	string @ 75:18	Scouts: You can see farther than most. In multiplayer, you can track a player on the same tile for 20 days.
-src/lib/spilTekst.ts:4271:4353:string:1x7979v	src/lib/spilTekst.ts	string	string @ 76:18	You start with 90 HP and 20 gold and take 10% more damage. Digging costs 6 energy.
-src/lib/spilTekst.ts:4393:4400:string:1208ih7	src/lib/spilTekst.ts	string	string @ 79:16	Captain
-src/lib/spilTekst.ts:4420:4539:string:5dyiri	src/lib/spilTekst.ts	string	string @ 80:18	Sea Raiders: You gain 20% more gold and start with a treasure map. In multiplayer, your sabre can rob selected classes.
-src/lib/spilTekst.ts:4559:4651:string:1wj820g	src/lib/spilTekst.ts	string	string @ 81:18	You start without a sleeping bag and can see only 1 tile. Find or buy healing along the way.
-src/lib/spilTekst.ts:4691:4698:string:gtj0o0	src/lib/spilTekst.ts	string	string @ 84:16	Corsair
-src/lib/spilTekst.ts:4718:4837:string:5dyiri	src/lib/spilTekst.ts	string	string @ 85:18	Sea Raiders: You gain 20% more gold and start with a treasure map. In multiplayer, your sabre can rob selected classes.
-src/lib/spilTekst.ts:4857:4949:string:1wj820g	src/lib/spilTekst.ts	string	string @ 86:18	You start without a sleeping bag and can see only 1 tile. Find or buy healing along the way.
-src/lib/spilTekst.ts:4988:4993:string:i0fayj	src/lib/spilTekst.ts	string	string @ 89:16	Dwarf
-src/lib/spilTekst.ts:5013:5125:string:1lsxswm	src/lib/spilTekst.ts	string	string @ 90:18	Mountainfolk: You dig for only 2 energy, gain 10% more gold and move easily through mountains and crystal tiles.
-src/lib/spilTekst.ts:5145:5237:string:1yzf0w1	src/lib/spilTekst.ts	string	string @ 91:18	Each normal step costs 1.5 energy. You can see only 1 tile and start without a sleeping bag.
-src/lib/spilTekst.ts:5276:5282:string:9tgkr7	src/lib/spilTekst.ts	string	string @ 94:16	Digger
-src/lib/spilTekst.ts:5302:5414:string:1lsxswm	src/lib/spilTekst.ts	string	string @ 95:18	Mountainfolk: You dig for only 2 energy, gain 10% more gold and move easily through mountains and crystal tiles.
-src/lib/spilTekst.ts:5434:5526:string:1yzf0w1	src/lib/spilTekst.ts	string	string @ 96:18	Each normal step costs 1.5 energy. You can see only 1 tile and start without a sleeping bag.
-src/lib/spilTekst.ts:5563:5566:string:qjy9x	src/lib/spilTekst.ts	string	string @ 99:16	Orc
-src/lib/spilTekst.ts:5586:5669:string:16lle3k	src/lib/spilTekst.ts	string	string @ 100:18	Clansfolk: You take 20% less damage and can smash towns and markets with your club.
-src/lib/spilTekst.ts:5689:5795:string:1bwt0j9	src/lib/spilTekst.ts	string	string @ 101:18	You start without gold, clothes or a sleeping bag and gain 20% less from all gold. Digging costs 6 energy.
-src/lib/spilTekst.ts:5832:5839:string:ed399l	src/lib/spilTekst.ts	string	string @ 104:16	Warrior
-src/lib/spilTekst.ts:5859:5942:string:16lle3k	src/lib/spilTekst.ts	string	string @ 105:18	Clansfolk: You take 20% less damage and can smash towns and markets with your club.
-src/lib/spilTekst.ts:5962:6068:string:1bwt0j9	src/lib/spilTekst.ts	string	string @ 106:18	You start without gold, clothes or a sleeping bag and gain 20% less from all gold. Digging costs 6 energy.
-src/lib/spilTekst.ts:6107:6112:string:175i9a4	src/lib/spilTekst.ts	string	string @ 109:16	Joker
-src/lib/spilTekst.ts:6132:6257:string:godc20	src/lib/spilTekst.ts	string	string @ 110:18	Wildcards: You can see farther, gain 50% more gold and bluff through event choices that require items or specific characters.
-src/lib/spilTekst.ts:6277:6405:string:18wjb6i	src/lib/spilTekst.ts	string	string @ 111:18	You start with 50 HP and 1 gold, without clothes or a sleeping bag, and take double damage. Almost any mistake can be your last.
-src/lib/spilTekst.ts:6444:6453:string:odp6sa	src/lib/spilTekst.ts	string	string @ 114:16	Harlequin
-src/lib/spilTekst.ts:6473:6598:string:godc20	src/lib/spilTekst.ts	string	string @ 115:18	Wildcards: You can see farther, gain 50% more gold and bluff through event choices that require items or specific characters.
-src/lib/spilTekst.ts:6618:6746:string:18wjb6i	src/lib/spilTekst.ts	string	string @ 116:18	You start with 50 HP and 1 gold, without clothes or a sleeping bag, and take double damage. Almost any mistake can be your last.
-src/lib/spilTekst.ts:6795:6805:string:173jh96	src/lib/spilTekst.ts	string	string @ 119:16	Apprentice
-src/lib/spilTekst.ts:6825:6903:string:73a3iy	src/lib/spilTekst.ts	string	string @ 120:18	You can see far, dig cheaply and start with a shovel, food and a sleeping bag.
-src/lib/spilTekst.ts:6923:7004:string:1xxtzwo	src/lib/spilTekst.ts	string	string @ 121:18	The Apprentice is used only in the tutorial and does not count toward your score.
-src/lib/spilTekst.ts:7077:7086:string:1j0qumk	src/lib/spilTekst.ts	string	string @ 126:14	The Order
-src/lib/spilTekst.ts:7104:7109:string:1hmee28	src/lib/spilTekst.ts	string	string @ 127:16	Mages
-src/lib/spilTekst.ts:7124:7131:string:125jhe2	src/lib/spilTekst.ts	string	string @ 128:13	Outlaws
-src/lib/spilTekst.ts:7149:7158:string:qixc63	src/lib/spilTekst.ts	string	string @ 129:16	Explorers
-src/lib/spilTekst.ts:7174:7183:string:18b5omi	src/lib/spilTekst.ts	string	string @ 130:14	Northfolk
-src/lib/spilTekst.ts:7198:7206:string:pxzwj	src/lib/spilTekst.ts	string	string @ 131:13	Nobility
-src/lib/spilTekst.ts:7222:7228:string:1u2r9pe	src/lib/spilTekst.ts	string	string @ 132:14	Scouts
-src/lib/spilTekst.ts:7244:7255:string:ujpt3c	src/lib/spilTekst.ts	string	string @ 133:14	Sea Raiders
-src/lib/spilTekst.ts:7270:7282:string:1x5rak	src/lib/spilTekst.ts	string	string @ 134:13	Mountainfolk
-src/lib/spilTekst.ts:7295:7304:string:1ylal2c	src/lib/spilTekst.ts	string	string @ 135:11	Clansfolk
-src/lib/spilTekst.ts:7319:7328:string:gcvnas	src/lib/spilTekst.ts	string	string @ 136:13	Wildcards
-src/lib/spilTekst.ts:7402:7409:string:kuv6ij	src/lib/spilTekst.ts	string	string @ 140:21	Clothes
-src/lib/spilTekst.ts:7426:7479:string:a0h8ly	src/lib/spilTekst.ts	string	string @ 140:45	Offers light protection and reduces all damage by 5%.
-src/lib/spilTekst.ts:7507:7512:string:10tp7xw	src/lib/spilTekst.ts	string	string @ 141:24	Armor
-src/lib/spilTekst.ts:7529:7706:string:1159z5x	src/lib/spilTekst.ts	string	string @ 141:46	Halves all damage. Its weight normally costs 1 extra energy per step, but Knight and Shieldmaiden ignore the weight and avoid buried traps. The armor sinks and is lost in water.
-src/lib/spilTekst.ts:7737:7748:string:fmcfrr	src/lib/spilTekst.ts	string	string @ 142:27	Royal Armor
-src/lib/spilTekst.ts:7765:7950:string:1ghlqh6	src/lib/spilTekst.ts	string	string @ 142:55	Reduces all damage by 70%. Its weight normally costs 1 extra energy per step, but Knight and Shieldmaiden ignore the weight and avoid buried traps. The armor sinks and is lost in water.
-src/lib/spilTekst.ts:7984:7995:string:9jtevq	src/lib/spilTekst.ts	string	string @ 143:30	Elven Armor
-src/lib/spilTekst.ts:8012:8143:string:waez2v	src/lib/spilTekst.ts	string	string @ 143:58	Halves all damage without costing extra energy. Knight and Shieldmaiden also avoid buried traps while wearing it. Cannot be bought.
-src/lib/spilTekst.ts:8172:8184:string:ck9f79	src/lib/spilTekst.ts	string	string @ 144:25	Fine Clothes
-src/lib/spilTekst.ts:8201:8283:string:33kdzy	src/lib/spilTekst.ts	string	string @ 144:54	Gives 15% more gold and light protection. Can be ruined in caves and blood forest.
-src/lib/spilTekst.ts:8314:8327:string:n32irs	src/lib/spilTekst.ts	string	string @ 145:27	Royal Clothes
-src/lib/spilTekst.ts:8344:8473:string:14kb5u0	src/lib/spilTekst.ts	string	string @ 145:57	Gives 40% more gold and better protection than fine clothes. If torn in a cave or blood forest, it becomes ordinary fine clothes.
-src/lib/spilTekst.ts:8497:8502:string:iq6g6y	src/lib/spilTekst.ts	string	string @ 146:20	Knife
-src/lib/spilTekst.ts:8519:8584:string:1kinpd8	src/lib/spilTekst.ts	string	string @ 146:42	A simple weapon that also unlocks special choices in some events.
-src/lib/spilTekst.ts:8614:8626:string:u6oocu	src/lib/spilTekst.ts	string	string @ 147:26	Master Knife
-src/lib/spilTekst.ts:8643:8744:string:1ea88bw	src/lib/spilTekst.ts	string	string @ 147:55	Unlocks the same choices as an ordinary knife, but knife choices give more gold and deal less damage.
-src/lib/spilTekst.ts:8768:8776:string:oweiyb	src/lib/spilTekst.ts	string	string @ 148:20	Lockpick
-src/lib/spilTekst.ts:8793:8826:string:dxvye1	src/lib/spilTekst.ts	string	string @ 148:45	Lets you burgle empty town tiles.
-src/lib/spilTekst.ts:8856:8871:string:e37op3	src/lib/spilTekst.ts	string	string @ 149:26	Master Lockpick
-src/lib/spilTekst.ts:8888:8969:string:afrwwi	src/lib/spilTekst.ts	string	string @ 149:58	Unlocks the same burglaries as an ordinary lockpick and gives twice as much gold.
-src/lib/spilTekst.ts:8993:8998:string:3murn5	src/lib/spilTekst.ts	string	string @ 150:20	Staff
-src/lib/spilTekst.ts:9015:9166:string:1sns1i4	src/lib/spilTekst.ts	string	string @ 150:42	Moves you 4 tiles east at your normal energy cost. The landing tile activates as usual. On crystal, the staff reveals crystal tiles up to 4 tiles away.
-src/lib/spilTekst.ts:9195:9207:string:1grfrb4	src/lib/spilTekst.ts	string	string @ 151:25	Dragon Staff
-src/lib/spilTekst.ts:9224:9451:string:1kkhvob	src/lib/spilTekst.ts	string	string @ 151:54	Moves you 5 tiles east and reveals the route along the way. If the jump ends in open water, you land on the last safe tile and the dragon staff becomes an ordinary staff. On crystal, it reveals crystal tiles up to 5 tiles away.
-src/lib/spilTekst.ts:9474:9477:string:1o5i5xn	src/lib/spilTekst.ts	string	string @ 152:19	Bow
-src/lib/spilTekst.ts:9494:9551:string:dfiylb	src/lib/spilTekst.ts	string	string @ 152:39	Unlocks special choices in events where distance matters.
-src/lib/spilTekst.ts:9580:9590:string:xkvjpo	src/lib/spilTekst.ts	string	string @ 153:25	Falcon Bow
-src/lib/spilTekst.ts:9607:9749:string:1xbnex8	src/lib/spilTekst.ts	string	string @ 153:52	Unlocks the same choices as an ordinary bow, but gives more gold and less damage. As you move, it reveals a small area just beyond your sight.
-src/lib/spilTekst.ts:9774:9777:string:1830ybf	src/lib/spilTekst.ts	string	string @ 154:21	Axe
-src/lib/spilTekst.ts:9794:9853:string:vc655k	src/lib/spilTekst.ts	string	string @ 154:41	A heavy weapon that unlocks special choices in some events.
-src/lib/spilTekst.ts:9883:9892:string:1h7pvz6	src/lib/spilTekst.ts	string	string @ 155:26	Storm Axe
-src/lib/spilTekst.ts:9909:10033:string:4ql9nh	src/lib/spilTekst.ts	string	string @ 155:52	Unlocks the same choices as an ordinary axe, but clears obstacles in one blow and therefore gives more gold and less damage.
-src/lib/spilTekst.ts:10059:10063:string:1ttc23x	src/lib/spilTekst.ts	string	string @ 156:22	Club
-src/lib/spilTekst.ts:10080:10166:string:1fr87vq	src/lib/spilTekst.ts	string	string @ 156:43	Can smash markets and ordinary town tiles into ruins. It costs a lot of energy and HP.
-src/lib/spilTekst.ts:10197:10208:string:qqjuov	src/lib/spilTekst.ts	string	string @ 157:27	Wallbreaker
-src/lib/spilTekst.ts:10225:10317:string:tyggx4	src/lib/spilTekst.ts	string	string @ 157:55	Can also smash workshops and empty the tile cash box. It still costs a lot of energy and HP.
-src/lib/spilTekst.ts:10343:10348:string:1kw9i5y	src/lib/spilTekst.ts	string	string @ 158:22	Sword
-src/lib/spilTekst.ts:10365:10431:string:czi96o	src/lib/spilTekst.ts	string	string @ 158:44	A versatile weapon that unlocks special choices in several events.
-src/lib/spilTekst.ts:10456:10461:string:1a6nm2s	src/lib/spilTekst.ts	string	string @ 159:21	Sabre
-src/lib/spilTekst.ts:10478:10537:string:1b3cdt3	src/lib/spilTekst.ts	string	string @ 159:43	A light weapon that unlocks special choices in some events.
-src/lib/spilTekst.ts:10562:10568:string:1evtaty	src/lib/spilTekst.ts	string	string @ 160:21	Shovel
-src/lib/spilTekst.ts:10585:10678:string:1r6kzlt	src/lib/spilTekst.ts	string	string @ 160:44	Lets you dig for gold and healing roots. Digging with your hands costs more and can hurt you.
-src/lib/spilTekst.ts:10709:10722:string:wkf6sa	src/lib/spilTekst.ts	string	string @ 161:27	Master Shovel
-src/lib/spilTekst.ts:10739:10811:string:1ksb749	src/lib/spilTekst.ts	string	string @ 161:57	Gives twice as much gold when digging and does not trigger buried traps.
-src/lib/spilTekst.ts:10844:10852:string:sm7czz	src/lib/spilTekst.ts	string	string @ 162:29	Detector
-src/lib/spilTekst.ts:10869:10976:string:zpu0ue	src/lib/spilTekst.ts	string	string @ 162:54	Shows hidden gold on known tiles up to 3 tiles away. Entering a crystal tile shorts it out and destroys it.
-src/lib/spilTekst.ts:11005:11015:string:vzj1gh	src/lib/spilTekst.ts	string	string @ 163:25	Ore Finder
-src/lib/spilTekst.ts:11032:11230:string:n3g5s9	src/lib/spilTekst.ts	string	string @ 163:52	Shows hidden gold on known tiles up to 3 tiles away and gold mines through mountains up to 2 tiles away. You also gain 25% more hidden gold when digging. On crystal, it becomes an ordinary detector.
-src/lib/spilTekst.ts:11260:11271:string:k7xo4n	src/lib/spilTekst.ts	string	string @ 164:26	Dowsing Rod
-src/lib/spilTekst.ts:11288:11364:string:1qh3o90	src/lib/spilTekst.ts	string	string @ 164:54	Shows healing roots on known tiles up to 3 tiles away. Lost on ritual tiles.
-src/lib/spilTekst.ts:11393:11401:string:4yw7d8	src/lib/spilTekst.ts	string	string @ 165:25	Rune Rod
-src/lib/spilTekst.ts:11418:11659:string:lfnp3b	src/lib/spilTekst.ts	string	string @ 165:50	Shows healing roots up to 3 tiles away. If you are missing HP, it automatically pulls up a hidden root when you enter the tile. This costs 1 energy and empties the tile without digging it. On ritual tiles, it becomes an ordinary dowsing rod.
-src/lib/spilTekst.ts:11690:11701:string:13q7avm	src/lib/spilTekst.ts	string	string @ 166:27	Life Elixir
-src/lib/spilTekst.ts:11718:11796:string:dxp8vd	src/lib/spilTekst.ts	string	string @ 166:55	Used automatically when you take lethal damage and saves you with up to 90 HP.
-src/lib/spilTekst.ts:11822:11827:string:nz6l6p	src/lib/spilTekst.ts	string	string @ 167:22	Torch
-src/lib/spilTekst.ts:11844:11996:string:1v5hotp	src/lib/spilTekst.ts	string	string @ 167:44	Extends your sight by 1. You can use it to light a large fire that everyone can see. The fire gives you full HP and 50 gold. The torch is lost in water.
-src/lib/spilTekst.ts:12025:12034:string:fjcx5j	src/lib/spilTekst.ts	string	string @ 168:25	Sun Torch
-src/lib/spilTekst.ts:12051:12204:string:1nl7s0	src/lib/spilTekst.ts	string	string @ 168:51	Extends your sight by 2. You can use it to light a sunfire that reveals a larger area and gives you full HP and 100 gold. The sun torch is lost in water.
-src/lib/spilTekst.ts:12232:12244:string:1n2ip1i	src/lib/spilTekst.ts	string	string @ 169:24	Sleeping Bag
-src/lib/spilTekst.ts:12261:12388:string:wxbzho	src/lib/spilTekst.ts	string	string @ 169:53	Lets you make camp in the wild and gain 20 HP. This uses the rest of your energy. Damp caves ruin the sleeping bag immediately.
-src/lib/spilTekst.ts:12421:12438:string:zmnj23	src/lib/spilTekst.ts	string	string @ 170:29	Silk Sleeping Bag
-src/lib/spilTekst.ts:12455:12585:string:f92val	src/lib/spilTekst.ts	string	string @ 170:63	Lets you make camp in the wild and gain 40 HP. In a damp cave, it becomes an ordinary sleeping bag instead of being lost entirely.
-src/lib/spilTekst.ts:12608:12619:string:18rbo0g	src/lib/spilTekst.ts	string	string @ 171:19	Food Ration
-src/lib/spilTekst.ts:12636:12706:string:1kgnsep	src/lib/spilTekst.ts	string	string @ 171:47	Gives +20 HP, and your next move costs 0 energy. Can be lost in ruins.
-src/lib/spilTekst.ts:12737:12752:string:1vaewam	src/lib/spilTekst.ts	string	string @ 172:27	Golden Spyglass
-src/lib/spilTekst.ts:12769:12804:string:zosy7m	src/lib/spilTekst.ts	string	string @ 172:59	Breaks if you enter a crystal tile.
-src/lib/spilTekst.ts:12834:12849:string:1vaewam	src/lib/spilTekst.ts	string	string @ 173:26	Golden Spyglass
-src/lib/spilTekst.ts:12866:12901:string:zosy7m	src/lib/spilTekst.ts	string	string @ 173:58	Breaks if you enter a crystal tile.
-src/lib/spilTekst.ts:12928:12935:string:1pyyslj	src/lib/spilTekst.ts	string	string @ 174:23	Diamond
-src/lib/spilTekst.ts:12952:13013:string:yxxj5f	src/lib/spilTekst.ts	string	string @ 174:47	A rare gem worth 250-600 gold. Its value depends on its size.
-src/lib/spilTekst.ts:13051:13067:string:kucwxg	src/lib/spilTekst.ts	string	string @ 175:34	Golden Distiller
-src/lib/spilTekst.ts:13084:13193:string:3w0uom	src/lib/spilTekst.ts	string	string @ 175:67	A relic that doubles all gold you dig up. With the master shovel, the gold is tripled rather than quadrupled.
-src/lib/spilTekst.ts:13223:13233:string:10o60c5	src/lib/spilTekst.ts	string	string @ 176:26	Root Heart
-src/lib/spilTekst.ts:13250:13349:string:sa3yta	src/lib/spilTekst.ts	string	string @ 176:53	A relic that doubles all healing from roots, both when digging and when the Rune Rod pulls them up.
-src/lib/spilTekst.ts:13380:13392:string:pkydle	src/lib/spilTekst.ts	string	string @ 177:27	Treasure Map
-src/lib/spilTekst.ts:13409:13485:string:1y7ri4n	src/lib/spilTekst.ts	string	string @ 177:56	Points toward an area with buried treasure. Some islands hide more than one.
-src/lib/spilTekst.ts:13545:13551:string:pvj3gy	src/lib/spilTekst.ts	string	string @ 181:6	Væbner
-src/lib/spilTekst.ts:13555:13561:string:w58vb2	src/lib/spilTekst.ts	string	string @ 181:16	Squire
-src/lib/spilTekst.ts:13580:13592:string:spfymz	src/lib/spilTekst.ts	string	string @ 182:17	Foot Soldier
-src/lib/spilTekst.ts:13611:13620:string:z9wxy3	src/lib/spilTekst.ts	string	string @ 183:17	Mercenary
-src/lib/spilTekst.ts:13643:13660:string:vtq7pq	src/lib/spilTekst.ts	string	string @ 184:21	Company Commander
-src/lib/spilTekst.ts:13677:13684:string:1208ih7	src/lib/spilTekst.ts	string	string @ 185:15	Captain
-src/lib/spilTekst.ts:13704:13716:string:w4ztlx	src/lib/spilTekst.ts	string	string @ 186:18	Lance Bearer
-src/lib/spilTekst.ts:13732:13738:string:1kwlcgs	src/lib/spilTekst.ts	string	string @ 187:14	Knight
-src/lib/spilTekst.ts:13759:13772:string:qaqo5k	src/lib/spilTekst.ts	string	string @ 188:19	Banner Bearer
-src/lib/spilTekst.ts:13790:13799:string:qkms9x	src/lib/spilTekst.ts	string	string @ 189:16	Commander
-src/lib/spilTekst.ts:13818:13828:string:mwahr9	src/lib/spilTekst.ts	string	string @ 190:17	War Master
-src/lib/spilTekst.ts:13848:13855:string:ebf0be	src/lib/spilTekst.ts	string	string @ 191:18	Warlord
-src/lib/spilTekst.ts:13872:13879:string:sjn18c	src/lib/spilTekst.ts	string	string @ 192:15	Paladin
-src/lib/spilTekst.ts:13894:13898:string:i0u8dy	src/lib/spilTekst.ts	string	string @ 193:13	King
-src/lib/spilTekst.ts:13916:13924:string:i5nqpd	src/lib/spilTekst.ts	string	string @ 194:16	Aspirant
-src/lib/spilTekst.ts:13941:13951:string:173jh96	src/lib/spilTekst.ts	string	string @ 195:15	Apprentice
-src/lib/spilTekst.ts:13967:13973:string:1g8lpq3	src/lib/spilTekst.ts	string	string @ 196:14	Novice
-src/lib/spilTekst.ts:13989:13996:string:1pvjc6a	src/lib/spilTekst.ts	string	string @ 197:14	Acolyte
-src/lib/spilTekst.ts:14017:14028:string:b4bw8y	src/lib/spilTekst.ts	string	string @ 198:19	Illusionist
-src/lib/spilTekst.ts:14050:14062:string:1c17whq	src/lib/spilTekst.ts	string	string @ 199:20	Elementalist
-src/lib/spilTekst.ts:14081:14089:string:x7wfbr	src/lib/spilTekst.ts	string	string @ 200:17	Conjurer
-src/lib/spilTekst.ts:14107:14115:string:x7q1u7	src/lib/spilTekst.ts	string	string @ 201:16	Magister
-src/lib/spilTekst.ts:14136:14144:string:nhpbjj	src/lib/spilTekst.ts	string	string @ 202:19	Archmage
-src/lib/spilTekst.ts:14164:14174:string:1a7tr0b	src/lib/spilTekst.ts	string	string @ 203:18	Runemaster
-src/lib/spilTekst.ts:14195:14205:string:1q6wnz5	src/lib/spilTekst.ts	string	string @ 204:19	Grand Mage
-src/lib/spilTekst.ts:14222:14229:string:mp8jey	src/lib/spilTekst.ts	string	string @ 205:15	Demigod
-src/lib/spilTekst.ts:14247:14257:string:1rwhopm	src/lib/spilTekst.ts	string	string @ 206:16	Pickpocket
-src/lib/spilTekst.ts:14272:14278:string:cv8ykl	src/lib/spilTekst.ts	string	string @ 207:13	Robber
-src/lib/spilTekst.ts:14299:14306:string:gk0cle	src/lib/spilTekst.ts	string	string @ 208:19	Burglar
-src/lib/spilTekst.ts:14326:14334:string:ja9dz8	src/lib/spilTekst.ts	string	string @ 209:18	Assassin
-src/lib/spilTekst.ts:14355:14366:string:10q0ncr	src/lib/spilTekst.ts	string	string @ 210:19	Nightwalker
-src/lib/spilTekst.ts:14382:14388:string:10appq9	src/lib/spilTekst.ts	string	string @ 211:14	Shadow
-src/lib/spilTekst.ts:14409:14417:string:1qoesqr	src/lib/spilTekst.ts	string	string @ 212:19	Swindler
-src/lib/spilTekst.ts:14437:14448:string:15zcacb	src/lib/spilTekst.ts	string	string @ 213:18	Gang Leader
-src/lib/spilTekst.ts:14470:14484:string:mtdqr2	src/lib/spilTekst.ts	string	string @ 214:20	Syndicate Boss
-src/lib/spilTekst.ts:14507:14523:string:s20oma	src/lib/spilTekst.ts	string	string @ 215:21	Syndicate Leader
-src/lib/spilTekst.ts:14539:14546:string:ncjwsi	src/lib/spilTekst.ts	string	string @ 216:14	Phantom
-src/lib/spilTekst.ts:14567:14578:string:14ej7ds	src/lib/spilTekst.ts	string	string @ 217:19	Shadow King
-src/lib/spilTekst.ts:14597:14609:string:1lag3vr	src/lib/spilTekst.ts	string	string @ 218:17	Master Thief
-src/lib/spilTekst.ts:14628:14633:string:16nxxn2	src/lib/spilTekst.ts	string	string @ 219:17	Stray
-src/lib/spilTekst.ts:14651:14661:string:b7pe79	src/lib/spilTekst.ts	string	string @ 220:16	Forerunner
-src/lib/spilTekst.ts:14678:14683:string:t3jzj9	src/lib/spilTekst.ts	string	string @ 221:15	Scout
-src/lib/spilTekst.ts:14702:14712:string:1anrzbe	src/lib/spilTekst.ts	string	string @ 222:17	Pathfinder
-src/lib/spilTekst.ts:14732:14744:string:2gxqer	src/lib/spilTekst.ts	string	string @ 223:18	Cartographer
-src/lib/spilTekst.ts:14761:14769:string:svgfab	src/lib/spilTekst.ts	string	string @ 224:15	Wanderer
-src/lib/spilTekst.ts:14789:14800:string:16b8a5p	src/lib/spilTekst.ts	string	string @ 225:18	Trailblazer
-src/lib/spilTekst.ts:14816:14823:string:1ydymm5	src/lib/spilTekst.ts	string	string @ 226:14	Pioneer
-src/lib/spilTekst.ts:14851:14863:string:ehq9p9	src/lib/spilTekst.ts	string	string @ 227:26	Expeditioner
-src/lib/spilTekst.ts:14890:14907:string:4445vn	src/lib/spilTekst.ts	string	string @ 228:25	Expedition Leader
-src/lib/spilTekst.ts:14924:14937:string:1geagz0	src/lib/spilTekst.ts	string	string @ 229:15	Island Expert
-src/lib/spilTekst.ts:14954:14963:string:14esd1j	src/lib/spilTekst.ts	string	string @ 230:15	Conqueror
-src/lib/spilTekst.ts:14980:14986:string:k0ttac	src/lib/spilTekst.ts	string	string @ 231:15	Legend
-src/lib/spilTekst.ts:15000:15006:string:b09jk0	src/lib/spilTekst.ts	string	string @ 232:12	Thrall
-src/lib/spilTekst.ts:15029:15043:string:wwurka	src/lib/spilTekst.ts	string	string @ 233:21	Longship Rower
-src/lib/spilTekst.ts:15061:15070:string:bbyciz	src/lib/spilTekst.ts	string	string @ 234:16	Boatswain
-src/lib/spilTekst.ts:15088:15094:string:1we5qoa	src/lib/spilTekst.ts	string	string @ 235:16	Raider
-src/lib/spilTekst.ts:15113:15123:string:16cwdvg	src/lib/spilTekst.ts	string	string @ 236:17	Axe Bearer
-src/lib/spilTekst.ts:15140:15149:string:4tiezi	src/lib/spilTekst.ts	string	string @ 237:15	Berserker
-src/lib/spilTekst.ts:15171:15184:string:1r8bgmc	src/lib/spilTekst.ts	string	string @ 238:20	Shieldbreaker
-src/lib/spilTekst.ts:15201:15210:string:o4ujqi	src/lib/spilTekst.ts	string	string @ 239:15	Chieftain
-src/lib/spilTekst.ts:15224:15228:string:14iquwq	src/lib/spilTekst.ts	string	string @ 240:12	Jarl
-src/lib/spilTekst.ts:15245:15253:string:rm9lwj	src/lib/spilTekst.ts	string	string @ 241:15	Sea King
-src/lib/spilTekst.ts:15272:15281:string:ovzqzb	src/lib/spilTekst.ts	string	string @ 242:17	Einherjar
-src/lib/spilTekst.ts:15297:15301:string:1f8l43x	src/lib/spilTekst.ts	string	string @ 243:14	Heir
-src/lib/spilTekst.ts:15318:15329:string:1az15u0	src/lib/spilTekst.ts	string	string @ 244:15	Court Snake
-src/lib/spilTekst.ts:15346:15354:string:19wbzao	src/lib/spilTekst.ts	string	string @ 245:15	Courtier
-src/lib/spilTekst.ts:15369:15374:string:qmbpwz	src/lib/spilTekst.ts	string	string @ 246:13	Baron
-src/lib/spilTekst.ts:15389:15394:string:1qoi4r8	src/lib/spilTekst.ts	string	string @ 247:13	Count
-src/lib/spilTekst.ts:15410:15418:string:1itoz4q	src/lib/spilTekst.ts	string	string @ 248:14	Marquess
-src/lib/spilTekst.ts:15437:15447:string:txn7pg	src/lib/spilTekst.ts	string	string @ 249:17	Liege Lord
-src/lib/spilTekst.ts:15463:15467:string:mxbgze	src/lib/spilTekst.ts	string	string @ 250:14	Duke
-src/lib/spilTekst.ts:15487:15499:string:gfnog6	src/lib/spilTekst.ts	string	string @ 251:18	Grand Prince
-src/lib/spilTekst.ts:15518:15530:string:x77wk1	src/lib/spilTekst.ts	string	string @ 252:17	Crown Prince
-src/lib/spilTekst.ts:15555:15563:string:157b95e	src/lib/spilTekst.ts	string	string @ 253:23	Autocrat
-src/lib/spilTekst.ts:15579:15585:string:jde6a2	src/lib/spilTekst.ts	string	string @ 254:14	Regent
-src/lib/spilTekst.ts:15601:15608:string:ejooqz	src/lib/spilTekst.ts	string	string @ 255:14	Emperor
-src/lib/spilTekst.ts:15628:15635:string:39095r	src/lib/spilTekst.ts	string	string @ 256:18	Poacher
-src/lib/spilTekst.ts:15653:15660:string:qerppn	src/lib/spilTekst.ts	string	string @ 257:16	Tracker
-src/lib/spilTekst.ts:15675:15682:string:17m6dmd	src/lib/spilTekst.ts	string	string @ 258:13	Skinner
-src/lib/spilTekst.ts:15701:15708:string:w0enj5	src/lib/spilTekst.ts	string	string @ 259:17	Trapper
-src/lib/spilTekst.ts:15731:15741:string:gdwx0b	src/lib/spilTekst.ts	string	string @ 260:21	Longbowman
-src/lib/spilTekst.ts:15760:15766:string:1a4zi5e	src/lib/spilTekst.ts	string	string @ 261:17	Archer
-src/lib/spilTekst.ts:15787:15799:string:1prtfl7	src/lib/spilTekst.ts	string	string @ 262:19	Game Tracker
-src/lib/spilTekst.ts:15814:15820:string:egc1w3	src/lib/spilTekst.ts	string	string @ 263:13	Hunter
-src/lib/spilTekst.ts:15841:15849:string:ygiyhn	src/lib/spilTekst.ts	string	string @ 264:19	Marksman
-src/lib/spilTekst.ts:15867:15877:string:1qdurxp	src/lib/spilTekst.ts	string	string @ 265:16	Falcon Eye
-src/lib/spilTekst.ts:15901:15912:string:330l9p	src/lib/spilTekst.ts	string	string @ 266:22	Beast Tamer
-src/lib/spilTekst.ts:15936:15951:string:gh2ct5	src/lib/spilTekst.ts	string	string @ 267:22	Big Game Hunter
-src/lib/spilTekst.ts:15970:15983:string:4415yy	src/lib/spilTekst.ts	string	string @ 268:17	Forest Runner
-src/lib/spilTekst.ts:16003:16013:string:nnj776	src/lib/spilTekst.ts	string	string @ 269:18	Huntmaster
-src/lib/spilTekst.ts:16032:16040:string:95gluh	src/lib/spilTekst.ts	string	string @ 270:17	Deckhand
-src/lib/spilTekst.ts:16056:16062:string:dgisix	src/lib/spilTekst.ts	string	string @ 271:14	Sailor
-src/lib/spilTekst.ts:16079:16088:string:m4xfjs	src/lib/spilTekst.ts	string	string @ 272:15	Cannoneer
-src/lib/spilTekst.ts:16104:16110:string:ao83wq	src/lib/spilTekst.ts	string	string @ 273:14	Gunner
-src/lib/spilTekst.ts:16128:16136:string:15plesi	src/lib/spilTekst.ts	string	string @ 274:16	Helmsman
-src/lib/spilTekst.ts:16154:16164:string:1cz0wfy	src/lib/spilTekst.ts	string	string @ 275:16	First Mate
-src/lib/spilTekst.ts:16184:16194:string:1kbu8sl	src/lib/spilTekst.ts	string	string @ 276:18	Shipmaster
-src/lib/spilTekst.ts:16213:16222:string:60qf6j	src/lib/spilTekst.ts	string	string @ 277:17	Privateer
-src/lib/spilTekst.ts:16238:16245:string:gtj0o0	src/lib/spilTekst.ts	string	string @ 278:14	Corsair
-src/lib/spilTekst.ts:16265:16276:string:ikxzfz	src/lib/spilTekst.ts	string	string @ 279:18	Pirate King
-src/lib/spilTekst.ts:16298:16312:string:cz8xis	src/lib/spilTekst.ts	string	string @ 280:20	Pirate Captain
-src/lib/spilTekst.ts:16320:16334:string:cvafa0	src/lib/spilTekst.ts	string	string @ 281:6	Havets Hersker
-src/lib/spilTekst.ts:16338:16354:string:zypyp8	src/lib/spilTekst.ts	string	string @ 281:24	Ruler of the Sea
-src/lib/spilTekst.ts:16373:16382:string:1dp9yjc	src/lib/spilTekst.ts	string	string @ 282:17	Sea Ruler
-src/lib/spilTekst.ts:16401:16411:string:g2sn59	src/lib/spilTekst.ts	string	string @ 283:17	Dust Biter
-src/lib/spilTekst.ts:16431:16444:string:1nx1pwe	src/lib/spilTekst.ts	string	string @ 284:18	Stone Crusher
-src/lib/spilTekst.ts:16464:16474:string:13lr1qu	src/lib/spilTekst.ts	string	string @ 285:18	Mine Brute
-src/lib/spilTekst.ts:16496:16508:string:1cz94m0	src/lib/spilTekst.ts	string	string @ 286:20	Rock Breaker
-src/lib/spilTekst.ts:16530:16541:string:ik5tb2	src/lib/spilTekst.ts	string	string @ 287:20	Smeltmaster
-src/lib/spilTekst.ts:16562:16573:string:srwelm	src/lib/spilTekst.ts	string	string @ 288:19	Tunnel Lord
-src/lib/spilTekst.ts:16595:16608:string:hw4r37	src/lib/spilTekst.ts	string	string @ 289:20	Tunnel Master
-src/lib/spilTekst.ts:16627:16636:string:1scl3cv	src/lib/spilTekst.ts	string	string @ 290:17	Ore Baron
-src/lib/spilTekst.ts:16655:16664:string:1sghkdi	src/lib/spilTekst.ts	string	string @ 291:17	Gold Lord
-src/lib/spilTekst.ts:16684:16697:string:vfxtj5	src/lib/spilTekst.ts	string	string @ 292:18	Mountain King
-src/lib/spilTekst.ts:16705:16720:string:14cvjy6	src/lib/spilTekst.ts	string	string @ 293:6	Dybdens Hersker
-src/lib/spilTekst.ts:16724:16741:string:1e2ssb3	src/lib/spilTekst.ts	string	string @ 293:25	Ruler of the Deep
-src/lib/spilTekst.ts:16762:16780:string:dlv2mn	src/lib/spilTekst.ts	string	string @ 294:19	Master of the Deep
-src/lib/spilTekst.ts:16794:16799:string:yqxjui	src/lib/spilTekst.ts	string	string @ 295:12	Creep
-src/lib/spilTekst.ts:16814:16824:string:13l3c8j	src/lib/spilTekst.ts	string	string @ 296:13	Ragged One
-src/lib/spilTekst.ts:16846:16855:string:1q9uizh	src/lib/spilTekst.ts	string	string @ 297:20	Greenhorn
-src/lib/spilTekst.ts:16875:16882:string:1b6gwma	src/lib/spilTekst.ts	string	string @ 298:18	Fighter
-src/lib/spilTekst.ts:16898:16905:string:ed399l	src/lib/spilTekst.ts	string	string @ 299:14	Warrior
-src/lib/spilTekst.ts:16926:16939:string:yqg0ow	src/lib/spilTekst.ts	string	string @ 300:19	Bloodthirster
-src/lib/spilTekst.ts:16959:16968:string:1djn0t6	src/lib/spilTekst.ts	string	string @ 301:18	War Crier
-src/lib/spilTekst.ts:16987:16998:string:li41g2	src/lib/spilTekst.ts	string	string @ 302:17	Clan Leader
-src/lib/spilTekst.ts:17017:17026:string:1ot97ec	src/lib/spilTekst.ts	string	string @ 303:17	Clan Lord
-src/lib/spilTekst.ts:17045:17055:string:56h522	src/lib/spilTekst.ts	string	string @ 304:17	Blood Lord
-src/lib/spilTekst.ts:17074:17083:string:32gueu	src/lib/spilTekst.ts	string	string @ 305:17	Destroyer
-src/lib/spilTekst.ts:17096:17100:string:1isnb7l	src/lib/spilTekst.ts	string	string @ 306:11	Fool
-src/lib/spilTekst.ts:17116:17122:string:nxuin8	src/lib/spilTekst.ts	string	string @ 307:14	Jester
-src/lib/spilTekst.ts:17145:17154:string:96se8g	src/lib/spilTekst.ts	string	string @ 308:21	Trickster
-src/lib/spilTekst.ts:17171:17178:string:1gl7b29	src/lib/spilTekst.ts	string	string @ 309:15	Juggler
-src/lib/spilTekst.ts:17199:17208:string:2e4z25	src/lib/spilTekst.ts	string	string @ 310:19	Prankster
-src/lib/spilTekst.ts:17228:17237:string:1t3dps3	src/lib/spilTekst.ts	string	string @ 311:18	Maskmaker
-src/lib/spilTekst.ts:17257:17271:string:4d3rzk	src/lib/spilTekst.ts	string	string @ 312:18	Fortune Hunter
-src/lib/spilTekst.ts:17286:17291:string:1940754	src/lib/spilTekst.ts	string	string @ 313:13	Demon
-src/lib/spilTekst.ts:17311:17322:string:bifnwr	src/lib/spilTekst.ts	string	string @ 314:18	Provocateur
-src/lib/spilTekst.ts:17342:17354:string:1b2d9e8	src/lib/spilTekst.ts	string	string @ 315:18	Chaos Prince
-src/lib/spilTekst.ts:17373:17384:string:rnkhgf	src/lib/spilTekst.ts	string	string @ 316:17	Chaos Maker
-src/lib/spilTekst.ts:17407:17419:string:hlcjd9	src/lib/spilTekst.ts	string	string @ 317:21	Fate Gambler
-src/lib/spilTekst.ts:17440:17449:string:1omgeyh	src/lib/spilTekst.ts	string	string @ 318:19	Fatemaker
-src/lib/spilTekst.ts:17717:17724:string:17v9s5z	src/lib/spilTekst.ts	string	string @ 324:40	Lærling
-src/lib/spilTekst.ts:17771:17781:string:173jh96	src/lib/spilTekst.ts	string	string @ 324:94	Apprentice
-src/lib/spilTekst.ts:17903:17909:string:1itwhp2	src/lib/spilTekst.ts	string	string @ 327:35	Ukendt
-src/lib/spilTekst.ts:17972:17979:string:1kmy72x	src/lib/spilTekst.ts	string	string @ 327:104	Unknown
-src/lib/spilTekst.ts:18534:18538:string:j42c9f	src/lib/spilTekst.ts	string	string @ 340:103	Alle
-src/lib/spilTekst.ts:18542:18545:string:wnjk2s	src/lib/spilTekst.ts	string	string @ 340:111	All
-src/lib/spilTekst.ts:18626:18641:string:ythygg	src/lib/spilTekst.ts	string	string @ 344:28	Ukendt genstand
-src/lib/spilTekst.ts:18645:18657:string:1sfxuxo	src/lib/spilTekst.ts	string	string @ 344:47	Unknown item
-src/lib/spilTekst.ts:18836:18858:string:106fi0p	src/lib/spilTekst.ts	string	string @ 349:28	Genstand i din rygsæk.
-src/lib/spilTekst.ts:18862:18884:string:1h8fpc4	src/lib/spilTekst.ts	string	string @ 349:54	Item in your backpack.
-src/lib/spilTekst.ts:18933:18955:string:106fi0p	src/lib/spilTekst.ts	string	string @ 350:46	Genstand i din rygsæk.
-src/lib/spilTekst.ts:19018:19040:string:1h8fpc4	src/lib/spilTekst.ts	string	string @ 350:131	Item in your backpack.
-src/lib/spilTekst.ts:19127:19144:string:19eiieo	src/lib/spilTekst.ts	string	string @ 354:30	Ingen titel endnu
-src/lib/spilTekst.ts:19161:19178:string:19eiieo	src/lib/spilTekst.ts	string	string @ 354:64	Ingen titel endnu
-src/lib/spilTekst.ts:19182:19194:string:1d7r5c2	src/lib/spilTekst.ts	string	string @ 354:85	No title yet
+src/lib/spilTekst.ts:3395:3498:string:11zzu7j	src/lib/spilTekst.ts	string	string @ 61:18	You have only 6 energy, take 10% more damage and start without a weapon. Digging costs a full 9 energy.
+src/lib/spilTekst.ts:3537:3542:string:1ecfm95	src/lib/spilTekst.ts	string	string @ 64:16	Queen
+src/lib/spilTekst.ts:3562:3678:string:t0uyc6	src/lib/spilTekst.ts	string	string @ 65:18	Nobility: You gain 20% more gold, can pressure merchants on price and collect tax from other players in multiplayer.
+src/lib/spilTekst.ts:3698:3801:string:11zzu7j	src/lib/spilTekst.ts	string	string @ 66:18	You have only 6 energy, take 10% more damage and start without a weapon. Digging costs a full 9 energy.
+src/lib/spilTekst.ts:3841:3847:string:egc1w3	src/lib/spilTekst.ts	string	string @ 69:16	Hunter
+src/lib/spilTekst.ts:3867:3974:string:nm0j1h	src/lib/spilTekst.ts	string	string @ 70:18	Scouts: You can see farther than most. In multiplayer, you can track a player on the same tile for 20 days.
+src/lib/spilTekst.ts:3994:4076:string:617fbq	src/lib/spilTekst.ts	string	string @ 71:18	You start with 90 HP and 20 gold and take 10% more damage. Digging costs 5 energy.
+src/lib/spilTekst.ts:4116:4122:string:1a4zi5e	src/lib/spilTekst.ts	string	string @ 74:16	Archer
+src/lib/spilTekst.ts:4142:4249:string:nm0j1h	src/lib/spilTekst.ts	string	string @ 75:18	Scouts: You can see farther than most. In multiplayer, you can track a player on the same tile for 20 days.
+src/lib/spilTekst.ts:4269:4351:string:617fbq	src/lib/spilTekst.ts	string	string @ 76:18	You start with 90 HP and 20 gold and take 10% more damage. Digging costs 5 energy.
+src/lib/spilTekst.ts:4391:4398:string:1208ih7	src/lib/spilTekst.ts	string	string @ 79:16	Captain
+src/lib/spilTekst.ts:4418:4537:string:5dyiri	src/lib/spilTekst.ts	string	string @ 80:18	Sea Raiders: You gain 20% more gold and start with a treasure map. In multiplayer, your sabre can rob selected classes.
+src/lib/spilTekst.ts:4557:4649:string:1wj820g	src/lib/spilTekst.ts	string	string @ 81:18	You start without a sleeping bag and can see only 1 tile. Find or buy healing along the way.
+src/lib/spilTekst.ts:4689:4696:string:gtj0o0	src/lib/spilTekst.ts	string	string @ 84:16	Corsair
+src/lib/spilTekst.ts:4716:4835:string:5dyiri	src/lib/spilTekst.ts	string	string @ 85:18	Sea Raiders: You gain 20% more gold and start with a treasure map. In multiplayer, your sabre can rob selected classes.
+src/lib/spilTekst.ts:4855:4947:string:1wj820g	src/lib/spilTekst.ts	string	string @ 86:18	You start without a sleeping bag and can see only 1 tile. Find or buy healing along the way.
+src/lib/spilTekst.ts:4986:4991:string:i0fayj	src/lib/spilTekst.ts	string	string @ 89:16	Dwarf
+src/lib/spilTekst.ts:5011:5123:string:1lsxswm	src/lib/spilTekst.ts	string	string @ 90:18	Mountainfolk: You dig for only 2 energy, gain 10% more gold and move easily through mountains and crystal tiles.
+src/lib/spilTekst.ts:5143:5235:string:1yzf0w1	src/lib/spilTekst.ts	string	string @ 91:18	Each normal step costs 1.5 energy. You can see only 1 tile and start without a sleeping bag.
+src/lib/spilTekst.ts:5274:5280:string:9tgkr7	src/lib/spilTekst.ts	string	string @ 94:16	Digger
+src/lib/spilTekst.ts:5300:5412:string:1lsxswm	src/lib/spilTekst.ts	string	string @ 95:18	Mountainfolk: You dig for only 2 energy, gain 10% more gold and move easily through mountains and crystal tiles.
+src/lib/spilTekst.ts:5432:5524:string:1yzf0w1	src/lib/spilTekst.ts	string	string @ 96:18	Each normal step costs 1.5 energy. You can see only 1 tile and start without a sleeping bag.
+src/lib/spilTekst.ts:5561:5564:string:qjy9x	src/lib/spilTekst.ts	string	string @ 99:16	Orc
+src/lib/spilTekst.ts:5584:5667:string:16lle3k	src/lib/spilTekst.ts	string	string @ 100:18	Clansfolk: You take 20% less damage and can smash towns and markets with your club.
+src/lib/spilTekst.ts:5687:5793:string:n8m2rw	src/lib/spilTekst.ts	string	string @ 101:18	You start without gold, clothes or a sleeping bag and gain 20% less from all gold. Digging costs 5 energy.
+src/lib/spilTekst.ts:5830:5837:string:ed399l	src/lib/spilTekst.ts	string	string @ 104:16	Warrior
+src/lib/spilTekst.ts:5857:5940:string:16lle3k	src/lib/spilTekst.ts	string	string @ 105:18	Clansfolk: You take 20% less damage and can smash towns and markets with your club.
+src/lib/spilTekst.ts:5960:6066:string:n8m2rw	src/lib/spilTekst.ts	string	string @ 106:18	You start without gold, clothes or a sleeping bag and gain 20% less from all gold. Digging costs 5 energy.
+src/lib/spilTekst.ts:6105:6110:string:175i9a4	src/lib/spilTekst.ts	string	string @ 109:16	Joker
+src/lib/spilTekst.ts:6130:6255:string:godc20	src/lib/spilTekst.ts	string	string @ 110:18	Wildcards: You can see farther, gain 50% more gold and bluff through event choices that require items or specific characters.
+src/lib/spilTekst.ts:6275:6403:string:18wjb6i	src/lib/spilTekst.ts	string	string @ 111:18	You start with 50 HP and 1 gold, without clothes or a sleeping bag, and take double damage. Almost any mistake can be your last.
+src/lib/spilTekst.ts:6442:6451:string:odp6sa	src/lib/spilTekst.ts	string	string @ 114:16	Harlequin
+src/lib/spilTekst.ts:6471:6596:string:godc20	src/lib/spilTekst.ts	string	string @ 115:18	Wildcards: You can see farther, gain 50% more gold and bluff through event choices that require items or specific characters.
+src/lib/spilTekst.ts:6616:6744:string:18wjb6i	src/lib/spilTekst.ts	string	string @ 116:18	You start with 50 HP and 1 gold, without clothes or a sleeping bag, and take double damage. Almost any mistake can be your last.
+src/lib/spilTekst.ts:6793:6803:string:173jh96	src/lib/spilTekst.ts	string	string @ 119:16	Apprentice
+src/lib/spilTekst.ts:6823:6901:string:73a3iy	src/lib/spilTekst.ts	string	string @ 120:18	You can see far, dig cheaply and start with a shovel, food and a sleeping bag.
+src/lib/spilTekst.ts:6921:7002:string:1xxtzwo	src/lib/spilTekst.ts	string	string @ 121:18	The Apprentice is used only in the tutorial and does not count toward your score.
+src/lib/spilTekst.ts:7075:7084:string:1j0qumk	src/lib/spilTekst.ts	string	string @ 126:14	The Order
+src/lib/spilTekst.ts:7102:7107:string:1hmee28	src/lib/spilTekst.ts	string	string @ 127:16	Mages
+src/lib/spilTekst.ts:7122:7129:string:125jhe2	src/lib/spilTekst.ts	string	string @ 128:13	Outlaws
+src/lib/spilTekst.ts:7147:7156:string:qixc63	src/lib/spilTekst.ts	string	string @ 129:16	Explorers
+src/lib/spilTekst.ts:7172:7181:string:18b5omi	src/lib/spilTekst.ts	string	string @ 130:14	Northfolk
+src/lib/spilTekst.ts:7196:7204:string:pxzwj	src/lib/spilTekst.ts	string	string @ 131:13	Nobility
+src/lib/spilTekst.ts:7220:7226:string:1u2r9pe	src/lib/spilTekst.ts	string	string @ 132:14	Scouts
+src/lib/spilTekst.ts:7242:7253:string:ujpt3c	src/lib/spilTekst.ts	string	string @ 133:14	Sea Raiders
+src/lib/spilTekst.ts:7268:7280:string:1x5rak	src/lib/spilTekst.ts	string	string @ 134:13	Mountainfolk
+src/lib/spilTekst.ts:7293:7302:string:1ylal2c	src/lib/spilTekst.ts	string	string @ 135:11	Clansfolk
+src/lib/spilTekst.ts:7317:7326:string:gcvnas	src/lib/spilTekst.ts	string	string @ 136:13	Wildcards
+src/lib/spilTekst.ts:7400:7407:string:kuv6ij	src/lib/spilTekst.ts	string	string @ 140:21	Clothes
+src/lib/spilTekst.ts:7424:7477:string:a0h8ly	src/lib/spilTekst.ts	string	string @ 140:45	Offers light protection and reduces all damage by 5%.
+src/lib/spilTekst.ts:7505:7510:string:10tp7xw	src/lib/spilTekst.ts	string	string @ 141:24	Armor
+src/lib/spilTekst.ts:7527:7704:string:1159z5x	src/lib/spilTekst.ts	string	string @ 141:46	Halves all damage. Its weight normally costs 1 extra energy per step, but Knight and Shieldmaiden ignore the weight and avoid buried traps. The armor sinks and is lost in water.
+src/lib/spilTekst.ts:7735:7746:string:fmcfrr	src/lib/spilTekst.ts	string	string @ 142:27	Royal Armor
+src/lib/spilTekst.ts:7763:7948:string:1ghlqh6	src/lib/spilTekst.ts	string	string @ 142:55	Reduces all damage by 70%. Its weight normally costs 1 extra energy per step, but Knight and Shieldmaiden ignore the weight and avoid buried traps. The armor sinks and is lost in water.
+src/lib/spilTekst.ts:7982:7993:string:9jtevq	src/lib/spilTekst.ts	string	string @ 143:30	Elven Armor
+src/lib/spilTekst.ts:8010:8141:string:waez2v	src/lib/spilTekst.ts	string	string @ 143:58	Halves all damage without costing extra energy. Knight and Shieldmaiden also avoid buried traps while wearing it. Cannot be bought.
+src/lib/spilTekst.ts:8170:8182:string:ck9f79	src/lib/spilTekst.ts	string	string @ 144:25	Fine Clothes
+src/lib/spilTekst.ts:8199:8281:string:33kdzy	src/lib/spilTekst.ts	string	string @ 144:54	Gives 15% more gold and light protection. Can be ruined in caves and blood forest.
+src/lib/spilTekst.ts:8312:8325:string:n32irs	src/lib/spilTekst.ts	string	string @ 145:27	Royal Clothes
+src/lib/spilTekst.ts:8342:8471:string:14kb5u0	src/lib/spilTekst.ts	string	string @ 145:57	Gives 40% more gold and better protection than fine clothes. If torn in a cave or blood forest, it becomes ordinary fine clothes.
+src/lib/spilTekst.ts:8495:8500:string:iq6g6y	src/lib/spilTekst.ts	string	string @ 146:20	Knife
+src/lib/spilTekst.ts:8517:8582:string:1kinpd8	src/lib/spilTekst.ts	string	string @ 146:42	A simple weapon that also unlocks special choices in some events.
+src/lib/spilTekst.ts:8612:8624:string:u6oocu	src/lib/spilTekst.ts	string	string @ 147:26	Master Knife
+src/lib/spilTekst.ts:8641:8742:string:1ea88bw	src/lib/spilTekst.ts	string	string @ 147:55	Unlocks the same choices as an ordinary knife, but knife choices give more gold and deal less damage.
+src/lib/spilTekst.ts:8766:8774:string:oweiyb	src/lib/spilTekst.ts	string	string @ 148:20	Lockpick
+src/lib/spilTekst.ts:8791:8824:string:dxvye1	src/lib/spilTekst.ts	string	string @ 148:45	Lets you burgle empty town tiles.
+src/lib/spilTekst.ts:8854:8869:string:e37op3	src/lib/spilTekst.ts	string	string @ 149:26	Master Lockpick
+src/lib/spilTekst.ts:8886:8967:string:afrwwi	src/lib/spilTekst.ts	string	string @ 149:58	Unlocks the same burglaries as an ordinary lockpick and gives twice as much gold.
+src/lib/spilTekst.ts:8991:8996:string:3murn5	src/lib/spilTekst.ts	string	string @ 150:20	Staff
+src/lib/spilTekst.ts:9013:9164:string:1sns1i4	src/lib/spilTekst.ts	string	string @ 150:42	Moves you 4 tiles east at your normal energy cost. The landing tile activates as usual. On crystal, the staff reveals crystal tiles up to 4 tiles away.
+src/lib/spilTekst.ts:9193:9205:string:1grfrb4	src/lib/spilTekst.ts	string	string @ 151:25	Dragon Staff
+src/lib/spilTekst.ts:9222:9449:string:1kkhvob	src/lib/spilTekst.ts	string	string @ 151:54	Moves you 5 tiles east and reveals the route along the way. If the jump ends in open water, you land on the last safe tile and the dragon staff becomes an ordinary staff. On crystal, it reveals crystal tiles up to 5 tiles away.
+src/lib/spilTekst.ts:9472:9475:string:1o5i5xn	src/lib/spilTekst.ts	string	string @ 152:19	Bow
+src/lib/spilTekst.ts:9492:9549:string:dfiylb	src/lib/spilTekst.ts	string	string @ 152:39	Unlocks special choices in events where distance matters.
+src/lib/spilTekst.ts:9578:9588:string:xkvjpo	src/lib/spilTekst.ts	string	string @ 153:25	Falcon Bow
+src/lib/spilTekst.ts:9605:9747:string:1xbnex8	src/lib/spilTekst.ts	string	string @ 153:52	Unlocks the same choices as an ordinary bow, but gives more gold and less damage. As you move, it reveals a small area just beyond your sight.
+src/lib/spilTekst.ts:9772:9775:string:1830ybf	src/lib/spilTekst.ts	string	string @ 154:21	Axe
+src/lib/spilTekst.ts:9792:9851:string:vc655k	src/lib/spilTekst.ts	string	string @ 154:41	A heavy weapon that unlocks special choices in some events.
+src/lib/spilTekst.ts:9881:9890:string:1h7pvz6	src/lib/spilTekst.ts	string	string @ 155:26	Storm Axe
+src/lib/spilTekst.ts:9907:10031:string:4ql9nh	src/lib/spilTekst.ts	string	string @ 155:52	Unlocks the same choices as an ordinary axe, but clears obstacles in one blow and therefore gives more gold and less damage.
+src/lib/spilTekst.ts:10057:10061:string:1ttc23x	src/lib/spilTekst.ts	string	string @ 156:22	Club
+src/lib/spilTekst.ts:10078:10164:string:1fr87vq	src/lib/spilTekst.ts	string	string @ 156:43	Can smash markets and ordinary town tiles into ruins. It costs a lot of energy and HP.
+src/lib/spilTekst.ts:10195:10206:string:qqjuov	src/lib/spilTekst.ts	string	string @ 157:27	Wallbreaker
+src/lib/spilTekst.ts:10223:10315:string:tyggx4	src/lib/spilTekst.ts	string	string @ 157:55	Can also smash workshops and empty the tile cash box. It still costs a lot of energy and HP.
+src/lib/spilTekst.ts:10341:10346:string:1kw9i5y	src/lib/spilTekst.ts	string	string @ 158:22	Sword
+src/lib/spilTekst.ts:10363:10429:string:czi96o	src/lib/spilTekst.ts	string	string @ 158:44	A versatile weapon that unlocks special choices in several events.
+src/lib/spilTekst.ts:10454:10459:string:1a6nm2s	src/lib/spilTekst.ts	string	string @ 159:21	Sabre
+src/lib/spilTekst.ts:10476:10535:string:1b3cdt3	src/lib/spilTekst.ts	string	string @ 159:43	A light weapon that unlocks special choices in some events.
+src/lib/spilTekst.ts:10560:10566:string:1evtaty	src/lib/spilTekst.ts	string	string @ 160:21	Shovel
+src/lib/spilTekst.ts:10583:10676:string:1r6kzlt	src/lib/spilTekst.ts	string	string @ 160:44	Lets you dig for gold and healing roots. Digging with your hands costs more and can hurt you.
+src/lib/spilTekst.ts:10707:10720:string:wkf6sa	src/lib/spilTekst.ts	string	string @ 161:27	Master Shovel
+src/lib/spilTekst.ts:10737:10809:string:1ksb749	src/lib/spilTekst.ts	string	string @ 161:57	Gives twice as much gold when digging and does not trigger buried traps.
+src/lib/spilTekst.ts:10842:10850:string:sm7czz	src/lib/spilTekst.ts	string	string @ 162:29	Detector
+src/lib/spilTekst.ts:10867:10974:string:zpu0ue	src/lib/spilTekst.ts	string	string @ 162:54	Shows hidden gold on known tiles up to 3 tiles away. Entering a crystal tile shorts it out and destroys it.
+src/lib/spilTekst.ts:11003:11013:string:vzj1gh	src/lib/spilTekst.ts	string	string @ 163:25	Ore Finder
+src/lib/spilTekst.ts:11030:11228:string:n3g5s9	src/lib/spilTekst.ts	string	string @ 163:52	Shows hidden gold on known tiles up to 3 tiles away and gold mines through mountains up to 2 tiles away. You also gain 25% more hidden gold when digging. On crystal, it becomes an ordinary detector.
+src/lib/spilTekst.ts:11258:11269:string:k7xo4n	src/lib/spilTekst.ts	string	string @ 164:26	Dowsing Rod
+src/lib/spilTekst.ts:11286:11362:string:1qh3o90	src/lib/spilTekst.ts	string	string @ 164:54	Shows healing roots on known tiles up to 3 tiles away. Lost on ritual tiles.
+src/lib/spilTekst.ts:11391:11399:string:4yw7d8	src/lib/spilTekst.ts	string	string @ 165:25	Rune Rod
+src/lib/spilTekst.ts:11416:11657:string:lfnp3b	src/lib/spilTekst.ts	string	string @ 165:50	Shows healing roots up to 3 tiles away. If you are missing HP, it automatically pulls up a hidden root when you enter the tile. This costs 1 energy and empties the tile without digging it. On ritual tiles, it becomes an ordinary dowsing rod.
+src/lib/spilTekst.ts:11688:11699:string:13q7avm	src/lib/spilTekst.ts	string	string @ 166:27	Life Elixir
+src/lib/spilTekst.ts:11716:11794:string:dxp8vd	src/lib/spilTekst.ts	string	string @ 166:55	Used automatically when you take lethal damage and saves you with up to 90 HP.
+src/lib/spilTekst.ts:11820:11825:string:nz6l6p	src/lib/spilTekst.ts	string	string @ 167:22	Torch
+src/lib/spilTekst.ts:11842:11994:string:1v5hotp	src/lib/spilTekst.ts	string	string @ 167:44	Extends your sight by 1. You can use it to light a large fire that everyone can see. The fire gives you full HP and 50 gold. The torch is lost in water.
+src/lib/spilTekst.ts:12023:12032:string:fjcx5j	src/lib/spilTekst.ts	string	string @ 168:25	Sun Torch
+src/lib/spilTekst.ts:12049:12202:string:1nl7s0	src/lib/spilTekst.ts	string	string @ 168:51	Extends your sight by 2. You can use it to light a sunfire that reveals a larger area and gives you full HP and 100 gold. The sun torch is lost in water.
+src/lib/spilTekst.ts:12230:12242:string:1n2ip1i	src/lib/spilTekst.ts	string	string @ 169:24	Sleeping Bag
+src/lib/spilTekst.ts:12259:12386:string:wxbzho	src/lib/spilTekst.ts	string	string @ 169:53	Lets you make camp in the wild and gain 20 HP. This uses the rest of your energy. Damp caves ruin the sleeping bag immediately.
+src/lib/spilTekst.ts:12419:12436:string:zmnj23	src/lib/spilTekst.ts	string	string @ 170:29	Silk Sleeping Bag
+src/lib/spilTekst.ts:12453:12583:string:f92val	src/lib/spilTekst.ts	string	string @ 170:63	Lets you make camp in the wild and gain 40 HP. In a damp cave, it becomes an ordinary sleeping bag instead of being lost entirely.
+src/lib/spilTekst.ts:12606:12617:string:18rbo0g	src/lib/spilTekst.ts	string	string @ 171:19	Food Ration
+src/lib/spilTekst.ts:12634:12704:string:1kgnsep	src/lib/spilTekst.ts	string	string @ 171:47	Gives +20 HP, and your next move costs 0 energy. Can be lost in ruins.
+src/lib/spilTekst.ts:12735:12750:string:1vaewam	src/lib/spilTekst.ts	string	string @ 172:27	Golden Spyglass
+src/lib/spilTekst.ts:12767:12802:string:zosy7m	src/lib/spilTekst.ts	string	string @ 172:59	Breaks if you enter a crystal tile.
+src/lib/spilTekst.ts:12832:12847:string:1vaewam	src/lib/spilTekst.ts	string	string @ 173:26	Golden Spyglass
+src/lib/spilTekst.ts:12864:12899:string:zosy7m	src/lib/spilTekst.ts	string	string @ 173:58	Breaks if you enter a crystal tile.
+src/lib/spilTekst.ts:12926:12933:string:1pyyslj	src/lib/spilTekst.ts	string	string @ 174:23	Diamond
+src/lib/spilTekst.ts:12950:13011:string:yxxj5f	src/lib/spilTekst.ts	string	string @ 174:47	A rare gem worth 250-600 gold. Its value depends on its size.
+src/lib/spilTekst.ts:13049:13065:string:kucwxg	src/lib/spilTekst.ts	string	string @ 175:34	Golden Distiller
+src/lib/spilTekst.ts:13082:13191:string:3w0uom	src/lib/spilTekst.ts	string	string @ 175:67	A relic that doubles all gold you dig up. With the master shovel, the gold is tripled rather than quadrupled.
+src/lib/spilTekst.ts:13221:13231:string:10o60c5	src/lib/spilTekst.ts	string	string @ 176:26	Root Heart
+src/lib/spilTekst.ts:13248:13347:string:sa3yta	src/lib/spilTekst.ts	string	string @ 176:53	A relic that doubles all healing from roots, both when digging and when the Rune Rod pulls them up.
+src/lib/spilTekst.ts:13378:13390:string:pkydle	src/lib/spilTekst.ts	string	string @ 177:27	Treasure Map
+src/lib/spilTekst.ts:13407:13483:string:1y7ri4n	src/lib/spilTekst.ts	string	string @ 177:56	Points toward an area with buried treasure. Some islands hide more than one.
+src/lib/spilTekst.ts:13543:13549:string:pvj3gy	src/lib/spilTekst.ts	string	string @ 181:6	Væbner
+src/lib/spilTekst.ts:13553:13559:string:w58vb2	src/lib/spilTekst.ts	string	string @ 181:16	Squire
+src/lib/spilTekst.ts:13578:13590:string:spfymz	src/lib/spilTekst.ts	string	string @ 182:17	Foot Soldier
+src/lib/spilTekst.ts:13609:13618:string:z9wxy3	src/lib/spilTekst.ts	string	string @ 183:17	Mercenary
+src/lib/spilTekst.ts:13641:13658:string:vtq7pq	src/lib/spilTekst.ts	string	string @ 184:21	Company Commander
+src/lib/spilTekst.ts:13675:13682:string:1208ih7	src/lib/spilTekst.ts	string	string @ 185:15	Captain
+src/lib/spilTekst.ts:13702:13714:string:w4ztlx	src/lib/spilTekst.ts	string	string @ 186:18	Lance Bearer
+src/lib/spilTekst.ts:13730:13736:string:1kwlcgs	src/lib/spilTekst.ts	string	string @ 187:14	Knight
+src/lib/spilTekst.ts:13757:13770:string:qaqo5k	src/lib/spilTekst.ts	string	string @ 188:19	Banner Bearer
+src/lib/spilTekst.ts:13788:13797:string:qkms9x	src/lib/spilTekst.ts	string	string @ 189:16	Commander
+src/lib/spilTekst.ts:13816:13826:string:mwahr9	src/lib/spilTekst.ts	string	string @ 190:17	War Master
+src/lib/spilTekst.ts:13846:13853:string:ebf0be	src/lib/spilTekst.ts	string	string @ 191:18	Warlord
+src/lib/spilTekst.ts:13870:13877:string:sjn18c	src/lib/spilTekst.ts	string	string @ 192:15	Paladin
+src/lib/spilTekst.ts:13892:13896:string:i0u8dy	src/lib/spilTekst.ts	string	string @ 193:13	King
+src/lib/spilTekst.ts:13914:13922:string:i5nqpd	src/lib/spilTekst.ts	string	string @ 194:16	Aspirant
+src/lib/spilTekst.ts:13939:13949:string:173jh96	src/lib/spilTekst.ts	string	string @ 195:15	Apprentice
+src/lib/spilTekst.ts:13965:13971:string:1g8lpq3	src/lib/spilTekst.ts	string	string @ 196:14	Novice
+src/lib/spilTekst.ts:13987:13994:string:1pvjc6a	src/lib/spilTekst.ts	string	string @ 197:14	Acolyte
+src/lib/spilTekst.ts:14015:14026:string:b4bw8y	src/lib/spilTekst.ts	string	string @ 198:19	Illusionist
+src/lib/spilTekst.ts:14048:14060:string:1c17whq	src/lib/spilTekst.ts	string	string @ 199:20	Elementalist
+src/lib/spilTekst.ts:14079:14087:string:x7wfbr	src/lib/spilTekst.ts	string	string @ 200:17	Conjurer
+src/lib/spilTekst.ts:14105:14113:string:x7q1u7	src/lib/spilTekst.ts	string	string @ 201:16	Magister
+src/lib/spilTekst.ts:14134:14142:string:nhpbjj	src/lib/spilTekst.ts	string	string @ 202:19	Archmage
+src/lib/spilTekst.ts:14162:14172:string:1a7tr0b	src/lib/spilTekst.ts	string	string @ 203:18	Runemaster
+src/lib/spilTekst.ts:14193:14203:string:1q6wnz5	src/lib/spilTekst.ts	string	string @ 204:19	Grand Mage
+src/lib/spilTekst.ts:14220:14227:string:mp8jey	src/lib/spilTekst.ts	string	string @ 205:15	Demigod
+src/lib/spilTekst.ts:14245:14255:string:1rwhopm	src/lib/spilTekst.ts	string	string @ 206:16	Pickpocket
+src/lib/spilTekst.ts:14270:14276:string:cv8ykl	src/lib/spilTekst.ts	string	string @ 207:13	Robber
+src/lib/spilTekst.ts:14297:14304:string:gk0cle	src/lib/spilTekst.ts	string	string @ 208:19	Burglar
+src/lib/spilTekst.ts:14324:14332:string:ja9dz8	src/lib/spilTekst.ts	string	string @ 209:18	Assassin
+src/lib/spilTekst.ts:14353:14364:string:10q0ncr	src/lib/spilTekst.ts	string	string @ 210:19	Nightwalker
+src/lib/spilTekst.ts:14380:14386:string:10appq9	src/lib/spilTekst.ts	string	string @ 211:14	Shadow
+src/lib/spilTekst.ts:14407:14415:string:1qoesqr	src/lib/spilTekst.ts	string	string @ 212:19	Swindler
+src/lib/spilTekst.ts:14435:14446:string:15zcacb	src/lib/spilTekst.ts	string	string @ 213:18	Gang Leader
+src/lib/spilTekst.ts:14468:14482:string:mtdqr2	src/lib/spilTekst.ts	string	string @ 214:20	Syndicate Boss
+src/lib/spilTekst.ts:14505:14521:string:s20oma	src/lib/spilTekst.ts	string	string @ 215:21	Syndicate Leader
+src/lib/spilTekst.ts:14537:14544:string:ncjwsi	src/lib/spilTekst.ts	string	string @ 216:14	Phantom
+src/lib/spilTekst.ts:14565:14576:string:14ej7ds	src/lib/spilTekst.ts	string	string @ 217:19	Shadow King
+src/lib/spilTekst.ts:14595:14607:string:1lag3vr	src/lib/spilTekst.ts	string	string @ 218:17	Master Thief
+src/lib/spilTekst.ts:14626:14631:string:16nxxn2	src/lib/spilTekst.ts	string	string @ 219:17	Stray
+src/lib/spilTekst.ts:14649:14659:string:b7pe79	src/lib/spilTekst.ts	string	string @ 220:16	Forerunner
+src/lib/spilTekst.ts:14676:14681:string:t3jzj9	src/lib/spilTekst.ts	string	string @ 221:15	Scout
+src/lib/spilTekst.ts:14700:14710:string:1anrzbe	src/lib/spilTekst.ts	string	string @ 222:17	Pathfinder
+src/lib/spilTekst.ts:14730:14742:string:2gxqer	src/lib/spilTekst.ts	string	string @ 223:18	Cartographer
+src/lib/spilTekst.ts:14759:14767:string:svgfab	src/lib/spilTekst.ts	string	string @ 224:15	Wanderer
+src/lib/spilTekst.ts:14787:14798:string:16b8a5p	src/lib/spilTekst.ts	string	string @ 225:18	Trailblazer
+src/lib/spilTekst.ts:14814:14821:string:1ydymm5	src/lib/spilTekst.ts	string	string @ 226:14	Pioneer
+src/lib/spilTekst.ts:14849:14861:string:ehq9p9	src/lib/spilTekst.ts	string	string @ 227:26	Expeditioner
+src/lib/spilTekst.ts:14888:14905:string:4445vn	src/lib/spilTekst.ts	string	string @ 228:25	Expedition Leader
+src/lib/spilTekst.ts:14922:14935:string:1geagz0	src/lib/spilTekst.ts	string	string @ 229:15	Island Expert
+src/lib/spilTekst.ts:14952:14961:string:14esd1j	src/lib/spilTekst.ts	string	string @ 230:15	Conqueror
+src/lib/spilTekst.ts:14978:14984:string:k0ttac	src/lib/spilTekst.ts	string	string @ 231:15	Legend
+src/lib/spilTekst.ts:14998:15004:string:b09jk0	src/lib/spilTekst.ts	string	string @ 232:12	Thrall
+src/lib/spilTekst.ts:15027:15041:string:wwurka	src/lib/spilTekst.ts	string	string @ 233:21	Longship Rower
+src/lib/spilTekst.ts:15059:15068:string:bbyciz	src/lib/spilTekst.ts	string	string @ 234:16	Boatswain
+src/lib/spilTekst.ts:15086:15092:string:1we5qoa	src/lib/spilTekst.ts	string	string @ 235:16	Raider
+src/lib/spilTekst.ts:15111:15121:string:16cwdvg	src/lib/spilTekst.ts	string	string @ 236:17	Axe Bearer
+src/lib/spilTekst.ts:15138:15147:string:4tiezi	src/lib/spilTekst.ts	string	string @ 237:15	Berserker
+src/lib/spilTekst.ts:15169:15182:string:1r8bgmc	src/lib/spilTekst.ts	string	string @ 238:20	Shieldbreaker
+src/lib/spilTekst.ts:15199:15208:string:o4ujqi	src/lib/spilTekst.ts	string	string @ 239:15	Chieftain
+src/lib/spilTekst.ts:15222:15226:string:14iquwq	src/lib/spilTekst.ts	string	string @ 240:12	Jarl
+src/lib/spilTekst.ts:15243:15251:string:rm9lwj	src/lib/spilTekst.ts	string	string @ 241:15	Sea King
+src/lib/spilTekst.ts:15270:15279:string:ovzqzb	src/lib/spilTekst.ts	string	string @ 242:17	Einherjar
+src/lib/spilTekst.ts:15295:15299:string:1f8l43x	src/lib/spilTekst.ts	string	string @ 243:14	Heir
+src/lib/spilTekst.ts:15316:15327:string:1az15u0	src/lib/spilTekst.ts	string	string @ 244:15	Court Snake
+src/lib/spilTekst.ts:15344:15352:string:19wbzao	src/lib/spilTekst.ts	string	string @ 245:15	Courtier
+src/lib/spilTekst.ts:15367:15372:string:qmbpwz	src/lib/spilTekst.ts	string	string @ 246:13	Baron
+src/lib/spilTekst.ts:15387:15392:string:1qoi4r8	src/lib/spilTekst.ts	string	string @ 247:13	Count
+src/lib/spilTekst.ts:15408:15416:string:1itoz4q	src/lib/spilTekst.ts	string	string @ 248:14	Marquess
+src/lib/spilTekst.ts:15435:15445:string:txn7pg	src/lib/spilTekst.ts	string	string @ 249:17	Liege Lord
+src/lib/spilTekst.ts:15461:15465:string:mxbgze	src/lib/spilTekst.ts	string	string @ 250:14	Duke
+src/lib/spilTekst.ts:15485:15497:string:gfnog6	src/lib/spilTekst.ts	string	string @ 251:18	Grand Prince
+src/lib/spilTekst.ts:15516:15528:string:x77wk1	src/lib/spilTekst.ts	string	string @ 252:17	Crown Prince
+src/lib/spilTekst.ts:15553:15561:string:157b95e	src/lib/spilTekst.ts	string	string @ 253:23	Autocrat
+src/lib/spilTekst.ts:15577:15583:string:jde6a2	src/lib/spilTekst.ts	string	string @ 254:14	Regent
+src/lib/spilTekst.ts:15599:15606:string:ejooqz	src/lib/spilTekst.ts	string	string @ 255:14	Emperor
+src/lib/spilTekst.ts:15626:15633:string:39095r	src/lib/spilTekst.ts	string	string @ 256:18	Poacher
+src/lib/spilTekst.ts:15651:15658:string:qerppn	src/lib/spilTekst.ts	string	string @ 257:16	Tracker
+src/lib/spilTekst.ts:15673:15680:string:17m6dmd	src/lib/spilTekst.ts	string	string @ 258:13	Skinner
+src/lib/spilTekst.ts:15699:15706:string:w0enj5	src/lib/spilTekst.ts	string	string @ 259:17	Trapper
+src/lib/spilTekst.ts:15729:15739:string:gdwx0b	src/lib/spilTekst.ts	string	string @ 260:21	Longbowman
+src/lib/spilTekst.ts:15758:15764:string:1a4zi5e	src/lib/spilTekst.ts	string	string @ 261:17	Archer
+src/lib/spilTekst.ts:15785:15797:string:1prtfl7	src/lib/spilTekst.ts	string	string @ 262:19	Game Tracker
+src/lib/spilTekst.ts:15812:15818:string:egc1w3	src/lib/spilTekst.ts	string	string @ 263:13	Hunter
+src/lib/spilTekst.ts:15839:15847:string:ygiyhn	src/lib/spilTekst.ts	string	string @ 264:19	Marksman
+src/lib/spilTekst.ts:15865:15875:string:1qdurxp	src/lib/spilTekst.ts	string	string @ 265:16	Falcon Eye
+src/lib/spilTekst.ts:15899:15910:string:330l9p	src/lib/spilTekst.ts	string	string @ 266:22	Beast Tamer
+src/lib/spilTekst.ts:15934:15949:string:gh2ct5	src/lib/spilTekst.ts	string	string @ 267:22	Big Game Hunter
+src/lib/spilTekst.ts:15968:15981:string:4415yy	src/lib/spilTekst.ts	string	string @ 268:17	Forest Runner
+src/lib/spilTekst.ts:16001:16011:string:nnj776	src/lib/spilTekst.ts	string	string @ 269:18	Huntmaster
+src/lib/spilTekst.ts:16030:16038:string:95gluh	src/lib/spilTekst.ts	string	string @ 270:17	Deckhand
+src/lib/spilTekst.ts:16054:16060:string:dgisix	src/lib/spilTekst.ts	string	string @ 271:14	Sailor
+src/lib/spilTekst.ts:16077:16086:string:m4xfjs	src/lib/spilTekst.ts	string	string @ 272:15	Cannoneer
+src/lib/spilTekst.ts:16102:16108:string:ao83wq	src/lib/spilTekst.ts	string	string @ 273:14	Gunner
+src/lib/spilTekst.ts:16126:16134:string:15plesi	src/lib/spilTekst.ts	string	string @ 274:16	Helmsman
+src/lib/spilTekst.ts:16152:16162:string:1cz0wfy	src/lib/spilTekst.ts	string	string @ 275:16	First Mate
+src/lib/spilTekst.ts:16182:16192:string:1kbu8sl	src/lib/spilTekst.ts	string	string @ 276:18	Shipmaster
+src/lib/spilTekst.ts:16211:16220:string:60qf6j	src/lib/spilTekst.ts	string	string @ 277:17	Privateer
+src/lib/spilTekst.ts:16236:16243:string:gtj0o0	src/lib/spilTekst.ts	string	string @ 278:14	Corsair
+src/lib/spilTekst.ts:16263:16274:string:ikxzfz	src/lib/spilTekst.ts	string	string @ 279:18	Pirate King
+src/lib/spilTekst.ts:16296:16310:string:cz8xis	src/lib/spilTekst.ts	string	string @ 280:20	Pirate Captain
+src/lib/spilTekst.ts:16318:16332:string:cvafa0	src/lib/spilTekst.ts	string	string @ 281:6	Havets Hersker
+src/lib/spilTekst.ts:16336:16352:string:zypyp8	src/lib/spilTekst.ts	string	string @ 281:24	Ruler of the Sea
+src/lib/spilTekst.ts:16371:16380:string:1dp9yjc	src/lib/spilTekst.ts	string	string @ 282:17	Sea Ruler
+src/lib/spilTekst.ts:16399:16409:string:g2sn59	src/lib/spilTekst.ts	string	string @ 283:17	Dust Biter
+src/lib/spilTekst.ts:16429:16442:string:1nx1pwe	src/lib/spilTekst.ts	string	string @ 284:18	Stone Crusher
+src/lib/spilTekst.ts:16462:16472:string:13lr1qu	src/lib/spilTekst.ts	string	string @ 285:18	Mine Brute
+src/lib/spilTekst.ts:16494:16506:string:1cz94m0	src/lib/spilTekst.ts	string	string @ 286:20	Rock Breaker
+src/lib/spilTekst.ts:16528:16539:string:ik5tb2	src/lib/spilTekst.ts	string	string @ 287:20	Smeltmaster
+src/lib/spilTekst.ts:16560:16571:string:srwelm	src/lib/spilTekst.ts	string	string @ 288:19	Tunnel Lord
+src/lib/spilTekst.ts:16593:16606:string:hw4r37	src/lib/spilTekst.ts	string	string @ 289:20	Tunnel Master
+src/lib/spilTekst.ts:16625:16634:string:1scl3cv	src/lib/spilTekst.ts	string	string @ 290:17	Ore Baron
+src/lib/spilTekst.ts:16653:16662:string:1sghkdi	src/lib/spilTekst.ts	string	string @ 291:17	Gold Lord
+src/lib/spilTekst.ts:16682:16695:string:vfxtj5	src/lib/spilTekst.ts	string	string @ 292:18	Mountain King
+src/lib/spilTekst.ts:16703:16718:string:14cvjy6	src/lib/spilTekst.ts	string	string @ 293:6	Dybdens Hersker
+src/lib/spilTekst.ts:16722:16739:string:1e2ssb3	src/lib/spilTekst.ts	string	string @ 293:25	Ruler of the Deep
+src/lib/spilTekst.ts:16760:16778:string:dlv2mn	src/lib/spilTekst.ts	string	string @ 294:19	Master of the Deep
+src/lib/spilTekst.ts:16792:16797:string:yqxjui	src/lib/spilTekst.ts	string	string @ 295:12	Creep
+src/lib/spilTekst.ts:16812:16822:string:13l3c8j	src/lib/spilTekst.ts	string	string @ 296:13	Ragged One
+src/lib/spilTekst.ts:16844:16853:string:1q9uizh	src/lib/spilTekst.ts	string	string @ 297:20	Greenhorn
+src/lib/spilTekst.ts:16873:16880:string:1b6gwma	src/lib/spilTekst.ts	string	string @ 298:18	Fighter
+src/lib/spilTekst.ts:16896:16903:string:ed399l	src/lib/spilTekst.ts	string	string @ 299:14	Warrior
+src/lib/spilTekst.ts:16924:16937:string:yqg0ow	src/lib/spilTekst.ts	string	string @ 300:19	Bloodthirster
+src/lib/spilTekst.ts:16957:16966:string:1djn0t6	src/lib/spilTekst.ts	string	string @ 301:18	War Crier
+src/lib/spilTekst.ts:16985:16996:string:li41g2	src/lib/spilTekst.ts	string	string @ 302:17	Clan Leader
+src/lib/spilTekst.ts:17015:17024:string:1ot97ec	src/lib/spilTekst.ts	string	string @ 303:17	Clan Lord
+src/lib/spilTekst.ts:17043:17053:string:56h522	src/lib/spilTekst.ts	string	string @ 304:17	Blood Lord
+src/lib/spilTekst.ts:17072:17081:string:32gueu	src/lib/spilTekst.ts	string	string @ 305:17	Destroyer
+src/lib/spilTekst.ts:17094:17098:string:1isnb7l	src/lib/spilTekst.ts	string	string @ 306:11	Fool
+src/lib/spilTekst.ts:17114:17120:string:nxuin8	src/lib/spilTekst.ts	string	string @ 307:14	Jester
+src/lib/spilTekst.ts:17143:17152:string:96se8g	src/lib/spilTekst.ts	string	string @ 308:21	Trickster
+src/lib/spilTekst.ts:17169:17176:string:1gl7b29	src/lib/spilTekst.ts	string	string @ 309:15	Juggler
+src/lib/spilTekst.ts:17197:17206:string:2e4z25	src/lib/spilTekst.ts	string	string @ 310:19	Prankster
+src/lib/spilTekst.ts:17226:17235:string:1t3dps3	src/lib/spilTekst.ts	string	string @ 311:18	Maskmaker
+src/lib/spilTekst.ts:17255:17269:string:4d3rzk	src/lib/spilTekst.ts	string	string @ 312:18	Fortune Hunter
+src/lib/spilTekst.ts:17284:17289:string:1940754	src/lib/spilTekst.ts	string	string @ 313:13	Demon
+src/lib/spilTekst.ts:17309:17320:string:bifnwr	src/lib/spilTekst.ts	string	string @ 314:18	Provocateur
+src/lib/spilTekst.ts:17340:17352:string:1b2d9e8	src/lib/spilTekst.ts	string	string @ 315:18	Chaos Prince
+src/lib/spilTekst.ts:17371:17382:string:rnkhgf	src/lib/spilTekst.ts	string	string @ 316:17	Chaos Maker
+src/lib/spilTekst.ts:17405:17417:string:hlcjd9	src/lib/spilTekst.ts	string	string @ 317:21	Fate Gambler
+src/lib/spilTekst.ts:17438:17447:string:1omgeyh	src/lib/spilTekst.ts	string	string @ 318:19	Fatemaker
+src/lib/spilTekst.ts:17715:17722:string:17v9s5z	src/lib/spilTekst.ts	string	string @ 324:40	Lærling
+src/lib/spilTekst.ts:17769:17779:string:173jh96	src/lib/spilTekst.ts	string	string @ 324:94	Apprentice
+src/lib/spilTekst.ts:17901:17907:string:1itwhp2	src/lib/spilTekst.ts	string	string @ 327:35	Ukendt
+src/lib/spilTekst.ts:17970:17977:string:1kmy72x	src/lib/spilTekst.ts	string	string @ 327:104	Unknown
+src/lib/spilTekst.ts:18532:18536:string:j42c9f	src/lib/spilTekst.ts	string	string @ 340:103	Alle
+src/lib/spilTekst.ts:18540:18543:string:wnjk2s	src/lib/spilTekst.ts	string	string @ 340:111	All
+src/lib/spilTekst.ts:18624:18639:string:ythygg	src/lib/spilTekst.ts	string	string @ 344:28	Ukendt genstand
+src/lib/spilTekst.ts:18643:18655:string:1sfxuxo	src/lib/spilTekst.ts	string	string @ 344:47	Unknown item
+src/lib/spilTekst.ts:18834:18856:string:106fi0p	src/lib/spilTekst.ts	string	string @ 349:28	Genstand i din rygsæk.
+src/lib/spilTekst.ts:18860:18882:string:1h8fpc4	src/lib/spilTekst.ts	string	string @ 349:54	Item in your backpack.
+src/lib/spilTekst.ts:18931:18953:string:106fi0p	src/lib/spilTekst.ts	string	string @ 350:46	Genstand i din rygsæk.
+src/lib/spilTekst.ts:19016:19038:string:1h8fpc4	src/lib/spilTekst.ts	string	string @ 350:131	Item in your backpack.
+src/lib/spilTekst.ts:19125:19142:string:19eiieo	src/lib/spilTekst.ts	string	string @ 354:30	Ingen titel endnu
+src/lib/spilTekst.ts:19159:19176:string:19eiieo	src/lib/spilTekst.ts	string	string @ 354:64	Ingen titel endnu
+src/lib/spilTekst.ts:19180:19192:string:1d7r5c2	src/lib/spilTekst.ts	string	string @ 354:85	No title yet
 src/lib/spilTilstand.svelte.ts:5007:5701:text:16x690e	src/lib/spilTilstand.svelte.ts	text	markup @ 135:52	,\r\n    mitUdstyr: [] as RygsækTing[],\r\n    mineKendteFelter: [] as number[],\r\n    mineSkattekortFelter: [] as number[],\n    trofaeStats: null as TrofaeStats | null,\n    nyeTrofaeIds: [] as TrofaeId[],\n    nyeMytiskeTrofaeIds: [] as TrofaeId[],\n    historik: [] as number[],\n    aktivShop: null as string[] | null,\r\n    aktivVaerksted: false,\r\n    \r\n    venteSpilAktiv: false,\r\n    ventePuljeGuld: 0,\r\n    ventePuljeLiv: 0,\r\n    venteFase: 'venter' as 'venter' | 'spiller' | 'viser_gevinst' | 'tabt' | 'vundet' | 'trukket',\r\n    sidsteVenteDag: 0,\r\n    venteRunde: 0,\r\n    venteStartTid: 0,\r\n    venteFriIndtilDag: 0,\r\n    venteGratisFeltBrugt: null as number | null,\r\n    venteKort: [] as Array
 src/lib/spildata.ts:1439:1442:string:1yr0t3l	src/lib/spildata.ts	string	string @ 25:36	Tøj
 src/lib/spildata.ts:1452:1455:string:16pyshd	src/lib/spildata.ts	string	string @ 25:49	tøj
@@ -2208,27 +2208,27 @@ src/lib/spildata.ts:11087:11162:string:44ef8m	src/lib/spildata.ts	string	string 
 src/lib/spildata.ts:11251:11257:string:155afqj	src/lib/spildata.ts	string	string @ 66:30	Ridder
 src/lib/spildata.ts:11306:11331:string:15wy6jf	src/lib/spildata.ts	string	string @ 66:85	Robust og godt beskyttet.
 src/lib/spildata.ts:11472:11565:string:mnfske	src/lib/spildata.ts	string	string @ 66:251	Ordenen: Du tager 10% mindre skade, mærker ikke rustningens vægt og undgår nedgravede fælder.
-src/lib/spildata.ts:11577:11677:string:16r6sv4	src/lib/spildata.ts	string	string @ 66:356	Du starter uden guld og ser kun 1 felt. Det koster 6 energi at grave, og rustningen går tabt i vand.
+src/lib/spildata.ts:11577:11677:string:17qc8vt	src/lib/spildata.ts	string	string @ 66:356	Du starter uden guld og ser kun 1 felt. Det koster 5 energi at grave, og rustningen går tabt i vand.
 src/lib/spildata.ts:11771:11779:string:cuucsp	src/lib/spildata.ts	string	string @ 67:30	Skjoldmø
 src/lib/spildata.ts:11828:11853:string:15wy6jf	src/lib/spildata.ts	string	string @ 67:87	Robust og godt beskyttet.
 src/lib/spildata.ts:11994:12087:string:mnfske	src/lib/spildata.ts	string	string @ 67:253	Ordenen: Du tager 10% mindre skade, mærker ikke rustningens vægt og undgår nedgravede fælder.
-src/lib/spildata.ts:12099:12199:string:16r6sv4	src/lib/spildata.ts	string	string @ 67:358	Du starter uden guld og ser kun 1 felt. Det koster 6 energi at grave, og rustningen går tabt i vand.
+src/lib/spildata.ts:12099:12199:string:17qc8vt	src/lib/spildata.ts	string	string @ 67:358	Du starter uden guld og ser kun 1 felt. Det koster 5 energi at grave, og rustningen går tabt i vand.
 src/lib/spildata.ts:12295:12304:string:1ktws0c	src/lib/spildata.ts	string	string @ 68:32	Troldmand
 src/lib/spildata.ts:12355:12381:string:11hl68o	src/lib/spildata.ts	string	string @ 68:92	Mobil magi med en nødplan.
 src/lib/spildata.ts:12531:12634:string:1w935qh	src/lib/spildata.ts	string	string @ 68:268	Magikere: Staven flytter dig mod øst. Krystaller heler dig og lader staven afsløre andre krystalfelter.
-src/lib/spildata.ts:12646:12767:string:c03i2d	src/lib/spildata.ts	string	string @ 68:383	Du starter med 80 HP og uden guld, tager 50% mere skade og bruger 8 energi på at grave. Der er ikke meget plads til fejl.
+src/lib/spildata.ts:12646:12767:string:ajlrr8	src/lib/spildata.ts	string	string @ 68:383	Du starter med 80 HP og uden guld, tager 50% mere skade og bruger 7 energi på at grave. Der er ikke meget plads til fejl.
 src/lib/spildata.ts:12862:12867:string:1nzcuho	src/lib/spildata.ts	string	string @ 69:32	Vølve
 src/lib/spildata.ts:12918:12944:string:11hl68o	src/lib/spildata.ts	string	string @ 69:88	Mobil magi med en nødplan.
 src/lib/spildata.ts:13094:13197:string:1w935qh	src/lib/spildata.ts	string	string @ 69:264	Magikere: Staven flytter dig mod øst. Krystaller heler dig og lader staven afsløre andre krystalfelter.
-src/lib/spildata.ts:13209:13330:string:c03i2d	src/lib/spildata.ts	string	string @ 69:379	Du starter med 80 HP og uden guld, tager 50% mere skade og bruger 8 energi på at grave. Der er ikke meget plads til fejl.
+src/lib/spildata.ts:13209:13330:string:ajlrr8	src/lib/spildata.ts	string	string @ 69:379	Du starter med 80 HP og uden guld, tager 50% mere skade og bruger 7 energi på at grave. Der er ikke meget plads til fejl.
 src/lib/spildata.ts:13422:13425:string:6l5p9k	src/lib/spildata.ts	string	string @ 70:29	Tyv
 src/lib/spildata.ts:13473:13505:string:1glugol	src/lib/spildata.ts	string	string @ 70:80	Hurtig, rig og klar til indbrud.
 src/lib/spildata.ts:13650:13736:string:1x3olb4	src/lib/spildata.ts	string	string @ 70:257	Lovløse: Du kan bryde ind i tomme byfelter med en dirk og får 10% mere ud af alt guld.
-src/lib/spildata.ts:13748:13820:string:1m1i7pz	src/lib/spildata.ts	string	string @ 70:355	Du tager 20% mere skade og ser kun 1 felt. Det koster 5 energi at grave.
+src/lib/spildata.ts:13748:13820:string:xj12tu	src/lib/spildata.ts	string	string @ 70:355	Du tager 20% mere skade og ser kun 1 felt. Det koster 4 energi at grave.
 src/lib/spildata.ts:13911:13917:string:gkykzv	src/lib/spildata.ts	string	string @ 71:29	Skygge
 src/lib/spildata.ts:13965:13997:string:1glugol	src/lib/spildata.ts	string	string @ 71:83	Hurtig, rig og klar til indbrud.
 src/lib/spildata.ts:14142:14228:string:1x3olb4	src/lib/spildata.ts	string	string @ 71:260	Lovløse: Du kan bryde ind i tomme byfelter med en dirk og får 10% mere ud af alt guld.
-src/lib/spildata.ts:14240:14312:string:1m1i7pz	src/lib/spildata.ts	string	string @ 71:358	Du tager 20% mere skade og ser kun 1 felt. Det koster 5 energi at grave.
+src/lib/spildata.ts:14240:14312:string:xj12tu	src/lib/spildata.ts	string	string @ 71:358	Du tager 20% mere skade og ser kun 1 felt. Det koster 4 energi at grave.
 src/lib/spildata.ts:14406:14413:string:4dsgad	src/lib/spildata.ts	string	string @ 72:32	Opdager
 src/lib/spildata.ts:14464:14492:string:cihgrt	src/lib/spildata.ts	string	string @ 72:90	Ser langt og graver billigt.
 src/lib/spildata.ts:14629:14734:string:6uu6bg	src/lib/spildata.ts	string	string @ 72:255	Udforskere: Du ser længere end de fleste. Huler og ruiner koster 2 mindre energi, og du graver for kun 3.
@@ -2247,64 +2247,64 @@ src/lib/spildata.ts:16289:16412:string:1xrxytb	src/lib/spildata.ts	string	string
 src/lib/spildata.ts:16424:16524:string:ld7p5o	src/lib/spildata.ts	string	string @ 75:386	Du starter uden sovepose og får 10% mindre ud af alt guld. Heling skal findes eller købes undervejs.
 src/lib/spildata.ts:16617:16623:string:1kjr6n4	src/lib/spildata.ts	string	string @ 76:29	Hertug
 src/lib/spildata.ts:16671:16701:string:u5d26s	src/lib/spildata.ts	string	string @ 76:83	Rig fra start, men uden våben.
-src/lib/spildata.ts:16836:16944:string:1w1mlvp	src/lib/spildata.ts	string	string @ 76:248	Adel: Du får 20% mere guld og kan presse handlende på prisen. Når du møder andre spillere, opkræver du skat.
-src/lib/spildata.ts:16956:17052:string:19xq3oz	src/lib/spildata.ts	string	string @ 76:368	Du har kun 6 energi, tager 10% mere skade og starter uden våben. Gravning koster hele 10 energi.
-src/lib/spildata.ts:17115:17123:string:tbv42w	src/lib/spildata.ts	string	string @ 77:29	Dronning
-src/lib/spildata.ts:17171:17201:string:u5d26s	src/lib/spildata.ts	string	string @ 77:85	Rig fra start, men uden våben.
-src/lib/spildata.ts:17336:17444:string:1w1mlvp	src/lib/spildata.ts	string	string @ 77:250	Adel: Du får 20% mere guld og kan presse handlende på prisen. Når du møder andre spillere, opkræver du skat.
-src/lib/spildata.ts:17456:17552:string:19xq3oz	src/lib/spildata.ts	string	string @ 77:370	Du har kun 6 energi, tager 10% mere skade og starter uden våben. Gravning koster hele 10 energi.
-src/lib/spildata.ts:17616:17621:string:1o61ith	src/lib/spildata.ts	string	string @ 78:30	Jæger
-src/lib/spildata.ts:17670:17706:string:157fuy4	src/lib/spildata.ts	string	string @ 78:84	Ser langt og bevæger sig let i skov.
-src/lib/spildata.ts:17841:17955:string:pe1v6e	src/lib/spildata.ts	string	string @ 78:255	Spejdere: Du ser længere end de fleste. Når du spiller med andre, kan du spore en spiller på samme felt i 20 dage.
-src/lib/spildata.ts:17967:18049:string:lr9e92	src/lib/spildata.ts	string	string @ 78:381	Du starter med 90 HP og 20 guld og tager 10% mere skade. Gravning koster 6 energi.
-src/lib/spildata.ts:18155:18161:string:1uaz6y1	src/lib/spildata.ts	string	string @ 79:30	Skytte
-src/lib/spildata.ts:18210:18246:string:157fuy4	src/lib/spildata.ts	string	string @ 79:85	Ser langt og bevæger sig let i skov.
-src/lib/spildata.ts:18381:18495:string:pe1v6e	src/lib/spildata.ts	string	string @ 79:256	Spejdere: Du ser længere end de fleste. Når du spiller med andre, kan du spore en spiller på samme felt i 20 dage.
-src/lib/spildata.ts:18507:18589:string:lr9e92	src/lib/spildata.ts	string	string @ 79:382	Du starter med 90 HP og 20 guld og tager 10% mere skade. Gravning koster 6 energi.
-src/lib/spildata.ts:18695:18702:string:uo6t9w	src/lib/spildata.ts	string	string @ 80:30	Kaptajn
-src/lib/spildata.ts:18751:18790:string:1a725q2	src/lib/spildata.ts	string	string @ 80:86	Tjener godt og bevæger sig let på vand.
-src/lib/spildata.ts:18932:19067:string:1jvppmv	src/lib/spildata.ts	string	string @ 80:267	Sørøvere: Du får 20% mere guld og starter med et skattekort. Når du spiller med andre, kan sabelen bruges til at røve udvalgte klasser.
-src/lib/spildata.ts:19079:19167:string:ki9l8c	src/lib/spildata.ts	string	string @ 80:414	Du starter uden sovepose og ser kun 1 felt. Du må finde eller købe din heling undervejs.
-src/lib/spildata.ts:19267:19273:string:19qcedb	src/lib/spildata.ts	string	string @ 81:30	Korsar
-src/lib/spildata.ts:19322:19361:string:1a725q2	src/lib/spildata.ts	string	string @ 81:85	Tjener godt og bevæger sig let på vand.
-src/lib/spildata.ts:19503:19638:string:1jvppmv	src/lib/spildata.ts	string	string @ 81:266	Sørøvere: Du får 20% mere guld og starter med et skattekort. Når du spiller med andre, kan sabelen bruges til at røve udvalgte klasser.
-src/lib/spildata.ts:19650:19738:string:ki9l8c	src/lib/spildata.ts	string	string @ 81:413	Du starter uden sovepose og ser kun 1 felt. Du må finde eller købe din heling undervejs.
-src/lib/spildata.ts:19837:19842:string:u9as90	src/lib/spildata.ts	string	string @ 82:29	Dværg
-src/lib/spildata.ts:19890:19926:string:1cm1wyz	src/lib/spildata.ts	string	string @ 82:82	Graver billigt og trives i bjergene.
-src/lib/spildata.ts:20063:20170:string:c4wz4d	src/lib/spildata.ts	string	string @ 82:255	Bjergfolk: Du graver for kun 2 energi, får 10% mere guld og bevæger dig let gennem bjerge og krystalfelter.
-src/lib/spildata.ts:20182:20269:string:1vhwikd	src/lib/spildata.ts	string	string @ 82:374	Hvert almindeligt skridt koster 1,5 energi. Du ser kun 1 felt og starter uden sovepose.
-src/lib/spildata.ts:20374:20380:string:1oqzrhc	src/lib/spildata.ts	string	string @ 83:29	Graver
-src/lib/spildata.ts:20428:20464:string:1cm1wyz	src/lib/spildata.ts	string	string @ 83:83	Graver billigt og trives i bjergene.
-src/lib/spildata.ts:20601:20708:string:c4wz4d	src/lib/spildata.ts	string	string @ 83:256	Bjergfolk: Du graver for kun 2 energi, får 10% mere guld og bevæger dig let gennem bjerge og krystalfelter.
-src/lib/spildata.ts:20720:20807:string:1vhwikd	src/lib/spildata.ts	string	string @ 83:375	Hvert almindeligt skridt koster 1,5 energi. Du ser kun 1 felt og starter uden sovepose.
-src/lib/spildata.ts:20910:20913:string:2ygrtp	src/lib/spildata.ts	string	string @ 84:27	Ork
-src/lib/spildata.ts:20959:20999:string:1mzj7lz	src/lib/spildata.ts	string	string @ 84:76	Tåler meget og kan smadre handelssteder.
-src/lib/spildata.ts:21116:21197:string:1jih8it	src/lib/spildata.ts	string	string @ 84:233	Klanfolk: Du tager 20% mindre skade og kan smadre byer og markeder med din kølle.
-src/lib/spildata.ts:21209:21306:string:1yvnhn3	src/lib/spildata.ts	string	string @ 84:326	Du starter uden guld, tøj og sovepose og får 20% mindre ud af alt guld. Gravning koster 6 energi.
-src/lib/spildata.ts:21397:21403:string:15g5quj	src/lib/spildata.ts	string	string @ 85:27	Kriger
-src/lib/spildata.ts:21449:21489:string:1mzj7lz	src/lib/spildata.ts	string	string @ 85:79	Tåler meget og kan smadre handelssteder.
-src/lib/spildata.ts:21606:21687:string:1jih8it	src/lib/spildata.ts	string	string @ 85:236	Klanfolk: Du tager 20% mindre skade og kan smadre byer og markeder med din kølle.
-src/lib/spildata.ts:21699:21796:string:1yvnhn3	src/lib/spildata.ts	string	string @ 85:329	Du starter uden guld, tøj og sovepose og får 20% mindre ud af alt guld. Gravning koster 6 energi.
-src/lib/spildata.ts:21889:21894:string:175i9a4	src/lib/spildata.ts	string	string @ 86:29	Joker
-src/lib/spildata.ts:21942:21980:string:lrfhp7	src/lib/spildata.ts	string	string @ 86:82	Stor gevinst, næsten ingen fejlmargin.
-src/lib/spildata.ts:22094:22226:string:1s1lbpa	src/lib/spildata.ts	string	string @ 86:234	Fantaster: Du ser længere, får 50% mere guld og kan bluffe dig gennem valg i hændelser, der kræver udstyr eller bestemte karakterer.
-src/lib/spildata.ts:22238:22359:string:14yjt06	src/lib/spildata.ts	string	string @ 86:378	Du starter med 50 HP og 1 guld, uden tøj eller sovepose, og tager dobbelt skade. Næsten enhver fejl kan blive den sidste.
-src/lib/spildata.ts:22422:22430:string:b0rhpz	src/lib/spildata.ts	string	string @ 87:29	Harlekin
-src/lib/spildata.ts:22478:22516:string:lrfhp7	src/lib/spildata.ts	string	string @ 87:85	Stor gevinst, næsten ingen fejlmargin.
-src/lib/spildata.ts:22630:22762:string:1s1lbpa	src/lib/spildata.ts	string	string @ 87:237	Fantaster: Du ser længere, får 50% mere guld og kan bluffe dig gennem valg i hændelser, der kræver udstyr eller bestemte karakterer.
-src/lib/spildata.ts:22774:22895:string:14yjt06	src/lib/spildata.ts	string	string @ 87:381	Du starter med 50 HP og 1 guld, uden tøj eller sovepose, og tager dobbelt skade. Næsten enhver fejl kan blive den sidste.
-src/lib/spildata.ts:23007:23014:string:1m9oppw	src/lib/spildata.ts	string	string @ 91:14	Ordenen
-src/lib/spildata.ts:23032:23040:string:1u5jk8y	src/lib/spildata.ts	string	string @ 92:16	Magikere
-src/lib/spildata.ts:23055:23062:string:10o2acq	src/lib/spildata.ts	string	string @ 93:13	Lovløse
-src/lib/spildata.ts:23080:23090:string:946khp	src/lib/spildata.ts	string	string @ 94:16	Udforskere
-src/lib/spildata.ts:23106:23115:string:j5zx8r	src/lib/spildata.ts	string	string @ 95:14	Nordboere
-src/lib/spildata.ts:23130:23134:string:1fc7c0h	src/lib/spildata.ts	string	string @ 96:13	Adel
-src/lib/spildata.ts:23150:23158:string:148s7gb	src/lib/spildata.ts	string	string @ 97:14	Spejdere
-src/lib/spildata.ts:23174:23182:string:1omvr1o	src/lib/spildata.ts	string	string @ 98:14	Sørøvere
-src/lib/spildata.ts:23197:23206:string:1redgyt	src/lib/spildata.ts	string	string @ 99:13	Bjergfolk
-src/lib/spildata.ts:23219:23227:string:oza38z	src/lib/spildata.ts	string	string @ 100:11	Klanfolk
-src/lib/spildata.ts:23242:23251:string:16mhkjd	src/lib/spildata.ts	string	string @ 101:13	Fantaster
-src/lib/spildata.ts:24165:24169:string:j42c9f	src/lib/spildata.ts	string	string @ 120:80	Alle
+src/lib/spildata.ts:16835:16943:string:1w1mlvp	src/lib/spildata.ts	string	string @ 76:247	Adel: Du får 20% mere guld og kan presse handlende på prisen. Når du møder andre spillere, opkræver du skat.
+src/lib/spildata.ts:16955:17050:string:ezbc9h	src/lib/spildata.ts	string	string @ 76:367	Du har kun 6 energi, tager 10% mere skade og starter uden våben. Gravning koster hele 9 energi.
+src/lib/spildata.ts:17113:17121:string:tbv42w	src/lib/spildata.ts	string	string @ 77:29	Dronning
+src/lib/spildata.ts:17169:17199:string:u5d26s	src/lib/spildata.ts	string	string @ 77:85	Rig fra start, men uden våben.
+src/lib/spildata.ts:17333:17441:string:1w1mlvp	src/lib/spildata.ts	string	string @ 77:249	Adel: Du får 20% mere guld og kan presse handlende på prisen. Når du møder andre spillere, opkræver du skat.
+src/lib/spildata.ts:17453:17548:string:ezbc9h	src/lib/spildata.ts	string	string @ 77:369	Du har kun 6 energi, tager 10% mere skade og starter uden våben. Gravning koster hele 9 energi.
+src/lib/spildata.ts:17612:17617:string:1o61ith	src/lib/spildata.ts	string	string @ 78:30	Jæger
+src/lib/spildata.ts:17666:17702:string:157fuy4	src/lib/spildata.ts	string	string @ 78:84	Ser langt og bevæger sig let i skov.
+src/lib/spildata.ts:17837:17951:string:pe1v6e	src/lib/spildata.ts	string	string @ 78:255	Spejdere: Du ser længere end de fleste. Når du spiller med andre, kan du spore en spiller på samme felt i 20 dage.
+src/lib/spildata.ts:17963:18045:string:7h0e77	src/lib/spildata.ts	string	string @ 78:381	Du starter med 90 HP og 20 guld og tager 10% mere skade. Gravning koster 5 energi.
+src/lib/spildata.ts:18151:18157:string:1uaz6y1	src/lib/spildata.ts	string	string @ 79:30	Skytte
+src/lib/spildata.ts:18206:18242:string:157fuy4	src/lib/spildata.ts	string	string @ 79:85	Ser langt og bevæger sig let i skov.
+src/lib/spildata.ts:18377:18491:string:pe1v6e	src/lib/spildata.ts	string	string @ 79:256	Spejdere: Du ser længere end de fleste. Når du spiller med andre, kan du spore en spiller på samme felt i 20 dage.
+src/lib/spildata.ts:18503:18585:string:7h0e77	src/lib/spildata.ts	string	string @ 79:382	Du starter med 90 HP og 20 guld og tager 10% mere skade. Gravning koster 5 energi.
+src/lib/spildata.ts:18691:18698:string:uo6t9w	src/lib/spildata.ts	string	string @ 80:30	Kaptajn
+src/lib/spildata.ts:18747:18786:string:1a725q2	src/lib/spildata.ts	string	string @ 80:86	Tjener godt og bevæger sig let på vand.
+src/lib/spildata.ts:18928:19063:string:1jvppmv	src/lib/spildata.ts	string	string @ 80:267	Sørøvere: Du får 20% mere guld og starter med et skattekort. Når du spiller med andre, kan sabelen bruges til at røve udvalgte klasser.
+src/lib/spildata.ts:19075:19163:string:ki9l8c	src/lib/spildata.ts	string	string @ 80:414	Du starter uden sovepose og ser kun 1 felt. Du må finde eller købe din heling undervejs.
+src/lib/spildata.ts:19263:19269:string:19qcedb	src/lib/spildata.ts	string	string @ 81:30	Korsar
+src/lib/spildata.ts:19318:19357:string:1a725q2	src/lib/spildata.ts	string	string @ 81:85	Tjener godt og bevæger sig let på vand.
+src/lib/spildata.ts:19499:19634:string:1jvppmv	src/lib/spildata.ts	string	string @ 81:266	Sørøvere: Du får 20% mere guld og starter med et skattekort. Når du spiller med andre, kan sabelen bruges til at røve udvalgte klasser.
+src/lib/spildata.ts:19646:19734:string:ki9l8c	src/lib/spildata.ts	string	string @ 81:413	Du starter uden sovepose og ser kun 1 felt. Du må finde eller købe din heling undervejs.
+src/lib/spildata.ts:19833:19838:string:u9as90	src/lib/spildata.ts	string	string @ 82:29	Dværg
+src/lib/spildata.ts:19886:19922:string:1cm1wyz	src/lib/spildata.ts	string	string @ 82:82	Graver billigt og trives i bjergene.
+src/lib/spildata.ts:20059:20166:string:c4wz4d	src/lib/spildata.ts	string	string @ 82:255	Bjergfolk: Du graver for kun 2 energi, får 10% mere guld og bevæger dig let gennem bjerge og krystalfelter.
+src/lib/spildata.ts:20178:20265:string:1vhwikd	src/lib/spildata.ts	string	string @ 82:374	Hvert almindeligt skridt koster 1,5 energi. Du ser kun 1 felt og starter uden sovepose.
+src/lib/spildata.ts:20370:20376:string:1oqzrhc	src/lib/spildata.ts	string	string @ 83:29	Graver
+src/lib/spildata.ts:20424:20460:string:1cm1wyz	src/lib/spildata.ts	string	string @ 83:83	Graver billigt og trives i bjergene.
+src/lib/spildata.ts:20597:20704:string:c4wz4d	src/lib/spildata.ts	string	string @ 83:256	Bjergfolk: Du graver for kun 2 energi, får 10% mere guld og bevæger dig let gennem bjerge og krystalfelter.
+src/lib/spildata.ts:20716:20803:string:1vhwikd	src/lib/spildata.ts	string	string @ 83:375	Hvert almindeligt skridt koster 1,5 energi. Du ser kun 1 felt og starter uden sovepose.
+src/lib/spildata.ts:20906:20909:string:2ygrtp	src/lib/spildata.ts	string	string @ 84:27	Ork
+src/lib/spildata.ts:20955:20995:string:1mzj7lz	src/lib/spildata.ts	string	string @ 84:76	Tåler meget og kan smadre handelssteder.
+src/lib/spildata.ts:21112:21193:string:1jih8it	src/lib/spildata.ts	string	string @ 84:233	Klanfolk: Du tager 20% mindre skade og kan smadre byer og markeder med din kølle.
+src/lib/spildata.ts:21205:21302:string:1wo3x36	src/lib/spildata.ts	string	string @ 84:326	Du starter uden guld, tøj og sovepose og får 20% mindre ud af alt guld. Gravning koster 5 energi.
+src/lib/spildata.ts:21393:21399:string:15g5quj	src/lib/spildata.ts	string	string @ 85:27	Kriger
+src/lib/spildata.ts:21445:21485:string:1mzj7lz	src/lib/spildata.ts	string	string @ 85:79	Tåler meget og kan smadre handelssteder.
+src/lib/spildata.ts:21602:21683:string:1jih8it	src/lib/spildata.ts	string	string @ 85:236	Klanfolk: Du tager 20% mindre skade og kan smadre byer og markeder med din kølle.
+src/lib/spildata.ts:21695:21792:string:1wo3x36	src/lib/spildata.ts	string	string @ 85:329	Du starter uden guld, tøj og sovepose og får 20% mindre ud af alt guld. Gravning koster 5 energi.
+src/lib/spildata.ts:21885:21890:string:175i9a4	src/lib/spildata.ts	string	string @ 86:29	Joker
+src/lib/spildata.ts:21938:21976:string:lrfhp7	src/lib/spildata.ts	string	string @ 86:82	Stor gevinst, næsten ingen fejlmargin.
+src/lib/spildata.ts:22090:22222:string:1s1lbpa	src/lib/spildata.ts	string	string @ 86:234	Fantaster: Du ser længere, får 50% mere guld og kan bluffe dig gennem valg i hændelser, der kræver udstyr eller bestemte karakterer.
+src/lib/spildata.ts:22234:22355:string:14yjt06	src/lib/spildata.ts	string	string @ 86:378	Du starter med 50 HP og 1 guld, uden tøj eller sovepose, og tager dobbelt skade. Næsten enhver fejl kan blive den sidste.
+src/lib/spildata.ts:22418:22426:string:b0rhpz	src/lib/spildata.ts	string	string @ 87:29	Harlekin
+src/lib/spildata.ts:22474:22512:string:lrfhp7	src/lib/spildata.ts	string	string @ 87:85	Stor gevinst, næsten ingen fejlmargin.
+src/lib/spildata.ts:22626:22758:string:1s1lbpa	src/lib/spildata.ts	string	string @ 87:237	Fantaster: Du ser længere, får 50% mere guld og kan bluffe dig gennem valg i hændelser, der kræver udstyr eller bestemte karakterer.
+src/lib/spildata.ts:22770:22891:string:14yjt06	src/lib/spildata.ts	string	string @ 87:381	Du starter med 50 HP og 1 guld, uden tøj eller sovepose, og tager dobbelt skade. Næsten enhver fejl kan blive den sidste.
+src/lib/spildata.ts:23003:23010:string:1m9oppw	src/lib/spildata.ts	string	string @ 91:14	Ordenen
+src/lib/spildata.ts:23028:23036:string:1u5jk8y	src/lib/spildata.ts	string	string @ 92:16	Magikere
+src/lib/spildata.ts:23051:23058:string:10o2acq	src/lib/spildata.ts	string	string @ 93:13	Lovløse
+src/lib/spildata.ts:23076:23086:string:946khp	src/lib/spildata.ts	string	string @ 94:16	Udforskere
+src/lib/spildata.ts:23102:23111:string:j5zx8r	src/lib/spildata.ts	string	string @ 95:14	Nordboere
+src/lib/spildata.ts:23126:23130:string:1fc7c0h	src/lib/spildata.ts	string	string @ 96:13	Adel
+src/lib/spildata.ts:23146:23154:string:148s7gb	src/lib/spildata.ts	string	string @ 97:14	Spejdere
+src/lib/spildata.ts:23170:23178:string:1omvr1o	src/lib/spildata.ts	string	string @ 98:14	Sørøvere
+src/lib/spildata.ts:23193:23202:string:1redgyt	src/lib/spildata.ts	string	string @ 99:13	Bjergfolk
+src/lib/spildata.ts:23215:23223:string:oza38z	src/lib/spildata.ts	string	string @ 100:11	Klanfolk
+src/lib/spildata.ts:23238:23247:string:16mhkjd	src/lib/spildata.ts	string	string @ 101:13	Fantaster
+src/lib/spildata.ts:24161:24165:string:j42c9f	src/lib/spildata.ts	string	string @ 120:80	Alle
 src/lib/spilmotor.ts:6365:6385:text:5z55qi	src/lib/spilmotor.ts	text	markup @ 163:37	= bredde || nyRaekke
 src/lib/spilmotor.ts:8530:8553:string:1gssnhz	src/lib/spilmotor.ts	string	string @ 226:39	Alarm kunne ikke sendes
 src/lib/spilmotor.ts:9314:9324:string:14sifgd	src/lib/spilmotor.ts	string	string @ 247:76	senderNavn
