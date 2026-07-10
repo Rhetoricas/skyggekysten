@@ -118,19 +118,19 @@ export async function goerOfflineAppKlar() {
 function offlineBeskedTekst(key: typeof offlineAppState.beskedKey) {
     switch (key) {
         case 'unsupported':
-            return tekst('Denne browser understøtter ikke offline-cache.', 'This browser does not support offline cache.');
+            return tekst('Denne browser kan ikke gemme spillet til offline brug.', 'This browser cannot save the game for offline play.');
         case 'ready':
-            return tekst('Spillet er klar på denne enhed', 'The game is ready on this device');
+            return tekst('Spillet er klar til offline brug på denne enhed.', 'The game is ready for offline play on this device.');
         case 'not-ready':
-            return tekst('Offline-cache er ikke klar endnu.', 'Offline cache is not ready yet.');
+            return tekst('Spillet er ikke hentet til offline brug endnu.', 'The game has not been saved for offline play yet.');
         case 'downloading':
-            return tekst('Downloader spillet til offline brug...', 'Downloading the game for offline use...');
+            return tekst('Gør spillet klar til offline brug...', 'Preparing the game for offline play...');
         case 'still-downloading':
-            return tekst('Downloader stadig. Firefox kan være lidt langsom første gang...', 'Still downloading. Firefox can be a little slow the first time...');
+            return tekst('Spillet gøres stadig klar. Første gang kan tage lidt længere...', 'The game is still being prepared. The first time may take a little longer...');
         case 'timeout':
-            return tekst('Offline-cache tog for lang tid. Genindlæs siden online og prøv igen.', 'Offline cache took too long. Reload the page online and try again.');
+            return tekst('Det tog for lang tid at gøre spillet klar. Gå online, genindlæs siden, og prøv igen.', 'Preparing the game took too long. Go online, reload the page, and try again.');
         case 'failed':
-            return tekst('Offline-cache kunne ikke gøres klar. Genindlæs siden online og prøv igen.', 'Offline cache could not be prepared. Reload the page online and try again.');
+            return tekst('Spillet kunne ikke gøres klar til offline brug. Gå online, genindlæs siden, og prøv igen.', 'The game could not be prepared for offline play. Go online, reload the page, and try again.');
         default:
             return '';
     }

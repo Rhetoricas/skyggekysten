@@ -127,7 +127,7 @@ export function tagValg(valg: Valg) {
     const afsluttetFeltIndex = eventState.rootFeltIndex ?? spilTilstand.spillerIndex;
 
     if (!kanViseValg(valg)) {
-        eventState.log = [...eventState.log, tekst('Du har ikke det nødvendige udstyr eller guld.', 'You do not have the required equipment or gold.')];
+        eventState.log = [...eventState.log, tekst('Du opfylder ikke kravene til dette valg.', 'You do not meet the requirements for this choice.')];
         return;
     }
 
@@ -138,7 +138,7 @@ export function tagValg(valg: Valg) {
     let gratisEnergiKvittering = "";
     if (valg.kosterEnergi) {
         const energiBetaling = brugEnergi(valg.kosterEnergi);
-        if (energiBetaling.gratis) gratisEnergiKvittering = tekst(' (Bersærkergangen betaler energien)', ' (Berserk pays the energy)');
+        if (energiBetaling.gratis) gratisEnergiKvittering = tekst(' (bersærkergangen dækker energiforbruget)', ' (your berserk rage covers the energy cost)');
     }
 
     eventState.valgLåst = true;
@@ -179,7 +179,7 @@ export function tagValg(valg: Valg) {
             const foerHp = spilTilstand.livspoint;
             spilTilstand.livspoint += (resultat.maxHpAendring > 0 ? resultat.maxHpAendring : 0);
             registrerHeling(foerHp, spilTilstand.livspoint);
-            kvittering += ` (${resultat.maxHpAendring > 0 ? '+' : ''}${resultat.maxHpAendring} Max HP)`;
+            kvittering += ` (${resultat.maxHpAendring > 0 ? '+' : ''}${resultat.maxHpAendring} ${tekst('maks. HP', 'max HP')})`;
         }
 
         if (resultat.hpAendring) {
@@ -202,7 +202,7 @@ export function tagValg(valg: Valg) {
             const foerGuld = spilTilstand.guldTotal;
             spilTilstand.guldTotal += endeligGuld;
             const faktiskGuld = spilTilstand.guldTotal - foerGuld;
-            if (faktiskGuld !== 0) kvittering += ` (${faktiskGuld > 0 ? '+' : ''}${faktiskGuld} ${tekst('Guld', 'Gold')})`;
+            if (faktiskGuld !== 0) kvittering += ` (${faktiskGuld > 0 ? '+' : ''}${faktiskGuld} ${tekst('guld', 'gold')})`;
         }
 
         if (resultat.givItem) {
@@ -238,7 +238,7 @@ export function tagValg(valg: Valg) {
             const foerHp = spilTilstand.livspoint;
             spilTilstand.livspoint += (resultat.maxHpAendring > 0 ? resultat.maxHpAendring : 0);
             registrerHeling(foerHp, spilTilstand.livspoint);
-            kvittering += ` (${resultat.maxHpAendring > 0 ? '+' : ''}${resultat.maxHpAendring} Max HP)`;
+            kvittering += ` (${resultat.maxHpAendring > 0 ? '+' : ''}${resultat.maxHpAendring} ${tekst('maks. HP', 'max HP')})`;
         }
 
         if (resultat.hpOp) {
@@ -261,28 +261,28 @@ export function tagValg(valg: Valg) {
             if (brugerMesterbue) grundIndkomst = Math.round(grundIndkomst * 1.25);
             const indkomst = spilTilstand.beregnGuldIndkomst(grundIndkomst);
             spilTilstand.guldTotal += indkomst;
-            kvittering += ` (+${indkomst} ${tekst('Guld', 'Gold')})`;
+            kvittering += ` (+${indkomst} ${tekst('guld', 'gold')})`;
         }
         if (resultat.guldNed) {
             spilTilstand.guldTotal -= resultat.guldNed;
-            kvittering += ` (-${resultat.guldNed} ${tekst('Guld', 'Gold')})`;
+            kvittering += ` (-${resultat.guldNed} ${tekst('guld', 'gold')})`;
         }
         if (resultat.energiOp) {
             const foerEnergi = spilTilstand.nuvaerendeEnergi;
             spilTilstand.nuvaerendeEnergi += resultat.energiOp;
             const faktiskEnergi = spilTilstand.nuvaerendeEnergi - foerEnergi;
-            if (faktiskEnergi > 0) kvittering += ` (+${faktiskEnergi} ${tekst('Energi', 'Energy')})`;
+            if (faktiskEnergi > 0) kvittering += ` (+${faktiskEnergi} ${tekst('energi', 'energy')})`;
         }
         if (resultat.energiTil !== undefined) {
             const foerEnergi = spilTilstand.nuvaerendeEnergi;
             spilTilstand._nuvaerendeEnergi = Math.max(spilTilstand.nuvaerendeEnergi, resultat.energiTil);
             const faktiskEnergi = spilTilstand.nuvaerendeEnergi - foerEnergi;
-            if (faktiskEnergi > 0) kvittering += ` (+${faktiskEnergi} ${tekst('Energi', 'Energy')})`;
+            if (faktiskEnergi > 0) kvittering += ` (+${faktiskEnergi} ${tekst('energi', 'energy')})`;
         }
         if (resultat.energiNed) {
             spilTilstand.nuvaerendeEnergi -= resultat.energiNed;
             visBrugteEnergiKugler(resultat.energiNed);
-            kvittering += ` (-${resultat.energiNed} ${tekst('Energi', 'Energy')})`;
+            kvittering += ` (-${resultat.energiNed} ${tekst('energi', 'energy')})`;
         }
         if (resultat.energisyn) {
             if (!spilTilstand.harEnergisyn) kvittering += ` (${tekst('Energisyn', 'Energy sight')})`;

@@ -417,10 +417,16 @@ Hvis der laves nye billeder, brug webp og læg dem i `static/events/`.
 Gode events bør:
 
 - Starte med en konkret situation, ikke en regeltekst.
-- Give 2-4 valg, gerne med mindst ét almindeligt valg og ét item/karaktervalg.
-- Lade dyre eller sjældne items føles stærke.
-- Undgå at forklare tal i valgets tekst. Lad kvitteringen vise `(+80 Guld)` osv.
-- Undgå at låse alle valg bag items. Hvis alle valg er låst, viser spillet kun “Flygt fra faren!”.
+- Skrives i nutid og henvende sig direkte til spilleren som “du”.
+- Bruge et enkelt, naturligt dansk med et diskret strejf af stemning. Undgå højtidelige vendinger, arkaiske ord og generiske fantasyfraser.
+- Lade scenen føre tydeligt frem til valget: Hvad ser du, hvad er problemet, og hvad er på spil?
+- Holde valgtekster korte og handlingsorienterede, helst som et udsagnsord efterfulgt af målet: “Undersøg tasken”, “Betal købmanden”, “Forlad stedet”.
+- Beskrive udfald som handling og konsekvens i samme bevægelse. Lad teksten fortælle, hvad der sker, mens kvitteringen viser de præcise tal.
+- Give 2-4 valg, gerne med mindst ét almindeligt valg og ét genstands- eller karaktervalg.
+- Lade dyre eller sjældne genstande føles stærke.
+- Undgå at forklare tal i valgets tekst. Lad kvitteringen vise `(+80 guld)` osv.
+- Undgå interne ord som “udfaldspulje”, “trigger” og “event-id” i spillerteksten.
+- Undgå at låse alle valg bag genstande. Hvis alle valg er låst, viser spillet kun “Forlad stedet”.
 
 ## Tjekliste før indsendelse
 

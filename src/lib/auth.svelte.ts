@@ -179,32 +179,32 @@ function loginFejlBesked(message: string) {
     const lavere = message.toLowerCase();
     if (lavere.includes('rate') || lavere.includes('security') || lavere.includes('limit') || lavere.includes('seconds') || lavere.includes('minute')) {
         return tekst(
-            'Supabase holder en kort pause på nye login-mails til den email. Du kan stadig spille offline imens og prøve login igen lidt senere.',
-            'Supabase is briefly pausing new login emails to that address. You can still play offline meanwhile and try login again a little later.'
+            'Der skal gå lidt tid, før vi kan sende endnu en loginmail til denne e-mailadresse. Du kan spille offline imens og prøve igen senere.',
+            'Please wait a little before requesting another login email for this address. You can play offline in the meantime and try again later.'
         );
     }
 
-    return tekst(`Login-linket kunne ikke sendes: ${message}`, `The login link could not be sent: ${message}`);
+    return tekst('Loginlinket blev ikke sendt. Tjek e-mailadressen, og prøv igen om lidt.', 'The login link was not sent. Check the email address and try again in a moment.');
 }
 
 function anonymLoginFejlBesked(message: string) {
     const lavere = message.toLowerCase();
     if (lavere.includes('anonymous') || lavere.includes('disabled') || lavere.includes('not enabled')) {
         return tekst(
-            'Automatisk profil uden email er ikke slået til i Supabase endnu. Du kan stadig spille, men spillet bliver ikke gemt på profilen.',
-            'Automatic profile saving without email is not enabled in Supabase yet. You can still play, but this run will not be saved to your profile.'
+            'En gæsteprofil kan ikke oprettes lige nu. Du kan stadig spille, men spillet bliver ikke gemt på din profil.',
+            'A guest profile cannot be created right now. You can still play, but the game will not be saved to your profile.'
         );
     }
     if (lavere.includes('rate') || lavere.includes('security') || lavere.includes('limit') || lavere.includes('seconds') || lavere.includes('minute')) {
         return tekst(
-            'Supabase holder en kort pause på nye profiler. Du kan stadig spille nu, men prøv igen lidt senere for at gemme på profilen.',
-            'Supabase is briefly pausing new profiles. You can still play now, but try again a little later to save to your profile.'
+            'Der skal gå lidt tid, før vi kan oprette endnu en profil. Du kan spille nu og prøve igen senere.',
+            'Please wait a little before creating another profile. You can play now and try again later.'
         );
     }
 
     return tekst(
-        `Automatisk profil kunne ikke oprettes: ${message}`,
-        `Automatic profile could not be created: ${message}`
+        'Gæsteprofilen kunne ikke oprettes. Du kan fortsætte uden en profil eller prøve igen om lidt.',
+        'The guest profile could not be created. You can continue without a profile or try again in a moment.'
     );
 }
 
@@ -212,14 +212,14 @@ function emailTilknytningFejlBesked(message: string) {
     const lavere = message.toLowerCase();
     if (lavere.includes('rate') || lavere.includes('security') || lavere.includes('limit') || lavere.includes('seconds') || lavere.includes('minute')) {
         return tekst(
-            'Supabase holder en kort pause på nye email-links. Din profil er stadig gemt i denne browser, og du kan prøve igen lidt senere.',
-            'Supabase is briefly pausing new email links. Your profile is still saved in this browser, and you can try again a little later.'
+            'Der skal gå lidt tid, før vi kan sende endnu et link. Din profil er stadig gemt på denne enhed, og du kan prøve igen senere.',
+            'Please wait a little before requesting another link. Your profile is still saved on this device, and you can try again later.'
         );
     }
 
     return tekst(
-        `Email kunne ikke tilknyttes profilen: ${message}`,
-        `Email could not be added to the profile: ${message}`
+        'E-mailadressen kunne ikke knyttes til profilen. Tjek adressen, og prøv igen om lidt.',
+        'The email address could not be linked to the profile. Check the address and try again in a moment.'
     );
 }
 
@@ -266,7 +266,7 @@ export async function sendLoginLink(email: string) {
 
     const rentEmail = email.trim();
     if (!rentEmail) {
-        authState.besked = tekst('Skriv din email.', 'Enter your email.');
+        authState.besked = tekst('Skriv din e-mailadresse.', 'Enter your email address.');
         return;
     }
 
@@ -288,12 +288,12 @@ export async function sendLoginLink(email: string) {
         }
 
         authState.besked = tekst(
-            'Vi har sendt et login-link til din email. Hvis du allerede har bedt om et link, kan Supabase kræve en kort pause før næste mail.',
-            'We sent a login link to your email. If you already requested a link, Supabase may require a short pause before the next email.'
+            'Vi har sendt et loginlink til din e-mailadresse. Det kan tage et øjeblik at nå frem.',
+            'We sent a login link to your email address. It may take a moment to arrive.'
         );
     } catch (error) {
         console.error('Login-link kunne ikke sendes:', error);
-        const message = error instanceof Error ? error.message : tekst('Ukendt fejl', 'Unknown error');
+        const message = error instanceof Error ? error.message : tekst('Noget gik galt', 'Something went wrong');
         authState.besked = loginFejlBesked(message);
     } finally {
         authState.loader = false;
@@ -321,8 +321,8 @@ export async function startAnonymProfil(navn?: string) {
         authState.user = data.user ?? data.session?.user ?? null;
         if (!authState.user) {
             authState.besked = tekst(
-                'Automatisk profil kunne ikke oprettes. Du kan stadig spille, men spillet bliver ikke gemt på profilen.',
-                'Automatic profile could not be created. You can still play, but this run will not be saved to your profile.'
+                'Gæsteprofilen kunne ikke oprettes. Du kan stadig spille, men spillet bliver ikke gemt på din profil.',
+                'The guest profile could not be created. You can still play, but the game will not be saved to your profile.'
             );
             return false;
         }
@@ -333,7 +333,7 @@ export async function startAnonymProfil(navn?: string) {
         return true;
     } catch (error) {
         console.error('Anonym profil kunne ikke oprettes:', error);
-        const message = error instanceof Error ? error.message : tekst('Ukendt fejl', 'Unknown error');
+        const message = error instanceof Error ? error.message : tekst('Noget gik galt', 'Something went wrong');
         authState.besked = anonymLoginFejlBesked(message);
         return false;
     } finally {
@@ -350,7 +350,7 @@ export async function sendEmailTilAnonymProfil(email: string) {
 
     const rentEmail = email.trim();
     if (!rentEmail) {
-        authState.besked = tekst('Skriv din email.', 'Enter your email.');
+        authState.besked = tekst('Skriv din e-mailadresse.', 'Enter your email address.');
         return;
     }
 
@@ -370,12 +370,12 @@ export async function sendEmailTilAnonymProfil(email: string) {
         }
 
         authState.besked = tekst(
-            'Vi har sendt et link til din email. Når du bekræfter den, bliver denne profil gemt på emailen.',
-            'We sent a link to your email. When you confirm it, this profile will be saved to that email.'
+            'Vi har sendt et bekræftelseslink til din e-mailadresse. Når du åbner det, bliver profilen knyttet til adressen.',
+            'We sent a confirmation link to your email address. Open it to link the profile to that address.'
         );
     } catch (error) {
         console.error('Email kunne ikke knyttes til anonym profil:', error);
-        const message = error instanceof Error ? error.message : tekst('Ukendt fejl', 'Unknown error');
+        const message = error instanceof Error ? error.message : tekst('Noget gik galt', 'Something went wrong');
         authState.besked = emailTilknytningFejlBesked(message);
     } finally {
         authState.loader = false;
@@ -533,7 +533,7 @@ export async function gemProfilKarakter(karakterId: string | null) {
         authState.profil = naesteProfil;
         authState.besked = rentKarakterId
             ? tekst('Profilbilledet er gemt på denne enhed.', 'Profile picture saved on this device.')
-            : tekst('Profilbilledet er sat tilbage til auto på denne enhed.', 'Profile picture reset to auto on this device.');
+            : tekst('Profilbilledet følger igen det automatiske valg på denne enhed.', 'The profile picture now follows the automatic choice on this device.');
         return;
     }
 
@@ -541,7 +541,7 @@ export async function gemProfilKarakter(karakterId: string | null) {
         authState.profil = medLokalProfilKarakterFallback(normaliserProfil(data));
         authState.besked = rentKarakterId
             ? tekst('Profilbilledet er gemt.', 'Profile picture saved.')
-            : tekst('Profilbilledet er sat tilbage til auto.', 'Profile picture reset to auto.');
+            : tekst('Profilbilledet følger igen det automatiske valg.', 'The profile picture now follows the automatic choice.');
     }
 }
 

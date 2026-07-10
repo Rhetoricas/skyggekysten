@@ -87,28 +87,28 @@ type VentendeHighscore = HighscorePayload & {
 };
 
 const timeoutLabelsEn: Record<string, string> = {
-    'Gemning af øen': 'Island save',
-    'Hentning af aktuel spillerliste': 'Current player list fetch',
-    'Login-tjek': 'Login check',
-    'Hentning af ø-session': 'Island session fetch',
-    'Gemning af afsluttet spiller': 'Finished player save',
-    'Gemning af score': 'Score save',
-    'Hentning af ø-score': 'Island score fetch',
-    'Hentning af global score': 'Global score fetch',
-    'Hentning af ugens globale score': 'Weekly global score fetch',
-    'Hentning af filtreret highscore': 'Filtered highscore fetch',
-    'Hentning af highscore-resultat': 'Highscore result fetch',
-    'Hentning af topmedalje-spil': 'Top medal game fetch',
-    'Hentning af offentlig profil': 'Public profile fetch',
-    'Hentning af gemt score-id': 'Saved score id fetch',
-    'Opdatering af highscore-medalje': 'Highscore medal update',
-    'Hentning af global rekord': 'Global record fetch'
+    'Gemning af øen': 'Saving the island',
+    'Hentning af aktuel spillerliste': 'Loading the current players',
+    'Login-tjek': 'Checking your login',
+    'Hentning af ø-session': 'Loading the island',
+    'Gemning af afsluttet spiller': 'Saving your finished game',
+    'Gemning af score': 'Saving the score',
+    'Hentning af ø-score': 'Loading the island leaderboard',
+    'Hentning af global score': 'Loading the global leaderboard',
+    'Hentning af ugens globale score': "Loading this week's leaderboard",
+    'Hentning af filtreret highscore': 'Loading the selected leaderboard',
+    'Hentning af highscore-resultat': 'Loading the leaderboard result',
+    'Hentning af topmedalje-spil': 'Loading the top medal game',
+    'Hentning af offentlig profil': 'Loading the public profile',
+    'Hentning af gemt score-id': 'Loading the saved score',
+    'Opdatering af highscore-medalje': 'Updating the leaderboard medal',
+    'Hentning af global rekord': 'Loading the global record'
 };
 
 function medTimeout<T>(promise: PromiseLike<T>, ms: number, label: string): Promise<T> {
     return new Promise((resolve, reject) => {
         const timer = setTimeout(
-            () => reject(new Error(tekst(`${label} tog for lang tid.`, `${timeoutLabelsEn[label] || label} took too long.`))),
+            () => reject(new Error(tekst(`${label} tog for lang tid, fordi forbindelsen ikke svarede. Prøv igen.`, `${timeoutLabelsEn[label] || label} took too long because the connection did not respond. Try again.`))),
             ms
         );
         Promise.resolve(promise)
@@ -317,7 +317,10 @@ export async function flushVentendeSync() {
     kortSkalOpdateres = false;
     return await medTimeout(udfoerDbUpload(sendKort), 12000, 'Gemning af øen').catch((error) => {
         console.error('Kunne ikke gemme ventende sync', error);
-        spilTilstand.statusBesked = error instanceof Error ? error.message : tekst('Øen kunne ikke gemmes.', 'The island could not be saved.');
+        spilTilstand.statusBesked = tekst(
+            'Øen blev ikke gemt. Tjek forbindelsen, og prøv igen om lidt.',
+            'The island was not saved. Check your connection and try again in a moment.'
+        );
         return false;
     });
 }
@@ -502,8 +505,8 @@ async function udfoerDbUpload(sendKort: boolean) {
     if (hentError) {
         console.error('Kunne ikke hente aktuel spillerliste', hentError);
         spilTilstand.statusBesked = tekst(
-            `Øen kunne ikke gemmes: ${hentError.message}`,
-            `The island could not be saved: ${hentError.message}`
+            'Øen blev ikke gemt. Tjek forbindelsen, og prøv igen om lidt.',
+            'The island was not saved. Check your connection and try again in a moment.'
         );
         return false;
     }
@@ -544,8 +547,8 @@ async function udfoerDbUpload(sendKort: boolean) {
     if (error) {
         console.error('Kunne ikke gemme spil-session', error);
         spilTilstand.statusBesked = tekst(
-            `Øen kunne ikke gemmes: ${error.message}`,
-            `The island could not be saved: ${error.message}`
+            'Øen blev ikke gemt. Tjek forbindelsen, og prøv igen om lidt.',
+            'The island was not saved. Check your connection and try again in a moment.'
         );
         return false;
     }
@@ -553,8 +556,8 @@ async function udfoerDbUpload(sendKort: boolean) {
     if (count === 0) {
         console.error('Kunne ikke gemme spil-session: ingen række matchede ø-navnet', spilTilstand.rumKode);
         spilTilstand.statusBesked = tekst(
-            'Øen kunne ikke gemmes: ingen session matchede ø-navnet.',
-            'The island could not be saved: no session matched the island name.'
+            'Øen blev ikke fundet. Kontroller øens navn, og prøv igen.',
+            'The island was not found. Check the island name and try again.'
         );
         return false;
     }
@@ -620,8 +623,8 @@ export async function gemHighscore() {
         huskVentendeHighscore(lavPayload());
         gemOfflineScore(true);
         spilTilstand.statusBesked = tekst(
-            'Login mangler eller er udløbet. Scoren er gemt i browseren og sendes, når du logger ind igen.',
-            'Login is missing or expired. The score is saved in the browser and will be sent when you log in again.'
+            'Du er blevet logget ud. Scoren er gemt på denne enhed og sendes, næste gang du logger ind.',
+            'You have been logged out. The score is saved on this device and will be sent the next time you log in.'
         );
         return false;
     }
@@ -636,15 +639,15 @@ export async function gemHighscore() {
         if (error.message.toLowerCase().includes('logget ind')) {
             markerLoginUdlobet();
             spilTilstand.statusBesked = tekst(
-                'Login mangler eller er udløbet. Scoren er gemt i browseren og sendes, når du logger ind igen.',
-                'Login is missing or expired. The score is saved in the browser and will be sent when you log in again.'
+                'Du er blevet logget ud. Scoren er gemt på denne enhed og sendes, næste gang du logger ind.',
+                'You have been logged out. The score is saved on this device and will be sent the next time you log in.'
             );
             return false;
         }
         gemOfflineScore(true);
         spilTilstand.statusBesked = tekst(
-            `Scoren kunne ikke gemmes globalt: ${error.message} Den prøves igen automatisk fra denne browser.`,
-            `The score could not be saved globally: ${error.message} It will be retried automatically from this browser.`
+            'Scoren er gemt på denne enhed, men kunne ikke sendes til toplisten endnu. Vi prøver automatisk igen.',
+            'The score is saved on this device but could not be sent to the leaderboard yet. We will try again automatically.'
         );
         return false;
     }
@@ -791,7 +794,7 @@ async function sendHighscorePayload(payload: HighscorePayload) {
     const sessionUser = sessionResultat?.data.session?.user;
     if (!sessionUser) {
         markerLoginUdlobet();
-        return new Error('Du er ikke logget ind længere. Log ind igen og prøv at gemme scoren.');
+        return new Error('Du er ikke logget ind længere. Scoren er gemt på denne enhed og sendes, når du logger ind igen.');
     }
     let payloadMedBruger = { ...payload, user_id: payload.user_id ?? sessionUser.id };
 
@@ -823,7 +826,7 @@ async function sendHighscorePayload(payload: HighscorePayload) {
             }
             sidsteFejl = error;
         } catch (error) {
-            sidsteFejl = error instanceof Error ? error : new Error('Gemning af score fejlede.');
+            sidsteFejl = error instanceof Error ? error : new Error('Scoren kunne ikke gemmes.');
         }
 
         await new Promise(resolve => setTimeout(resolve, 900 * forsoeg));

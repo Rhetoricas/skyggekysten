@@ -182,7 +182,7 @@ export function indlaesOfflineSpil() {
         spilTilstand.sidsteBersaerkDag = data.sidsteBersaerkDag ?? 0;
         spilTilstand.harEnergisyn = data.harEnergisyn ?? false;
         spilTilstand.musikTaendt = data.musikTaendt ?? true;
-        spilTilstand.statusBesked = tekst('Offline-spil indlæst.', 'Offline game loaded.');
+        spilTilstand.statusBesked = tekst('Dit offline-spil er indlæst.', 'Your offline game is loaded.');
 
         return true;
     } catch {

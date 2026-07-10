@@ -115,7 +115,7 @@ export function beskrivSlutSalg(udstyr: RygsækTing[] = []) {
             if (salgspris <= 0) return '';
             const antal = Math.max(0, Math.floor(Number(ting.maengde) || 0));
             const navn = itemNavn(ting.id);
-            return `${antal > 1 ? `${antal} x ` : ''}${navn} (${salgspris} ${tekst('point', 'points')})`;
+            return `${antal > 1 ? `${antal} × ` : ''}${navn} (${salgspris} ${tekst('point', 'points')})`;
         })
         .filter(Boolean);
 

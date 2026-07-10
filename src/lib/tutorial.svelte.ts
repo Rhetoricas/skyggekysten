@@ -12,50 +12,50 @@ export const TUTORIAL_RANGTRIN = [
     {
         point: 0,
         titel: 'Landkrabbe',
-        tekst: 'Du kom i gang og fik prøvet øens grundregler.'
+        tekst: 'Du kom i gang og lærte øens grundregler.'
     },
     {
         point: 500,
         titel: 'Begynder',
-        tekst: 'Du fandt rytmen i bevægelse, energi og de første valg.'
+        tekst: 'Du har styr på bevægelse, energi og de første valg.'
     },
     {
         point: 1000,
         titel: 'Stifinder',
-        tekst: 'Du brugte øen målrettet og kom hjem med en solid forståelse.'
+        tekst: 'Du fandt en sikker rute og brugte øens muligheder godt.'
     },
     {
         point: 1500,
         titel: 'Ø-kender',
-        tekst: 'Du fik både udstyr, udforskning og tempo til at arbejde sammen.'
+        tekst: 'Du fik udstyr, udforskning og tempo til at arbejde sammen.'
     },
     {
         point: 2000,
         titel: 'Tågevandrer',
-        tekst: 'Du spiller tutorialen som en rigtig ekspedition.'
+        tekst: 'Du bevæger dig gennem tutorialen som på en rigtig ekspedition.'
     }
 ];
 
 const tutorialRangEngelsk = [
     {
         titel: 'Landlubber',
-        tekst: 'You got started and tried the island basics.'
+        tekst: 'You got started and learned the island basics.'
     },
     {
         titel: 'Beginner',
-        tekst: 'You found the rhythm of movement, energy and the first choices.'
+        tekst: 'You understand movement, energy and the first choices.'
     },
     {
         titel: 'Pathfinder',
-        tekst: 'You used the island with purpose and came home with solid understanding.'
+        tekst: 'You found a safe route and used the island well.'
     },
     {
-        titel: 'Island-Knower',
-        tekst: 'You got equipment, exploration and tempo working together.'
+        titel: 'Island Guide',
+        tekst: 'You brought equipment, exploration and pace together.'
     },
     {
         titel: 'Fog Walker',
-        tekst: 'You play the tutorial like a real expedition.'
+        tekst: 'You move through the tutorial like a real expedition.'
     }
 ];
 
@@ -108,7 +108,7 @@ export const tutorialKarakter: Karakter = {
     id: 'tutorial_laerling',
     navn: 'Lærling',
     ikon: '/game_faces/beginner.webp',
-    startMsg: 'En rolig øvelsestur.',
+    startMsg: 'En rolig tur, hvor du kan lære øen at kende.',
     startHp: 120,
     startGuld: 180,
     startUdstyr: ['skovl', 'mad', 'sovepose'],
@@ -116,8 +116,8 @@ export const tutorialKarakter: Karakter = {
     digCost: 2,
     dmgMod: 1,
     goldMod: 1,
-    fordel: 'Balanceret øvelseskarakter med skovl, mad og lidt ekstra fejlmargin.',
-    ulempe: 'Bruges kun på tutorial-øen og tæller ikke med i scores.',
+    fordel: 'Du ser langt, graver billigt og starter med skovl, mad og sovepose.',
+    ulempe: 'Lærlingen bruges kun i tutorialen og tæller ikke med i din score.',
     baseEnergi: 12,
     synsRadius: 2
 };
@@ -140,11 +140,11 @@ export const tutorialTrin: TutorialTrin[] = [
     {
         id: 'move',
         titel: '1. Gå i land',
-        tekst: 'Tutorial-øen er 20 felter bred og 10 felter høj. Tryk på et nabofelt for at flytte.',
+        tekst: 'Tutorial-øen er 20 × 10 felter. Tryk på et felt ved siden af dig for at flytte.',
         popupTitel: 'Velkommen, Lærling',
-        popupTekst: 'Her prøver du de vigtigste dele af Tågeøerne uden at påvirke rigtige øer, gemte spil eller highscores.',
+        popupTekst: 'Her kan du lære de vigtigste dele af Tågeøerne uden at påvirke gemte spil eller toplisten.',
         popupPunkter: [
-            'Kortet er 20 felter bredt og 10 felter højt. Rigtige øer er cirka 100 x 20.',
+            'Kortet er 20 × 10 felter. De store øer er omkring 100 × 20.',
             'Tryk på et felt lige ved siden af Lærling for at flytte.',
             'Øverst ligger fokus, spørgsmålstegn, regelbog og lyd. Nederst ligger HP, guld, energi, gravning og rygsæk.'
         ],
@@ -153,105 +153,105 @@ export const tutorialTrin: TutorialTrin[] = [
     {
         id: 'help',
         titel: '2. Brug spørgsmålstegnet',
-        tekst: 'Tryk på ? øverst i højre hjørne og derefter på et felt, ikon eller statusfelt for at få en forklaring.',
-        popupTitel: 'Få hjælp på selve skærmen',
-        popupTekst: 'Spørgsmålstegnet er den hurtigste måde at forstå interface og felter på, mens du spiller.',
+        tekst: 'Tryk på ? øverst til højre. Tryk derefter på et felt, et ikon eller en status for at få en forklaring.',
+        popupTitel: 'Få hjælp direkte på skærmen',
+        popupTekst: 'Spørgsmålstegnet forklarer felter, ikoner og status, mens du spiller.',
         popupPunkter: [
-            'Tryk på ? øverst i højre hjørne for at slå forklaringsmode til.',
+            'Tryk på ? øverst til højre for at slå hjælpen til.',
             'Tryk derefter på et felt, HP, guld, energi, graveknappen eller en genstand.',
-            'Tryk på ? igen, når du vil tilbage til normal styring.'
+            'Tryk på ? igen for at vende tilbage til spillet.'
         ],
         laesMere: 'Når du senere møder mærkelige felter eller nye ikoner, er ? det første sted at starte.'
     },
     {
         id: 'rulebook',
         titel: '3. Åbn regelbogen',
-        tekst: 'Tryk på bog-ikonet øverst. Den er altid der, når du bliver i tvivl om reglerne.',
-        popupTitel: 'Regelbogen er din reference',
-        popupTekst: 'Regelbogen forklarer de større systemer: tåge, både, udstyr, events, gravning, score og karakterer.',
+        tekst: 'Tryk på bogikonet øverst. Her kan du altid slå en regel op.',
+        popupTitel: 'Brug regelbogen, når du er i tvivl',
+        popupTekst: 'Her finder du reglerne for tåge, både, udstyr, hændelser, gravning, score og karakterer.',
         popupPunkter: [
             'Du behøver ikke læse den fra start til slut.',
             'Brug den, når du vil forstå hvorfor noget skete.',
-            'Den almindelige ø bliver meget lettere, når du kender få nøgleregler.'
+            'De store øer bliver lettere at læse, når du kender nogle få nøgleregler.'
         ],
         laesMere: 'Tutorialen viser kun det vigtigste. Regelbogen er dér, hvor du kan sætte dig mere ind i detaljerne.'
     },
     {
         id: 'dig',
         titel: '4. Grav efter noget',
-        tekst: 'Gå til markfeltet på ruten og tryk på graveknappen i bunden. Skovlen gør det billigere.',
-        popupTitel: 'Gravning afslører skjulte ting',
-        popupTekst: 'Nogle felter gemmer guld, rødder, fælder eller loot. Graveknappen i bunden bliver aktiv, når feltet kan graves.',
+        tekst: 'Gå til marken på ruten, og tryk på graveknappen nederst. Med en skovl bruger du mindre energi.',
+        popupTitel: 'Der kan ligge noget under jorden',
+        popupTekst: 'Nogle felter gemmer guld, helende rødder, fælder eller udstyr. Graveknappen bliver aktiv, når du kan grave på feltet.',
         popupPunkter: [
-            'Skovl gør gravning billigere og mindre risikabelt end at grave med hænderne.',
+            'En skovl gør gravning billigere og mindre risikabel end at grave med hænderne.',
             'Gravning bruger energi. Når energien slipper op, går dagen videre.',
             'Det er ikke altid værd at grave alt. Tågen presser dig mod øst.'
         ],
-        laesMere: 'Regelbogen har mere om skjulte fælder, rødder, skovle og særlige grave-genstande.'
+        laesMere: 'Regelbogen har mere om skjulte fælder, rødder, skovle og særligt graveudstyr.'
     },
     {
         id: 'item',
         titel: '5. Brug rygsækken',
-        tekst: 'Tryk på din madration i bunden. Genstande i rygsækken bruges ved at trykke på dem.',
+        tekst: 'Tryk på din madration nederst. Du bruger genstande i rygsækken ved at trykke på dem.',
         popupTitel: 'Rygsækken er din værktøjskasse',
-        popupTekst: 'Genstande i bunden kan enten bruges med et klik eller give passive effekter. Madration er god at prøve, fordi den virker med det samme.',
+        popupTekst: 'Nogle genstande bruger du selv, mens andre virker automatisk. Madrationen virker med det samme og er et godt sted at begynde.',
         popupPunkter: [
-            'Tryk på mad for at få HP og gøre næste bevægelse gratis.',
+            'Tryk på madrationen for at få HP og gøre næste bevægelse gratis.',
             'Nogle ting virker kun i bestemte situationer og bliver grå, når de ikke kan bruges.',
             'Andre ting virker automatisk, for eksempel udstyr der ændrer skade, syn eller energi.'
         ],
-        laesMere: 'Brug ? på en genstand, hvis du vil vide om den er aktiv, passiv eller situationsbestemt.'
+        laesMere: 'Brug ? på en genstand for at se, hvornår og hvordan den virker.'
     },
     {
         id: 'shop',
         titel: '6. Besøg markedet',
-        tekst: 'Gå ind på markedet og køb en vare. Guld bruges i butikker og tæller normalt med i score.',
-        popupTitel: 'Butikker omsætter guld til muligheder',
-        popupTekst: 'Når du går ind på et marked eller en butik, kan du købe udstyr. I rigtige spil skal du vurdere, om pengene er bedre brugt eller gemt til score.',
+        tekst: 'Gå ind på markedet, og køb en vare. Guld kan bruges på udstyr eller gemmes til din score.',
+        popupTitel: 'Brug guldet – eller tag det med hjem',
+        popupTekst: 'På markeder og i butikker kan du købe udstyr. På en rigtig ø må du vælge mellem hjælp her og nu eller mere guld til din score.',
         popupPunkter: [
-            'Klik på en vare for at købe den.',
-            'Klik på egne genstande i butikken for at sælge dem.',
-            'Nogle varer er almindelige, mens sjældne relikvier typisk findes i events.'
+            'Tryk på en vare for at købe den.',
+            'Tryk på dine egne genstande for at sælge dem.',
+            'Nogle varer er almindelige, mens sjældne relikvier typisk findes i hændelser.'
         ],
         laesMere: 'Regelbogen forklarer butikker, værksteder, salgsværdi og hvordan guld tæller med i slutscoren.'
     },
     {
         id: 'event',
-        titel: '7. Prøv et event',
-        tekst: 'Gå til prismet på ruten og vælg en handling. Der er også et ekstra tutorialevent tæt ved.',
-        popupTitel: 'Events er øens små historier',
-        popupTekst: 'Events giver valg. På tutorial-øen ligger der både prismet fra det rigtige eventbibliotek og et ekstra tutorialevent, så du kan se, at felter kan gemme forskellige situationer.',
+        titel: '7. Prøv en hændelse',
+        tekst: 'Gå til prismet på ruten, og vælg en handling. Der ligger endnu et prisme i nærheden, hvis du vil prøve mere.',
+        popupTitel: 'Hændelser giver dig valg',
+        popupTekst: 'En hændelse sætter dig i en situation og lader dig vælge, hvad du gør. Nogle valg kræver bestemt udstyr eller har en tydelig risiko.',
         popupPunkter: [
             'Prismet kan have låste valg, hvis du mangler bestemte genstande.',
-            'Tutorialeventet er mere roligt og viser samme grundidé uden så meget risiko.',
-            'Et godt item kan ofte åbne en bedre eller mere sikker løsning.',
-            'Når eventet er færdigt, går tiden normalt videre.'
+            'Hændelsen i tutorialen er mere rolig og viser samme grundidé med mindre risiko.',
+            'Det rette udstyr kan ofte åbne en bedre eller mere sikker løsning.',
+            'Når hændelsen er slut, går tiden normalt videre.'
         ],
-        laesMere: 'Senere kan du bruge regelbogen til at forstå krav, våbenfordele, relikvier og særlige event-kæder.'
+        laesMere: 'Regelbogen forklarer krav, våbenfordele, relikvier og længere hændelsesforløb.'
     },
     {
         id: 'boat',
         titel: '8. Find båden',
-        tekst: 'Fortsæt mod øst til flugtbåden. Når du går ombord, er øen klaret.',
+        tekst: 'Fortsæt mod øst til flugtbåden. Gå ombord for at klare øen.',
         popupTitel: 'Målet er ikke at se alt',
-        popupTekst: 'Tågeøerne handler om at overleve længe nok til at nå en flugtbåd. På rigtige øer kommer bådene typisk mod øst, og tågen presser bagfra.',
+        popupTekst: 'Du skal ikke undersøge alt. Du skal overleve længe nok til at nå en flugtbåd. På de store øer ligger bådene typisk mod øst, mens tågen presser på bagfra.',
         popupPunkter: [
             'Du vinder ved at gå ombord på en båd.',
-            'Rigtige øer er større, så rutevalg og tempo betyder mere.',
+            'De store øer kræver skarpere rutevalg og et højere tempo.',
             'Det er ofte bedre at nå frem end at rydde hele kortet.'
         ],
-        laesMere: 'Regelbogen har mere om tågens retning, bådenes timing og hvordan flere spillere deler øen.'
+        laesMere: 'Regelbogen har mere om tågens retning, hvornår bådene ankommer, og hvordan flere spillere deler øen.'
     },
     {
         id: 'done',
         titel: 'Tutorial klaret',
-        tekst: 'Du har prøvet de vigtigste knapper. Rigtige øer er større, farligere og cirka 100 x 20 felter.',
+        tekst: 'Du har prøvet de vigtigste handlinger. De store øer er farligere og omkring 100 × 20 felter.',
         popupTitel: 'Du er klar til en rigtig ø',
-        popupTekst: 'Du har prøvet bevægelse, hjælp, regelbog, gravning, rygsæk, butik, event og flugtbåd.',
+        popupTekst: 'Du har bevæget dig, gravet, brugt udstyr, handlet, mødt en hændelse og fundet flugtbåden. Nu er du klar til tågen.',
         popupPunkter: [
-            'På startskærmen kan du skrive et ø-navn eller få et tilfældigt.',
-            'Samme ø-navn giver samme ø, så andre kan lande samme sted i starten.',
-            'Brug ? og regelbogen undervejs, når spillet begynder at åbne sig.'
+            'På startskærmen kan du skrive et ønavn eller få et tilfældigt forslag.',
+            'Det samme ønavn skaber den samme ø, så andre kan lande der i begyndelsen.',
+            'Brug ? og regelbogen undervejs, når du møder noget nyt.'
         ],
         laesMere: 'Det er helt fint ikke at kende alle regler fra start. Spillet er lavet til at blive lært gennem ture.'
     }
@@ -260,112 +260,112 @@ export const tutorialTrin: TutorialTrin[] = [
 const tutorialTrinEngelsk: Record<TutorialTrinId, Partial<TutorialTrin>> = {
     move: {
         titel: '1. Land',
-        tekst: 'The tutorial island is 20 fields wide and 10 fields high. Tap a neighboring field to move.',
+        tekst: 'The tutorial island is 20 × 10 tiles. Tap a tile next to you to move.',
         popupTitel: 'Welcome, Apprentice',
-        popupTekst: 'Here you try the most important parts of Fog Island without affecting real islands, saved games or highscores.',
+        popupTekst: 'Here you can learn the most important parts of Fog Island without affecting saved games or the leaderboard.',
         popupPunkter: [
-            'The map is 20 fields wide and 10 fields high. Real islands are about 100 x 20.',
-            'Tap a field right next to the Apprentice to move.',
+            'The map is 20 × 10 tiles. Larger islands are about 100 × 20.',
+            'Tap a tile next to the Apprentice to move.',
             'The top holds focus, help, rulebook and sound. The bottom holds HP, gold, energy, digging and backpack.'
         ],
         laesMere: 'You do not need to remember everything now. The question mark and rulebook are built to help you later.'
     },
     help: {
-        titel: '2. Use The Question Mark',
-        tekst: 'Tap ? in the top right corner and then tap a field, icon or status field to get an explanation.',
-        popupTitel: 'Get Help On The Screen',
-        popupTekst: 'The question mark is the fastest way to understand the interface and fields while playing.',
+        titel: '2. Use the question mark',
+        tekst: 'Tap ? in the top right. Then tap a tile, icon or status to see an explanation.',
+        popupTitel: 'Get help on screen',
+        popupTekst: 'The question mark explains tiles, icons and status while you play.',
         popupPunkter: [
-            'Tap ? in the top right corner to turn explanation mode on.',
-            'Then tap a field, HP, gold, energy, the dig button or an item.',
-            'Tap ? again when you want normal control back.'
+            'Tap ? in the top right to turn help on.',
+            'Then tap a tile, HP, gold, energy, the dig button or an item.',
+            'Tap ? again to return to the game.'
         ],
-        laesMere: 'When you later meet strange fields or new icons, ? is the first place to start.'
+        laesMere: 'When you later meet unfamiliar tiles or new icons, ? is the first place to start.'
     },
     rulebook: {
-        titel: '3. Open The Rulebook',
-        tekst: 'Tap the book icon at the top. It is always there when you are unsure about the rules.',
-        popupTitel: 'The Rulebook Is Your Reference',
-        popupTekst: 'The rulebook explains the larger systems: fog, boats, equipment, events, digging, score and characters.',
+        titel: '3. Open the rulebook',
+        tekst: 'Tap the book icon at the top. You can always look up a rule here.',
+        popupTitel: 'Use the rulebook when in doubt',
+        popupTekst: 'It covers fog, boats, equipment, events, digging, score and characters.',
         popupPunkter: [
             'You do not need to read it from start to finish.',
             'Use it when you want to understand why something happened.',
-            'The ordinary island becomes much easier once you know a few key rules.'
+            'Larger islands become easier to read once you know a few key rules.'
         ],
         laesMere: 'The tutorial shows only the essentials. The rulebook is where you can dig into the details.'
     },
     dig: {
-        titel: '4. Dig Something Up',
-        tekst: 'Go to the field field on the route and tap the dig button at the bottom. The shovel makes it cheaper.',
-        popupTitel: 'Digging Reveals Hidden Things',
-        popupTekst: 'Some fields hide gold, roots, traps or loot. The dig button at the bottom becomes active when the field can be dug.',
+        titel: '4. Dig something up',
+        tekst: 'Go to the field on the route and tap the dig button at the bottom. A shovel costs less energy.',
+        popupTitel: 'Something may be buried here',
+        popupTekst: 'Some tiles hide gold, healing roots, traps or equipment. The dig button becomes active when you can dig on the tile.',
         popupPunkter: [
-            'Shovel makes digging cheaper and less risky than digging with your hands.',
+            'A shovel makes digging cheaper and less risky than digging with your hands.',
             'Digging uses energy. When energy runs out, the day advances.',
             'It is not always worth digging everything. The fog pushes you east.'
         ],
         laesMere: 'The rulebook has more about hidden traps, roots, shovels and special digging items.'
     },
     item: {
-        titel: '5. Use The Backpack',
-        tekst: 'Tap your food ration at the bottom. Items in your backpack are used by tapping them.',
-        popupTitel: 'The Backpack Is Your Toolbox',
-        popupTekst: 'Items at the bottom can either be used with a tap or give passive effects. Food ration is good to try because it works immediately.',
+        titel: '5. Use the backpack',
+        tekst: 'Tap your food ration at the bottom. Tap items in your backpack to use them.',
+        popupTitel: 'The backpack is your toolbox',
+        popupTekst: 'Some items are used directly, while others work automatically. The food ration works at once and is a good place to start.',
         popupPunkter: [
             'Tap food to gain HP and make the next move free.',
             'Some items work only in specific situations and turn grey when they cannot be used.',
             'Other items work automatically, for example equipment that changes damage, sight or energy.'
         ],
-        laesMere: 'Use ? on an item if you want to know whether it is active, passive or situation-based.'
+        laesMere: 'Use ? on an item to see when and how it works.'
     },
     shop: {
-        titel: '6. Visit The Market',
-        tekst: 'Enter the market and buy an item. Gold is used in shops and normally counts toward score.',
-        popupTitel: 'Shops Turn Gold Into Options',
-        popupTekst: 'When you enter a market or shop, you can buy equipment. In real games you must judge whether money is better spent or kept for score.',
+        titel: '6. Visit the market',
+        tekst: 'Enter the market and buy an item. Spend gold on equipment or save it for your score.',
+        popupTitel: 'Spend the gold – or bring it home',
+        popupTekst: 'Markets and shops sell equipment. On a real island, you must choose between help now and more gold for your score.',
         popupPunkter: [
-            'Click an item to buy it.',
-            'Click your own items in the shop to sell them.',
+            'Select an item to buy it.',
+            'Select one of your own items to sell it.',
             'Some goods are common, while rare relics are usually found in events.'
         ],
         laesMere: 'The rulebook explains shops, workshops, sale value and how gold counts in final score.'
     },
     event: {
-        titel: '7. Try An Event',
-        tekst: 'Go to the prism on the route and choose an action. There is also an extra tutorial event nearby.',
-        popupTitel: 'Events Are The Island Stories',
-        popupTekst: 'Events give choices. On the tutorial island there is both the prism from the real event library and an extra tutorial event, so you can see that fields can hide different situations.',
+        titel: '7. Try an event',
+        tekst: 'Go to the prism on the route and choose an action. Another event is nearby if you want to try more.',
+        popupTitel: 'Events give you a choice',
+        popupTekst: 'An event puts you in a situation and lets you decide what to do. Some choices require certain equipment or carry a clear risk.',
         popupPunkter: [
             'The prism may have locked choices if you lack specific items.',
             'The tutorial event is calmer and shows the same basic idea with less risk.',
-            'A good item can often open a better or safer solution.',
-            'When the event is finished, time normally advances.'
+            'The right item can often open a better or safer solution.',
+            'When the event ends, time normally advances.'
         ],
-        laesMere: 'Later you can use the rulebook to understand requirements, weapon advantages, relics and special event chains.'
+        laesMere: 'Later you can use the rulebook to understand requirements, weapon advantages, relics and linked events.'
     },
     boat: {
-        titel: '8. Find The Boat',
-        tekst: 'Continue east to the escape boat. When you board, the island is cleared.',
-        popupTitel: 'The Goal Is Not To See Everything',
-        popupTekst: 'Fog Island is about surviving long enough to reach an escape boat. On real islands, boats usually come toward the east, and the fog presses from behind.',
+        titel: '8. Find the boat',
+        tekst: 'Continue east to the escape boat. Board it to clear the island.',
+        popupTitel: 'The goal is not to see everything',
+        popupTekst: 'You do not need to explore everything. Survive long enough to reach an escape boat. On larger islands, the boats are usually to the east while the fog closes in from behind.',
         popupPunkter: [
             'You win by boarding a boat.',
-            'Real islands are larger, so route choice and tempo matter more.',
+            'Larger islands demand sharper route choices and a faster pace.',
             'It is often better to make it out than to clear the entire map.'
         ],
-        laesMere: 'The rulebook has more about fog direction, boat timing and how several players share the island.'
+        laesMere: 'The rulebook has more about fog direction, when the boats arrive and how several players share the island.'
     },
     done: {
-        titel: 'Tutorial Complete',
-        tekst: 'You tried the most important buttons. Real islands are larger, more dangerous and about 100 x 20 fields.',
-        popupTitel: 'You Are Ready For A Real Island',
-        popupTekst: 'You tried movement, help, rulebook, digging, backpack, shop, event and escape boat.',
+        titel: 'Tutorial complete',
+        tekst: 'You tried the most important actions. Larger islands are more dangerous and about 100 × 20 tiles.',
+        popupTitel: 'You are ready for a larger island',
+        popupTekst: 'You moved, dug, used equipment, traded, faced an event and found the escape boat. You are ready for the fog.',
         popupPunkter: [
             'On the main menu you can write an island name or get a random one.',
             'The same island name gives the same island, so others can land in the same place at the start.',
-            'Use ? and the rulebook along the way when the game starts to open up.'
+            'Use ? and the rulebook whenever you encounter something new.'
         ],
-        laesMere: 'It is completely fine not to know every rule at first. The game is made to be learned through runs.'
+        laesMere: 'You do not need to know every rule at first. The game is meant to be learned one journey at a time.'
     }
 };
 

@@ -50,12 +50,12 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         mytiskSti: '/screens/mineejeren_myth.webp',
         label: 'Mineejer',
         labelEn: 'Mine Owner',
-        krav: 'Overlev spillet med 12 miner ved spilslut.',
-        kravEn: 'Survive the game with 12 mines at game end.',
-        mytiskKrav: 'Overlev spillet med 15 miner ved spilslut.',
-        mytiskKravEn: 'Survive the game with 15 mines at game end.',
-        episkTekst: 'Du ejede 12 miner og slap levende væk.',
-        episkTekstEn: 'You owned 12 mines and escaped alive.'
+        krav: 'Slip væk fra øen med 12 miner.',
+        kravEn: 'Escape the island with 12 mines.',
+        mytiskKrav: 'Slip væk fra øen med 15 miner.',
+        mytiskKravEn: 'Escape the island with 15 mines.',
+        episkTekst: 'Du forlader øen som ejer af 12 miner.',
+        episkTekstEn: 'You leave the island as the owner of 12 mines.'
     },
     {
         id: 'taagekonge',
@@ -63,12 +63,12 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         mytiskSti: '/screens/taagekonge_myth.webp',
         label: 'Tågekonge',
         labelEn: 'Fog King',
-        krav: 'Overlev spillet efter 20 bevægelser i tåge.',
-        kravEn: 'Survive the game after 20 moves in the fog.',
-        mytiskKrav: 'Overlev spillet efter 100 bevægelser i tåge.',
-        mytiskKravEn: 'Survive the game after 100 moves in the fog.',
-        episkTekst: 'Du gik 20 gange i tågen og kom ud igen.',
-        episkTekstEn: 'You walked into the fog 20 times and came back out.'
+        krav: 'Slip væk efter mindst 20 bevægelser i tågen.',
+        kravEn: 'Escape after at least 20 moves in the fog.',
+        mytiskKrav: 'Slip væk efter mindst 100 bevægelser i tågen.',
+        mytiskKravEn: 'Escape after at least 100 moves in the fog.',
+        episkTekst: 'Du tog 20 skridt gennem tågen og fandt alligevel ud.',
+        episkTekstEn: 'You took 20 steps through the fog and still found your way out.'
     },
     {
         id: 'boelgebaereren',
@@ -76,12 +76,12 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         mytiskSti: '/screens/Bølgebæreren_myth.webp',
         label: 'Bølgebærer',
         labelEn: 'Wavebearer',
-        krav: 'Overlev spillet efter at have startet en oversvømmelse og taget skade fra vand 5 gange.',
-        kravEn: 'Survive the game after starting a flood and taking water damage 5 times.',
-        mytiskKrav: 'Overlev spillet efter at have startet en oversvømmelse og taget skade fra vand 30 gange.',
-        mytiskKravEn: 'Survive the game after starting a flood and taking water damage 30 times.',
-        episkTekst: 'Du startede en oversvømmelse, bar vandets straf og overlevede.',
-        episkTekstEn: 'You started a flood, bore the water’s punishment and survived.'
+        krav: 'Start en oversvømmelse, tag skade fra vand 5 gange, og slip væk.',
+        kravEn: 'Start a flood, take water damage 5 times and escape.',
+        mytiskKrav: 'Start en oversvømmelse, tag skade fra vand 30 gange, og slip væk.',
+        mytiskKravEn: 'Start a flood, take water damage 30 times and escape.',
+        episkTekst: 'Du startede en oversvømmelse, tog vandets slag og nåede ud.',
+        episkTekstEn: 'You started a flood, took the hits from the water and made it out.'
     },
     {
         id: 'relikviejaegeren',
@@ -89,12 +89,12 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         mytiskSti: '/screens/relikviejægeren_myth.webp',
         label: 'Relikviejæger',
         labelEn: 'Relic Hunter',
-        krav: 'Overlev spillet med 3 af 4 magiske genstande i rygsækken: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.',
-        kravEn: 'Survive the game with 3 of 4 magical items in your backpack: Rootheart, Golden Distiller, Dragon Staff and Rune Rod.',
-        mytiskKrav: 'Overlev spillet med alle 4 magiske genstande i rygsækken: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.',
-        mytiskKravEn: 'Survive the game with all 4 magical items in your backpack: Rootheart, Golden Distiller, Dragon Staff and Rune Rod.',
-        episkTekst: 'Du bar tre magiske genstande ud af tågen.',
-        episkTekstEn: 'You carried three magical items out of the fog.'
+        krav: 'Slip væk med 3 af disse 4 genstande: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.',
+        kravEn: 'Escape with 3 of these 4 items: Root Heart, Golden Distiller, Dragon Staff and Rune Rod.',
+        mytiskKrav: 'Slip væk med alle 4 genstande: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.',
+        mytiskKravEn: 'Escape with all 4 items: Root Heart, Golden Distiller, Dragon Staff and Rune Rod.',
+        episkTekst: 'Du fik tre af øens sjældneste genstande med ud af tågen.',
+        episkTekstEn: 'You carried three of the island’s rarest items out of the fog.'
     },
     {
         id: 'guldfyrsten',
@@ -102,12 +102,12 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         mytiskSti: '/screens/guldfyrsten_myth.webp',
         label: 'Guldfyrste',
         labelEn: 'Gold Prince',
-        krav: 'Overlev spillet med 5000 guld. Kun rent guld tæller.',
-        kravEn: 'Survive the game with 5000 gold. Only pure gold counts.',
-        mytiskKrav: 'Overlev spillet med 8000 guld. Kun rent guld tæller.',
-        mytiskKravEn: 'Survive the game with 8000 gold. Only pure gold counts.',
-        episkTekst: 'Du slap væk med 5000 guld i hænderne.',
-        episkTekstEn: 'You escaped with 5000 gold in your hands.'
+        krav: 'Slip væk med 5000 guld. Kun din guldbeholdning tæller.',
+        kravEn: 'Escape with 5000 gold. Only the gold you hold counts.',
+        mytiskKrav: 'Slip væk med 8000 guld. Kun din guldbeholdning tæller.',
+        mytiskKravEn: 'Escape with 8000 gold. Only the gold you hold counts.',
+        episkTekst: 'Du forlader øen med 5000 guld.',
+        episkTekstEn: 'You leave the island with 5000 gold.'
     },
     {
         id: 'livsvogteren',
@@ -115,12 +115,12 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         mytiskSti: '/screens/livsvogteren_myth.webp',
         label: 'Livvogter',
         labelEn: 'Life Warden',
-        krav: 'Overlev spillet efter at have healet 400 HP.',
-        kravEn: 'Survive the game after healing 400 HP.',
-        mytiskKrav: 'Overlev spillet efter at have healet 1200 HP.',
-        mytiskKravEn: 'Survive the game after healing 1200 HP.',
-        episkTekst: 'Du helede 400 HP og holdt dig levende hele vejen.',
-        episkTekstEn: 'You healed 400 HP and kept yourself alive all the way.'
+        krav: 'Hel mindst 400 HP i løbet af spillet, og slip væk.',
+        kravEn: 'Heal at least 400 HP during the game and escape.',
+        mytiskKrav: 'Hel mindst 1200 HP i løbet af spillet, og slip væk.',
+        mytiskKravEn: 'Heal at least 1200 HP during the game and escape.',
+        episkTekst: 'Du helede 400 HP og holdt dig i live hele vejen.',
+        episkTekstEn: 'You healed 400 HP and stayed alive all the way.'
     },
     {
         id: 'korttegneren',
@@ -128,12 +128,12 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         mytiskSti: '/screens/korttegneren_myth.webp',
         label: 'Korttegner',
         labelEn: 'Cartographer',
-        krav: 'Overlev spillet med 1500 kendte felter.',
-        kravEn: 'Survive the game with 1500 known fields.',
-        mytiskKrav: 'Overlev spillet med 2000 kendte felter.',
-        mytiskKravEn: 'Survive the game with 2000 known fields.',
-        episkTekst: 'Du kortlagde 1500 felter og fandt hjem.',
-        episkTekstEn: 'You mapped 1500 fields and found your way home.'
+        krav: 'Afslør mindst 1500 felter, og slip væk.',
+        kravEn: 'Reveal at least 1500 tiles and escape.',
+        mytiskKrav: 'Afslør mindst 2000 felter, og slip væk.',
+        mytiskKravEn: 'Reveal at least 2000 tiles and escape.',
+        episkTekst: 'Du kortlagde 1500 felter og fandt vejen ud.',
+        episkTekstEn: 'You mapped 1500 tiles and found your way out.'
     },
     {
         id: 'udstyrsmesteren',
@@ -141,25 +141,25 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
         mytiskSti: '/screens/udstyrsmesteren_myth.webp',
         label: 'Udstyrsmester',
         labelEn: 'Equipment Master',
-        krav: 'Overlev spillet med 10 opgraderede items i rygsækken på samme tid.',
-        kravEn: 'Survive the game with 10 upgraded items in your backpack at the same time.',
-        mytiskKrav: 'Overlev spillet med 13 opgraderingspoint i rygsækken på samme tid.',
-        mytiskKravEn: 'Survive the game with 13 upgrade points in your backpack at the same time.',
-        episkTekst: 'Du bar 10 mesterlige stykker udstyr på samme tid.',
-        episkTekstEn: 'You carried 10 masterwork pieces of equipment at the same time.'
+        krav: 'Slip væk med 10 opgraderingspoint i rygsækken på samme tid.',
+        kravEn: 'Escape with 10 upgrade points in your backpack at the same time.',
+        mytiskKrav: 'Slip væk med 13 opgraderingspoint i rygsækken på samme tid.',
+        mytiskKravEn: 'Escape with 13 upgrade points in your backpack at the same time.',
+        episkTekst: 'Du fik en hel samling opgraderet udstyr med hjem.',
+        episkTekstEn: 'You brought home a full collection of upgraded equipment.'
     },
     {
         id: 'diamantjaegeren',
         sti: '/screens/diamantjægeren.webp',
         label: 'Diamantjæger',
         labelEn: 'Diamond Hunter',
-        krav: 'Overlev spillet efter at have fundet diamanter med en samlet værdi på mindst 3000.',
-        kravEn: 'Survive the game after finding diamonds with a total value of at least 3000.',
+        krav: 'Find diamanter til mindst 3000 guld i alt, og slip væk.',
+        kravEn: 'Find diamonds worth at least 3000 gold in total and escape.',
         mytiskSti: '/screens/diamantjægeren_myth.webp',
-        mytiskKrav: 'Overlev spillet efter at have fundet diamanter med en samlet værdi på mindst 6000.',
-        mytiskKravEn: 'Survive the game after finding diamonds with a total value of at least 6000.',
-        episkTekst: 'Du fandt diamanter med en samlet værdi på mindst 3000.',
-        episkTekstEn: 'You found diamonds with a total value of at least 3000.'
+        mytiskKrav: 'Find diamanter til mindst 6000 guld i alt, og slip væk.',
+        mytiskKravEn: 'Find diamonds worth at least 6000 gold in total and escape.',
+        episkTekst: 'Du fandt diamanter til mindst 3000 guld og slap væk fra øen.',
+        episkTekstEn: 'You found diamonds worth at least 3000 gold and escaped the island.'
     }
 ];
 

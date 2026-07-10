@@ -102,8 +102,8 @@ export function udloesBersaerkHvisRelevant(faktiskSkade: number) {
     spilTilstand.gratisNaesteBevaegelse = true;
     spilTilstand.gratisBevaegelseKilde = 'bersaerk';
     return tekst(
-        ' Smerten vækker bersærkergangen. Næste energikrævende handling koster 0 energi.',
-        ' The pain wakes berserk. The next energy-costing action costs 0 energy.'
+        ' Smerten vækker din bersærkergang. Din næste handling med energiforbrug er gratis.',
+        ' The pain awakens your berserk rage. Your next action with an energy cost is free.'
     );
 }
 
@@ -265,7 +265,7 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
         if (erHavet) registrerVandSkade(faktiskSkade);
 
         if (brugEliksir()) {
-            spilTilstand.logBesked = tekst(`Du faldt om. ${beskedMedTal} Eliksiren redder dig.`, `You fell. ${beskedMedTal} The elixir saves you.`);
+            spilTilstand.logBesked = tekst(`${beskedMedTal} Du falder om, men livseliksiren redder dig.`, `${beskedMedTal} You collapse, but the life elixir saves you.`);
             syncTilDb();
             return;
         }
@@ -289,11 +289,11 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
 
         const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
         if (aktueltFelt && spilTilstand.valgtKarakter) {
-            tilfoejGravsten(aktueltFelt, doedsBesked || tekst(`${beskedMedTal} Du døde.`, `${beskedMedTal} You died.`));
+            tilfoejGravsten(aktueltFelt, doedsBesked || tekst(`${beskedMedTal} Du dør.`, `${beskedMedTal} You die.`));
             broadcastFelt(spilTilstand.spillerIndex, aktueltFelt);
         }
         
-        spilTilstand.logBesked = doedsBesked || tekst(`${beskedMedTal} Du døde.`, `${beskedMedTal} You died.`);
+        spilTilstand.logBesked = doedsBesked || tekst(`${beskedMedTal} Du dør.`, `${beskedMedTal} You die.`);
         syncTilDb(true);
     } else {
         const erHavet = rensetBesked.includes("havet") || rensetBesked.includes("saltvand") || rensetBesked.includes("hav") || erVandBiome(spilTilstand.gitter[spilTilstand.spillerIndex]?.biome);
@@ -329,7 +329,7 @@ export function tjekOverlevelse() {
 
     if (erSpillerITaagen()) {
         if (brugEliksir()) {
-            spilTilstand.logBesked = tekst('Du var ved at kollapse, men livseliksiren redder dig.', 'You were about to collapse, but the life elixir saves you.');
+            spilTilstand.logBesked = tekst('Du er ved at kollapse, men livseliksiren redder dig.', 'You are about to collapse, but the life elixir saves you.');
             syncTilDb();
             return;
         }
@@ -343,11 +343,11 @@ export function tjekOverlevelse() {
 
         const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
         if (aktueltFelt && spilTilstand.valgtKarakter) {
-            tilfoejGravsten(aktueltFelt, tekst('Tågen lukker sig om dig. Du mister resten af dit liv.', 'The fog closes around you. You lose the rest of your life.'));
+            tilfoejGravsten(aktueltFelt, tekst('Tågen lukker sig om dig. Du dør i den giftige luft.', 'The fog closes around you. You die in the toxic air.'));
             broadcastFelt(spilTilstand.spillerIndex, aktueltFelt);
         }
 
-        spilTilstand.logBesked = tekst('Tågen lukker sig om dig. Du mister resten af dit liv.', 'The fog closes around you. You lose the rest of your life.');
+        spilTilstand.logBesked = tekst('Tågen lukker sig om dig. Du dør i den giftige luft.', 'The fog closes around you. You die in the toxic air.');
         syncTilDb(true);
         return;
     }
@@ -404,7 +404,7 @@ export function fremrykTid() {
             const placeret = placerManglendeFlugtbaade(kystFelter, antalBaade);
             if (placeret > 0) kortAendret = true;
             
-            samletLog += tekst('Et horn lyder mod øst. Flugtbådene er ankommet.', 'A horn sounds to the east. The escape boats have arrived.');
+            samletLog += tekst('Et horn lyder mod øst. Flugtbådene venter ved kysten.', 'A horn sounds to the east. The escape boats are waiting by the coast.');
             spilTilstand.gitter = [...spilTilstand.gitter];
         }
 
@@ -414,8 +414,8 @@ export function fremrykTid() {
 
         if (taagenVendte) {
             spilTilstand.logBesked = tekst(
-                'Vinden vender ved østkysten. Tågen stiger til niveau 2 og giver dobbelt skade, medmindre en tågeblokker holder den nede.',
-                'The wind turns at the east coast. The fog rises to level 2 and deals double damage unless a fog blocker holds it down.'
+                'Vinden vender ved østkysten. Tågen når niveau 2 og giver dobbelt skade, medmindre en tågeblokker beskytter dig.',
+                'The wind turns at the east coast. The fog reaches level 2 and deals double damage unless a fog blocker protects you.'
             );
         }
     }
@@ -427,10 +427,10 @@ export function fremrykTid() {
         tagSkadeOgTjekDød(
             tredobbeltTaage ? 90 : dobbeltTaage ? 60 : 30,
             tredobbeltTaage
-                ? tekst('Tågen har krydset hele øen og stiger til niveau 3. Den lægger sig tre gange så tungt om dig.', 'The fog has crossed the whole island and rises to level 3. It settles three times as heavily around you.')
+                ? tekst('Tågen har krydset hele øen og nået niveau 3. Den giver dig tredobbelt skade.', 'The fog has crossed the entire island and reached level 3. It deals triple damage to you.')
                 : dobbeltTaage
-                ? tekst('Tågen er på niveau 2 og lægger sig dobbelt tungt om dig.', 'The fog is level 2 and settles twice as heavily around you.')
-                : tekst('Tågens syre ætsede dine lunger.', 'The fog acid burned your lungs.')
+                ? tekst('Tågen er på niveau 2 og giver dig dobbelt skade.', 'The fog is at level 2 and deals double damage to you.')
+                : tekst('Den giftige tåge ætser dine lunger.', 'The toxic fog burns your lungs.')
         );
         if (kortAendret && spilTilstand.gameState === 'play') syncTilDb(true);
     } else {
@@ -440,11 +440,11 @@ export function fremrykTid() {
 
 export function udfoerBlodofring() {
     if (!erSpillerITaagen()) {
-        spilTilstand.logBesked = tekst('Du kan kun drikke af dit blod, når tågen omslutter dig.', 'You can only drink from your blood when the fog surrounds you.');
+        spilTilstand.logBesked = tekst('Du kan kun bruge blodofferet, når tågen omslutter dig.', 'You can only use the blood sacrifice while the fog surrounds you.');
         return;
     }
     if (spilTilstand.maxLivspoint <= 10) {
-        spilTilstand.logBesked = tekst('Du kan ikke sænke Max HP mere.', 'You cannot lower Max HP any further.');
+        spilTilstand.logBesked = tekst('Du kan ikke sænke dit maks. HP yderligere.', 'You cannot lower your maximum HP any further.');
         return;
     }
     
@@ -453,7 +453,7 @@ export function udfoerBlodofring() {
     spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 50);
     registrerHeling(foerHp, spilTilstand.livspoint);
     
-    spilTilstand.logBesked = tekst('Du bruger blodofferet. (-10 Max HP, +50 HP)', 'You use the blood sacrifice. (-10 Max HP, +50 HP)');
+    spilTilstand.logBesked = tekst('Du ofrer 10 maks. HP og genvinder 50 HP.', 'You sacrifice 10 maximum HP and recover 50 HP.');
     
     syncTilDb();
 }
@@ -462,13 +462,13 @@ export function fremtvingKollaps(brugerdefineretAarsag?: string) {
     if (spilTilstand.gameState !== 'play' || spilTilstand.erBevidstløs) return;
 
     if (erVandBiome(spilTilstand.gitter[spilTilstand.spillerIndex]?.biome)) {
-        druknSpiller(brugerdefineretAarsag || tekst('Du mistede bevidstheden i vandet og druknede.', 'You lost consciousness in the water and drowned.'));
+        druknSpiller(brugerdefineretAarsag || tekst('Du mister bevidstheden i vandet og drukner.', 'You lose consciousness in the water and drown.'));
         return;
     }
 
     if (brugEliksir()) {
-        const aarsag = brugerdefineretAarsag ? `${brugerdefineretAarsag} ` : tekst('Du var ved at kollapse. ', 'You were about to collapse. ');
-        spilTilstand.logBesked = `${aarsag}${tekst('Eliksiren redder dig.', 'The elixir saves you.')}`;
+        const aarsag = brugerdefineretAarsag ? `${brugerdefineretAarsag} ` : tekst('Du er ved at kollapse. ', 'You are about to collapse. ');
+        spilTilstand.logBesked = `${aarsag}${tekst('Livseliksiren redder dig.', 'The life elixir saves you.')}`;
         syncTilDb();
         return; 
     }
@@ -481,8 +481,8 @@ export function fremtvingKollaps(brugerdefineretAarsag?: string) {
     spilTilstand.guldTotal -= mistetGuld;
 
     const basisKollaps = mistetGuld > 0 
-        ? tekst(`Du kollapser. Da du vågner, mangler du ${mistetGuld} guld.`, `You collapse. When you wake, ${mistetGuld} gold is missing.`)
-        : tekst('Du kollapser af udmattelse. Tiden går, og tågen rykker frem.', 'You collapse from exhaustion. Time passes, and the fog advances.');
+        ? tekst(`Du kollapser. Da du kommer til dig selv, er ${mistetGuld} guld væk.`, `You collapse. When you come to, ${mistetGuld} gold is gone.`)
+        : tekst('Du kollapser af udmattelse. Imens rykker tågen frem.', 'You collapse from exhaustion. While you are unconscious, the fog advances.');
 
     spilTilstand.logBesked = brugerdefineretAarsag ? `${brugerdefineretAarsag} ${basisKollaps}` : basisKollaps;
     
@@ -493,8 +493,8 @@ export function fremtvingKollaps(brugerdefineretAarsag?: string) {
             spilTilstand.livspoint = 10;
             spilTilstand.erBevidstløs = false;
             spilTilstand.logBesked = mistetGuld > 0 
-                ? tekst(`Du vågner med 10 HP. Du mangler ${mistetGuld} guld. Tågen er rykket frem.`, `You wake with 10 HP. ${mistetGuld} gold is missing. The fog has advanced.`)
-                : tekst('Du vågner med 10 HP. Tågen er rykket frem.', 'You wake with 10 HP. The fog has advanced.');
+                ? tekst(`Du vågner med 10 HP. ${mistetGuld} guld er væk, og tågen er rykket frem.`, `You wake with 10 HP. ${mistetGuld} gold is gone, and the fog has advanced.`)
+                : tekst('Du vågner med 10 HP. Imens er tågen rykket frem.', 'You wake with 10 HP. In the meantime, the fog has advanced.');
             syncTilDb();
         }
     }, 2000);

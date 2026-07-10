@@ -57,7 +57,7 @@ export function startVenteSpil(kosterPenge: boolean = false) {
     if (erVenteTidUdlobet()) {
         spilTilstand.venteSpilAktiv = true;
         spilTilstand.venteFase = 'venter';
-        spilTilstand.logBesked = tekst('Impen pakker bordet sammen. Du kan ikke starte flere ventespilsrunder.', 'The imp is packing up the table. You cannot start more waiting-game rounds.');
+        spilTilstand.logBesked = tekst('Impen pakker kortene væk. Der er ikke tid til en ny runde.', 'The imp is putting the cards away. There is no time for another round.');
         syncTilDb();
         return;
     }
@@ -68,7 +68,7 @@ export function startVenteSpil(kosterPenge: boolean = false) {
     if (!foersteRunde && !kosterPenge) {
         spilTilstand.venteSpilAktiv = true;
         spilTilstand.venteFase = 'venter';
-        spilTilstand.logBesked = tekst('Du må vente på de andre spillere. Gratisrunden på dette felt er brugt, men du kan købe en ny runde for 5 guld.', 'You must wait for the other players. The free round on this field has been used, but you can buy a new round for 5 gold.');
+        spilTilstand.logBesked = tekst('Gratisrunden på dette felt er brugt. Du kan spille igen for 5 guld, mens du venter.', 'The free round on this tile is used. You can play again for 5 gold while you wait.');
         if (spilTilstand.venteKort.length === 0) delNyeKort();
         syncTilDb();
         return;
@@ -88,7 +88,7 @@ export function startVenteSpil(kosterPenge: boolean = false) {
         spilTilstand.logBesked = tekst('Du lægger 5 guld på bordet. Impen blander kortene.', 'You put 5 gold on the table. The imp shuffles the cards.');
     } else {
         spilTilstand.logBesked = foersteRunde
-            ? tekst('Impen blander kortene til første runde. Den er gratis.', 'The imp shuffles the cards for the first round. It is free.')
+            ? tekst('Impen blander kortene. Første runde er gratis.', 'The imp shuffles the cards. The first round is free.')
             : tekst('Impen blander kortene.', 'The imp shuffles the cards.');
     }
     
@@ -116,8 +116,8 @@ export function vendKort(indeks: number) {
         spilTilstand.ventePuljeLiv -= rundeLiv;
 
         spilTilstand.logBesked = tekst(
-            `Kraniet bed. Du mistede runde-gevinsten på ${rundeGuld} Guld og ${rundeLiv} HP. Du beholder din sikre pulje.`,
-            `The skull bit. You lost the round winnings of ${rundeGuld} Gold and ${rundeLiv} HP. You keep your safe pot.`
+            `Kraniet dukker op. Du mister rundens ${rundeGuld} guld og ${rundeLiv} HP, men din sikrede pulje er i sikkerhed.`,
+            `The skull appears. You lose this round’s ${rundeGuld} gold and ${rundeLiv} HP, but your secured pot is safe.`
         );
         spilTilstand.venteFase = 'tabt'; 
         
@@ -139,7 +139,7 @@ export function vendKort(indeks: number) {
         if (kort.type === 'guld') {
             spilTilstand.ventePuljeGuld += kort.vaerdi;
             rundeGuld += kort.vaerdi; 
-            if (kort.vaerdi === 100) spilTilstand.logBesked = tekst('Jackpot! Du fandt den legendariske guldskat.', 'Jackpot! You found the legendary gold treasure.');
+            if (kort.vaerdi === 100) spilTilstand.logBesked = tekst('Jackpot! Kortet er 100 guld værd.', 'Jackpot! The card is worth 100 gold.');
         }
 
         spilTilstand.venteFase = 'viser_gevinst';
@@ -173,8 +173,8 @@ function udbetalPulje() {
         registrerHeling(foerHp, spilTilstand.livspoint);
         spilTilstand.guldTotal += spilTilstand.ventePuljeGuld;
         spilTilstand.logBesked = tekst(
-            `Du forlod bordet. Du indkasserede ${spilTilstand.ventePuljeGuld} Guld og ${spilTilstand.ventePuljeLiv} HP.`,
-            `You left the table. You collected ${spilTilstand.ventePuljeGuld} Gold and ${spilTilstand.ventePuljeLiv} HP.`
+            `Du forlader bordet med ${spilTilstand.ventePuljeGuld} guld og ${spilTilstand.ventePuljeLiv} HP.`,
+            `You leave the table with ${spilTilstand.ventePuljeGuld} gold and ${spilTilstand.ventePuljeLiv} HP.`
         );
         
         spilTilstand.ventePuljeLiv = 0;
@@ -184,7 +184,7 @@ function udbetalPulje() {
 }
 
 export function stopVenteSpil() {
-    spilTilstand.logBesked = tekst('Du låser puljen på bordet. Den tåler nu kraniets bid.', 'You lock the pot on the table. It can now withstand the skull bite.');
+    spilTilstand.logBesked = tekst('Du sikrer puljen. Kraniet kan ikke tage den i næste runde.', 'You secure the pot. The skull cannot take it in the next round.');
     spilTilstand.venteFase = 'vundet';
     syncTilDb();
 }

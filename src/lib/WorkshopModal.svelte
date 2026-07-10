@@ -78,7 +78,10 @@
         spilTilstand.guldTotal -= betaltPris;
         laegGuldIKasseForAktueltFelt(betaltPris);
         royalPrisPressetLog = royalPrisPresset
-            ? tekst(' Mesteren bukker for titlen og lader resten af betalingen ligge.', ' The master bows to the title and lets the rest of the payment go.')
+            ? tekst(
+                ' Mesteren ser din titel og nøjes med beløbet. Ingen på værkstedet protesterer.',
+                ' The master sees your title and accepts the amount. No one in the workshop objects.'
+            )
             : '';
     }
 
@@ -96,7 +99,7 @@
         if (harKoelleEllerMurknuser()) {
             naegtHandelForAktuelSpillerPaaAktueltFelt();
             const senesteBesked = spilTilstand.logBesked.replace(/^DAG \d+ - /, '');
-            spilTilstand.logBesked = `${senesteBesked} ${tekst('Mesteren får øje på køllen og tør ikke arbejde mere for dig.', 'The master notices the club and no longer dares to work for you.')}`;
+            spilTilstand.logBesked = `${senesteBesked} ${tekst('Mesteren får øje på køllen og vil ikke arbejde for dig igen.', 'The master notices the club and refuses to work for you again.')}`;
             lukVaerksted();
             return;
         }
@@ -128,12 +131,12 @@
         }
 
         if (!harSkovl) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke opgradere en skovl, du ikke har.', 'The workshop cannot upgrade a shovel you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen almindelig skovl at opgradere.', 'You do not have a regular shovel to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(SKOVL_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren ryster på hovedet. Du har ikke guld nok til arbejdet.', 'The master shakes his head. You do not have enough gold for the work.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere skovlen.', 'You need more gold to upgrade the shovel.');
             syncTilDb();
             return;
         }
@@ -154,12 +157,12 @@
         }
 
         if (!harStav) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke vække dragen i en stav, du ikke har.', 'The workshop cannot wake the dragon in a staff you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen almindelig stav at opgradere.', 'You do not have a regular staff to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(STAV_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren peger på guldet. Dragestaven kræver mere arbejde.', 'The master points at the gold. The dragon staff requires more work.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere staven.', 'You need more gold to upgrade the staff.');
             syncTilDb();
             return;
         }
@@ -169,7 +172,7 @@
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'stav' && ting.id !== 'dragestav'),
             { id: 'dragestav', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
-        spilTilstand.logBesked = tekst('Værkstedet tvinder dragekraft ind i staven. Den er nu en dragestav.', 'The workshop twists dragon power into the staff. It is now a dragon staff.');
+        spilTilstand.logBesked = tekst('Mesteren sætter en glødende kerne i staven. Den er nu en dragestav.', 'The master fits a glowing core into the staff. It is now a dragon staff.');
         afslutOpgradering();
     }
 
@@ -180,12 +183,12 @@
         }
 
         if (!harKvist) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke indridse runer i en kvist, du ikke har.', 'The workshop cannot carve runes into a rod you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen søgekvist at opgradere.', 'You do not have a dowsing rod to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(KVIST_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren mangler guld til runerne.', 'The master needs more gold for the runes.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere søgekvisten.', 'You need more gold to upgrade the dowsing rod.');
             syncTilDb();
             return;
         }
@@ -206,12 +209,12 @@
         }
 
         if (!harDirk) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke file en dirk, du ikke har.', 'The workshop cannot file a lockpick you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen almindelig dirk at opgradere.', 'You do not have a regular lockpick to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(DIRK_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren kræver mere guld for det fine låsearbejde.', 'The master demands more gold for the delicate lockwork.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere dirken.', 'You need more gold to upgrade the lockpick.');
             syncTilDb();
             return;
         }
@@ -221,7 +224,7 @@
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'dirk' && ting.id !== 'mesterdirk'),
             { id: 'mesterdirk', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
-        spilTilstand.logBesked = tekst('Værkstedet sliber dirkens tænder og skjuler nye fjedre i tasken. Den er nu en mesterdirk.', 'The workshop sharpens the lockpick teeth and hides new springs in the pouch. It is now a master lockpick.');
+        spilTilstand.logBesked = tekst('Mesteren sliber dirkens tænder og bygger fine fjedre ind i skaftet. Den er nu en mesterdirk.', 'The master sharpens the lockpick’s teeth and fits fine springs into its shaft. It is now a master lockpick.');
         afslutOpgradering();
     }
 
@@ -232,12 +235,12 @@
         }
 
         if (!harKniv) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke balancere en kniv, du ikke har.', 'The workshop cannot balance a knife you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen almindelig kniv at opgradere.', 'You do not have a regular knife to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(KNIV_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren mangler guld til hærdning og indlæg.', 'The master needs more gold for hardening and inlay.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere kniven.', 'You need more gold to upgrade the knife.');
             syncTilDb();
             return;
         }
@@ -258,12 +261,12 @@
         }
 
         if (!harRustning) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke forgylde en rustning, du ikke har.', 'The workshop cannot gild armor you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen almindelig rustning at opgradere.', 'You do not have regular armor to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(RUSTNING_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren kræver mere guld til panserplader og ædelstensfatninger.', 'The master demands more gold for armor plates and gem settings.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere rustningen.', 'You need more gold to upgrade the armor.');
             syncTilDb();
             return;
         }
@@ -273,7 +276,7 @@
             ...spilTilstand.mitUdstyr.filter(ting => ting.id !== 'rustning' && ting.id !== 'kongepanser'),
             { id: 'kongepanser', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
-        spilTilstand.logBesked = tekst('Værkstedet forgylder pladerne og låser ædelsten i brystet. Din rustning er nu et kongepanser.', 'The workshop gilds the plates and locks gems into the chest. Your armor is now royal armor.');
+        spilTilstand.logBesked = tekst('Mesteren forgylder pladerne og fæstner ædelsten i brystpladen. Din rustning er nu et kongepanser.', 'The master gilds the plates and sets gems into the breastplate. Your armor is now royal armor.');
         afslutOpgradering();
     }
 
@@ -284,12 +287,12 @@
         }
 
         if (!harOekse) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke vække stormen i en økse, du ikke har.', 'The workshop cannot wake the storm in an axe you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen almindelig økse at opgradere.', 'You do not have a regular axe to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(OEKSE_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren kræver mere guld til runer og hærdet æg.', 'The master demands more gold for runes and a hardened edge.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere øksen.', 'You need more gold to upgrade the axe.');
             syncTilDb();
             return;
         }
@@ -310,12 +313,12 @@
         }
 
         if (!harKoelle) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke forstærke en kølle, du ikke har.', 'The workshop cannot reinforce a club you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen almindelig kølle at opgradere.', 'You do not have a regular club to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(KOELLE_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren kræver mere guld til jernbånd, blykerne og nitter.', 'The master demands more gold for iron bands, lead core and rivets.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere køllen.', 'You need more gold to upgrade the club.');
             syncTilDb();
             return;
         }
@@ -336,12 +339,12 @@
         }
 
         if (!harBue) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke spænde en bue, du ikke har.', 'The workshop cannot string a bow you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen almindelig bue at opgradere.', 'You do not have a regular bow to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(BUE_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren kræver mere guld til horn, sene og afbalancering.', 'The master demands more gold for horn, string and balancing.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere buen.', 'You need more gold to upgrade the bow.');
             syncTilDb();
             return;
         }
@@ -362,12 +365,12 @@
         }
 
         if (!harKlude) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke sy fint tøj uden stof at starte med.', 'The workshop cannot sew fine clothes without cloth to start from.');
+            spilTilstand.logBesked = tekst('Du har ikke noget almindeligt tøj at opgradere.', 'You do not have regular clothes to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(KLUDER_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren kræver mere guld til stof, tråd og syning.', 'The master demands more gold for cloth, thread and sewing.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere tøjet.', 'You need more gold to upgrade the clothes.');
             syncTilDb();
             return;
         }
@@ -388,12 +391,12 @@
         }
 
         if (!harFintToej) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke brodere et hofskrud uden fint tøj.', 'The workshop cannot embroider court finery without fine clothes.');
+            spilTilstand.logBesked = tekst('Du har ikke fint tøj at opgradere.', 'You do not have fine clothes to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(ROYALT_TOEJ_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren kræver mere guld til hermelin, brokade og guldbroderi.', 'The master demands more gold for ermine, brocade and gold embroidery.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere det fine tøj.', 'You need more gold to upgrade the fine clothes.');
             syncTilDb();
             return;
         }
@@ -409,18 +412,18 @@
 
     function opgraderFakkel() {
         if (!harFakkel) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke forgylde en fakkel, du ikke har.', 'The workshop cannot gild a torch you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen almindelig fakkel at opgradere.', 'You do not have a regular torch to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(FAKKEL_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren kræver mere guld til olie, guldtråd og ildsten.', 'The master demands more gold for oil, gold thread and firestone.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere faklen.', 'You need more gold to upgrade the torch.');
             syncTilDb();
             return;
         }
 
         if (!brugEnFakkelOgTilfoejSolfakkel()) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke forgylde en fakkel, du ikke har.', 'The workshop cannot gild a torch you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen almindelig fakkel at opgradere.', 'You do not have a regular torch to upgrade.');
             return;
         }
 
@@ -436,12 +439,12 @@
         }
 
         if (!harDetektor) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke kalibrere en detektor, du ikke har.', 'The workshop cannot calibrate a detector you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen almindelig detektor at opgradere.', 'You do not have a regular detector to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(DETEKTOR_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren kræver mere guld til linser, spoler og malmkalibrering.', 'The master demands more gold for lenses, coils and ore calibration.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere detektoren.', 'You need more gold to upgrade the detector.');
             syncTilDb();
             return;
         }
@@ -452,7 +455,7 @@
             { id: 'malmviser', maengde: 1, anskaffetDag: spilTilstand.dag }
         ];
         afslørMalmviserMiner();
-        spilTilstand.logBesked = tekst('Værkstedet kalibrerer spolen til ren malmklang. Din detektor er nu en malmviser.', 'The workshop calibrates the coil to a clear ore tone. Your detector is now an ore finder.');
+        spilTilstand.logBesked = tekst('Mesteren kalibrerer spolen til at finde malm. Din detektor er nu en malmviser.', 'The master calibrates the coil to detect ore. Your detector is now an ore finder.');
         afslutOpgradering();
     }
 
@@ -463,12 +466,12 @@
         }
 
         if (!harSovepose) {
-            spilTilstand.logBesked = tekst('Værkstedet kan ikke fore en sovepose, du ikke har.', 'The workshop cannot line a sleeping bag you do not have.');
+            spilTilstand.logBesked = tekst('Du har ingen almindelig sovepose at opgradere.', 'You do not have a regular sleeping bag to upgrade.');
             return;
         }
 
         if (!kanBetaleVaerkstedPris(SOVEPOSE_OPGRADERING_PRIS)) {
-            spilTilstand.logBesked = tekst('Mesteren kræver mere guld til silke, dun og guldsyning.', 'The master demands more gold for silk, down and golden stitching.');
+            spilTilstand.logBesked = tekst('Du mangler guld til at opgradere soveposen.', 'You need more gold to upgrade the sleeping bag.');
             syncTilDb();
             return;
         }
@@ -503,9 +506,9 @@
             pris: SKOVL_OPGRADERING_PRIS,
             harBasis: harSkovl && !harMesterskovl,
             kanOpgradere: kanOpgradereSkovl,
-            kortTekst: tekst('Dobbelt guld ved gravning. Nedgravede fælder bliver fundet uden at udløse.', 'Double gold when digging. Buried traps are found without triggering.'),
+            kortTekst: tekst('Dobbelt guld ved gravning. Nedgravede fælder findes uden at blive udløst.', 'Double gold when digging. Buried traps are found without being triggered.'),
             helpTitle: tekst('Skovl-opgradering', 'Shovel upgrade'),
-            helpBody: tekst('Kræver en almindelig skovl og 150 guld. Mesterskovlen giver dobbelt guld ved gravning og udløser ikke nedgravede fælder.', 'Requires a normal shovel and 150 gold. The master shovel gives double gold when digging and does not trigger buried traps.'),
+            helpBody: tekst('Kræver en almindelig skovl og 150 guld. Mesterskovlen giver dobbelt guld ved gravning og finder nedgravede fælder uden at udløse dem.', 'Requires a regular shovel and 150 gold. The master shovel gives double gold when digging and finds buried traps without triggering them.'),
             opgrader: opgraderSkovl
         },
         {
@@ -515,9 +518,9 @@
             pris: STAV_OPGRADERING_PRIS,
             harBasis: harStav && !harDragestav,
             kanOpgradere: kanOpgradereStav,
-            kortTekst: tekst('5 felter mod øst. Viser ruten imellem. Hvis teleporten ville ende i vand, stopper den sikkert og bliver til almindelig stav.', '5 fields east. Reveals the route between. If the teleport would end in water, it stops safely and becomes a normal staff.'),
+            kortTekst: tekst('Fører dig 5 felter mod øst og viser ruten. Ender turen i vand, stopper du på det sidste sikre felt, og dragestaven bliver til en almindelig stav.', 'Carries you 5 tiles east and reveals the route. If the journey ends in water, you stop on the last safe tile, and the dragon staff becomes a regular staff.'),
             helpTitle: tekst('Stav-opgradering', 'Staff upgrade'),
-            helpBody: tekst('Kræver en almindelig stav og 200 guld. Dragestaven teleporterer 5 felter mod øst og afslører ruten imellem. Kun hvis selve teleporten ville ende i åbent vand, stopper den på sidste sikre felt og bliver til en almindelig stav.', 'Requires a normal staff and 200 gold. The dragon staff teleports 5 fields east and reveals the route between. Only if the teleport itself would end in open water, it stops on the last safe field and becomes a normal staff.'),
+            helpBody: tekst('Kræver en almindelig stav og 200 guld. Dragestaven fører dig 5 felter mod øst og afslører ruten. Hvis turen ender i åbent vand, standser du på det sidste sikre felt, og dragestaven bliver til en almindelig stav.', 'Requires a regular staff and 200 gold. The dragon staff carries you 5 tiles east and reveals the route. If the journey ends in open water, you stop on the last safe tile, and the dragon staff becomes a regular staff.'),
             opgrader: opgraderStav
         },
         {
@@ -527,9 +530,9 @@
             pris: KVIST_OPGRADERING_PRIS,
             harBasis: harKvist && !harRunekvist,
             kanOpgradere: kanOpgradereKvist,
-            kortTekst: tekst('Trækker skjult liv op ved ankomst, hvis du mangler HP. Koster 1 energi og efterlader feltet ugravet, men tomt.', 'Pulls up hidden health on arrival if you are missing HP. Costs 1 energy and leaves the field undug but empty.'),
+            kortTekst: tekst('Trækker automatisk helende rødder op, når du mangler HP. Koster 1 energi. Du kan stadig grave bagefter, men der er intet tilbage at finde.', 'Automatically pulls up healing roots when you are missing HP. Costs 1 energy. You can still dig afterward, but there is nothing left to find.'),
             helpTitle: tekst('Kvist-opgradering', 'Rod upgrade'),
-            helpBody: tekst('Kræver søgekvist og 175 guld. Runekvisten viser rødder i radius 3 og trækker automatisk skjult liv op, når du mangler HP og går ind på feltet. Det koster 1 energi og efterlader feltet ugravet, men tomt.', 'Requires a dowsing rod and 175 gold. The rune rod shows roots within radius 3 and automatically pulls up hidden health when you are missing HP and enter the field. It costs 1 energy and leaves the field undug but empty.'),
+            helpBody: tekst('Kræver en søgekvist og 175 guld. Runekvisten viser rødder op til 3 felter væk og trækker dem automatisk op, når du mangler HP og går ind på feltet. Det koster 1 energi. Du kan stadig grave bagefter, men der er intet tilbage at finde.', 'Requires a dowsing rod and 175 gold. The rune rod reveals roots up to 3 tiles away and automatically pulls them up when you are missing HP and enter the tile. It costs 1 energy. You can still dig afterward, but there is nothing left to find.'),
             opgrader: opgraderKvist
         },
         {
@@ -539,9 +542,9 @@
             pris: DIRK_OPGRADERING_PRIS,
             harBasis: harDirk && !harMesterdirk,
             kanOpgradere: kanOpgradereDirk,
-            kortTekst: tekst('Dobbelt guld ved indbrud på tomme byfelter. Risikoen for at blive opdaget er den samme.', 'Double gold from burglary on empty town fields. The risk of being caught is the same.'),
+            kortTekst: tekst('Dobbelt guld ved indbrud på tomme byfelter. Risikoen for at blive opdaget er uændret.', 'Double gold from burglary on empty town tiles. The risk of being caught is unchanged.'),
             helpTitle: tekst('Dirk-opgradering', 'Lockpick upgrade'),
-            helpBody: tekst('Kræver en almindelig dirk og 150 guld. Mesterdirken giver dobbelt guld ved indbrud og tæller stadig som dirk.', 'Requires a normal lockpick and 150 gold. The master lockpick gives double gold from burglary and still counts as a lockpick.'),
+            helpBody: tekst('Kræver en almindelig dirk og 150 guld. Mesterdirken giver dobbelt guld ved indbrud og kan bruges til alle valg, der kræver en dirk.', 'Requires a regular lockpick and 150 gold. The master lockpick gives double gold from burglary and works for every choice that requires a lockpick.'),
             opgrader: opgraderDirk
         },
         {
@@ -551,9 +554,9 @@
             pris: KNIV_OPGRADERING_PRIS,
             harBasis: harKniv && !harMesterkniv,
             kanOpgradere: kanOpgradereKniv,
-            kortTekst: tekst('Tæller som kniv i events. Knivvalg giver mere guld og mindre skade.', 'Counts as a knife in events. Knife choices give more gold and less damage.'),
+            kortTekst: tekst('Kan bruges til alle valg, der kræver en kniv. De valg giver mere guld og mindre skade.', 'Works for every choice that requires a knife. Those choices give more gold and less damage.'),
             helpTitle: tekst('Kniv-opgradering', 'Knife upgrade'),
-            helpBody: tekst('Kræver en almindelig kniv og 150 guld. Mesterkniven tæller som kniv i events og gør knivvalg bedre.', 'Requires a normal knife and 150 gold. The master knife counts as a knife in events and improves knife choices.'),
+            helpBody: tekst('Kræver en almindelig kniv og 150 guld. Mesterkniven kan bruges til alle knivvalg og forbedrer deres udbytte.', 'Requires a regular knife and 150 gold. The master knife works for every knife choice and improves its outcome.'),
             opgrader: opgraderKniv
         },
         {
@@ -563,9 +566,9 @@
             pris: RUSTNING_OPGRADERING_PRIS,
             harBasis: harRustning && !harKongepanser,
             kanOpgradere: kanOpgradereRustning,
-            kortTekst: tekst('70% skadesreduktion. Normalt tung: +1 energi pr. skridt, men ikke for Ridder/Skjoldmø. Går tabt i vand.', '70% damage reduction. Normally heavy: +1 energy per step, but not for Knight/Shieldmaiden. Lost in water.'),
+            kortTekst: tekst('70 % skadesreduktion. Koster normalt 1 ekstra energi pr. skridt, men ikke for Ridder og Skjoldmø. Går tabt i vand.', '70% damage reduction. Normally costs 1 extra energy per step, but not for the Knight and Shieldmaiden. Lost in water.'),
             helpTitle: tekst('Rustning-opgradering', 'Armor upgrade'),
-            helpBody: tekst('Kræver almindelig rustning og 250 guld. Kongepanseret reducerer skade med 70%, men koster normalt 1 ekstra energi pr. skridt. Ridder og Skjoldmø ignorerer vægten. Går tabt i vand.', 'Requires normal armor and 250 gold. Royal armor reduces damage by 70%, but normally costs 1 extra energy per step. Knight and Shieldmaiden ignore the weight. Lost in water.'),
+            helpBody: tekst('Kræver almindelig rustning og 250 guld. Kongepanseret reducerer skade med 70 %, men koster normalt 1 ekstra energi pr. skridt. Ridder og Skjoldmø ignorerer vægten. Panseret går tabt i vand.', 'Requires regular armor and 250 gold. Royal armor reduces damage by 70% but normally costs 1 extra energy per step. The Knight and Shieldmaiden ignore the weight. The armor is lost in water.'),
             opgrader: opgraderRustning
         },
         {
@@ -575,9 +578,9 @@
             pris: OEKSE_OPGRADERING_PRIS,
             harBasis: harOekse && !harStormoekse,
             kanOpgradere: kanOpgradereOekse,
-            kortTekst: tekst('Tæller som økse i events. Øksevalg giver 50% mere guld og halverer eventskade fra selve valget.', 'Counts as an axe in events. Axe choices give 50% more gold and halve event damage from the choice itself.'),
+            kortTekst: tekst('Kan bruges til alle valg, der kræver en økse. De valg giver 50 % mere guld og halverer skaden.', 'Works for every choice that requires an axe. Those choices give 50% more gold and halve the damage.'),
             helpTitle: tekst('Økse-opgradering', 'Axe upgrade'),
-            helpBody: tekst('Kræver en almindelig økse og 175 guld. Stormøksen tæller som økse i events og gør øksevalg mere brutale: mere guld og mindre skade.', 'Requires a normal axe and 175 gold. The storm axe counts as an axe in events and makes axe choices more brutal: more gold and less damage.'),
+            helpBody: tekst('Kræver en almindelig økse og 175 guld. Stormøksen kan bruges til alle øksevalg og giver mere guld med mindre skade.', 'Requires a regular axe and 175 gold. The storm axe works for every axe choice and gives more gold with less damage.'),
             opgrader: opgraderOekse
         },
         {
@@ -587,9 +590,9 @@
             pris: KOELLE_OPGRADERING_PRIS,
             harBasis: harKoelle && !harOpgraderetKoelle,
             kanOpgradere: kanOpgradereKoelle,
-            kortTekst: tekst('Kan smadre værksteder og tømme feltets kasse. Smadring koster stadig meget energi.', 'Can smash workshops and empty the field cashbox. Smashing still costs a lot of energy.'),
+            kortTekst: tekst('Kan ødelægge værksteder og tage guldet fra kassen. Det koster stadig meget energi.', 'Can destroy workshops and take the gold from the till. It still costs a lot of energy.'),
             helpTitle: tekst('Kølle-opgradering', 'Club upgrade'),
-            helpBody: tekst('Kræver en almindelig kølle og 185 guld. Murknuseren kan smadre værkstedsfelter, som en almindelig kølle ikke kan knuse.', 'Requires a normal club and 185 gold. The wallbreaker can smash workshop fields that a normal club cannot break.'),
+            helpBody: tekst('Kræver en almindelig kølle og 185 guld. Murknuseren kan ødelægge værksteder, som en almindelig kølle ikke kan bryde ned.', 'Requires a regular club and 185 gold. The wallbreaker can destroy workshops that a regular club cannot break down.'),
             opgrader: opgraderKoelle
         },
         {
@@ -599,9 +602,9 @@
             pris: KLUDER_OPGRADERING_PRIS,
             harBasis: harKlude && !harFintToej && !harRoyaltToej,
             kanOpgradere: kanOpgradereKlude,
-            kortTekst: tekst('Fint tøj giver +15% guldindkomst og lidt beskyttelse, men kan blive flænset i huler og blodskov.', 'Fine clothes give +15% gold income and a little protection, but can be torn in caves and bloodwood.'),
+            kortTekst: tekst('Fint tøj giver 15 % mere guld og lidt beskyttelse, men kan blive flænset i huler og blodskov.', 'Fine clothes give 15% more gold and some protection but can be torn in caves and the bloodwood.'),
             helpTitle: tekst('Tøj-opgradering', 'Clothes upgrade'),
-            helpBody: tekst('Kræver tøj og 100 guld. Værkstedet syr det om til fint tøj, som giver bedre guldindkomst.', 'Requires clothes and 100 gold. The workshop sews them into fine clothes, improving gold income.'),
+            helpBody: tekst('Kræver tøj og 100 guld. Værkstedet syr det om til fint tøj, som giver 15 % mere guld og lidt beskyttelse.', 'Requires clothes and 100 gold. The workshop turns them into fine clothes that give 15% more gold and some protection.'),
             opgrader: opgraderKlude
         },
         {
@@ -611,9 +614,9 @@
             pris: ROYALT_TOEJ_OPGRADERING_PRIS,
             harBasis: harFintToej && !harRoyaltToej,
             kanOpgradere: kanOpgradereFintToej,
-            kortTekst: tekst('+40% guldindkomst og lidt bedre beskyttelse. Hvis det flænses, bliver det til almindeligt fint tøj.', '+40% gold income and a little better protection. If torn, it becomes normal fine clothes.'),
+            kortTekst: tekst('40 % mere guld og lidt bedre beskyttelse. Hvis tøjet flænses, bliver det til almindeligt fint tøj.', '40% more gold and slightly better protection. If the clothes are torn, they become regular fine clothes.'),
             helpTitle: tekst('Royalt tøj', 'Royal clothes'),
-            helpBody: tekst('Kræver fint tøj og 500 guld. Royalt tøj giver stor guldindkomst og bliver nedgraderet til fint tøj, hvis det flænses.', 'Requires fine clothes and 500 gold. Royal clothes give high gold income and downgrade to fine clothes if torn.'),
+            helpBody: tekst('Kræver fint tøj og 500 guld. Royalt tøj giver 40 % mere guld og bliver til fint tøj, hvis det flænses.', 'Requires fine clothes and 500 gold. Royal clothes give 40% more gold and become fine clothes if torn.'),
             opgrader: opgraderFintToej
         },
         {
@@ -623,9 +626,9 @@
             pris: FAKKEL_OPGRADERING_PRIS,
             harBasis: harFakkel,
             kanOpgradere: kanOpgradereFakkel,
-            kortTekst: tekst('+2 syn. Solbålet afslører et større område for alle, giver fuld HP og 100 guld.', '+2 vision. The sunfire reveals a larger area for everyone, gives full HP and 100 gold.'),
+            kortTekst: tekst('Du ser 2 felter længere. Solbålet afslører et større område for alle, giver fuld HP og 100 guld.', 'You see 2 tiles farther. The sunfire reveals a larger area for everyone, gives full HP and 100 gold.'),
             helpTitle: tekst('Fakkel-opgradering', 'Torch upgrade'),
-            helpBody: tekst('Kræver en almindelig fakkel og 225 guld. Solfaklen giver +2 syn og kan tænde et større solbål.', 'Requires a normal torch and 225 gold. The sun torch gives +2 vision and can light a larger sunfire.'),
+            helpBody: tekst('Kræver en almindelig fakkel og 225 guld. Solfaklen lader dig se 2 felter længere og kan tænde et større solbål.', 'Requires a regular torch and 225 gold. The sun torch lets you see 2 tiles farther and can light a larger sunfire.'),
             opgrader: opgraderFakkel
         },
         {
@@ -635,9 +638,9 @@
             pris: SOVEPOSE_OPGRADERING_PRIS,
             harBasis: harSovepose && !harSilkesovepose,
             kanOpgradere: kanOpgradereSovepose,
-            kortTekst: tekst('Hvile giver 40 HP i stedet for 20. I huler bliver den nedgraderet til almindelig sovepose.', 'Rest gives 40 HP instead of 20. In caves, it downgrades to a normal sleeping bag.'),
+            kortTekst: tekst('Hvile genvinder op til 40 HP i stedet for 20. I huler bliver den til en almindelig sovepose.', 'Rest recovers up to 40 HP instead of 20. In caves, it becomes a regular sleeping bag.'),
             helpTitle: tekst('Sovepose-opgradering', 'Sleeping bag upgrade'),
-            helpBody: tekst('Kræver en almindelig sovepose og 150 guld. Silkesoveposen giver 40 HP ved hvile og overlever hulefugt som almindelig sovepose.', 'Requires a normal sleeping bag and 150 gold. The silk sleeping bag gives 40 HP when resting and survives cave damp as a normal sleeping bag.'),
+            helpBody: tekst('Kræver en almindelig sovepose og 150 guld. Silkesoveposen genvinder op til 40 HP ved hvile. Hulefugt gør den til en almindelig sovepose.', 'Requires a regular sleeping bag and 150 gold. The silk sleeping bag recovers up to 40 HP when resting. Cave damp turns it into a regular sleeping bag.'),
             opgrader: opgraderSovepose
         },
         {
@@ -647,9 +650,9 @@
             pris: DETEKTOR_OPGRADERING_PRIS,
             harBasis: harDetektor && !harMalmviser,
             kanOpgradere: kanOpgradereDetektor,
-            kortTekst: tekst('Viser skjult guld i radius 3. Guldminer inden for radius 2 popper frem gennem bjerge. Graveguld giver 25% ekstra.', 'Shows hidden gold within radius 3. Gold mines within radius 2 pop through mountains. Dug gold gives 25% extra.'),
+            kortTekst: tekst('Viser skjult guld op til 3 felter væk og guldminer op til 2 felter væk, selv bag bjerge. Du finder 25 % mere guld, når du graver.', 'Shows hidden gold up to 3 tiles away and gold mines up to 2 tiles away, even behind mountains. You find 25% more gold when digging.'),
             helpTitle: tekst('Detektor-opgradering', 'Detector upgrade'),
-            helpBody: tekst('Kræver en almindelig detektor og 250 guld. Malmviseren viser skjult guld som før, afslører guldminer inden for radius 2 og giver 25% mere, når du graver guldet frem. Krystaller nedgraderer den til almindelig detektor.', 'Requires a normal detector and 250 gold. The ore finder shows hidden gold as before, reveals gold mines within radius 2 and gives 25% more when you dig gold up. Crystals downgrade it to a normal detector.'),
+            helpBody: tekst('Kræver en almindelig detektor og 250 guld. Malmviseren afslører skjult guld op til 3 felter væk, finder guldminer op til 2 felter væk og giver 25 % mere guld ved gravning. Krystaller gør den til en almindelig detektor igen.', 'Requires a regular detector and 250 gold. The ore finder reveals hidden gold up to 3 tiles away, finds gold mines up to 2 tiles away and gives 25% more gold when digging. Crystals turn it back into a regular detector.'),
             opgrader: opgraderDetektor
         },
         {
@@ -659,9 +662,9 @@
             pris: BUE_OPGRADERING_PRIS,
             harBasis: harBue && !harMesterbue,
             kanOpgradere: kanOpgradereBue,
-            kortTekst: tekst('Tæller som bue i events. Buevalg giver 25% mere guld og halverer skade. Når du går, afslører den en lille vifte lige uden for dit syn i bevægelsesretningen.', 'Counts as a bow in events. Bow choices give 25% more gold and halve damage. When you move, it reveals a small fan just beyond your sight in the direction you went.'),
+            kortTekst: tekst('Kan bruges til alle valg, der kræver en bue. De valg giver 25 % mere guld og halverer skaden. Når du går, afslører buen et lille område foran dig.', 'Works for every choice that requires a bow. Those choices give 25% more gold and halve the damage. When you move, the bow reveals a small area ahead of you.'),
             helpTitle: tekst('Bue-opgradering', 'Bow upgrade'),
-            helpBody: tekst('Kræver en almindelig bue og 175 guld. Falkebuen tæller som bue, forbedrer buevalg og afslører en lille vifte foran dig, når du går.', 'Requires a normal bow and 175 gold. The falcon bow counts as a bow, improves bow choices and reveals a small fan ahead of you when you move.'),
+            helpBody: tekst('Kræver en almindelig bue og 175 guld. Falkebuen forbedrer alle buevalg og afslører et lille område foran dig, når du går.', 'Requires a regular bow and 175 gold. The falcon bow improves every bow choice and reveals a small area ahead of you when you move.'),
             opgrader: opgraderBue
         }
     ].filter(opgradering => opgradering.harBasis));
@@ -674,7 +677,7 @@
     <div
         class="vaerksted-content"
         data-help-title={tekst('Værksted', 'Workshop')}
-        data-help-body={tekst('Værkstedet opgraderer udstyr. Du beholder ikke den gamle genstand ved siden af den nye. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang.', 'The workshop upgrades equipment. You do not keep the old item alongside the new one. If you have a club or wallbreaker, the master only dares to work for you once.')}
+        data-help-body={tekst('Værkstedet opgraderer dit udstyr og erstatter den gamle genstand. Har du en kølle eller murknuser, afslutter mesteren handlen efter én opgradering.', 'The workshop upgrades your equipment and replaces the old item. If you have a club or wallbreaker, the master ends the trade after one upgrade.')}
     >
         <h2>{tekst('Mesterværkstedet', 'Master Workshop')}</h2>
         <p class="intro">{tekst('Her kan almindeligt udstyr bygges om til noget bedre.', 'Here, ordinary equipment can be rebuilt into something better.')}</p>
@@ -697,14 +700,14 @@
                     <div class="tekst">
                         <strong>{opgradering.titel}</strong>
                         <p>{opgradering.kortTekst}</p>
-                        <span class="pris">{opgradering.pris} {tekst('Guld', 'Gold')}</span>
+                        <span class="pris">{opgradering.pris} {tekst('guld', 'gold')}</span>
                     </div>
 
                     <button
                         type="button"
                         onclick={opgradering.opgrader}
                         data-help-title={tekst('Opgrader', 'Upgrade')}
-                        data-help-body={tekst(`Bruger ${opgradering.pris} guld og erstatter ${itemNavn(opgradering.fraId).toLowerCase()} med ${itemNavn(opgradering.tilId).toLowerCase()}.`, `Uses ${opgradering.pris} gold and replaces ${itemNavn(opgradering.fraId).toLowerCase()} with ${itemNavn(opgradering.tilId).toLowerCase()}.`)}
+                        data-help-body={tekst(`Koster ${opgradering.pris} guld. Opgraderingen erstatter ${itemNavn(opgradering.fraId).toLowerCase()} med ${itemNavn(opgradering.tilId).toLowerCase()}.`, `Costs ${opgradering.pris} gold. The upgrade replaces ${itemNavn(opgradering.fraId).toLowerCase()} with ${itemNavn(opgradering.tilId).toLowerCase()}.`)}
                     >
                         {tekst('Opgrader', 'Upgrade')}
                     </button>

@@ -3,7 +3,7 @@
     import { spilTilstand } from '$lib/spilTilstand.svelte';
     import { PROFIL_AUTO_BEDSTE_SCORE_ID, PROFIL_TUTORIAL_KARAKTER_ID, authState, erAnonymBruger, gemProfilKarakter, gemProfilNavn, hentProfilStats, logUd, sendEmailTilAnonymProfil, sendLoginLink, startAnonymProfil, type ProfilSpil } from '$lib/auth.svelte';
     import { hentKarakterKlasseNoegle, tilgaengeligeKarakterer } from '$lib/spildata';
-    import { karakterFordel, karakterKlasseNavn as visKarakterKlasseNavn, karakterNavn, karakterUlempe, titelNavn } from '$lib/spilTekst';
+    import { itemNavn, karakterFordel, karakterKlasseNavn as visKarakterKlasseNavn, karakterNavn, titelNavn } from '$lib/spilTekst';
     import { beregnFremdriftPoint, beregnMinePoint, beregnMineScoreModifier, beregnMultiplayerScoreModifier, beregnSpillerScore, beregnUdstyrPoint, findMedaljeNiveau, findMedaljeSti, taelScoreSpillere } from '$lib/score';
     import { genererSlutHistorie, hentTitel } from '$lib/historieMotor';
     import { goerOfflineAppKlar, offlineAppBesked, offlineAppState, tjekOfflineAppKlar } from '$lib/offlineApp.svelte';
@@ -117,6 +117,17 @@
     let visJoinLukketModal = $state(false);
     let karaktervalgStatus = $derived(hentKaraktervalgStatus());
     const HIGHSCORE_SIDE_STOERRELSE = 10;
+    function karakterStatsTekst(karakter: Karakter) {
+        return `HP: ${karakter.startHp} | ${tekst('Guld', 'Gold')}: ${karakter.startGuld} | ${tekst('Energi', 'Energy')}: ${karakter.baseEnergi}`;
+    }
+
+    function karakterStartUdstyrTekst(karakter: Karakter) {
+        const udstyr = karakter.startUdstyr?.length
+            ? karakter.startUdstyr.map((id) => itemNavn(id)).join(', ')
+            : tekst('intet udstyr', 'no equipment');
+        return `${tekst('Starter med', 'Starts with')}: ${udstyr}`;
+    }
+
     const lokaleKortPresets = [
         { label: '20 x 20', bredde: 20, hoejde: 20 },
         { label: '50 x 20', bredde: 50, hoejde: 20 },
@@ -309,8 +320,8 @@
                 sti: profilTopMedaljeSti(),
                 label: 'Topmedalje',
                 labelEn: 'Top Medal',
-                krav: 'Den medalje har du fået for din højeste score.',
-                kravEn: 'You earned this medal for your highest score.',
+                krav: 'Din bedste score afgør denne medalje.',
+                kravEn: 'Your best score determines this medal.',
                 bedste: true,
                 opnaaet: true,
                 mytisk: false
@@ -325,8 +336,8 @@
                 sti: '/screens/m1.webp',
                 label: 'Topmedalje',
                 labelEn: 'Top Medal',
-                krav: 'Log ind for at gemme din bedste scoremedalje på profilen.',
-                kravEn: 'Log in to save your best score medal on your profile.',
+                krav: 'Log ind for at gemme medaljen fra din bedste score på profilen.',
+                kravEn: 'Log in to save the medal from your best score to your profile.',
                 bedste: false,
                 opnaaet: false,
                 mytisk: false
@@ -646,7 +657,9 @@
 
     function highscoreSpillerAntal(score: HighscoreDetaljer) {
         if (score.antalSpillere === undefined || score.antalSpillere === null) return tekst('Ukendt', 'Unknown');
-        return score.antalSpillere <= 1 ? 'Solo' : `Multiplayer (${score.antalSpillere})`;
+        return score.antalSpillere <= 1
+            ? 'Solo'
+            : tekst(`Spil med andre (${score.antalSpillere})`, `Multiplayer (${score.antalSpillere})`);
     }
 
     async function hentHighscoreTrofaeAwards(id?: number) {
@@ -811,10 +824,10 @@
         const maalinger = [
             { key: 'miner', label: tekst('Miner', 'Mines') },
             { key: 'taageBevaegelser', label: tekst('Bevægelser i tågen', 'Fog moves') },
-            { key: 'vandSkader', label: tekst('Vandskader', 'Water hits') },
+            { key: 'vandSkader', label: tekst('Skade fra vand', 'Water damage') },
             { key: 'magiskeGenstande', label: tekst('Magiske genstande', 'Magical items') },
             { key: 'guld', label: tekst('Guld', 'Gold') },
-            { key: 'healetHp', label: tekst('HP healet', 'HP healed') },
+            { key: 'healetHp', label: tekst('Helet HP', 'HP healed') },
             { key: 'kendteFelter', label: tekst('Kendte felter', 'Known fields') },
             { key: 'opgraderingsPoint', label: tekst('Opgraderingspoint', 'Upgrade points') },
             { key: 'diamantRaavaerdiFundet', label: tekst('Diamantværdi', 'Diamond value') }
@@ -850,7 +863,7 @@
             }
             case 'livsvogteren': {
                 const healet = awardTal(data, 'healetHp');
-                return healet === null ? '' : tekst(`${healet} HP healet`, `${healet} HP healed`);
+                return healet === null ? '' : tekst(`${healet} HP helet`, `${healet} HP healed`);
             }
             case 'korttegneren': {
                 const felter = awardTal(data, 'kendteFelter');
@@ -1352,9 +1365,9 @@
 {#snippet pointSpecifikation()}
     <div class="point-kvittering">
         <h4>{tekst('Opgørelse', 'Breakdown')}</h4>
-        <div class="kvittering-linje"><span>{tekst('Indsamlet guld:', 'Collected gold:')}</span> <span>{spilTilstand.guldTotal}</span></div>
+        <div class="kvittering-linje"><span>{tekst('Guld:', 'Gold:')}</span> <span>{spilTilstand.guldTotal}</span></div>
         <div class="kvittering-linje">
-            <span>{hentPointSpec().erVinder ? tekst('Overlevelses-bonus', 'Survival bonus') : tekst('Fremdrift', 'Progress')}:</span>
+            <span>{hentPointSpec().erVinder ? tekst('Overlevelsesbonus', 'Survival bonus') : tekst('Fremdrift', 'Progress')}:</span>
             <span>{hentPointSpec().fremdriftPoint}</span>
         </div>
         <div class="kvittering-linje"><span>{tekst('Udforskning:', 'Exploration:')}</span> <span>{hentPointSpec().udforskning}</span></div>
@@ -1367,18 +1380,18 @@
             <div class="kvittering-skiller"></div>
         {/if}
         {#if hentPointSpec().hpMult > 1}
-            <div class="kvittering-linje mult"><span>{tekst('Helbreds-bonus (HP):', 'Health bonus (HP):')}</span> <span>x {hentPointSpec().hpMult.toFixed(3)}</span></div>
+            <div class="kvittering-linje mult"><span>{tekst('Helbredsbonus:', 'Health bonus:')}</span> <span>x {hentPointSpec().hpMult.toFixed(3)}</span></div>
         {/if}
         {#if hentPointSpec().multiplayerModifier > 1}
-            <div class="kvittering-linje mult"><span>Multiplayer:</span> <span>x {hentPointSpec().multiplayerModifier.toFixed(1)}</span></div>
+            <div class="kvittering-linje mult"><span>{tekst('Flere spillere:', 'Multiplayer:')}</span> <span>x {hentPointSpec().multiplayerModifier.toFixed(1)}</span></div>
         {/if}
-        <div class="kvittering-total"><span>{tekst('Total Score:', 'Total Score:')}</span> <span>{spilTilstand.samletScore}</span></div>
+        <div class="kvittering-total"><span>{tekst('Samlet score:', 'Total score:')}</span> <span>{spilTilstand.samletScore}</span></div>
     </div>
 {/snippet}
 
 {#snippet sessionTavle()}
     <div class="session-tavle">
-        <h3>{tekst('Alle karakterer', 'All Characters')}</h3>
+        <h3>{tekst('Alle karakterer', 'All characters')}</h3>
         <div class="session-liste">
             {#each hentSessionSpillere() as { navn, data, score } (navn)}
                 <div class="session-raekke" class:aktiv-mig={navn === spilTilstand.spillerNavn}>
@@ -1400,9 +1413,9 @@
 
 {#snippet tutorialResultatTavle()}
     {@const vurdering = hentTutorialRang(spilTilstand.samletScore)}
-    <section class="tutorial-resultat" aria-label="Tutorial-resultat">
+    <section class="tutorial-resultat" aria-label={tekst('Resultat fra tutorialen', 'Tutorial result')}>
         <div class="tutorial-resultat-top">
-            <span>{tekst('Tutorialrang', 'Tutorial rank')}</span>
+            <span>{tekst('Din tutorialrang', 'Your tutorial rank')}</span>
             <strong>{vurdering.aktuel.titel}</strong>
             <p>{vurdering.aktuel.tekst}</p>
         </div>
@@ -1421,7 +1434,7 @@
         {:else}
             <p class="tutorial-naeste">{tekst('Du har nået højeste tutorialrang.', 'You have reached the highest tutorial rank.')}</p>
         {/if}
-        <p class="tutorial-resultat-note">{tekst('Dette er kun en øvelsesvurdering. Den bliver ikke gemt og tæller ikke på rigtige øer.', 'This is only a practice rating. It is not saved and does not count on real islands.')}</p>
+        <p class="tutorial-resultat-note">{tekst('Rangen er kun til øvelse. Den bliver ikke gemt og tæller ikke i andre spil.', 'This rank is for practice only. It is not saved and does not count in other games.')}</p>
     </section>
 {/snippet}
 
@@ -1435,10 +1448,10 @@
                     {/if}
                     <span>
                         <strong>{authState.profil?.display_name || tekst('Logget ind', 'Logged in')}</strong>
-                        <em>{erAnonymBruger() ? tekst('Anonym profil i denne browser', 'Anonymous profile in this browser') : profilMestSpilletTitelTekst()}</em>
+                        <em>{erAnonymBruger() ? tekst('Gæsteprofil i denne browser', 'Guest profile in this browser') : profilMestSpilletTitelTekst()}</em>
                     </span>
                 </button>
-                <button type="button" class="konto-aabn-profil-knap" onclick={aabnProfil}>{tekst('Åbn Profil', 'Open Profile')}</button>
+                <button type="button" class="konto-aabn-profil-knap" onclick={aabnProfil}>{tekst('Åbn profil', 'Open profile')}</button>
             </div>
             <div class="konto-medaljer" aria-label={tekst('Dine medaljer', 'Your medals')}>
                 {#each profilMedaljer() as medalje, index (`profil-medalje-${index}-${medalje.sti}`)}
@@ -1461,16 +1474,16 @@
                 {/each}
             </div>
             {#if erAnonymBruger()}
-                <p class="konto-hint konto-hint-anonym">{tekst('Profilen gemmes på denne browser. Tilknyt og gem med din email, hvis du vil kunne finde din profil igen på en anden enhed.', 'This profile is saved in this browser. Add and save it with your email if you want to find your profile again on another device.')}</p>
+                <p class="konto-hint konto-hint-anonym">{tekst('Profilen er gemt i denne browser. Tilknyt din e-mail, hvis du også vil kunne bruge profilen på andre enheder.', 'This profile is saved in this browser. Add your email if you also want to use the profile on other devices.')}</p>
                 <div class="konto-login konto-login-anonym">
                     <input
                         type="email"
                         bind:value={authState.email}
-                        placeholder="Email"
+                        placeholder={tekst('E-mailadresse', 'Email address')}
                         onkeydown={(e) => { if (e.key === 'Enter') sendEmailTilAnonymProfil(authState.email); }}
                     />
                     <button type="button" onclick={() => sendEmailTilAnonymProfil(authState.email)} disabled={authState.loader}>
-                        {authState.loader ? tekst('Sender...', 'Sending...') : tekst('Tilknyt email', 'Add email')}
+                        {authState.loader ? tekst('Sender...', 'Sending...') : tekst('Tilknyt e-mail', 'Add email')}
                     </button>
                 </div>
             {/if}
@@ -1478,8 +1491,8 @@
             {#if ER_ITCH_BUILD}
                 <p class="konto-hint">
                     {tekst(
-                        'Du er velkommen til at prøve spillet her på itch. Hvis du vil logge ind, spille den nyeste version, gemme profil og være med på de globale toplister, skal du spille live-versionen.',
-                        'You are welcome to try the game here on itch. To log in, play the latest version, save your profile, and join the global leaderboards, play the live version.'
+                        'Her på itch kan du prøve spillet uden en konto. I live-versionen får du den nyeste udgave, en gemt profil og adgang til de globale toplister.',
+                        'Here on itch, you can try the game without an account. The live version gives you the latest build, a saved profile and access to the global leaderboards.'
                     )}
                 </p>
                 <div class="konto-medaljer konto-medaljer-login-teaser" aria-label={tekst('Medaljer du kan gemme med login', 'Medals you can save with login')}>
@@ -1503,10 +1516,10 @@
                     <button type="button" onclick={aabnLiveVersion}>
                         {tekst('Spil nyeste version og opret konto', 'Play latest version and create an account')}
                     </button>
-                    <span>{tekst('Itch-versionen kan bruges til at teste spillet uden konto.', 'The itch version is for trying the game without an account.')}</span>
+                    <span>{tekst('Prøv itch-versionen uden en konto.', 'Try the itch version without an account.')}</span>
                 </div>
             {:else}
-            <p class="konto-hint">{tekst('Start med at skrive dit spillernavn (kan ændres i profil senere) og et navn på en ø. Du kan spille i denne browser uden at tilknytte en email. Senere kan du gemme din profil med din email, hvis du vil sikre den og spille på andre devices.', 'Start by entering your player name (you can change it in your profile later) and an island name. You can play in this browser without adding an email. Later, you can save your profile with your email if you want to secure it and play on other devices.')}</p>
+            <p class="konto-hint">{tekst('Skriv dit spillernavn og et navn til øen. Du kan begynde uden e-mail og senere tilknytte den, hvis profilen skal gemmes og bruges på andre enheder.', 'Enter your player name and a name for the island. You can begin without an email and add one later if you want to save the profile and use it on other devices.')}</p>
             <div class="konto-medaljer konto-medaljer-login-teaser" aria-label={tekst('Medaljer du kan gemme med login', 'Medals you can save with login')}>
                 {#each loginTeaserMedaljer() as medalje, index (`login-teaser-medalje-${index}-${medalje.sti}`)}
                     <button
@@ -1528,11 +1541,11 @@
                 <input
                     type="email"
                     bind:value={authState.email}
-                    placeholder="Email"
+                    placeholder={tekst('E-mailadresse', 'Email address')}
                     onkeydown={(e) => { if (e.key === 'Enter') sendLoginLink(authState.email); }}
                 />
                 <button type="button" onclick={() => sendLoginLink(authState.email)} disabled={authState.loader}>
-                    {authState.loader ? tekst('Sender...', 'Sending...') : tekst('Email-login', 'Email login')}
+                    {authState.loader ? tekst('Sender...', 'Sending...') : tekst('Log ind med e-mail', 'Log in with email')}
                 </button>
             </div>
             {/if}
@@ -1607,11 +1620,11 @@
                             {/if}
                         </button>
                         <div>
-                        <h2>{tekst('Min profil', 'My Profile')}</h2>
+                        <h2>{tekst('Min profil', 'My profile')}</h2>
                         {#if maskeretEmail(authState.user.email)}
                             <p>{maskeretEmail(authState.user.email)}</p>
                         {:else if erAnonymBruger()}
-                            <p>{tekst('Anonym profil i denne browser', 'Anonymous profile in this browser')}</p>
+                            <p>{tekst('Gæsteprofil i denne browser', 'Guest profile in this browser')}</p>
                         {/if}
                         </div>
                     </div>
@@ -1718,13 +1731,13 @@
                 {#if authState.stats}
                     <div class="profil-liste">
                         <div class="profil-spil-header">
-                            <h3>{tekst('Find dine spil', 'Find Your Runs')}</h3>
-                            <span>{tekst('Søg eller filtrér på minimumsscore.', 'Search or filter by minimum score.')}</span>
+                            <h3>{tekst('Find dine spil', 'Find your runs')}</h3>
+                            <span>{tekst('Søg på ø, karakter eller dato – eller angiv en mindstescore.', 'Search by island, character or date – or enter a minimum score.')}</span>
                         </div>
                         <input
                             class="profil-spil-soeg"
                             bind:value={profilSpilSoegning}
-                            placeholder={tekst('Søg på ø, karakter, dato - eller skriv min. score...', 'Search island, character, date - or type min. score...')}
+                            placeholder={tekst('Søg i spil eller skriv en mindstescore...', 'Search runs or enter a minimum score...')}
                             aria-label={tekst('Søg i dine gemte spil', 'Search your saved runs')}
                         />
                         {#if authState.stats.spilHistorik.length === 0}
@@ -1755,7 +1768,7 @@
                         {/if}
                     </div>
                 {:else}
-                    <p class="konto-hint">{tekst('Ingen statistik endnu. Loggede spil bliver gemt her.', 'No statistics yet. Logged-in games are saved here.')}</p>
+                    <p class="konto-hint">{tekst('Ingen statistik endnu. Dine spil bliver gemt her, når du er logget ind.', 'No statistics yet. Your runs are saved here when you are logged in.')}</p>
                 {/if}
             </div>
         </div>
@@ -1859,7 +1872,7 @@
                 </div>
 
                 <div class="highscore-detail-total">
-                    <span>TOTAL SCORE</span>
+                    <span>{tekst('SAMLET SCORE', 'TOTAL SCORE')}</span>
                     <strong>{valgtHighscore.point}</strong>
                     <img
                         src={findHighscoreMedalje(valgtHighscore)}
@@ -1874,7 +1887,7 @@
                 {:else if harHighscoreDetaljer(valgtHighscore)}
                     {@const miniRute = highscoreMiniRute(valgtHighscore)}
                     {#if highscoreTrofaeer(valgtHighscore).length > 0}
-                        <section class="highscore-detail-trofaeer" aria-label={tekst('Trofæmedaljer opnået i dette run', 'Trophy medals earned in this run')}>
+                        <section class="highscore-detail-trofaeer" aria-label={tekst('Trofæmedaljer opnået i dette spil', 'Trophy medals earned in this run')}>
                             <span>{tekst('Trofæmedaljer opnået', 'Trophy medals earned')}</span>
                             <div class="highscore-detail-trofae-liste">
                                 {#each highscoreTrofaeer(valgtHighscore) as trofae (trofae.id)}
@@ -1905,7 +1918,7 @@
                     </section>
 
                     {#if highscoreTrofaeMaalinger(valgtHighscore).length > 0}
-                        <section class="highscore-detail-maalinger" aria-label={tekst('Trofæmålinger', 'Trophy measurements')}>
+                        <section class="highscore-detail-maalinger" aria-label={tekst('Trofæfremdrift', 'Trophy progress')}>
                             <p class="highscore-detail-maalinger-meta">
                                 {highscoreStatus(valgtHighscore)} · {talEllerUkendt(valgtHighscore.dage)} {tekst('dage', 'days')} · {highscoreSpillerAntal(valgtHighscore)}
                             </p>
@@ -1950,7 +1963,7 @@
                         {#if highscoreDrilldown.henter}
                             <p class="highscore-detail-note">{tekst('Henter liste...', 'Loading list...')}</p>
                         {:else if highscoreDrilldown.scores.length === 0}
-                            <p class="highscore-detail-note">{tekst('Ingen scores fundet.', 'No scores found.')}</p>
+                            <p class="highscore-detail-note">{tekst('Ingen resultater fundet.', 'No results found.')}</p>
                         {:else}
                             <ol class="highscore-filter-list">
                                 {#each highscoreDrilldown.scores as score, i (score.id || `${score.spillerNavn}-${score.point}-${score.oeNavn}-${i}`)}
@@ -2013,7 +2026,7 @@
                         <input
                             type="email"
                             bind:value={authState.email}
-                            placeholder={tekst('Email til login-link', 'Email for login link')}
+                            placeholder={tekst('E-mailadresse til login', 'Email address for login')}
                             onkeydown={(e) => { if (e.key === 'Enter') sendLoginLink(authState.email); }}
                         />
                         <button type="button" onclick={() => sendLoginLink(authState.email)} disabled={authState.loader}>
@@ -2032,9 +2045,9 @@
 {#snippet ugensGlobalHighscoreTavle()}
     {@const sideStart = highscoreSideStart(ugensGlobalHighscoreSide, ugensGlobaleScores)}
     <div class="tavle">
-        <img src="/screens/boardglobal.webp" alt={tekst('Ugens globale tavle', 'This week global board')} class="tavle-billede" />
+        <img src="/screens/boardglobal.webp" alt={tekst('Ugens globale topliste', "This week's global leaderboard")} class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
-            <h3>{tekst('Toplisten i uge', 'Leaderboard week')} {aktuelIsoUge()}</h3>
+            <h3>{tekst('Ugens topliste · uge', 'Weekly leaderboard · week')} {aktuelIsoUge()}</h3>
             {#if ugensGlobaleScores.length === 0}
                 <p class="tom-liste">{tekst('Ingen resultater endnu i denne uge', 'No results yet this week')}</p>
             {:else}
@@ -2053,10 +2066,10 @@
         </div>
         {#if ugensGlobaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
             <div class="highscore-pager">
-                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeUgensGlobalHighscoreSide} aria-label={tekst('Vis forrige 10 highscores i denne uge', 'Show previous 10 highscores this week')}>
+                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeUgensGlobalHighscoreSide} aria-label={tekst('Vis de forrige 10 resultater fra denne uge', 'Show previous 10 scores from this week')}>
                     &lt;
                 </button>
-                <button type="button" class="highscore-naeste" onclick={naesteUgensGlobalHighscoreSide} aria-label={tekst('Vis næste 10 highscores i denne uge', 'Show next 10 highscores this week')}>
+                <button type="button" class="highscore-naeste" onclick={naesteUgensGlobalHighscoreSide} aria-label={tekst('Vis de næste 10 resultater fra denne uge', 'Show next 10 scores from this week')}>
                     &gt;
                 </button>
             </div>
@@ -2067,9 +2080,9 @@
 {#snippet globalHighscoreTavle()}
     {@const sideStart = highscoreSideStart(globalHighscoreSide, globaleScores)}
     <div class="tavle">
-        <img src="/screens/boardglobal.webp" alt={tekst('Global tavle', 'Global board')} class="tavle-billede" />
+        <img src="/screens/boardglobal.webp" alt={tekst('Global topliste', 'Global leaderboard')} class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
-            <h3>{tekst('Toplisten global', 'Global leaderboard')}</h3>
+            <h3>{tekst('Global topliste', 'Global leaderboard')}</h3>
             {#if globaleScores.length === 0}
                 <p class="tom-liste">{tekst('Ingen data endnu', 'No data yet')}</p>
             {:else}
@@ -2088,10 +2101,10 @@
         </div>
         {#if globaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
             <div class="highscore-pager">
-                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeGlobalHighscoreSide} aria-label={tekst('Vis forrige 10 globale highscores', 'Show previous 10 global highscores')}>
+                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeGlobalHighscoreSide} aria-label={tekst('Vis de forrige 10 globale resultater', 'Show previous 10 global scores')}>
                     &lt;
                 </button>
-                <button type="button" class="highscore-naeste" onclick={naesteGlobalHighscoreSide} aria-label={tekst('Vis næste 10 globale highscores', 'Show next 10 global highscores')}>
+                <button type="button" class="highscore-naeste" onclick={naesteGlobalHighscoreSide} aria-label={tekst('Vis de næste 10 globale resultater', 'Show next 10 global scores')}>
                     &gt;
                 </button>
             </div>
@@ -2102,7 +2115,7 @@
 {#snippet klasseHighscoreTavle()}
     {@const sideStart = highscoreSideStart(klasseHighscoreSide, klasseScores)}
     <div class="tavle klasse-tavle">
-        <img src="/screens/boardglobal.webp" alt={tekst('Karakterklasse tavle', 'Character class board')} class="tavle-billede" />
+        <img src="/screens/boardglobal.webp" alt={tekst('Topliste for karakterklassen', 'Character class leaderboard')} class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
             <h3>{tekst('Toplisten', 'Leaderboard')} {highscoreKlasseNavn()}</h3>
             {#if klasseScores.length === 0}
@@ -2123,10 +2136,10 @@
         </div>
         {#if klasseScores.length > HIGHSCORE_SIDE_STOERRELSE}
             <div class="highscore-pager">
-                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeKlasseHighscoreSide} aria-label={tekst('Vis forrige 10 highscores for karakterklassen', 'Show previous 10 highscores for the character class')}>
+                <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeKlasseHighscoreSide} aria-label={tekst('Vis de forrige 10 resultater for karakterklassen', 'Show previous 10 scores for the character class')}>
                     &lt;
                 </button>
-                <button type="button" class="highscore-naeste" onclick={naesteKlasseHighscoreSide} aria-label={tekst('Vis næste 10 highscores for karakterklassen', 'Show next 10 highscores for the character class')}>
+                <button type="button" class="highscore-naeste" onclick={naesteKlasseHighscoreSide} aria-label={tekst('Vis de næste 10 resultater for karakterklassen', 'Show next 10 scores for the character class')}>
                     &gt;
                 </button>
             </div>
@@ -2156,13 +2169,13 @@
                 <div class="start-copy">
                     <p class="start-eyebrow">{tekst('En ny ø venter', 'A new island awaits')}</p>
                     <h1 id="start-title">{tekst('Tågeøerne', 'Fog Island')}</h1>
-                    <p class="start-tagline">{tekst('Udforsk, overlev, og find en båd før tågen tager dig.', 'Explore, survive, and find a boat before the fog takes you.')}</p>
+                    <p class="start-tagline">{tekst('Udforsk øen, hold dig foran tågen og find en båd mod øst.', 'Explore the island, stay ahead of the fog and find a boat to the east.')}</p>
                 </div>
             </section>
 
             <div class="start-intel">
-                <span>{tekst('Samme ø-navn giver samme ø igen og igen', 'The same island name gives the same island again and again')}</span>
-                <strong>{tekst('De første fem dage afgør, hvem der når med.', 'The first five days decide who can join.')}</strong>
+                <span>{tekst('Det samme ønavn skaber altid den samme ø', 'The same island name always creates the same island')}</span>
+                <strong>{tekst('Andre spillere kan slutte sig til i de første fem dage.', 'Other players can join during the first five days.')}</strong>
             </div>
 
             <div class="login-main start-form">
@@ -2233,10 +2246,10 @@
                     aria-label={tekst('Offline / Flytilstand', 'Offline / Flight mode')}
                 >
                     <img src="/ui/flight.webp" alt="" class="flight-ikon" />
-                    <span>{offlineAppState.arbejder ? tekst('Downloader...', 'Downloading...') : tekst('Offline / Flytilstand', 'Offline / Flight mode')}</span>
+                    <span>{offlineAppState.arbejder ? tekst('Gør klar...', 'Preparing...') : tekst('Offline / Flytilstand', 'Offline / Flight mode')}</span>
                 </button>
                 {#if !offlineAppState.klar}
-                    <p class="fly-hint">{tekst('tryk inden du går offline', 'tap before going offline')}</p>
+                    <p class="fly-hint">{tekst('Tryk her, før du går offline', 'Tap here before going offline')}</p>
                 {/if}
                 {#if offlineAppBesked()}
                     <p class="offline-besked">{offlineAppBesked()}</p>
@@ -2265,7 +2278,7 @@
                 <strong>{karaktervalgStatus.kanJoine ? tekst('Åben', 'Open') : tekst('Lukket', 'Closed')}</strong>
             </div>
             <p class="instruktion">
-                {spilTilstand.gameMode === 'offline' ? tekst('Offline. Spillet gemmes lokalt i denne browser.', 'Offline. The game is saved locally in this browser.') : tekst('Du har fået otte muligheder. Vælg hvem du vil være.', 'You have been given eight options. Choose who you want to be.')}
+                {spilTilstand.gameMode === 'offline' ? tekst('Du spiller offline. Spillet bliver gemt i denne browser.', 'You are playing offline. The game is saved in this browser.') : tekst('Øen har givet dig otte muligheder. Vælg den karakter, du vil gå i land som.', 'The island has given you eight options. Choose the character you want to land as.')}
             </p>
             
             <div class="character-gallery">
@@ -2279,9 +2292,9 @@
                     >
                         <img src={k.ikon} alt={karakterNavn(k)} class="char-icon" />
                         <h3>{karakterNavn(k)}</h3>
-                        <p class="stats">HP: {k.startHp} | {tekst('Guld', 'Gold')}: {k.startGuld}</p>
+                        <p class="stats">{karakterStatsTekst(k)}</p>
                         <p class="desc positive">{karakterFordel(k)}</p>
-                        <p class="desc negative">{karakterUlempe(k)}</p>
+                        <p class="desc negative">{karakterStartUdstyrTekst(k)}</p>
                     </div>
                 {/each}
             </div>
@@ -2337,9 +2350,9 @@
             <div class="highscore-container">
                 {@render scoreGemStatus()}
                 <div class="tavle">
-                    <img src="/screens/boardlocal.webp" alt={tekst('Lokal tavle', 'Local board')} class="tavle-billede" />
+                    <img src="/screens/boardlocal.webp" alt={tekst('Øens topliste', 'Island leaderboard')} class="tavle-billede" />
                     <div class="tavle-indhold lokal-indhold">
-                        <h3>{tekst('Toplisten på', 'Leaderboard on')} {formaterNavn(spilTilstand.rumKode)}</h3>
+                        <h3>{tekst('Toplisten for', 'Leaderboard for')} {formaterNavn(spilTilstand.rumKode)}</h3>
                         {#if lokaleScores.length === 0}
                             <p class="tom-liste">{tekst('Ingen resultater endnu', 'No results yet')}</p>
                         {:else}
@@ -2358,15 +2371,15 @@
                         {#if spilTilstand.offlineMode}
                             <p class="global-note tavle-note-bund">{tekst('Gemt lokalt i browseren.', 'Saved locally in the browser.')}</p>
                         {:else if !authState.user}
-                            <p class="global-note tavle-note-bund">{tekst('Login kræves for at gemme score.', 'Login is required to save score.')}</p>
+                            <p class="global-note tavle-note-bund">{tekst('Log ind for at gemme din score.', 'Log in to save your score.')}</p>
                         {/if}
                     </div>
                     {#if lokaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
                         <div class="highscore-pager">
-                            <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeLokalHighscoreSide} aria-label={tekst('Vis forrige 10 highscores på øen', 'Show previous 10 highscores on the island')}>
+                            <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeLokalHighscoreSide} aria-label={tekst('Vis de forrige 10 resultater på øen', 'Show previous 10 scores on the island')}>
                                 &lt;
                             </button>
-                            <button type="button" class="highscore-naeste" onclick={naesteLokalHighscoreSide} aria-label={tekst('Vis næste 10 highscores på øen', 'Show next 10 highscores on the island')}>
+                            <button type="button" class="highscore-naeste" onclick={naesteLokalHighscoreSide} aria-label={tekst('Vis de næste 10 resultater på øen', 'Show next 10 scores on the island')}>
                                 &gt;
                             </button>
                         </div>
@@ -2430,9 +2443,9 @@
             <div class="highscore-container">
                 {@render scoreGemStatus()}
                 <div class="tavle">
-                    <img src="/screens/boardlocal.webp" alt={tekst('Lokal tavle', 'Local board')} class="tavle-billede" />
+                    <img src="/screens/boardlocal.webp" alt={tekst('Øens topliste', 'Island leaderboard')} class="tavle-billede" />
                     <div class="tavle-indhold lokal-indhold">
-                        <h3>{tekst('Toplisten på', 'Leaderboard on')} {formaterNavn(spilTilstand.rumKode)}</h3>
+                        <h3>{tekst('Toplisten for', 'Leaderboard for')} {formaterNavn(spilTilstand.rumKode)}</h3>
                         {#if lokaleScores.length === 0}
                             <p class="tom-liste">{tekst('Ingen resultater endnu', 'No results yet')}</p>
                         {:else}
@@ -2451,15 +2464,15 @@
                         {#if spilTilstand.offlineMode}
                             <p class="global-note tavle-note-bund">{tekst('Gemt lokalt i browseren.', 'Saved locally in the browser.')}</p>
                         {:else if !authState.user}
-                            <p class="global-note tavle-note-bund">{tekst('Login kræves for at gemme score.', 'Login is required to save score.')}</p>
+                            <p class="global-note tavle-note-bund">{tekst('Log ind for at gemme din score.', 'Log in to save your score.')}</p>
                         {/if}
                     </div>
                     {#if lokaleScores.length > HIGHSCORE_SIDE_STOERRELSE}
                         <div class="highscore-pager">
-                            <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeLokalHighscoreSide} aria-label={tekst('Vis forrige 10 highscores på øen', 'Show previous 10 highscores on the island')}>
+                            <button type="button" class="highscore-naeste highscore-forrige" onclick={forrigeLokalHighscoreSide} aria-label={tekst('Vis de forrige 10 resultater på øen', 'Show previous 10 scores on the island')}>
                                 &lt;
                             </button>
-                            <button type="button" class="highscore-naeste" onclick={naesteLokalHighscoreSide} aria-label={tekst('Vis næste 10 highscores på øen', 'Show next 10 highscores on the island')}>
+                            <button type="button" class="highscore-naeste" onclick={naesteLokalHighscoreSide} aria-label={tekst('Vis de næste 10 resultater på øen', 'Show next 10 scores on the island')}>
                                 &gt;
                             </button>
                         </div>
@@ -2485,8 +2498,8 @@
 {#if visJoinLukketModal}
     <div class="join-lukket-overlay" role="dialog" aria-modal="true" aria-labelledby="join-lukket-title">
         <div class="join-lukket-modal">
-            <h2 id="join-lukket-title">{tekst('Spillet er gået i gang', 'The game has started')}</h2>
-            <p>{tekst(`Du nåede ikke at gå i land på ${formaterNavn(spilTilstand.rumKode)}, og det er for sent at joine denne ø.`, `You did not land on ${formaterNavn(spilTilstand.rumKode)} in time, and it is too late to join this island.`)}</p>
+            <h2 id="join-lukket-title">{tekst('Øen er lukket for nye spillere', 'The island is closed to new players')}</h2>
+            <p>{tekst(`Du nåede ikke i land på ${formaterNavn(spilTilstand.rumKode)}, før spillet lukkede for nye spillere.`, `You did not reach ${formaterNavn(spilTilstand.rumKode)} before the game closed to new players.`)}</p>
             <button type="button" onclick={() => visJoinLukketModal = false}>OK</button>
         </div>
     </div>
@@ -3616,9 +3629,9 @@
     .character-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
     .char-card { background: #222; border: 2px solid #444; padding: 20px; text-align: center; cursor: pointer; border-radius: 8px; transition: 0.2s; display: flex; flex-direction: column; align-items: center; }
     .char-card:hover { border-color: #fff; transform: scale(1.02); }
-    .char-card h3 { margin-top: 10px; color: #fff; font-size: 1.3rem; font-family: 'Cinzel', serif; }
+    .char-card h3 { margin: 10px 0 4px; color: #fff; font-size: 1.3rem; font-family: 'Cinzel', serif; }
     .char-icon { height: 90px; width: auto; margin-bottom: 10px; }
-    .stats { font-weight: bold; color: #aaa; margin: 10px 0; font-family: monospace; }
+    .stats { font-weight: bold; color: #aaa; margin: 2px 0 12px; font-family: monospace; white-space: nowrap; }
     .desc { font-size: 0.9rem; margin: 4px 0; line-height: 1.3; font-style: italic; }
     .positive { color: #ccc; }
     .negative { color: #888; }

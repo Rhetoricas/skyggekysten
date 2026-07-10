@@ -16,8 +16,8 @@
     class:lyd-lav={lydKontrol.niveau === 'lav'}
     class:lyd-slukket={lydKontrol.niveau === 'slukket'}
     onclick={skiftOgGemLyd}
-    title={`${lydTitel()} - ${tekst('klik for næste niveau', 'click for next level')}`}
-    aria-label={`${lydTitel()} - ${tekst('klik for næste niveau', 'click for next level')}`}
+    title={`${lydTitel()} – ${tekst('tryk for næste niveau', 'press for next level')}`}
+    aria-label={`${lydTitel()} – ${tekst('tryk for næste niveau', 'press for next level')}`}
 >
     <svg class="lyd-ikon" viewBox="0 0 48 48" aria-hidden="true">
         <path class="lyd-højttaler" d="M7 19h8l11-9v28l-11-9H7z" />

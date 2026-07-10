@@ -61,11 +61,11 @@
 
     function itemMarkoerTitel(type: ItemMarkoerType, itemId: string) {
         if (itemId === 'alle_toej') {
-            if (type === 'mister') return tekst('Mister tøj', 'Consumes clothes');
+            if (type === 'mister') return tekst('Mister tøj', 'Lose clothes');
             if (type === 'risikerer') return tekst('Risikerer tøj', 'May lose clothes');
             return tekst('Kræver tøj', 'Requires clothes');
         }
-        if (type === 'mister') return tekst(`Mister ${itemNavn(itemId)}`, `Consumes ${itemNavn(itemId)}`);
+        if (type === 'mister') return tekst(`Mister ${itemNavn(itemId)}`, `Lose ${itemNavn(itemId)}`);
         if (type === 'risikerer') return tekst(`Risikerer ${itemNavn(itemId)}`, `May lose ${itemNavn(itemId)}`);
         return tekst(`Kræver ${itemNavn(itemId)}`, `Requires ${itemNavn(itemId)}`);
     }
@@ -85,7 +85,7 @@
     <div class="event-boks">
         <img
             src={eventState.aktivt.billede || `/events/ev_${grundBiome}.webp`}
-            alt={tekst('Event baggrund', 'Event background')}
+            alt={tekst('Scene fra hændelsen', 'Event scene')}
             onerror={(e) => {
                 (e.currentTarget as HTMLImageElement).onerror = null;
                 (e.currentTarget as HTMLImageElement).src = '/events/event.webp';
@@ -137,7 +137,7 @@
                                     </div>
                                 {/if}
                                 {#if valg.kraeverKarakter}
-                                    <span class="mangel-ikon karakter-mangel" title={tekst('Kræver specifik helt', 'Requires a specific hero')}></span>
+                                    <span class="mangel-ikon karakter-mangel" title={tekst('Kun for bestemte karakterer', 'Only available to specific characters')}></span>
                                 {/if}
                                 {#if !itemMarkoerer.length && valg.kraeverItem && itemDB[valg.kraeverItem]}
                                     <img src={itemDB[valg.kraeverItem].billede} alt={tekst('Mangler genstand', 'Missing item')} class="mangel-ikon" title={tekst(`Du mangler ${itemNavn(valg.kraeverItem)}`, `You need ${itemNavn(valg.kraeverItem)}`)} />
@@ -153,13 +153,13 @@
                                     </div>
                                 {/if}
                                 {#if !itemMarkoerer.length && valg.kosterItem && itemDB[valg.kosterItem]}
-                                    <img src={itemDB[valg.kosterItem].billede} alt={tekst('Koster genstand', 'Costs item')} class="mangel-ikon koster-mangel" title={tekst(`Du skal betale med ${itemNavn(valg.kosterItem)}`, `You must pay with ${itemNavn(valg.kosterItem)}`)} />
+                                    <img src={itemDB[valg.kosterItem].billede} alt={tekst('Genstanden bruges', 'Item is used')} class="mangel-ikon koster-mangel" title={tekst(`Bruger ${itemNavn(valg.kosterItem)}`, `Uses ${itemNavn(valg.kosterItem)}`)} />
                                 {/if}
                                 {#if valg.puljeVaerdi}
-                                    <span class="mangel-guld">{tekst('Mangler', 'Need')} {valg.puljeVaerdi} {tekst('Guld', 'Gold')}</span>
+                                    <span class="mangel-guld">{tekst('Koster', 'Costs')} {valg.puljeVaerdi} {tekst('guld', 'gold')}</span>
                                 {/if}
                                 {#if valg.kosterEnergi}
-                                    <span class="mangel-guld">{tekst('Mangler', 'Need')} {valg.kosterEnergi} {tekst('Energi', 'Energy')}</span>
+                                    <span class="mangel-guld">{tekst('Koster', 'Costs')} {valg.kosterEnergi} {tekst('energi', 'energy')}</span>
                                 {/if}
                             </div>
                         {/if}
@@ -167,7 +167,7 @@
                 {/each}
                 
                 {#if eventState.aktivt.valg.every((v: Valg) => !kanViseValg(v))}
-                    <button class="valg-btn ulåst flygt-btn" onclick={(e) => { e.stopPropagation(); lukEvent(); }}>{tekst('Flygt fra faren!', 'Flee the danger!')}</button>
+                    <button class="valg-btn ulåst flygt-btn" onclick={(e) => { e.stopPropagation(); lukEvent(); }}>{tekst('Forlad stedet', 'Leave')}</button>
                 {/if}
             {:else}
                 <button class="fortsaet-btn" onclick={(e) => { e.stopPropagation(); haandterKlikVidere(); }}>

@@ -54,8 +54,8 @@ export function skabKamera() {
         
         if (harForbandelse) {
             spilTilstand.logBesked = tekst(
-                "Forbandelsen tvinger dit syn ud af fokus. Du kan ikke ændre afstanden.",
-                "The curse forces your vision out of focus. You cannot change the distance."
+                "Den gyldne kikkert låser dit syn. Du kan ikke zoome.",
+                "The golden spyglass locks your view. You cannot zoom."
             );
             return;
         }
@@ -97,8 +97,8 @@ function foelgSpiller(index: number, bredde: number, hexW: number, rowH: number)
 
         if (harForbandelse) {
             spilTilstand.logBesked = tekst(
-                "Forbandelsen tvinger dit syn ud af fokus. Du kan ikke ændre afstanden.",
-                "The curse forces your vision out of focus. You cannot change the distance."
+                "Den gyldne kikkert låser dit syn. Du kan ikke zoome.",
+                "The golden spyglass locks your view. You cannot zoom."
             );
             return;
         }

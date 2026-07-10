@@ -49,7 +49,8 @@ export function escapeCell(value) {
         .replaceAll('\\', '\\\\')
         .replaceAll('\t', '\\t')
         .replaceAll('\r', '\\r')
-        .replaceAll('\n', '\\n');
+        .replaceAll('\n', '\\n')
+        .replace(/ +$/g, (spaces) => '\\s'.repeat(spaces.length));
 }
 
 export function unescapeCell(value) {
@@ -65,6 +66,7 @@ export function unescapeCell(value) {
         if (next === 't') out += '\t';
         else if (next === 'r') out += '\r';
         else if (next === 'n') out += '\n';
+        else if (next === 's') out += ' ';
         else out += next;
     }
     return out;
@@ -89,7 +91,9 @@ export function toTsv(rows) {
     const headers = ['id', 'file', 'kind', 'context', 'original', 'updated'];
     return [
         headers.join('\t'),
-        ...rows.map((row) => headers.map((header) => escapeCell(row[header] ?? '')).join('\t'))
+        ...rows.map((row) =>
+            headers.map((header) => escapeCell(row[header] ?? '')).join('\t').replace(/\t$/, '')
+        )
     ].join('\n') + '\n';
 }
 

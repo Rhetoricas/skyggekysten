@@ -40,65 +40,65 @@ export function genererSlutHistorie(titel: string, niveau: number, oeNavn: strin
         let blok1: string;
         if (hp <= 25) {
             blok1 = tekst(
-                `Du når kysten med ${hp} HP tilbage og må samle vejret, før du går videre. `,
-                `You reach the coast with ${hp} HP left and have to catch your breath before moving on. `
+                `Du når kysten med kun ${hp} HP tilbage. Først da båden ligger fri af land, tør du trække vejret roligt. `,
+                `You reach the coast with only ${hp} HP left. Only when the boat pulls clear of shore do you finally breathe easy. `
             );
         } else if (hp <= 75) {
             blok1 = tekst(
-                `Du træder ud af tågen med ${hp} HP og tydelige spor efter rejsen. `,
-                `You step out of the fog with ${hp} HP and clear marks from the journey. `
+                `Du træder ud af tågen med ${hp} HP. Rejsen har sat sine spor, men du står stadig. `,
+                `You step out of the fog with ${hp} HP. The journey has left its mark, but you are still standing. `
             );
         } else {
             blok1 = tekst(
-                `Du finder kysten i god behold med ${hp} HP tilbage. `,
-                `You find the coast in good shape with ${hp} HP left. `
+                `Du når kysten i god behold med ${hp} HP tilbage. Båden ligger klar foran dig. `,
+                `You reach the coast in good shape with ${hp} HP left. The boat is waiting ahead. `
             );
         }
 
         let blok2: string;
         if (harDiamant) {
             blok2 = tekst(
-                "Diamanten ligger stadig sikkert i din oppakning. ",
-                "The diamond is still safe in your pack. "
+                "Diamanten ligger stadig sikkert i din oppakning – et sjældent minde om det, du fandt på øen. ",
+                "The diamond is still safe in your pack, a rare reminder of what you found on the island. "
             );
         } else if (harSvaerd) {
             blok2 = tekst(
-                "Dit våben bærer mærker efter turen. ",
-                "Your weapon bears marks from the journey. "
+                "Dit våben bærer mærker efter alt det, der stod mellem dig og kysten. ",
+                "Your weapon bears the marks of everything that stood between you and the coast. "
             );
         } else if (harSkovl) {
             blok2 = tekst(
-                "Der sidder stadig jord på hænderne efter alt det, du gravede frem. ",
-                "There is still soil on your hands from everything you dug up. "
+                "Der sidder stadig jord på dine hænder efter alt det, du gravede frem undervejs. ",
+                "There is still soil on your hands from everything you uncovered along the way. "
             );
         } else {
             blok2 = tekst(
-                "Du har ikke meget udstyr tilbage, men du nåede ud. ",
-                "You do not have much equipment left, but you made it out. "
+                "Der er ikke meget udstyr tilbage, men du kom ud med livet i behold. ",
+                "Little of your equipment remains, but you made it out alive. "
             );
         }
 
         let blok3: string;
         if (guld >= 1500) {
             blok3 = tekst(
-                `På dag ${dag} forlader du øen med ${guld} guld. `,
-                `On day ${dag}, you leave the island with ${guld} gold. `
+                `På dag ${dag} forlader du øen med hele ${guld} guld. `,
+                `On day ${dag}, you leave the island with an impressive ${guld} gold. `
             );
         } else if (guld >= 400) {
             blok3 = tekst(
-                `På dag ${dag} slipper du væk med ${guld} guld i tasken. `,
-                `On day ${dag}, you escape with ${guld} gold in your bag. `
+                `På dag ${dag} slipper du væk med ${guld} guld i tasken. Det rækker til mere end bare den næste rejse. `,
+                `On day ${dag}, you escape with ${guld} gold in your bag, enough for more than the next journey. `
             );
         } else {
             blok3 = tekst(
-                `På dag ${dag} slipper du væk med ${guld} guld. Det var nok denne gang. `,
-                `On day ${dag}, you escape with ${guld} gold. It was enough this time. `
+                `På dag ${dag} slipper du væk med ${guld} guld. Det er ikke en formue, men du er fri af øen. `,
+                `On day ${dag}, you escape with ${guld} gold. It is no fortune, but you are free of the island. `
             );
         }
 
         const blok4 = tekst(
-            `Du ender på rang ${niveau}. Din titel: ${titelStort} AF ${oeNavnStort}`,
-            `You end at rank ${niveau}. Your title: ${titelStort} OF ${oeNavnStort}`
+            `Rejsen slutter på rang ${niveau}. Du forlader øen som ${titelStort} fra ${oeNavnStort}.`,
+            `The journey ends at rank ${niveau}. You leave the island as ${titelStort} from ${oeNavnStort}.`
         );
 
         return `${blok1}${blok2}${blok3}${blok4}`;
@@ -106,47 +106,47 @@ export function genererSlutHistorie(titel: string, niveau: number, oeNavn: strin
         let blok2: string;
         if (harDiamant) {
             blok2 = tekst(
-                "Diamanten kom ikke med dig ud. ",
-                "The diamond did not make it out with you. "
+                "Diamanten bliver liggende et sted i tågen, langt fra kysten. ",
+                "The diamond remains somewhere in the fog, far from the coast. "
             );
         } else if (harSvaerd) {
             blok2 = tekst(
-                "Dit våben ligger tilbage på øen. ",
-                "Your weapon lies behind on the island. "
+                "Dit våben ligger tilbage på øen, hvor rejsen sluttede. ",
+                "Your weapon remains on the island where the journey ended. "
             );
         } else if (harSkovl) {
             blok2 = tekst(
-                "Sporene efter dit gravearbejde er det eneste, der bliver tilbage. ",
-                "The traces of your digging are all that remain. "
+                "De åbne huller i jorden står tilbage som spor efter din vej over øen. ",
+                "The open pits remain as traces of your path across the island. "
             );
         } else {
             blok2 = tekst(
-                "Du nåede ikke at få nok med dig. ",
-                "You did not manage to bring enough with you. "
+                "Du nåede hverken båden eller et sikkert sted at vente. ",
+                "You reached neither the boat nor a safe place to wait. "
             );
         }
 
         let blok3: string;
         if (guld >= 1500) {
             blok3 = tekst(
-                `Du nåede dag ${dag} og samlede ${guld} guld, men kom ikke væk. `,
-                `You reached day ${dag} and gathered ${guld} gold, but did not escape. `
+                `Du nåede dag ${dag} og samlede ${guld} guld, men flugtbåden forblev uden for rækkevidde. `,
+                `You reached day ${dag} and gathered ${guld} gold, but the escape boat remained out of reach. `
             );
         } else if (guld >= 400) {
             blok3 = tekst(
-                `Du nåede dag ${dag} og samlede ${guld} guld, før turen sluttede. `,
-                `You reached day ${dag} and gathered ${guld} gold before the journey ended. `
+                `Du nåede dag ${dag} og samlede ${guld} guld, før rejsen endte i tågen. `,
+                `You reached day ${dag} and gathered ${guld} gold before the journey ended in the fog. `
             );
         } else {
             blok3 = tekst(
-                `Du faldt på dag ${dag} med ${guld} guld. `,
-                `You fell on day ${dag} with ${guld} gold. `
+                `På dag ${dag} slap kræfterne op. Du faldt med ${guld} guld på dig. `,
+                `On day ${dag}, your strength gave out. You fell carrying ${guld} gold. `
             );
         }
 
         const blok4 = tekst(
-            `Du ender på rang ${niveau}. Din titel: ${titelStort} AF ${oeNavnStort}`,
-            `You end at rank ${niveau}. Your title: ${titelStort} OF ${oeNavnStort}`
+            `Rejsen slutter på rang ${niveau}. På øen ${oeNavnStort} bliver du husket som ${titelStort}.`,
+            `The journey ends at rank ${niveau}. On the island of ${oeNavnStort}, you are remembered as ${titelStort}.`
         );
 
         return `${blok2}${blok3}${blok4}`;

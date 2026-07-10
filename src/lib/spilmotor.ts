@@ -520,16 +520,16 @@ export function tilfoejTilRygsæk(genstandId: string, tilfoejetMaengde: number =
             spilTilstand.mitUdstyr = udstyrListe.filter(ting => ting.id !== genstandId || ting === fundetTing);
         } else {
             spilTilstand.logBesked = tekst(
-                `Du har allerede ${itemNavn(genstandId) || 'den genstand'}.`,
-                `You already have ${itemNavn(genstandId) || 'that item'}.`
+                `Du har allerede ${itemNavn(genstandId) || 'den genstand'}. Du kan ikke bære en mere.`,
+                `You already have ${itemNavn(genstandId) || 'that item'}. You cannot carry another one.`
             );
             return { tilfoejet: false, diamantVaerdier: [], diamantBeskrivelse: '' };
         }
     } else {
         if (!kanModtageItem(genstandId)) {
             spilTilstand.logBesked = tekst(
-                `Du har allerede ${itemNavn(genstandId) || 'den type udstyr'}.`,
-                `You already have that kind of gear.`
+                `Du har allerede ${itemNavn(genstandId) || 'den type udstyr'}. Du kan ikke bære en mere.`,
+                `You already have that kind of gear. You cannot carry another one.`
             );
             return { tilfoejet: false, diamantVaerdier: [], diamantBeskrivelse: '' };
         }
@@ -890,13 +890,13 @@ function handelNaegtelseBesked(felt: Felt | null | undefined, type: 'shop' | 'va
     const grund = handelNaegtelseGrund(felt);
     if (grund === 'koelle') {
         return type === 'vaerksted'
-            ? "Værkstedet lukker porten, da de ser dig. Mesteren husker køllen og tør ikke arbejde for dig igen."
-            : "Boderne lukker skodderne, da de ser dig. Købmanden husker køllen og tør ikke handle mere med dig.";
+            ? "Værkstedet lukker porten, så snart de ser dig. Mesteren husker din kølle og vil ikke arbejde for dig igen."
+            : "Boderne lukker skodderne, så snart de ser dig. Købmanden husker din kølle og vil ikke handle med dig igen.";
     }
 
     return type === 'vaerksted'
-        ? "Værkstedet lukker porten, da de ser dig. Rygtet om dine smadrede naboer er nået hertil."
-        : "Boderne lukker skodderne, da de ser dig. Rygtet om dine smadrede naboer er nået hertil.";
+        ? "Værkstedet lukker porten, så snart de ser dig. Rygtet om de ødelagte handelssteder i nærheden er nået hertil."
+        : "Boderne lukker skodderne, så snart de ser dig. Rygtet om de ødelagte handelssteder i nærheden er nået hertil.";
 }
 
 export function naegtHandelForAktuelSpillerPaaAktueltFelt() {
@@ -973,8 +973,8 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
             spilTilstand.alleSpillere[spilTilstand.spillerNavn].deathCause = 'taage';
         }
         spilTilstand.logBesked = tekst(
-            "Du har været væk for længe. Tågen har indhentet dig.",
-            "You were away too long. The fog caught up with you."
+            "Du har været væk for længe. Tågen har indhentet dig, og du overlever ikke.",
+            "You were away too long. The fog caught up with you, and you do not survive."
         );
         syncTilDb(true);
         return false;
@@ -983,8 +983,8 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     const venteFredet = (spilTilstand.venteFriIndtilDag || 0) > (spilTilstand.dag || 1);
     if (!venteFredet && spilTilstand.dag >= options.langsomsteDag + options.maxDageForan) {
         spilTilstand.logBesked = tekst(
-            'Du må vente på de andre spillere.',
-            'You need to wait for the other players.'
+            'Du er for langt foran. Vent på de andre spillere.',
+            'You are too far ahead. Wait for the other players.'
         );
         startVenteSpil(false);
         return false;
@@ -1018,8 +1018,8 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
     const ankomstResultat = haandterAnkomstPaaFelt(nytIndeks, 'gang', {
         startLog: energiBetaling.gratis
             ? (energiBetaling.kilde === 'bersaerk'
-                ? tekst("Bersærkergangen bærer dig frem. Bevægelsen koster 0 energi.", "Berserk carries you forward. The move costs 0 energy.")
-                : tekst("Maden holder dig i gang. Bevægelsen koster 0 energi.", "Food keeps you going. The move costs 0 energy."))
+                ? tekst("Bersærkergangen driver dig frem. Bevægelsen er gratis.", "Your berserk rage drives you forward. The move is free.")
+                : tekst("Maden giver dig kræfter til turen. Bevægelsen er gratis.", "The food gives you strength for the journey. The move is free."))
             : "",
         onBaadStart: options.onBaadStart
     });
@@ -1049,8 +1049,8 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         hpStraf = spilTilstand.beregnSkade(hpStraf);
         spilTilstand.livspoint -= hpStraf;
         ekstraLog += tekst(
-            ` Terrænet slider på dig. (-${hpStraf} HP)${udloesBersaerkHvisRelevant(hpStraf)}`,
-            ` The terrain wears you down. (-${hpStraf} HP)${udloesBersaerkHvisRelevant(hpStraf)}`
+            ` Det hårde terræn koster dig ${hpStraf} HP.${udloesBersaerkHvisRelevant(hpStraf)}`,
+            ` The rough terrain costs you ${hpStraf} HP.${udloesBersaerkHvisRelevant(hpStraf)}`
         );
     }
 
@@ -1065,8 +1065,8 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
             if (insektPlageAktiv) {
                 felt.hoestetFremTilBlok = nuBlok;
                 ekstraLog += tekst(
-                    " Græshopperne har spist den modne afgrøde.",
-                    " Locusts have eaten the ripe crop."
+                    " Græshopperne har allerede ædt den modne afgrøde.",
+                    " The locusts have already eaten the ripe crop."
                 );
             } else {
                 const foerHp = spilTilstand.livspoint;
@@ -1084,8 +1084,8 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
     if (erVandBiome(felt.biome) && !felt.hasBoat) {
         tagSkadeOgTjekDød(
             30,
-            tekst(`Du ender i åbent vand.`, `You end up in open water.`),
-            tekst("Du druknede i det åbne vand.", "You drowned in the open water.")
+            tekst(`Du træder ud i åbent vand.`, `You step into open water.`),
+            tekst("Du drukner i det åbne vand.", "You drown in the open water.")
         );
         if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'dead') {
             return false;
@@ -1096,18 +1096,18 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
 
     if ((charId === 'thief_m' || charId === 'thief_f') && (b === 'marked' || b === 'by')) {
         spilTilstand.guldTotal += 5;
-        ekstraLog += tekst(" Du finder 5 guld i en tilfældig lomme.", " You find 5 gold in a random pocket.");
+        ekstraLog += tekst(" Du fisker 5 guld op af en fremmed lomme.", " You lift 5 gold from a stranger’s pocket.");
     } else if ((charId === 'joker_m' || charId === 'joker_f') && b === 'marked') {
         spilTilstand.guldTotal += 20;
-        ekstraLog += tekst(" Din optræden giver 20 guld.", " Your performance earns 20 gold.");
+        ekstraLog += tekst(" Tilskuerne giver 20 guld for din optræden.", " The crowd gives you 20 gold for your performance.");
     } else if ((charId === 'royal_m' || charId === 'royal_f') && b === 'by') {
         spilTilstand.guldTotal += 5;
-        ekstraLog += tekst(" Du opkræver 5 guld i lokal skat.", " You collect 5 gold in local tax.");
+        ekstraLog += tekst(" Du opkræver 5 guld i skat fra byen.", " You collect 5 gold in tax from the town.");
     } else if ((charId === 'magician_m' || charId === 'magician_f') && b === 'ritual') {
         const foerHp = spilTilstand.livspoint;
         spilTilstand.livspoint = Math.min(spilTilstand.maxLivspoint, spilTilstand.livspoint + 5);
         registrerHeling(foerHp, spilTilstand.livspoint);
-        ekstraLog += tekst(" Ritualpladsen giver dig 5 HP.", " The ritual site gives you 5 HP.");
+        ekstraLog += tekst(" Ritualpladsens kraft giver dig 5 HP.", " The ritual site restores 5 HP.");
     }
 
     if (erMagiker && b === 'krystal') {
@@ -1117,8 +1117,8 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         if (faktiskHeling > 0) {
             registrerHeling(foerHp, spilTilstand.livspoint);
             ekstraLog += tekst(
-                ` Krystallet nærer din magi. (+${faktiskHeling} HP)`,
-                ` The crystal feeds your magic. (+${faktiskHeling} HP)`
+                ` Krystallet styrker dig. Du genvinder ${faktiskHeling} HP.`,
+                ` The crystal strengthens you. You recover ${faktiskHeling} HP.`
             );
         }
     }
@@ -1126,8 +1126,8 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
     const krystallerAfsloret = afslørKrystalResonans(nytIndeks);
     if (krystallerAfsloret > 0) {
         ekstraLog += tekst(
-            ` Staven svarer på krystallet og viser ${krystallerAfsloret} ${krystallerAfsloret === 1 ? 'krystalfelt' : 'krystalfelter'} i nærheden.`,
-            ` The staff answers the crystal and reveals ${krystallerAfsloret} nearby crystal ${krystallerAfsloret === 1 ? 'tile' : 'tiles'}.`
+            ` Staven reagerer på krystallet og afslører ${krystallerAfsloret} ${krystallerAfsloret === 1 ? 'krystalfelt' : 'krystalfelter'} i nærheden.`,
+            ` The staff reacts to the crystal and reveals ${krystallerAfsloret} nearby crystal ${krystallerAfsloret === 1 ? 'tile' : 'tiles'}.`
         );
     }
 
@@ -1141,20 +1141,20 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         registrerHeling(hpFoer, spilTilstand.livspoint);
         const energiBetaling = brugEnergi(1);
         const energiTekst = energiBetaling.gratis
-            ? tekst("bersærkergangen betaler energien", "berserk pays the energy")
-            : tekst("-1 energi", "-1 energy");
+            ? tekst("Bersærkergangen dækker energiforbruget.", "Your berserk rage covers the energy cost.")
+            : tekst("Du bruger 1 energi.", "You use 1 energy.");
         felt.skjultLiv = 0;
         felt.skjultGuld = 0;
         felt.skjultLoot = null;
         felt.skjultFaelde = false;
         ekstraLog += faktiskHeling > 0
             ? tekst(
-                ` Runekvisten trækker rødderne op uden at grave. Jorden falder sammen til sten og orme. (+${faktiskHeling} HP, ${energiTekst})`,
-                ` The rune twig pulls up the roots without digging. The ground collapses into stones and worms. (+${faktiskHeling} HP, ${energiTekst})`
+                ` Runekvisten trækker rødderne op uden at grave. Du genvinder ${faktiskHeling} HP. Under rødderne er der kun sten og orme. ${energiTekst}`,
+                ` The rune twig pulls up the roots without digging. You recover ${faktiskHeling} HP. Beneath the roots, there are only stones and worms. ${energiTekst}`
             )
             : tekst(
-                ` Runekvisten trækker rødderne op uden at grave, men du kan ikke rumme mere liv. Jorden falder sammen til sten og orme. (${energiTekst})`,
-                ` The rune twig pulls up the roots without digging, but you cannot hold more life. The ground collapses into stones and worms. (${energiTekst})`
+                ` Runekvisten trækker rødderne op uden at grave, men du har allerede fuld HP. Under rødderne er der kun sten og orme. ${energiTekst}`,
+                ` The rune twig pulls up the roots without digging, but you are already at full HP. Beneath the roots, there are only stones and worms. ${energiTekst}`
             );
         broadcastFelt(nytIndeks, felt);
         mapAendret = true;
@@ -1170,7 +1170,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         
         if (!varEjer) {
             if (felt.mineLocked) {
-                ekstraLog += tekst(" Minen er låst af ejeren.", " The mine is locked by its owner.");
+                ekstraLog += tekst(" Ejeren har låst minen, så du kan ikke overtage den.", " The owner has locked the mine, so you cannot take it over.");
             } else {
                 const ejedeMiner = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
                 felt.mineOwner = spilTilstand.spillerNavn;
@@ -1182,12 +1182,12 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
                     spilTilstand.guldTotal += faktiskGuld;
                     ekstraLog += tidligereEjer
                         ? tekst(
-                            ` Du overtager ${tidligereEjer}s mine og udbetaler ${faktiskGuld} guld til dig selv.`,
-                            ` You take over ${tidligereEjer}'s mine and pay yourself ${faktiskGuld} gold.`
+                            ` Du overtager ${tidligereEjer}s mine og finder ${faktiskGuld} guld i lageret.`,
+                            ` You take over ${tidligereEjer}'s mine and find ${faktiskGuld} gold in storage.`
                         )
                         : tekst(
-                            ` Du overtager minen og udbetaler ${faktiskGuld} guld til dig selv.`,
-                            ` You take over the mine and pay yourself ${faktiskGuld} gold.`
+                            ` Du overtager minen og finder ${faktiskGuld} guld i lageret.`,
+                            ` You take over the mine and find ${faktiskGuld} gold in storage.`
                         );
                 } else {
                     felt.mineLocked = true;
@@ -1204,7 +1204,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
     }
 
     if (spilTilstand.livspoint <= 0 && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map') {
-        fremtvingKollaps(ekstraLog.trim() || tekst("Terrænet tog dine sidste kræfter.", "The terrain took your last strength."));
+        fremtvingKollaps(ekstraLog.trim() || tekst("Det hårde terræn tager dine sidste kræfter.", "The rough terrain drains your last strength."));
         spilTilstand.gitter = [...spilTilstand.gitter];
         syncTilDb(mapAendret);
         return false;
@@ -1214,8 +1214,8 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         ankomstKilde === 'gang'
             ? ""
             : ankomstKilde === 'stav' 
-            ? tekst("Staven flytter dig fire felter mod øst.", "The staff moves you four tiles east.")
-            : tekst("Portalen slynger dig mod øst.", "The portal hurls you east.")
+            ? tekst("Staven fører dig fire felter mod øst.", "The staff carries you four tiles east.")
+            : tekst("Portalen sender dig mod øst.", "The portal sends you east.")
     );
     const slidLog = felt.hasBoat ? "" : tjekMiljoeSlitage(felt.biome as string);
     const samletLog = `${startLog}${ekstraLog}${slidLog}`.trim();
@@ -1257,8 +1257,8 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         }
         spilTilstand.doedsAarsag = null;
         spilTilstand.logBesked = tekst(
-            "Du går ombord i båden og forlader øen.",
-            "You board the boat and leave the island."
+            "Du går ombord. Båden fører dig væk fra øen.",
+            "You board the boat. It carries you away from the island."
         );
         broadcastFelt(nytIndeks, felt);
         mapAendret = true;
@@ -1296,12 +1296,12 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
             } else if (harShop(felt)) {
                 spilTilstand.logBesked = felt.shopItems?.includes('hemmelighed') && !harUtydedeSkattekortSpor()
                     ? tekst(
-                        "Købmanden har ikke flere skattekort, der peger på noget nyt på denne ø.",
-                        "The merchant has no more treasure maps pointing to anything new on this island."
+                        "Købmanden har ingen skattekort tilbage med nye spor på øen.",
+                        "The merchant has no treasure maps left with new clues on the island."
                     )
                     : tekst(
-                        "Butikkens hylde er tom for i dag. Kom tilbage i morgen.",
-                        "The shop shelf is empty today. Come back tomorrow."
+                        "Butikkens hylder er tomme for i dag. Kom tilbage i morgen.",
+                        "The shop shelves are empty for today. Come back tomorrow."
                     );
             }
         }
@@ -1311,7 +1311,7 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
     syncTilDb(mapAendret); // Uploades kun hvis nødvendigt
 
     if (spilTilstand.livspoint <= 0 && spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'win_map') {
-        fremtvingKollaps(tekst("Kræfterne rev din sidste livsgnist væk.", "Your strength tore away your last spark of life."));
+        fremtvingKollaps(tekst("Du mister de sidste kræfter.", "Your remaining strength gives out."));
     }
     return true;
 }
@@ -1390,7 +1390,7 @@ export function udfoerTeleportMedOptions(options: TeleportOptions) {
 
     haandterAnkomstPaaFelt(maal.indeks, options.kilde, {
         startLog: energiBetaling.gratis
-            ? `${options.startLog ?? ''} ${tekst("Bersærkergangen betaler energien.", "Berserk pays the energy.")}`.trim()
+            ? `${options.startLog ?? ''} ${tekst("Bersærkergangen dækker energiforbruget.", "Your berserk rage covers the energy cost.")}`.trim()
             : options.startLog
     });
     tjekAutoTracker();
@@ -1404,7 +1404,7 @@ export function udfoerTeleport() {
     return udfoerTeleportMedOptions({
         kilde: 'stav',
         kraeverStav: true,
-        startLog: tekst("Staven flytter dig fire felter mod øst.", "The staff moves you four tiles east.")
+        startLog: tekst("Staven fører dig fire felter mod øst.", "The staff carries you four tiles east.")
     });
 }
 
@@ -1450,15 +1450,15 @@ export function udfoerDrageTeleport() {
 
     const startLog = nedgraderet
             ? tekst(
-                "Dragestaven kaster dig mod øst, men åbent vand svarer igen. Den redder dig til sidste sikre felt og brænder ned til en almindelig stav.",
-                "The dragon staff throws you east, but open water answers back. It saves you on the last safe tile and burns down into an ordinary staff."
+                "Dragestaven kaster dig mod øst, men ruten ender i åbent vand. Den sætter dig af på det sidste sikre felt og brænder ud til en almindelig stav.",
+                "The dragon staff throws you east, but the route ends in open water. It drops you on the last safe tile and burns down into an ordinary staff."
             )
             : tekst(
-                "Dragestaven flytter dig fem felter mod øst og viser ruten imellem.",
-                "The dragon staff moves you five tiles east and reveals the route between."
+                "Dragestaven fører dig fem felter mod øst og afslører hele ruten.",
+                "The dragon staff carries you five tiles east and reveals the entire route."
             );
     haandterAnkomstPaaFelt(maalIndeks, 'stav', {
-        startLog: energiBetaling.gratis ? `${startLog} ${tekst("Bersærkergangen betaler energien.", "Berserk pays the energy.")}` : startLog
+        startLog: energiBetaling.gratis ? `${startLog} ${tekst("Bersærkergangen dækker energiforbruget.", "Your berserk rage covers the energy cost.")}` : startLog
     });
     tjekAutoTracker();
     return true;
@@ -1470,8 +1470,8 @@ export function udfoerPortalTeleport() {
         kilde: 'portal',
         afstand,
         startLog: tekst(
-            `Portalen slynger dig ${afstand} felter mod øst.`,
-            `The portal hurls you ${afstand} tiles east.`
+            `Portalen sender dig ${afstand} felter mod øst.`,
+            `The portal sends you ${afstand} tiles east.`
         )
     });
 }
@@ -1480,7 +1480,7 @@ export function hvil() {
     if (!spilTilstand.valgtKarakter || spilTilstand.erBevidstløs) return;
 
     if (erSpillerITaagen()) {
-        spilTilstand.logBesked = tekst("Du kan ikke slå lejr i tågen.", "You cannot camp in the fog.");
+        spilTilstand.logBesked = tekst("Du kan ikke slå lejr, mens tågen omslutter dig.", "You cannot make camp while the fog surrounds you.");
         return;
     }
 
@@ -1488,14 +1488,14 @@ export function hvil() {
     const vildmark = ['eng', 'skov', 'mark', 'bjerg', 'hoejland' ];
     
     if (!felt || !vildmark.includes(felt.biome as string)) {
-        spilTilstand.logBesked = tekst("Miljøet er uegnet til at slå lejr i.", "This place is not suitable for camp.");
+        spilTilstand.logBesked = tekst("Du kan ikke slå lejr i dette terræn.", "You cannot make camp in this terrain.");
         return;
     }
     
     const harSilkesovepose = spilTilstand.mitUdstyr?.some(ting => ting.id === 'silkesovepose');
     const harSovepose = harSilkesovepose || spilTilstand.mitUdstyr?.some(ting => ting.id === 'sovepose');
     if (!harSovepose) {
-        spilTilstand.logBesked = tekst("Du mangler en sovepose for at slå lejr.", "You need a sleeping bag to make camp.");
+        spilTilstand.logBesked = tekst("Du skal bruge en sovepose for at slå lejr.", "You need a sleeping bag to make camp.");
         return;
     }
 
@@ -1507,8 +1507,8 @@ export function hvil() {
     brugResterendeEnergi();
     
     spilTilstand.logBesked = harSilkesovepose
-        ? tekst("Du hviler i silkesoveposen. Du får 40 HP, og tiden går.", "You rest in the silk sleeping bag. You gain 40 HP, and time passes.")
-        : tekst("Du hviler i soveposen. Du får 20 HP, og tiden går.", "You rest in the sleeping bag. You gain 20 HP, and time passes.");
+        ? tekst("Du hviler i silkesoveposen og genvinder op til 40 HP. Imens går tiden.", "You rest in the silk sleeping bag and recover up to 40 HP. Time passes while you rest.")
+        : tekst("Du hviler i soveposen og genvinder op til 20 HP. Imens går tiden.", "You rest in the sleeping bag and recover up to 20 HP. Time passes while you rest.");
     
     fremrykTid();
     syncTilDb(); // Soveposen ændrer intet i landskabet. Drop (true).
@@ -1532,14 +1532,14 @@ export function aktiverHemmelighed() {
 
         spilTilstand.kameraFokus = valgtKlynge.center;
         spilTilstand.logBesked = tekst(
-            "Du læser skattekortet. Det gamle pergament peger på et område, men ikke på sandheden under jorden.",
-            "You read the treasure map. The old parchment points to an area, but not to the truth under the soil."
+            "Du læser skattekortet. Det markerer et område, men ikke det præcise sted, hvor skatten ligger.",
+            "You read the treasure map. It marks an area, but not the exact spot where the treasure is buried."
         );
     } else {
         spilTilstand.guldTotal += 50;
         spilTilstand.logBesked = tekst(
-            "Skattekortet er for gammelt. Alle dets mærker fører til steder, du allerede har tydet, men pergamentet er stadig 50 guld værd for en samler.",
-            "The treasure map is too old. Every mark leads to places you have already decoded, but the parchment is still worth 50 gold to a collector."
+            "Alle kortets mærker fører til steder, du allerede har undersøgt. En samler køber alligevel det gamle pergament for 50 guld.",
+            "Every mark on the map leads to places you have already searched. A collector still buys the old parchment for 50 gold."
         );
     }
     
@@ -1668,15 +1668,15 @@ export function erTrackerAktivPaa(navn: string) {
 
 function saetTracker(targetNavn: string, visLog = true) {
     if (!erHunter()) {
-        spilTilstand.logBesked = tekst('Kun jægere kan sætte en tracker.', 'Only hunters can place a tracker.');
+        spilTilstand.logBesked = tekst('Kun jægere kan bruge et sporingsmærke.', 'Only hunters can use a tracker.');
         return;
     }
 
     const target = spilTilstand.alleSpillere[targetNavn];
     if (!target || target.index !== spilTilstand.spillerIndex || !erFriskAktivSpiller(target)) {
         spilTilstand.logBesked = tekst(
-            'Du skal stå på samme felt som spilleren for at sætte en tracker.',
-            'You need to stand on the same tile as the player to place a tracker.'
+            'Du skal stå på samme felt som spilleren for at starte sporingen.',
+            'You need to stand on the same tile as the player to start tracking them.'
         );
         return;
     }
@@ -1684,7 +1684,7 @@ function saetTracker(targetNavn: string, visLog = true) {
     const mig = spilTilstand.alleSpillere[spilTilstand.spillerNavn] || {};
     if (mig.aktivTracker && mig.aktivTracker.slutterDag >= spilTilstand.dag) {
         spilTilstand.logBesked = tekst(
-            `Du følger allerede ${mig.aktivTracker.targetNavn}s spor.`,
+            `Du følger allerede sporet efter ${mig.aktivTracker.targetNavn}.`,
             `You are already following ${mig.aktivTracker.targetNavn}'s trail.`
         );
         return;
@@ -1710,8 +1710,8 @@ function saetTracker(targetNavn: string, visLog = true) {
     opdaterTrackerSyn();
     if (visLog) {
         spilTilstand.logBesked = tekst(
-            `Du følger ${targetNavn}s spor. I tyve dage ser du de felter, spilleren ser.`,
-            `You follow ${targetNavn}'s trail. For twenty days, you see the tiles that player sees.`
+            `Du følger sporet efter ${targetNavn}. De næste tyve dage ser du de samme felter som spilleren.`,
+            `You follow ${targetNavn}'s trail. For the next twenty days, you see the same tiles as that player.`
         );
     }
     syncTilDb();
@@ -1777,7 +1777,7 @@ export function tjekAutoSpillerMoede() {
                 spiller,
                 0.1,
                 tekst(
-                    `${spilTilstand.spillerNavn} opkræver 10% i skat fra dig.`,
+                    `${spilTilstand.spillerNavn} opkræver 10 % af dit guld i skat.`,
                     `${spilTilstand.spillerNavn} collects 10% tax from you.`
                 )
             );
@@ -1810,7 +1810,7 @@ export function tjekAutoSpillerMoede() {
                 spiller,
                 0.1,
                 tekst(
-                    `${spilTilstand.spillerNavn} overfalder dig og stjæler 10% af dit guld.`,
+                    `${spilTilstand.spillerNavn} overfalder dig og stjæler 10 % af dit guld.`,
                     `${spilTilstand.spillerNavn} attacks you and steals 10% of your gold.`
                 )
             );
@@ -1879,12 +1879,12 @@ export function begaaIndbrud() {
     const felt = spilTilstand.gitter[indeks];
 
     if (!harUdstyr('dirk')) {
-        spilTilstand.logBesked = tekst("Du mangler en dirk.", "You need a lockpick.");
+        spilTilstand.logBesked = tekst("Du skal bruge en dirk for at bryde ind.", "You need a lockpick to break in.");
         return;
     }
 
     if (!kanBegaaIndbrudPaaFelt(felt)) {
-        spilTilstand.logBesked = tekst("Dirken kan kun bruges på tomme byfelter.", "The lockpick can only be used on empty town tiles.");
+        spilTilstand.logBesked = tekst("Dirken kan kun bruges på et tomt byfelt.", "The lockpick can only be used on an empty town tile.");
         return;
     }
 
@@ -1897,7 +1897,7 @@ export function begaaIndbrud() {
 
     const energiBetaling = brugEnergi(energiPris);
     const energiLog = energiBetaling.gratis
-        ? tekst("Bersærkergangen betaler energien.", "Berserk pays the energy.")
+        ? tekst("Bersærkergangen dækker energiforbruget.", "Your berserk rage covers the energy cost.")
         : tekst(`Det koster ${energiPris} energi.`, `It costs ${energiPris} energy.`);
     felt.indbrudt = true;
     spilTilstand.gitter[indeks] = { ...felt };
@@ -1907,16 +1907,16 @@ export function begaaIndbrud() {
         tagSkadeOgTjekDød(
             grundSkade,
             tekst(
-                `Du begår indbrud${harMesterdirk ? ' med mesterdirken' : ''}. ${energiLog} Du bliver opdaget, får tæv og når ikke at få guldet med.`,
-                `You break in${harMesterdirk ? ' with the master lockpick' : ''}. ${energiLog} You are discovered, beaten up, and do not get away with the gold.`
+                `Du bryder ind${harMesterdirk ? ' med mesterdirken' : ''}. ${energiLog} Vagterne opdager dig og slår dig ned, før du får guldet med.`,
+                `You break in${harMesterdirk ? ' with the master lockpick' : ''}. ${energiLog} The guards spot you and beat you down before you can take the gold.`
             ),
-            tekst("Vagterne slog dig ihjel.", "The guards killed you.")
+            tekst("Vagterne slår dig ihjel.", "The guards kill you.")
         );
     } else {
         spilTilstand.guldTotal += udbytte;
         spilTilstand.logBesked = tekst(
-            `Du begår indbrud${harMesterdirk ? ' med mesterdirken' : ''} og finder ${udbytte} guld. ${energiLog} Ingen når at stoppe dig.`,
-            `You break in${harMesterdirk ? ' with the master lockpick' : ''} and find ${udbytte} gold. ${energiLog} No one stops you in time.`
+            `Du bryder ind${harMesterdirk ? ' med mesterdirken' : ''} og tager ${udbytte} guld. ${energiLog} Du slipper væk, før nogen opdager dig.`,
+            `You break in${harMesterdirk ? ' with the master lockpick' : ''} and take ${udbytte} gold. ${energiLog} You get away before anyone spots you.`
         );
     }
 
@@ -1938,20 +1938,20 @@ export function plyndrFelt() {
     const felt = spilTilstand.gitter[indeks];
 
     if (!harRygsaekItem('koelle')) {
-        spilTilstand.logBesked = tekst("Du skal bruge en kølle for at smadre byer og markeder.", "You need a club to smash towns and markets.");
+        spilTilstand.logBesked = tekst("Du skal bruge en kølle for at ødelægge en by eller et marked.", "You need a club to destroy a town or market.");
         return;
     }
 
     if (harAktivtVaerksted(felt) && !harRygsaekItem('koelle_upgr')) {
         spilTilstand.logBesked = tekst(
-            "Værkstedets murværk holder. Du skal bruge en opgraderet kølle for at smadre det.",
-            "The workshop masonry holds. You need an upgraded club to smash it."
+            "Værkstedets mure holder stand. Du skal bruge en opgraderet kølle for at bryde dem ned.",
+            "The workshop walls hold firm. You need an upgraded club to break them down."
         );
         return;
     }
 
     if (!kanPlyndreFelt(felt)) {
-        spilTilstand.logBesked = tekst("Køllen kan kun smadre hele by- og markedsfelter.", "The club can only smash intact town and market tiles.");
+        spilTilstand.logBesked = tekst("Køllen kan kun bruges på intakte byer og markeder.", "The club can only be used on intact towns and markets.");
         return;
     }
 
@@ -1972,7 +1972,7 @@ export function plyndrFelt() {
 
     const energiBetaling = brugEnergi(energiPris);
     const energiLog = energiBetaling.gratis
-        ? tekst("Bersærkergangen betaler energien.", "Berserk pays the energy.")
+        ? tekst("Bersærkergangen dækker energiforbruget.", "Your berserk rage covers the energy cost.")
         : tekst(`Det koster ${energiPris} energi.`, `It costs ${energiPris} energy.`);
     spilTilstand.guldTotal += loot;
     felt.plyndret = undefined;
@@ -1996,14 +1996,14 @@ export function plyndrFelt() {
     const ekstra = havdeVaerksted
         ? tekst(" Værkstedet styrter sammen.", " The workshop collapses.")
         : havdeButik
-            ? tekst(" Boderne står tilbage som splinter.", " The stalls are left as splinters.")
+            ? tekst(" Boderne ender som splinter.", " The stalls are reduced to splinters.")
             : "";
     const kasseLog = kasseIndhold > 0
-        ? tekst(" Det meste af kassen ryger med i byttet.", " Most of the chest goes into the loot.")
+        ? tekst(" Du får det meste af guldet i kassen med.", " You take most of the gold from the till.")
         : "";
     const skraemteHandlende = skraemNaboHandlende(indeks);
     const skraemmeLog = skraemteHandlende > 0
-        ? tekst(" Naboernes handlende har set nok og nægter at handle med dig.", " Nearby merchants have seen enough and refuse to trade with you.")
+        ? tekst(" Handlende i nabofelterne har set nok og nægter nu at handle med dig.", " Merchants on neighboring tiles have seen enough and now refuse to trade with you.")
         : "";
     const smadreMaal = varMarked
         ? tekst('markedet', 'the market')
@@ -2011,14 +2011,14 @@ export function plyndrFelt() {
             ? tekst('værkstedet', 'the workshop')
             : tekst('byen', 'the town');
     const smadreLog = tekst(
-        `Du smadrer ${smadreMaal} i blodrus og skraber ${loot} guld ud af resterne. ${energiLog}${kasseLog}${ekstra}${skraemmeLog}`,
-        `You smash ${smadreMaal} in a blood frenzy and scrape ${loot} gold from the ruins. ${energiLog}${kasseLog}${ekstra}${skraemmeLog}`
+        `I blodrus smadrer du ${smadreMaal} og finder ${loot} guld i resterne. ${energiLog}${kasseLog}${ekstra}${skraemmeLog}`,
+        `In a blood frenzy, you smash ${smadreMaal} and find ${loot} gold in the wreckage. ${energiLog}${kasseLog}${ekstra}${skraemmeLog}`
     );
 
     broadcastFelt(indeks, spilTilstand.gitter[indeks]);
     syncKortTilDbSenere();
 
-    tagSkadeOgTjekDød(skadePris, smadreLog, tekst("Blodrusen blev for dyr.", "The blood frenzy cost too much."));
+    tagSkadeOgTjekDød(skadePris, smadreLog, tekst("Blodrusen koster dig livet.", "The blood frenzy costs you your life."));
 
     if (spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'dead' && spilTilstand.gameState !== 'win_map') {
         fremrykTid();
@@ -2093,7 +2093,7 @@ function findEllerSkabBaad() {
 export function lysBaadForAlle() {
     const baadIndex = findEllerSkabBaad();
     if (baadIndex === null) {
-        return tekst('Lyset rammer havet, men finder ingen båd.', 'The light hits the sea, but finds no boat.');
+        return tekst('Lyset søger over havet, men finder ingen båd.', 'The light sweeps across the sea but finds no boat.');
     }
 
     const kendteFelter = new Set(spilTilstand.mineKendteFelter);
@@ -2114,8 +2114,8 @@ export function lysBaadForAlle() {
     syncKortTilDbSenere();
 
     return tekst(
-        'Lyset finder en båd mod øst. Alle på øen kan se den nu.',
-        'The light finds a boat to the east. Everyone on the island can see it now.'
+        'Lyset finder en båd mod øst og markerer den for alle på øen.',
+        'The light finds a boat to the east and marks it for everyone on the island.'
     );
 }
 
@@ -2582,16 +2582,16 @@ export function tjekMiljoeSlitage(biome: string): string {
             if (vare.id === 'royalt_toej') {
                 nedgraderetRoyaltToej += vare.maengde;
                 logBeskeder.push(tekst(
-                    "Hulen flænser dit royale tøj. Det kan stadig bruges som fint tøj.",
-                    "The cave tears your royal clothes. They can still be used as fine clothes."
+                    "De skarpe klipper flænser dit royale tøj. Det kan stadig bruges som fint tøj.",
+                    "The sharp rocks tear your royal clothes. They can still be used as fine clothes."
                 ));
                 return false;
             }
             if (vare.id === 'flot_toej') {
                 mistetFintToej += vare.maengde;
                 logBeskeder.push(tekst(
-                    "Hulen ødelægger dit fine tøj. Du får almindeligt tøj tilbage.",
-                    "The cave ruins your fine clothes. You get ordinary rags back."
+                    "De skarpe klipper flænser dit fine tøj til klude.",
+                    "The sharp rocks tear your fine clothes into rags."
                 ));
                 return false;
             }
@@ -2611,8 +2611,8 @@ export function tjekMiljoeSlitage(biome: string): string {
             if (vare.id === 'royalt_toej') {
                 nedgraderetRoyaltToej += vare.maengde;
                 logBeskeder.push(tekst(
-                    "Tornene flænser dit royale tøj. Det bliver til almindeligt fint tøj.",
-                    "The thorns tear your royal clothes. They become ordinary fine clothes."
+                    "Tornene flænser dit royale tøj. Du kan stadig bruge det som fint tøj.",
+                    "The thorns tear your royal clothes. You can still use them as fine clothes."
                 ));
                 return false;
             }
@@ -2624,8 +2624,8 @@ export function tjekMiljoeSlitage(biome: string): string {
         } else if (biome === 'krystal') {
             if (vare.id === 'malmviser') {
                 logBeskeder.push(tekst(
-                    "Krystallerne får Malmviseren til at hyle. Den kortslutter ned til en almindelig detektor.",
-                    "The crystals make the ore finder howl. It shorts down into an ordinary detector."
+                    "Krystallernes resonans overbelaster malmviseren. Den virker nu kun som en almindelig metaldetektor.",
+                    "The crystal resonance overloads the ore finder. It now works only as a regular metal detector."
                 ));
                 nedgraderetMalmviser = true;
                 return false;
@@ -2647,8 +2647,8 @@ export function tjekMiljoeSlitage(biome: string): string {
             if (vare.id === 'runekvist') {
                 nedgraderetRunekvist = true;
                 logBeskeder.push(tekst(
-                    "Ritualpladsen river runerne ud af din runekvist. Den kan stadig bruges som søgekvist.",
-                    "The ritual site rips the runes from your rune twig. It can still be used as a seeker twig."
+                    "Runerne på din runekvist forsvinder. Du kan stadig bruge den som søgekvist.",
+                    "The runes on your rune twig fade away. You can still use it as a seeker twig."
                 ));
                 return false;
             }
@@ -2726,12 +2726,12 @@ export function taendBaal() {
     
     spilTilstand.logBesked = erSolfakkel
         ? tekst(
-            "Du tænder et solbål. Lyset river tågen op i et stort område, som alle kan se. Folk stimler sammen om flammen: Du får fuld HP og 100 guld.",
-            "You light a sunfire. The light tears open the fog in a large area everyone can see. People gather around the flame: You get full HP and 100 gold."
+            "Du tænder et solbål. Det spreder tågen i et stort område og gør feltet synligt for alle. Folk samles om varmen, og du får fuld HP samt 100 guld.",
+            "You light a sunfire. It clears the fog across a large area and makes the tile visible to everyone. People gather around the warmth, and you gain full HP and 100 gold."
         )
         : tekst(
-            "Du tænder et stort bål. Området omkring dig bliver synligt for alle. Folk stimler sammen om lyset: Du får fuld HP og 50 guld.",
-            "You light a great fire. The area around you becomes visible to everyone. People gather around the light: You get full HP and 50 gold."
+            "Du tænder et stort bål, som gør området synligt for alle. Folk samles om varmen, og du får fuld HP samt 50 guld.",
+            "You light a large fire that makes the area visible to everyone. People gather around the warmth, and you gain full HP and 50 gold."
         );
     
     sendBaalSignal(spilTilstand.spillerIndex, radius);
@@ -2744,8 +2744,8 @@ export function bygOgHopGennemPortal() {
         kilde: 'byg_portal',
         opretPortalVedStart: true,
         startLog: tekst(
-            "Der opstår en portal bag dig. Du flyttes fire felter mod øst.",
-            "A portal appears behind you. You are moved four tiles east."
+            "En portal åbner sig bag dig og sender dig fire felter mod øst.",
+            "A portal opens behind you and sends you four tiles east."
         )
     });
 }
@@ -2808,8 +2808,8 @@ export async function udloesNaturkatastrofe(centerIndex: number) {
     if (paavirkedeArray.includes(spilTilstand.spillerIndex)) {
         tagSkadeOgTjekDød(
             30,
-            tekst("Meteoren rammer dit felt.", "The meteor hits your tile."),
-            tekst("Nedslaget dræbte dig.", "The impact killed you.")
+            tekst("Meteoren slår ned på dit felt.", "The meteor strikes your tile."),
+            tekst("Nedslaget dræber dig.", "The impact kills you.")
         );
     }
 
@@ -2894,8 +2894,8 @@ export function udloesJordskaelv(centerIndex: number, gemSkatIKlippe = false) {
     if (paavirkedeArray.includes(spilTilstand.spillerIndex)) {
         tagSkadeOgTjekDød(
             40,
-            tekst("Jorden brød op under dig.", "The ground broke open beneath you."),
-            tekst("Jordskælvet dræbte dig.", "The earthquake killed you.")
+            tekst("Jorden bryder op under dig.", "The ground breaks open beneath you."),
+            tekst("Jordskælvet dræber dig.", "The earthquake kills you.")
         );
     }
 
@@ -2932,8 +2932,8 @@ function bevarDragestavEfterOversvoemmelse(havdeDragestav: boolean) {
     ];
 
     return tekst(
-        " Dragestaven ulmer, men oversvømmelsen kan ikke nedgradere den.",
-        " The dragon staff smolders, but the flood cannot downgrade it."
+        " Dragestaven ulmer, men oversvømmelsen kan ikke svække den.",
+        " The dragon staff smolders, but the flood cannot weaken it."
     );
 }
 
@@ -3005,19 +3005,19 @@ export async function udloesOversvoemmelse(centerIndex: number) {
             tagSkadeOgTjekDød(
                 80,
                 tekst(
-                    `Oversvømmelsen rammer dig hårdt. ${udstyrsLog}`.trim(),
-                    `The flood hits you hard. ${udstyrsLog}`.trim()
+                    `Oversvømmelsen river benene væk under dig. ${udstyrsLog}`.trim(),
+                    `The flood sweeps your feet from under you. ${udstyrsLog}`.trim()
                 ),
-                tekst("Du druknede i oversvømmelsen.", "You drowned in the flood.")
+                tekst("Du drukner i oversvømmelsen.", "You drown in the flood.")
             );
         } else {
             tagSkadeOgTjekDød(
                 30,
                 tekst(
-                    `Oversvømmelsen rammer dit felt. ${udstyrsLog}`.trim(),
-                    `The flood hits your tile. ${udstyrsLog}`.trim()
+                    `Oversvømmelsen skyller ind over dit felt. ${udstyrsLog}`.trim(),
+                    `The flood sweeps across your tile. ${udstyrsLog}`.trim()
                 ),
-                tekst("Du druknede i oversvømmelsen.", "You drowned in the flood.")
+                tekst("Du drukner i oversvømmelsen.", "You drown in the flood.")
             );
         }
     }
@@ -3096,7 +3096,7 @@ export function udvindMeteorSkat(metode: string): { logBesked: string; logBesked
     const pris = spilTilstand.valgtKarakter ? spilTilstand.valgtKarakter.baseEnergi * 2 : 10;
     const energiBetaling = brugEnergi(pris);
     const energiLog = energiBetaling.gratis
-        ? tekst(" Bersærkergangen betaler energien.", " Berserk pays the energy.")
+        ? tekst(" Bersærkergangen dækker energiforbruget.", " Your berserk rage covers the energy cost.")
         : "";
     
     const felt = spilTilstand.gitter[spilTilstand.spillerIndex];
@@ -3106,8 +3106,8 @@ export function udvindMeteorSkat(metode: string): { logBesked: string; logBesked
     if (metode === 'haender') {
         const toejLog = flensToejPaaMeteor();
         const logBesked = tekst(
-            `Du får noget af guldet fri af stenen.${energiLog}${toejLog}`,
-            `You pry some of the gold free from the stone.${energiLog}${toejLog}`
+            `Du brænder hænderne, men får noget af guldet fri af stenen.${energiLog}${toejLog}`,
+            `You burn your hands but pry some of the gold free from the rock.${energiLog}${toejLog}`
         );
         return {
             logBesked,
@@ -3117,8 +3117,8 @@ export function udvindMeteorSkat(metode: string): { logBesked: string; logBesked
         };
     } else {
         const logBesked = tekst(
-            `Værktøjet går tabt, men du får stenen åbnet.${energiLog}`,
-            `The tool is lost, but you crack the stone open.${energiLog}`
+            `Det, du bruger, går tabt, men stenen åbner sig.${energiLog}`,
+            `What you use is lost, but the rock cracks open.${energiLog}`
         );
         return {
             logBesked,

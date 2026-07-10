@@ -95,7 +95,7 @@ export function grav() {
     }
     
     if (!felt.kanGraves) {
-        spilTilstand.logBesked = tekst('Du kan ikke grave her.', 'You cannot dig here.');
+        spilTilstand.logBesked = tekst('Du kan ikke grave i dette terræn.', 'You cannot dig in this terrain.');
         return;
     }
 
@@ -120,17 +120,17 @@ export function grav() {
 
     const faktiskEnergiPris = harSkovl ? baseGravePris : baseGravePris + 4;
     const energiBetaling = brugEnergi(faktiskEnergiPris);
-    const energiTekst = energiBetaling.gratis ? tekst('bersærkergangen betaler energien', 'berserk pays the energy') : `${faktiskEnergiPris} ${tekst('Energi', 'Energy')}`;
+    const energiTekst = energiBetaling.gratis ? tekst('Bersærkergangen dækker energiforbruget.', 'Your berserk rage covers the energy cost.') : tekst(`Du bruger ${faktiskEnergiPris} energi.`, `You use ${faktiskEnergiPris} energy.`);
 
     if (!harSkovl) {
         const skade = spilTilstand.beregnSkade(4);
         spilTilstand.livspoint -= skade;
         udstyrsLog = tekst(
-            ` Du graver uden skovl. Du mister ${skade} HP og ${energiTekst}.${udloesBersaerkHvisRelevant(skade)}`,
-            ` You dig without a shovel. You lose ${skade} HP and ${energiTekst}.${udloesBersaerkHvisRelevant(skade)}`
+            ` Du graver med hænderne og mister ${skade} HP. ${energiTekst}${udloesBersaerkHvisRelevant(skade)}`,
+            ` You dig with your hands and lose ${skade} HP. ${energiTekst}${udloesBersaerkHvisRelevant(skade)}`
         );
     } else if (energiBetaling.gratis) {
-        udstyrsLog = tekst(' Bersærkergangen betaler energien.', ' Berserk pays the energy.');
+        udstyrsLog = tekst(' Bersærkergangen dækker energiforbruget.', ' Your berserk rage covers the energy cost.');
     }
 
     const guldVaerdi = felt.skjultGuld ?? 0;
@@ -153,30 +153,30 @@ export function grav() {
     
     afslørOmraade(spilTilstand.spillerIndex, 1);    
 
-    let fundLog = tekst('Du finder ikke noget brugbart.', 'You find nothing useful.');
+    let fundLog = tekst('Du graver feltet igennem, men finder intet brugbart.', 'You search the ground but find nothing useful.');
 
     if (faelde && jordskredsSkatSpor && ridderPanserStopperNedgravetFaelde()) {
         fundLog = tekst(
-            'Du graver under krydset, og klippen styrter sammen. Panseret tager slaget, mens ridderens træning holder benene fri.',
-            'You dig beneath the mark, and the rock collapses. Your armor takes the blow while knight training keeps your legs free.'
+            'Du graver under krydset, og klippen styrter sammen. Panseret tager slaget, og din riddertræning holder benene fri.',
+            'You dig beneath the mark, and the rock collapses. Your armor takes the blow, and your knight training keeps your legs clear.'
         );
     } else if (faelde && jordskredsSkatSpor) {
         const faeldeSkade = spilTilstand.beregnSkade(8);
         spilTilstand.livspoint -= faeldeSkade;
         fundLog = tekst(
-            `Du graver under krydset, men klippen er stadig løs efter jordskælvet. Det styrter sammen om benene på dig (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`,
+            `Du graver under krydset, men klippen er stadig løs efter jordskælvet. Den styrter sammen om dine ben (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`,
             `You dig beneath the mark, but the rock is still loose after the earthquake. It collapses around your legs (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`
         );
     } else if (faelde && harMesterskovl) {
-        fundLog = tekst('Mesterskovlen finder fælden, før den klapper. Du får den gravet fri uden skade.', 'The master shovel finds the trap before it snaps. You dig it free without damage.');
+        fundLog = tekst('Mesterskovlen rammer fælden, før den klapper. Du graver den fri uden at komme til skade.', 'The master shovel strikes the trap before it snaps. You dig it free without getting hurt.');
     } else if (faelde && ridderPanserStopperNedgravetFaelde()) {
-        fundLog = tekst('KLIK. Den nedgravede fælde klapper om dit panser, men ridderens træning holder benet fri.', 'CLICK. The buried trap snaps around your armor, but knight training keeps your leg free.');
+        fundLog = tekst('Klik. Den nedgravede fælde klapper om dit panser, men din riddertræning holder benet fri.', 'Click. The buried trap snaps around your armor, but your knight training keeps your leg clear.');
     } else if (faelde) {
         const faeldeSkade = spilTilstand.beregnSkade(10);
         spilTilstand.livspoint -= faeldeSkade;
         fundLog = tekst(
-            `KLIK. En nedgravet fælde bider sig fast i dit ben (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`,
-            `CLICK. A buried trap bites into your leg (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`
+            `Klik. En nedgravet fælde klapper om dit ben (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`,
+            `Click. A buried trap snaps around your leg (-${faeldeSkade} HP)${udloesBersaerkHvisRelevant(faeldeSkade)}`
         );
     } else if (fundetLoot === 'skattekiste') {
         spilTilstand.guldTotal += 600;
@@ -184,8 +184,8 @@ export function grav() {
         tilfoejTilRygsæk('diamant', 1, [unikDiamantVaerdi]);
         felt.tomSkattekiste = true;
         fundLog = tekst(
-            `Skovlen rammer træ. Du åbner en kiste. (+600 Guld, +unik diamant (${unikDiamantVaerdi} guld))`,
-            `The shovel hits wood. You open a chest. (+600 Gold, +unique diamond (${unikDiamantVaerdi} gold))`
+            `Skovlen rammer træ. Under jorden ligger en kiste med 600 guld og en unik diamant med en værdi på ${unikDiamantVaerdi} guld.`,
+            `The shovel strikes wood. Buried below is a chest with 600 gold and a unique diamond worth ${unikDiamantVaerdi} gold.`
         );
     } else if (guldVaerdi > 0) {
         const graveGuldMultiplier = harMesterskovl && harGyldenDestillator ? 3 : (harMesterskovl || harGyldenDestillator) ? 2 : 1;
@@ -196,14 +196,14 @@ export function grav() {
         spilTilstand.guldTotal += maengde;
         const faktiskGuld = spilTilstand.guldTotal - foerGuld;
         fundLog = harMalmviser
-            ? tekst(`Malmviseren synger, mens du graver åren fri. Jorden gemte på ${faktiskGuld} Guld.`, `The ore finder sings as you dig the vein free. The earth hid ${faktiskGuld} Gold.`)
+            ? tekst(`Malmviseren slår ud, mens du graver åren fri. Du finder ${faktiskGuld} guld.`, `The ore finder reacts as you uncover the vein. You find ${faktiskGuld} gold.`)
             : harMesterskovl && harGyldenDestillator
-            ? tekst(`Mesterskovlen og den gyldne destillator presser åren ren. Jorden gemte på ${faktiskGuld} Guld.`, `The master shovel and golden distiller press the vein clean. The earth hid ${faktiskGuld} Gold.`)
+            ? tekst(`Mesterskovlen og den gyldne destillator får alt ud af åren. Du finder ${faktiskGuld} guld.`, `The master shovel and golden distiller extract everything from the vein. You find ${faktiskGuld} gold.`)
             : harMesterskovl
-                ? tekst(`Mesterskovlen åbner åren rent. Jorden gemte på ${faktiskGuld} Guld.`, `The master shovel opens the vein cleanly. The earth hid ${faktiskGuld} Gold.`)
+                ? tekst(`Mesterskovlen åbner åren uden spild. Du finder ${faktiskGuld} guld.`, `The master shovel opens the vein without waste. You find ${faktiskGuld} gold.`)
                 : harGyldenDestillator
-                    ? tekst(`Den gyldne destillator trækker ekstra glans ud af jorden. Du finder ${faktiskGuld} Guld.`, `The golden distiller pulls extra shine from the earth. You find ${faktiskGuld} Gold.`)
-                    : tekst(`Jorden gemte på ${faktiskGuld} Guld.`, `The earth hid ${faktiskGuld} Gold.`);
+                    ? tekst(`Den gyldne destillator trækker mere guld ud af jorden. Du finder ${faktiskGuld} guld.`, `The golden distiller draws more gold from the ground. You find ${faktiskGuld} gold.`)
+                    : tekst(`Du finder ${faktiskGuld} guld i jorden.`, `You find ${faktiskGuld} gold in the ground.`);
     } else if (livVaerdi > 0) {
         const aktuelHp = spilTilstand.livspoint;
         spilTilstand.livspoint += harRodhjertet ? livVaerdi * 2 : livVaerdi; 
@@ -211,9 +211,9 @@ export function grav() {
         registrerHeling(aktuelHp, spilTilstand.livspoint);
         
         if (faktiskHeling > 0) {
-            fundLog = tekst(`Du finder en spiselig rod. Du heler ${faktiskHeling} HP.`, `You find an edible root. You heal ${faktiskHeling} HP.`);
+            fundLog = tekst(`Du finder en spiselig rod og genvinder ${faktiskHeling} HP.`, `You find an edible root and recover ${faktiskHeling} HP.`);
         } else {
-            fundLog = tekst('Du finder en rod, men du har ikke brug for mere liv lige nu.', 'You find a root, but you do not need more health right now.');
+            fundLog = tekst('Du finder en spiselig rod, men har allerede fuldt liv.', 'You find an edible root, but you are already at full health.');
         }
     } else if (fundetLoot) {
         const itemFund = tilfoejTilRygsæk(fundetLoot, 1);
@@ -230,7 +230,7 @@ export function grav() {
 
     if (spilTilstand.livspoint <= 0) {
         spilTilstand.livspoint = 1; 
-        spilTilstand.logBesked += tekst(' Du kollapser.', ' You collapse.');
+        spilTilstand.logBesked += tekst(' Kræfterne slipper op, og du kollapser.', ' Your strength runs out, and you collapse.');
         fremtvingKollaps();
     } else {
         fremrykTid();

@@ -3,90 +3,90 @@ import type { SpilEvent } from './eventBibliotek';
 export const blodskovensHjerteEvents: Record<string, SpilEvent> = {
   blodskovens_hjerte: {
     id: 'blodskovens_hjerte',
-    titel: 'Træets blødende rod',
-    titelEn: 'The Tree’s Bleeding Root',
+    titel: 'Det blødende træ',
+    titelEn: 'The Bleeding Tree',
     biome: ['blodskov'],
-    tekst: `Rød saft klistrer til dine støvler. Et massivt træ fylder hele lysningen. Tykke rødder holder fem skovhuggere fastspændt mod stammen. Rødderne knuser dem langsomt.
+    tekst: `Rød saft klistrer til dine støvler. Midt i lysningen står et massivt træ. Dets tykke rødder holder fem skovhuggere presset mod stammen og strammer langsomt grebet.
 
-Deres leder står fri. Hun hugger en sløv økse i barken for at få dem fri. Ved træets fod sidder en gammel mand bundet til barken med sit eget hår. Hver gang øksen rammer, bløder han fra munden.
+Deres leder er stadig fri. Hun prøver at hugge dem løs med en sløv økse. Ved træets fod sidder en gammel mand bundet til barken med sit eget hår. Hver gang øksen rammer, løber der blod fra hans mund.
 
-Lederen råber, at træets kerne kan betale mændenes gæld. Den gamle mand spytter blod og siger, at kernen vil æde den by, den bliver bragt til.`,
+Lederen råber, at træets kerne kan betale hele gruppens gæld. Den gamle mand spytter blod og advarer: Tager de kernen med hjem, vil den æde byen indefra.`,
     tekstEn: `Red sap sticks to your boots. A massive tree fills the whole clearing. Thick roots hold five woodcutters pinned against the trunk. The roots are slowly crushing them.
 
 Their leader stands free. She chops a dull axe into the bark to free them. At the foot of the tree, an old man is bound to the bark with his own hair. Every time the axe lands, blood runs from his mouth.
 
-The leader shouts that the tree’s core can pay the men’s debt. The old man spits blood and says the core will devour the town it is brought to.`,
+The leader shouts that the tree’s core can pay the group’s debt. The old man spits blood and warns that the core will devour any town it is brought to.`,
     unik: true,
     erSubTrin: false,
     billede: '/events/ev_blodskov.webp',
     valg: [
       {
-        tekst: 'Træd frem og kræv at lederen smider øksen.',
-        tekstEn: 'Step forward and demand that the leader drops the axe.',
+        tekst: 'Træd frem, og få lederen til at sænke øksen.',
+        tekstEn: 'Step forward and demand that the leader drop the axe.',
         udfaldListe: [
-          { log: `Hun stopper slaget. Træet udnytter pausen til at stramme grebet om en arbejder. Hans kraveben brækker med et højt knæk.`, hpAendring: -5, naesteTrin: 'blodskov_vaegtskaalen' },
+          { log: `Hun standser midt i slaget. I pausen strammer træet grebet om en af skovhuggerne. Hans kraveben brækker med et højt knæk.`, hpAendring: -5, naesteTrin: 'blodskov_vaegtskaalen' },
           { log: `Hun svinger øksen mod dig i stedet for stammen. Du dukker dig, men skaftet rammer din skulder hårdt.`, hpAendring: -12, naesteTrin: 'blodskov_angrebet' },
-          { log: `Din stemme får pladsen til at fryse. Både kvinden og den gamle mand kigger på dig, mens rødderne slapper en anelse af.`, maxHpAendring: 4, naesteTrin: 'blodskov_vaegtskaalen' }
+          { log: `Din stemme får dem begge til at standse. Mens de ser på dig, løsner rødderne grebet en smule.`, maxHpAendring: 4, naesteTrin: 'blodskov_vaegtskaalen' }
         ]
       },
       {
-        tekst: 'Træk dit våben og hjælp med at fælde træet.',
+        tekst: 'Træk dit våben, og hjælp med at fælde træet.',
         tekstEn: 'Draw your weapon and help fell the tree.',
         kraeverEtAfItems: ['svaerd', 'sabel', 'oekse', 'kniv'],
         udfaldListe: [
-          { log: `Barken flænges under jeres fælles angreb. Den gamle mand skriger, og jorden ryster voldsomt under jer.`, naesteTrin: 'blodskov_angrebet' },
-          { log: `En gren pisker ned fra trækronen og slår dig til jorden. Du mister pusten totalt.`, hpAendring: -18, naesteTrin: 'blodskov_angrebet' },
-          { log: `Du rammer et blødt punkt i stammen. En enorm mængde rød saft flyder ud og tvinger rødderne tilbage.`, guldAendring: 40, maxHpAendring: 5, naesteTrin: 'blodskov_saften' }
+          { log: `Barken flænges under jeres fælles angreb. Den gamle mand skriger, og jorden ryster under jer.`, naesteTrin: 'blodskov_angrebet' },
+          { log: `En gren pisker ned fra trækronen og slår dig til jorden. Al luft bliver slået ud af dig.`, hpAendring: -18, naesteTrin: 'blodskov_angrebet' },
+          { log: `Du rammer et blødt punkt i stammen. Rød saft vælter ud og tvinger rødderne tilbage.`, guldAendring: 40, maxHpAendring: 5, naesteTrin: 'blodskov_saften' }
         ]
       },
       {
-        tekst: 'Grav rødderne fri med skovlen.',
+        tekst: 'Grav omkring rødderne med skovlen.',
         tekstEn: 'Dig the roots free with the shovel.',
         kraeverItem: 'skovl',
         udfaldListe: [
           { log: `Skovlen får fat under de øverste rødder. Du løsner dem nok til, at lederen sænker øksen og lytter.`, maxHpAendring: 4, naesteTrin: 'blodskov_roedderne' },
-          { log: `Du rammer en blodfyldt rod. Saften sprøjter op, og træet svarer ved at slå hårdt ned omkring dig.`, hpAendring: -10, naesteTrin: 'blodskov_vaegtskaalen' },
-          { log: `Jorden åbner et lille hulrum ved stammen. Det er ikke kernen, men der ligger gamle mønter i det mørke.`, guldAendring: 60, naesteTrin: 'blodskov_kernen' }
+          { log: `Du rammer en blodfyldt rod. Saften sprøjter op, og en anden rod hamrer ned over dig.`, hpAendring: -10, naesteTrin: 'blodskov_vaegtskaalen' },
+          { log: `Jorden giver efter ved stammen og afslører et lille hulrum. Det er ikke kernen, men mørket gemmer på gamle mønter.`, guldAendring: 60, naesteTrin: 'blodskov_kernen' }
         ]
       },
       {
-        tekst: 'Sæt ild til grenene med din fakkel for at skabe panik.',
-        tekstEn: 'Set fire to the branches with your torch to create panic.',
+        tekst: 'Sæt ild til grenene med faklen.',
+        tekstEn: 'Set fire to the branches with your torch.',
         kosterItem: 'fakkel',
         udfaldListe: [
-          { log: `Ilden griber fat i den tørre bark. Træet trækker sine rødder til sig i forsvarsmekanisme, og skovhuggerne falder ned i mudderet.`, maxHpAendring: 6, naesteTrin: 'blodskov_roedderne' },
-          { log: `Varmen brænder også dig. Du skaber afstanden, men flammerne fortærer din oppakning lidt.`, hpAendring: -10, naesteTrin: 'blodskov_roedderne' },
-          { log: `Ilden afslører et mærkeligt hulrum oppe i stammen. Lederen stirrer grådigt på det.`, guldAendring: 60, naesteTrin: 'blodskov_kernen' }
+          { log: `Ilden får fat i den tørre bark. Træet trækker rødderne til sig for at beskytte stammen, og skovhuggerne falder ned i mudderet.`, maxHpAendring: 6, naesteTrin: 'blodskov_roedderne' },
+          { log: `Flammerne breder sig hurtigere end ventet. Du får skabt afstand, men varmen svider hænder og ansigt.`, hpAendring: -10, naesteTrin: 'blodskov_roedderne' },
+          { log: `Ilden afslører et hulrum højt oppe i stammen. Forkullede mønter falder ud, og lederen ser dem med det samme.`, guldAendring: 60, naesteTrin: 'blodskov_kernen' }
         ]
       },
       {
-        tekst: 'Giv den gamle mand din mad for at aflede hans magt.',
-        tekstEn: 'Give the old man your food to distract his power.',
+        tekst: 'Giv den gamle mand din mad.',
+        tekstEn: 'Give the old man your food.',
         kosterItem: 'mad',
         udfaldListe: [
           { log: `Han tager imod brødet. Da han spiser, mister træet sit faste greb om mændene.`, maxHpAendring: 5, naesteTrin: 'blodskov_vaegtskaalen' },
-          { log: `Han ignorerer maden fuldstændig. En sulten arbejder kaster sig frem og sluger det foran ham. Det skaber kun mere kaos.`, hpAendring: -6, naesteTrin: 'blodskov_roedderne' },
-          { log: `Brødet absorberer noget af den røde saft på jorden. Den gamle samler det op og gemmer det. Han skylder dig noget nu.`, guldAendring: 50, naesteTrin: 'blodskov_vaegtskaalen' }
+          { log: `Han ignorerer maden. En sulten skovhugger kaster sig i stedet over den, og forvirringen vokser.`, hpAendring: -6, naesteTrin: 'blodskov_roedderne' },
+          { log: `Brødet suger rød saft fra jorden. Den gamle tager det og betaler dig med en lille pung mønter.`, guldAendring: 50, naesteTrin: 'blodskov_vaegtskaalen' }
         ]
       },
       {
-        tekst: 'Som jæger læser du røddernes bevægelsesmønster før du reagerer.',
-        tekstEn: 'As hunter, read the roots’ movement pattern before reacting.',
+        tekst: 'Læs røddernes bevægelser som jæger.',
+        tekstEn: 'Read the roots’ movements as a hunter.',
         kraeverKarakter: 'hunter_m',
         udfaldListe: [
           { log: `Du ser, at rødderne ikke angriber. De forsvarer stammens indre. Den gamle mand styrer dem med små ryk i fingrene.`, naesteTrin: 'blodskov_kernen' },
-          { log: `Du står for længe og observerer. Mudderet giver efter under dig, og du glider ned i en pøl af saft.`, hpAendring: -8, naesteTrin: 'blodskov_saften' },
-          { log: `Du finder den nøjagtige rytme i træets forsvar. Du kan træde helt hen til kernen uden at blive rørt.`, maxHpAendring: 8, naesteTrin: 'blodskov_kernen' }
+          { log: `Du ser for længe på rødderne. Mudderet giver efter, og du glider ned i en pøl af saft.`, hpAendring: -8, naesteTrin: 'blodskov_saften' },
+          { log: `Du finder rytmen i træets forsvar og bevæger dig helt frem til kernen uden at blive ramt.`, maxHpAendring: 8, naesteTrin: 'blodskov_kernen' }
         ]
       },
       {
-        tekst: 'Som jægerinde læser du røddernes bevægelsesmønster før du reagerer.',
-        tekstEn: 'As huntress, read the roots’ movement pattern before reacting.',
+        tekst: 'Læs røddernes bevægelser som jægerinde.',
+        tekstEn: 'Read the roots’ movements as a huntress.',
         kraeverKarakter: 'hunter_f',
         udfaldListe: [
           { log: `Du ser, at rødderne ikke angriber. De forsvarer stammens indre. Den gamle mand styrer dem med små ryk i fingrene.`, naesteTrin: 'blodskov_kernen' },
-          { log: `Du står for længe og observerer. Mudderet giver efter under dig, og du glider ned i en pøl af saft.`, hpAendring: -8, naesteTrin: 'blodskov_saften' },
-          { log: `Du finder den nøjagtige rytme i træets forsvar. Du kan træde helt hen til kernen uden at blive rørt.`, maxHpAendring: 8, naesteTrin: 'blodskov_kernen' }
+          { log: `Du ser for længe på rødderne. Mudderet giver efter, og du glider ned i en pøl af saft.`, hpAendring: -8, naesteTrin: 'blodskov_saften' },
+          { log: `Du finder rytmen i træets forsvar og bevæger dig helt frem til kernen uden at blive ramt.`, maxHpAendring: 8, naesteTrin: 'blodskov_kernen' }
         ]
       }
     ]
@@ -97,11 +97,11 @@ The leader shouts that the tree’s core can pay the men’s debt. The old man s
     titel: 'Vægtskålen',
     titelEn: 'The Scales',
     biome: ['blodskov'],
-    tekst: `Lederen sænker sin økse. Hun tørrer sved af panden og peger anklagende på den gamle mand. Hun siger, at han er en kultist, der har fodret træet med byfolk i årevis.
+    tekst: `Lederen sænker øksen og tørrer sveden af panden. Hun peger på den gamle mand og kalder ham kultist. I årevis, siger hun, har han fodret træet med folk fra byen.
 
-Den gamle spytter igen. Han siger, at han er den eneste lås på et bur, der holder skoven fra at æde egnen.
+Den gamle spytter blod i mudderet. Han påstår, at han er den eneste lås på et bur, der ellers ville slippe skoven løs over egnen.
 
-De fastklemte skovhuggere stønner. Træet strammer langsomt grebet igen. Her er ingen tid til forhandlinger. Der skal handles.`,
+De fastklemte skovhuggere stønner, mens rødderne igen strammer grebet. Hvis du vil gribe ind, skal det være nu.`,
     tekstEn: `The leader lowers her axe. She wipes sweat from her brow and points accusingly at the old man. She says he is a cultist who has fed the tree with townsfolk for years.
 
 The old man spits again. He says he is the only lock on a cage that keeps the forest from eating the region.
@@ -112,72 +112,72 @@ The trapped woodcutters groan. The tree slowly tightens its grip again. There is
     billede: '/events/ev_blodskov.webp',
     valg: [
       {
-        tekst: 'Gå tæt på og tving manden til at slippe mændene.',
-        tekstEn: 'Move close and force the man to release the workers.',
+        tekst: 'Pres den gamle mand til at slippe skovhuggerne.',
+        tekstEn: 'Force the old man to release the woodcutters.',
         udfaldListe: [
           { log: `Han nægter. Du vrider hans arm, og træet reagerer ved at kaste dig tilbage i mudderet.`, hpAendring: -15, naesteTrin: 'blodskov_roedderne' },
-          { log: `Du presser en støvle mod hans hals. Rødderne løsner grebet øjeblikkeligt, og skovhuggerne falder fri.`, maxHpAendring: 5, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du sætter støvlen mod hans hals. Rødderne løsner straks grebet, og skovhuggerne falder fri.`, maxHpAendring: 5, naesteTrin: 'blodskov_efterspillet' },
           { log: `Han ler af dig. Det giver lederen tid til at finde sin økse og rette den mod jer begge.`, hpAendring: -6, guldAendring: 30, naesteTrin: 'blodskov_angrebet' }
         ]
       },
       {
-        tekst: 'Betal lederen for at opgive træet og lade det være i fred.',
-        tekstEn: 'Pay the leader to abandon the tree and leave it in peace.',
+        tekst: 'Betal lederen for at opgive træet.',
+        tekstEn: 'Pay the leader to abandon the tree.',
         puljeVaerdi: 150,
         udfaldListe: [
-          { log: `Hun tager pengene. Det løser hendes gæld, men hendes mænd sidder stadig fast i rødderne. Problemet eksisterer stadig.`, maxHpAendring: -2, naesteTrin: 'blodskov_roedderne' },
-          { log: `Mønterne overbeviser hende. Hun kalder sine folk tilbage, og manden stopper sit forsvar.`, hpAendring: 12, maxHpAendring: 4, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Hun tager pengene. Gælden er betalt, men hendes folk sidder stadig fast. Du har kun løst hendes problem.`, maxHpAendring: -2, naesteTrin: 'blodskov_roedderne' },
+          { log: `Betalingen overbeviser hende. Hun kalder sine folk tilbage, og den gamle mand lader rødderne slippe.`, hpAendring: 12, maxHpAendring: 4, naesteTrin: 'blodskov_efterspillet' },
           { log: `Hun gemmer pengene og hugger alligevel. Grådighed lader sig sjældent stoppe af en enkelt betaling.`, hpAendring: -10, naesteTrin: 'blodskov_angrebet' }
         ]
       },
       {
-        tekst: 'Find jernkæden under mudderet med din metaldetektor.',
+        tekst: 'Find kæden under mudderet med metaldetektoren.',
         tekstEn: 'Find the iron chain under the mud with your metal detector.',
         kraeverItem: 'metaldetektor',
         udfaldListe: [
-          { log: `Maskinen hyler. Du finder kæden, der binder manden til træet, og knækker den. Han er nu fri til at slå fra sig.`, naesteTrin: 'blodskov_angrebet' },
-          { log: `Kæden rummer et skjult rum med gamle mønter. Du tager dem, mens de andre skændes.`, guldAendring: 120, naesteTrin: 'blodskov_kernen' },
-          { log: `Du rører en forkert del af kæden, og den brænder dig med mørk magi. Det koster på kræfterne.`, hpAendring: -14, naesteTrin: 'blodskov_kernen' }
+          { log: `Metaldetektoren hyler over en kæde, der binder manden til træet. Du knækker den, og han slår straks fra sig.`, naesteTrin: 'blodskov_angrebet' },
+          { log: `I et skjult rum i kæden finder du gamle mønter. Du tager dem, mens de andre skændes.`, guldAendring: 120, naesteTrin: 'blodskov_kernen' },
+          { log: `Du griber om det forkerte led. Kæden bliver glohed og brænder kræfterne ud af armen.`, hpAendring: -14, naesteTrin: 'blodskov_kernen' }
         ]
       },
       {
-        tekst: 'Grav rundt om mandens binding med skovlen.',
+        tekst: 'Grav mandens binding fri med skovlen.',
         tekstEn: 'Dig around the man’s binding with the shovel.',
         kraeverItem: 'skovl',
         udfaldListe: [
-          { log: `Du løsner jorden omkring håret og finder den knude, der holder manden fast. Rødderne slipper kort efter.`, maxHpAendring: 5, naesteTrin: 'blodskov_roedderne' },
+          { log: `Du løsner jorden omkring håret og finder knuden, der holder manden fast. Kort efter slipper rødderne deres greb.`, maxHpAendring: 5, naesteTrin: 'blodskov_roedderne' },
           { log: `Skovlen rammer en skjult jernring under mudderet. Den er gammel, men stadig penge værd.`, guldAendring: 70, naesteTrin: 'blodskov_kernen' },
           { log: `Roden slår tilbage gennem skaftet. Smerten går op gennem armen, før du når væk.`, hpAendring: -10, naesteTrin: 'blodskov_angrebet' }
         ]
       },
       {
-        tekst: 'Kast dit flotte tøj over mandens hoved for at blænde hans kontrol.',
+        tekst: 'Kast dit fine tøj over mandens hoved.',
         tekstEn: 'Throw your fine clothes over the man’s head to blind his control.',
         kosterItem: 'flot_toej',
         udfaldListe: [
-          { log: `Stoffet blokerer hans udsyn. Rødderne mister retning og slipper mændene.`, maxHpAendring: 6, naesteTrin: 'blodskov_roedderne' },
+          { log: `Stoffet dækker hans ansigt. Rødderne farer planløst rundt og slipper skovhuggerne.`, maxHpAendring: 6, naesteTrin: 'blodskov_roedderne' },
           { log: `Han river tøjet i stykker med det samme. Træet strammer grebet af ren vrede.`, hpAendring: -8, naesteTrin: 'blodskov_angrebet' },
-          { log: `Det skaber nok forvirring til, at du kan tømme de tasker, der ligger efterladt på jorden.`, guldAendring: 90, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Forvirringen giver dig tid til at tømme de efterladte tasker på jorden.`, guldAendring: 90, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Som ridder tager du kontrollen over pladsen og beordrer våbenhvile.',
-        tekstEn: 'As knight, take control of the clearing and order a ceasefire.',
+        tekst: 'Skab ro, og beordr våbenhvile som ridder.',
+        tekstEn: 'Order a ceasefire as a knight.',
         kraeverKarakter: 'knight_m',
         udfaldListe: [
-          { log: `Din autoritet slår igennem. Lederen bakker, og manden slapper af. Du kan nu frit tilgå træets kerne.`, maxHpAendring: 8, naesteTrin: 'blodskov_kernen' },
+          { log: `Din autoritet slår igennem. Lederen træder tilbage, og den gamle mand falder til ro. Vejen til kernen er fri.`, maxHpAendring: 8, naesteTrin: 'blodskov_kernen' },
           { log: `Din befaling bliver mødt med en splintrende gren, der slår ind mod dit panser. Her gælder kun skovens lov.`, hpAendring: -10, naesteTrin: 'blodskov_angrebet' },
-          { log: `Skovhuggerne adlyder dig og samler deres ting. De overlader kampen mod kultisten til dig.`, guldAendring: 60, naesteTrin: 'blodskov_angrebet' }
+          { log: `Skovhuggerne adlyder og samler deres ting. Så trækker de sig tilbage og overlader den gamle mand til dig.`, guldAendring: 60, naesteTrin: 'blodskov_angrebet' }
         ]
       },
       {
-        tekst: 'Som skjoldmø tager du kontrollen over pladsen og beordrer våbenhvile.',
-        tekstEn: 'As shieldmaiden, take control of the clearing and order a ceasefire.',
+        tekst: 'Skab ro, og beordr våbenhvile som skjoldmø.',
+        tekstEn: 'Order a ceasefire as a shieldmaiden.',
         kraeverKarakter: 'knight_f',
         udfaldListe: [
-          { log: `Din autoritet slår igennem. Lederen bakker, og manden slapper af. Du kan nu frit tilgå træets kerne.`, maxHpAendring: 8, naesteTrin: 'blodskov_kernen' },
+          { log: `Din autoritet slår igennem. Lederen træder tilbage, og den gamle mand falder til ro. Vejen til kernen er fri.`, maxHpAendring: 8, naesteTrin: 'blodskov_kernen' },
           { log: `Din befaling bliver mødt med en splintrende gren, der slår ind mod dit panser. Her gælder kun skovens lov.`, hpAendring: -10, naesteTrin: 'blodskov_angrebet' },
-          { log: `Skovhuggerne adlyder dig og samler deres ting. De overlader kampen mod kultisten til dig.`, guldAendring: 60, naesteTrin: 'blodskov_angrebet' }
+          { log: `Skovhuggerne adlyder og samler deres ting. Så trækker de sig tilbage og overlader den gamle mand til dig.`, guldAendring: 60, naesteTrin: 'blodskov_angrebet' }
         ]
       }
     ]
@@ -185,65 +185,65 @@ The trapped woodcutters groan. The tree slowly tightens its grip again. There is
 
   blodskov_angrebet: {
     id: 'blodskov_angrebet',
-    titel: 'Bark og Blod',
+    titel: 'Bark og blod',
     titelEn: 'Bark and Blood',
     biome: ['blodskov'],
-    tekst: `Barken flænges. Træet kaster en byge af sylespidse splinter ud over rydningen. Den gamle mand brøler, mens rødderne begynder at trække to af mændene under jorden.
+    tekst: `Barken flækker, og en byge af skarpe splinter flyver ud over lysningen. Den gamle mand brøler, mens rødderne trækker to skovhuggere ned i jorden.
 
-Gennem såret i stammen lyser træets indre svagt rødt. Lederen gør klar til at lade sine folk i stikken for at nå frem til kilden først.`,
+Inde bag såret gløder stammen rødt. Lederen har set det. Hun er klar til at lade sine folk blive taget, hvis det betyder, at hun når kilden først.`,
     tekstEn: `The bark splits. The tree throws a shower of needle-sharp splinters across the clearing. The old man roars while the roots begin dragging two of the workers underground.
 
-Through the wound in the trunk, the tree’s inside glows faintly red. The leader prepares to abandon her people to reach the source first.`,
+The inside of the trunk glows faintly red through the wound. The leader is ready to abandon her people if it means reaching the source first.`,
     unik: true,
     erSubTrin: true,
     billede: '/events/ev_blodskov.webp',
     valg: [
       {
-        tekst: 'Skub lederen i mudderet og tag hulrummet for dig selv.',
-        tekstEn: 'Push the leader into the mud and claim the hollow for yourself.',
+        tekst: 'Skub lederen væk, og nå hulrummet først.',
+        tekstEn: 'Push the leader aside and reach the hollow first.',
         udfaldListe: [
-          { log: `Hun falder tungt. Du rækker ind i træet og får fingrene i noget massivt og glødende.`, naesteTrin: 'blodskov_kernen' },
-          { log: `Hun trækker dig med ned i faldet. Rødderne pisker jer begge. Du betaler med smerte for dit grådighed.`, hpAendring: -18, naesteTrin: 'blodskov_kernen' },
-          { log: `Du får et solidt forspring og samler løse ædelstene op fra jorden foran stammen.`, guldAendring: 110, maxHpAendring: 3, naesteTrin: 'blodskov_saften' }
+          { log: `Hun falder tungt i mudderet. Du rækker ind i træet og får fat i noget stort og glødende.`, naesteTrin: 'blodskov_kernen' },
+          { log: `Hun trækker dig med ned, og rødderne pisker jer begge.`, hpAendring: -18, naesteTrin: 'blodskov_kernen' },
+          { log: `Du kommer først frem og samler løse ædelsten op foran stammen.`, guldAendring: 110, maxHpAendring: 3, naesteTrin: 'blodskov_saften' }
         ]
       },
       {
-        tekst: 'Prøv at hive folkene op fra hullerne.',
-        tekstEn: 'Try to pull the workers up from the holes.',
+        tekst: 'Træk skovhuggerne op af jorden.',
+        tekstEn: 'Pull the woodcutters out of the ground.',
         udfaldListe: [
-          { log: `Du får fat i to af dem. De hoster jord op og takker dig med det guld, de har tilbage i lommerne.`, guldAendring: 140, maxHpAendring: 6, naesteTrin: 'blodskov_roedderne' },
-          { log: `Rødderne er for stærke. De trækker dem under, mens tornene river huden af dine underarme.`, hpAendring: -22, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Du redder den ene, mens den anden forsvinder. Det er en delvis sejr. Han lader sin dolk ligge til dig.`, givItem: 'kniv', maxHpAendring: 4, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Du får to af dem op. De hoster jord og giver dig det guld, de har tilbage i lommerne.`, guldAendring: 140, maxHpAendring: 6, naesteTrin: 'blodskov_roedderne' },
+          { log: `Rødderne er for stærke. De trækker skovhuggerne ned, mens tornene flår huden på dine underarme.`, hpAendring: -22, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du får den ene fri, mens den anden forsvinder under jorden. Den overlevende giver dig sin dolk med rystende hænder.`, givItem: 'kniv', maxHpAendring: 4, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Brug din rustning som et skjold mod træets splint-regn.',
-        tekstEn: 'Use your armor as a shield against the tree’s splinter rain.',
+        tekst: 'Brug rustningen som skjold mod splinterne.',
+        tekstEn: 'Use your armor as a shield against the splinters.',
         kosterItem: 'rustning',
         udfaldListe: [
-          { log: `Panseret beskytter dig fuldstændigt mod angrebet. Du baner vej gennem kaosset og når stammen uskadet.`, maxHpAendring: 8, naesteTrin: 'blodskov_kernen' },
-          { log: `Træet smadrer metallet totalt, og et par splinter slipper igennem til dit lår.`, hpAendring: -12, naesteTrin: 'blodskov_saften' },
-          { log: `Du absorberer stødet for alle. Lederen kvitterer ved at række dig sin stak af sammensparet bytte.`, guldAendring: 160, naesteTrin: 'blodskov_roedderne' }
+          { log: `Panseret tager hele bygen. Du presser dig gennem kaosset og når stammen uden en skramme.`, maxHpAendring: 8, naesteTrin: 'blodskov_kernen' },
+          { log: `Splinterne flår metallet op, og flere trænger igennem til dit lår.`, hpAendring: -12, naesteTrin: 'blodskov_saften' },
+          { log: `Du tager imod bygen for de andre. Lederen takker ved at give dig det bytte, hun har samlet.`, guldAendring: 160, naesteTrin: 'blodskov_roedderne' }
         ]
       },
       {
-        tekst: 'Som ork brøler du højt og slår stammen med dine bare næver.',
-        tekstEn: 'As orc, roar loudly and strike the trunk with your bare fists.',
+        tekst: 'Slå stammen med de bare næver som ork.',
+        tekstEn: 'Strike the trunk with your bare fists as an orc.',
         kraeverKarakter: 'orc_m',
         udfaldListe: [
-          { log: `Dit slag kaster en trykbølge gennem barken. Træet standser sit angreb af ren chok, og hulrummet åbnes yderligere.`, maxHpAendring: 10, naesteTrin: 'blodskov_kernen' },
-          { log: `Træet er hårdere end sten. Du brækker to knoer og falder baglæns med en smertefuld rysten i armen.`, hpAendring: -15, naesteTrin: 'blodskov_saften' },
-          { log: `Slaget vælter døde grene ned. De indeholder intakte eliksirer fra tidligere rejsende, der mødte skoven.`, givItem: 'livseliksir', guldAendring: 50, naesteTrin: 'blodskov_roedderne' }
+          { log: `Slaget sender en bølge gennem barken. Træet standser angrebet, og hullet i stammen flækker endnu mere op.`, maxHpAendring: 10, naesteTrin: 'blodskov_kernen' },
+          { log: `Træet er hårdere end sten. To knoer brækker, og smerten skyder op gennem armen.`, hpAendring: -15, naesteTrin: 'blodskov_saften' },
+          { log: `Slaget river døde grene løs. Mellem dem hænger en intakt eliksir og en møntpung fra en tidligere rejsende.`, givItem: 'livseliksir', guldAendring: 50, naesteTrin: 'blodskov_roedderne' }
         ]
       },
       {
-        tekst: 'Som klanleder brøler du højt og slår stammen med dine bare næver.',
-        tekstEn: 'As clan leader, roar loudly and strike the trunk with your bare fists.',
+        tekst: 'Slå stammen med de bare næver som klanleder.',
+        tekstEn: 'Strike the trunk with your bare fists as a clan leader.',
         kraeverKarakter: 'orc_f',
         udfaldListe: [
-          { log: `Dit slag kaster en trykbølge gennem barken. Træet standser sit angreb af ren chok, og hulrummet åbnes yderligere.`, maxHpAendring: 10, naesteTrin: 'blodskov_kernen' },
-          { log: `Træet er hårdere end sten. Du brækker to knoer og falder baglæns med en smertefuld rysten i armen.`, hpAendring: -15, naesteTrin: 'blodskov_saften' },
-          { log: `Slaget vælter døde grene ned. De indeholder intakte eliksirer fra tidligere rejsende, der mødte skoven.`, givItem: 'livseliksir', guldAendring: 50, naesteTrin: 'blodskov_roedderne' }
+          { log: `Slaget sender en bølge gennem barken. Træet standser angrebet, og hullet i stammen flækker endnu mere op.`, maxHpAendring: 10, naesteTrin: 'blodskov_kernen' },
+          { log: `Træet er hårdere end sten. To knoer brækker, og smerten skyder op gennem armen.`, hpAendring: -15, naesteTrin: 'blodskov_saften' },
+          { log: `Slaget river døde grene løs. Mellem dem hænger en intakt eliksir og en møntpung fra en tidligere rejsende.`, givItem: 'livseliksir', guldAendring: 50, naesteTrin: 'blodskov_roedderne' }
         ]
       }
     ]
@@ -251,66 +251,66 @@ Through the wound in the trunk, the tree’s inside glows faintly red. The leade
 
   blodskov_roedderne: {
     id: 'blodskov_roedderne',
-    titel: 'Jordens Lås',
+    titel: 'Jordens lås',
     titelEn: 'The Earth’s Lock',
     biome: ['blodskov'],
-    tekst: `Rødderne er seje som ståltråd. Mudderet stinker voldsomt af jern. En af mændene rækker dig en pung og beder dig tage pengene mod at lade ham ligge. Han har opgivet.
+    tekst: `Rødderne er seje som ståltråd, og mudderet lugter skarpt af jern. En af skovhuggerne rækker dig sin pung. Han beder dig tage pengene og lade ham ligge. Han har givet op.
 
-Den gamle mand styrer tydeligvis røddernes greb. Han lader skovhuggerne lide med fuldt overlæg. Lader du rødderne æde dem, tager skoven dem permanent.`,
-    tekstEn: `The roots are tough as wire. The mud reeks violently of iron. One of the men reaches you a purse and asks you to take the money in exchange for leaving him there. He has given up.
+Den gamle mand styrer uden tvivl rødderne. Han lader skovhuggerne lide med vilje. Hvis rødderne får dem helt ned, kommer de ikke op igen.`,
+    tekstEn: `The roots are tough as wire, and the mud reeks of iron. One of the woodcutters holds out his purse and asks you to take the money and leave him there. He has given up.
 
-The old man is clearly controlling the roots’ grip. He is letting the woodcutters suffer deliberately. If you let the roots eat them, the forest takes them permanently.`,
+The old man is clearly controlling the roots. He is making the woodcutters suffer on purpose. If the roots pull them all the way under, they will not come back.`,
     unik: true,
     erSubTrin: true,
     billede: '/events/ev_blodskov.webp',
     valg: [
       {
-        tekst: 'Skær mændene fri én efter én med dit blad.',
-        tekstEn: 'Cut the men free one by one with your blade.',
+        tekst: 'Skær skovhuggerne fri med kniven.',
+        tekstEn: 'Cut the woodcutters free with your knife.',
         kraeverItem: 'kniv',
         udfaldListe: [
-          { log: `Kniven arbejder hurtigt og præcist. Du løsner båndene og sikrer dig arbejdernes guld som tak.`, guldAendring: 180, maxHpAendring: 6, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Klingen smutter på den hårde bark og skærer dybt i din håndflade. De kommer fri, men det kostede.`, hpAendring: -12, guldAendring: 100, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Træet afgiver en sort gas fra snittene. Du hoster og mister pusten, mens de stikker af.`, hpAendring: -16, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Kniven glider sikkert gennem de tynde rødder. Skovhuggerne kommer fri og giver dig deres guld som tak.`, guldAendring: 180, maxHpAendring: 6, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Klingen smutter på den hårde bark og skærer dybt i din håndflade. Skovhuggerne kommer fri, men du må betale i blod.`, hpAendring: -12, guldAendring: 100, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Sort gas siver ud fra snittene. Du hoster og mister pusten, mens skovhuggerne flygter.`, hpAendring: -16, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Grav de fastklemte fri med skovlen.',
-        tekstEn: 'Dig the trapped men free with the shovel.',
+        tekst: 'Grav skovhuggerne fri med skovlen.',
+        tekstEn: 'Dig the woodcutters free with your shovel.',
         kraeverItem: 'skovl',
         udfaldListe: [
-          { log: `Du skærer ikke rødderne over, men fjerner jorden omkring dem. Det tager tid, men mændene kommer fri.`, guldAendring: 90, maxHpAendring: 5, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du fjerner jorden omkring rødderne uden at skære i dem. Det tager tid, men alle kommer fri.`, guldAendring: 90, maxHpAendring: 5, naesteTrin: 'blodskov_efterspillet' },
           { log: `Du graver for tæt på en levende rod. Den slår op gennem mudderet og rammer dig hårdt i siden.`, hpAendring: -12, naesteTrin: 'blodskov_saften' },
           { log: `Skovlen rammer et gammelt skjul under en rod. Der ligger mad og mønter fra folk, der ikke slap ud.`, givItem: 'mad', guldAendring: 70, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Træk dem op med ren håndkraft.',
+        tekst: 'Træk dem fri med håndkraft.',
         tekstEn: 'Pull them up with raw strength.',
         udfaldListe: [
-          { log: `Det kræver al din styrke. Din ryg brokker sig voldsomt, og det trækker hårde smerter gennem lænden.`, hpAendring: -20, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Du hiver dem op som radiser. Din styrke redder dagen uden omkostninger.`, maxHpAendring: 5, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Du mister grebet om den sidste. Han overlever ikke. Du samler hans taske op i stedet.`, guldAendring: 130, hpAendring: -8, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Det kræver alle dine kræfter. Du får dem fri, men smerten skærer gennem ryggen og lænden.`, hpAendring: -20, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du planter fødderne i mudderet og river dem fri én efter én. Din styrke holder hele vejen.`, maxHpAendring: 5, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du mister grebet om den sidste, og rødderne tager ham. Tilbage ligger hans taske i mudderet.`, guldAendring: 130, hpAendring: -8, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Sænk din eliksir ned til manden, så han kan tåle trykket.',
-        tekstEn: 'Lower your elixir to the man so he can withstand the pressure.',
+        tekst: 'Giv den fastklemte skovhugger din livseliksir.',
+        tekstEn: 'Give the trapped woodcutter your life elixir.',
         kosterItem: 'livseliksir',
         udfaldListe: [
-          { log: `Væsken giver ham styrke til selv at brække rødderne op. Han rækker dig en diamant, han fandt dernede.`, givItem: 'diamant', maxHpAendring: 8, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Han spilder det meste. Det redder hans liv, men skaber ingen rigdom til dig.`, maxHpAendring: 3, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Trædrikken absorberes delvist af jorden. Skoven trækker sig roligt tilbage mæt af energi.`, hpAendring: 10, maxHpAendring: 5, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Eliksiren giver ham styrke til selv at bryde rødderne op. Da han kommer fri, rækker han dig en diamant fra jorden.`, givItem: 'diamant', maxHpAendring: 8, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Han spilder det meste, men får nok i sig til at overleve og komme fri.`, maxHpAendring: 3, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Jorden suger en del af eliksiren til sig. Rødderne falder til ro og trækker sig mætte tilbage.`, hpAendring: 10, maxHpAendring: 5, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Mærk med kvisten efter det sted, hvor jorden er svagest.',
-        tekstEn: 'Use the twig to feel where the ground is weakest.',
+        tekst: 'Brug søgekvisten til at finde jordens svage punkt.',
+        tekstEn: 'Use the seeker twig to find the ground’s weak point.',
         kraeverItem: 'soegekvist',
         udfaldListe: [
-          { log: `Kvisten peger direkte på en hul rod. Du træder på den, og alle fangere slipper øjeblikkeligt deres bytte.`, maxHpAendring: 10, naesteTrin: 'blodskov_saften' },
-          { log: `Den viser dig en vej uden om mændene, direkte til en skjult bunke valuta.`, guldAendring: 160, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Kvisten forvirres af træets magi og vildleder dig ud i en tornebusk.`, hpAendring: -10, naesteTrin: 'blodskov_saften' }
+          { log: `Kvisten peger på en hul rod. Du træder den i stykker, og de andre rødder slipper straks deres greb.`, maxHpAendring: 10, naesteTrin: 'blodskov_saften' },
+          { log: `Kvisten fører dig uden om skovhuggerne og hen til en skjult bunke mønter.`, guldAendring: 160, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Træets magi sender kvisten på afveje og leder dig direkte ind i en tornebusk.`, hpAendring: -10, naesteTrin: 'blodskov_saften' }
         ]
       }
     ]
@@ -318,12 +318,12 @@ The old man is clearly controlling the roots’ grip. He is letting the woodcutt
 
   blodskov_saften: {
     id: 'blodskov_saften',
-    titel: 'Det Røde Guld',
+    titel: 'Det røde guld',
     titelEn: 'The Red Gold',
     biome: ['blodskov'],
-    tekst: `Den røde saft strømmer nu frit fra sårene i stammen. Den er varm og lugter kraftigt af jern. Du kan høre svage stød inde fra træet.
+    tekst: `Rød saft strømmer frit fra sårene i stammen. Den er varm og lugter skarpt af jern. Inde fra træet kommer langsomme, dæmpede slag.
 
-Lederen stikker hurtigt en læderflaske ind for at fange dråberne. Hun siger, det kan hele al sygdom. Den gamle mand advarer om, at dråberne vil forandre hendes blod permanent.`,
+Lederen holder en læderflaske ind under strømmen. Hun siger, at saften kan helbrede enhver sygdom. Den gamle mand advarer hende: Drikker hun den, vil hendes blod aldrig blive det samme.`,
     tekstEn: `The red sap now streams freely from the wounds in the trunk. It is warm and smells sharply of iron. You can hear faint pulses from inside the tree.
 
 The leader quickly thrusts in a leather bottle to catch the drops. She says it can heal all sickness. The old man warns that the drops will change her blood permanently.`,
@@ -332,42 +332,42 @@ The leader quickly thrusts in a leather bottle to catch the drops. She says it c
     billede: '/events/ev_blodskov.webp',
     valg: [
       {
-        tekst: 'Saml saften op med dit eget tøj.',
-        tekstEn: 'Collect the sap with your own clothes.',
+        tekst: 'Sug saften op med dine klude.',
+        tekstEn: 'Soak up the sap with your rags.',
         kosterItem: 'klude',
         udfaldListe: [
-          { log: `Tøjet fungerer som en svamp. Du vrider det ned i din egen taske og får et massivt energiboost af dampen alene.`, hpAendring: 25, maxHpAendring: 10, naesteTrin: 'blodskov_kernen' },
-          { log: `Syren i saften ætser stoffet på sekunder. Du når lige akkurat at undgå brændsår på fingrene.`, hpAendring: -5, naesteTrin: 'blodskov_kernen' },
-          { log: `Det drypper på mønterne i lommen, som tager en underlig rød glans og stiger i værdi for samlere.`, guldAendring: 120, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Kludene suger saften til sig. Bare dampen fylder kroppen med varme og nye kræfter.`, hpAendring: 25, maxHpAendring: 10, naesteTrin: 'blodskov_kernen' },
+          { log: `Saften ætser gennem stoffet på få sekunder. Du slipper kludene, men ikke før syren har svedet fingrene.`, hpAendring: -5, naesteTrin: 'blodskov_kernen' },
+          { log: `Saften drypper ned i lommen og giver mønterne en sjælden rød glans. En samler vil betale godt for dem.`, guldAendring: 120, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Slå flasken ud af hånden på hende.',
+        tekst: 'Slå flasken ud af lederens hånd.',
         tekstEn: 'Knock the bottle from her hand.',
         udfaldListe: [
           { log: `Flasken splintres. Den røde saft trænger ned i jorden. Lederen trækker sin kniv mod dig.`, hpAendring: -14, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Du vipper den væk. Det forhindrer hende i at drikke giften. Hun takker dig stumt og afleverer sit udstyr.`, givItem: 'sabel', maxHpAendring: 6, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Lederen dykker efter den i mudderet. I forvirringen napper du hendes tunge pengepung uforstyrret.`, guldAendring: 150, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Du slår flasken væk, før hun kan drikke. Hun forstår advarslen, nikker stumt og giver dig sin sabel.`, givItem: 'sabel', maxHpAendring: 6, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Lederen kaster sig efter flasken i mudderet. Mens hun leder, tager du hendes tunge pengepung.`, guldAendring: 150, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Som pirat stjæler du flasken i farten for dig selv.',
-        tekstEn: 'As pirate, steal the bottle for yourself in the rush.',
+        tekst: 'Stjæl flasken som pirat.',
+        tekstEn: 'Steal the bottle as a pirate.',
         kraeverKarakter: 'pirate_m',
         udfaldListe: [
-          { log: `Dine hænder er hurtigere end hendes øjne. Du erstatter flasken med mudder og drikker styrken i dig selv.`, hpAendring: 30, maxHpAendring: 12, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Du hugger den, men saften koger op i maven på dig og forvolder en voldsom krampe.`, hpAendring: -18, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Du fanger flasken og tvinger hende til at betale en enorm løsesum for at få den tilbage.`, guldAendring: 250, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Dine hænder er hurtigere end hendes blik. Du bytter flasken ud med en klump mudder og drikker selv saften.`, hpAendring: 30, maxHpAendring: 12, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du snupper flasken og drikker. Saften koger i maven og trækker kroppen sammen i en voldsom krampe.`, hpAendring: -18, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du stjæler flasken og kræver en høj pris for at give den tilbage. Lederen betaler.`, guldAendring: 250, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Som korsar stjæler du flasken i farten for dig selv.',
-        tekstEn: 'As corsair, steal the bottle for yourself in the rush.',
+        tekst: 'Stjæl flasken som korsar.',
+        tekstEn: 'Steal the bottle as a corsair.',
         kraeverKarakter: 'pirate_f',
         udfaldListe: [
-          { log: `Dine hænder er hurtigere end hendes øjne. Du erstatter flasken med mudder og drikker styrken i dig selv.`, hpAendring: 30, maxHpAendring: 12, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Du hugger den, men saften koger op i maven på dig og forvolder en voldsom krampe.`, hpAendring: -18, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Du fanger flasken og tvinger hende til at betale en enorm løsesum for at få den tilbage.`, guldAendring: 250, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Dine hænder er hurtigere end hendes blik. Du bytter flasken ud med en klump mudder og drikker selv saften.`, hpAendring: 30, maxHpAendring: 12, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du snupper flasken og drikker. Saften koger i maven og trækker kroppen sammen i en voldsom krampe.`, hpAendring: -18, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du stjæler flasken og kræver en høj pris for at give den tilbage. Lederen betaler.`, guldAendring: 250, naesteTrin: 'blodskov_efterspillet' }
         ]
       }
     ]
@@ -375,13 +375,13 @@ The leader quickly thrusts in a leather bottle to catch the drops. She says it c
 
   blodskov_kernen: {
     id: 'blodskov_kernen',
-    titel: 'Træets Hjerte',
+    titel: 'Træets hjerte',
     titelEn: 'The Tree’s Heart',
     biome: ['blodskov'],
-    tekst: `Træets midte er nu fuldstændig blottet. Her sidder en kæmpemæssig, rødlig krystal. Den udstråler en kvælende hede og pumper i et langsomt tempo.
+    tekst: `Træets indre ligger åbent. Midt i stammen sidder en stor, rød krystal. Den pulserer langsomt og sender en kvælende varme ud i lysningen.
 
-Den gamle mands øjne er rullet tilbage i hovedet, og han forsøger at dække krystallen med sine sidste tynde rødder. Lederen hæver sin kniv. Hun vil skære stenen ud, selv hvis det koster hendes egne folks liv under rødderne.`,
-    tekstEn: `The tree’s center is now completely exposed. Here sits an enormous reddish crystal. It radiates choking heat and pulses at a slow rhythm.
+Den gamle mands øjne er rullet tilbage. Med de sidste tynde rødder prøver han at dække krystallen. Lederen hæver kniven. Hun vil skære stenen fri, selv hvis hendes egne folk dør under rødderne.`,
+    tekstEn: `The inside of the tree lies exposed. An enormous red crystal sits in the center of the trunk, pulsing slowly and radiating choking heat.
 
 The old man’s eyes have rolled back in his head, and he tries to cover the crystal with his last thin roots. The leader raises her knife. She will cut out the stone even if it costs her own people’s lives under the roots.`,
     unik: true,
@@ -389,62 +389,62 @@ The old man’s eyes have rolled back in his head, and he tries to cover the cry
     billede: '/events/ev_blodskov.webp',
     valg: [
       {
-        tekst: 'Flæk krystallen med et tungt slag fra dit sværd.',
-        tekstEn: 'Split the crystal with a heavy blow from your sword.',
+        tekst: 'Flæk krystallen med sværdet.',
+        tekstEn: 'Split the crystal with your sword.',
         kraeverItem: 'svaerd',
         udfaldListe: [
-          { log: `Sværdet rammer plet. Krystallen sprænges i tusind stykker, og træet dør øjeblikkeligt. Du samler splinterne op.`, givItem: 'diamant', guldAendring: 120, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Trykbølgen fra slaget smadrer klingen og sender dig flyvende ind i en stamme. Våbnet er tabt, men skoven giver op.`, hpAendring: -20, maxHpAendring: -2, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Du knuser hjertet. Magien fordamper, og den gamle mand falder om. Du tager pengene fra hans gemmer under rødderne.`, guldAendring: 220, maxHpAendring: 8, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Sværdet rammer rent. Krystallen splintrer, og træet dør med det samme. Du samler det største stykke og de værdifulde splinter op.`, givItem: 'diamant', guldAendring: 120, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Slaget udløser en trykbølge, der knuser klingen og kaster dig ind i en stamme. Våbnet er tabt, men træet dør.`, hpAendring: -20, maxHpAendring: -2, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du knuser hjertet. Gløden forsvinder, og den gamle mand falder om. Under rødderne finder du hans skjulte mønter.`, guldAendring: 220, maxHpAendring: 8, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Skyd krystallen ud af stammen med en pil fra afstand.',
-        tekstEn: 'Shoot the crystal out of the trunk with an arrow from a distance.',
+        tekst: 'Skyd krystallen løs med buen.',
+        tekstEn: 'Shoot the crystal loose with your bow.',
         kraeverItem: 'bue',
         udfaldListe: [
-          { log: `Pilen borer sig ind bag stenen og vipper den ud. Krystallen dæmper sin varme og lader sig let indsamle.`, givItem: 'diamant', maxHpAendring: 6, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Du rammer forbi stenen og punkterer en saftkirtel. Dampen svider din næse og øjne alvorligt.`, hpAendring: -15, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Skuddet skærer stenen i to. Lederen griber den ene, du tager den anden. Det er en handel formet af vold.`, givItem: 'diamant', guldAendring: 90, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Pilen borer sig ind bag stenen og vipper den fri. Varmen falder, så du kan tage krystallen med hænderne.`, givItem: 'diamant', maxHpAendring: 6, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Pilen går forbi og rammer en lomme fuld af saft. Den varme damp svier øjne og luftveje.`, hpAendring: -15, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Skuddet deler stenen i to. Lederen griber den ene halvdel, og du tager den anden uden at diskutere.`, givItem: 'diamant', guldAendring: 90, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Smid en diamant til rødderne for at bytte med træets kerne.',
-        tekstEn: 'Throw a diamond to the roots to bargain for the tree’s core.',
+        tekst: 'Byt din diamant for træets kerne.',
+        tekstEn: 'Trade your diamond for the tree’s core.',
         kosterItem: 'diamant',
         udfaldListe: [
-          { log: `Træet accepterer din byttehandel. Krystallen triller ud, og skoven roer sig ned med din diamant som erstatning.`, givItem: 'livseliksir', guldAendring: 300, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Træet æder diamanten og spytter syre ud i hovedet på dig. Magien vil ikke købes i dag.`, hpAendring: -25, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Manden sluger diamanten. Han løsner sit eget greb og trækker vejret tungt, mens træet frigiver en stak skjold og våben.`, givItem: 'rustning', guldAendring: 150, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Træet tager imod byttet. Krystallen triller ud, og rødderne falder til ro med din diamant i stammen.`, givItem: 'livseliksir', guldAendring: 300, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Træet sluger diamanten og sender en stråle syre mod dit ansigt. Det vil have mere end betaling.`, hpAendring: -25, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Den gamle mand sluger diamanten. Han løsner grebet, og rødderne skubber rustning, våben og mønter op af jorden.`, givItem: 'rustning', guldAendring: 150, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Kræv stenen udleveret mod at dele overskuddet med lederen.',
-        tekstEn: 'Demand the stone in exchange for sharing the profit with the leader.',
+        tekst: 'Tilbyd lederen en del af stenens værdi.',
+        tekstEn: 'Offer to share the stone’s value with the leader.',
         udfaldListe: [
-          { log: `Hun accepterer. I vrikker stenen løs sammen og deler puljen op på stående fod.`, givItem: 'diamant', hpAendring: -5, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Hun accepterer. Sammen vrikker I stenen fri og deler værdien med det samme.`, givItem: 'diamant', hpAendring: -5, naesteTrin: 'blodskov_efterspillet' },
           { log: `Hun snyder dig og stikker af med stenen, mens træet pisker dig over ansigtet med en gren.`, hpAendring: -16, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Forhandlingen tager for lang tid. Krystallen smelter væk, men lader mønter fra de tidligere ofre ligge frit fremme.`, guldAendring: 250, maxHpAendring: 4, naesteTrin: 'blodskov_efterspillet' }
+          { log: `I taler for længe. Krystallen smelter væk, men efterlader de tidligere ofres mønter i det åbne hulrum.`, guldAendring: 250, maxHpAendring: 4, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Som troldmand afbryder du forbindelsen mellem sten og træ.',
-        tekstEn: 'As wizard, sever the connection between stone and tree.',
+        tekst: 'Bryd forbindelsen mellem sten og træ som troldmand.',
+        tekstEn: 'Sever the link between stone and tree as a wizard.',
         kraeverKarakter: 'magician_m',
         udfaldListe: [
-          { log: `Du udsender en modpuls. Krystallen afbrydes fra træet, og magien fader blødt ud uden fare. Stenen er din.`, givItem: 'diamant', maxHpAendring: 10, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Magien er stærkere end forventet. Du får et alvorligt tilbagekast, der dræner dit indre, før stenen overgiver sig.`, hpAendring: -20, givItem: 'diamant', naesteTrin: 'blodskov_efterspillet' },
-          { log: `Du slukker træet fuldstændig. Den gamle mand takker dig med dybe buk og lader sit lager af udstyr stå åbent.`, givItem: 'metaldetektor', guldAendring: 180, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Du sender en modpuls gennem stammen. Forbindelsen brister, og gløden forsvinder stille fra træet. Stenen er din.`, givItem: 'diamant', maxHpAendring: 10, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Magien slår hårdere tilbage end ventet og dræner dine kræfter. Til sidst slipper træet stenen.`, hpAendring: -20, givItem: 'diamant', naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du slukker træets magi helt. Den gamle mand takker og åbner sit skjulte lager. Du tager mønterne og en metaldetektor.`, givItem: 'metaldetektor', guldAendring: 180, naesteTrin: 'blodskov_efterspillet' }
         ]
       },
       {
-        tekst: 'Som troldkvinde afbryder du forbindelsen mellem sten og træ.',
-        tekstEn: 'As sorceress, sever the connection between stone and tree.',
+        tekst: 'Bryd forbindelsen mellem sten og træ som troldkvinde.',
+        tekstEn: 'Sever the link between stone and tree as a sorceress.',
         kraeverKarakter: 'magician_f',
         udfaldListe: [
-          { log: `Du udsender en modpuls. Krystallen afbrydes fra træet, og magien fader blødt ud uden fare. Stenen er din.`, givItem: 'diamant', maxHpAendring: 10, naesteTrin: 'blodskov_efterspillet' },
-          { log: `Magien er stærkere end forventet. Du får et alvorligt tilbagekast, der dræner dit indre, før stenen overgiver sig.`, hpAendring: -20, givItem: 'diamant', naesteTrin: 'blodskov_efterspillet' },
-          { log: `Du slukker træet fuldstændig. Den gamle mand takker dig med dybe buk og lader sit lager af udstyr stå åbent.`, givItem: 'metaldetektor', guldAendring: 180, naesteTrin: 'blodskov_efterspillet' }
+          { log: `Du sender en modpuls gennem stammen. Forbindelsen brister, og gløden forsvinder stille fra træet. Stenen er din.`, givItem: 'diamant', maxHpAendring: 10, naesteTrin: 'blodskov_efterspillet' },
+          { log: `Magien slår hårdere tilbage end ventet og dræner dine kræfter. Til sidst slipper træet stenen.`, hpAendring: -20, givItem: 'diamant', naesteTrin: 'blodskov_efterspillet' },
+          { log: `Du slukker træets magi helt. Den gamle mand takker og åbner sit skjulte lager. Du tager mønterne og en metaldetektor.`, givItem: 'metaldetektor', guldAendring: 180, naesteTrin: 'blodskov_efterspillet' }
         ]
       }
     ]
@@ -452,64 +452,64 @@ The old man’s eyes have rolled back in his head, and he tries to cover the cry
 
   blodskov_efterspillet: {
     id: 'blodskov_efterspillet',
-    titel: 'Stilhed over Saften',
-    titelEn: 'Silence over the Sap',
+    titel: 'Stilhed i lysningen',
+    titelEn: 'Silence in the Clearing',
     biome: ['blodskov'],
-    tekst: `Rydningen bliver mærkeligt stille. Rødderne trækker sig ikke længere. Skovhuggerne forsøger at samle sig og binde deres sår ind.
+    tekst: `Lysningen bliver stille. Rødderne ligger livløse, og skovhuggerne prøver at komme på benene og forbinde deres sår.
 
-Træet er blot en stor, udhulet plante nu. Omkring dig flyder det med efterladenskaber. Det er tid til at vurdere prisen på din indgriben, pakke rygsækken og komme videre inden tågen opsluger pladsen.`,
-    tekstEn: `The clearing grows strangely quiet. The roots no longer pull. The woodcutters try to gather themselves and bind their wounds.
+Træet står udhulet tilbage. Mudderet er dækket af ødelagt udstyr og efterladte tasker. Tågen driver allerede ind mellem stammerne. Du må beslutte, hvad du tager med, og komme videre.`,
+    tekstEn: `The clearing falls silent. The roots lie still, and the woodcutters struggle to their feet and bind their wounds.
 
-The tree is only a large hollowed plant now. Around you lie scattered remains. It is time to judge the price of your intervention, pack your backpack and move on before the fog swallows the place.`,
+The tree stands hollow. Broken equipment and abandoned bags cover the mud, and fog is already drifting between the trunks. Decide what to take and move on.`,
     unik: true,
     erSubTrin: true,
     billede: '/events/ev_blodskov.webp',
     valg: [
       {
-        tekst: 'Forlad pladsen hurtigst muligt.',
-        tekstEn: 'Leave the place as quickly as possible.',
+        tekst: 'Forlad lysningen med det samme.',
+        tekstEn: 'Leave the clearing at once.',
         udfaldListe: [
-          { log: `Du trækker dig tilbage og overlader rydningen til sig selv. Skoven har ikke mere at fortælle dig i dag.`, maxHpAendring: 5 },
-          { log: `Du træder over en skjult rod på vej væk og får et slemt træk i anklen, men overlever sagen.`, hpAendring: -8, maxHpAendring: 3 },
-          { log: `Du lister afsted og opdager en efterladt skovl ved kanten af lysningen. Skoven sørger altid for noget.`, givItem: 'skovl', maxHpAendring: 4 }
+          { log: `Du trækker dig tilbage og lader lysningen ligge. Først mellem de næste træer falder pulsen til ro.`, maxHpAendring: 5 },
+          { log: `På vej væk træder du på en rod skjult i mudderet og vrider anklen slemt. Du kommer ud, men hvert skridt gør ondt.`, hpAendring: -8, maxHpAendring: 3 },
+          { log: `Ved kanten af lysningen finder du en efterladt skovl. Du tager den med, før tågen lukker sig bag dig.`, givItem: 'skovl', maxHpAendring: 4 }
         ]
       },
       {
-        tekst: 'Kræv kontant betaling af de overlevende for din indsats.',
-        tekstEn: 'Demand cash payment from the survivors for your effort.',
+        tekst: 'Kræv betaling af de overlevende.',
+        tekstEn: 'Demand payment from the survivors.',
         udfaldListe: [
-          { log: `De har ingen energi til at diskutere. De kaster deres møntposer over til dig med vrede blikke.`, guldAendring: 240, maxHpAendring: -2 },
-          { log: `Lederen forsvarer sit guld til det sidste og skærer dig en overfladisk flænge med kniven, inden hun betaler.`, hpAendring: -12, guldAendring: 180 },
+          { log: `De orker ikke at diskutere. Med vrede blikke kaster de deres møntposer over til dig.`, guldAendring: 240, maxHpAendring: -2 },
+          { log: `Lederen nægter først og flænser dig med kniven. Da hun ser, at du ikke giver dig, betaler hun.`, hpAendring: -12, guldAendring: 180 },
           { log: `De betaler uden et ord. Mønterne klirrer koldt i lommen. Du har overlevet. De har overlevet. Intet mere.`, guldAendring: 210 }
         ]
       },
       {
-        tekst: 'Tilbyd at eskortere dem ud til grænsen af skoven.',
-        tekstEn: 'Offer to escort them to the edge of the forest.',
+        tekst: 'Følg dem sikkert ud af skoven.',
+        tekstEn: 'Escort them safely out of the forest.',
         udfaldListe: [
-          { log: `Turen ud er rolig. Det giver dig anledning til at rense tankerne og helbrede kroppen let. De takker med lidt mønter.`, hpAendring: 15, guldAendring: 80 },
-          { log: `En sidste gren falder uventet og slår dig over hovedet på vejen. Du hjælper dem, men betaler prisen.`, hpAendring: -14, maxHpAendring: 5 },
-          { log: `Du guider dem ud sikkert. En arbejder presser en lille ædelsten i din hånd som tak for livet.`, givItem: 'diamant', maxHpAendring: 8 }
+          { log: `Turen ud bliver rolig. Kroppen får tid til at komme sig, og skovhuggerne takker dig med de mønter, de kan undvære.`, hpAendring: 15, guldAendring: 80 },
+          { log: `På vejen falder en tung gren og rammer dig i hovedet. Du får dem ud, men må betale prisen.`, hpAendring: -14, maxHpAendring: 5 },
+          { log: `Du får alle sikkert ud. Ved skovbrynet presser en af dem en lille ædelsten i din hånd som tak.`, givItem: 'diamant', maxHpAendring: 8 }
         ]
       },
       {
-        tekst: 'Som hertug beslaglægger du alle værdier fra pladsen i statens navn.',
-        tekstEn: 'As duke, seize all valuables from the place in the name of the state.',
+        tekst: 'Beslaglæg værdierne i statens navn som hertug.',
+        tekstEn: 'Seize the valuables in the name of the state as a duke.',
         kraeverKarakter: 'royal_m',
         udfaldListe: [
-          { log: `Din autoritet tillader ingen modsigelse. Du rydder lysningen for alt af værdi. Det er beskidt arbejde, men yderst rentabelt.`, guldAendring: 320, maxHpAendring: 5 },
-          { log: `En skovhugger yder desperat modstand. Det koster dig nogle skrammer at overbevise ham om dit ejerskab.`, hpAendring: -15, guldAendring: 280 },
-          { log: `Den gamle mand nikker og accepterer din lov. Du modtager både mønter og et efterladt våben fra jorden.`, givItem: 'sabel', guldAendring: 200 }
+          { log: `Ingen tør modsige din ordre. Du tager alt af værdi fra lysningen. Beskidt arbejde, men en god forretning.`, guldAendring: 320, maxHpAendring: 5 },
+          { log: `En skovhugger gør desperat modstand. Du får mønterne, men ikke uden skrammer.`, hpAendring: -15, guldAendring: 280 },
+          { log: `Den gamle mand accepterer din ordre. Du tager mønterne og en sabel, der ligger i mudderet.`, givItem: 'sabel', guldAendring: 200 }
         ]
       },
       {
-        tekst: 'Som hertuginde beslaglægger du alle værdier fra pladsen i statens navn.',
-        tekstEn: 'As duchess, seize all valuables from the place in the name of the state.',
+        tekst: 'Beslaglæg værdierne i statens navn som hertuginde.',
+        tekstEn: 'Seize the valuables in the name of the state as a duchess.',
         kraeverKarakter: 'royal_f',
         udfaldListe: [
-          { log: `Din autoritet tillader ingen modsigelse. Du rydder lysningen for alt af værdi. Det er beskidt arbejde, men yderst rentabelt.`, guldAendring: 320, maxHpAendring: 5 },
-          { log: `En skovhugger yder desperat modstand. Det koster dig nogle skrammer at overbevise ham om dit ejerskab.`, hpAendring: -15, guldAendring: 280 },
-          { log: `Den gamle mand nikker og accepterer din lov. Du modtager både mønter og et efterladt våben fra jorden.`, givItem: 'sabel', guldAendring: 200 }
+          { log: `Ingen tør modsige din ordre. Du tager alt af værdi fra lysningen. Beskidt arbejde, men en god forretning.`, guldAendring: 320, maxHpAendring: 5 },
+          { log: `En skovhugger gør desperat modstand. Du får mønterne, men ikke uden skrammer.`, hpAendring: -15, guldAendring: 280 },
+          { log: `Den gamle mand accepterer din ordre. Du tager mønterne og en sabel, der ligger i mudderet.`, givItem: 'sabel', guldAendring: 200 }
         ]
       }
     ]
@@ -517,105 +517,105 @@ The tree is only a large hollowed plant now. Around you lie scattered remains. I
 };
 
 const blodskovLogEn: Record<string, string> = {
-  [`Hun stopper slaget. Træet udnytter pausen til at stramme grebet om en arbejder. Hans kraveben brækker med et højt knæk.`]: `She stops the blow. The tree uses the pause to tighten its grip around a worker. His collarbone breaks with a loud crack.`,
-  [`Hun svinger øksen mod dig i stedet for stammen. Du dukker dig, men skaftet rammer din skulder hårdt.`]: `She swings the axe at you instead of the trunk. You duck, but the haft hits your shoulder hard.`,
-  [`Din stemme får pladsen til at fryse. Både kvinden og den gamle mand kigger på dig, mens rødderne slapper en anelse af.`]: `Your voice freezes the clearing. Both the woman and the old man look at you while the roots loosen slightly.`,
-  [`Barken flænges under jeres fælles angreb. Den gamle mand skriger, og jorden ryster voldsomt under jer.`]: `The bark splits under your joint attack. The old man screams, and the ground shakes violently beneath you.`,
-  [`En gren pisker ned fra trækronen og slår dig til jorden. Du mister pusten totalt.`]: `A branch lashes down from the crown and knocks you to the ground. The air is driven completely out of you.`,
-  [`Du rammer et blødt punkt i stammen. En enorm mængde rød saft flyder ud og tvinger rødderne tilbage.`]: `You strike a soft spot in the trunk. A huge rush of red sap flows out and forces the roots back.`,
+  [`Hun standser midt i slaget. I pausen strammer træet grebet om en af skovhuggerne. Hans kraveben brækker med et højt knæk.`]: `She stops mid-swing. During the pause, the tree tightens its grip on one of the woodcutters. His collarbone breaks with a loud crack.`,
+  [`Hun svinger øksen mod dig i stedet for stammen. Du dukker dig, men skaftet rammer din skulder hårdt.`]: `She swings the axe at you instead of the trunk. You duck, but the handle strikes your shoulder hard.`,
+  [`Din stemme får dem begge til at standse. Mens de ser på dig, løsner rødderne grebet en smule.`]: `Your voice makes both of them stop. While they watch you, the roots loosen their grip slightly.`,
+  [`Barken flænges under jeres fælles angreb. Den gamle mand skriger, og jorden ryster under jer.`]: `The bark splits under your combined attack. The old man screams, and the ground shakes beneath you.`,
+  [`En gren pisker ned fra trækronen og slår dig til jorden. Al luft bliver slået ud af dig.`]: `A branch lashes down from the crown and knocks you to the ground. The impact drives the air from your lungs.`,
+  [`Du rammer et blødt punkt i stammen. Rød saft vælter ud og tvinger rødderne tilbage.`]: `You strike a soft spot in the trunk. Red sap pours out and forces the roots back.`,
   [`Skovlen får fat under de øverste rødder. Du løsner dem nok til, at lederen sænker øksen og lytter.`]: `The shovel catches beneath the upper roots. You loosen them enough that the leader lowers her axe and listens.`,
-  [`Du rammer en blodfyldt rod. Saften sprøjter op, og træet svarer ved at slå hårdt ned omkring dig.`]: `You hit a blood-filled root. Sap sprays up, and the tree answers by striking hard around you.`,
-  [`Jorden åbner et lille hulrum ved stammen. Det er ikke kernen, men der ligger gamle mønter i det mørke.`]: `The ground opens a small hollow by the trunk. It is not the core, but old coins lie in the darkness.`,
-  [`Ilden griber fat i den tørre bark. Træet trækker sine rødder til sig i forsvarsmekanisme, og skovhuggerne falder ned i mudderet.`]: `The fire catches in the dry bark. The tree pulls its roots inward in defense, and the woodcutters drop into the mud.`,
-  [`Varmen brænder også dig. Du skaber afstanden, men flammerne fortærer din oppakning lidt.`]: `The heat burns you too. You create space, but the flames eat at your pack a little.`,
-  [`Ilden afslører et mærkeligt hulrum oppe i stammen. Lederen stirrer grådigt på det.`]: `The fire reveals a strange hollow high in the trunk. The leader stares at it greedily.`,
+  [`Du rammer en blodfyldt rod. Saften sprøjter op, og en anden rod hamrer ned over dig.`]: `You hit a blood-filled root. Sap sprays up, and another root slams down on you.`,
+  [`Jorden giver efter ved stammen og afslører et lille hulrum. Det er ikke kernen, men mørket gemmer på gamle mønter.`]: `The ground opens a small hollow by the trunk. It is not the core, but old coins lie in the darkness.`,
+  [`Ilden får fat i den tørre bark. Træet trækker rødderne til sig for at beskytte stammen, og skovhuggerne falder ned i mudderet.`]: `The fire catches in the dry bark. The tree pulls its roots inward in defense, and the woodcutters drop into the mud.`,
+  [`Flammerne breder sig hurtigere end ventet. Du får skabt afstand, men varmen svider hænder og ansigt.`]: `The flames spread faster than expected. You create some distance, but the heat burns your hands and face.`,
+  [`Ilden afslører et hulrum højt oppe i stammen. Forkullede mønter falder ud, og lederen ser dem med det samme.`]: `The fire reveals a hollow high in the trunk. Charred coins tumble out, and the leader spots them at once.`,
   [`Han tager imod brødet. Da han spiser, mister træet sit faste greb om mændene.`]: `He accepts the bread. When he eats, the tree loses its firm grip on the men.`,
-  [`Han ignorerer maden fuldstændig. En sulten arbejder kaster sig frem og sluger det foran ham. Det skaber kun mere kaos.`]: `He ignores the food completely. A hungry worker lunges forward and swallows it in front of him. It only creates more chaos.`,
-  [`Brødet absorberer noget af den røde saft på jorden. Den gamle samler det op og gemmer det. Han skylder dig noget nu.`]: `The bread absorbs some of the red sap on the ground. The old man picks it up and hides it. He owes you something now.`,
+  [`Han ignorerer maden. En sulten skovhugger kaster sig i stedet over den, og forvirringen vokser.`]: `He ignores the food. A hungry woodcutter lunges for it instead, adding to the confusion.`,
+  [`Brødet suger rød saft fra jorden. Den gamle tager det og betaler dig med en lille pung mønter.`]: `The bread absorbs red sap from the ground. The old man takes it and pays you with a small pouch of coins.`,
   [`Du ser, at rødderne ikke angriber. De forsvarer stammens indre. Den gamle mand styrer dem med små ryk i fingrene.`]: `You see that the roots are not attacking. They are defending the trunk's interior. The old man controls them with tiny jerks of his fingers.`,
-  [`Du står for længe og observerer. Mudderet giver efter under dig, og du glider ned i en pøl af saft.`]: `You stand and observe too long. The mud gives way beneath you, and you slide into a pool of sap.`,
-  [`Du finder den nøjagtige rytme i træets forsvar. Du kan træde helt hen til kernen uden at blive rørt.`]: `You find the exact rhythm of the tree's defense. You can step all the way to the core without being touched.`,
+  [`Du ser for længe på rødderne. Mudderet giver efter, og du glider ned i en pøl af saft.`]: `You watch the roots for too long. The mud gives way, and you slide into a pool of sap.`,
+  [`Du finder rytmen i træets forsvar og bevæger dig helt frem til kernen uden at blive ramt.`]: `You find the rhythm of the tree's defense and reach the core without being hit.`,
   [`Han nægter. Du vrider hans arm, og træet reagerer ved at kaste dig tilbage i mudderet.`]: `He refuses. You twist his arm, and the tree responds by throwing you back into the mud.`,
-  [`Du presser en støvle mod hans hals. Rødderne løsner grebet øjeblikkeligt, og skovhuggerne falder fri.`]: `You press a boot against his throat. The roots release their grip instantly, and the woodcutters fall free.`,
+  [`Du sætter støvlen mod hans hals. Rødderne løsner straks grebet, og skovhuggerne falder fri.`]: `You press a boot against his throat. The roots release their grip instantly, and the woodcutters fall free.`,
   [`Han ler af dig. Det giver lederen tid til at finde sin økse og rette den mod jer begge.`]: `He laughs at you. It gives the leader time to find her axe and point it at both of you.`,
-  [`Hun tager pengene. Det løser hendes gæld, men hendes mænd sidder stadig fast i rødderne. Problemet eksisterer stadig.`]: `She takes the money. It solves her debt, but her men are still trapped in the roots. The problem still exists.`,
-  [`Mønterne overbeviser hende. Hun kalder sine folk tilbage, og manden stopper sit forsvar.`]: `The coins convince her. She calls her people back, and the man stops his defense.`,
+  [`Hun tager pengene. Gælden er betalt, men hendes folk sidder stadig fast. Du har kun løst hendes problem.`]: `She takes the money. Her debt is paid, but her people remain trapped. You have solved only her problem.`,
+  [`Betalingen overbeviser hende. Hun kalder sine folk tilbage, og den gamle mand lader rødderne slippe.`]: `The payment convinces her. She calls her people back, and the old man makes the roots release them.`,
   [`Hun gemmer pengene og hugger alligevel. Grådighed lader sig sjældent stoppe af en enkelt betaling.`]: `She pockets the money and chops anyway. Greed is rarely stopped by a single payment.`,
-  [`Maskinen hyler. Du finder kæden, der binder manden til træet, og knækker den. Han er nu fri til at slå fra sig.`]: `The machine howls. You find the chain binding the man to the tree and break it. He is now free to strike back.`,
-  [`Kæden rummer et skjult rum med gamle mønter. Du tager dem, mens de andre skændes.`]: `The chain contains a hidden compartment with old coins. You take them while the others argue.`,
-  [`Du rører en forkert del af kæden, og den brænder dig med mørk magi. Det koster på kræfterne.`]: `You touch the wrong part of the chain, and it burns you with dark magic. It costs you strength.`,
-  [`Du løsner jorden omkring håret og finder den knude, der holder manden fast. Rødderne slipper kort efter.`]: `You loosen the soil around the hair and find the knot holding the man in place. The roots let go shortly after.`,
+  [`Metaldetektoren hyler over en kæde, der binder manden til træet. Du knækker den, og han slår straks fra sig.`]: `The metal detector shrieks over a chain binding the man to the tree. You break it, and he immediately strikes out.`,
+  [`I et skjult rum i kæden finder du gamle mønter. Du tager dem, mens de andre skændes.`]: `The chain contains a hidden compartment with old coins. You take them while the others argue.`,
+  [`Du griber om det forkerte led. Kæden bliver glohed og brænder kræfterne ud af armen.`]: `You grab the wrong link. The chain turns white-hot and burns the strength from your arm.`,
+  [`Du løsner jorden omkring håret og finder knuden, der holder manden fast. Kort efter slipper rødderne deres greb.`]: `You loosen the soil around the hair and find the knot holding the man in place. The roots let go shortly after.`,
   [`Skovlen rammer en skjult jernring under mudderet. Den er gammel, men stadig penge værd.`]: `The shovel hits a hidden iron ring beneath the mud. It is old, but still worth money.`,
   [`Roden slår tilbage gennem skaftet. Smerten går op gennem armen, før du når væk.`]: `The root strikes back through the shaft. Pain runs up your arm before you can get away.`,
-  [`Stoffet blokerer hans udsyn. Rødderne mister retning og slipper mændene.`]: `The cloth blocks his sight. The roots lose direction and release the men.`,
+  [`Stoffet dækker hans ansigt. Rødderne farer planløst rundt og slipper skovhuggerne.`]: `The cloth covers his face. The roots flail blindly and release the woodcutters.`,
   [`Han river tøjet i stykker med det samme. Træet strammer grebet af ren vrede.`]: `He tears the clothes apart immediately. The tree tightens its grip out of pure anger.`,
-  [`Det skaber nok forvirring til, at du kan tømme de tasker, der ligger efterladt på jorden.`]: `It creates enough confusion for you to empty the bags abandoned on the ground.`,
-  [`Din autoritet slår igennem. Lederen bakker, og manden slapper af. Du kan nu frit tilgå træets kerne.`]: `Your authority breaks through. The leader backs down, and the man relaxes. You can now approach the tree's core freely.`,
+  [`Forvirringen giver dig tid til at tømme de efterladte tasker på jorden.`]: `It creates enough confusion for you to empty the bags abandoned on the ground.`,
+  [`Din autoritet slår igennem. Lederen træder tilbage, og den gamle mand falder til ro. Vejen til kernen er fri.`]: `Your authority carries. The leader steps back, the old man calms down, and the way to the core opens.`,
   [`Din befaling bliver mødt med en splintrende gren, der slår ind mod dit panser. Her gælder kun skovens lov.`]: `Your order is met by a splintering branch that smashes into your armor. Only the forest's law applies here.`,
-  [`Skovhuggerne adlyder dig og samler deres ting. De overlader kampen mod kultisten til dig.`]: `The woodcutters obey you and gather their things. They leave the fight against the cultist to you.`,
-  [`Hun falder tungt. Du rækker ind i træet og får fingrene i noget massivt og glødende.`]: `She falls heavily. You reach into the tree and get your fingers around something solid and glowing.`,
-  [`Hun trækker dig med ned i faldet. Rødderne pisker jer begge. Du betaler med smerte for dit grådighed.`]: `She drags you down with her. The roots whip you both. You pay for your greed in pain.`,
-  [`Du får et solidt forspring og samler løse ædelstene op fra jorden foran stammen.`]: `You gain a solid lead and scoop up loose gemstones from the ground in front of the trunk.`,
-  [`Du får fat i to af dem. De hoster jord op og takker dig med det guld, de har tilbage i lommerne.`]: `You get hold of two of them. They cough up dirt and thank you with the gold left in their pockets.`,
-  [`Rødderne er for stærke. De trækker dem under, mens tornene river huden af dine underarme.`]: `The roots are too strong. They pull them under while thorns tear the skin from your forearms.`,
-  [`Du redder den ene, mens den anden forsvinder. Det er en delvis sejr. Han lader sin dolk ligge til dig.`]: `You save one while the other disappears. It is a partial victory. He leaves his dagger behind for you.`,
-  [`Panseret beskytter dig fuldstændigt mod angrebet. Du baner vej gennem kaosset og når stammen uskadet.`]: `The armor protects you completely from the attack. You force a path through the chaos and reach the trunk unharmed.`,
-  [`Træet smadrer metallet totalt, og et par splinter slipper igennem til dit lår.`]: `The tree smashes the metal completely, and a few splinters get through to your thigh.`,
-  [`Du absorberer stødet for alle. Lederen kvitterer ved at række dig sin stak af sammensparet bytte.`]: `You absorb the impact for everyone. The leader repays you by handing over her stack of saved-up loot.`,
-  [`Dit slag kaster en trykbølge gennem barken. Træet standser sit angreb af ren chok, og hulrummet åbnes yderligere.`]: `Your blow throws a pressure wave through the bark. The tree stops its attack from sheer shock, and the hollow opens wider.`,
-  [`Træet er hårdere end sten. Du brækker to knoer og falder baglæns med en smertefuld rysten i armen.`]: `The tree is harder than stone. You break two knuckles and fall backward with a painful tremor in your arm.`,
-  [`Slaget vælter døde grene ned. De indeholder intakte eliksirer fra tidligere rejsende, der mødte skoven.`]: `The blow knocks dead branches down. They contain intact elixirs from earlier travelers who met the forest.`,
-  [`Kniven arbejder hurtigt og præcist. Du løsner båndene og sikrer dig arbejdernes guld som tak.`]: `The knife works quickly and precisely. You loosen the bonds and secure the workers' gold as thanks.`,
-  [`Klingen smutter på den hårde bark og skærer dybt i din håndflade. De kommer fri, men det kostede.`]: `The blade slips on the hard bark and cuts deep into your palm. They get free, but it cost you.`,
-  [`Træet afgiver en sort gas fra snittene. Du hoster og mister pusten, mens de stikker af.`]: `The tree releases black gas from the cuts. You cough and lose your breath while they run away.`,
-  [`Du skærer ikke rødderne over, men fjerner jorden omkring dem. Det tager tid, men mændene kommer fri.`]: `You do not cut the roots, but remove the soil around them. It takes time, but the men get free.`,
+  [`Skovhuggerne adlyder og samler deres ting. Så trækker de sig tilbage og overlader den gamle mand til dig.`]: `The woodcutters obey, gather their things and withdraw, leaving the old man to you.`,
+  [`Hun falder tungt i mudderet. Du rækker ind i træet og får fat i noget stort og glødende.`]: `She falls heavily into the mud. You reach into the tree and grasp something large and glowing.`,
+  [`Hun trækker dig med ned, og rødderne pisker jer begge.`]: `She drags you down with her, and the roots whip both of you.`,
+  [`Du kommer først frem og samler løse ædelsten op foran stammen.`]: `You get there first and gather the loose gemstones in front of the trunk.`,
+  [`Du får to af dem op. De hoster jord og giver dig det guld, de har tilbage i lommerne.`]: `You pull two of them free. They cough up dirt and give you the gold left in their pockets.`,
+  [`Rødderne er for stærke. De trækker skovhuggerne ned, mens tornene flår huden på dine underarme.`]: `The roots are too strong. They pull the woodcutters under while thorns tear the skin from your forearms.`,
+  [`Du får den ene fri, mens den anden forsvinder under jorden. Den overlevende giver dig sin dolk med rystende hænder.`]: `You free one while the other disappears underground. The survivor gives you his dagger with shaking hands.`,
+  [`Panseret tager hele bygen. Du presser dig gennem kaosset og når stammen uden en skramme.`]: `Your armor takes the full shower. You push through the chaos and reach the trunk without a scratch.`,
+  [`Splinterne flår metallet op, og flere trænger igennem til dit lår.`]: `The splinters tear through the metal, and several pierce your thigh.`,
+  [`Du tager imod bygen for de andre. Lederen takker ved at give dig det bytte, hun har samlet.`]: `You take the shower of splinters for the others. The leader thanks you with the valuables she has collected.`,
+  [`Slaget sender en bølge gennem barken. Træet standser angrebet, og hullet i stammen flækker endnu mere op.`]: `The blow sends a wave through the bark. The tree stops its attack, and the hollow in the trunk splits wider.`,
+  [`Træet er hårdere end sten. To knoer brækker, og smerten skyder op gennem armen.`]: `The tree is harder than stone. Two knuckles break, and pain shoots up your arm.`,
+  [`Slaget river døde grene løs. Mellem dem hænger en intakt eliksir og en møntpung fra en tidligere rejsende.`]: `The blow tears loose several dead branches. An intact elixir and a former traveler’s coin pouch hang among them.`,
+  [`Kniven glider sikkert gennem de tynde rødder. Skovhuggerne kommer fri og giver dig deres guld som tak.`]: `The knife slides cleanly through the thin roots. The woodcutters come free and give you their gold in thanks.`,
+  [`Klingen smutter på den hårde bark og skærer dybt i din håndflade. Skovhuggerne kommer fri, men du må betale i blod.`]: `The blade slips on the hard bark and cuts deep into your palm. The woodcutters get free, but you pay in blood.`,
+  [`Sort gas siver ud fra snittene. Du hoster og mister pusten, mens skovhuggerne flygter.`]: `The tree releases black gas from the cuts. You cough and lose your breath while they run away.`,
+  [`Du fjerner jorden omkring rødderne uden at skære i dem. Det tager tid, men alle kommer fri.`]: `You clear the soil from around the roots without cutting them. It takes time, but everyone gets free.`,
   [`Du graver for tæt på en levende rod. Den slår op gennem mudderet og rammer dig hårdt i siden.`]: `You dig too close to a living root. It strikes up through the mud and hits you hard in the side.`,
   [`Skovlen rammer et gammelt skjul under en rod. Der ligger mad og mønter fra folk, der ikke slap ud.`]: `The shovel hits an old cache beneath a root. Food and coins from people who never escaped are inside.`,
-  [`Det kræver al din styrke. Din ryg brokker sig voldsomt, og det trækker hårde smerter gennem lænden.`]: `It takes all your strength. Your back protests violently, sending hard pain through your lower spine.`,
-  [`Du hiver dem op som radiser. Din styrke redder dagen uden omkostninger.`]: `You pull them up like radishes. Your strength saves the day without cost.`,
-  [`Du mister grebet om den sidste. Han overlever ikke. Du samler hans taske op i stedet.`]: `You lose your grip on the last one. He does not survive. You pick up his bag instead.`,
-  [`Væsken giver ham styrke til selv at brække rødderne op. Han rækker dig en diamant, han fandt dernede.`]: `The liquid gives him the strength to break the roots himself. He hands you a diamond he found down there.`,
-  [`Han spilder det meste. Det redder hans liv, men skaber ingen rigdom til dig.`]: `He spills most of it. It saves his life, but creates no wealth for you.`,
-  [`Trædrikken absorberes delvist af jorden. Skoven trækker sig roligt tilbage mæt af energi.`]: `The tree-drink is partly absorbed by the soil. The forest calmly withdraws, full of energy.`,
-  [`Kvisten peger direkte på en hul rod. Du træder på den, og alle fangere slipper øjeblikkeligt deres bytte.`]: `The twig points straight at a hollow root. You step on it, and every captor instantly releases its prey.`,
-  [`Den viser dig en vej uden om mændene, direkte til en skjult bunke valuta.`]: `It shows you a way around the men, straight to a hidden pile of valuables.`,
-  [`Kvisten forvirres af træets magi og vildleder dig ud i en tornebusk.`]: `The twig is confused by the tree's magic and misleads you into a thornbush.`,
-  [`Tøjet fungerer som en svamp. Du vrider det ned i din egen taske og får et massivt energiboost af dampen alene.`]: `The cloth works like a sponge. You wring it into your own bag and get a massive boost from the vapor alone.`,
-  [`Syren i saften ætser stoffet på sekunder. Du når lige akkurat at undgå brændsår på fingrene.`]: `The acid in the sap eats through the fabric in seconds. You barely avoid burns on your fingers.`,
-  [`Det drypper på mønterne i lommen, som tager en underlig rød glans og stiger i værdi for samlere.`]: `It drips onto the coins in your pocket, giving them a strange red sheen and making them more valuable to collectors.`,
+  [`Det kræver alle dine kræfter. Du får dem fri, men smerten skærer gennem ryggen og lænden.`]: `It takes all your strength. You free them, but pain cuts through your back and lower spine.`,
+  [`Du planter fødderne i mudderet og river dem fri én efter én. Din styrke holder hele vejen.`]: `You plant your feet in the mud and pull them free one by one. Your strength holds.`,
+  [`Du mister grebet om den sidste, og rødderne tager ham. Tilbage ligger hans taske i mudderet.`]: `You lose your grip on the last woodcutter, and the roots take him. His bag remains in the mud.`,
+  [`Eliksiren giver ham styrke til selv at bryde rødderne op. Da han kommer fri, rækker han dig en diamant fra jorden.`]: `The elixir gives him enough strength to break the roots himself. Once free, he hands you a diamond from the soil.`,
+  [`Han spilder det meste, men får nok i sig til at overleve og komme fri.`]: `He spills most of it but drinks enough to survive and pull himself free.`,
+  [`Jorden suger en del af eliksiren til sig. Rødderne falder til ro og trækker sig mætte tilbage.`]: `The soil absorbs some of the elixir. The roots grow still and withdraw, satisfied.`,
+  [`Kvisten peger på en hul rod. Du træder den i stykker, og de andre rødder slipper straks deres greb.`]: `The twig points to a hollow root. You crush it underfoot, and the other roots immediately release their grip.`,
+  [`Kvisten fører dig uden om skovhuggerne og hen til en skjult bunke mønter.`]: `The twig leads you around the woodcutters and straight to a hidden pile of coins.`,
+  [`Træets magi sender kvisten på afveje og leder dig direkte ind i en tornebusk.`]: `The tree’s magic sends the twig off course and leads you straight into a thorn bush.`,
+  [`Kludene suger saften til sig. Bare dampen fylder kroppen med varme og nye kræfter.`]: `The rags soak up the sap. Even the vapor fills your body with warmth and fresh strength.`,
+  [`Saften ætser gennem stoffet på få sekunder. Du slipper kludene, men ikke før syren har svedet fingrene.`]: `The sap eats through the fabric in seconds. You drop the rags, but not before the acid burns your fingers.`,
+  [`Saften drypper ned i lommen og giver mønterne en sjælden rød glans. En samler vil betale godt for dem.`]: `It drips onto the coins in your pocket, giving them a strange red sheen and making them more valuable to collectors.`,
   [`Flasken splintres. Den røde saft trænger ned i jorden. Lederen trækker sin kniv mod dig.`]: `The bottle shatters. The red sap seeps into the ground. The leader draws her knife against you.`,
-  [`Du vipper den væk. Det forhindrer hende i at drikke giften. Hun takker dig stumt og afleverer sit udstyr.`]: `You knock it away. It keeps her from drinking the poison. She thanks you silently and hands over her gear.`,
-  [`Lederen dykker efter den i mudderet. I forvirringen napper du hendes tunge pengepung uforstyrret.`]: `The leader dives after it in the mud. In the confusion, you quietly snatch her heavy purse.`,
-  [`Dine hænder er hurtigere end hendes øjne. Du erstatter flasken med mudder og drikker styrken i dig selv.`]: `Your hands are faster than her eyes. You replace the bottle with mud and drink the strength into yourself.`,
-  [`Du hugger den, men saften koger op i maven på dig og forvolder en voldsom krampe.`]: `You snatch it, but the sap boils up in your stomach and causes a violent cramp.`,
-  [`Du fanger flasken og tvinger hende til at betale en enorm løsesum for at få den tilbage.`]: `You catch the bottle and force her to pay an enormous ransom to get it back.`,
-  [`Sværdet rammer plet. Krystallen sprænges i tusind stykker, og træet dør øjeblikkeligt. Du samler splinterne op.`]: `The sword strikes true. The crystal bursts into a thousand pieces, and the tree dies instantly. You gather the shards.`,
-  [`Trykbølgen fra slaget smadrer klingen og sender dig flyvende ind i en stamme. Våbnet er tabt, men skoven giver op.`]: `The shock wave from the blow shatters the blade and sends you flying into a trunk. The weapon is lost, but the forest gives up.`,
-  [`Du knuser hjertet. Magien fordamper, og den gamle mand falder om. Du tager pengene fra hans gemmer under rødderne.`]: `You crush the heart. The magic evaporates, and the old man collapses. You take the money from his stores beneath the roots.`,
-  [`Pilen borer sig ind bag stenen og vipper den ud. Krystallen dæmper sin varme og lader sig let indsamle.`]: `The arrow drives in behind the stone and levers it out. The crystal dampens its heat and lets itself be collected easily.`,
-  [`Du rammer forbi stenen og punkterer en saftkirtel. Dampen svider din næse og øjne alvorligt.`]: `You miss the stone and puncture a sap gland. The vapor badly stings your nose and eyes.`,
-  [`Skuddet skærer stenen i to. Lederen griber den ene, du tager den anden. Det er en handel formet af vold.`]: `The shot cuts the stone in two. The leader grabs one half, and you take the other. It is a trade shaped by violence.`,
-  [`Træet accepterer din byttehandel. Krystallen triller ud, og skoven roer sig ned med din diamant som erstatning.`]: `The tree accepts your bargain. The crystal rolls out, and the forest calms with your diamond as replacement.`,
-  [`Træet æder diamanten og spytter syre ud i hovedet på dig. Magien vil ikke købes i dag.`]: `The tree eats the diamond and spits acid into your face. The magic will not be bought today.`,
-  [`Manden sluger diamanten. Han løsner sit eget greb og trækker vejret tungt, mens træet frigiver en stak skjold og våben.`]: `The man swallows the diamond. He loosens his own grip and breathes heavily while the tree releases a stack of shields and weapons.`,
-  [`Hun accepterer. I vrikker stenen løs sammen og deler puljen op på stående fod.`]: `She accepts. Together you work the stone loose and split the take on the spot.`,
+  [`Du slår flasken væk, før hun kan drikke. Hun forstår advarslen, nikker stumt og giver dig sin sabel.`]: `You knock the bottle away before she can drink. She understands the warning, nods silently and gives you her saber.`,
+  [`Lederen kaster sig efter flasken i mudderet. Mens hun leder, tager du hendes tunge pengepung.`]: `The leader dives after it in the mud. In the confusion, you quietly snatch her heavy purse.`,
+  [`Dine hænder er hurtigere end hendes blik. Du bytter flasken ud med en klump mudder og drikker selv saften.`]: `Your hands are faster than her eyes. You replace the bottle with a lump of mud and drink the sap yourself.`,
+  [`Du snupper flasken og drikker. Saften koger i maven og trækker kroppen sammen i en voldsom krampe.`]: `You snatch the bottle and drink. The sap boils in your stomach and sends your body into a violent spasm.`,
+  [`Du stjæler flasken og kræver en høj pris for at give den tilbage. Lederen betaler.`]: `You steal the bottle and demand a high price to return it. The leader pays.`,
+  [`Sværdet rammer rent. Krystallen splintrer, og træet dør med det samme. Du samler det største stykke og de værdifulde splinter op.`]: `The sword strikes cleanly. The crystal shatters, and the tree dies at once. You collect the largest piece and the valuable shards.`,
+  [`Slaget udløser en trykbølge, der knuser klingen og kaster dig ind i en stamme. Våbnet er tabt, men træet dør.`]: `The blow releases a shock wave that shatters the blade and throws you into a trunk. The weapon is lost, but the tree dies.`,
+  [`Du knuser hjertet. Gløden forsvinder, og den gamle mand falder om. Under rødderne finder du hans skjulte mønter.`]: `You crush the heart. Its glow fades, and the old man collapses. Beneath the roots, you find his hidden coins.`,
+  [`Pilen borer sig ind bag stenen og vipper den fri. Varmen falder, så du kan tage krystallen med hænderne.`]: `The arrow drives in behind the stone and levers it free. The heat subsides, allowing you to pick up the crystal.`,
+  [`Pilen går forbi og rammer en lomme fuld af saft. Den varme damp svier øjne og luftveje.`]: `The arrow misses and pierces a pocket of sap. The hot vapor burns your eyes and airways.`,
+  [`Skuddet deler stenen i to. Lederen griber den ene halvdel, og du tager den anden uden at diskutere.`]: `The shot splits the stone in two. The leader grabs one half, and you take the other without arguing.`,
+  [`Træet tager imod byttet. Krystallen triller ud, og rødderne falder til ro med din diamant i stammen.`]: `The tree accepts the trade. The crystal rolls out, and the roots settle with your diamond inside the trunk.`,
+  [`Træet sluger diamanten og sender en stråle syre mod dit ansigt. Det vil have mere end betaling.`]: `The tree swallows the diamond and spits acid at your face. It wants more than payment.`,
+  [`Den gamle mand sluger diamanten. Han løsner grebet, og rødderne skubber rustning, våben og mønter op af jorden.`]: `The old man swallows the diamond. He loosens his grip, and the roots push armor, weapons and coins out of the ground.`,
+  [`Hun accepterer. Sammen vrikker I stenen fri og deler værdien med det samme.`]: `She accepts. Together, you work the stone loose and split its value on the spot.`,
   [`Hun snyder dig og stikker af med stenen, mens træet pisker dig over ansigtet med en gren.`]: `She cheats you and runs off with the stone while the tree lashes your face with a branch.`,
-  [`Forhandlingen tager for lang tid. Krystallen smelter væk, men lader mønter fra de tidligere ofre ligge frit fremme.`]: `The negotiation takes too long. The crystal melts away, but leaves coins from earlier victims lying in the open.`,
-  [`Du udsender en modpuls. Krystallen afbrydes fra træet, og magien fader blødt ud uden fare. Stenen er din.`]: `You send out a counter-pulse. The crystal is severed from the tree, and the magic fades softly without danger. The stone is yours.`,
-  [`Magien er stærkere end forventet. Du får et alvorligt tilbagekast, der dræner dit indre, før stenen overgiver sig.`]: `The magic is stronger than expected. You suffer a serious backlash that drains your insides before the stone yields.`,
-  [`Du slukker træet fuldstændig. Den gamle mand takker dig med dybe buk og lader sit lager af udstyr stå åbent.`]: `You extinguish the tree completely. The old man thanks you with deep bows and leaves his equipment store open.`,
-  [`Du trækker dig tilbage og overlader rydningen til sig selv. Skoven har ikke mere at fortælle dig i dag.`]: `You withdraw and leave the clearing to itself. The forest has nothing more to tell you today.`,
-  [`Du træder over en skjult rod på vej væk og får et slemt træk i anklen, men overlever sagen.`]: `You step over a hidden root on the way out and twist your ankle badly, but you survive the matter.`,
-  [`Du lister afsted og opdager en efterladt skovl ved kanten af lysningen. Skoven sørger altid for noget.`]: `You slip away and discover an abandoned shovel at the edge of the clearing. The forest always provides something.`,
-  [`De har ingen energi til at diskutere. De kaster deres møntposer over til dig med vrede blikke.`]: `They have no energy to argue. They throw their coin pouches to you with angry looks.`,
-  [`Lederen forsvarer sit guld til det sidste og skærer dig en overfladisk flænge med kniven, inden hun betaler.`]: `The leader defends her gold to the end and cuts you shallowly with the knife before paying.`,
+  [`I taler for længe. Krystallen smelter væk, men efterlader de tidligere ofres mønter i det åbne hulrum.`]: `The negotiation takes too long. The crystal melts away, but leaves coins from earlier victims lying in the open.`,
+  [`Du sender en modpuls gennem stammen. Forbindelsen brister, og gløden forsvinder stille fra træet. Stenen er din.`]: `You send a counter-pulse through the trunk. The connection breaks, and the tree’s glow fades. The stone is yours.`,
+  [`Magien slår hårdere tilbage end ventet og dræner dine kræfter. Til sidst slipper træet stenen.`]: `The magic strikes back harder than expected and drains your strength. At last, the tree releases the stone.`,
+  [`Du slukker træets magi helt. Den gamle mand takker og åbner sit skjulte lager. Du tager mønterne og en metaldetektor.`]: `You extinguish the tree’s magic. The old man thanks you and opens his hidden cache. You take the coins and a metal detector.`,
+  [`Du trækker dig tilbage og lader lysningen ligge. Først mellem de næste træer falder pulsen til ro.`]: `You retreat and leave the clearing behind. Your pulse settles only once you are among the trees beyond it.`,
+  [`På vej væk træder du på en rod skjult i mudderet og vrider anklen slemt. Du kommer ud, men hvert skridt gør ondt.`]: `On the way out, you step on a root hidden in the mud and badly twist your ankle. You make it out, but every step hurts.`,
+  [`Ved kanten af lysningen finder du en efterladt skovl. Du tager den med, før tågen lukker sig bag dig.`]: `At the edge of the clearing, you find an abandoned shovel. You take it before the fog closes behind you.`,
+  [`De orker ikke at diskutere. Med vrede blikke kaster de deres møntposer over til dig.`]: `They have no energy to argue. They throw their coin pouches to you with angry looks.`,
+  [`Lederen nægter først og flænser dig med kniven. Da hun ser, at du ikke giver dig, betaler hun.`]: `The leader refuses at first and slashes you with her knife. When she sees that you will not back down, she pays.`,
   [`De betaler uden et ord. Mønterne klirrer koldt i lommen. Du har overlevet. De har overlevet. Intet mere.`]: `They pay without a word. The coins clink coldly in your pocket. You survived. They survived. Nothing more.`,
-  [`Turen ud er rolig. Det giver dig anledning til at rense tankerne og helbrede kroppen let. De takker med lidt mønter.`]: `The walk out is calm. It gives you a chance to clear your thoughts and heal your body a little. They thank you with a few coins.`,
-  [`En sidste gren falder uventet og slår dig over hovedet på vejen. Du hjælper dem, men betaler prisen.`]: `One last branch falls unexpectedly and hits you on the head on the way. You help them, but pay the price.`,
-  [`Du guider dem ud sikkert. En arbejder presser en lille ædelsten i din hånd som tak for livet.`]: `You guide them out safely. A worker presses a small gemstone into your hand as thanks for his life.`,
-  [`Din autoritet tillader ingen modsigelse. Du rydder lysningen for alt af værdi. Det er beskidt arbejde, men yderst rentabelt.`]: `Your authority allows no objection. You clear the clearing of everything valuable. It is dirty work, but extremely profitable.`,
-  [`En skovhugger yder desperat modstand. Det koster dig nogle skrammer at overbevise ham om dit ejerskab.`]: `A woodcutter resists desperately. It costs you a few scrapes to convince him of your ownership.`,
-  [`Den gamle mand nikker og accepterer din lov. Du modtager både mønter og et efterladt våben fra jorden.`]: `The old man nods and accepts your law. You receive both coins and an abandoned weapon from the ground.`
+  [`Turen ud bliver rolig. Kroppen får tid til at komme sig, og skovhuggerne takker dig med de mønter, de kan undvære.`]: `The walk out is quiet. Your body has time to recover, and the woodcutters thank you with the coins they can spare.`,
+  [`På vejen falder en tung gren og rammer dig i hovedet. Du får dem ud, men må betale prisen.`]: `A heavy branch falls and hits you on the head. You get them out, but the effort costs you.`,
+  [`Du får alle sikkert ud. Ved skovbrynet presser en af dem en lille ædelsten i din hånd som tak.`]: `You lead everyone out safely. At the forest edge, one of them presses a small gemstone into your hand in thanks.`,
+  [`Ingen tør modsige din ordre. Du tager alt af værdi fra lysningen. Beskidt arbejde, men en god forretning.`]: `No one dares challenge your order. You take everything of value from the clearing. Dirty work, but profitable.`,
+  [`En skovhugger gør desperat modstand. Du får mønterne, men ikke uden skrammer.`]: `A woodcutter resists desperately. You get the coins, but not without a few scrapes.`,
+  [`Den gamle mand accepterer din ordre. Du tager mønterne og en sabel, der ligger i mudderet.`]: `The old man accepts your order. You take the coins and a saber lying in the mud.`
 };
 
 for (const event of Object.values(blodskovensHjerteEvents)) {

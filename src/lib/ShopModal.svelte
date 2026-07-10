@@ -40,31 +40,31 @@
 
         if (!brugerKludeSomRabat && !kanModtageItem(id)) {
             spilTilstand.logBesked = id === 'skovl' || id === 'mesterskovl'
-                ? tekst('Du har allerede en skovl. Find et værksted, hvis den skal forbedres.', 'You already have a shovel. Find a workshop if it needs upgrading.')
+                ? tekst('Du har allerede en skovl. Den kan forbedres på et værksted.', 'You already have a shovel. You can improve it at a workshop.')
                 : id === 'stav' || id === 'dragestav'
-                    ? tekst('Du har allerede en stav. Find et værksted, hvis den skal forbedres.', 'You already have a staff. Find a workshop if it needs upgrading.')
+                    ? tekst('Du har allerede en stav. Den kan forbedres på et værksted.', 'You already have a staff. You can improve it at a workshop.')
                     : id === 'soegekvist' || id === 'runekvist'
-                        ? tekst('Du har allerede en søgekvist. Find et værksted, hvis den skal forbedres.', 'You already have a dowsing rod. Find a workshop if it needs upgrading.')
+                        ? tekst('Du har allerede en søgekvist. Den kan forbedres på et værksted.', 'You already have a dowsing rod. You can improve it at a workshop.')
                         : id === 'dirk' || id === 'mesterdirk'
-                            ? tekst('Du har allerede en dirk. Find et værksted, hvis den skal forbedres.', 'You already have a lockpick. Find a workshop if it needs upgrading.')
+                            ? tekst('Du har allerede en dirk. Den kan forbedres på et værksted.', 'You already have a lockpick. You can improve it at a workshop.')
                             : id === 'kniv' || id === 'mesterkniv'
-                                ? tekst('Du har allerede en kniv. Find et værksted, hvis den skal forbedres.', 'You already have a knife. Find a workshop if it needs upgrading.')
+                                ? tekst('Du har allerede en kniv. Den kan forbedres på et værksted.', 'You already have a knife. You can improve it at a workshop.')
                                 : id === 'rustning' || id === 'kongepanser'
-                                    ? tekst('Du har allerede en rustning. Find et værksted, hvis den skal forbedres.', 'You already have armor. Find a workshop if it needs upgrading.')
+                                    ? tekst('Du har allerede en rustning. Den kan forbedres på et værksted.', 'You already have armor. You can improve it at a workshop.')
                                     : id === 'oekse' || id === 'stormoekse'
-                                        ? tekst('Du har allerede en økse. Find et værksted, hvis den skal forbedres.', 'You already have an axe. Find a workshop if it needs upgrading.')
+                                        ? tekst('Du har allerede en økse. Den kan forbedres på et værksted.', 'You already have an axe. You can improve it at a workshop.')
                                         : id === 'koelle' || id === 'koelle_upgr'
-                                            ? tekst('Du har allerede en kølle. Find et værksted, hvis den skal forbedres.', 'You already have a club. Find a workshop if it needs upgrading.')
+                                            ? tekst('Du har allerede en kølle. Den kan forbedres på et værksted.', 'You already have a club. You can improve it at a workshop.')
                                             : id === 'bue' || id === 'mesterbue'
-                                                ? tekst('Du har allerede en bue. Find et værksted, hvis den skal forbedres.', 'You already have a bow. Find a workshop if it needs upgrading.')
+                                                ? tekst('Du har allerede en bue. Den kan forbedres på et værksted.', 'You already have a bow. You can improve it at a workshop.')
                                                 : id === 'klude' || id === 'flot_toej' || id === 'royalt_toej'
-                                                    ? tekst('Du har allerede tøj. Find et værksted, hvis det skal forbedres.', 'You already have clothes. Find a workshop if they need upgrading.')
+                                                    ? tekst('Du har allerede tøj. Det kan forbedres på et værksted.', 'You already have clothes. You can improve them at a workshop.')
                                                     : id === 'fakkel' || id === 'solfakkel'
-                                                        ? tekst('Du har allerede en fakkel. Find et værksted, hvis den skal forbedres.', 'You already have a torch. Find a workshop if it needs upgrading.')
+                                                        ? tekst('Du har allerede en fakkel. Den kan forbedres på et værksted.', 'You already have a torch. You can improve it at a workshop.')
                                                         : id === 'metaldetektor' || id === 'malmviser'
-                                                            ? tekst('Du har allerede en detektor. Find et værksted, hvis den skal forbedres.', 'You already have a detector. Find a workshop if it needs upgrading.')
+                                                            ? tekst('Du har allerede en detektor. Den kan forbedres på et værksted.', 'You already have a detector. You can improve it at a workshop.')
                                                             : id === 'sovepose' || id === 'silkesovepose'
-                                                                ? tekst('Du har allerede en sovepose. Find et værksted, hvis den skal forbedres.', 'You already have a sleeping bag. Find a workshop if it needs upgrading.')
+                                                                ? tekst('Du har allerede en sovepose. Den kan forbedres på et værksted.', 'You already have a sleeping bag. You can improve it at a workshop.')
                                                                 : tekst(`Du har allerede ${itemNavn(id)}.`, `You already have ${itemNavn(id)}.`);
             syncTilDb();
             return;
@@ -82,11 +82,11 @@
             if (brugerKludeSomRabat) brugFraRygsæk('klude', 1);
             spilTilstand.logBesked = royalPrisPresset
                 ? tekst(
-                    `Du købte ${itemNavn(id)} for ${betaltPris} guld. Købmanden ser på dit navn og lader som om resten af prisen aldrig fandtes.`,
-                    `You bought ${itemNavn(id)} for ${betaltPris} gold. The merchant looks at your name and pretends the rest of the price never existed.`
+                    `Du købte ${itemNavn(id)} for ${betaltPris} guld. Købmanden ser din titel og nøjes med beløbet. Ingen i boden protesterer.`,
+                    `You bought ${itemNavn(id)} for ${betaltPris} gold. The merchant sees your title and accepts the amount. No one at the stall objects.`
                 )
                 : brugerKludeSomRabat
-                    ? tekst(`Du købte ${itemNavn(id)} for ${pris} guld. Købmanden tog dit gamle tøj som ${kludeRabat} guld i rabat.`, `You bought ${itemNavn(id)} for ${pris} gold. The merchant took your old clothes as a ${kludeRabat} gold discount.`)
+                    ? tekst(`Du købte ${itemNavn(id)} for ${pris} guld. Dit gamle tøj gav ${kludeRabat} guld i rabat.`, `You bought ${itemNavn(id)} for ${pris} gold. Your old clothes gave you a ${kludeRabat} gold discount.`)
                     : tekst(`Du købte ${itemNavn(id)} for ${vareData.pris} guld.`, `You bought ${itemNavn(id)} for ${vareData.pris} gold.`);
             tilfoejTilRygsæk(id, 1);
             markerTutorialHandling('shop');
@@ -94,17 +94,17 @@
                 naegtHandelForAktuelSpillerPaaAktueltFelt();
                 spilTilstand.logBesked = royalPrisPresset
                     ? tekst(
-                        `Du købte ${itemNavn(id)} for ${betaltPris} guld. Købmanden tør hverken kræve resten af prisen eller handle mere, da han får øje på køllen.`,
-                        `You bought ${itemNavn(id)} for ${betaltPris} gold. The merchant dares neither demand the rest of the price nor keep trading when he notices the club.`
+                        `Du købte ${itemNavn(id)} for ${betaltPris} guld. Købmanden ser først din titel og så køllen. Han nøjes med beløbet, men vil ikke handle med dig igen.`,
+                        `You bought ${itemNavn(id)} for ${betaltPris} gold. The merchant looks first at your title and then at the club. He accepts the amount but refuses to trade with you again.`
                     )
                     : brugerKludeSomRabat
-                        ? tekst(`Du købte ${itemNavn(id)} for ${pris} guld med dit gamle tøj som rabat. Købmanden får øje på køllen og tør ikke handle mere med dig.`, `You bought ${itemNavn(id)} for ${pris} gold with your old clothes as discount. The merchant notices the club and no longer dares to trade with you.`)
-                        : tekst(`Du købte ${itemNavn(id)} for ${vareData.pris} guld. Købmanden får øje på køllen og tør ikke handle mere med dig.`, `You bought ${itemNavn(id)} for ${vareData.pris} gold. The merchant notices the club and no longer dares to trade with you.`);
+                        ? tekst(`Du købte ${itemNavn(id)} for ${pris} guld med dit gamle tøj som rabat. Købmanden ser køllen og vil ikke handle med dig igen.`, `You bought ${itemNavn(id)} for ${pris} gold with your old clothes as a discount. The merchant sees the club and refuses to trade with you again.`)
+                        : tekst(`Du købte ${itemNavn(id)} for ${vareData.pris} guld. Købmanden ser køllen og vil ikke handle med dig igen.`, `You bought ${itemNavn(id)} for ${vareData.pris} gold. The merchant sees the club and refuses to trade with you again.`);
                 lukShop();
             }
         } else {
             spilTilstand.livspoint -= 2;
-            spilTilstand.logBesked = tekst('Købmanden smider dig ud for at røre ved noget du ikke har råd til.', 'The merchant throws you out for touching something you cannot afford.');
+            spilTilstand.logBesked = tekst('Du rører ved en vare, du ikke har råd til. Købmanden smider dig ud med hård hånd.', 'You touch an item you cannot afford. The merchant throws you out by force.');
             syncTilDb();
             lukShop();
             if (spilTilstand.livspoint <= 0) fremtvingKollaps();
@@ -142,7 +142,7 @@
                 ? tekst(`${vare.maengde} diamanter. De sælges samlet for ${diamantSalgspris(vare)} guld.`, `${vare.maengde} diamonds. They sell together for ${diamantSalgspris(vare)} gold.`)
                 : tekst(`Diamanten sælges for ${diamantSalgspris(vare)} guld.`, `The diamond sells for ${diamantSalgspris(vare)} gold.`);
         }
-        return `${itemBeskrivelse(vare.id)} ${tekst('Klik her for at sælge den for 75% af værdien.', 'Click here to sell it for 75% of its value.')}`;
+        return `${itemBeskrivelse(vare.id)} ${tekst('Sælg den her for 75 % af værdien.', 'Sell it here for 75% of its value.')}`;
     }
 
     function vareSalgspris(vare: { id: string; maengde: number; diamanter?: number[] }) {
@@ -152,7 +152,7 @@
 
 <div class="shop-overlay">
     <div class="shop-content">
-        <h2>{spilTilstand.gitter[spilTilstand.spillerIndex]?.biome === 'by' ? tekst('Byens Butik', 'Town Shop') : tekst('Markedet', 'Market')}</h2>
+        <h2>{spilTilstand.gitter[spilTilstand.spillerIndex]?.biome === 'by' ? tekst('Byens butik', 'Town shop') : tekst('Markedet', 'Market')}</h2>
         
         <div class="shop-grid">
             {#each spilTilstand.aktivShop || [] as itemId (itemId)}
@@ -166,7 +166,7 @@
                          role="button" tabindex="0">
                         <img src={tilbud.billede} alt="" class="vare-ikon" />
                         <strong class="vare-navn">{itemNavn(itemId)}</strong>
-                        <span class="vare-pris">{vareKoebspris(itemId)} {tekst('Guld', 'Gold')}</span>
+                        <span class="vare-pris">{vareKoebspris(itemId)} {tekst('guld', 'gold')}</span>
                         {#if tilbud.beskrivelse}
                             <p class="vare-regler">{itemBeskrivelse(itemId)}</p>
                         {/if}
@@ -176,10 +176,10 @@
         </div>
 
         <div class="sell-section">
-            <p>{tekst('Dine ting (klik for at sælge for 75% af værdien):', 'Your items (click to sell for 75% of value):')}</p>
+            <p>{tekst('Sælg udstyr for 75 % af værdien:', 'Sell equipment for 75% of its value:')}</p>
             
             <div class="inventory-small-row">
-                <div class="small-item guld-item" title={tekst('Din formue', 'Your wealth')} data-help-title={tekst('Guld', 'Gold')} data-help-body={tekst('Din nuværende formue. Guld bruges til køb og tæller med i score.', 'Your current wealth. Gold is used for purchases and counts toward score.')}>
+                <div class="small-item guld-item" title={tekst('Din formue', 'Your wealth')} data-help-title={tekst('Guld', 'Gold')} data-help-body={tekst('Din nuværende formue. Guld bruges til køb og tæller med i din score.', 'Your current wealth. Gold is used for purchases and counts toward your score.')}>
                     <img src="/inventory/guld.webp" alt={tekst('Guld', 'Gold')} />
                     <span class="count">{spilTilstand.guldTotal}</span>
                 </div>

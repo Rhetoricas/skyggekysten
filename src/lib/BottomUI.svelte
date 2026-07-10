@@ -24,24 +24,24 @@
     let harMesterskovl = $derived(spilTilstand.mitUdstyr?.some((ting) => ting.id === 'mesterskovl' && ting.maengde > 0) ?? false);
     let harSkovl = $derived(spilTilstand.mitUdstyr?.some((ting) => (ting.id === 'skovl' || ting.id === 'mesterskovl') && ting.maengde > 0) ?? false);
     let graveIkon = $derived(harMesterskovl ? itemDB.mesterskovl.billede : harSkovl ? itemDB.skovl.billede : '/ui/haandgrav.webp');
-    let graveNavn = $derived(harMesterskovl ? itemNavn('mesterskovl') : harSkovl ? itemNavn('skovl') : tekst('Grav med hænderne', 'Dig with hands'));
-    let graveAlt = $derived(kanGrave ? (harSkovl ? tekst(`Grav med ${harMesterskovl ? 'mesterskovl' : 'skovl'}`, `Dig with ${harMesterskovl ? 'master shovel' : 'shovel'}`) : tekst('Grav med hænderne', 'Dig with hands')) : tekst('Her kan ikke graves', 'You cannot dig here'));
+    let graveNavn = $derived(harMesterskovl ? itemNavn('mesterskovl') : harSkovl ? itemNavn('skovl') : tekst('Grav med hænderne', 'Dig by hand'));
+    let graveAlt = $derived(kanGrave ? (harSkovl ? tekst(`Grav med ${harMesterskovl ? 'mesterskovl' : 'skovl'}`, `Dig with ${harMesterskovl ? 'master shovel' : 'shovel'}`) : tekst('Grav med hænderne', 'Dig by hand')) : tekst('Du kan ikke grave her', 'You cannot dig here'));
     let graveEnergiPris = $derived(spilTilstand.valgtKarakter?.digCost ?? 3);
     let haandGraveEnergiPris = $derived(graveEnergiPris + 4);
     let haandGraveSkade = $derived(spilTilstand.beregnSkade(4));
-    let hpHjaelp = $derived(tekst('Dit helbred. På land kollapser du normalt ved 0 HP. I tåge eller vand dør du, medmindre en livseliksir redder dig først. Mad giver +20 HP.', 'Your health. On land you normally collapse at 0 HP. In fog or water you die unless a life elixir saves you first. Food gives +20 HP.'));
+    let hpHjaelp = $derived(tekst('Dit helbred. Ved 0 HP kollapser du normalt på land, men dør i tåge og vand. En livseliksir kan redde dig fra dødelig skade, og en madration genvinder 20 HP.', 'Your health. At 0 HP, you normally collapse on land but die in fog and water. A life elixir can save you from lethal damage, and a food ration restores 20 HP.'));
     let energiHjaelp = $derived(
         spilTilstand.gratisNaesteBevaegelse
             ? (spilTilstand.gratisBevaegelseKilde === 'bersaerk'
-                ? tekst('Din næste energikrævende handling koster 0 energi på grund af bersærkergang.', 'Your next energy-costing action costs 0 energy because of berserk.')
-                : tekst('Din næste bevægelse koster 0 energi på grund af mad.', 'Your next move costs 0 energy because of food.'))
-            : tekst('Energi bruges på bevægelse, gravning og visse handlinger. Når energien løber tør, går dagen videre efter handlingen.', 'Energy is used for movement, digging and some actions. When energy runs out, the day advances after the action.')
+                ? tekst('Bersærkergangen gør din næste handling med energiforbrug gratis.', 'Your berserk rage makes your next action with an energy cost free.')
+                : tekst('Madrationen gør din næste bevægelse gratis.', 'The food ration makes your next move free.'))
+            : tekst('Du bruger energi på at bevæge dig, grave og udføre visse handlinger. Når energien slipper op, slutter dagen efter din handling.', 'You spend energy to move, dig and perform certain actions. When your energy runs out, the day ends after your action.')
     );
     let graveHjaelp = $derived.by(() => {
-        if (!kanGrave) return tekst('Du kan ikke grave på dette felt lige nu.', 'You cannot dig on this field right now.');
-        if (harMesterskovl) return tekst(`Graver for ${graveEnergiPris} energi. Mesterskovlen giver normalt dobbelt guld og finder nedgravede fælder uden skade.`, `Dig for ${graveEnergiPris} energy. The master shovel normally gives double gold and finds buried traps without damage.`);
-        if (harSkovl) return tekst(`Graver for ${graveEnergiPris} energi. Nedgravede fælder udløses stadig.`, `Dig for ${graveEnergiPris} energy. Buried traps still trigger.`);
-        return tekst(`Graver med hænderne for ${haandGraveEnergiPris} energi og ${haandGraveSkade} HP. Nedgravede fælder kan stadig udløses.`, `Dig with hands for ${haandGraveEnergiPris} energy and ${haandGraveSkade} HP. Buried traps can still trigger.`);
+        if (!kanGrave) return tekst('Du kan ikke grave på dette felt lige nu.', 'You cannot dig on this tile right now.');
+        if (harMesterskovl) return tekst(`Koster ${graveEnergiPris} energi. Mesterskovlen giver normalt dobbelt guld og finder nedgravede fælder uden at udløse dem.`, `Costs ${graveEnergiPris} energy. The master shovel normally gives double gold and finds buried traps without triggering them.`);
+        if (harSkovl) return tekst(`Koster ${graveEnergiPris} energi. Nedgravede fælder kan stadig blive udløst.`, `Costs ${graveEnergiPris} energy. Buried traps can still be triggered.`);
+        return tekst(`Koster ${haandGraveEnergiPris} energi og ${haandGraveSkade} HP at grave med hænderne. Nedgravede fælder kan stadig blive udløst.`, `Costs ${haandGraveEnergiPris} energy and ${haandGraveSkade} HP to dig by hand. Buried traps can still be triggered.`);
     });
     const hvileBiomer = ['eng', 'skov', 'mark', 'bjerg', 'hoejland'];
 
@@ -64,7 +64,7 @@
         const harGratisBevaegelse = spilTilstand.gratisNaesteBevaegelse;
 
         if (fuldHp && harGratisBevaegelse) {
-            spilTilstand.logBesked = tekst('Du er allerede mæt og fuldt udhvilet.', 'You are already fed and fully rested.');
+            spilTilstand.logBesked = tekst('Du har fuld HP, og din næste bevægelse er allerede gratis.', 'You have full HP, and your next move is already free.');
             return;
         }
 
@@ -76,8 +76,8 @@
         spilTilstand.gratisBevaegelseKilde = 'mad';
         const faktiskHeling = spilTilstand.livspoint - foerHp;
         spilTilstand.logBesked = tekst(
-            `Du spiser din madration. (+${faktiskHeling} HP, næste bevægelse koster 0 energi)`,
-            `You eat your food ration. (+${faktiskHeling} HP, next move costs 0 energy)`
+            `Du spiser madrationen og genvinder ${faktiskHeling} HP. Din næste bevægelse er gratis.`,
+            `You eat the food ration and recover ${faktiskHeling} HP. Your next move is free.`
         );
         syncTilDb();
     }
@@ -150,18 +150,18 @@
 
     function diamantForklaring(vare: RygsækTing) {
         const vaerdier = diamantVaerdier(vare);
-        if (vaerdier.length === 0) return tekst('En sjælden ædelsten. Den kan sælges i butikker.', 'A rare gem. It can be sold in shops.');
+        if (vaerdier.length === 0) return tekst('En sjælden ædelsten, som kan sælges i butikker.', 'A rare gem that can be sold in shops.');
         if (vaerdier.length === 1) {
             const stoerrelse = diamantStoerrelsesNavn(vaerdier[0]);
             const enStoerrelse = stoerrelse === 'enorm' ? 'huge' : stoerrelse === 'stor' ? 'large' : 'small';
-            return tekst(`Det er en ${stoerrelse} diamant til ${vaerdier[0]} guld. I butikker får du 75% af værdien.`, `It is a ${enStoerrelse} diamond worth ${vaerdier[0]} gold. Shops pay 75% of the value.`);
+            return tekst(`En ${stoerrelse} diamant med en værdi på ${vaerdier[0]} guld. Butikker betaler 75 % af værdien.`, `A ${enStoerrelse} diamond worth ${vaerdier[0]} gold. Shops pay 75% of its value.`);
         }
-        const danskeStoerrelser = vaerdier.map((vaerdi) => `${diamantStoerrelsesNavn(vaerdi)} ${vaerdi}`).join(', ');
+        const danskeStoerrelser = vaerdier.map((vaerdi) => `${diamantStoerrelsesNavn(vaerdi)} (${vaerdi} guld)`).join(', ');
         const engelskeStoerrelser = vaerdier.map((vaerdi) => {
             const stoerrelse = diamantStoerrelsesNavn(vaerdi);
-            return `${stoerrelse === 'enorm' ? 'huge' : stoerrelse === 'stor' ? 'large' : 'small'} ${vaerdi}`;
+            return `${stoerrelse === 'enorm' ? 'huge' : stoerrelse === 'stor' ? 'large' : 'small'} (${vaerdi} gold)`;
         }).join(', ');
-        return tekst(`${vaerdier.length} diamanter, samlet værdi ${diamantSamletVaerdi(vare)} guld. Størrelser: ${danskeStoerrelser}. I butikker sælges de samlet for 75% af værdien.`, `${vaerdier.length} diamonds, total value ${diamantSamletVaerdi(vare)} gold. Sizes: ${engelskeStoerrelser}. Shops buy them together for 75% of the value.`);
+        return tekst(`${vaerdier.length} diamanter med en samlet værdi på ${diamantSamletVaerdi(vare)} guld: ${danskeStoerrelser}. Butikker betaler 75 % af den samlede værdi.`, `${vaerdier.length} diamonds worth ${diamantSamletVaerdi(vare)} gold in total: ${engelskeStoerrelser}. Shops pay 75% of the combined value.`);
     }
 
     function vareBadgeTekst(vare: RygsækTing) {
@@ -174,15 +174,15 @@
         if (!info) return tekst('Ukendt genstand.', 'Unknown item.');
 
         if (vareId === 'metaldetektor' || vareId === 'malmviser') {
-            return `${itemBeskrivelse(vareId)} ${tekst('Den virker passivt, mens du bevæger dig.', 'It works passively while you move.')}`;
+            return `${itemBeskrivelse(vareId)} ${tekst('Virker automatisk, mens du bevæger dig.', 'Works automatically while you move.')}`;
         }
 
         if (vareId === 'soegekvist' || vareId === 'runekvist') {
-            return `${itemBeskrivelse(vareId)} ${tekst('Den virker passivt, mens du bevæger dig.', 'It works passively while you move.')}`;
+            return `${itemBeskrivelse(vareId)} ${tekst('Virker automatisk, mens du bevæger dig.', 'Works automatically while you move.')}`;
         }
 
         if (vareId === 'livseliksir') {
-            return `${itemBeskrivelse(vareId)} ${tekst('Den bruges automatisk ved dødelig skade.', 'It is used automatically on lethal damage.')}`;
+            return `${itemBeskrivelse(vareId)} ${tekst('Du behøver ikke selv aktivere den.', 'You do not need to activate it yourself.')}`;
         }
 
         if (vareId === 'diamant') {
@@ -190,10 +190,10 @@
         }
 
         const status = aktiv
-            ? tekst('Den kan bruges lige nu.', 'It can be used right now.')
+            ? tekst('Kan bruges nu.', 'Can be used now.')
             : erSituationsVare(vareId)
-                ? tekst('Den kan ikke bruges i den nuværende situation.', 'It cannot be used in the current situation.')
-                : tekst('Effekten virker automatisk eller i events; den skal ikke aktiveres fra inventory.', 'The effect works automatically or in events; it does not need to be activated from the inventory.');
+                ? tekst('Kan ikke bruges her.', 'Cannot be used here.')
+                : tekst('Virker automatisk eller giver særlige valgmuligheder. Den kan ikke aktiveres direkte fra rygsækken.', 'Works automatically or unlocks special choices. It cannot be activated directly from the backpack.');
 
         return `${itemBeskrivelse(vareId)} ${status}`;
     }
@@ -215,7 +215,7 @@
                 <span class="status-value">{spilTilstand.livspoint}</span>
             </div>
             
-            <div class="status-item" data-help-title={tekst('Guld', 'Gold')} data-help-body={tekst('Guld bruges i butikker og tæller med i score. Nogle karakterer tjener mere eller mindre guld.', 'Gold is used in shops and counts toward score. Some characters earn more or less gold.')}>
+            <div class="status-item" data-help-title={tekst('Guld', 'Gold')} data-help-body={tekst('Guld kan bruges i butikker og tæller med i din endelige score. Din karakter og dit tøj kan ændre, hvor meget du tjener.', 'Gold can be spent in shops and counts toward your final score. Your character and clothes can change how much you earn.')}>
                 <img src="/inventory/guld.webp" alt={tekst('Guld', 'Gold')} class="status-icon" />
                 <span class="status-value">{spilTilstand.guldTotal}</span>
             </div>

@@ -50,23 +50,23 @@
 
 <div class="vente-overlay">
     <div class="vente-content">
-        <h2>{tekst('Tiden står stille', 'Time stands still')}</h2>
+        <h2>{tekst('Mens du venter', 'While you wait')}</h2>
         <div class="imp-timer" class:udloebet={impTidUdlobet}>
             {#if impTidUdlobet}
-                {tekst('Impen pakker sammen efter denne runde', 'The imp packs up after this round')}
+                {tekst('Sidste runde – impen pakker kortene væk', 'Last round – the imp is putting the cards away')}
             {:else}
-                {tekst(`Impen bliver i ${sekunderTilbage} sekunder`, `The imp stays for ${sekunderTilbage} seconds`)}
+                {tekst(`Impen går om ${sekunderTilbage} sekunder`, `The imp leaves in ${sekunderTilbage} seconds`)}
             {/if}
         </div>
         <p class="vente-desc">
-            {tekst('Du har slået lejr', 'You have made camp')}
+            {tekst('Du er', 'You are')}
             <strong style="color: gold;">{dageForan} {dageForan === 1 ? tekst('dag', 'day') : tekst('dage', 'days')}</strong>
-            {tekst('foran den langsomste på øen. En imp dukker pludselig op med et magisk kortspil.', 'ahead of the slowest player on the island. An imp suddenly appears with a magic card game.')}
+            {tekst('foran den langsomste spiller. Imens lægger en imp fire kort på bordet.', 'ahead of the slowest player. Meanwhile, an imp lays four cards on the table.')}
             <br><br>
             <strong>{tekst('Regler:', 'Rules:')}</strong>
             {tekst(
-                `Impen bliver højst ${Math.round(VENTE_MAKS_MS / 1000)} sekunder. Du får én gratis runde pr. felt. Du kan først få en ny gratis runde, når du har flyttet dig. På samme felt kan du selv købe flere runder for 5 guld. Træk kort for at vinde guld eller helbred. Trækker du kraniet, mister du alt det, du har vundet i denne runde.`,
-                `The imp stays for at most ${Math.round(VENTE_MAKS_MS / 1000)} seconds. You get one free round per field. You can only get a new free round after moving. On the same field, you can buy more rounds for 5 gold. Draw cards to win gold or health. If you draw the skull, you lose everything won in this round.`
+                `Impen bliver højst ${Math.round(VENTE_MAKS_MS / 1000)} sekunder. Første runde på hvert felt er gratis; derefter koster en ny runde 5 guld. Vend kort og saml guld og HP. Finder du kraniet, mister du det, du har samlet i den aktuelle runde. Din sikrede pulje er i sikkerhed.`,
+                `The imp stays for at most ${Math.round(VENTE_MAKS_MS / 1000)} seconds. The first round on each tile is free; after that, a new round costs 5 gold. Turn cards to collect gold and HP. If you find the skull, you lose what you collected in the current round. Your secured pot is safe.`
             )}
         </p>
 
@@ -107,7 +107,7 @@
         <div class="handling-sektion">
             {#if spilTilstand.venteFase === 'spiller' || spilTilstand.venteFase === 'viser_gevinst'}
                 {#if spilTilstand.ventePuljeLiv > 0 || spilTilstand.ventePuljeGuld > 0}
-                    <button class="vente-btn stop-btn" onclick={stopVenteSpil}>{tekst('Stop og behold puljen', 'Stop and keep the pot')}</button>
+                    <button class="vente-btn stop-btn" onclick={stopVenteSpil}>{tekst('Sikr puljen', 'Secure the pot')}</button>
                 {/if}
             {:else if spilTilstand.venteFase === 'tabt' || spilTilstand.venteFase === 'vundet' || spilTilstand.venteFase === 'venter' || spilTilstand.venteFase === 'trukket'}
                 {#if kanStarteRunde}
@@ -116,11 +116,11 @@
                         disabled={!kanBetaleNaesteRunde}
                         onclick={() => startVenteSpil(true)}
                     >
-                        {naesteRundeErGratis ? tekst('Start første runde (Gratis)', 'Start first round (Free)') : tekst('Start ny runde (Koster 5 Guld)', 'Start new round (Costs 5 Gold)')}
+                        {naesteRundeErGratis ? tekst('Spil gratis', 'Play for free') : tekst('Spil igen · 5 guld', 'Play again · 5 gold')}
                     </button>
                 {:else}
                     <button class="vente-btn udsolgt-btn" disabled>
-                        {impTidUdlobet ? tekst('Impen pakker sammen.', 'The imp is packing up.') : tekst('De andre er ved at pakke bordet sammen.', 'The others are packing up the table.')}
+                        {impTidUdlobet ? tekst('Impen pakker sammen', 'The imp is packing up') : tekst('Runden slutter', 'The round is ending')}
                     </button>
                 {/if}
             {/if}
