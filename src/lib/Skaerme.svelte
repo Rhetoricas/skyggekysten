@@ -2047,7 +2047,7 @@
     <div class="tavle">
         <img src="/screens/boardglobal.webp" alt={tekst('Ugens globale topliste', "This week's global leaderboard")} class="tavle-billede" />
         <div class="tavle-indhold global-indhold">
-            <h3>{tekst('Ugens topliste · uge', 'Weekly leaderboard · week')} {aktuelIsoUge()}</h3>
+            <h3 class="uge-titel">{tekst('Topliste · uge', 'Leaderboard · week')} {aktuelIsoUge()}</h3>
             {#if ugensGlobaleScores.length === 0}
                 <p class="tom-liste">{tekst('Ingen resultater endnu i denne uge', 'No results yet this week')}</p>
             {:else}
@@ -3913,6 +3913,7 @@
     .tavle-billede { width: 100%; }
     .tavle-indhold { position: absolute; width: 76%; left: 12%; top: 12%; color: #eee; }
     .tavle-indhold h3 { color: #fff; font-size: 1rem; text-align: center; font-family: 'Cinzel', serif; margin-top: 0;}
+    .tavle-indhold h3.uge-titel { font-size: clamp(0.72rem, 4vw, 0.9rem); white-space: nowrap; }
     .tavle-indhold ol { padding: 0; list-style: none; }
     .tavle-indhold li { border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 0; font-size: 0.85rem; }
     .highscore-række {
