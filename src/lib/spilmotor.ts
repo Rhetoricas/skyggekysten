@@ -2708,10 +2708,10 @@ export async function sendSynSignal(centerIndex: number, radius: number, fokusIn
     }).catch((error) => console.warn('Synssignal kunne ikke sendes', error));
 }
 
-export function taendBaal() {
+export function taendBaal(fakkelId: 'fakkel' | 'solfakkel') {
     if (spilTilstand.erBevidstløs || !spilTilstand.valgtKarakter) return;
-    
-    const fakkel = spilTilstand.mitUdstyr.find(i => i.id === 'fakkel' || i.id === 'solfakkel');
+
+    const fakkel = spilTilstand.mitUdstyr.find(i => i.id === fakkelId);
     if (!fakkel || fakkel.maengde <= 0) return;
 
     const erSolfakkel = fakkel.id === 'solfakkel';

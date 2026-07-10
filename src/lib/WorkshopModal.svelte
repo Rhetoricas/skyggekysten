@@ -58,7 +58,7 @@
     let kanOpgradereFintToej = $derived(harFintToej && !harRoyaltToej && kanBetaleVaerkstedPris(ROYALT_TOEJ_OPGRADERING_PRIS));
     let harFakkel = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'fakkel' && ting.maengde > 0));
     let harSolfakkel = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'solfakkel' && ting.maengde > 0));
-    let kanOpgradereFakkel = $derived(harFakkel && kanBetaleVaerkstedPris(FAKKEL_OPGRADERING_PRIS));
+    let kanOpgradereFakkel = $derived(harFakkel && !harSolfakkel && kanBetaleVaerkstedPris(FAKKEL_OPGRADERING_PRIS));
     let harDetektor = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'metaldetektor' && ting.maengde > 0));
     let harMalmviser = $derived(spilTilstand.mitUdstyr.some(ting => ting.id === 'malmviser' && ting.maengde > 0));
     let kanOpgradereDetektor = $derived(harDetektor && !harMalmviser && kanBetaleVaerkstedPris(DETEKTOR_OPGRADERING_PRIS));
@@ -411,6 +411,11 @@
     }
 
     function opgraderFakkel() {
+        if (harSolfakkel) {
+            spilTilstand.logBesked = tekst('Du har allerede en solfakkel. Værkstedet opgraderer ikke flere fakler.', 'You already have a sun torch. The workshop will not upgrade another torch.');
+            return;
+        }
+
         if (!harFakkel) {
             spilTilstand.logBesked = tekst('Du har ingen almindelig fakkel at opgradere.', 'You do not have a regular torch to upgrade.');
             return;
@@ -624,7 +629,7 @@
             fraId: 'fakkel',
             tilId: 'solfakkel',
             pris: FAKKEL_OPGRADERING_PRIS,
-            harBasis: harFakkel,
+            harBasis: harFakkel && !harSolfakkel,
             kanOpgradere: kanOpgradereFakkel,
             kortTekst: tekst('Du ser 2 felter længere. Solbålet afslører et større område for alle, giver fuld HP og 100 guld.', 'You see 2 tiles farther. The sunfire reveals a larger area for everyone, gives full HP and 100 gold.'),
             helpTitle: tekst('Fakkel-opgradering', 'Torch upgrade'),

@@ -17,28 +17,28 @@ src/lib/BottomUI.svelte:3400:3440:string:ms3hz3	src/lib/BottomUI.svelte	string	s
 src/lib/BottomUI.svelte:3444:3482:string:tr435s	src/lib/BottomUI.svelte	string	string @ 41:82	You cannot dig on this tile right now.
 src/lib/BottomUI.svelte:5314:5372:string:zj4ont	src/lib/BottomUI.svelte	string	string @ 67:45	Du har fuld HP, og din næste bevægelse er allerede gratis.
 src/lib/BottomUI.svelte:5376:5429:string:16c4q2x	src/lib/BottomUI.svelte	string	string @ 67:107	You have full HP, and your next move is already free.
-src/lib/BottomUI.svelte:8887:8934:string:s0ei2	src/lib/BottomUI.svelte	string	string @ 153:50	En sjælden ædelsten, som kan sælges i butikker.
-src/lib/BottomUI.svelte:8938:8975:string:1vj8v5r	src/lib/BottomUI.svelte	string	string @ 153:101	A rare gem that can be sold in shops.
-src/lib/BottomUI.svelte:10473:10489:string:bxxjui	src/lib/BottomUI.svelte	string	string @ 174:34	Ukendt genstand.
-src/lib/BottomUI.svelte:10493:10506:string:14a35di	src/lib/BottomUI.svelte	string	string @ 174:54	Unknown item.
-src/lib/BottomUI.svelte:11383:11397:string:19gk4qi	src/lib/BottomUI.svelte	string	string @ 193:22	Kan bruges nu.
-src/lib/BottomUI.svelte:11401:11417:string:ahhvvj	src/lib/BottomUI.svelte	string	string @ 193:40	Can be used now.
-src/lib/BottomUI.svelte:11484:11504:string:pa9jas	src/lib/BottomUI.svelte	string	string @ 195:26	Kan ikke bruges her.
-src/lib/BottomUI.svelte:11508:11528:string:ckzt2s	src/lib/BottomUI.svelte	string	string @ 195:50	Cannot be used here.
-src/lib/BottomUI.svelte:11556:11655:string:1wdor4h	src/lib/BottomUI.svelte	string	string @ 196:26	Virker automatisk eller giver særlige valgmuligheder. Den kan ikke aktiveres direkte fra rygsækken.
-src/lib/BottomUI.svelte:11659:11757:string:360ceu	src/lib/BottomUI.svelte	string	string @ 196:129	Works automatically or unlocks special choices. It cannot be activated directly from the backpack.
-src/lib/BottomUI.svelte:12433:12436:string:18mlmb4	src/lib/BottomUI.svelte	string	string @ 214:59	Liv
-src/lib/BottomUI.svelte:12440:12446:string:16a2x0v	src/lib/BottomUI.svelte	string	string @ 214:66	Health
-src/lib/BottomUI.svelte:12641:12645:string:1qxrbj5	src/lib/BottomUI.svelte	string	string @ 218:62	Guld
-src/lib/BottomUI.svelte:12649:12653:string:u4l1gz	src/lib/BottomUI.svelte	string	string @ 218:70	Gold
-src/lib/BottomUI.svelte:12680:12799:string:1mfea2p	src/lib/BottomUI.svelte	string	string @ 218:101	Guld kan bruges i butikker og tæller med i din endelige score. Din karakter og dit tøj kan ændre, hvor meget du tjener.
-src/lib/BottomUI.svelte:12803:12922:string:n7x4my	src/lib/BottomUI.svelte	string	string @ 218:224	Gold can be spent in shops and counts toward your final score. Your character and clothes can change how much you earn.
-src/lib/BottomUI.svelte:12987:12991:string:1qxrbj5	src/lib/BottomUI.svelte	string	string @ 219:61	Guld
-src/lib/BottomUI.svelte:12995:12999:string:u4l1gz	src/lib/BottomUI.svelte	string	string @ 219:69	Gold
-src/lib/BottomUI.svelte:13193:13199:string:1zgkud	src/lib/BottomUI.svelte	string	string @ 223:65	Energi
-src/lib/BottomUI.svelte:13203:13209:string:6fa7xx	src/lib/BottomUI.svelte	string	string @ 223:75	Energy
-src/lib/BottomUI.svelte:17833:17839:string:xlvu1w	src/lib/BottomUI.svelte	string	string @ 332:23	Cinzel
-src/lib/BottomUI.svelte:18287:18293:string:xlvu1w	src/lib/BottomUI.svelte	string	string @ 349:23	Cinzel
+src/lib/BottomUI.svelte:8893:8940:string:s0ei2	src/lib/BottomUI.svelte	string	string @ 153:50	En sjælden ædelsten, som kan sælges i butikker.
+src/lib/BottomUI.svelte:8944:8981:string:1vj8v5r	src/lib/BottomUI.svelte	string	string @ 153:101	A rare gem that can be sold in shops.
+src/lib/BottomUI.svelte:10479:10495:string:bxxjui	src/lib/BottomUI.svelte	string	string @ 174:34	Ukendt genstand.
+src/lib/BottomUI.svelte:10499:10512:string:14a35di	src/lib/BottomUI.svelte	string	string @ 174:54	Unknown item.
+src/lib/BottomUI.svelte:11389:11403:string:19gk4qi	src/lib/BottomUI.svelte	string	string @ 193:22	Kan bruges nu.
+src/lib/BottomUI.svelte:11407:11423:string:ahhvvj	src/lib/BottomUI.svelte	string	string @ 193:40	Can be used now.
+src/lib/BottomUI.svelte:11490:11510:string:pa9jas	src/lib/BottomUI.svelte	string	string @ 195:26	Kan ikke bruges her.
+src/lib/BottomUI.svelte:11514:11534:string:ckzt2s	src/lib/BottomUI.svelte	string	string @ 195:50	Cannot be used here.
+src/lib/BottomUI.svelte:11562:11661:string:1wdor4h	src/lib/BottomUI.svelte	string	string @ 196:26	Virker automatisk eller giver særlige valgmuligheder. Den kan ikke aktiveres direkte fra rygsækken.
+src/lib/BottomUI.svelte:11665:11763:string:360ceu	src/lib/BottomUI.svelte	string	string @ 196:129	Works automatically or unlocks special choices. It cannot be activated directly from the backpack.
+src/lib/BottomUI.svelte:12439:12442:string:18mlmb4	src/lib/BottomUI.svelte	string	string @ 214:59	Liv
+src/lib/BottomUI.svelte:12446:12452:string:16a2x0v	src/lib/BottomUI.svelte	string	string @ 214:66	Health
+src/lib/BottomUI.svelte:12647:12651:string:1qxrbj5	src/lib/BottomUI.svelte	string	string @ 218:62	Guld
+src/lib/BottomUI.svelte:12655:12659:string:u4l1gz	src/lib/BottomUI.svelte	string	string @ 218:70	Gold
+src/lib/BottomUI.svelte:12686:12805:string:1mfea2p	src/lib/BottomUI.svelte	string	string @ 218:101	Guld kan bruges i butikker og tæller med i din endelige score. Din karakter og dit tøj kan ændre, hvor meget du tjener.
+src/lib/BottomUI.svelte:12809:12928:string:n7x4my	src/lib/BottomUI.svelte	string	string @ 218:224	Gold can be spent in shops and counts toward your final score. Your character and clothes can change how much you earn.
+src/lib/BottomUI.svelte:12993:12997:string:1qxrbj5	src/lib/BottomUI.svelte	string	string @ 219:61	Guld
+src/lib/BottomUI.svelte:13001:13005:string:u4l1gz	src/lib/BottomUI.svelte	string	string @ 219:69	Gold
+src/lib/BottomUI.svelte:13199:13205:string:1zgkud	src/lib/BottomUI.svelte	string	string @ 223:65	Energi
+src/lib/BottomUI.svelte:13209:13215:string:6fa7xx	src/lib/BottomUI.svelte	string	string @ 223:75	Energy
+src/lib/BottomUI.svelte:17839:17845:string:xlvu1w	src/lib/BottomUI.svelte	string	string @ 332:23	Cinzel
+src/lib/BottomUI.svelte:18293:18299:string:xlvu1w	src/lib/BottomUI.svelte	string	string @ 349:23	Cinzel
 src/lib/EventModal.svelte:2591:2601:string:mqpeml	src/lib/EventModal.svelte	string	string @ 64:50	Mister tøj
 src/lib/EventModal.svelte:2605:2617:string:ox0mxs	src/lib/EventModal.svelte	string	string @ 64:64	Lose clothes
 src/lib/EventModal.svelte:2673:2686:string:xocl3j	src/lib/EventModal.svelte	string	string @ 65:53	Risikerer tøj
@@ -994,405 +994,407 @@ src/lib/VenteModal.svelte:6388:6407:string:8eooqt	src/lib/VenteModal.svelte	stri
 src/lib/VenteModal.svelte:6411:6432:string:1hnshpa	src/lib/VenteModal.svelte	string	string @ 123:72	The imp is packing up
 src/lib/VenteModal.svelte:6444:6458:string:1nhp86g	src/lib/VenteModal.svelte	string	string @ 123:105	Runden slutter
 src/lib/VenteModal.svelte:6462:6481:string:toncn3	src/lib/VenteModal.svelte	string	string @ 123:123	The round is ending
-src/lib/WorkshopModal.svelte:6494:6572:string:1ypprgi	src/lib/WorkshopModal.svelte	string	string @ 82:18	 Mesteren ser din titel og nøjes med beløbet. Ingen på værkstedet protesterer.
-src/lib/WorkshopModal.svelte:6592:6675:string:zcrvhk	src/lib/WorkshopModal.svelte	string	string @ 83:18	 The master sees your title and accepts the amount. No one in the workshop objects.
-src/lib/WorkshopModal.svelte:8507:8540:string:1fh9thd	src/lib/WorkshopModal.svelte	string	string @ 129:45	Din skovl er allerede opgraderet.
-src/lib/WorkshopModal.svelte:8544:8576:string:13ov3tp	src/lib/WorkshopModal.svelte	string	string @ 129:82	Your shovel is already upgraded.
-src/lib/WorkshopModal.svelte:8680:8723:string:13uzv9b	src/lib/WorkshopModal.svelte	string	string @ 134:45	Du har ingen almindelig skovl at opgradere.
-src/lib/WorkshopModal.svelte:8727:8771:string:1gwzv7t	src/lib/WorkshopModal.svelte	string	string @ 134:92	You do not have a regular shovel to upgrade.
-src/lib/WorkshopModal.svelte:8913:8954:string:tcbiz1	src/lib/WorkshopModal.svelte	string	string @ 139:45	Du mangler guld til at opgradere skovlen.
-src/lib/WorkshopModal.svelte:8958:8999:string:spcram	src/lib/WorkshopModal.svelte	string	string @ 139:90	You need more gold to upgrade the shovel.
-src/lib/WorkshopModal.svelte:9378:9459:string:7pxdli	src/lib/WorkshopModal.svelte	string	string @ 149:41	Værkstedet afbalancerer skaftet og hærder bladet. Din skovl er nu en mesterskovl.
-src/lib/WorkshopModal.svelte:9463:9554:string:1qdjn0i	src/lib/WorkshopModal.svelte	string	string @ 149:126	The workshop balances the handle and hardens the blade. Your shovel is now a master shovel.
-src/lib/WorkshopModal.svelte:9696:9728:string:16n3jcs	src/lib/WorkshopModal.svelte	string	string @ 155:45	Din stav er allerede opgraderet.
-src/lib/WorkshopModal.svelte:9732:9763:string:1nr7pay	src/lib/WorkshopModal.svelte	string	string @ 155:81	Your staff is already upgraded.
-src/lib/WorkshopModal.svelte:9866:9908:string:1t03nkm	src/lib/WorkshopModal.svelte	string	string @ 160:45	Du har ingen almindelig stav at opgradere.
-src/lib/WorkshopModal.svelte:9912:9955:string:1r6xh3q	src/lib/WorkshopModal.svelte	string	string @ 160:91	You do not have a regular staff to upgrade.
-src/lib/WorkshopModal.svelte:10096:10136:string:e9imjk	src/lib/WorkshopModal.svelte	string	string @ 165:45	Du mangler guld til at opgradere staven.
-src/lib/WorkshopModal.svelte:10140:10180:string:12yfbof	src/lib/WorkshopModal.svelte	string	string @ 165:89	You need more gold to upgrade the staff.
-src/lib/WorkshopModal.svelte:10553:10620:string:857vng	src/lib/WorkshopModal.svelte	string	string @ 175:41	Mesteren sætter en glødende kerne i staven. Den er nu en dragestav.
-src/lib/WorkshopModal.svelte:10624:10696:string:8qbkc7	src/lib/WorkshopModal.svelte	string	string @ 175:112	The master fits a glowing core into the staff. It is now a dragon staff.
-src/lib/WorkshopModal.svelte:10839:10876:string:1v16pz6	src/lib/WorkshopModal.svelte	string	string @ 181:45	Din søgekvist er allerede opgraderet.
-src/lib/WorkshopModal.svelte:10880:10917:string:1treolk	src/lib/WorkshopModal.svelte	string	string @ 181:86	Your dowsing rod is already upgraded.
-src/lib/WorkshopModal.svelte:11021:11057:string:1b76zos	src/lib/WorkshopModal.svelte	string	string @ 186:45	Du har ingen søgekvist at opgradere.
-src/lib/WorkshopModal.svelte:11061:11102:string:krsgqw	src/lib/WorkshopModal.svelte	string	string @ 186:85	You do not have a dowsing rod to upgrade.
-src/lib/WorkshopModal.svelte:11244:11289:string:sqcvk	src/lib/WorkshopModal.svelte	string	string @ 191:45	Du mangler guld til at opgradere søgekvisten.
-src/lib/WorkshopModal.svelte:11293:11339:string:1ivomzp	src/lib/WorkshopModal.svelte	string	string @ 191:94	You need more gold to upgrade the dowsing rod.
-src/lib/WorkshopModal.svelte:11719:11796:string:zfl7kw	src/lib/WorkshopModal.svelte	string	string @ 201:41	Værkstedet skærer runer i kvisten. Den kan nu trække rødder op uden at grave.
-src/lib/WorkshopModal.svelte:11800:11879:string:dv09r8	src/lib/WorkshopModal.svelte	string	string @ 201:122	The workshop cuts runes into the rod. It can now pull up roots without digging.
-src/lib/WorkshopModal.svelte:12022:12054:string:15ct878	src/lib/WorkshopModal.svelte	string	string @ 207:45	Din dirk er allerede opgraderet.
-src/lib/WorkshopModal.svelte:12058:12092:string:wckttu	src/lib/WorkshopModal.svelte	string	string @ 207:81	Your lockpick is already upgraded.
-src/lib/WorkshopModal.svelte:12195:12237:string:9tkbee	src/lib/WorkshopModal.svelte	string	string @ 212:45	Du har ingen almindelig dirk at opgradere.
-src/lib/WorkshopModal.svelte:12241:12287:string:v76r9g	src/lib/WorkshopModal.svelte	string	string @ 212:91	You do not have a regular lockpick to upgrade.
-src/lib/WorkshopModal.svelte:12428:12468:string:12dj1k8	src/lib/WorkshopModal.svelte	string	string @ 217:45	Du mangler guld til at opgradere dirken.
-src/lib/WorkshopModal.svelte:12472:12515:string:rkkgfx	src/lib/WorkshopModal.svelte	string	string @ 217:89	You need more gold to upgrade the lockpick.
-src/lib/WorkshopModal.svelte:12890:12982:string:n4kio4	src/lib/WorkshopModal.svelte	string	string @ 227:41	Mesteren sliber dirkens tænder og bygger fine fjedre ind i skaftet. Den er nu en mesterdirk.
-src/lib/WorkshopModal.svelte:12986:13093:string:1qafl1k	src/lib/WorkshopModal.svelte	string	string @ 227:137	The master sharpens the lockpick’s teeth and fits fine springs into its shaft. It is now a master lockpick.
-src/lib/WorkshopModal.svelte:13236:13268:string:1g2qgii	src/lib/WorkshopModal.svelte	string	string @ 233:45	Din kniv er allerede opgraderet.
-src/lib/WorkshopModal.svelte:13272:13303:string:1kwewz	src/lib/WorkshopModal.svelte	string	string @ 233:81	Your knife is already upgraded.
-src/lib/WorkshopModal.svelte:13406:13448:string:1gl5lxc	src/lib/WorkshopModal.svelte	string	string @ 238:45	Du har ingen almindelig kniv at opgradere.
-src/lib/WorkshopModal.svelte:13452:13495:string:nvovxd	src/lib/WorkshopModal.svelte	string	string @ 238:91	You do not have a regular knife to upgrade.
-src/lib/WorkshopModal.svelte:13636:13676:string:845dvm	src/lib/WorkshopModal.svelte	string	string @ 243:45	Du mangler guld til at opgradere kniven.
-src/lib/WorkshopModal.svelte:13680:13720:string:v7asva	src/lib/WorkshopModal.svelte	string	string @ 243:89	You need more gold to upgrade the knife.
-src/lib/WorkshopModal.svelte:14095:14173:string:7tl629	src/lib/WorkshopModal.svelte	string	string @ 253:41	Værkstedet hærder bladet og afbalancerer grebet. Din kniv er nu en mesterkniv.
-src/lib/WorkshopModal.svelte:14177:14264:string:11joz1g	src/lib/WorkshopModal.svelte	string	string @ 253:123	The workshop hardens the blade and balances the grip. Your knife is now a master knife.
-src/lib/WorkshopModal.svelte:14412:14448:string:toxvtk	src/lib/WorkshopModal.svelte	string	string @ 259:45	Din rustning er allerede opgraderet.
-src/lib/WorkshopModal.svelte:14452:14483:string:16up0td	src/lib/WorkshopModal.svelte	string	string @ 259:85	Your armor is already upgraded.
-src/lib/WorkshopModal.svelte:14590:14636:string:xq7ipi	src/lib/WorkshopModal.svelte	string	string @ 264:45	Du har ingen almindelig rustning at opgradere.
-src/lib/WorkshopModal.svelte:14640:14681:string:1ns4g6s	src/lib/WorkshopModal.svelte	string	string @ 264:95	You do not have regular armor to upgrade.
-src/lib/WorkshopModal.svelte:14826:14870:string:jpie2w	src/lib/WorkshopModal.svelte	string	string @ 269:45	Du mangler guld til at opgradere rustningen.
-src/lib/WorkshopModal.svelte:14874:14914:string:ff0shk	src/lib/WorkshopModal.svelte	string	string @ 269:93	You need more gold to upgrade the armor.
-src/lib/WorkshopModal.svelte:15299:15396:string:wg9874	src/lib/WorkshopModal.svelte	string	string @ 279:41	Mesteren forgylder pladerne og fæstner ædelsten i brystpladen. Din rustning er nu et kongepanser.
-src/lib/WorkshopModal.svelte:15400:15494:string:n7asmz	src/lib/WorkshopModal.svelte	string	string @ 279:142	The master gilds the plates and sets gems into the breastplate. Your armor is now royal armor.
-src/lib/WorkshopModal.svelte:15638:15670:string:1484501	src/lib/WorkshopModal.svelte	string	string @ 285:45	Din økse er allerede opgraderet.
-src/lib/WorkshopModal.svelte:15674:15703:string:1qs0rzw	src/lib/WorkshopModal.svelte	string	string @ 285:81	Your axe is already upgraded.
-src/lib/WorkshopModal.svelte:15807:15849:string:1ni4e5v	src/lib/WorkshopModal.svelte	string	string @ 290:45	Du har ingen almindelig økse at opgradere.
-src/lib/WorkshopModal.svelte:15853:15894:string:r77xws	src/lib/WorkshopModal.svelte	string	string @ 290:91	You do not have a regular axe to upgrade.
-src/lib/WorkshopModal.svelte:16036:16075:string:juabao	src/lib/WorkshopModal.svelte	string	string @ 295:45	Du mangler guld til at opgradere øksen.
-src/lib/WorkshopModal.svelte:16079:16117:string:ng3t1	src/lib/WorkshopModal.svelte	string	string @ 295:88	You need more gold to upgrade the axe.
-src/lib/WorkshopModal.svelte:16494:16577:string:1qvuamw	src/lib/WorkshopModal.svelte	string	string @ 305:41	Værkstedet lægger runer i øksehovedet og hærder æggen. Din økse er nu en stormøkse.
-src/lib/WorkshopModal.svelte:16581:16673:string:1nlk46p	src/lib/WorkshopModal.svelte	string	string @ 305:128	The workshop sets runes into the axe head and hardens the edge. Your axe is now a storm axe.
-src/lib/WorkshopModal.svelte:16824:16857:string:1jtm92	src/lib/WorkshopModal.svelte	string	string @ 311:45	Din kølle er allerede opgraderet.
-src/lib/WorkshopModal.svelte:16861:16891:string:j8diso	src/lib/WorkshopModal.svelte	string	string @ 311:82	Your club is already upgraded.
-src/lib/WorkshopModal.svelte:16996:17039:string:q71uzs	src/lib/WorkshopModal.svelte	string	string @ 316:45	Du har ingen almindelig kølle at opgradere.
-src/lib/WorkshopModal.svelte:17043:17085:string:1bgpgqa	src/lib/WorkshopModal.svelte	string	string @ 316:92	You do not have a regular club to upgrade.
-src/lib/WorkshopModal.svelte:17228:17268:string:14rmtkt	src/lib/WorkshopModal.svelte	string	string @ 321:45	Du mangler guld til at opgradere køllen.
-src/lib/WorkshopModal.svelte:17272:17311:string:4ohdsj	src/lib/WorkshopModal.svelte	string	string @ 321:89	You need more gold to upgrade the club.
-src/lib/WorkshopModal.svelte:17692:17781:string:pv29z	src/lib/WorkshopModal.svelte	string	string @ 331:41	Værkstedet binder jern om hovedet og fylder kernen med bly. Din kølle er nu en murknuser.
-src/lib/WorkshopModal.svelte:17785:17886:string:89b9py	src/lib/WorkshopModal.svelte	string	string @ 331:134	The workshop binds iron around the head and fills the core with lead. Your club is now a wallbreaker.
-src/lib/WorkshopModal.svelte:18027:18058:string:1qma7h0	src/lib/WorkshopModal.svelte	string	string @ 337:45	Din bue er allerede opgraderet.
-src/lib/WorkshopModal.svelte:18062:18091:string:pgspcg	src/lib/WorkshopModal.svelte	string	string @ 337:80	Your bow is already upgraded.
-src/lib/WorkshopModal.svelte:18193:18234:string:1qgscj2	src/lib/WorkshopModal.svelte	string	string @ 342:45	Du har ingen almindelig bue at opgradere.
-src/lib/WorkshopModal.svelte:18238:18279:string:j2k4nc	src/lib/WorkshopModal.svelte	string	string @ 342:90	You do not have a regular bow to upgrade.
-src/lib/WorkshopModal.svelte:18419:18457:string:12b7l17	src/lib/WorkshopModal.svelte	string	string @ 347:45	Du mangler guld til at opgradere buen.
-src/lib/WorkshopModal.svelte:18461:18499:string:9cqo1l	src/lib/WorkshopModal.svelte	string	string @ 347:87	You need more gold to upgrade the bow.
-src/lib/WorkshopModal.svelte:18870:18960:string:1yeutft	src/lib/WorkshopModal.svelte	string	string @ 357:41	Værkstedet spænder buen med ny sene og indlægger horn i grebet. Din bue er nu en falkebue.
-src/lib/WorkshopModal.svelte:18964:19065:string:1i9qttn	src/lib/WorkshopModal.svelte	string	string @ 357:135	The workshop strings the bow with new cord and sets horn into the grip. Your bow is now a falcon bow.
-src/lib/WorkshopModal.svelte:19224:19253:string:1tao87a	src/lib/WorkshopModal.svelte	string	string @ 363:45	Dit tøj er allerede fint nok.
-src/lib/WorkshopModal.svelte:19257:19294:string:1kmc86	src/lib/WorkshopModal.svelte	string	string @ 363:78	Your clothes are already fine enough.
-src/lib/WorkshopModal.svelte:19398:19445:string:gmemmw	src/lib/WorkshopModal.svelte	string	string @ 368:45	Du har ikke noget almindeligt tøj at opgradere.
-src/lib/WorkshopModal.svelte:19449:19492:string:1sggpsv	src/lib/WorkshopModal.svelte	string	string @ 368:96	You do not have regular clothes to upgrade.
-src/lib/WorkshopModal.svelte:19635:19674:string:2uadta	src/lib/WorkshopModal.svelte	string	string @ 373:45	Du mangler guld til at opgradere tøjet.
-src/lib/WorkshopModal.svelte:19678:19720:string:us2nh5	src/lib/WorkshopModal.svelte	string	string @ 373:88	You need more gold to upgrade the clothes.
-src/lib/WorkshopModal.svelte:20125:20189:string:1yvutbi	src/lib/WorkshopModal.svelte	string	string @ 383:41	Værkstedet vasker, farver og syr dit tøj om. Du har nu fint tøj.
-src/lib/WorkshopModal.svelte:20193:20270:string:wcxz9b	src/lib/WorkshopModal.svelte	string	string @ 383:109	The workshop washes, dyes and resews your clothes. You now have fine clothes.
-src/lib/WorkshopModal.svelte:20417:20444:string:d0cob0	src/lib/WorkshopModal.svelte	string	string @ 389:45	Dit tøj er allerede royalt.
-src/lib/WorkshopModal.svelte:20448:20479:string:1l6c2vr	src/lib/WorkshopModal.svelte	string	string @ 389:76	Your clothes are already royal.
-src/lib/WorkshopModal.svelte:20586:20620:string:1vjncl0	src/lib/WorkshopModal.svelte	string	string @ 394:45	Du har ikke fint tøj at opgradere.
-src/lib/WorkshopModal.svelte:20624:20664:string:osk8z	src/lib/WorkshopModal.svelte	string	string @ 394:83	You do not have fine clothes to upgrade.
-src/lib/WorkshopModal.svelte:20812:20858:string:3f91hu	src/lib/WorkshopModal.svelte	string	string @ 399:45	Du mangler guld til at opgradere det fine tøj.
-src/lib/WorkshopModal.svelte:20862:20909:string:x9e7kf	src/lib/WorkshopModal.svelte	string	string @ 399:95	You need more gold to upgrade the fine clothes.
-src/lib/WorkshopModal.svelte:21321:21407:string:12whe7s	src/lib/WorkshopModal.svelte	string	string @ 409:41	Værkstedet broderer guldkant og lægger pels over skuldrene. Dit fine tøj er nu royalt.
-src/lib/WorkshopModal.svelte:21411:21513:string:91dsbv	src/lib/WorkshopModal.svelte	string	string @ 409:131	The workshop embroiders golden trim and lays fur over your shoulders. Your fine clothes are now royal.
-src/lib/WorkshopModal.svelte:21655:21699:string:w0ks20	src/lib/WorkshopModal.svelte	string	string @ 415:45	Du har ingen almindelig fakkel at opgradere.
-src/lib/WorkshopModal.svelte:21703:21746:string:1lzuqdi	src/lib/WorkshopModal.svelte	string	string @ 415:93	You do not have a regular torch to upgrade.
-src/lib/WorkshopModal.svelte:21889:21929:string:tj8wra	src/lib/WorkshopModal.svelte	string	string @ 420:45	Du mangler guld til at opgradere faklen.
-src/lib/WorkshopModal.svelte:21933:21973:string:1igfb5b	src/lib/WorkshopModal.svelte	string	string @ 420:89	You need more gold to upgrade the torch.
-src/lib/WorkshopModal.svelte:22126:22170:string:w0ks20	src/lib/WorkshopModal.svelte	string	string @ 426:45	Du har ingen almindelig fakkel at opgradere.
-src/lib/WorkshopModal.svelte:22174:22217:string:1lzuqdi	src/lib/WorkshopModal.svelte	string	string @ 426:93	You do not have a regular torch to upgrade.
-src/lib/WorkshopModal.svelte:22344:22419:string:8km8kn	src/lib/WorkshopModal.svelte	string	string @ 431:41	Værkstedet binder ildstenen i faklens krone. Din fakkel er nu en solfakkel.
-src/lib/WorkshopModal.svelte:22423:22508:string:6e0igp	src/lib/WorkshopModal.svelte	string	string @ 431:120	The workshop binds the firestone into the torch crown. Your torch is now a sun torch.
-src/lib/WorkshopModal.svelte:22654:22692:string:1l3hj5q	src/lib/WorkshopModal.svelte	string	string @ 437:45	Din detektor er allerede en malmviser.
-src/lib/WorkshopModal.svelte:22696:22735:string:1kf36zd	src/lib/WorkshopModal.svelte	string	string @ 437:87	Your detector is already an ore finder.
-src/lib/WorkshopModal.svelte:22842:22888:string:1mp9068	src/lib/WorkshopModal.svelte	string	string @ 442:45	Du har ingen almindelig detektor at opgradere.
-src/lib/WorkshopModal.svelte:22892:22938:string:3yave8	src/lib/WorkshopModal.svelte	string	string @ 442:95	You do not have a regular detector to upgrade.
-src/lib/WorkshopModal.svelte:23083:23127:string:cmp9pq	src/lib/WorkshopModal.svelte	string	string @ 447:45	Du mangler guld til at opgradere detektoren.
-src/lib/WorkshopModal.svelte:23131:23174:string:o7c1i9	src/lib/WorkshopModal.svelte	string	string @ 447:93	You need more gold to upgrade the detector.
-src/lib/WorkshopModal.svelte:23592:23670:string:1rg4qmf	src/lib/WorkshopModal.svelte	string	string @ 458:41	Mesteren kalibrerer spolen til at finde malm. Din detektor er nu en malmviser.
-src/lib/WorkshopModal.svelte:23674:23755:string:13u4pei	src/lib/WorkshopModal.svelte	string	string @ 458:123	The master calibrates the coil to detect ore. Your detector is now an ore finder.
-src/lib/WorkshopModal.svelte:23905:23941:string:186mx7a	src/lib/WorkshopModal.svelte	string	string @ 464:45	Din sovepose er allerede opgraderet.
-src/lib/WorkshopModal.svelte:23945:23983:string:1wfqk31	src/lib/WorkshopModal.svelte	string	string @ 464:85	Your sleeping bag is already upgraded.
-src/lib/WorkshopModal.svelte:24090:24136:string:np3lv0	src/lib/WorkshopModal.svelte	string	string @ 469:45	Du har ingen almindelig sovepose at opgradere.
-src/lib/WorkshopModal.svelte:24140:24190:string:15cksfd	src/lib/WorkshopModal.svelte	string	string @ 469:95	You do not have a regular sleeping bag to upgrade.
-src/lib/WorkshopModal.svelte:24335:24378:string:z7oswz	src/lib/WorkshopModal.svelte	string	string @ 474:45	Du mangler guld til at opgradere soveposen.
-src/lib/WorkshopModal.svelte:24382:24429:string:1pzpzny	src/lib/WorkshopModal.svelte	string	string @ 474:92	You need more gold to upgrade the sleeping bag.
-src/lib/WorkshopModal.svelte:24818:24901:string:bgr7i8	src/lib/WorkshopModal.svelte	string	string @ 484:41	Værkstedet syr blødt silkefoer og dun i posen. Din sovepose er nu en silkesovepose.
-src/lib/WorkshopModal.svelte:24905:25008:string:m08zea	src/lib/WorkshopModal.svelte	string	string @ 484:128	The workshop sews soft silk lining and down into the bag. Your sleeping bag is now a silk sleeping bag.
-src/lib/WorkshopModal.svelte:25435:25456:string:1kbaesk	src/lib/WorkshopModal.svelte	string	string @ 503:27	Skovl til Mesterskovl
-src/lib/WorkshopModal.svelte:25460:25483:string:1risq96	src/lib/WorkshopModal.svelte	string	string @ 503:52	Shovel to Master Shovel
-src/lib/WorkshopModal.svelte:25717:25790:string:1pb835a	src/lib/WorkshopModal.svelte	string	string @ 509:31	Dobbelt guld ved gravning. Nedgravede fælder findes uden at blive udløst.
-src/lib/WorkshopModal.svelte:25794:25867:string:emy0to	src/lib/WorkshopModal.svelte	string	string @ 509:108	Double gold when digging. Buried traps are found without being triggered.
-src/lib/WorkshopModal.svelte:25901:25918:string:hzyzfr	src/lib/WorkshopModal.svelte	string	string @ 510:31	Skovl-opgradering
-src/lib/WorkshopModal.svelte:25922:25936:string:me6yje	src/lib/WorkshopModal.svelte	string	string @ 510:52	Shovel upgrade
-src/lib/WorkshopModal.svelte:25969:26102:string:12rf4ej	src/lib/WorkshopModal.svelte	string	string @ 511:30	Kræver en almindelig skovl og 150 guld. Mesterskovlen giver dobbelt guld ved gravning og finder nedgravede fælder uden at udløse dem.
-src/lib/WorkshopModal.svelte:26106:26242:string:1p05oy4	src/lib/WorkshopModal.svelte	string	string @ 511:167	Requires a regular shovel and 150 gold. The master shovel gives double gold when digging and finds buried traps without triggering them.
-src/lib/WorkshopModal.svelte:26329:26347:string:7ud955	src/lib/WorkshopModal.svelte	string	string @ 515:27	Stav til Dragestav
-src/lib/WorkshopModal.svelte:26351:26372:string:1posxj7	src/lib/WorkshopModal.svelte	string	string @ 515:49	Staff to Dragon Staff
-src/lib/WorkshopModal.svelte:26598:26743:string:64ose0	src/lib/WorkshopModal.svelte	string	string @ 521:31	Fører dig 5 felter mod øst og viser ruten. Ender turen i vand, stopper du på det sidste sikre felt, og dragestaven bliver til en almindelig stav.
-src/lib/WorkshopModal.svelte:26747:26902:string:1bj1mm3	src/lib/WorkshopModal.svelte	string	string @ 521:180	Carries you 5 tiles east and reveals the route. If the journey ends in water, you stop on the last safe tile, and the dragon staff becomes a regular staff.
-src/lib/WorkshopModal.svelte:26936:26952:string:1cfllt4	src/lib/WorkshopModal.svelte	string	string @ 522:31	Stav-opgradering
-src/lib/WorkshopModal.svelte:26956:26969:string:q6354p	src/lib/WorkshopModal.svelte	string	string @ 522:51	Staff upgrade
-src/lib/WorkshopModal.svelte:27002:27213:string:1mt6xbm	src/lib/WorkshopModal.svelte	string	string @ 523:30	Kræver en almindelig stav og 200 guld. Dragestaven fører dig 5 felter mod øst og afslører ruten. Hvis turen ender i åbent vand, standser du på det sidste sikre felt, og dragestaven bliver til en almindelig stav.
-src/lib/WorkshopModal.svelte:27217:27433:string:1qz7rud	src/lib/WorkshopModal.svelte	string	string @ 523:245	Requires a regular staff and 200 gold. The dragon staff carries you 5 tiles east and reveals the route. If the journey ends in open water, you stop on the last safe tile, and the dragon staff becomes a regular staff.
-src/lib/WorkshopModal.svelte:27519:27542:string:1v38a53	src/lib/WorkshopModal.svelte	string	string @ 527:27	Søgekvist til Runekvist
-src/lib/WorkshopModal.svelte:27546:27569:string:1oe3gcx	src/lib/WorkshopModal.svelte	string	string @ 527:54	Dowsing Rod to Rune Rod
-src/lib/WorkshopModal.svelte:27804:27942:string:b9a415	src/lib/WorkshopModal.svelte	string	string @ 533:31	Trækker automatisk helende rødder op, når du mangler HP. Koster 1 energi. Du kan stadig grave bagefter, men der er intet tilbage at finde.
-src/lib/WorkshopModal.svelte:27946:28087:string:pm8j8w	src/lib/WorkshopModal.svelte	string	string @ 533:173	Automatically pulls up healing roots when you are missing HP. Costs 1 energy. You can still dig afterward, but there is nothing left to find.
-src/lib/WorkshopModal.svelte:28121:28138:string:vvy3vt	src/lib/WorkshopModal.svelte	string	string @ 534:31	Kvist-opgradering
-src/lib/WorkshopModal.svelte:28142:28153:string:1wqueiq	src/lib/WorkshopModal.svelte	string	string @ 534:52	Rod upgrade
-src/lib/WorkshopModal.svelte:28186:28419:string:1hc0l8g	src/lib/WorkshopModal.svelte	string	string @ 535:30	Kræver en søgekvist og 175 guld. Runekvisten viser rødder op til 3 felter væk og trækker dem automatisk op, når du mangler HP og går ind på feltet. Det koster 1 energi. Du kan stadig grave bagefter, men der er intet tilbage at finde.
-src/lib/WorkshopModal.svelte:28423:28664:string:n8z1w7	src/lib/WorkshopModal.svelte	string	string @ 535:267	Requires a dowsing rod and 175 gold. The rune rod reveals roots up to 3 tiles away and automatically pulls them up when you are missing HP and enter the tile. It costs 1 energy. You can still dig afterward, but there is nothing left to find.
-src/lib/WorkshopModal.svelte:28751:28770:string:m8v7bm	src/lib/WorkshopModal.svelte	string	string @ 539:27	Dirk til Mesterdirk
-src/lib/WorkshopModal.svelte:28774:28801:string:12pxgo8	src/lib/WorkshopModal.svelte	string	string @ 539:50	Lockpick to Master Lockpick
-src/lib/WorkshopModal.svelte:29029:29114:string:31pbir	src/lib/WorkshopModal.svelte	string	string @ 545:31	Dobbelt guld ved indbrud på tomme byfelter. Risikoen for at blive opdaget er uændret.
-src/lib/WorkshopModal.svelte:29118:29203:string:19lqilo	src/lib/WorkshopModal.svelte	string	string @ 545:120	Double gold from burglary on empty town tiles. The risk of being caught is unchanged.
-src/lib/WorkshopModal.svelte:29237:29253:string:esuupk	src/lib/WorkshopModal.svelte	string	string @ 546:31	Dirk-opgradering
-src/lib/WorkshopModal.svelte:29257:29273:string:we7npv	src/lib/WorkshopModal.svelte	string	string @ 546:51	Lockpick upgrade
-src/lib/WorkshopModal.svelte:29306:29437:string:r16i5g	src/lib/WorkshopModal.svelte	string	string @ 547:30	Kræver en almindelig dirk og 150 guld. Mesterdirken giver dobbelt guld ved indbrud og kan bruges til alle valg, der kræver en dirk.
-src/lib/WorkshopModal.svelte:29441:29587:string:12251ob	src/lib/WorkshopModal.svelte	string	string @ 547:165	Requires a regular lockpick and 150 gold. The master lockpick gives double gold from burglary and works for every choice that requires a lockpick.
-src/lib/WorkshopModal.svelte:29673:29692:string:1xlyjb2	src/lib/WorkshopModal.svelte	string	string @ 551:27	Kniv til Mesterkniv
-src/lib/WorkshopModal.svelte:29696:29717:string:a536hu	src/lib/WorkshopModal.svelte	string	string @ 551:50	Knife to Master Knife
-src/lib/WorkshopModal.svelte:29945:30031:string:1o0axns	src/lib/WorkshopModal.svelte	string	string @ 557:31	Kan bruges til alle valg, der kræver en kniv. De valg giver mere guld og mindre skade.
-src/lib/WorkshopModal.svelte:30035:30126:string:196063j	src/lib/WorkshopModal.svelte	string	string @ 557:121	Works for every choice that requires a knife. Those choices give more gold and less damage.
-src/lib/WorkshopModal.svelte:30160:30176:string:1b2iogu	src/lib/WorkshopModal.svelte	string	string @ 558:31	Kniv-opgradering
-src/lib/WorkshopModal.svelte:30180:30193:string:90q0um	src/lib/WorkshopModal.svelte	string	string @ 558:51	Knife upgrade
-src/lib/WorkshopModal.svelte:30226:30334:string:o1pmex	src/lib/WorkshopModal.svelte	string	string @ 559:30	Kræver en almindelig kniv og 150 guld. Mesterkniven kan bruges til alle knivvalg og forbedrer deres udbytte.
-src/lib/WorkshopModal.svelte:30338:30448:string:181qy8i	src/lib/WorkshopModal.svelte	string	string @ 559:142	Requires a regular knife and 150 gold. The master knife works for every knife choice and improves its outcome.
-src/lib/WorkshopModal.svelte:30534:30558:string:c9z3rv	src/lib/WorkshopModal.svelte	string	string @ 563:27	Rustning til Kongepanser
-src/lib/WorkshopModal.svelte:30562:30582:string:11ebf8h	src/lib/WorkshopModal.svelte	string	string @ 563:55	Armor to Royal Armor
-src/lib/WorkshopModal.svelte:30828:30942:string:1to4bho	src/lib/WorkshopModal.svelte	string	string @ 569:31	70 % skadesreduktion. Koster normalt 1 ekstra energi pr. skridt, men ikke for Ridder og Skjoldmø. Går tabt i vand.
-src/lib/WorkshopModal.svelte:30946:31063:string:vfjbxq	src/lib/WorkshopModal.svelte	string	string @ 569:149	70% damage reduction. Normally costs 1 extra energy per step, but not for the Knight and Shieldmaiden. Lost in water.
-src/lib/WorkshopModal.svelte:31097:31117:string:1np9muw	src/lib/WorkshopModal.svelte	string	string @ 570:31	Rustning-opgradering
-src/lib/WorkshopModal.svelte:31121:31134:string:bpxis0	src/lib/WorkshopModal.svelte	string	string @ 570:55	Armor upgrade
-src/lib/WorkshopModal.svelte:31167:31356:string:ajhld8	src/lib/WorkshopModal.svelte	string	string @ 571:30	Kræver almindelig rustning og 250 guld. Kongepanseret reducerer skade med 70 %, men koster normalt 1 ekstra energi pr. skridt. Ridder og Skjoldmø ignorerer vægten. Panseret går tabt i vand.
-src/lib/WorkshopModal.svelte:31360:31549:string:1rwdlvz	src/lib/WorkshopModal.svelte	string	string @ 571:223	Requires regular armor and 250 gold. Royal armor reduces damage by 70% but normally costs 1 extra energy per step. The Knight and Shieldmaiden ignore the weight. The armor is lost in water.
-src/lib/WorkshopModal.svelte:31639:31657:string:1383is5	src/lib/WorkshopModal.svelte	string	string @ 575:27	Økse til Stormøkse
-src/lib/WorkshopModal.svelte:31661:31677:string:1uocaol	src/lib/WorkshopModal.svelte	string	string @ 575:49	Axe to Storm Axe
-src/lib/WorkshopModal.svelte:31909:32003:string:wanb4r	src/lib/WorkshopModal.svelte	string	string @ 581:31	Kan bruges til alle valg, der kræver en økse. De valg giver 50 % mere guld og halverer skaden.
-src/lib/WorkshopModal.svelte:32007:32106:string:hdv0ro	src/lib/WorkshopModal.svelte	string	string @ 581:129	Works for every choice that requires an axe. Those choices give 50% more gold and halve the damage.
-src/lib/WorkshopModal.svelte:32140:32156:string:ain5s1	src/lib/WorkshopModal.svelte	string	string @ 582:31	Økse-opgradering
-src/lib/WorkshopModal.svelte:32160:32171:string:kq174r	src/lib/WorkshopModal.svelte	string	string @ 582:51	Axe upgrade
-src/lib/WorkshopModal.svelte:32204:32319:string:83taob	src/lib/WorkshopModal.svelte	string	string @ 583:30	Kræver en almindelig økse og 175 guld. Stormøksen kan bruges til alle øksevalg og giver mere guld med mindre skade.
-src/lib/WorkshopModal.svelte:32323:32438:string:13rjwz5	src/lib/WorkshopModal.svelte	string	string @ 583:149	Requires a regular axe and 175 gold. The storm axe works for every axe choice and gives more gold with less damage.
-src/lib/WorkshopModal.svelte:32525:32544:string:1p5jita	src/lib/WorkshopModal.svelte	string	string @ 587:27	Kølle til Murknuser
-src/lib/WorkshopModal.svelte:32548:32567:string:19u9k1q	src/lib/WorkshopModal.svelte	string	string @ 587:50	Club to Wallbreaker
-src/lib/WorkshopModal.svelte:32810:32892:string:tpmac2	src/lib/WorkshopModal.svelte	string	string @ 593:31	Kan ødelægge værksteder og tage guldet fra kassen. Det koster stadig meget energi.
-src/lib/WorkshopModal.svelte:32896:32982:string:1jm416u	src/lib/WorkshopModal.svelte	string	string @ 593:117	Can destroy workshops and take the gold from the till. It still costs a lot of energy.
-src/lib/WorkshopModal.svelte:33016:33033:string:1dim03w	src/lib/WorkshopModal.svelte	string	string @ 594:31	Kølle-opgradering
-src/lib/WorkshopModal.svelte:33037:33049:string:1dqb11	src/lib/WorkshopModal.svelte	string	string @ 594:52	Club upgrade
-src/lib/WorkshopModal.svelte:33082:33202:string:h63lme	src/lib/WorkshopModal.svelte	string	string @ 595:30	Kræver en almindelig kølle og 185 guld. Murknuseren kan ødelægge værksteder, som en almindelig kølle ikke kan bryde ned.
-src/lib/WorkshopModal.svelte:33206:33320:string:hz4zxa	src/lib/WorkshopModal.svelte	string	string @ 595:154	Requires a regular club and 185 gold. The wallbreaker can destroy workshops that a regular club cannot break down.
-src/lib/WorkshopModal.svelte:33408:33424:string:6d4ml1	src/lib/WorkshopModal.svelte	string	string @ 599:27	Tøj til Fint tøj
-src/lib/WorkshopModal.svelte:33428:33451:string:97gd8w	src/lib/WorkshopModal.svelte	string	string @ 599:47	Clothes to Fine Clothes
-src/lib/WorkshopModal.svelte:33699:33792:string:lushsw	src/lib/WorkshopModal.svelte	string	string @ 605:31	Fint tøj giver 15 % mere guld og lidt beskyttelse, men kan blive flænset i huler og blodskov.
-src/lib/WorkshopModal.svelte:33796:33891:string:1cogty3	src/lib/WorkshopModal.svelte	string	string @ 605:128	Fine clothes give 15% more gold and some protection but can be torn in caves and the bloodwood.
-src/lib/WorkshopModal.svelte:33925:33940:string:1nb9mn8	src/lib/WorkshopModal.svelte	string	string @ 606:31	Tøj-opgradering
-src/lib/WorkshopModal.svelte:33944:33959:string:9gsj8b	src/lib/WorkshopModal.svelte	string	string @ 606:50	Clothes upgrade
-src/lib/WorkshopModal.svelte:33992:34097:string:1qyyc2j	src/lib/WorkshopModal.svelte	string	string @ 607:30	Kræver tøj og 100 guld. Værkstedet syr det om til fint tøj, som giver 15 % mere guld og lidt beskyttelse.
-src/lib/WorkshopModal.svelte:34101:34218:string:1qdtp7v	src/lib/WorkshopModal.svelte	string	string @ 607:139	Requires clothes and 100 gold. The workshop turns them into fine clothes that give 15% more gold and some protection.
-src/lib/WorkshopModal.svelte:34305:34328:string:1i8e1ko	src/lib/WorkshopModal.svelte	string	string @ 611:27	Fint tøj til Royalt tøj
-src/lib/WorkshopModal.svelte:34332:34361:string:18l6uy5	src/lib/WorkshopModal.svelte	string	string @ 611:54	Fine Clothes to Royal Clothes
-src/lib/WorkshopModal.svelte:34610:34708:string:1jzmdaw	src/lib/WorkshopModal.svelte	string	string @ 617:31	40 % mere guld og lidt bedre beskyttelse. Hvis tøjet flænses, bliver det til almindeligt fint tøj.
-src/lib/WorkshopModal.svelte:34712:34816:string:18oepb7	src/lib/WorkshopModal.svelte	string	string @ 617:133	40% more gold and slightly better protection. If the clothes are torn, they become regular fine clothes.
-src/lib/WorkshopModal.svelte:34850:34860:string:18evrpy	src/lib/WorkshopModal.svelte	string	string @ 618:31	Royalt tøj
-src/lib/WorkshopModal.svelte:34864:34877:string:cnoai0	src/lib/WorkshopModal.svelte	string	string @ 618:45	Royal clothes
-src/lib/WorkshopModal.svelte:34910:35012:string:1u3d5rz	src/lib/WorkshopModal.svelte	string	string @ 619:30	Kræver fint tøj og 500 guld. Royalt tøj giver 40 % mere guld og bliver til fint tøj, hvis det flænses.
-src/lib/WorkshopModal.svelte:35016:35117:string:3egh83	src/lib/WorkshopModal.svelte	string	string @ 619:136	Requires fine clothes and 500 gold. Royal clothes give 40% more gold and become fine clothes if torn.
-src/lib/WorkshopModal.svelte:35207:35227:string:sije0u	src/lib/WorkshopModal.svelte	string	string @ 623:27	Fakkel til Solfakkel
-src/lib/WorkshopModal.svelte:35231:35249:string:j1l6eu	src/lib/WorkshopModal.svelte	string	string @ 623:51	Torch to Sun Torch
-src/lib/WorkshopModal.svelte:35466:35562:string:14o8xpz	src/lib/WorkshopModal.svelte	string	string @ 629:31	Du ser 2 felter længere. Solbålet afslører et større område for alle, giver fuld HP og 100 guld.
-src/lib/WorkshopModal.svelte:35566:35666:string:1wwm72r	src/lib/WorkshopModal.svelte	string	string @ 629:131	You see 2 tiles farther. The sunfire reveals a larger area for everyone, gives full HP and 100 gold.
-src/lib/WorkshopModal.svelte:35700:35718:string:15s8guy	src/lib/WorkshopModal.svelte	string	string @ 630:31	Fakkel-opgradering
-src/lib/WorkshopModal.svelte:35722:35735:string:1pglbah	src/lib/WorkshopModal.svelte	string	string @ 630:53	Torch upgrade
-src/lib/WorkshopModal.svelte:35768:35879:string:1utsu24	src/lib/WorkshopModal.svelte	string	string @ 631:30	Kræver en almindelig fakkel og 225 guld. Solfaklen lader dig se 2 felter længere og kan tænde et større solbål.
-src/lib/WorkshopModal.svelte:35883:35996:string:vnqelt	src/lib/WorkshopModal.svelte	string	string @ 631:145	Requires a regular torch and 225 gold. The sun torch lets you see 2 tiles farther and can light a larger sunfire.
-src/lib/WorkshopModal.svelte:36084:36110:string:t8t344	src/lib/WorkshopModal.svelte	string	string @ 635:27	Sovepose til Silkesovepose
-src/lib/WorkshopModal.svelte:36114:36147:string:1vl2od7	src/lib/WorkshopModal.svelte	string	string @ 635:57	Sleeping Bag to Silk Sleeping Bag
-src/lib/WorkshopModal.svelte:36397:36489:string:gdc3u	src/lib/WorkshopModal.svelte	string	string @ 641:31	Hvile genvinder op til 40 HP i stedet for 20. I huler bliver den til en almindelig sovepose.
-src/lib/WorkshopModal.svelte:36493:36578:string:jk6ns1	src/lib/WorkshopModal.svelte	string	string @ 641:127	Rest recovers up to 40 HP instead of 20. In caves, it becomes a regular sleeping bag.
-src/lib/WorkshopModal.svelte:36612:36632:string:1i8c51e	src/lib/WorkshopModal.svelte	string	string @ 642:31	Sovepose-opgradering
-src/lib/WorkshopModal.svelte:36636:36656:string:upb556	src/lib/WorkshopModal.svelte	string	string @ 642:55	Sleeping bag upgrade
-src/lib/WorkshopModal.svelte:36689:36825:string:1vdparr	src/lib/WorkshopModal.svelte	string	string @ 643:30	Kræver en almindelig sovepose og 150 guld. Silkesoveposen genvinder op til 40 HP ved hvile. Hulefugt gør den til en almindelig sovepose.
-src/lib/WorkshopModal.svelte:36829:36979:string:gp8upc	src/lib/WorkshopModal.svelte	string	string @ 643:170	Requires a regular sleeping bag and 150 gold. The silk sleeping bag recovers up to 40 HP when resting. Cave damp turns it into a regular sleeping bag.
-src/lib/WorkshopModal.svelte:37069:37091:string:rshv7o	src/lib/WorkshopModal.svelte	string	string @ 647:27	Detektor til Malmviser
-src/lib/WorkshopModal.svelte:37095:37117:string:1mv4f1g	src/lib/WorkshopModal.svelte	string	string @ 647:53	Detector to Ore Finder
-src/lib/WorkshopModal.svelte:37364:37493:string:fhoyff	src/lib/WorkshopModal.svelte	string	string @ 653:31	Viser skjult guld op til 3 felter væk og guldminer op til 2 felter væk, selv bag bjerge. Du finder 25 % mere guld, når du graver.
-src/lib/WorkshopModal.svelte:37497:37628:string:1t8shnf	src/lib/WorkshopModal.svelte	string	string @ 653:164	Shows hidden gold up to 3 tiles away and gold mines up to 2 tiles away, even behind mountains. You find 25% more gold when digging.
-src/lib/WorkshopModal.svelte:37662:37682:string:1vh5bk2	src/lib/WorkshopModal.svelte	string	string @ 654:31	Detektor-opgradering
-src/lib/WorkshopModal.svelte:37686:37702:string:qlenpb	src/lib/WorkshopModal.svelte	string	string @ 654:55	Detector upgrade
-src/lib/WorkshopModal.svelte:37735:37958:string:9wwzel	src/lib/WorkshopModal.svelte	string	string @ 655:30	Kræver en almindelig detektor og 250 guld. Malmviseren afslører skjult guld op til 3 felter væk, finder guldminer op til 2 felter væk og giver 25 % mere guld ved gravning. Krystaller gør den til en almindelig detektor igen.
-src/lib/WorkshopModal.svelte:37962:38179:string:ihysbw	src/lib/WorkshopModal.svelte	string	string @ 655:257	Requires a regular detector and 250 gold. The ore finder reveals hidden gold up to 3 tiles away, finds gold mines up to 2 tiles away and gives 25% more gold when digging. Crystals turn it back into a regular detector.
-src/lib/WorkshopModal.svelte:38269:38285:string:1d60cuj	src/lib/WorkshopModal.svelte	string	string @ 659:27	Bue til Falkebue
-src/lib/WorkshopModal.svelte:38289:38306:string:43dl11	src/lib/WorkshopModal.svelte	string	string @ 659:47	Bow to Falcon Bow
-src/lib/WorkshopModal.svelte:38528:38674:string:db5eko	src/lib/WorkshopModal.svelte	string	string @ 665:31	Kan bruges til alle valg, der kræver en bue. De valg giver 25 % mere guld og halverer skaden. Når du går, afslører buen et lille område foran dig.
-src/lib/WorkshopModal.svelte:38678:38834:string:v8jm5d	src/lib/WorkshopModal.svelte	string	string @ 665:181	Works for every choice that requires a bow. Those choices give 25% more gold and halve the damage. When you move, the bow reveals a small area ahead of you.
-src/lib/WorkshopModal.svelte:38868:38883:string:uvam4q	src/lib/WorkshopModal.svelte	string	string @ 666:31	Bue-opgradering
-src/lib/WorkshopModal.svelte:38887:38898:string:50txcb	src/lib/WorkshopModal.svelte	string	string @ 666:50	Bow upgrade
-src/lib/WorkshopModal.svelte:38931:39052:string:1ppy3x9	src/lib/WorkshopModal.svelte	string	string @ 667:30	Kræver en almindelig bue og 175 guld. Falkebuen forbedrer alle buevalg og afslører et lille område foran dig, når du går.
-src/lib/WorkshopModal.svelte:39056:39186:string:1dvgwg2	src/lib/WorkshopModal.svelte	string	string @ 667:155	Requires a regular bow and 175 gold. The falcon bow improves every bow choice and reveals a small area ahead of you when you move.
-src/lib/WorkshopModal.svelte:39634:39642:string:1vjzexo	src/lib/WorkshopModal.svelte	string	string @ 679:33	Værksted
-src/lib/WorkshopModal.svelte:39646:39654:string:1qr5r8s	src/lib/WorkshopModal.svelte	string	string @ 679:45	Workshop
-src/lib/WorkshopModal.svelte:39689:39836:string:1sr1v6q	src/lib/WorkshopModal.svelte	string	string @ 680:32	Værkstedet opgraderer dit udstyr og erstatter den gamle genstand. Har du en kølle eller murknuser, afslutter mesteren handlen efter én opgradering.
-src/lib/WorkshopModal.svelte:39840:39983:string:1thqbp6	src/lib/WorkshopModal.svelte	string	string @ 680:183	The workshop upgrades your equipment and replaces the old item. If you have a club or wallbreaker, the master ends the trade after one upgrade.
-src/lib/WorkshopModal.svelte:40013:40029:string:r55hbv	src/lib/WorkshopModal.svelte	string	string @ 682:21	Mesterværkstedet
-src/lib/WorkshopModal.svelte:40033:40048:string:amyf4o	src/lib/WorkshopModal.svelte	string	string @ 682:41	Master Workshop
-src/lib/WorkshopModal.svelte:40147:40209:string:1ean8sj	src/lib/WorkshopModal.svelte	string	string @ 683:91	Here, ordinary equipment can be rebuilt into something better.
-src/lib/WorkshopModal.svelte:40374:40434:string:1gwy1h6	src/lib/WorkshopModal.svelte	string	string @ 686:107	You do not have anything the workshop can improve right now.
-src/lib/WorkshopModal.svelte:41521:41529:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 709:49	Opgrader
-src/lib/WorkshopModal.svelte:41533:41540:string:3ofr4n	src/lib/WorkshopModal.svelte	string	string @ 709:61	Upgrade
-src/lib/WorkshopModal.svelte:41952:41960:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 712:33	Opgrader
-src/lib/WorkshopModal.svelte:41964:41971:string:3ofr4n	src/lib/WorkshopModal.svelte	string	string @ 712:45	Upgrade
-src/lib/WorkshopModal.svelte:42215:42227:string:1khm7xp	src/lib/WorkshopModal.svelte	string	string @ 720:45	Mangler guld
-src/lib/WorkshopModal.svelte:42231:42243:string:1lxbpzn	src/lib/WorkshopModal.svelte	string	string @ 720:61	Missing gold
-src/lib/WorkshopModal.svelte:42290:42357:string:fhdq1w	src/lib/WorkshopModal.svelte	string	string @ 721:44	Du har genstanden, men mangler stadig guld til disse opgraderinger.
-src/lib/WorkshopModal.svelte:42361:42419:string:a0zcsm	src/lib/WorkshopModal.svelte	string	string @ 721:115	You have the item, but still need gold for these upgrades.
-src/lib/WorkshopModal.svelte:43516:43533:string:hzyzfr	src/lib/WorkshopModal.svelte	string	string @ 742:30	Skovl-opgradering
-src/lib/WorkshopModal.svelte:43563:43683:string:1xdcspu	src/lib/WorkshopModal.svelte	string	string @ 743:29	Kræver en almindelig skovl og 150 guld. Mesterskovlen giver dobbelt guld ved gravning og udløser ikke nedgravede fælder.
-src/lib/WorkshopModal.svelte:43783:43788:attribute:beisjq	src/lib/WorkshopModal.svelte	attribute	alt @ 746:54	Skovl
-src/lib/WorkshopModal.svelte:43883:43894:attribute:9b9jas	src/lib/WorkshopModal.svelte	attribute	alt @ 748:60	Mesterskovl
-src/lib/WorkshopModal.svelte:43994:44015:text:1kbaesk	src/lib/WorkshopModal.svelte	text	markup @ 752:25	Skovl til Mesterskovl
-src/lib/WorkshopModal.svelte:44044:44118:text:109z0pk	src/lib/WorkshopModal.svelte	text	markup @ 753:20	Dobbelt guld ved gravning. Nedgravede fælder bliver fundet uden at udløse.
-src/lib/WorkshopModal.svelte:44384:44392:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 761:34	Opgrader
-src/lib/WorkshopModal.svelte:44444:44474:string:6dznub	src/lib/WorkshopModal.svelte	string	string @ 762:51	Du har allerede mesterskovlen.
-src/lib/WorkshopModal.svelte:44490:44548:string:1k7u7xo	src/lib/WorkshopModal.svelte	string	string @ 762:97	Bruger 150 guld og erstatter din skovl med en mesterskovl.
-src/lib/WorkshopModal.svelte:44553:44592:string:1xi812y	src/lib/WorkshopModal.svelte	string	string @ 762:160	Du skal først have en almindelig skovl.
-src/lib/WorkshopModal.svelte:44644:44654:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 764:36	Opgraderet
-src/lib/WorkshopModal.svelte:44670:44678:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 764:62	Opgrader
-src/lib/WorkshopModal.svelte:44683:44695:string:hr2eh6	src/lib/WorkshopModal.svelte	string	string @ 764:75	Kræver skovl
-src/lib/WorkshopModal.svelte:44861:44877:string:1cfllt4	src/lib/WorkshopModal.svelte	string	string @ 771:30	Stav-opgradering
-src/lib/WorkshopModal.svelte:44907:45132:string:4pij0c	src/lib/WorkshopModal.svelte	string	string @ 772:29	Kræver en almindelig stav og 200 guld. Dragestaven teleporterer 5 felter mod øst og afslører ruten imellem. Kun hvis selve teleporten ville ende i åbent vand, stopper den på sidste sikre felt og bliver til en almindelig stav.
-src/lib/WorkshopModal.svelte:45231:45235:attribute:np2vod	src/lib/WorkshopModal.svelte	attribute	alt @ 775:53	Stav
-src/lib/WorkshopModal.svelte:45328:45337:attribute:3a887i	src/lib/WorkshopModal.svelte	attribute	alt @ 777:58	Dragestav
-src/lib/WorkshopModal.svelte:45437:45455:text:7ud955	src/lib/WorkshopModal.svelte	text	markup @ 781:25	Stav til Dragestav
-src/lib/WorkshopModal.svelte:45484:45608:text:1000nj	src/lib/WorkshopModal.svelte	text	markup @ 782:20	5 felter mod øst. Viser ruten imellem. Hvis teleporten ville ende i vand, stopper den sikkert og bliver til almindelig stav.
-src/lib/WorkshopModal.svelte:45871:45879:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 790:34	Opgrader
-src/lib/WorkshopModal.svelte:45929:45957:string:l4c701	src/lib/WorkshopModal.svelte	string	string @ 791:49	Du har allerede dragestaven.
-src/lib/WorkshopModal.svelte:45972:46027:string:10stdkx	src/lib/WorkshopModal.svelte	string	string @ 791:92	Bruger 200 guld og erstatter din stav med en dragestav.
-src/lib/WorkshopModal.svelte:46032:46070:string:6ftp2n	src/lib/WorkshopModal.svelte	string	string @ 791:152	Du skal først have en almindelig stav.
-src/lib/WorkshopModal.svelte:46120:46130:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 793:34	Opgraderet
-src/lib/WorkshopModal.svelte:46145:46153:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 793:59	Opgrader
-src/lib/WorkshopModal.svelte:46158:46169:string:ch2vs1	src/lib/WorkshopModal.svelte	string	string @ 793:72	Kræver stav
-src/lib/WorkshopModal.svelte:46336:46353:string:vvy3vt	src/lib/WorkshopModal.svelte	string	string @ 800:30	Kvist-opgradering
-src/lib/WorkshopModal.svelte:46383:46531:string:1x0ssft	src/lib/WorkshopModal.svelte	string	string @ 801:29	Kræver søgekvist og 175 guld. Runekvisten viser rødder i samme radius 3 og trækker automatisk skjult liv op, når du mangler HP og går ind på feltet.
-src/lib/WorkshopModal.svelte:46636:46645:attribute:ojyu45	src/lib/WorkshopModal.svelte	attribute	alt @ 804:59	Søgekvist
-src/lib/WorkshopModal.svelte:46738:46747:attribute:mbr8g	src/lib/WorkshopModal.svelte	attribute	alt @ 806:58	Runekvist
-src/lib/WorkshopModal.svelte:46847:46870:text:1v38a53	src/lib/WorkshopModal.svelte	text	markup @ 810:25	Søgekvist til Runekvist
-src/lib/WorkshopModal.svelte:46899:47009:text:8r6kzf	src/lib/WorkshopModal.svelte	text	markup @ 811:20	Trækker skjult liv op ved ankomst, hvis du mangler HP. Koster 1 energi og efterlader feltet ugravet, men tomt.
-src/lib/WorkshopModal.svelte:47275:47283:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 819:34	Opgrader
-src/lib/WorkshopModal.svelte:47333:47361:string:vl45y7	src/lib/WorkshopModal.svelte	string	string @ 820:49	Du har allerede runekvisten.
-src/lib/WorkshopModal.svelte:47377:47437:string:1rnlege	src/lib/WorkshopModal.svelte	string	string @ 820:93	Bruger 175 guld og erstatter din søgekvist med en runekvist.
-src/lib/WorkshopModal.svelte:47442:47474:string:ptj83h	src/lib/WorkshopModal.svelte	string	string @ 820:158	Du skal først have en søgekvist.
-src/lib/WorkshopModal.svelte:47524:47534:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 822:34	Opgraderet
-src/lib/WorkshopModal.svelte:47550:47558:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 822:60	Opgrader
-src/lib/WorkshopModal.svelte:47563:47575:string:x0pcfo	src/lib/WorkshopModal.svelte	string	string @ 822:73	Kræver kvist
-src/lib/WorkshopModal.svelte:47741:47757:string:esuupk	src/lib/WorkshopModal.svelte	string	string @ 829:30	Dirk-opgradering
-src/lib/WorkshopModal.svelte:47787:47896:string:1lr59wx	src/lib/WorkshopModal.svelte	string	string @ 830:29	Kræver en almindelig dirk og 150 guld. Mesterdirken giver dobbelt guld ved indbrud og tæller stadig som dirk.
-src/lib/WorkshopModal.svelte:47995:47999:attribute:1lcv3pp	src/lib/WorkshopModal.svelte	attribute	alt @ 833:53	Dirk
-src/lib/WorkshopModal.svelte:48093:48103:attribute:l9alj3	src/lib/WorkshopModal.svelte	attribute	alt @ 835:59	Mesterdirk
-src/lib/WorkshopModal.svelte:48203:48222:text:m8v7bm	src/lib/WorkshopModal.svelte	text	markup @ 839:25	Dirk til Mesterdirk
-src/lib/WorkshopModal.svelte:48251:48338:text:uacgy1	src/lib/WorkshopModal.svelte	text	markup @ 840:20	Dobbelt guld ved indbrud på tomme byfelter. Risikoen for at blive opdaget er den samme.
-src/lib/WorkshopModal.svelte:48601:48609:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 848:34	Opgrader
-src/lib/WorkshopModal.svelte:48660:48689:string:14a7e82	src/lib/WorkshopModal.svelte	string	string @ 849:50	Du har allerede mesterdirken.
-src/lib/WorkshopModal.svelte:48704:48760:string:1p9ikd0	src/lib/WorkshopModal.svelte	string	string @ 849:94	Bruger 150 guld og erstatter din dirk med en mesterdirk.
-src/lib/WorkshopModal.svelte:48765:48803:string:11d7mzr	src/lib/WorkshopModal.svelte	string	string @ 849:155	Du skal først have en almindelig dirk.
-src/lib/WorkshopModal.svelte:48854:48864:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 851:35	Opgraderet
-src/lib/WorkshopModal.svelte:48879:48887:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 851:60	Opgrader
-src/lib/WorkshopModal.svelte:48892:48903:string:q656gp	src/lib/WorkshopModal.svelte	string	string @ 851:73	Kræver dirk
-src/lib/WorkshopModal.svelte:49069:49085:string:1b2iogu	src/lib/WorkshopModal.svelte	string	string @ 858:30	Kniv-opgradering
-src/lib/WorkshopModal.svelte:49115:49214:string:nrgu3o	src/lib/WorkshopModal.svelte	string	string @ 859:29	Kræver en almindelig kniv og 150 guld. Mesterkniven tæller som kniv i events og gør knivvalg bedre.
-src/lib/WorkshopModal.svelte:49313:49317:attribute:1cbwknf	src/lib/WorkshopModal.svelte	attribute	alt @ 862:53	Kniv
-src/lib/WorkshopModal.svelte:49411:49421:attribute:3n93e9	src/lib/WorkshopModal.svelte	attribute	alt @ 864:59	Mesterkniv
-src/lib/WorkshopModal.svelte:49521:49540:text:1xlyjb2	src/lib/WorkshopModal.svelte	text	markup @ 868:25	Kniv til Mesterkniv
-src/lib/WorkshopModal.svelte:49569:49636:text:mdd11w	src/lib/WorkshopModal.svelte	text	markup @ 869:20	Tæller som kniv i events. Knivvalg giver mere guld og mindre skade.
-src/lib/WorkshopModal.svelte:49899:49907:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 877:34	Opgrader
-src/lib/WorkshopModal.svelte:49958:49987:string:14n8be8	src/lib/WorkshopModal.svelte	string	string @ 878:50	Du har allerede mesterkniven.
-src/lib/WorkshopModal.svelte:50002:50058:string:2ly8ec	src/lib/WorkshopModal.svelte	string	string @ 878:94	Bruger 150 guld og erstatter din kniv med en mesterkniv.
-src/lib/WorkshopModal.svelte:50063:50101:string:i0kt2h	src/lib/WorkshopModal.svelte	string	string @ 878:155	Du skal først have en almindelig kniv.
-src/lib/WorkshopModal.svelte:50152:50162:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 880:35	Opgraderet
-src/lib/WorkshopModal.svelte:50177:50185:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 880:60	Opgrader
-src/lib/WorkshopModal.svelte:50190:50201:string:4wby67	src/lib/WorkshopModal.svelte	string	string @ 880:73	Kræver kniv
-src/lib/WorkshopModal.svelte:50371:50391:string:1np9muw	src/lib/WorkshopModal.svelte	string	string @ 887:30	Rustning-opgradering
-src/lib/WorkshopModal.svelte:50421:50583:string:1fntr7x	src/lib/WorkshopModal.svelte	string	string @ 888:29	Kræver almindelig rustning og 250 guld. Kongepanseret reducerer skade med 70%, men koster normalt 1 ekstra energi pr. skridt. Ridder og Skjoldmø ignorerer vægten.
-src/lib/WorkshopModal.svelte:50686:50694:attribute:jd27bh	src/lib/WorkshopModal.svelte	attribute	alt @ 891:57	Rustning
-src/lib/WorkshopModal.svelte:50789:50800:attribute:f0hwk8	src/lib/WorkshopModal.svelte	attribute	alt @ 893:60	Kongepanser
-src/lib/WorkshopModal.svelte:50900:50924:text:c9z3rv	src/lib/WorkshopModal.svelte	text	markup @ 897:25	Rustning til Kongepanser
-src/lib/WorkshopModal.svelte:50953:51056:text:1apt5ug	src/lib/WorkshopModal.svelte	text	markup @ 898:20	70% skadesreduktion. Normalt tung: +1 energi pr. skridt, men ikke for Ridder/Skjoldmø. Går tabt i vand.
-src/lib/WorkshopModal.svelte:51331:51339:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 906:34	Opgrader
-src/lib/WorkshopModal.svelte:51391:51421:string:18n5gjx	src/lib/WorkshopModal.svelte	string	string @ 907:51	Du har allerede kongepanseret.
-src/lib/WorkshopModal.svelte:51440:51501:string:12tiwey	src/lib/WorkshopModal.svelte	string	string @ 907:100	Bruger 250 guld og erstatter din rustning med et kongepanser.
-src/lib/WorkshopModal.svelte:51506:51548:string:m2j0or	src/lib/WorkshopModal.svelte	string	string @ 907:166	Du skal først have en almindelig rustning.
-src/lib/WorkshopModal.svelte:51600:51610:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 909:36	Opgraderet
-src/lib/WorkshopModal.svelte:51629:51637:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 909:65	Opgrader
-src/lib/WorkshopModal.svelte:51642:51657:string:pfnnop	src/lib/WorkshopModal.svelte	string	string @ 909:78	Kræver rustning
-src/lib/WorkshopModal.svelte:51824:51840:string:ain5s1	src/lib/WorkshopModal.svelte	string	string @ 916:30	Økse-opgradering
-src/lib/WorkshopModal.svelte:51870:52001:string:1mbpppz	src/lib/WorkshopModal.svelte	string	string @ 917:29	Kræver en almindelig økse og 175 guld. Stormøksen tæller som økse i events og gør øksevalg mere brutale: mere guld og mindre skade.
-src/lib/WorkshopModal.svelte:52101:52105:attribute:1vj3c8g	src/lib/WorkshopModal.svelte	attribute	alt @ 920:54	Økse
-src/lib/WorkshopModal.svelte:52199:52208:attribute:n61w8v	src/lib/WorkshopModal.svelte	attribute	alt @ 922:59	Stormøkse
-src/lib/WorkshopModal.svelte:52308:52326:text:1383is5	src/lib/WorkshopModal.svelte	text	markup @ 926:25	Økse til Stormøkse
-src/lib/WorkshopModal.svelte:52355:52450:text:jkda0z	src/lib/WorkshopModal.svelte	text	markup @ 927:20	Tæller som økse i events. Øksevalg giver 50% mere guld og halverer eventskade fra selve valget.
-src/lib/WorkshopModal.svelte:52716:52724:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 935:34	Opgrader
-src/lib/WorkshopModal.svelte:52775:52802:string:bjfftr	src/lib/WorkshopModal.svelte	string	string @ 936:50	Du har allerede stormøksen.
-src/lib/WorkshopModal.svelte:52818:52873:string:1umc0tg	src/lib/WorkshopModal.svelte	string	string @ 936:93	Bruger 175 guld og erstatter din økse med en stormøkse.
-src/lib/WorkshopModal.svelte:52878:52916:string:jbj78w	src/lib/WorkshopModal.svelte	string	string @ 936:153	Du skal først have en almindelig økse.
-src/lib/WorkshopModal.svelte:52967:52977:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 938:35	Opgraderet
-src/lib/WorkshopModal.svelte:52993:53001:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 938:61	Opgrader
-src/lib/WorkshopModal.svelte:53006:53017:string:j1u964	src/lib/WorkshopModal.svelte	string	string @ 938:74	Kræver økse
-src/lib/WorkshopModal.svelte:53184:53199:string:1nb9mn8	src/lib/WorkshopModal.svelte	string	string @ 945:30	Tøj-opgradering
-src/lib/WorkshopModal.svelte:53229:53318:string:1mmdyg0	src/lib/WorkshopModal.svelte	string	string @ 946:29	Kræver tøj og 100 guld. Værkstedet syr det om til fint tøj, som giver bedre guldindkomst.
-src/lib/WorkshopModal.svelte:53418:53421:attribute:1yr0t3l	src/lib/WorkshopModal.svelte	attribute	alt @ 949:54	Tøj
-src/lib/WorkshopModal.svelte:53514:53522:attribute:icc76w	src/lib/WorkshopModal.svelte	attribute	alt @ 951:58	Fint tøj
-src/lib/WorkshopModal.svelte:53622:53638:text:6d4ml1	src/lib/WorkshopModal.svelte	text	markup @ 955:25	Tøj til Fint tøj
-src/lib/WorkshopModal.svelte:53667:53763:text:yideeh	src/lib/WorkshopModal.svelte	text	markup @ 956:20	Fint tøj giver +15% guldindkomst og lidt beskyttelse, men kan blive flænset i huler og blodskov.
-src/lib/WorkshopModal.svelte:54030:54038:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 964:34	Opgrader
-src/lib/WorkshopModal.svelte:54089:54116:string:c73v74	src/lib/WorkshopModal.svelte	string	string @ 965:50	Du har allerede royalt tøj.
-src/lib/WorkshopModal.svelte:54135:54160:string:19c3u22	src/lib/WorkshopModal.svelte	string	string @ 965:96	Du har allerede fint tøj.
-src/lib/WorkshopModal.svelte:54176:54223:string:1jlui5i	src/lib/WorkshopModal.svelte	string	string @ 965:137	Bruger 100 guld og syr dit tøj om til fint tøj.
-src/lib/WorkshopModal.svelte:54228:54251:string:1ozyyck	src/lib/WorkshopModal.svelte	string	string @ 965:189	Du skal først have tøj.
-src/lib/WorkshopModal.svelte:54317:54327:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 967:50	Opgraderet
-src/lib/WorkshopModal.svelte:54343:54351:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 967:76	Opgrader
-src/lib/WorkshopModal.svelte:54356:54366:string:1yawclx	src/lib/WorkshopModal.svelte	string	string @ 967:89	Kræver tøj
-src/lib/WorkshopModal.svelte:54536:54546:string:18evrpy	src/lib/WorkshopModal.svelte	string	string @ 974:30	Royalt tøj
-src/lib/WorkshopModal.svelte:54576:54693:string:1niy4u1	src/lib/WorkshopModal.svelte	string	string @ 975:29	Kræver fint tøj og 500 guld. Royalt tøj giver stor guldindkomst og bliver nedgraderet til fint tøj, hvis det flænses.
-src/lib/WorkshopModal.svelte:54797:54805:attribute:icc76w	src/lib/WorkshopModal.svelte	attribute	alt @ 978:58	Fint tøj
-src/lib/WorkshopModal.svelte:54900:54910:attribute:18evrpy	src/lib/WorkshopModal.svelte	attribute	alt @ 980:60	Royalt tøj
-src/lib/WorkshopModal.svelte:55010:55033:text:1i8e1ko	src/lib/WorkshopModal.svelte	text	markup @ 984:25	Fint tøj til Royalt tøj
-src/lib/WorkshopModal.svelte:55062:55161:text:1g4y7dz	src/lib/WorkshopModal.svelte	text	markup @ 985:20	+40% guldindkomst og lidt bedre beskyttelse. Hvis det flænses, bliver det til almindeligt fint tøj.
-src/lib/WorkshopModal.svelte:55439:55447:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 993:34	Opgrader
-src/lib/WorkshopModal.svelte:55498:55525:string:c73v74	src/lib/WorkshopModal.svelte	string	string @ 994:50	Du har allerede royalt tøj.
-src/lib/WorkshopModal.svelte:55544:55601:string:1gxpz7d	src/lib/WorkshopModal.svelte	string	string @ 994:96	Bruger 500 guld og erstatter dit fine tøj med royalt tøj.
-src/lib/WorkshopModal.svelte:55606:55634:string:ecg74p	src/lib/WorkshopModal.svelte	string	string @ 994:158	Du skal først have fint tøj.
-src/lib/WorkshopModal.svelte:55685:55695:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 996:35	Opgraderet
-src/lib/WorkshopModal.svelte:55714:55722:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 996:64	Opgrader
-src/lib/WorkshopModal.svelte:55727:55742:string:1mm5awc	src/lib/WorkshopModal.svelte	string	string @ 996:77	Kræver fint tøj
-src/lib/WorkshopModal.svelte:55910:55928:string:15s8guy	src/lib/WorkshopModal.svelte	string	string @ 1003:30	Fakkel-opgradering
-src/lib/WorkshopModal.svelte:55958:56052:string:wxp20l	src/lib/WorkshopModal.svelte	string	string @ 1004:29	Kræver en almindelig fakkel og 225 guld. Solfaklen giver +2 syn og kan tænde et større solbål.
-src/lib/WorkshopModal.svelte:56153:56159:attribute:nfa7bz	src/lib/WorkshopModal.svelte	attribute	alt @ 1007:55	Fakkel
-src/lib/WorkshopModal.svelte:56252:56261:attribute:uievpf	src/lib/WorkshopModal.svelte	attribute	alt @ 1009:58	Solfakkel
-src/lib/WorkshopModal.svelte:56361:56381:text:sije0u	src/lib/WorkshopModal.svelte	text	markup @ 1013:25	Fakkel til Solfakkel
-src/lib/WorkshopModal.svelte:56410:56489:text:bblng6	src/lib/WorkshopModal.svelte	text	markup @ 1014:20	+2 syn. Solbålet afslører et større område for alle, giver fuld HP og 100 guld.
-src/lib/WorkshopModal.svelte:56758:56766:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1022:34	Opgrader
-src/lib/WorkshopModal.svelte:56813:56870:string:14culyr	src/lib/WorkshopModal.svelte	string	string @ 1023:46	Bruger 225 guld og opgraderer én fakkel til én solfakkel.
-src/lib/WorkshopModal.svelte:56875:56915:string:34men9	src/lib/WorkshopModal.svelte	string	string @ 1023:108	Du skal først have en almindelig fakkel.
-src/lib/WorkshopModal.svelte:56962:56970:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1025:31	Opgrader
-src/lib/WorkshopModal.svelte:56975:56988:string:17wf4sr	src/lib/WorkshopModal.svelte	string	string @ 1025:44	Kræver fakkel
-src/lib/WorkshopModal.svelte:57158:57178:string:1vh5bk2	src/lib/WorkshopModal.svelte	string	string @ 1032:30	Detektor-opgradering
-src/lib/WorkshopModal.svelte:57208:57373:string:1qkprqk	src/lib/WorkshopModal.svelte	string	string @ 1033:29	Kræver en almindelig detektor og 250 guld. Malmviseren viser skjult guld som før, afslører guldminer inden for radius 2 og giver 25% mere, når du graver guldet frem.
-src/lib/WorkshopModal.svelte:57481:57489:attribute:1brjz6v	src/lib/WorkshopModal.svelte	attribute	alt @ 1036:62	Detektor
-src/lib/WorkshopModal.svelte:57582:57591:attribute:1n7bnnd	src/lib/WorkshopModal.svelte	attribute	alt @ 1038:58	Malmviser
-src/lib/WorkshopModal.svelte:57691:57713:text:rshv7o	src/lib/WorkshopModal.svelte	text	markup @ 1042:25	Detektor til Malmviser
-src/lib/WorkshopModal.svelte:57742:57855:text:ijeg5g	src/lib/WorkshopModal.svelte	text	markup @ 1043:20	Viser skjult guld i radius 3. Guldminer inden for radius 2 popper frem gennem bjerge. Graveguld giver 25% ekstra.
-src/lib/WorkshopModal.svelte:58130:58138:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1051:34	Opgrader
-src/lib/WorkshopModal.svelte:58188:58216:string:12z6bmg	src/lib/WorkshopModal.svelte	string	string @ 1052:49	Du har allerede malmviseren.
-src/lib/WorkshopModal.svelte:58235:58294:string:10f9461	src/lib/WorkshopModal.svelte	string	string @ 1052:96	Bruger 250 guld og erstatter din detektor med en malmviser.
-src/lib/WorkshopModal.svelte:58299:58341:string:1ou91ud	src/lib/WorkshopModal.svelte	string	string @ 1052:160	Du skal først have en almindelig detektor.
-src/lib/WorkshopModal.svelte:58391:58401:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 1054:34	Opgraderet
-src/lib/WorkshopModal.svelte:58420:58428:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1054:63	Opgrader
-src/lib/WorkshopModal.svelte:58433:58448:string:9lxjm3	src/lib/WorkshopModal.svelte	string	string @ 1054:76	Kræver detektor
-src/lib/WorkshopModal.svelte:58613:58628:string:uvam4q	src/lib/WorkshopModal.svelte	string	string @ 1061:30	Bue-opgradering
-src/lib/WorkshopModal.svelte:58658:58789:string:1bft7jl	src/lib/WorkshopModal.svelte	string	string @ 1062:29	Kræver en almindelig bue og 175 guld. Falkebuen tæller som bue, forbedrer buevalg og afslører en lille vifte foran dig, når du går.
-src/lib/WorkshopModal.svelte:58887:58890:attribute:1nm435b	src/lib/WorkshopModal.svelte	attribute	alt @ 1065:52	Bue
-src/lib/WorkshopModal.svelte:58983:58991:attribute:1o3apno	src/lib/WorkshopModal.svelte	attribute	alt @ 1067:58	Falkebue
-src/lib/WorkshopModal.svelte:59091:59107:text:1d60cuj	src/lib/WorkshopModal.svelte	text	markup @ 1071:25	Bue til Falkebue
-src/lib/WorkshopModal.svelte:59136:59292:text:wrp4vh	src/lib/WorkshopModal.svelte	text	markup @ 1072:20	Tæller som bue i events. Buevalg giver 25% mere guld og halverer skade. Når du går, afslører den en lille vifte lige uden for dit syn i bevægelsesretningen.
-src/lib/WorkshopModal.svelte:59552:59560:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1080:34	Opgrader
-src/lib/WorkshopModal.svelte:59610:59636:string:qrkeiw	src/lib/WorkshopModal.svelte	string	string @ 1081:49	Du har allerede falkebuen.
-src/lib/WorkshopModal.svelte:59650:59703:string:i2j5y8	src/lib/WorkshopModal.svelte	string	string @ 1081:89	Bruger 175 guld og erstatter din bue med en falkebue.
-src/lib/WorkshopModal.svelte:59708:59745:string:1nacibd	src/lib/WorkshopModal.svelte	string	string @ 1081:147	Du skal først have en almindelig bue.
-src/lib/WorkshopModal.svelte:59795:59805:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 1083:34	Opgraderet
-src/lib/WorkshopModal.svelte:59819:59827:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1083:58	Opgrader
-src/lib/WorkshopModal.svelte:59832:59842:string:1wcqepn	src/lib/WorkshopModal.svelte	string	string @ 1083:71	Kræver bue
-src/lib/WorkshopModal.svelte:59963:59980:string:zvd6p3	src/lib/WorkshopModal.svelte	string	string @ 1088:67	Forlad værkstedet
-src/lib/WorkshopModal.svelte:59984:59998:string:1y36yy9	src/lib/WorkshopModal.svelte	string	string @ 1088:88	Leave workshop
+src/lib/WorkshopModal.svelte:6511:6589:string:1ypprgi	src/lib/WorkshopModal.svelte	string	string @ 82:18	 Mesteren ser din titel og nøjes med beløbet. Ingen på værkstedet protesterer.
+src/lib/WorkshopModal.svelte:6609:6692:string:zcrvhk	src/lib/WorkshopModal.svelte	string	string @ 83:18	 The master sees your title and accepts the amount. No one in the workshop objects.
+src/lib/WorkshopModal.svelte:8524:8557:string:1fh9thd	src/lib/WorkshopModal.svelte	string	string @ 129:45	Din skovl er allerede opgraderet.
+src/lib/WorkshopModal.svelte:8561:8593:string:13ov3tp	src/lib/WorkshopModal.svelte	string	string @ 129:82	Your shovel is already upgraded.
+src/lib/WorkshopModal.svelte:8697:8740:string:13uzv9b	src/lib/WorkshopModal.svelte	string	string @ 134:45	Du har ingen almindelig skovl at opgradere.
+src/lib/WorkshopModal.svelte:8744:8788:string:1gwzv7t	src/lib/WorkshopModal.svelte	string	string @ 134:92	You do not have a regular shovel to upgrade.
+src/lib/WorkshopModal.svelte:8930:8971:string:tcbiz1	src/lib/WorkshopModal.svelte	string	string @ 139:45	Du mangler guld til at opgradere skovlen.
+src/lib/WorkshopModal.svelte:8975:9016:string:spcram	src/lib/WorkshopModal.svelte	string	string @ 139:90	You need more gold to upgrade the shovel.
+src/lib/WorkshopModal.svelte:9395:9476:string:7pxdli	src/lib/WorkshopModal.svelte	string	string @ 149:41	Værkstedet afbalancerer skaftet og hærder bladet. Din skovl er nu en mesterskovl.
+src/lib/WorkshopModal.svelte:9480:9571:string:1qdjn0i	src/lib/WorkshopModal.svelte	string	string @ 149:126	The workshop balances the handle and hardens the blade. Your shovel is now a master shovel.
+src/lib/WorkshopModal.svelte:9713:9745:string:16n3jcs	src/lib/WorkshopModal.svelte	string	string @ 155:45	Din stav er allerede opgraderet.
+src/lib/WorkshopModal.svelte:9749:9780:string:1nr7pay	src/lib/WorkshopModal.svelte	string	string @ 155:81	Your staff is already upgraded.
+src/lib/WorkshopModal.svelte:9883:9925:string:1t03nkm	src/lib/WorkshopModal.svelte	string	string @ 160:45	Du har ingen almindelig stav at opgradere.
+src/lib/WorkshopModal.svelte:9929:9972:string:1r6xh3q	src/lib/WorkshopModal.svelte	string	string @ 160:91	You do not have a regular staff to upgrade.
+src/lib/WorkshopModal.svelte:10113:10153:string:e9imjk	src/lib/WorkshopModal.svelte	string	string @ 165:45	Du mangler guld til at opgradere staven.
+src/lib/WorkshopModal.svelte:10157:10197:string:12yfbof	src/lib/WorkshopModal.svelte	string	string @ 165:89	You need more gold to upgrade the staff.
+src/lib/WorkshopModal.svelte:10570:10637:string:857vng	src/lib/WorkshopModal.svelte	string	string @ 175:41	Mesteren sætter en glødende kerne i staven. Den er nu en dragestav.
+src/lib/WorkshopModal.svelte:10641:10713:string:8qbkc7	src/lib/WorkshopModal.svelte	string	string @ 175:112	The master fits a glowing core into the staff. It is now a dragon staff.
+src/lib/WorkshopModal.svelte:10856:10893:string:1v16pz6	src/lib/WorkshopModal.svelte	string	string @ 181:45	Din søgekvist er allerede opgraderet.
+src/lib/WorkshopModal.svelte:10897:10934:string:1treolk	src/lib/WorkshopModal.svelte	string	string @ 181:86	Your dowsing rod is already upgraded.
+src/lib/WorkshopModal.svelte:11038:11074:string:1b76zos	src/lib/WorkshopModal.svelte	string	string @ 186:45	Du har ingen søgekvist at opgradere.
+src/lib/WorkshopModal.svelte:11078:11119:string:krsgqw	src/lib/WorkshopModal.svelte	string	string @ 186:85	You do not have a dowsing rod to upgrade.
+src/lib/WorkshopModal.svelte:11261:11306:string:sqcvk	src/lib/WorkshopModal.svelte	string	string @ 191:45	Du mangler guld til at opgradere søgekvisten.
+src/lib/WorkshopModal.svelte:11310:11356:string:1ivomzp	src/lib/WorkshopModal.svelte	string	string @ 191:94	You need more gold to upgrade the dowsing rod.
+src/lib/WorkshopModal.svelte:11736:11813:string:zfl7kw	src/lib/WorkshopModal.svelte	string	string @ 201:41	Værkstedet skærer runer i kvisten. Den kan nu trække rødder op uden at grave.
+src/lib/WorkshopModal.svelte:11817:11896:string:dv09r8	src/lib/WorkshopModal.svelte	string	string @ 201:122	The workshop cuts runes into the rod. It can now pull up roots without digging.
+src/lib/WorkshopModal.svelte:12039:12071:string:15ct878	src/lib/WorkshopModal.svelte	string	string @ 207:45	Din dirk er allerede opgraderet.
+src/lib/WorkshopModal.svelte:12075:12109:string:wckttu	src/lib/WorkshopModal.svelte	string	string @ 207:81	Your lockpick is already upgraded.
+src/lib/WorkshopModal.svelte:12212:12254:string:9tkbee	src/lib/WorkshopModal.svelte	string	string @ 212:45	Du har ingen almindelig dirk at opgradere.
+src/lib/WorkshopModal.svelte:12258:12304:string:v76r9g	src/lib/WorkshopModal.svelte	string	string @ 212:91	You do not have a regular lockpick to upgrade.
+src/lib/WorkshopModal.svelte:12445:12485:string:12dj1k8	src/lib/WorkshopModal.svelte	string	string @ 217:45	Du mangler guld til at opgradere dirken.
+src/lib/WorkshopModal.svelte:12489:12532:string:rkkgfx	src/lib/WorkshopModal.svelte	string	string @ 217:89	You need more gold to upgrade the lockpick.
+src/lib/WorkshopModal.svelte:12907:12999:string:n4kio4	src/lib/WorkshopModal.svelte	string	string @ 227:41	Mesteren sliber dirkens tænder og bygger fine fjedre ind i skaftet. Den er nu en mesterdirk.
+src/lib/WorkshopModal.svelte:13003:13110:string:1qafl1k	src/lib/WorkshopModal.svelte	string	string @ 227:137	The master sharpens the lockpick’s teeth and fits fine springs into its shaft. It is now a master lockpick.
+src/lib/WorkshopModal.svelte:13253:13285:string:1g2qgii	src/lib/WorkshopModal.svelte	string	string @ 233:45	Din kniv er allerede opgraderet.
+src/lib/WorkshopModal.svelte:13289:13320:string:1kwewz	src/lib/WorkshopModal.svelte	string	string @ 233:81	Your knife is already upgraded.
+src/lib/WorkshopModal.svelte:13423:13465:string:1gl5lxc	src/lib/WorkshopModal.svelte	string	string @ 238:45	Du har ingen almindelig kniv at opgradere.
+src/lib/WorkshopModal.svelte:13469:13512:string:nvovxd	src/lib/WorkshopModal.svelte	string	string @ 238:91	You do not have a regular knife to upgrade.
+src/lib/WorkshopModal.svelte:13653:13693:string:845dvm	src/lib/WorkshopModal.svelte	string	string @ 243:45	Du mangler guld til at opgradere kniven.
+src/lib/WorkshopModal.svelte:13697:13737:string:v7asva	src/lib/WorkshopModal.svelte	string	string @ 243:89	You need more gold to upgrade the knife.
+src/lib/WorkshopModal.svelte:14112:14190:string:7tl629	src/lib/WorkshopModal.svelte	string	string @ 253:41	Værkstedet hærder bladet og afbalancerer grebet. Din kniv er nu en mesterkniv.
+src/lib/WorkshopModal.svelte:14194:14281:string:11joz1g	src/lib/WorkshopModal.svelte	string	string @ 253:123	The workshop hardens the blade and balances the grip. Your knife is now a master knife.
+src/lib/WorkshopModal.svelte:14429:14465:string:toxvtk	src/lib/WorkshopModal.svelte	string	string @ 259:45	Din rustning er allerede opgraderet.
+src/lib/WorkshopModal.svelte:14469:14500:string:16up0td	src/lib/WorkshopModal.svelte	string	string @ 259:85	Your armor is already upgraded.
+src/lib/WorkshopModal.svelte:14607:14653:string:xq7ipi	src/lib/WorkshopModal.svelte	string	string @ 264:45	Du har ingen almindelig rustning at opgradere.
+src/lib/WorkshopModal.svelte:14657:14698:string:1ns4g6s	src/lib/WorkshopModal.svelte	string	string @ 264:95	You do not have regular armor to upgrade.
+src/lib/WorkshopModal.svelte:14843:14887:string:jpie2w	src/lib/WorkshopModal.svelte	string	string @ 269:45	Du mangler guld til at opgradere rustningen.
+src/lib/WorkshopModal.svelte:14891:14931:string:ff0shk	src/lib/WorkshopModal.svelte	string	string @ 269:93	You need more gold to upgrade the armor.
+src/lib/WorkshopModal.svelte:15316:15413:string:wg9874	src/lib/WorkshopModal.svelte	string	string @ 279:41	Mesteren forgylder pladerne og fæstner ædelsten i brystpladen. Din rustning er nu et kongepanser.
+src/lib/WorkshopModal.svelte:15417:15511:string:n7asmz	src/lib/WorkshopModal.svelte	string	string @ 279:142	The master gilds the plates and sets gems into the breastplate. Your armor is now royal armor.
+src/lib/WorkshopModal.svelte:15655:15687:string:1484501	src/lib/WorkshopModal.svelte	string	string @ 285:45	Din økse er allerede opgraderet.
+src/lib/WorkshopModal.svelte:15691:15720:string:1qs0rzw	src/lib/WorkshopModal.svelte	string	string @ 285:81	Your axe is already upgraded.
+src/lib/WorkshopModal.svelte:15824:15866:string:1ni4e5v	src/lib/WorkshopModal.svelte	string	string @ 290:45	Du har ingen almindelig økse at opgradere.
+src/lib/WorkshopModal.svelte:15870:15911:string:r77xws	src/lib/WorkshopModal.svelte	string	string @ 290:91	You do not have a regular axe to upgrade.
+src/lib/WorkshopModal.svelte:16053:16092:string:juabao	src/lib/WorkshopModal.svelte	string	string @ 295:45	Du mangler guld til at opgradere øksen.
+src/lib/WorkshopModal.svelte:16096:16134:string:ng3t1	src/lib/WorkshopModal.svelte	string	string @ 295:88	You need more gold to upgrade the axe.
+src/lib/WorkshopModal.svelte:16511:16594:string:1qvuamw	src/lib/WorkshopModal.svelte	string	string @ 305:41	Værkstedet lægger runer i øksehovedet og hærder æggen. Din økse er nu en stormøkse.
+src/lib/WorkshopModal.svelte:16598:16690:string:1nlk46p	src/lib/WorkshopModal.svelte	string	string @ 305:128	The workshop sets runes into the axe head and hardens the edge. Your axe is now a storm axe.
+src/lib/WorkshopModal.svelte:16841:16874:string:1jtm92	src/lib/WorkshopModal.svelte	string	string @ 311:45	Din kølle er allerede opgraderet.
+src/lib/WorkshopModal.svelte:16878:16908:string:j8diso	src/lib/WorkshopModal.svelte	string	string @ 311:82	Your club is already upgraded.
+src/lib/WorkshopModal.svelte:17013:17056:string:q71uzs	src/lib/WorkshopModal.svelte	string	string @ 316:45	Du har ingen almindelig kølle at opgradere.
+src/lib/WorkshopModal.svelte:17060:17102:string:1bgpgqa	src/lib/WorkshopModal.svelte	string	string @ 316:92	You do not have a regular club to upgrade.
+src/lib/WorkshopModal.svelte:17245:17285:string:14rmtkt	src/lib/WorkshopModal.svelte	string	string @ 321:45	Du mangler guld til at opgradere køllen.
+src/lib/WorkshopModal.svelte:17289:17328:string:4ohdsj	src/lib/WorkshopModal.svelte	string	string @ 321:89	You need more gold to upgrade the club.
+src/lib/WorkshopModal.svelte:17709:17798:string:pv29z	src/lib/WorkshopModal.svelte	string	string @ 331:41	Værkstedet binder jern om hovedet og fylder kernen med bly. Din kølle er nu en murknuser.
+src/lib/WorkshopModal.svelte:17802:17903:string:89b9py	src/lib/WorkshopModal.svelte	string	string @ 331:134	The workshop binds iron around the head and fills the core with lead. Your club is now a wallbreaker.
+src/lib/WorkshopModal.svelte:18044:18075:string:1qma7h0	src/lib/WorkshopModal.svelte	string	string @ 337:45	Din bue er allerede opgraderet.
+src/lib/WorkshopModal.svelte:18079:18108:string:pgspcg	src/lib/WorkshopModal.svelte	string	string @ 337:80	Your bow is already upgraded.
+src/lib/WorkshopModal.svelte:18210:18251:string:1qgscj2	src/lib/WorkshopModal.svelte	string	string @ 342:45	Du har ingen almindelig bue at opgradere.
+src/lib/WorkshopModal.svelte:18255:18296:string:j2k4nc	src/lib/WorkshopModal.svelte	string	string @ 342:90	You do not have a regular bow to upgrade.
+src/lib/WorkshopModal.svelte:18436:18474:string:12b7l17	src/lib/WorkshopModal.svelte	string	string @ 347:45	Du mangler guld til at opgradere buen.
+src/lib/WorkshopModal.svelte:18478:18516:string:9cqo1l	src/lib/WorkshopModal.svelte	string	string @ 347:87	You need more gold to upgrade the bow.
+src/lib/WorkshopModal.svelte:18887:18977:string:1yeutft	src/lib/WorkshopModal.svelte	string	string @ 357:41	Værkstedet spænder buen med ny sene og indlægger horn i grebet. Din bue er nu en falkebue.
+src/lib/WorkshopModal.svelte:18981:19082:string:1i9qttn	src/lib/WorkshopModal.svelte	string	string @ 357:135	The workshop strings the bow with new cord and sets horn into the grip. Your bow is now a falcon bow.
+src/lib/WorkshopModal.svelte:19241:19270:string:1tao87a	src/lib/WorkshopModal.svelte	string	string @ 363:45	Dit tøj er allerede fint nok.
+src/lib/WorkshopModal.svelte:19274:19311:string:1kmc86	src/lib/WorkshopModal.svelte	string	string @ 363:78	Your clothes are already fine enough.
+src/lib/WorkshopModal.svelte:19415:19462:string:gmemmw	src/lib/WorkshopModal.svelte	string	string @ 368:45	Du har ikke noget almindeligt tøj at opgradere.
+src/lib/WorkshopModal.svelte:19466:19509:string:1sggpsv	src/lib/WorkshopModal.svelte	string	string @ 368:96	You do not have regular clothes to upgrade.
+src/lib/WorkshopModal.svelte:19652:19691:string:2uadta	src/lib/WorkshopModal.svelte	string	string @ 373:45	Du mangler guld til at opgradere tøjet.
+src/lib/WorkshopModal.svelte:19695:19737:string:us2nh5	src/lib/WorkshopModal.svelte	string	string @ 373:88	You need more gold to upgrade the clothes.
+src/lib/WorkshopModal.svelte:20142:20206:string:1yvutbi	src/lib/WorkshopModal.svelte	string	string @ 383:41	Værkstedet vasker, farver og syr dit tøj om. Du har nu fint tøj.
+src/lib/WorkshopModal.svelte:20210:20287:string:wcxz9b	src/lib/WorkshopModal.svelte	string	string @ 383:109	The workshop washes, dyes and resews your clothes. You now have fine clothes.
+src/lib/WorkshopModal.svelte:20434:20461:string:d0cob0	src/lib/WorkshopModal.svelte	string	string @ 389:45	Dit tøj er allerede royalt.
+src/lib/WorkshopModal.svelte:20465:20496:string:1l6c2vr	src/lib/WorkshopModal.svelte	string	string @ 389:76	Your clothes are already royal.
+src/lib/WorkshopModal.svelte:20603:20637:string:1vjncl0	src/lib/WorkshopModal.svelte	string	string @ 394:45	Du har ikke fint tøj at opgradere.
+src/lib/WorkshopModal.svelte:20641:20681:string:osk8z	src/lib/WorkshopModal.svelte	string	string @ 394:83	You do not have fine clothes to upgrade.
+src/lib/WorkshopModal.svelte:20829:20875:string:3f91hu	src/lib/WorkshopModal.svelte	string	string @ 399:45	Du mangler guld til at opgradere det fine tøj.
+src/lib/WorkshopModal.svelte:20879:20926:string:x9e7kf	src/lib/WorkshopModal.svelte	string	string @ 399:95	You need more gold to upgrade the fine clothes.
+src/lib/WorkshopModal.svelte:21338:21424:string:12whe7s	src/lib/WorkshopModal.svelte	string	string @ 409:41	Værkstedet broderer guldkant og lægger pels over skuldrene. Dit fine tøj er nu royalt.
+src/lib/WorkshopModal.svelte:21428:21530:string:91dsbv	src/lib/WorkshopModal.svelte	string	string @ 409:131	The workshop embroiders golden trim and lays fur over your shoulders. Your fine clothes are now royal.
+src/lib/WorkshopModal.svelte:21674:21744:string:oja8e0	src/lib/WorkshopModal.svelte	string	string @ 415:45	Du har allerede en solfakkel. Værkstedet opgraderer ikke flere fakler.
+src/lib/WorkshopModal.svelte:21748:21822:string:1g68fex	src/lib/WorkshopModal.svelte	string	string @ 415:119	You already have a sun torch. The workshop will not upgrade another torch.
+src/lib/WorkshopModal.svelte:21927:21971:string:w0ks20	src/lib/WorkshopModal.svelte	string	string @ 420:45	Du har ingen almindelig fakkel at opgradere.
+src/lib/WorkshopModal.svelte:21975:22018:string:1lzuqdi	src/lib/WorkshopModal.svelte	string	string @ 420:93	You do not have a regular torch to upgrade.
+src/lib/WorkshopModal.svelte:22161:22201:string:tj8wra	src/lib/WorkshopModal.svelte	string	string @ 425:45	Du mangler guld til at opgradere faklen.
+src/lib/WorkshopModal.svelte:22205:22245:string:1igfb5b	src/lib/WorkshopModal.svelte	string	string @ 425:89	You need more gold to upgrade the torch.
+src/lib/WorkshopModal.svelte:22398:22442:string:w0ks20	src/lib/WorkshopModal.svelte	string	string @ 431:45	Du har ingen almindelig fakkel at opgradere.
+src/lib/WorkshopModal.svelte:22446:22489:string:1lzuqdi	src/lib/WorkshopModal.svelte	string	string @ 431:93	You do not have a regular torch to upgrade.
+src/lib/WorkshopModal.svelte:22616:22691:string:8km8kn	src/lib/WorkshopModal.svelte	string	string @ 436:41	Værkstedet binder ildstenen i faklens krone. Din fakkel er nu en solfakkel.
+src/lib/WorkshopModal.svelte:22695:22780:string:6e0igp	src/lib/WorkshopModal.svelte	string	string @ 436:120	The workshop binds the firestone into the torch crown. Your torch is now a sun torch.
+src/lib/WorkshopModal.svelte:22926:22964:string:1l3hj5q	src/lib/WorkshopModal.svelte	string	string @ 442:45	Din detektor er allerede en malmviser.
+src/lib/WorkshopModal.svelte:22968:23007:string:1kf36zd	src/lib/WorkshopModal.svelte	string	string @ 442:87	Your detector is already an ore finder.
+src/lib/WorkshopModal.svelte:23114:23160:string:1mp9068	src/lib/WorkshopModal.svelte	string	string @ 447:45	Du har ingen almindelig detektor at opgradere.
+src/lib/WorkshopModal.svelte:23164:23210:string:3yave8	src/lib/WorkshopModal.svelte	string	string @ 447:95	You do not have a regular detector to upgrade.
+src/lib/WorkshopModal.svelte:23355:23399:string:cmp9pq	src/lib/WorkshopModal.svelte	string	string @ 452:45	Du mangler guld til at opgradere detektoren.
+src/lib/WorkshopModal.svelte:23403:23446:string:o7c1i9	src/lib/WorkshopModal.svelte	string	string @ 452:93	You need more gold to upgrade the detector.
+src/lib/WorkshopModal.svelte:23864:23942:string:1rg4qmf	src/lib/WorkshopModal.svelte	string	string @ 463:41	Mesteren kalibrerer spolen til at finde malm. Din detektor er nu en malmviser.
+src/lib/WorkshopModal.svelte:23946:24027:string:13u4pei	src/lib/WorkshopModal.svelte	string	string @ 463:123	The master calibrates the coil to detect ore. Your detector is now an ore finder.
+src/lib/WorkshopModal.svelte:24177:24213:string:186mx7a	src/lib/WorkshopModal.svelte	string	string @ 469:45	Din sovepose er allerede opgraderet.
+src/lib/WorkshopModal.svelte:24217:24255:string:1wfqk31	src/lib/WorkshopModal.svelte	string	string @ 469:85	Your sleeping bag is already upgraded.
+src/lib/WorkshopModal.svelte:24362:24408:string:np3lv0	src/lib/WorkshopModal.svelte	string	string @ 474:45	Du har ingen almindelig sovepose at opgradere.
+src/lib/WorkshopModal.svelte:24412:24462:string:15cksfd	src/lib/WorkshopModal.svelte	string	string @ 474:95	You do not have a regular sleeping bag to upgrade.
+src/lib/WorkshopModal.svelte:24607:24650:string:z7oswz	src/lib/WorkshopModal.svelte	string	string @ 479:45	Du mangler guld til at opgradere soveposen.
+src/lib/WorkshopModal.svelte:24654:24701:string:1pzpzny	src/lib/WorkshopModal.svelte	string	string @ 479:92	You need more gold to upgrade the sleeping bag.
+src/lib/WorkshopModal.svelte:25090:25173:string:bgr7i8	src/lib/WorkshopModal.svelte	string	string @ 489:41	Værkstedet syr blødt silkefoer og dun i posen. Din sovepose er nu en silkesovepose.
+src/lib/WorkshopModal.svelte:25177:25280:string:m08zea	src/lib/WorkshopModal.svelte	string	string @ 489:128	The workshop sews soft silk lining and down into the bag. Your sleeping bag is now a silk sleeping bag.
+src/lib/WorkshopModal.svelte:25707:25728:string:1kbaesk	src/lib/WorkshopModal.svelte	string	string @ 508:27	Skovl til Mesterskovl
+src/lib/WorkshopModal.svelte:25732:25755:string:1risq96	src/lib/WorkshopModal.svelte	string	string @ 508:52	Shovel to Master Shovel
+src/lib/WorkshopModal.svelte:25989:26062:string:1pb835a	src/lib/WorkshopModal.svelte	string	string @ 514:31	Dobbelt guld ved gravning. Nedgravede fælder findes uden at blive udløst.
+src/lib/WorkshopModal.svelte:26066:26139:string:emy0to	src/lib/WorkshopModal.svelte	string	string @ 514:108	Double gold when digging. Buried traps are found without being triggered.
+src/lib/WorkshopModal.svelte:26173:26190:string:hzyzfr	src/lib/WorkshopModal.svelte	string	string @ 515:31	Skovl-opgradering
+src/lib/WorkshopModal.svelte:26194:26208:string:me6yje	src/lib/WorkshopModal.svelte	string	string @ 515:52	Shovel upgrade
+src/lib/WorkshopModal.svelte:26241:26374:string:12rf4ej	src/lib/WorkshopModal.svelte	string	string @ 516:30	Kræver en almindelig skovl og 150 guld. Mesterskovlen giver dobbelt guld ved gravning og finder nedgravede fælder uden at udløse dem.
+src/lib/WorkshopModal.svelte:26378:26514:string:1p05oy4	src/lib/WorkshopModal.svelte	string	string @ 516:167	Requires a regular shovel and 150 gold. The master shovel gives double gold when digging and finds buried traps without triggering them.
+src/lib/WorkshopModal.svelte:26601:26619:string:7ud955	src/lib/WorkshopModal.svelte	string	string @ 520:27	Stav til Dragestav
+src/lib/WorkshopModal.svelte:26623:26644:string:1posxj7	src/lib/WorkshopModal.svelte	string	string @ 520:49	Staff to Dragon Staff
+src/lib/WorkshopModal.svelte:26870:27015:string:64ose0	src/lib/WorkshopModal.svelte	string	string @ 526:31	Fører dig 5 felter mod øst og viser ruten. Ender turen i vand, stopper du på det sidste sikre felt, og dragestaven bliver til en almindelig stav.
+src/lib/WorkshopModal.svelte:27019:27174:string:1bj1mm3	src/lib/WorkshopModal.svelte	string	string @ 526:180	Carries you 5 tiles east and reveals the route. If the journey ends in water, you stop on the last safe tile, and the dragon staff becomes a regular staff.
+src/lib/WorkshopModal.svelte:27208:27224:string:1cfllt4	src/lib/WorkshopModal.svelte	string	string @ 527:31	Stav-opgradering
+src/lib/WorkshopModal.svelte:27228:27241:string:q6354p	src/lib/WorkshopModal.svelte	string	string @ 527:51	Staff upgrade
+src/lib/WorkshopModal.svelte:27274:27485:string:1mt6xbm	src/lib/WorkshopModal.svelte	string	string @ 528:30	Kræver en almindelig stav og 200 guld. Dragestaven fører dig 5 felter mod øst og afslører ruten. Hvis turen ender i åbent vand, standser du på det sidste sikre felt, og dragestaven bliver til en almindelig stav.
+src/lib/WorkshopModal.svelte:27489:27705:string:1qz7rud	src/lib/WorkshopModal.svelte	string	string @ 528:245	Requires a regular staff and 200 gold. The dragon staff carries you 5 tiles east and reveals the route. If the journey ends in open water, you stop on the last safe tile, and the dragon staff becomes a regular staff.
+src/lib/WorkshopModal.svelte:27791:27814:string:1v38a53	src/lib/WorkshopModal.svelte	string	string @ 532:27	Søgekvist til Runekvist
+src/lib/WorkshopModal.svelte:27818:27841:string:1oe3gcx	src/lib/WorkshopModal.svelte	string	string @ 532:54	Dowsing Rod to Rune Rod
+src/lib/WorkshopModal.svelte:28076:28214:string:b9a415	src/lib/WorkshopModal.svelte	string	string @ 538:31	Trækker automatisk helende rødder op, når du mangler HP. Koster 1 energi. Du kan stadig grave bagefter, men der er intet tilbage at finde.
+src/lib/WorkshopModal.svelte:28218:28359:string:pm8j8w	src/lib/WorkshopModal.svelte	string	string @ 538:173	Automatically pulls up healing roots when you are missing HP. Costs 1 energy. You can still dig afterward, but there is nothing left to find.
+src/lib/WorkshopModal.svelte:28393:28410:string:vvy3vt	src/lib/WorkshopModal.svelte	string	string @ 539:31	Kvist-opgradering
+src/lib/WorkshopModal.svelte:28414:28425:string:1wqueiq	src/lib/WorkshopModal.svelte	string	string @ 539:52	Rod upgrade
+src/lib/WorkshopModal.svelte:28458:28691:string:1hc0l8g	src/lib/WorkshopModal.svelte	string	string @ 540:30	Kræver en søgekvist og 175 guld. Runekvisten viser rødder op til 3 felter væk og trækker dem automatisk op, når du mangler HP og går ind på feltet. Det koster 1 energi. Du kan stadig grave bagefter, men der er intet tilbage at finde.
+src/lib/WorkshopModal.svelte:28695:28936:string:n8z1w7	src/lib/WorkshopModal.svelte	string	string @ 540:267	Requires a dowsing rod and 175 gold. The rune rod reveals roots up to 3 tiles away and automatically pulls them up when you are missing HP and enter the tile. It costs 1 energy. You can still dig afterward, but there is nothing left to find.
+src/lib/WorkshopModal.svelte:29023:29042:string:m8v7bm	src/lib/WorkshopModal.svelte	string	string @ 544:27	Dirk til Mesterdirk
+src/lib/WorkshopModal.svelte:29046:29073:string:12pxgo8	src/lib/WorkshopModal.svelte	string	string @ 544:50	Lockpick to Master Lockpick
+src/lib/WorkshopModal.svelte:29301:29386:string:31pbir	src/lib/WorkshopModal.svelte	string	string @ 550:31	Dobbelt guld ved indbrud på tomme byfelter. Risikoen for at blive opdaget er uændret.
+src/lib/WorkshopModal.svelte:29390:29475:string:19lqilo	src/lib/WorkshopModal.svelte	string	string @ 550:120	Double gold from burglary on empty town tiles. The risk of being caught is unchanged.
+src/lib/WorkshopModal.svelte:29509:29525:string:esuupk	src/lib/WorkshopModal.svelte	string	string @ 551:31	Dirk-opgradering
+src/lib/WorkshopModal.svelte:29529:29545:string:we7npv	src/lib/WorkshopModal.svelte	string	string @ 551:51	Lockpick upgrade
+src/lib/WorkshopModal.svelte:29578:29709:string:r16i5g	src/lib/WorkshopModal.svelte	string	string @ 552:30	Kræver en almindelig dirk og 150 guld. Mesterdirken giver dobbelt guld ved indbrud og kan bruges til alle valg, der kræver en dirk.
+src/lib/WorkshopModal.svelte:29713:29859:string:12251ob	src/lib/WorkshopModal.svelte	string	string @ 552:165	Requires a regular lockpick and 150 gold. The master lockpick gives double gold from burglary and works for every choice that requires a lockpick.
+src/lib/WorkshopModal.svelte:29945:29964:string:1xlyjb2	src/lib/WorkshopModal.svelte	string	string @ 556:27	Kniv til Mesterkniv
+src/lib/WorkshopModal.svelte:29968:29989:string:a536hu	src/lib/WorkshopModal.svelte	string	string @ 556:50	Knife to Master Knife
+src/lib/WorkshopModal.svelte:30217:30303:string:1o0axns	src/lib/WorkshopModal.svelte	string	string @ 562:31	Kan bruges til alle valg, der kræver en kniv. De valg giver mere guld og mindre skade.
+src/lib/WorkshopModal.svelte:30307:30398:string:196063j	src/lib/WorkshopModal.svelte	string	string @ 562:121	Works for every choice that requires a knife. Those choices give more gold and less damage.
+src/lib/WorkshopModal.svelte:30432:30448:string:1b2iogu	src/lib/WorkshopModal.svelte	string	string @ 563:31	Kniv-opgradering
+src/lib/WorkshopModal.svelte:30452:30465:string:90q0um	src/lib/WorkshopModal.svelte	string	string @ 563:51	Knife upgrade
+src/lib/WorkshopModal.svelte:30498:30606:string:o1pmex	src/lib/WorkshopModal.svelte	string	string @ 564:30	Kræver en almindelig kniv og 150 guld. Mesterkniven kan bruges til alle knivvalg og forbedrer deres udbytte.
+src/lib/WorkshopModal.svelte:30610:30720:string:181qy8i	src/lib/WorkshopModal.svelte	string	string @ 564:142	Requires a regular knife and 150 gold. The master knife works for every knife choice and improves its outcome.
+src/lib/WorkshopModal.svelte:30806:30830:string:c9z3rv	src/lib/WorkshopModal.svelte	string	string @ 568:27	Rustning til Kongepanser
+src/lib/WorkshopModal.svelte:30834:30854:string:11ebf8h	src/lib/WorkshopModal.svelte	string	string @ 568:55	Armor to Royal Armor
+src/lib/WorkshopModal.svelte:31100:31214:string:1to4bho	src/lib/WorkshopModal.svelte	string	string @ 574:31	70 % skadesreduktion. Koster normalt 1 ekstra energi pr. skridt, men ikke for Ridder og Skjoldmø. Går tabt i vand.
+src/lib/WorkshopModal.svelte:31218:31335:string:vfjbxq	src/lib/WorkshopModal.svelte	string	string @ 574:149	70% damage reduction. Normally costs 1 extra energy per step, but not for the Knight and Shieldmaiden. Lost in water.
+src/lib/WorkshopModal.svelte:31369:31389:string:1np9muw	src/lib/WorkshopModal.svelte	string	string @ 575:31	Rustning-opgradering
+src/lib/WorkshopModal.svelte:31393:31406:string:bpxis0	src/lib/WorkshopModal.svelte	string	string @ 575:55	Armor upgrade
+src/lib/WorkshopModal.svelte:31439:31628:string:ajhld8	src/lib/WorkshopModal.svelte	string	string @ 576:30	Kræver almindelig rustning og 250 guld. Kongepanseret reducerer skade med 70 %, men koster normalt 1 ekstra energi pr. skridt. Ridder og Skjoldmø ignorerer vægten. Panseret går tabt i vand.
+src/lib/WorkshopModal.svelte:31632:31821:string:1rwdlvz	src/lib/WorkshopModal.svelte	string	string @ 576:223	Requires regular armor and 250 gold. Royal armor reduces damage by 70% but normally costs 1 extra energy per step. The Knight and Shieldmaiden ignore the weight. The armor is lost in water.
+src/lib/WorkshopModal.svelte:31911:31929:string:1383is5	src/lib/WorkshopModal.svelte	string	string @ 580:27	Økse til Stormøkse
+src/lib/WorkshopModal.svelte:31933:31949:string:1uocaol	src/lib/WorkshopModal.svelte	string	string @ 580:49	Axe to Storm Axe
+src/lib/WorkshopModal.svelte:32181:32275:string:wanb4r	src/lib/WorkshopModal.svelte	string	string @ 586:31	Kan bruges til alle valg, der kræver en økse. De valg giver 50 % mere guld og halverer skaden.
+src/lib/WorkshopModal.svelte:32279:32378:string:hdv0ro	src/lib/WorkshopModal.svelte	string	string @ 586:129	Works for every choice that requires an axe. Those choices give 50% more gold and halve the damage.
+src/lib/WorkshopModal.svelte:32412:32428:string:ain5s1	src/lib/WorkshopModal.svelte	string	string @ 587:31	Økse-opgradering
+src/lib/WorkshopModal.svelte:32432:32443:string:kq174r	src/lib/WorkshopModal.svelte	string	string @ 587:51	Axe upgrade
+src/lib/WorkshopModal.svelte:32476:32591:string:83taob	src/lib/WorkshopModal.svelte	string	string @ 588:30	Kræver en almindelig økse og 175 guld. Stormøksen kan bruges til alle øksevalg og giver mere guld med mindre skade.
+src/lib/WorkshopModal.svelte:32595:32710:string:13rjwz5	src/lib/WorkshopModal.svelte	string	string @ 588:149	Requires a regular axe and 175 gold. The storm axe works for every axe choice and gives more gold with less damage.
+src/lib/WorkshopModal.svelte:32797:32816:string:1p5jita	src/lib/WorkshopModal.svelte	string	string @ 592:27	Kølle til Murknuser
+src/lib/WorkshopModal.svelte:32820:32839:string:19u9k1q	src/lib/WorkshopModal.svelte	string	string @ 592:50	Club to Wallbreaker
+src/lib/WorkshopModal.svelte:33082:33164:string:tpmac2	src/lib/WorkshopModal.svelte	string	string @ 598:31	Kan ødelægge værksteder og tage guldet fra kassen. Det koster stadig meget energi.
+src/lib/WorkshopModal.svelte:33168:33254:string:1jm416u	src/lib/WorkshopModal.svelte	string	string @ 598:117	Can destroy workshops and take the gold from the till. It still costs a lot of energy.
+src/lib/WorkshopModal.svelte:33288:33305:string:1dim03w	src/lib/WorkshopModal.svelte	string	string @ 599:31	Kølle-opgradering
+src/lib/WorkshopModal.svelte:33309:33321:string:1dqb11	src/lib/WorkshopModal.svelte	string	string @ 599:52	Club upgrade
+src/lib/WorkshopModal.svelte:33354:33474:string:h63lme	src/lib/WorkshopModal.svelte	string	string @ 600:30	Kræver en almindelig kølle og 185 guld. Murknuseren kan ødelægge værksteder, som en almindelig kølle ikke kan bryde ned.
+src/lib/WorkshopModal.svelte:33478:33592:string:hz4zxa	src/lib/WorkshopModal.svelte	string	string @ 600:154	Requires a regular club and 185 gold. The wallbreaker can destroy workshops that a regular club cannot break down.
+src/lib/WorkshopModal.svelte:33680:33696:string:6d4ml1	src/lib/WorkshopModal.svelte	string	string @ 604:27	Tøj til Fint tøj
+src/lib/WorkshopModal.svelte:33700:33723:string:97gd8w	src/lib/WorkshopModal.svelte	string	string @ 604:47	Clothes to Fine Clothes
+src/lib/WorkshopModal.svelte:33971:34064:string:lushsw	src/lib/WorkshopModal.svelte	string	string @ 610:31	Fint tøj giver 15 % mere guld og lidt beskyttelse, men kan blive flænset i huler og blodskov.
+src/lib/WorkshopModal.svelte:34068:34163:string:1cogty3	src/lib/WorkshopModal.svelte	string	string @ 610:128	Fine clothes give 15% more gold and some protection but can be torn in caves and the bloodwood.
+src/lib/WorkshopModal.svelte:34197:34212:string:1nb9mn8	src/lib/WorkshopModal.svelte	string	string @ 611:31	Tøj-opgradering
+src/lib/WorkshopModal.svelte:34216:34231:string:9gsj8b	src/lib/WorkshopModal.svelte	string	string @ 611:50	Clothes upgrade
+src/lib/WorkshopModal.svelte:34264:34369:string:1qyyc2j	src/lib/WorkshopModal.svelte	string	string @ 612:30	Kræver tøj og 100 guld. Værkstedet syr det om til fint tøj, som giver 15 % mere guld og lidt beskyttelse.
+src/lib/WorkshopModal.svelte:34373:34490:string:1qdtp7v	src/lib/WorkshopModal.svelte	string	string @ 612:139	Requires clothes and 100 gold. The workshop turns them into fine clothes that give 15% more gold and some protection.
+src/lib/WorkshopModal.svelte:34577:34600:string:1i8e1ko	src/lib/WorkshopModal.svelte	string	string @ 616:27	Fint tøj til Royalt tøj
+src/lib/WorkshopModal.svelte:34604:34633:string:18l6uy5	src/lib/WorkshopModal.svelte	string	string @ 616:54	Fine Clothes to Royal Clothes
+src/lib/WorkshopModal.svelte:34882:34980:string:1jzmdaw	src/lib/WorkshopModal.svelte	string	string @ 622:31	40 % mere guld og lidt bedre beskyttelse. Hvis tøjet flænses, bliver det til almindeligt fint tøj.
+src/lib/WorkshopModal.svelte:34984:35088:string:18oepb7	src/lib/WorkshopModal.svelte	string	string @ 622:133	40% more gold and slightly better protection. If the clothes are torn, they become regular fine clothes.
+src/lib/WorkshopModal.svelte:35122:35132:string:18evrpy	src/lib/WorkshopModal.svelte	string	string @ 623:31	Royalt tøj
+src/lib/WorkshopModal.svelte:35136:35149:string:cnoai0	src/lib/WorkshopModal.svelte	string	string @ 623:45	Royal clothes
+src/lib/WorkshopModal.svelte:35182:35284:string:1u3d5rz	src/lib/WorkshopModal.svelte	string	string @ 624:30	Kræver fint tøj og 500 guld. Royalt tøj giver 40 % mere guld og bliver til fint tøj, hvis det flænses.
+src/lib/WorkshopModal.svelte:35288:35389:string:3egh83	src/lib/WorkshopModal.svelte	string	string @ 624:136	Requires fine clothes and 500 gold. Royal clothes give 40% more gold and become fine clothes if torn.
+src/lib/WorkshopModal.svelte:35479:35499:string:sije0u	src/lib/WorkshopModal.svelte	string	string @ 628:27	Fakkel til Solfakkel
+src/lib/WorkshopModal.svelte:35503:35521:string:j1l6eu	src/lib/WorkshopModal.svelte	string	string @ 628:51	Torch to Sun Torch
+src/lib/WorkshopModal.svelte:35755:35851:string:14o8xpz	src/lib/WorkshopModal.svelte	string	string @ 634:31	Du ser 2 felter længere. Solbålet afslører et større område for alle, giver fuld HP og 100 guld.
+src/lib/WorkshopModal.svelte:35855:35955:string:1wwm72r	src/lib/WorkshopModal.svelte	string	string @ 634:131	You see 2 tiles farther. The sunfire reveals a larger area for everyone, gives full HP and 100 gold.
+src/lib/WorkshopModal.svelte:35989:36007:string:15s8guy	src/lib/WorkshopModal.svelte	string	string @ 635:31	Fakkel-opgradering
+src/lib/WorkshopModal.svelte:36011:36024:string:1pglbah	src/lib/WorkshopModal.svelte	string	string @ 635:53	Torch upgrade
+src/lib/WorkshopModal.svelte:36057:36168:string:1utsu24	src/lib/WorkshopModal.svelte	string	string @ 636:30	Kræver en almindelig fakkel og 225 guld. Solfaklen lader dig se 2 felter længere og kan tænde et større solbål.
+src/lib/WorkshopModal.svelte:36172:36285:string:vnqelt	src/lib/WorkshopModal.svelte	string	string @ 636:145	Requires a regular torch and 225 gold. The sun torch lets you see 2 tiles farther and can light a larger sunfire.
+src/lib/WorkshopModal.svelte:36373:36399:string:t8t344	src/lib/WorkshopModal.svelte	string	string @ 640:27	Sovepose til Silkesovepose
+src/lib/WorkshopModal.svelte:36403:36436:string:1vl2od7	src/lib/WorkshopModal.svelte	string	string @ 640:57	Sleeping Bag to Silk Sleeping Bag
+src/lib/WorkshopModal.svelte:36686:36778:string:gdc3u	src/lib/WorkshopModal.svelte	string	string @ 646:31	Hvile genvinder op til 40 HP i stedet for 20. I huler bliver den til en almindelig sovepose.
+src/lib/WorkshopModal.svelte:36782:36867:string:jk6ns1	src/lib/WorkshopModal.svelte	string	string @ 646:127	Rest recovers up to 40 HP instead of 20. In caves, it becomes a regular sleeping bag.
+src/lib/WorkshopModal.svelte:36901:36921:string:1i8c51e	src/lib/WorkshopModal.svelte	string	string @ 647:31	Sovepose-opgradering
+src/lib/WorkshopModal.svelte:36925:36945:string:upb556	src/lib/WorkshopModal.svelte	string	string @ 647:55	Sleeping bag upgrade
+src/lib/WorkshopModal.svelte:36978:37114:string:1vdparr	src/lib/WorkshopModal.svelte	string	string @ 648:30	Kræver en almindelig sovepose og 150 guld. Silkesoveposen genvinder op til 40 HP ved hvile. Hulefugt gør den til en almindelig sovepose.
+src/lib/WorkshopModal.svelte:37118:37268:string:gp8upc	src/lib/WorkshopModal.svelte	string	string @ 648:170	Requires a regular sleeping bag and 150 gold. The silk sleeping bag recovers up to 40 HP when resting. Cave damp turns it into a regular sleeping bag.
+src/lib/WorkshopModal.svelte:37358:37380:string:rshv7o	src/lib/WorkshopModal.svelte	string	string @ 652:27	Detektor til Malmviser
+src/lib/WorkshopModal.svelte:37384:37406:string:1mv4f1g	src/lib/WorkshopModal.svelte	string	string @ 652:53	Detector to Ore Finder
+src/lib/WorkshopModal.svelte:37653:37782:string:fhoyff	src/lib/WorkshopModal.svelte	string	string @ 658:31	Viser skjult guld op til 3 felter væk og guldminer op til 2 felter væk, selv bag bjerge. Du finder 25 % mere guld, når du graver.
+src/lib/WorkshopModal.svelte:37786:37917:string:1t8shnf	src/lib/WorkshopModal.svelte	string	string @ 658:164	Shows hidden gold up to 3 tiles away and gold mines up to 2 tiles away, even behind mountains. You find 25% more gold when digging.
+src/lib/WorkshopModal.svelte:37951:37971:string:1vh5bk2	src/lib/WorkshopModal.svelte	string	string @ 659:31	Detektor-opgradering
+src/lib/WorkshopModal.svelte:37975:37991:string:qlenpb	src/lib/WorkshopModal.svelte	string	string @ 659:55	Detector upgrade
+src/lib/WorkshopModal.svelte:38024:38247:string:9wwzel	src/lib/WorkshopModal.svelte	string	string @ 660:30	Kræver en almindelig detektor og 250 guld. Malmviseren afslører skjult guld op til 3 felter væk, finder guldminer op til 2 felter væk og giver 25 % mere guld ved gravning. Krystaller gør den til en almindelig detektor igen.
+src/lib/WorkshopModal.svelte:38251:38468:string:ihysbw	src/lib/WorkshopModal.svelte	string	string @ 660:257	Requires a regular detector and 250 gold. The ore finder reveals hidden gold up to 3 tiles away, finds gold mines up to 2 tiles away and gives 25% more gold when digging. Crystals turn it back into a regular detector.
+src/lib/WorkshopModal.svelte:38558:38574:string:1d60cuj	src/lib/WorkshopModal.svelte	string	string @ 664:27	Bue til Falkebue
+src/lib/WorkshopModal.svelte:38578:38595:string:43dl11	src/lib/WorkshopModal.svelte	string	string @ 664:47	Bow to Falcon Bow
+src/lib/WorkshopModal.svelte:38817:38963:string:db5eko	src/lib/WorkshopModal.svelte	string	string @ 670:31	Kan bruges til alle valg, der kræver en bue. De valg giver 25 % mere guld og halverer skaden. Når du går, afslører buen et lille område foran dig.
+src/lib/WorkshopModal.svelte:38967:39123:string:v8jm5d	src/lib/WorkshopModal.svelte	string	string @ 670:181	Works for every choice that requires a bow. Those choices give 25% more gold and halve the damage. When you move, the bow reveals a small area ahead of you.
+src/lib/WorkshopModal.svelte:39157:39172:string:uvam4q	src/lib/WorkshopModal.svelte	string	string @ 671:31	Bue-opgradering
+src/lib/WorkshopModal.svelte:39176:39187:string:50txcb	src/lib/WorkshopModal.svelte	string	string @ 671:50	Bow upgrade
+src/lib/WorkshopModal.svelte:39220:39341:string:1ppy3x9	src/lib/WorkshopModal.svelte	string	string @ 672:30	Kræver en almindelig bue og 175 guld. Falkebuen forbedrer alle buevalg og afslører et lille område foran dig, når du går.
+src/lib/WorkshopModal.svelte:39345:39475:string:1dvgwg2	src/lib/WorkshopModal.svelte	string	string @ 672:155	Requires a regular bow and 175 gold. The falcon bow improves every bow choice and reveals a small area ahead of you when you move.
+src/lib/WorkshopModal.svelte:39923:39931:string:1vjzexo	src/lib/WorkshopModal.svelte	string	string @ 684:33	Værksted
+src/lib/WorkshopModal.svelte:39935:39943:string:1qr5r8s	src/lib/WorkshopModal.svelte	string	string @ 684:45	Workshop
+src/lib/WorkshopModal.svelte:39978:40125:string:1sr1v6q	src/lib/WorkshopModal.svelte	string	string @ 685:32	Værkstedet opgraderer dit udstyr og erstatter den gamle genstand. Har du en kølle eller murknuser, afslutter mesteren handlen efter én opgradering.
+src/lib/WorkshopModal.svelte:40129:40272:string:1thqbp6	src/lib/WorkshopModal.svelte	string	string @ 685:183	The workshop upgrades your equipment and replaces the old item. If you have a club or wallbreaker, the master ends the trade after one upgrade.
+src/lib/WorkshopModal.svelte:40302:40318:string:r55hbv	src/lib/WorkshopModal.svelte	string	string @ 687:21	Mesterværkstedet
+src/lib/WorkshopModal.svelte:40322:40337:string:amyf4o	src/lib/WorkshopModal.svelte	string	string @ 687:41	Master Workshop
+src/lib/WorkshopModal.svelte:40436:40498:string:1ean8sj	src/lib/WorkshopModal.svelte	string	string @ 688:91	Here, ordinary equipment can be rebuilt into something better.
+src/lib/WorkshopModal.svelte:40663:40723:string:1gwy1h6	src/lib/WorkshopModal.svelte	string	string @ 691:107	You do not have anything the workshop can improve right now.
+src/lib/WorkshopModal.svelte:41810:41818:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 714:49	Opgrader
+src/lib/WorkshopModal.svelte:41822:41829:string:3ofr4n	src/lib/WorkshopModal.svelte	string	string @ 714:61	Upgrade
+src/lib/WorkshopModal.svelte:42241:42249:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 717:33	Opgrader
+src/lib/WorkshopModal.svelte:42253:42260:string:3ofr4n	src/lib/WorkshopModal.svelte	string	string @ 717:45	Upgrade
+src/lib/WorkshopModal.svelte:42504:42516:string:1khm7xp	src/lib/WorkshopModal.svelte	string	string @ 725:45	Mangler guld
+src/lib/WorkshopModal.svelte:42520:42532:string:1lxbpzn	src/lib/WorkshopModal.svelte	string	string @ 725:61	Missing gold
+src/lib/WorkshopModal.svelte:42579:42646:string:fhdq1w	src/lib/WorkshopModal.svelte	string	string @ 726:44	Du har genstanden, men mangler stadig guld til disse opgraderinger.
+src/lib/WorkshopModal.svelte:42650:42708:string:a0zcsm	src/lib/WorkshopModal.svelte	string	string @ 726:115	You have the item, but still need gold for these upgrades.
+src/lib/WorkshopModal.svelte:43805:43822:string:hzyzfr	src/lib/WorkshopModal.svelte	string	string @ 747:30	Skovl-opgradering
+src/lib/WorkshopModal.svelte:43852:43972:string:1xdcspu	src/lib/WorkshopModal.svelte	string	string @ 748:29	Kræver en almindelig skovl og 150 guld. Mesterskovlen giver dobbelt guld ved gravning og udløser ikke nedgravede fælder.
+src/lib/WorkshopModal.svelte:44072:44077:attribute:beisjq	src/lib/WorkshopModal.svelte	attribute	alt @ 751:54	Skovl
+src/lib/WorkshopModal.svelte:44172:44183:attribute:9b9jas	src/lib/WorkshopModal.svelte	attribute	alt @ 753:60	Mesterskovl
+src/lib/WorkshopModal.svelte:44283:44304:text:1kbaesk	src/lib/WorkshopModal.svelte	text	markup @ 757:25	Skovl til Mesterskovl
+src/lib/WorkshopModal.svelte:44333:44407:text:109z0pk	src/lib/WorkshopModal.svelte	text	markup @ 758:20	Dobbelt guld ved gravning. Nedgravede fælder bliver fundet uden at udløse.
+src/lib/WorkshopModal.svelte:44673:44681:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 766:34	Opgrader
+src/lib/WorkshopModal.svelte:44733:44763:string:6dznub	src/lib/WorkshopModal.svelte	string	string @ 767:51	Du har allerede mesterskovlen.
+src/lib/WorkshopModal.svelte:44779:44837:string:1k7u7xo	src/lib/WorkshopModal.svelte	string	string @ 767:97	Bruger 150 guld og erstatter din skovl med en mesterskovl.
+src/lib/WorkshopModal.svelte:44842:44881:string:1xi812y	src/lib/WorkshopModal.svelte	string	string @ 767:160	Du skal først have en almindelig skovl.
+src/lib/WorkshopModal.svelte:44933:44943:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 769:36	Opgraderet
+src/lib/WorkshopModal.svelte:44959:44967:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 769:62	Opgrader
+src/lib/WorkshopModal.svelte:44972:44984:string:hr2eh6	src/lib/WorkshopModal.svelte	string	string @ 769:75	Kræver skovl
+src/lib/WorkshopModal.svelte:45150:45166:string:1cfllt4	src/lib/WorkshopModal.svelte	string	string @ 776:30	Stav-opgradering
+src/lib/WorkshopModal.svelte:45196:45421:string:4pij0c	src/lib/WorkshopModal.svelte	string	string @ 777:29	Kræver en almindelig stav og 200 guld. Dragestaven teleporterer 5 felter mod øst og afslører ruten imellem. Kun hvis selve teleporten ville ende i åbent vand, stopper den på sidste sikre felt og bliver til en almindelig stav.
+src/lib/WorkshopModal.svelte:45520:45524:attribute:np2vod	src/lib/WorkshopModal.svelte	attribute	alt @ 780:53	Stav
+src/lib/WorkshopModal.svelte:45617:45626:attribute:3a887i	src/lib/WorkshopModal.svelte	attribute	alt @ 782:58	Dragestav
+src/lib/WorkshopModal.svelte:45726:45744:text:7ud955	src/lib/WorkshopModal.svelte	text	markup @ 786:25	Stav til Dragestav
+src/lib/WorkshopModal.svelte:45773:45897:text:1000nj	src/lib/WorkshopModal.svelte	text	markup @ 787:20	5 felter mod øst. Viser ruten imellem. Hvis teleporten ville ende i vand, stopper den sikkert og bliver til almindelig stav.
+src/lib/WorkshopModal.svelte:46160:46168:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 795:34	Opgrader
+src/lib/WorkshopModal.svelte:46218:46246:string:l4c701	src/lib/WorkshopModal.svelte	string	string @ 796:49	Du har allerede dragestaven.
+src/lib/WorkshopModal.svelte:46261:46316:string:10stdkx	src/lib/WorkshopModal.svelte	string	string @ 796:92	Bruger 200 guld og erstatter din stav med en dragestav.
+src/lib/WorkshopModal.svelte:46321:46359:string:6ftp2n	src/lib/WorkshopModal.svelte	string	string @ 796:152	Du skal først have en almindelig stav.
+src/lib/WorkshopModal.svelte:46409:46419:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 798:34	Opgraderet
+src/lib/WorkshopModal.svelte:46434:46442:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 798:59	Opgrader
+src/lib/WorkshopModal.svelte:46447:46458:string:ch2vs1	src/lib/WorkshopModal.svelte	string	string @ 798:72	Kræver stav
+src/lib/WorkshopModal.svelte:46625:46642:string:vvy3vt	src/lib/WorkshopModal.svelte	string	string @ 805:30	Kvist-opgradering
+src/lib/WorkshopModal.svelte:46672:46820:string:1x0ssft	src/lib/WorkshopModal.svelte	string	string @ 806:29	Kræver søgekvist og 175 guld. Runekvisten viser rødder i samme radius 3 og trækker automatisk skjult liv op, når du mangler HP og går ind på feltet.
+src/lib/WorkshopModal.svelte:46925:46934:attribute:ojyu45	src/lib/WorkshopModal.svelte	attribute	alt @ 809:59	Søgekvist
+src/lib/WorkshopModal.svelte:47027:47036:attribute:mbr8g	src/lib/WorkshopModal.svelte	attribute	alt @ 811:58	Runekvist
+src/lib/WorkshopModal.svelte:47136:47159:text:1v38a53	src/lib/WorkshopModal.svelte	text	markup @ 815:25	Søgekvist til Runekvist
+src/lib/WorkshopModal.svelte:47188:47298:text:8r6kzf	src/lib/WorkshopModal.svelte	text	markup @ 816:20	Trækker skjult liv op ved ankomst, hvis du mangler HP. Koster 1 energi og efterlader feltet ugravet, men tomt.
+src/lib/WorkshopModal.svelte:47564:47572:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 824:34	Opgrader
+src/lib/WorkshopModal.svelte:47622:47650:string:vl45y7	src/lib/WorkshopModal.svelte	string	string @ 825:49	Du har allerede runekvisten.
+src/lib/WorkshopModal.svelte:47666:47726:string:1rnlege	src/lib/WorkshopModal.svelte	string	string @ 825:93	Bruger 175 guld og erstatter din søgekvist med en runekvist.
+src/lib/WorkshopModal.svelte:47731:47763:string:ptj83h	src/lib/WorkshopModal.svelte	string	string @ 825:158	Du skal først have en søgekvist.
+src/lib/WorkshopModal.svelte:47813:47823:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 827:34	Opgraderet
+src/lib/WorkshopModal.svelte:47839:47847:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 827:60	Opgrader
+src/lib/WorkshopModal.svelte:47852:47864:string:x0pcfo	src/lib/WorkshopModal.svelte	string	string @ 827:73	Kræver kvist
+src/lib/WorkshopModal.svelte:48030:48046:string:esuupk	src/lib/WorkshopModal.svelte	string	string @ 834:30	Dirk-opgradering
+src/lib/WorkshopModal.svelte:48076:48185:string:1lr59wx	src/lib/WorkshopModal.svelte	string	string @ 835:29	Kræver en almindelig dirk og 150 guld. Mesterdirken giver dobbelt guld ved indbrud og tæller stadig som dirk.
+src/lib/WorkshopModal.svelte:48284:48288:attribute:1lcv3pp	src/lib/WorkshopModal.svelte	attribute	alt @ 838:53	Dirk
+src/lib/WorkshopModal.svelte:48382:48392:attribute:l9alj3	src/lib/WorkshopModal.svelte	attribute	alt @ 840:59	Mesterdirk
+src/lib/WorkshopModal.svelte:48492:48511:text:m8v7bm	src/lib/WorkshopModal.svelte	text	markup @ 844:25	Dirk til Mesterdirk
+src/lib/WorkshopModal.svelte:48540:48627:text:uacgy1	src/lib/WorkshopModal.svelte	text	markup @ 845:20	Dobbelt guld ved indbrud på tomme byfelter. Risikoen for at blive opdaget er den samme.
+src/lib/WorkshopModal.svelte:48890:48898:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 853:34	Opgrader
+src/lib/WorkshopModal.svelte:48949:48978:string:14a7e82	src/lib/WorkshopModal.svelte	string	string @ 854:50	Du har allerede mesterdirken.
+src/lib/WorkshopModal.svelte:48993:49049:string:1p9ikd0	src/lib/WorkshopModal.svelte	string	string @ 854:94	Bruger 150 guld og erstatter din dirk med en mesterdirk.
+src/lib/WorkshopModal.svelte:49054:49092:string:11d7mzr	src/lib/WorkshopModal.svelte	string	string @ 854:155	Du skal først have en almindelig dirk.
+src/lib/WorkshopModal.svelte:49143:49153:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 856:35	Opgraderet
+src/lib/WorkshopModal.svelte:49168:49176:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 856:60	Opgrader
+src/lib/WorkshopModal.svelte:49181:49192:string:q656gp	src/lib/WorkshopModal.svelte	string	string @ 856:73	Kræver dirk
+src/lib/WorkshopModal.svelte:49358:49374:string:1b2iogu	src/lib/WorkshopModal.svelte	string	string @ 863:30	Kniv-opgradering
+src/lib/WorkshopModal.svelte:49404:49503:string:nrgu3o	src/lib/WorkshopModal.svelte	string	string @ 864:29	Kræver en almindelig kniv og 150 guld. Mesterkniven tæller som kniv i events og gør knivvalg bedre.
+src/lib/WorkshopModal.svelte:49602:49606:attribute:1cbwknf	src/lib/WorkshopModal.svelte	attribute	alt @ 867:53	Kniv
+src/lib/WorkshopModal.svelte:49700:49710:attribute:3n93e9	src/lib/WorkshopModal.svelte	attribute	alt @ 869:59	Mesterkniv
+src/lib/WorkshopModal.svelte:49810:49829:text:1xlyjb2	src/lib/WorkshopModal.svelte	text	markup @ 873:25	Kniv til Mesterkniv
+src/lib/WorkshopModal.svelte:49858:49925:text:mdd11w	src/lib/WorkshopModal.svelte	text	markup @ 874:20	Tæller som kniv i events. Knivvalg giver mere guld og mindre skade.
+src/lib/WorkshopModal.svelte:50188:50196:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 882:34	Opgrader
+src/lib/WorkshopModal.svelte:50247:50276:string:14n8be8	src/lib/WorkshopModal.svelte	string	string @ 883:50	Du har allerede mesterkniven.
+src/lib/WorkshopModal.svelte:50291:50347:string:2ly8ec	src/lib/WorkshopModal.svelte	string	string @ 883:94	Bruger 150 guld og erstatter din kniv med en mesterkniv.
+src/lib/WorkshopModal.svelte:50352:50390:string:i0kt2h	src/lib/WorkshopModal.svelte	string	string @ 883:155	Du skal først have en almindelig kniv.
+src/lib/WorkshopModal.svelte:50441:50451:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 885:35	Opgraderet
+src/lib/WorkshopModal.svelte:50466:50474:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 885:60	Opgrader
+src/lib/WorkshopModal.svelte:50479:50490:string:4wby67	src/lib/WorkshopModal.svelte	string	string @ 885:73	Kræver kniv
+src/lib/WorkshopModal.svelte:50660:50680:string:1np9muw	src/lib/WorkshopModal.svelte	string	string @ 892:30	Rustning-opgradering
+src/lib/WorkshopModal.svelte:50710:50872:string:1fntr7x	src/lib/WorkshopModal.svelte	string	string @ 893:29	Kræver almindelig rustning og 250 guld. Kongepanseret reducerer skade med 70%, men koster normalt 1 ekstra energi pr. skridt. Ridder og Skjoldmø ignorerer vægten.
+src/lib/WorkshopModal.svelte:50975:50983:attribute:jd27bh	src/lib/WorkshopModal.svelte	attribute	alt @ 896:57	Rustning
+src/lib/WorkshopModal.svelte:51078:51089:attribute:f0hwk8	src/lib/WorkshopModal.svelte	attribute	alt @ 898:60	Kongepanser
+src/lib/WorkshopModal.svelte:51189:51213:text:c9z3rv	src/lib/WorkshopModal.svelte	text	markup @ 902:25	Rustning til Kongepanser
+src/lib/WorkshopModal.svelte:51242:51345:text:1apt5ug	src/lib/WorkshopModal.svelte	text	markup @ 903:20	70% skadesreduktion. Normalt tung: +1 energi pr. skridt, men ikke for Ridder/Skjoldmø. Går tabt i vand.
+src/lib/WorkshopModal.svelte:51620:51628:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 911:34	Opgrader
+src/lib/WorkshopModal.svelte:51680:51710:string:18n5gjx	src/lib/WorkshopModal.svelte	string	string @ 912:51	Du har allerede kongepanseret.
+src/lib/WorkshopModal.svelte:51729:51790:string:12tiwey	src/lib/WorkshopModal.svelte	string	string @ 912:100	Bruger 250 guld og erstatter din rustning med et kongepanser.
+src/lib/WorkshopModal.svelte:51795:51837:string:m2j0or	src/lib/WorkshopModal.svelte	string	string @ 912:166	Du skal først have en almindelig rustning.
+src/lib/WorkshopModal.svelte:51889:51899:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 914:36	Opgraderet
+src/lib/WorkshopModal.svelte:51918:51926:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 914:65	Opgrader
+src/lib/WorkshopModal.svelte:51931:51946:string:pfnnop	src/lib/WorkshopModal.svelte	string	string @ 914:78	Kræver rustning
+src/lib/WorkshopModal.svelte:52113:52129:string:ain5s1	src/lib/WorkshopModal.svelte	string	string @ 921:30	Økse-opgradering
+src/lib/WorkshopModal.svelte:52159:52290:string:1mbpppz	src/lib/WorkshopModal.svelte	string	string @ 922:29	Kræver en almindelig økse og 175 guld. Stormøksen tæller som økse i events og gør øksevalg mere brutale: mere guld og mindre skade.
+src/lib/WorkshopModal.svelte:52390:52394:attribute:1vj3c8g	src/lib/WorkshopModal.svelte	attribute	alt @ 925:54	Økse
+src/lib/WorkshopModal.svelte:52488:52497:attribute:n61w8v	src/lib/WorkshopModal.svelte	attribute	alt @ 927:59	Stormøkse
+src/lib/WorkshopModal.svelte:52597:52615:text:1383is5	src/lib/WorkshopModal.svelte	text	markup @ 931:25	Økse til Stormøkse
+src/lib/WorkshopModal.svelte:52644:52739:text:jkda0z	src/lib/WorkshopModal.svelte	text	markup @ 932:20	Tæller som økse i events. Øksevalg giver 50% mere guld og halverer eventskade fra selve valget.
+src/lib/WorkshopModal.svelte:53005:53013:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 940:34	Opgrader
+src/lib/WorkshopModal.svelte:53064:53091:string:bjfftr	src/lib/WorkshopModal.svelte	string	string @ 941:50	Du har allerede stormøksen.
+src/lib/WorkshopModal.svelte:53107:53162:string:1umc0tg	src/lib/WorkshopModal.svelte	string	string @ 941:93	Bruger 175 guld og erstatter din økse med en stormøkse.
+src/lib/WorkshopModal.svelte:53167:53205:string:jbj78w	src/lib/WorkshopModal.svelte	string	string @ 941:153	Du skal først have en almindelig økse.
+src/lib/WorkshopModal.svelte:53256:53266:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 943:35	Opgraderet
+src/lib/WorkshopModal.svelte:53282:53290:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 943:61	Opgrader
+src/lib/WorkshopModal.svelte:53295:53306:string:j1u964	src/lib/WorkshopModal.svelte	string	string @ 943:74	Kræver økse
+src/lib/WorkshopModal.svelte:53473:53488:string:1nb9mn8	src/lib/WorkshopModal.svelte	string	string @ 950:30	Tøj-opgradering
+src/lib/WorkshopModal.svelte:53518:53607:string:1mmdyg0	src/lib/WorkshopModal.svelte	string	string @ 951:29	Kræver tøj og 100 guld. Værkstedet syr det om til fint tøj, som giver bedre guldindkomst.
+src/lib/WorkshopModal.svelte:53707:53710:attribute:1yr0t3l	src/lib/WorkshopModal.svelte	attribute	alt @ 954:54	Tøj
+src/lib/WorkshopModal.svelte:53803:53811:attribute:icc76w	src/lib/WorkshopModal.svelte	attribute	alt @ 956:58	Fint tøj
+src/lib/WorkshopModal.svelte:53911:53927:text:6d4ml1	src/lib/WorkshopModal.svelte	text	markup @ 960:25	Tøj til Fint tøj
+src/lib/WorkshopModal.svelte:53956:54052:text:yideeh	src/lib/WorkshopModal.svelte	text	markup @ 961:20	Fint tøj giver +15% guldindkomst og lidt beskyttelse, men kan blive flænset i huler og blodskov.
+src/lib/WorkshopModal.svelte:54319:54327:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 969:34	Opgrader
+src/lib/WorkshopModal.svelte:54378:54405:string:c73v74	src/lib/WorkshopModal.svelte	string	string @ 970:50	Du har allerede royalt tøj.
+src/lib/WorkshopModal.svelte:54424:54449:string:19c3u22	src/lib/WorkshopModal.svelte	string	string @ 970:96	Du har allerede fint tøj.
+src/lib/WorkshopModal.svelte:54465:54512:string:1jlui5i	src/lib/WorkshopModal.svelte	string	string @ 970:137	Bruger 100 guld og syr dit tøj om til fint tøj.
+src/lib/WorkshopModal.svelte:54517:54540:string:1ozyyck	src/lib/WorkshopModal.svelte	string	string @ 970:189	Du skal først have tøj.
+src/lib/WorkshopModal.svelte:54606:54616:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 972:50	Opgraderet
+src/lib/WorkshopModal.svelte:54632:54640:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 972:76	Opgrader
+src/lib/WorkshopModal.svelte:54645:54655:string:1yawclx	src/lib/WorkshopModal.svelte	string	string @ 972:89	Kræver tøj
+src/lib/WorkshopModal.svelte:54825:54835:string:18evrpy	src/lib/WorkshopModal.svelte	string	string @ 979:30	Royalt tøj
+src/lib/WorkshopModal.svelte:54865:54982:string:1niy4u1	src/lib/WorkshopModal.svelte	string	string @ 980:29	Kræver fint tøj og 500 guld. Royalt tøj giver stor guldindkomst og bliver nedgraderet til fint tøj, hvis det flænses.
+src/lib/WorkshopModal.svelte:55086:55094:attribute:icc76w	src/lib/WorkshopModal.svelte	attribute	alt @ 983:58	Fint tøj
+src/lib/WorkshopModal.svelte:55189:55199:attribute:18evrpy	src/lib/WorkshopModal.svelte	attribute	alt @ 985:60	Royalt tøj
+src/lib/WorkshopModal.svelte:55299:55322:text:1i8e1ko	src/lib/WorkshopModal.svelte	text	markup @ 989:25	Fint tøj til Royalt tøj
+src/lib/WorkshopModal.svelte:55351:55450:text:1g4y7dz	src/lib/WorkshopModal.svelte	text	markup @ 990:20	+40% guldindkomst og lidt bedre beskyttelse. Hvis det flænses, bliver det til almindeligt fint tøj.
+src/lib/WorkshopModal.svelte:55728:55736:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 998:34	Opgrader
+src/lib/WorkshopModal.svelte:55787:55814:string:c73v74	src/lib/WorkshopModal.svelte	string	string @ 999:50	Du har allerede royalt tøj.
+src/lib/WorkshopModal.svelte:55833:55890:string:1gxpz7d	src/lib/WorkshopModal.svelte	string	string @ 999:96	Bruger 500 guld og erstatter dit fine tøj med royalt tøj.
+src/lib/WorkshopModal.svelte:55895:55923:string:ecg74p	src/lib/WorkshopModal.svelte	string	string @ 999:158	Du skal først have fint tøj.
+src/lib/WorkshopModal.svelte:55974:55984:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 1001:35	Opgraderet
+src/lib/WorkshopModal.svelte:56003:56011:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1001:64	Opgrader
+src/lib/WorkshopModal.svelte:56016:56031:string:1mm5awc	src/lib/WorkshopModal.svelte	string	string @ 1001:77	Kræver fint tøj
+src/lib/WorkshopModal.svelte:56199:56217:string:15s8guy	src/lib/WorkshopModal.svelte	string	string @ 1008:30	Fakkel-opgradering
+src/lib/WorkshopModal.svelte:56247:56341:string:wxp20l	src/lib/WorkshopModal.svelte	string	string @ 1009:29	Kræver en almindelig fakkel og 225 guld. Solfaklen giver +2 syn og kan tænde et større solbål.
+src/lib/WorkshopModal.svelte:56442:56448:attribute:nfa7bz	src/lib/WorkshopModal.svelte	attribute	alt @ 1012:55	Fakkel
+src/lib/WorkshopModal.svelte:56541:56550:attribute:uievpf	src/lib/WorkshopModal.svelte	attribute	alt @ 1014:58	Solfakkel
+src/lib/WorkshopModal.svelte:56650:56670:text:sije0u	src/lib/WorkshopModal.svelte	text	markup @ 1018:25	Fakkel til Solfakkel
+src/lib/WorkshopModal.svelte:56699:56778:text:bblng6	src/lib/WorkshopModal.svelte	text	markup @ 1019:20	+2 syn. Solbålet afslører et større område for alle, giver fuld HP og 100 guld.
+src/lib/WorkshopModal.svelte:57047:57055:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1027:34	Opgrader
+src/lib/WorkshopModal.svelte:57102:57159:string:14culyr	src/lib/WorkshopModal.svelte	string	string @ 1028:46	Bruger 225 guld og opgraderer én fakkel til én solfakkel.
+src/lib/WorkshopModal.svelte:57164:57204:string:34men9	src/lib/WorkshopModal.svelte	string	string @ 1028:108	Du skal først have en almindelig fakkel.
+src/lib/WorkshopModal.svelte:57251:57259:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1030:31	Opgrader
+src/lib/WorkshopModal.svelte:57264:57277:string:17wf4sr	src/lib/WorkshopModal.svelte	string	string @ 1030:44	Kræver fakkel
+src/lib/WorkshopModal.svelte:57447:57467:string:1vh5bk2	src/lib/WorkshopModal.svelte	string	string @ 1037:30	Detektor-opgradering
+src/lib/WorkshopModal.svelte:57497:57662:string:1qkprqk	src/lib/WorkshopModal.svelte	string	string @ 1038:29	Kræver en almindelig detektor og 250 guld. Malmviseren viser skjult guld som før, afslører guldminer inden for radius 2 og giver 25% mere, når du graver guldet frem.
+src/lib/WorkshopModal.svelte:57770:57778:attribute:1brjz6v	src/lib/WorkshopModal.svelte	attribute	alt @ 1041:62	Detektor
+src/lib/WorkshopModal.svelte:57871:57880:attribute:1n7bnnd	src/lib/WorkshopModal.svelte	attribute	alt @ 1043:58	Malmviser
+src/lib/WorkshopModal.svelte:57980:58002:text:rshv7o	src/lib/WorkshopModal.svelte	text	markup @ 1047:25	Detektor til Malmviser
+src/lib/WorkshopModal.svelte:58031:58144:text:ijeg5g	src/lib/WorkshopModal.svelte	text	markup @ 1048:20	Viser skjult guld i radius 3. Guldminer inden for radius 2 popper frem gennem bjerge. Graveguld giver 25% ekstra.
+src/lib/WorkshopModal.svelte:58419:58427:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1056:34	Opgrader
+src/lib/WorkshopModal.svelte:58477:58505:string:12z6bmg	src/lib/WorkshopModal.svelte	string	string @ 1057:49	Du har allerede malmviseren.
+src/lib/WorkshopModal.svelte:58524:58583:string:10f9461	src/lib/WorkshopModal.svelte	string	string @ 1057:96	Bruger 250 guld og erstatter din detektor med en malmviser.
+src/lib/WorkshopModal.svelte:58588:58630:string:1ou91ud	src/lib/WorkshopModal.svelte	string	string @ 1057:160	Du skal først have en almindelig detektor.
+src/lib/WorkshopModal.svelte:58680:58690:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 1059:34	Opgraderet
+src/lib/WorkshopModal.svelte:58709:58717:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1059:63	Opgrader
+src/lib/WorkshopModal.svelte:58722:58737:string:9lxjm3	src/lib/WorkshopModal.svelte	string	string @ 1059:76	Kræver detektor
+src/lib/WorkshopModal.svelte:58902:58917:string:uvam4q	src/lib/WorkshopModal.svelte	string	string @ 1066:30	Bue-opgradering
+src/lib/WorkshopModal.svelte:58947:59078:string:1bft7jl	src/lib/WorkshopModal.svelte	string	string @ 1067:29	Kræver en almindelig bue og 175 guld. Falkebuen tæller som bue, forbedrer buevalg og afslører en lille vifte foran dig, når du går.
+src/lib/WorkshopModal.svelte:59176:59179:attribute:1nm435b	src/lib/WorkshopModal.svelte	attribute	alt @ 1070:52	Bue
+src/lib/WorkshopModal.svelte:59272:59280:attribute:1o3apno	src/lib/WorkshopModal.svelte	attribute	alt @ 1072:58	Falkebue
+src/lib/WorkshopModal.svelte:59380:59396:text:1d60cuj	src/lib/WorkshopModal.svelte	text	markup @ 1076:25	Bue til Falkebue
+src/lib/WorkshopModal.svelte:59425:59581:text:wrp4vh	src/lib/WorkshopModal.svelte	text	markup @ 1077:20	Tæller som bue i events. Buevalg giver 25% mere guld og halverer skade. Når du går, afslører den en lille vifte lige uden for dit syn i bevægelsesretningen.
+src/lib/WorkshopModal.svelte:59841:59849:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1085:34	Opgrader
+src/lib/WorkshopModal.svelte:59899:59925:string:qrkeiw	src/lib/WorkshopModal.svelte	string	string @ 1086:49	Du har allerede falkebuen.
+src/lib/WorkshopModal.svelte:59939:59992:string:i2j5y8	src/lib/WorkshopModal.svelte	string	string @ 1086:89	Bruger 175 guld og erstatter din bue med en falkebue.
+src/lib/WorkshopModal.svelte:59997:60034:string:1nacibd	src/lib/WorkshopModal.svelte	string	string @ 1086:147	Du skal først have en almindelig bue.
+src/lib/WorkshopModal.svelte:60084:60094:string:fwde6c	src/lib/WorkshopModal.svelte	string	string @ 1088:34	Opgraderet
+src/lib/WorkshopModal.svelte:60108:60116:string:15pbzh	src/lib/WorkshopModal.svelte	string	string @ 1088:58	Opgrader
+src/lib/WorkshopModal.svelte:60121:60131:string:1wcqepn	src/lib/WorkshopModal.svelte	string	string @ 1088:71	Kræver bue
+src/lib/WorkshopModal.svelte:60252:60269:string:zvd6p3	src/lib/WorkshopModal.svelte	string	string @ 1093:67	Forlad værkstedet
+src/lib/WorkshopModal.svelte:60273:60287:string:1y36yy9	src/lib/WorkshopModal.svelte	string	string @ 1093:88	Leave workshop
 src/lib/auth.svelte.ts:2124:2148:string:zm53gv	src/lib/auth.svelte.ts	string	string @ 73:30	taage_profile_character:
 src/lib/auth.svelte.ts:2174:2286:string:1x2obgx	src/lib/auth.svelte.ts	string	string @ 74:24	id, display_name, sound_level, trophies, mythic_trophies, profile_character_id, language, created_at, updated_at
 src/lib/auth.svelte.ts:6453:6585:string:zzepws	src/lib/auth.svelte.ts	string	string @ 182:14	Der skal gå lidt tid, før vi kan sende endnu en loginmail til denne e-mailadresse. Du kan spille offline imens og prøve igen senere.
@@ -2466,38 +2468,38 @@ src/lib/spilmotor.ts:108832:108870:string:6ncy5w	src/lib/spilmotor.ts	string	str
 src/lib/spilmotor.ts:108874:108916:string:1vdmuwq	src/lib/spilmotor.ts	string	string @ 2656:83	The ritual site destroys your seeker twig.
 src/lib/spilmotor.ts:110214:110241:string:17w27r9	src/lib/spilmotor.ts	string	string @ 2698:39	Bålsignal kunne ikke sendes
 src/lib/spilmotor.ts:110678:110706:string:bmd9k7	src/lib/spilmotor.ts	string	string @ 2708:39	Synssignal kunne ikke sendes
-src/lib/spilmotor.ts:110888:110966:text:ejpzar	src/lib/spilmotor.ts	text	markup @ 2714:53	i.id === 'fakkel' || i.id === 'solfakkel');\r\n    if (!fakkel || fakkel.maengde
-src/lib/spilmotor.ts:111539:111683:string:1nxm5kf	src/lib/spilmotor.ts	string	string @ 2729:14	Du tænder et solbål. Det spreder tågen i et stort område og gør feltet synligt for alle. Folk samles om varmen, og du får fuld HP samt 100 guld.
-src/lib/spilmotor.ts:111699:111865:string:1gt6n93	src/lib/spilmotor.ts	string	string @ 2730:14	You light a sunfire. It clears the fog across a large area and makes the tile visible to everyone. People gather around the warmth, and you gain full HP and 100 gold.
-src/lib/spilmotor.ts:111907:112019:string:8s4n53	src/lib/spilmotor.ts	string	string @ 2733:14	Du tænder et stort bål, som gør området synligt for alle. Folk samles om varmen, og du får fuld HP samt 50 guld.
-src/lib/spilmotor.ts:112035:112165:string:1qooh1v	src/lib/spilmotor.ts	string	string @ 2734:14	You light a large fire that makes the area visible to everyone. People gather around the warmth, and you gain full HP and 50 gold.
-src/lib/spilmotor.ts:112533:112595:string:ydqvw1	src/lib/spilmotor.ts	string	string @ 2747:14	En portal åbner sig bag dig og sender dig fire felter mod øst.
-src/lib/spilmotor.ts:112611:112667:string:68pjhd	src/lib/spilmotor.ts	string	string @ 2748:14	A portal opens behind you and sends you four tiles east.
-src/lib/spilmotor.ts:114800:114830:string:1tbjt6o	src/lib/spilmotor.ts	string	string @ 2811:20	Meteoren slår ned på dit felt.
-src/lib/spilmotor.ts:114834:114863:string:1pil41o	src/lib/spilmotor.ts	string	string @ 2811:54	The meteor strikes your tile.
-src/lib/spilmotor.ts:114886:114907:string:isblbr	src/lib/spilmotor.ts	string	string @ 2812:20	Nedslaget dræber dig.
-src/lib/spilmotor.ts:114911:114932:string:9dj1um	src/lib/spilmotor.ts	string	string @ 2812:45	The impact kills you.
-src/lib/spilmotor.ts:118067:118094:string:1nt4z8m	src/lib/spilmotor.ts	string	string @ 2897:20	Jorden bryder op under dig.
-src/lib/spilmotor.ts:118098:118133:string:11gk45b	src/lib/spilmotor.ts	string	string @ 2897:51	The ground breaks open beneath you.
-src/lib/spilmotor.ts:118156:118179:string:18g7k1y	src/lib/spilmotor.ts	string	string @ 2898:20	Jordskælvet dræber dig.
-src/lib/spilmotor.ts:118183:118208:string:ihki53	src/lib/spilmotor.ts	string	string @ 2898:47	The earthquake kills you.
-src/lib/spilmotor.ts:119426:119485:string:8rx36f	src/lib/spilmotor.ts	string	string @ 2935:10	 Dragestaven ulmer, men oversvømmelsen kan ikke svække den.
-src/lib/spilmotor.ts:119497:119556:string:1masnrt	src/lib/spilmotor.ts	string	string @ 2936:10	 The dragon staff smolders, but the flood cannot weaken it.
-src/lib/spilmotor.ts:119795:119873:text:1fe5gx9	src/lib/spilmotor.ts	text	markup @ 2943:108	0);\r\n\r\n    const felter = spilTilstand.gitter;\r\n    const paavirkede = new Set
-src/lib/spilmotor.ts:121890:121916:string:1bkmdnf	src/lib/spilmotor.ts	string	string @ 2999:36	Vandet slukker din fakkel.
-src/lib/spilmotor.ts:121920:121954:string:hzjdtk	src/lib/spilmotor.ts	string	string @ 2999:66	The water extinguishes your torch.
-src/lib/spilmotor.ts:122000:122032:string:19fniya	src/lib/spilmotor.ts	string	string @ 3000:38	Du mister din rustning i vandet.
-src/lib/spilmotor.ts:122036:122069:string:nlbts0	src/lib/spilmotor.ts	string	string @ 3000:74	You lose your armor in the water.
-src/lib/spilmotor.ts:122461:122489:string:99aiqk	src/lib/spilmotor.ts	string	string @ 3011:24	Du drukner i oversvømmelsen.
-src/lib/spilmotor.ts:122493:122516:string:1emjy38	src/lib/spilmotor.ts	string	string @ 3011:56	You drown in the flood.
-src/lib/spilmotor.ts:122831:122859:string:99aiqk	src/lib/spilmotor.ts	string	string @ 3020:24	Du drukner i oversvømmelsen.
-src/lib/spilmotor.ts:122863:122886:string:1emjy38	src/lib/spilmotor.ts	string	string @ 3020:56	You drown in the flood.
-src/lib/spilmotor.ts:125884:125924:string:1ip3b5k	src/lib/spilmotor.ts	string	string @ 3099:18	 Bersærkergangen dækker energiforbruget.
-src/lib/spilmotor.ts:125928:125970:string:1j92k0b	src/lib/spilmotor.ts	string	string @ 3099:62	 Your berserk rage covers the energy cost.
-src/lib/spilmotor.ts:127353:127429:string:1bw1fb8	src/lib/spilmotor.ts	string	string @ 3141:18	Meteorens varme flænser dit royale tøj. Det bliver til almindeligt fint tøj.
-src/lib/spilmotor.ts:127449:127525:string:1cmdthq	src/lib/spilmotor.ts	string	string @ 3142:18	The meteor heat tears your royal clothes. They become ordinary fine clothes.
-src/lib/spilmotor.ts:127698:127737:string:11y6zs1	src/lib/spilmotor.ts	string	string @ 3148:37	Meteorens varme ødelægger dit fine tøj.
-src/lib/spilmotor.ts:127741:127781:string:1co6vye	src/lib/spilmotor.ts	string	string @ 3148:80	The meteor heat ruins your fine clothes.
+src/lib/spilmotor.ts:110913:110966:text:z9qkqy	src/lib/spilmotor.ts	text	markup @ 2714:53	i.id === fakkelId);\n    if (!fakkel || fakkel.maengde
+src/lib/spilmotor.ts:111538:111682:string:1nxm5kf	src/lib/spilmotor.ts	string	string @ 2729:14	Du tænder et solbål. Det spreder tågen i et stort område og gør feltet synligt for alle. Folk samles om varmen, og du får fuld HP samt 100 guld.
+src/lib/spilmotor.ts:111698:111864:string:1gt6n93	src/lib/spilmotor.ts	string	string @ 2730:14	You light a sunfire. It clears the fog across a large area and makes the tile visible to everyone. People gather around the warmth, and you gain full HP and 100 gold.
+src/lib/spilmotor.ts:111906:112018:string:8s4n53	src/lib/spilmotor.ts	string	string @ 2733:14	Du tænder et stort bål, som gør området synligt for alle. Folk samles om varmen, og du får fuld HP samt 50 guld.
+src/lib/spilmotor.ts:112034:112164:string:1qooh1v	src/lib/spilmotor.ts	string	string @ 2734:14	You light a large fire that makes the area visible to everyone. People gather around the warmth, and you gain full HP and 50 gold.
+src/lib/spilmotor.ts:112532:112594:string:ydqvw1	src/lib/spilmotor.ts	string	string @ 2747:14	En portal åbner sig bag dig og sender dig fire felter mod øst.
+src/lib/spilmotor.ts:112610:112666:string:68pjhd	src/lib/spilmotor.ts	string	string @ 2748:14	A portal opens behind you and sends you four tiles east.
+src/lib/spilmotor.ts:114799:114829:string:1tbjt6o	src/lib/spilmotor.ts	string	string @ 2811:20	Meteoren slår ned på dit felt.
+src/lib/spilmotor.ts:114833:114862:string:1pil41o	src/lib/spilmotor.ts	string	string @ 2811:54	The meteor strikes your tile.
+src/lib/spilmotor.ts:114885:114906:string:isblbr	src/lib/spilmotor.ts	string	string @ 2812:20	Nedslaget dræber dig.
+src/lib/spilmotor.ts:114910:114931:string:9dj1um	src/lib/spilmotor.ts	string	string @ 2812:45	The impact kills you.
+src/lib/spilmotor.ts:118066:118093:string:1nt4z8m	src/lib/spilmotor.ts	string	string @ 2897:20	Jorden bryder op under dig.
+src/lib/spilmotor.ts:118097:118132:string:11gk45b	src/lib/spilmotor.ts	string	string @ 2897:51	The ground breaks open beneath you.
+src/lib/spilmotor.ts:118155:118178:string:18g7k1y	src/lib/spilmotor.ts	string	string @ 2898:20	Jordskælvet dræber dig.
+src/lib/spilmotor.ts:118182:118207:string:ihki53	src/lib/spilmotor.ts	string	string @ 2898:47	The earthquake kills you.
+src/lib/spilmotor.ts:119425:119484:string:8rx36f	src/lib/spilmotor.ts	string	string @ 2935:10	 Dragestaven ulmer, men oversvømmelsen kan ikke svække den.
+src/lib/spilmotor.ts:119496:119555:string:1masnrt	src/lib/spilmotor.ts	string	string @ 2936:10	 The dragon staff smolders, but the flood cannot weaken it.
+src/lib/spilmotor.ts:119794:119872:text:1fe5gx9	src/lib/spilmotor.ts	text	markup @ 2943:108	0);\r\n\r\n    const felter = spilTilstand.gitter;\r\n    const paavirkede = new Set
+src/lib/spilmotor.ts:121889:121915:string:1bkmdnf	src/lib/spilmotor.ts	string	string @ 2999:36	Vandet slukker din fakkel.
+src/lib/spilmotor.ts:121919:121953:string:hzjdtk	src/lib/spilmotor.ts	string	string @ 2999:66	The water extinguishes your torch.
+src/lib/spilmotor.ts:121999:122031:string:19fniya	src/lib/spilmotor.ts	string	string @ 3000:38	Du mister din rustning i vandet.
+src/lib/spilmotor.ts:122035:122068:string:nlbts0	src/lib/spilmotor.ts	string	string @ 3000:74	You lose your armor in the water.
+src/lib/spilmotor.ts:122460:122488:string:99aiqk	src/lib/spilmotor.ts	string	string @ 3011:24	Du drukner i oversvømmelsen.
+src/lib/spilmotor.ts:122492:122515:string:1emjy38	src/lib/spilmotor.ts	string	string @ 3011:56	You drown in the flood.
+src/lib/spilmotor.ts:122830:122858:string:99aiqk	src/lib/spilmotor.ts	string	string @ 3020:24	Du drukner i oversvømmelsen.
+src/lib/spilmotor.ts:122862:122885:string:1emjy38	src/lib/spilmotor.ts	string	string @ 3020:56	You drown in the flood.
+src/lib/spilmotor.ts:125883:125923:string:1ip3b5k	src/lib/spilmotor.ts	string	string @ 3099:18	 Bersærkergangen dækker energiforbruget.
+src/lib/spilmotor.ts:125927:125969:string:1j92k0b	src/lib/spilmotor.ts	string	string @ 3099:62	 Your berserk rage covers the energy cost.
+src/lib/spilmotor.ts:127352:127428:string:1bw1fb8	src/lib/spilmotor.ts	string	string @ 3141:18	Meteorens varme flænser dit royale tøj. Det bliver til almindeligt fint tøj.
+src/lib/spilmotor.ts:127448:127524:string:1cmdthq	src/lib/spilmotor.ts	string	string @ 3142:18	The meteor heat tears your royal clothes. They become ordinary fine clothes.
+src/lib/spilmotor.ts:127697:127736:string:11y6zs1	src/lib/spilmotor.ts	string	string @ 3148:37	Meteorens varme ødelægger dit fine tøj.
+src/lib/spilmotor.ts:127740:127780:string:1co6vye	src/lib/spilmotor.ts	string	string @ 3148:80	The meteor heat ruins your fine clothes.
 src/lib/trofaeer.ts:1203:1211:string:qyc5v6	src/lib/trofaeer.ts	string	string @ 51:17	Mineejer
 src/lib/trofaeer.ts:1232:1242:string:1dmuinx	src/lib/trofaeer.ts	string	string @ 52:19	Mine Owner
 src/lib/trofaeer.ts:1260:1290:string:1oga45a	src/lib/trofaeer.ts	string	string @ 53:16	Slip væk fra øen med 12 miner.

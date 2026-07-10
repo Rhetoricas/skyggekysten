@@ -92,7 +92,7 @@
         } else if (vareId === 'stav' || vareId === 'dragestav') {
             udfoerTeleport();
         } else if (vareId === 'fakkel' || vareId === 'solfakkel') {
-            taendBaal();
+            taendBaal(vareId);
         } else if (vareId === 'hemmelighed') {
             aktiverHemmelighed();
         } else if (vareId === 'dirk' || vareId === 'mesterdirk') {
