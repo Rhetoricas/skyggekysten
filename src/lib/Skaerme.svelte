@@ -387,6 +387,12 @@
         return tekst('Min profil', 'My profile');
     }
 
+    function karakterFordelUdenKlasse(karakter: Karakter) {
+        const fordel = karakterFordel(karakter);
+        const kolon = fordel.indexOf(':');
+        return kolon >= 0 ? fordel.slice(kolon + 1).trim() : fordel;
+    }
+
     function medaljeLabel(medalje: { label: string; labelEn?: string }) {
         return tekst(medalje.label, medalje.labelEn || medalje.label);
     }
@@ -2288,7 +2294,7 @@
                         <img src={k.ikon} alt={karakterNavn(k)} class="char-icon" />
                         <h3>{karakterNavn(k)}</h3>
                         <p class="stats">{karakterStatsTekst(k)}</p>
-                        <p class="desc positive">{karakterFordel(k)}</p>
+                        <p class="desc positive"><span class="klasse-navn">{visKarakterKlasseNavn(k)}:</span> {karakterFordelUdenKlasse(k)}</p>
                         <p class="desc negative">{karakterStartUdstyrTekst(k)}</p>
                     </div>
                 {/each}
@@ -3628,6 +3634,7 @@
     .char-icon { height: 90px; width: auto; margin-bottom: 10px; }
     .stats { font-weight: bold; color: #aaa; margin: 2px 0 12px; font-family: monospace; white-space: nowrap; }
     .desc { font-size: 0.9rem; margin: 4px 0; line-height: 1.3; font-style: italic; }
+    .desc .klasse-navn { font-style: normal; font-weight: 700; }
     .positive { color: #ccc; }
     .negative { color: #888; }
 

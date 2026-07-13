@@ -27,12 +27,12 @@ const karakterTekster: Record<string, TekstPar> = {
     },
     thief_m: {
         navn: 'Thief',
-        fordel: 'Outlaws: You can burgle empty town tiles with a lockpick and gain 10% more from all gold.',
+        fordel: 'Outlaws: You can break into empty houses in town with your lockpick. You find a little more gold than others.',
         ulempe: 'You take 20% more damage and can see only 1 tile. Digging costs 4 energy.'
     },
     thief_f: {
         navn: 'Shadow',
-        fordel: 'Outlaws: You can burgle empty town tiles with a lockpick and gain 10% more from all gold.',
+        fordel: 'Outlaws: You can break into empty houses in town with your lockpick. You find a little more gold than others.',
         ulempe: 'You take 20% more damage and can see only 1 tile. Digging costs 4 energy.'
     },
     explorer_m: {
@@ -67,32 +67,32 @@ const karakterTekster: Record<string, TekstPar> = {
     },
     hunter_m: {
         navn: 'Hunter',
-        fordel: 'Scouts: You can see farther than most. In multiplayer, you can track a player on the same tile for 20 days.',
+        fordel: 'Scouts: You can see farther than most. You can track other players you meet.',
         ulempe: 'You start with 90 HP and 20 gold and take 10% more damage. Digging costs 5 energy.'
     },
     hunter_f: {
         navn: 'Archer',
-        fordel: 'Scouts: You can see farther than most. In multiplayer, you can track a player on the same tile for 20 days.',
+        fordel: 'Scouts: You can see farther than most. You can track other players you meet.',
         ulempe: 'You start with 90 HP and 20 gold and take 10% more damage. Digging costs 5 energy.'
     },
     pirate_m: {
         navn: 'Captain',
-        fordel: 'Sea Raiders: You gain 20% more gold and start with a treasure map. In multiplayer, your sabre can rob selected classes.',
+        fordel: 'Sea Raiders: You land with a treasure map and find more gold than others. With your sabre, you can ambush other players.',
         ulempe: 'You start without a sleeping bag and can see only 1 tile. Find or buy healing along the way.'
     },
     pirate_f: {
         navn: 'Corsair',
-        fordel: 'Sea Raiders: You gain 20% more gold and start with a treasure map. In multiplayer, your sabre can rob selected classes.',
+        fordel: 'Sea Raiders: You land with a treasure map and find more gold than others. With your sabre, you can ambush other players.',
         ulempe: 'You start without a sleeping bag and can see only 1 tile. Find or buy healing along the way.'
     },
     dwarf_m: {
         navn: 'Dwarf',
-        fordel: 'Mountainfolk: You dig for only 2 energy, gain 10% more gold and move easily through mountains and crystal tiles.',
+        fordel: 'Mountainfolk: You are the best digger and find a little more gold than others. You move more easily through mountains and crystal tiles.',
         ulempe: 'Each normal step costs 1.5 energy. You can see only 1 tile and start without a sleeping bag.'
     },
     dwarf_f: {
         navn: 'Digger',
-        fordel: 'Mountainfolk: You dig for only 2 energy, gain 10% more gold and move easily through mountains and crystal tiles.',
+        fordel: 'Mountainfolk: You are the best digger and find a little more gold than others. You move more easily through mountains and crystal tiles.',
         ulempe: 'Each normal step costs 1.5 energy. You can see only 1 tile and start without a sleeping bag.'
     },
     orc_m: {
