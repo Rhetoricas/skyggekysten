@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { spilTilstand } from './spilTilstand.svelte';
+import { taelScoreSpillere } from './score';
 import type { RygsækTing } from './types';
 
 export type TrofaeId =
@@ -760,6 +761,7 @@ export function findNyeTrofaeer(tidligereIds: TrofaeId[] = []) {
 
 export function findNyeMytiskeTrofaeer(tidligereMytiskeIds: TrofaeId[] = [], normaleIdsEfterRun: TrofaeId[] = []) {
     if (!overlevedeSpillet()) return [];
+    if (taelScoreSpillere(spilTilstand.alleSpillere) !== 1) return [];
 
     const tidligere = new Set(tidligereMytiskeIds);
     const normale = new Set(normaliserTrofaeIds(normaleIdsEfterRun));

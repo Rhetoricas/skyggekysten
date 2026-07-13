@@ -400,13 +400,16 @@
     }
 
     function medaljeMytiskKrav(medalje: { mytiskKrav?: string; mytiskKravEn?: string }) {
-        return tekst(medalje.mytiskKrav || '', medalje.mytiskKravEn || medalje.mytiskKrav || '');
+        return tekst(
+            `${medalje.mytiskKrav || ''} Kun i solospil.`,
+            `${medalje.mytiskKravEn || medalje.mytiskKrav || ''} Solo games only.`
+        );
     }
 
     function mytiskKravSaetning(medalje: { mytiskKrav?: string; mytiskKravEn?: string }) {
         return tekst(
-            `For at blive Mytisk: ${medalje.mytiskKrav || ''}`,
-            `To become Mythic: ${medalje.mytiskKravEn || medalje.mytiskKrav || ''}`
+            `For at blive Mytisk: ${medalje.mytiskKrav || ''} Kun i solospil.`,
+            `To become Mythic: ${medalje.mytiskKravEn || medalje.mytiskKrav || ''} Solo games only.`
         );
     }
 

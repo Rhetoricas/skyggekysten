@@ -535,436 +535,436 @@ src/lib/Skaerme.svelte:18437:18447:string:1m0jmpb	src/lib/Skaerme.svelte	string	
 src/lib/Skaerme.svelte:18451:18461:string:151h1ju	src/lib/Skaerme.svelte	string	string @ 387:37	My profile
 src/lib/Skaerme.svelte:18728:18734:string:8gj1zu	src/lib/Skaerme.svelte	string	string @ 395:40	Mytisk
 src/lib/Skaerme.svelte:18738:18744:string:12n5egr	src/lib/Skaerme.svelte	string	string @ 395:50	Mythic
-src/lib/Skaerme.svelte:25975:25981:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 563:55	Ukendt
-src/lib/Skaerme.svelte:25985:25992:string:1kmy72x	src/lib/Skaerme.svelte	string	string @ 563:65	Unknown
-src/lib/Skaerme.svelte:26111:26122:string:7zj9hd	src/lib/Skaerme.svelte	string	string @ 567:43	Sluppet væk
-src/lib/Skaerme.svelte:26126:26133:string:yze5eu	src/lib/Skaerme.svelte	string	string @ 567:58	Escaped
-src/lib/Skaerme.svelte:26349:26352:string:ky5fgv	src/lib/Skaerme.svelte	string	string @ 570:22	Død
-src/lib/Skaerme.svelte:26356:26360:string:7z6slj	src/lib/Skaerme.svelte	string	string @ 570:29	Dead
-src/lib/Skaerme.svelte:26386:26392:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 571:23	Ukendt
-src/lib/Skaerme.svelte:26396:26403:string:1kmy72x	src/lib/Skaerme.svelte	string	string @ 571:33	Unknown
-src/lib/Skaerme.svelte:26570:26581:string:7zj9hd	src/lib/Skaerme.svelte	string	string @ 575:42	Sluppet væk
-src/lib/Skaerme.svelte:26585:26592:string:yze5eu	src/lib/Skaerme.svelte	string	string @ 575:57	Escaped
-src/lib/Skaerme.svelte:26636:26643:string:ltt27n	src/lib/Skaerme.svelte	string	string @ 576:41	I tågen
-src/lib/Skaerme.svelte:26647:26657:string:fo1h9p	src/lib/Skaerme.svelte	string	string @ 576:52	In the fog
-src/lib/Skaerme.svelte:26849:26852:string:ky5fgv	src/lib/Skaerme.svelte	string	string @ 579:22	Død
-src/lib/Skaerme.svelte:26856:26860:string:7z6slj	src/lib/Skaerme.svelte	string	string @ 579:29	Dead
-src/lib/Skaerme.svelte:26976:26987:string:199raw	src/lib/Skaerme.svelte	string	string @ 583:39	Ukendt dato
-src/lib/Skaerme.svelte:26991:27003:string:t060q7	src/lib/Skaerme.svelte	string	string @ 583:54	Unknown date
-src/lib/Skaerme.svelte:27105:27116:string:199raw	src/lib/Skaerme.svelte	string	string @ 585:57	Ukendt dato
-src/lib/Skaerme.svelte:27120:27132:string:t060q7	src/lib/Skaerme.svelte	string	string @ 585:72	Unknown date
-src/lib/Skaerme.svelte:27182:27187:string:1a9vu1o	src/lib/Skaerme.svelte	string	string @ 586:47	da-DK
-src/lib/Skaerme.svelte:27191:27196:string:191jr7d	src/lib/Skaerme.svelte	string	string @ 586:56	en-US
-src/lib/Skaerme.svelte:29527:29533:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 651:94	Ukendt
-src/lib/Skaerme.svelte:29537:29544:string:1kmy72x	src/lib/Skaerme.svelte	string	string @ 651:104	Unknown
-src/lib/Skaerme.svelte:29603:29607:string:taf2ay	src/lib/Skaerme.svelte	string	string @ 653:16	Solo
-src/lib/Skaerme.svelte:33688:33698:string:5y827i	src/lib/Skaerme.svelte	string	string @ 728:21	Topmedalje
-src/lib/Skaerme.svelte:33723:33732:string:1y0cmqf	src/lib/Skaerme.svelte	string	string @ 729:23	Top Medal
-src/lib/Skaerme.svelte:37748:37753:string:1jstfzg	src/lib/Skaerme.svelte	string	string @ 817:43	Miner
-src/lib/Skaerme.svelte:37757:37762:string:1k2t1of	src/lib/Skaerme.svelte	string	string @ 817:52	Mines
-src/lib/Skaerme.svelte:37788:37804:string:13bih9a	src/lib/Skaerme.svelte	string	string @ 818:21	taageBevaegelser
-src/lib/Skaerme.svelte:37821:37839:string:1a68k72	src/lib/Skaerme.svelte	string	string @ 818:54	Bevægelser i tågen
-src/lib/Skaerme.svelte:37843:37852:string:wb3wsd	src/lib/Skaerme.svelte	string	string @ 818:76	Fog moves
-src/lib/Skaerme.svelte:37878:37888:string:nr76xa	src/lib/Skaerme.svelte	string	string @ 819:21	vandSkader
-src/lib/Skaerme.svelte:37905:37919:string:1fp4qg9	src/lib/Skaerme.svelte	string	string @ 819:48	Skade fra vand
-src/lib/Skaerme.svelte:37923:37935:string:un3j6p	src/lib/Skaerme.svelte	string	string @ 819:66	Water damage
-src/lib/Skaerme.svelte:37961:37977:string:fa6mfl	src/lib/Skaerme.svelte	string	string @ 820:21	magiskeGenstande
-src/lib/Skaerme.svelte:37994:38011:string:1gcbu1d	src/lib/Skaerme.svelte	string	string @ 820:54	Magiske genstande
-src/lib/Skaerme.svelte:38015:38028:string:17056px	src/lib/Skaerme.svelte	string	string @ 820:75	Magical items
-src/lib/Skaerme.svelte:38075:38079:string:1qxrbj5	src/lib/Skaerme.svelte	string	string @ 821:42	Guld
-src/lib/Skaerme.svelte:38083:38087:string:u4l1gz	src/lib/Skaerme.svelte	string	string @ 821:50	Gold
-src/lib/Skaerme.svelte:38113:38121:string:gte8oy	src/lib/Skaerme.svelte	string	string @ 822:21	healetHp
-src/lib/Skaerme.svelte:38138:38146:string:spgttp	src/lib/Skaerme.svelte	string	string @ 822:46	Helet HP
-src/lib/Skaerme.svelte:38150:38159:string:e7g3j8	src/lib/Skaerme.svelte	string	string @ 822:58	HP healed
-src/lib/Skaerme.svelte:38185:38197:string:1409w22	src/lib/Skaerme.svelte	string	string @ 823:21	kendteFelter
-src/lib/Skaerme.svelte:38214:38227:string:1jzapsy	src/lib/Skaerme.svelte	string	string @ 823:50	Kendte felter
-src/lib/Skaerme.svelte:38231:38243:string:l3mhht	src/lib/Skaerme.svelte	string	string @ 823:67	Known fields
-src/lib/Skaerme.svelte:38269:38286:string:18x0kom	src/lib/Skaerme.svelte	string	string @ 824:21	opgraderingsPoint
-src/lib/Skaerme.svelte:38303:38320:string:oreoza	src/lib/Skaerme.svelte	string	string @ 824:55	Opgraderingspoint
-src/lib/Skaerme.svelte:38324:38338:string:k3ho6u	src/lib/Skaerme.svelte	string	string @ 824:76	Upgrade points
-src/lib/Skaerme.svelte:38364:38386:string:11mv7g	src/lib/Skaerme.svelte	string	string @ 825:21	diamantRaavaerdiFundet
-src/lib/Skaerme.svelte:38403:38415:string:x4lyje	src/lib/Skaerme.svelte	string	string @ 825:60	Diamantværdi
-src/lib/Skaerme.svelte:38419:38432:string:1mhi1t6	src/lib/Skaerme.svelte	string	string @ 825:76	Diamond value
-src/lib/Skaerme.svelte:39053:39069:string:13bih9a	src/lib/Skaerme.svelte	string	string @ 841:46	taageBevaegelser
-src/lib/Skaerme.svelte:39273:39283:string:nr76xa	src/lib/Skaerme.svelte	string	string @ 845:48	vandSkader
-src/lib/Skaerme.svelte:39487:39503:string:fa6mfl	src/lib/Skaerme.svelte	string	string @ 849:47	magiskeGenstande
-src/lib/Skaerme.svelte:39895:39903:string:gte8oy	src/lib/Skaerme.svelte	string	string @ 857:48	healetHp
-src/lib/Skaerme.svelte:40101:40113:string:1409w22	src/lib/Skaerme.svelte	string	string @ 861:48	kendteFelter
-src/lib/Skaerme.svelte:40321:40338:string:18x0kom	src/lib/Skaerme.svelte	string	string @ 865:47	opgraderingsPoint
-src/lib/Skaerme.svelte:40549:40571:string:11mv7g	src/lib/Skaerme.svelte	string	string @ 869:47	diamantRaavaerdiFundet
-src/lib/Skaerme.svelte:51584:51603:string:ytviv7	src/lib/Skaerme.svelte	string	string @ 1181:46	noopener,noreferrer
-src/lib/Skaerme.svelte:56613:56630:string:1sbozcw	src/lib/Skaerme.svelte	string	string @ 1322:64	Nye trofæmedaljer
-src/lib/Skaerme.svelte:56634:56651:string:dvfc4z	src/lib/Skaerme.svelte	string	string @ 1322:85	New trophy medals
-src/lib/Skaerme.svelte:56729:56742:string:h6o7kg	src/lib/Skaerme.svelte	string	string @ 1323:74	Mytisk niveau
-src/lib/Skaerme.svelte:56746:56757:string:wt8jid	src/lib/Skaerme.svelte	string	string @ 1323:91	Mythic tier
-src/lib/Skaerme.svelte:56769:56784:string:76jytr	src/lib/Skaerme.svelte	string	string @ 1323:114	Ny trofæmedalje
-src/lib/Skaerme.svelte:56788:56804:string:1baiowi	src/lib/Skaerme.svelte	string	string @ 1323:133	New trophy medal
-src/lib/Skaerme.svelte:58720:58729:string:zzkq54	src/lib/Skaerme.svelte	string	string @ 1359:21	Opgørelse
-src/lib/Skaerme.svelte:58733:58742:string:1tepclg	src/lib/Skaerme.svelte	string	string @ 1359:34	Breakdown
-src/lib/Skaerme.svelte:58812:58817:string:x1q3l7	src/lib/Skaerme.svelte	string	string @ 1360:62	Gold:
-src/lib/Skaerme.svelte:58964:58981:string:1qroiyv	src/lib/Skaerme.svelte	string	string @ 1362:54	Overlevelsesbonus
-src/lib/Skaerme.svelte:58985:58999:string:848abw	src/lib/Skaerme.svelte	string	string @ 1362:75	Survival bonus
-src/lib/Skaerme.svelte:59011:59020:string:elwjuu	src/lib/Skaerme.svelte	string	string @ 1362:101	Fremdrift
-src/lib/Skaerme.svelte:59024:59032:string:79u6hy	src/lib/Skaerme.svelte	string	string @ 1362:114	Progress
-src/lib/Skaerme.svelte:59185:59197:string:1i8djts	src/lib/Skaerme.svelte	string	string @ 1365:69	Exploration:
-src/lib/Skaerme.svelte:59322:59342:string:12y2i4d	src/lib/Skaerme.svelte	string	string @ 1367:27	Territorium (miner):
-src/lib/Skaerme.svelte:59346:59364:string:16yxgoc	src/lib/Skaerme.svelte	string	string @ 1367:51	Territory (mines):
-src/lib/Skaerme.svelte:59506:59516:string:1nhmu6v	src/lib/Skaerme.svelte	string	string @ 1370:64	Equipment:
-src/lib/Skaerme.svelte:59831:59845:string:k53zyv	src/lib/Skaerme.svelte	string	string @ 1375:62	Helbredsbonus:
-src/lib/Skaerme.svelte:59849:59862:string:1ylv76q	src/lib/Skaerme.svelte	string	string @ 1375:80	Health bonus:
-src/lib/Skaerme.svelte:60061:60076:string:1mtczx	src/lib/Skaerme.svelte	string	string @ 1378:62	Flere spillere:
-src/lib/Skaerme.svelte:60080:60092:string:1fspjoj	src/lib/Skaerme.svelte	string	string @ 1378:81	Multiplayer:
-src/lib/Skaerme.svelte:60257:60269:string:1bgd9bn	src/lib/Skaerme.svelte	string	string @ 1380:70	Total score:
-src/lib/Skaerme.svelte:60430:60445:string:dba8tj	src/lib/Skaerme.svelte	string	string @ 1386:21	Alle karakterer
-src/lib/Skaerme.svelte:60449:60463:string:1esna0w	src/lib/Skaerme.svelte	string	string @ 1386:40	All characters
-src/lib/Skaerme.svelte:61212:61217:attribute:x9tsfp	src/lib/Skaerme.svelte	attribute	title @ 1398:38	Score
-src/lib/Skaerme.svelte:61529:61552:string:oqx737	src/lib/Skaerme.svelte	string	string @ 1408:59	Resultat fra tutorialen
-src/lib/Skaerme.svelte:61556:61571:string:vlfqb0	src/lib/Skaerme.svelte	string	string @ 1408:86	Tutorial result
-src/lib/Skaerme.svelte:61646:61662:string:188zneo	src/lib/Skaerme.svelte	string	string @ 1410:27	Din tutorialrang
-src/lib/Skaerme.svelte:61666:61684:string:11bn5ee	src/lib/Skaerme.svelte	string	string @ 1410:47	Your tutorial rank
-src/lib/Skaerme.svelte:62265:62275:string:1cno57o	src/lib/Skaerme.svelte	string	string @ 1425:63	Next rank:
-src/lib/Skaerme.svelte:62358:62364:string:16m3fsd	src/lib/Skaerme.svelte	string	string @ 1425:156	point.
-src/lib/Skaerme.svelte:62368:62375:string:1j9q8fs	src/lib/Skaerme.svelte	string	string @ 1425:166	points.
-src/lib/Skaerme.svelte:62483:62526:string:1usmpn	src/lib/Skaerme.svelte	string	string @ 1427:85	You have reached the highest tutorial rank.
-src/lib/Skaerme.svelte:62677:62759:string:1fjkx7o	src/lib/Skaerme.svelte	string	string @ 1429:130	This rank is for practice only. It is not saved and does not count in other games.
-src/lib/Skaerme.svelte:63288:63298:string:oqce4a	src/lib/Skaerme.svelte	string	string @ 1442:75	Logget ind
-src/lib/Skaerme.svelte:63302:63311:string:hfeve2	src/lib/Skaerme.svelte	string	string @ 1442:89	Logged in
-src/lib/Skaerme.svelte:63379:63406:string:e3ph8p	src/lib/Skaerme.svelte	string	string @ 1443:56	Gæsteprofil i denne browser
-src/lib/Skaerme.svelte:63410:63439:string:1mhra57	src/lib/Skaerme.svelte	string	string @ 1443:87	Guest profile in this browser
-src/lib/Skaerme.svelte:63632:63642:string:1jh88e2	src/lib/Skaerme.svelte	string	string @ 1446:99	Åbn profil
-src/lib/Skaerme.svelte:63646:63658:string:16qitn8	src/lib/Skaerme.svelte	string	string @ 1446:113	Open profile
-src/lib/Skaerme.svelte:63749:63762:string:1ewy4wt	src/lib/Skaerme.svelte	string	string @ 1448:60	Dine medaljer
-src/lib/Skaerme.svelte:63766:63777:string:1izmcsa	src/lib/Skaerme.svelte	string	string @ 1448:77	Your medals
-src/lib/Skaerme.svelte:64991:65100:string:5fw6x5	src/lib/Skaerme.svelte	string	string @ 1469:65	Profilen er gemt i denne browser. Tilknyt din e-mail, hvis du også vil kunne bruge profilen på andre enheder.
-src/lib/Skaerme.svelte:65104:65211:string:3cqq2p	src/lib/Skaerme.svelte	string	string @ 1469:178	This profile is saved in this browser. Add your email if you also want to use the profile on other devices.
-src/lib/Skaerme.svelte:65441:65454:string:5g5uf5	src/lib/Skaerme.svelte	string	string @ 1474:45	E-mailadresse
-src/lib/Skaerme.svelte:65458:65471:string:1cdit03	src/lib/Skaerme.svelte	string	string @ 1474:62	Email address
-src/lib/Skaerme.svelte:65791:65800:string:1gxet22	src/lib/Skaerme.svelte	string	string @ 1478:52	Sender...
-src/lib/Skaerme.svelte:65804:65814:string:2q3xjh	src/lib/Skaerme.svelte	string	string @ 1478:65	Sending...
-src/lib/Skaerme.svelte:65826:65840:string:qn2qm7	src/lib/Skaerme.svelte	string	string @ 1478:87	Tilknyt e-mail
-src/lib/Skaerme.svelte:65844:65853:string:xwo7x0	src/lib/Skaerme.svelte	string	string @ 1478:105	Add email
-src/lib/Skaerme.svelte:66068:66209:string:rc55p6	src/lib/Skaerme.svelte	string	string @ 1486:26	Her på itch kan du prøve spillet uden en konto. I live-versionen får du den nyeste udgave, en gemt profil og adgang til de globale toplister.
-src/lib/Skaerme.svelte:66237:66391:string:kkjee2	src/lib/Skaerme.svelte	string	string @ 1487:26	Here on itch, you can try the game without an account. The live version gives you the latest build, a saved profile and access to the global leaderboards.
-src/lib/Skaerme.svelte:66528:66559:string:1lni6vw	src/lib/Skaerme.svelte	string	string @ 1490:92	Medaljer du kan gemme med login
-src/lib/Skaerme.svelte:66563:66593:string:f5khy2	src/lib/Skaerme.svelte	string	string @ 1490:127	Medals you can save with login
-src/lib/Skaerme.svelte:67611:67645:string:1ovk63c	src/lib/Skaerme.svelte	string	string @ 1509:33	Spil nyeste version og opret konto
-src/lib/Skaerme.svelte:67649:67690:string:1frjmbv	src/lib/Skaerme.svelte	string	string @ 1509:71	Play latest version and create an account
-src/lib/Skaerme.svelte:67758:67792:string:maj14j	src/lib/Skaerme.svelte	string	string @ 1511:35	Prøv itch-versionen uden en konto.
-src/lib/Skaerme.svelte:67796:67836:string:jautuf	src/lib/Skaerme.svelte	string	string @ 1511:73	Try the itch version without an account.
-src/lib/Skaerme.svelte:68083:68242:string:kn7mxy	src/lib/Skaerme.svelte	string	string @ 1514:194	Enter your player name and a name for the island. You can begin without an email and add one later if you want to save the profile and use it on other devices.
-src/lib/Skaerme.svelte:68337:68368:string:1lni6vw	src/lib/Skaerme.svelte	string	string @ 1515:88	Medaljer du kan gemme med login
-src/lib/Skaerme.svelte:68372:68402:string:f5khy2	src/lib/Skaerme.svelte	string	string @ 1515:123	Medals you can save with login
-src/lib/Skaerme.svelte:69388:69401:string:5g5uf5	src/lib/Skaerme.svelte	string	string @ 1536:41	E-mailadresse
-src/lib/Skaerme.svelte:69405:69418:string:1cdit03	src/lib/Skaerme.svelte	string	string @ 1536:58	Email address
-src/lib/Skaerme.svelte:69702:69711:string:1gxet22	src/lib/Skaerme.svelte	string	string @ 1540:48	Sender...
-src/lib/Skaerme.svelte:69715:69725:string:2q3xjh	src/lib/Skaerme.svelte	string	string @ 1540:61	Sending...
-src/lib/Skaerme.svelte:69737:69755:string:1lnjh57	src/lib/Skaerme.svelte	string	string @ 1540:83	Log ind med e-mail
-src/lib/Skaerme.svelte:69759:69776:string:11sdta8	src/lib/Skaerme.svelte	string	string @ 1540:105	Log in with email
-src/lib/Skaerme.svelte:71362:71383:string:1vbgrxb	src/lib/Skaerme.svelte	string	string @ 1578:32	Mytisk niveau opnået.
-src/lib/Skaerme.svelte:71387:71408:string:1coyhbg	src/lib/Skaerme.svelte	string	string @ 1578:57	Mythic tier achieved.
-src/lib/Skaerme.svelte:71488:71507:string:g568u2	src/lib/Skaerme.svelte	string	string @ 1579:73	Mythic requirement:
-src/lib/Skaerme.svelte:71766:71778:string:10y18fq	src/lib/Skaerme.svelte	string	string @ 1582:66	Requirement:
-src/lib/Skaerme.svelte:71948:71967:string:g568u2	src/lib/Skaerme.svelte	string	string @ 1584:77	Mythic requirement:
-src/lib/Skaerme.svelte:72239:72242:string:1ej2e9v	src/lib/Skaerme.svelte	string	string @ 1589:96	Luk
-src/lib/Skaerme.svelte:72246:72251:string:1l0xxoj	src/lib/Skaerme.svelte	string	string @ 1589:103	Close
-src/lib/Skaerme.svelte:72942:72961:string:1ul5cu3	src/lib/Skaerme.svelte	string	string @ 1605:48	Vælg profilkarakter
-src/lib/Skaerme.svelte:72965:72989:string:7m1edi	src/lib/Skaerme.svelte	string	string @ 1605:71	Choose profile character
-src/lib/Skaerme.svelte:73035:73054:string:1ul5cu3	src/lib/Skaerme.svelte	string	string @ 1606:43	Vælg profilkarakter
-src/lib/Skaerme.svelte:73058:73082:string:7m1edi	src/lib/Skaerme.svelte	string	string @ 1606:66	Choose profile character
-src/lib/Skaerme.svelte:73466:73476:string:1m0jmpb	src/lib/Skaerme.svelte	string	string @ 1615:37	Min profil
-src/lib/Skaerme.svelte:73480:73490:string:151h1ju	src/lib/Skaerme.svelte	string	string @ 1615:51	My profile
-src/lib/Skaerme.svelte:73729:73756:string:e3ph8p	src/lib/Skaerme.svelte	string	string @ 1619:40	Gæsteprofil i denne browser
-src/lib/Skaerme.svelte:73760:73789:string:1mhra57	src/lib/Skaerme.svelte	string	string @ 1619:71	Guest profile in this browser
-src/lib/Skaerme.svelte:74082:74085:string:1ej2e9v	src/lib/Skaerme.svelte	string	string @ 1625:39	Luk
-src/lib/Skaerme.svelte:74089:74094:string:1l0xxoj	src/lib/Skaerme.svelte	string	string @ 1625:46	Close
-src/lib/Skaerme.svelte:74275:74289:string:12ee6dy	src/lib/Skaerme.svelte	string	string @ 1630:73	Profilkarakter
-src/lib/Skaerme.svelte:74293:74310:string:dpam1p	src/lib/Skaerme.svelte	string	string @ 1630:91	Profile character
-src/lib/Skaerme.svelte:74609:74613:string:540b06	src/lib/Skaerme.svelte	string	string @ 1636:43	Auto
-src/lib/Skaerme.svelte:74617:74621:string:540b06	src/lib/Skaerme.svelte	string	string @ 1636:51	Auto
-src/lib/Skaerme.svelte:74672:74684:string:ux7zwf	src/lib/Skaerme.svelte	string	string @ 1637:41	Mest spillet
-src/lib/Skaerme.svelte:74688:74699:string:3p15m1	src/lib/Skaerme.svelte	string	string @ 1637:57	Most played
-src/lib/Skaerme.svelte:75090:75094:string:540b06	src/lib/Skaerme.svelte	string	string @ 1644:43	Auto
-src/lib/Skaerme.svelte:75098:75102:string:540b06	src/lib/Skaerme.svelte	string	string @ 1644:51	Auto
-src/lib/Skaerme.svelte:75153:75166:string:vzz6q0	src/lib/Skaerme.svelte	string	string @ 1645:41	Højeste score
-src/lib/Skaerme.svelte:75170:75183:string:ozya99	src/lib/Skaerme.svelte	string	string @ 1645:58	Highest score
-src/lib/Skaerme.svelte:76600:76615:string:ugx8dw	src/lib/Skaerme.svelte	string	string @ 1671:35	Ret spillernavn
-src/lib/Skaerme.svelte:76619:76635:string:1b82eol	src/lib/Skaerme.svelte	string	string @ 1671:54	Edit player name
-src/lib/Skaerme.svelte:76824:76827:string:1glrrp8	src/lib/Skaerme.svelte	string	string @ 1674:75	Gem
-src/lib/Skaerme.svelte:76831:76835:string:lewgh4	src/lib/Skaerme.svelte	string	string @ 1674:82	Save
-src/lib/Skaerme.svelte:77070:77074:string:127rswj	src/lib/Skaerme.svelte	string	string @ 1680:83	Spil
-src/lib/Skaerme.svelte:77078:77083:string:w6fxh8	src/lib/Skaerme.svelte	string	string @ 1680:91	Games
-src/lib/Skaerme.svelte:77183:77188:string:llq6w8	src/lib/Skaerme.svelte	string	string @ 1681:84	Sejre
-src/lib/Skaerme.svelte:77192:77196:string:zv33ge	src/lib/Skaerme.svelte	string	string @ 1681:93	Wins
-src/lib/Skaerme.svelte:77300:77308:string:14pcgwd	src/lib/Skaerme.svelte	string	string @ 1682:88	Dødsfald
-src/lib/Skaerme.svelte:77312:77318:string:1oy72d6	src/lib/Skaerme.svelte	string	string @ 1682:100	Deaths
-src/lib/Skaerme.svelte:77424:77436:string:1f7anq4	src/lib/Skaerme.svelte	string	string @ 1683:90	Bedste score
-src/lib/Skaerme.svelte:77440:77450:string:5xow45	src/lib/Skaerme.svelte	string	string @ 1683:106	Best score
-src/lib/Skaerme.svelte:77560:77570:string:1rrd157	src/lib/Skaerme.svelte	string	string @ 1684:94	Gns. score
-src/lib/Skaerme.svelte:77574:77584:string:5crpod	src/lib/Skaerme.svelte	string	string @ 1684:108	Avg. score
-src/lib/Skaerme.svelte:77687:77696:string:e1rwo8	src/lib/Skaerme.svelte	string	string @ 1685:87	Mest guld
-src/lib/Skaerme.svelte:77700:77709:string:13vdlw4	src/lib/Skaerme.svelte	string	string @ 1685:100	Most gold
-src/lib/Skaerme.svelte:77813:77825:string:1kunwcw	src/lib/Skaerme.svelte	string	string @ 1686:88	Længste spil
-src/lib/Skaerme.svelte:77829:77841:string:y9jon9	src/lib/Skaerme.svelte	string	string @ 1686:104	Longest game
-src/lib/Skaerme.svelte:77947:77959:string:1ypdsax	src/lib/Skaerme.svelte	string	string @ 1687:90	Flest felter
-src/lib/Skaerme.svelte:77963:77974:string:1yrjvw3	src/lib/Skaerme.svelte	string	string @ 1687:106	Most fields
-src/lib/Skaerme.svelte:78079:78090:string:hsz3dq	src/lib/Skaerme.svelte	string	string @ 1688:89	Flest miner
-src/lib/Skaerme.svelte:78094:78104:string:p5egg2	src/lib/Skaerme.svelte	string	string @ 1688:104	Most mines
-src/lib/Skaerme.svelte:78228:78240:string:ux7zwf	src/lib/Skaerme.svelte	string	string @ 1689:108	Mest spillet
-src/lib/Skaerme.svelte:78244:78255:string:3p15m1	src/lib/Skaerme.svelte	string	string @ 1689:124	Most played
-src/lib/Skaerme.svelte:78390:78404:string:drgdhz	src/lib/Skaerme.svelte	string	string @ 1693:69	Profilmedaljer
-src/lib/Skaerme.svelte:78408:78422:string:jar3py	src/lib/Skaerme.svelte	string	string @ 1693:87	Profile medals
-src/lib/Skaerme.svelte:80518:80532:string:321be2	src/lib/Skaerme.svelte	string	string @ 1726:41	Find dine spil
-src/lib/Skaerme.svelte:80536:80550:string:4kir0t	src/lib/Skaerme.svelte	string	string @ 1726:59	Find your runs
-src/lib/Skaerme.svelte:80601:80661:string:10zw14e	src/lib/Skaerme.svelte	string	string @ 1727:43	Søg på ø, karakter eller dato – eller angiv en mindstescore.
-src/lib/Skaerme.svelte:80665:80728:string:15fyubg	src/lib/Skaerme.svelte	string	string @ 1727:107	Search by island, character or date – or enter a minimum score.
-src/lib/Skaerme.svelte:80962:81003:string:becece	src/lib/Skaerme.svelte	string	string @ 1732:49	Søg i spil eller skriv en mindstescore...
-src/lib/Skaerme.svelte:81007:81046:string:1n6jpo1	src/lib/Skaerme.svelte	string	string @ 1732:94	Search runs or enter a minimum score...
-src/lib/Skaerme.svelte:81097:81118:string:10trzuo	src/lib/Skaerme.svelte	string	string @ 1733:48	Søg i dine gemte spil
-src/lib/Skaerme.svelte:81122:81144:string:1xxnccv	src/lib/Skaerme.svelte	string	string @ 1733:73	Search your saved runs
-src/lib/Skaerme.svelte:81286:81309:string:1gdrsr8	src/lib/Skaerme.svelte	string	string @ 1736:40	Ingen gemte spil endnu.
-src/lib/Skaerme.svelte:81313:81331:string:1froc2z	src/lib/Skaerme.svelte	string	string @ 1736:67	No saved runs yet.
-src/lib/Skaerme.svelte:81454:81485:string:1h83s0t	src/lib/Skaerme.svelte	string	string @ 1738:40	Ingen spil matcher din søgning.
-src/lib/Skaerme.svelte:81489:81515:string:1beslui	src/lib/Skaerme.svelte	string	string @ 1738:75	No runs match your search.
-src/lib/Skaerme.svelte:81988:81996:string:1ihj37y	src/lib/Skaerme.svelte	string	string @ 1744:91	Ukendt ø
-src/lib/Skaerme.svelte:82000:82014:string:hd8niq	src/lib/Skaerme.svelte	string	string @ 1744:103	Unknown island
-src/lib/Skaerme.svelte:82331:82337:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 1748:90	Ukendt
-src/lib/Skaerme.svelte:82341:82348:string:1kmy72x	src/lib/Skaerme.svelte	string	string @ 1748:100	Unknown
-src/lib/Skaerme.svelte:83239:83307:string:14xk3w2	src/lib/Skaerme.svelte	string	string @ 1758:142	Showing the first results. Search more precisely to find older runs.
-src/lib/Skaerme.svelte:83555:83622:string:1tnsilj	src/lib/Skaerme.svelte	string	string @ 1763:126	No statistics yet. Your runs are saved here when you are logged in.
-src/lib/Skaerme.svelte:83985:84002:string:gyrms0	src/lib/Skaerme.svelte	string	string @ 1773:134	Luk spillerprofil
-src/lib/Skaerme.svelte:84006:84026:string:1dnp0gp	src/lib/Skaerme.svelte	string	string @ 1773:155	Close player profile
-src/lib/Skaerme.svelte:84137:84159:string:1pupr41	src/lib/Skaerme.svelte	string	string @ 1774:98	offentlig-profil-title
-src/lib/Skaerme.svelte:84382:84404:string:1pupr41	src/lib/Skaerme.svelte	string	string @ 1778:33	offentlig-profil-title
-src/lib/Skaerme.svelte:84656:84659:string:1ej2e9v	src/lib/Skaerme.svelte	string	string @ 1781:97	Luk
-src/lib/Skaerme.svelte:84663:84668:string:1l0xxoj	src/lib/Skaerme.svelte	string	string @ 1781:104	Close
-src/lib/Skaerme.svelte:84845:84870:string:1ie6n3d	src/lib/Skaerme.svelte	string	string @ 1785:89	Loading player profile...
-src/lib/Skaerme.svelte:84984:85003:string:cwu5fa	src/lib/Skaerme.svelte	string	string @ 1787:83	Spillerens medaljer
-src/lib/Skaerme.svelte:85007:85020:string:ct00bc	src/lib/Skaerme.svelte	string	string @ 1787:106	Player medals
-src/lib/Skaerme.svelte:87097:87117:string:h5xtrh	src/lib/Skaerme.svelte	string	string @ 1816:101	No saved medals yet.
-src/lib/Skaerme.svelte:87510:87528:string:1u4x8p0	src/lib/Skaerme.svelte	string	string @ 1828:119	Luk scoreopgørelse
-src/lib/Skaerme.svelte:87532:87553:string:1fqkpu6	src/lib/Skaerme.svelte	string	string @ 1828:141	Close score breakdown
-src/lib/Skaerme.svelte:87664:87686:string:j123aq	src/lib/Skaerme.svelte	string	string @ 1829:98	highscore-detail-title
-src/lib/Skaerme.svelte:88068:88090:string:j123aq	src/lib/Skaerme.svelte	string	string @ 1837:37	highscore-detail-title
-src/lib/Skaerme.svelte:88720:88726:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 1849:41	Ukendt
-src/lib/Skaerme.svelte:88730:88737:string:1kmy72x	src/lib/Skaerme.svelte	string	string @ 1849:51	Unknown
-src/lib/Skaerme.svelte:89437:89440:string:1ej2e9v	src/lib/Skaerme.svelte	string	string @ 1863:82	Luk
-src/lib/Skaerme.svelte:89444:89449:string:1l0xxoj	src/lib/Skaerme.svelte	string	string @ 1863:89	Close
-src/lib/Skaerme.svelte:89575:89587:string:1jday8f	src/lib/Skaerme.svelte	string	string @ 1867:35	SAMLET SCORE
-src/lib/Skaerme.svelte:89591:89602:string:1v9efgb	src/lib/Skaerme.svelte	string	string @ 1867:51	TOTAL SCORE
-src/lib/Skaerme.svelte:89801:89808:string:1ot2045	src/lib/Skaerme.svelte	string	string @ 1871:37	Medalje
-src/lib/Skaerme.svelte:89812:89817:string:1g793kc	src/lib/Skaerme.svelte	string	string @ 1871:48	Medal
-src/lib/Skaerme.svelte:90215:90235:string:1aj3r2i	src/lib/Skaerme.svelte	string	string @ 1878:85	Loading breakdown...
-src/lib/Skaerme.svelte:90538:90571:string:trx4z4	src/lib/Skaerme.svelte	string	string @ 1882:87	Trofæmedaljer opnået i dette spil
-src/lib/Skaerme.svelte:90575:90607:string:19plikc	src/lib/Skaerme.svelte	string	string @ 1882:124	Trophy medals earned in this run
-src/lib/Skaerme.svelte:90654:90674:string:mgmst7	src/lib/Skaerme.svelte	string	string @ 1883:43	Trofæmedaljer opnået
-src/lib/Skaerme.svelte:90678:90698:string:1qed700	src/lib/Skaerme.svelte	string	string @ 1883:67	Trophy medals earned
-src/lib/Skaerme.svelte:92162:92168:string:1obkoi7	src/lib/Skaerme.svelte	string	string @ 1905:81	Logbog
-src/lib/Skaerme.svelte:92172:92179:string:18rn4f8	src/lib/Skaerme.svelte	string	string @ 1905:91	Logbook
-src/lib/Skaerme.svelte:92222:92228:string:1obkoi7	src/lib/Skaerme.svelte	string	string @ 1906:39	Logbog
-src/lib/Skaerme.svelte:92232:92239:string:18rn4f8	src/lib/Skaerme.svelte	string	string @ 1906:49	Logbook
-src/lib/Skaerme.svelte:92383:92393:string:ltlcbq	src/lib/Skaerme.svelte	string	string @ 1907:134	Åbn logbog
-src/lib/Skaerme.svelte:92397:92409:string:d0wx52	src/lib/Skaerme.svelte	string	string @ 1907:148	Open logbook
-src/lib/Skaerme.svelte:92427:92437:string:ltlcbq	src/lib/Skaerme.svelte	string	string @ 1907:178	Åbn logbog
-src/lib/Skaerme.svelte:92441:92453:string:d0wx52	src/lib/Skaerme.svelte	string	string @ 1907:192	Open logbook
-src/lib/Skaerme.svelte:92754:92768:string:dhrajh	src/lib/Skaerme.svelte	string	string @ 1913:88	Trofæfremdrift
-src/lib/Skaerme.svelte:92772:92787:string:13fs63i	src/lib/Skaerme.svelte	string	string @ 1913:106	Trophy progress
-src/lib/Skaerme.svelte:93567:93571:string:1bud7az	src/lib/Skaerme.svelte	string	string @ 1926:83	Rute
-src/lib/Skaerme.svelte:93575:93580:string:1nvxkfy	src/lib/Skaerme.svelte	string	string @ 1926:91	Route
-src/lib/Skaerme.svelte:93627:93631:string:1bud7az	src/lib/Skaerme.svelte	string	string @ 1927:43	Rute
-src/lib/Skaerme.svelte:93635:93640:string:1nvxkfy	src/lib/Skaerme.svelte	string	string @ 1927:51	Route
-src/lib/Skaerme.svelte:93802:93815:string:4w8g9n	src/lib/Skaerme.svelte	string	string @ 1929:86	xMidYMid meet
-src/lib/Skaerme.svelte:94029:94054:string:11631gw	src/lib/Skaerme.svelte	string	string @ 1933:49	rgba(255, 255, 255, 0.88)
-src/lib/Skaerme.svelte:94899:94985:string:1m8ml38	src/lib/Skaerme.svelte	string	string @ 1946:143	This score was saved before detailed breakdowns, so only the total score is available.
-src/lib/Skaerme.svelte:95345:95350:string:xq4t6	src/lib/Skaerme.svelte	string	string @ 1953:101	Skjul
-src/lib/Skaerme.svelte:95354:95358:string:1qfy6dp	src/lib/Skaerme.svelte	string	string @ 1953:110	Hide
-src/lib/Skaerme.svelte:95546:95561:string:mm5b3p	src/lib/Skaerme.svelte	string	string @ 1956:89	Loading list...
-src/lib/Skaerme.svelte:95740:95757:string:4mov36	src/lib/Skaerme.svelte	string	string @ 1958:98	No results found.
-src/lib/Skaerme.svelte:97034:97044:string:f22tq3	src/lib/Skaerme.svelte	string	string @ 1980:133	Luk logbog
-src/lib/Skaerme.svelte:97048:97061:string:5sric8	src/lib/Skaerme.svelte	string	string @ 1980:147	Close logbook
-src/lib/Skaerme.svelte:97339:97345:string:1obkoi7	src/lib/Skaerme.svelte	string	string @ 1983:66	Logbog
-src/lib/Skaerme.svelte:97349:97356:string:18rn4f8	src/lib/Skaerme.svelte	string	string @ 1983:76	Logbook
-src/lib/Skaerme.svelte:97474:97484:string:f22tq3	src/lib/Skaerme.svelte	string	string @ 1984:110	Luk logbog
-src/lib/Skaerme.svelte:97488:97501:string:5sric8	src/lib/Skaerme.svelte	string	string @ 1984:124	Close logbook
-src/lib/Skaerme.svelte:97513:97516:string:1ej2e9v	src/lib/Skaerme.svelte	string	string @ 1984:149	Luk
-src/lib/Skaerme.svelte:97520:97525:string:1l0xxoj	src/lib/Skaerme.svelte	string	string @ 1984:156	Close
-src/lib/Skaerme.svelte:97982:98026:string:pjphbd	src/lib/Skaerme.svelte	string	string @ 1992:44	Logbogen er ikke gemt for denne score endnu.
-src/lib/Skaerme.svelte:98030:98080:string:ic2i5u	src/lib/Skaerme.svelte	string	string @ 1992:92	The logbook has not been saved for this score yet.
-src/lib/Skaerme.svelte:98471:98486:string:1uf469s	src/lib/Skaerme.svelte	string	string @ 2006:31	Gemmer score...
-src/lib/Skaerme.svelte:98490:98505:string:1esvarp	src/lib/Skaerme.svelte	string	string @ 2006:50	Saving score...
-src/lib/Skaerme.svelte:98595:98617:string:52r6lb	src/lib/Skaerme.svelte	string	string @ 2008:60	Scoren blev ikke gemt.
-src/lib/Skaerme.svelte:98621:98645:string:pulv39	src/lib/Skaerme.svelte	string	string @ 2008:86	The score was not saved.
-src/lib/Skaerme.svelte:98725:98734:string:1ia72p8	src/lib/Skaerme.svelte	string	string @ 2009:70	Prøv igen
-src/lib/Skaerme.svelte:98738:98747:string:982hh6	src/lib/Skaerme.svelte	string	string @ 2009:83	Try again
-src/lib/Skaerme.svelte:98994:99028:string:1ovk63c	src/lib/Skaerme.svelte	string	string @ 2013:37	Spil nyeste version og opret konto
-src/lib/Skaerme.svelte:99032:99073:string:1frjmbv	src/lib/Skaerme.svelte	string	string @ 2013:75	Play latest version and create an account
-src/lib/Skaerme.svelte:99414:99437:string:1wl64cl	src/lib/Skaerme.svelte	string	string @ 2021:49	E-mailadresse til login
-src/lib/Skaerme.svelte:99441:99464:string:h91jx5	src/lib/Skaerme.svelte	string	string @ 2021:76	Email address for login
-src/lib/Skaerme.svelte:99781:99790:string:1gxet22	src/lib/Skaerme.svelte	string	string @ 2025:56	Sender...
-src/lib/Skaerme.svelte:99794:99804:string:2q3xjh	src/lib/Skaerme.svelte	string	string @ 2025:69	Sending...
-src/lib/Skaerme.svelte:99816:99828:string:3g9slf	src/lib/Skaerme.svelte	string	string @ 2025:91	Log ind igen
-src/lib/Skaerme.svelte:99832:99844:string:jhq7bw	src/lib/Skaerme.svelte	string	string @ 2025:107	Log in again
-src/lib/Skaerme.svelte:100356:100378:string:iga951	src/lib/Skaerme.svelte	string	string @ 2040:58	Ugens globale topliste
-src/lib/Skaerme.svelte:100382:100412:string:1w0g1ez	src/lib/Skaerme.svelte	string	string @ 2040:84	This week's global leaderboard
-src/lib/Skaerme.svelte:100552:100570:string:j5hwvv	src/lib/Skaerme.svelte	string	string @ 2042:61	Leaderboard · week
-src/lib/Skaerme.svelte:100729:100753:string:wngsze	src/lib/Skaerme.svelte	string	string @ 2044:84	No results yet this week
-src/lib/Skaerme.svelte:101961:102003:string:upg190	src/lib/Skaerme.svelte	string	string @ 2061:143	Vis de forrige 10 resultater fra denne uge
-src/lib/Skaerme.svelte:102007:102045:string:vbmu1z	src/lib/Skaerme.svelte	string	string @ 2061:189	Show previous 10 scores from this week
-src/lib/Skaerme.svelte:102070:102074:text:16bg5am	src/lib/Skaerme.svelte	text	markup @ 2062:21	&lt;
-src/lib/Skaerme.svelte:102224:102264:string:pisjfs	src/lib/Skaerme.svelte	string	string @ 2064:124	Vis de næste 10 resultater fra denne uge
-src/lib/Skaerme.svelte:102268:102302:string:ntxy6z	src/lib/Skaerme.svelte	string	string @ 2064:168	Show next 10 scores from this week
-src/lib/Skaerme.svelte:102327:102331:text:ul9v7n	src/lib/Skaerme.svelte	text	markup @ 2065:21	&gt;
-src/lib/Skaerme.svelte:102609:102624:string:bxa9j8	src/lib/Skaerme.svelte	string	string @ 2075:58	Global topliste
-src/lib/Skaerme.svelte:102628:102646:string:18zxbdp	src/lib/Skaerme.svelte	string	string @ 2075:77	Global leaderboard
-src/lib/Skaerme.svelte:102750:102765:string:bxa9j8	src/lib/Skaerme.svelte	string	string @ 2077:25	Global topliste
-src/lib/Skaerme.svelte:102769:102787:string:18zxbdp	src/lib/Skaerme.svelte	string	string @ 2077:44	Global leaderboard
-src/lib/Skaerme.svelte:102906:102917:string:fqfdkg	src/lib/Skaerme.svelte	string	string @ 2079:66	No data yet
-src/lib/Skaerme.svelte:104118:104154:string:16xcu4g	src/lib/Skaerme.svelte	string	string @ 2096:138	Vis de forrige 10 globale resultater
-src/lib/Skaerme.svelte:104158:104188:string:1scl1kc	src/lib/Skaerme.svelte	string	string @ 2096:178	Show previous 10 global scores
-src/lib/Skaerme.svelte:104213:104217:text:16bg5am	src/lib/Skaerme.svelte	text	markup @ 2097:21	&lt;
-src/lib/Skaerme.svelte:104364:104398:string:1iq4j5g	src/lib/Skaerme.svelte	string	string @ 2099:119	Vis de næste 10 globale resultater
-src/lib/Skaerme.svelte:104402:104428:string:r45vew	src/lib/Skaerme.svelte	string	string @ 2099:157	Show next 10 global scores
-src/lib/Skaerme.svelte:104453:104457:text:ul9v7n	src/lib/Skaerme.svelte	text	markup @ 2100:21	&gt;
-src/lib/Skaerme.svelte:104757:104785:string:5cpjno	src/lib/Skaerme.svelte	string	string @ 2110:58	Topliste for karakterklassen
-src/lib/Skaerme.svelte:104789:104816:string:1ggpo47	src/lib/Skaerme.svelte	string	string @ 2110:90	Character class leaderboard
-src/lib/Skaerme.svelte:104920:104929:string:14eamp3	src/lib/Skaerme.svelte	string	string @ 2112:25	Toplisten
-src/lib/Skaerme.svelte:104933:104944:string:1i5w5ak	src/lib/Skaerme.svelte	string	string @ 2112:38	Leaderboard
-src/lib/Skaerme.svelte:105086:105097:string:fqfdkg	src/lib/Skaerme.svelte	string	string @ 2114:66	No data yet
-src/lib/Skaerme.svelte:106296:106344:string:e5g195	src/lib/Skaerme.svelte	string	string @ 2131:138	Vis de forrige 10 resultater for karakterklassen
-src/lib/Skaerme.svelte:106348:106395:string:lv51ui	src/lib/Skaerme.svelte	string	string @ 2131:190	Show previous 10 scores for the character class
-src/lib/Skaerme.svelte:106420:106424:text:16bg5am	src/lib/Skaerme.svelte	text	markup @ 2132:21	&lt;
-src/lib/Skaerme.svelte:106571:106617:string:1r7eekt	src/lib/Skaerme.svelte	string	string @ 2134:119	Vis de næste 10 resultater for karakterklassen
-src/lib/Skaerme.svelte:106621:106664:string:17wrkli	src/lib/Skaerme.svelte	string	string @ 2134:169	Show next 10 scores for the character class
-src/lib/Skaerme.svelte:106689:106693:text:ul9v7n	src/lib/Skaerme.svelte	text	markup @ 2135:21	&gt;
-src/lib/Skaerme.svelte:107523:107538:string:1lrylrl	src/lib/Skaerme.svelte	string	string @ 2159:68	Båd ved tågeøen
-src/lib/Skaerme.svelte:107542:107564:string:16humuo	src/lib/Skaerme.svelte	string	string @ 2159:87	Boat by the fog island
-src/lib/Skaerme.svelte:107745:107764:string:hi9mha	src/lib/Skaerme.svelte	string	string @ 2162:72	A new island awaits
-src/lib/Skaerme.svelte:107821:107830:string:1q5q03g	src/lib/Skaerme.svelte	string	string @ 2163:50	Tågeøerne
-src/lib/Skaerme.svelte:107834:107844:string:3mclic	src/lib/Skaerme.svelte	string	string @ 2163:63	Fog Island
-src/lib/Skaerme.svelte:107967:108037:string:s25usc	src/lib/Skaerme.svelte	string	string @ 2164:115	Explore the island, stay ahead of the fog and find a boat to the east.
-src/lib/Skaerme.svelte:108160:108200:string:osfe3o	src/lib/Skaerme.svelte	string	string @ 2169:31	Det samme ønavn skaber altid den samme ø
-src/lib/Skaerme.svelte:108204:108255:string:16erw8e	src/lib/Skaerme.svelte	string	string @ 2169:75	The same island name always creates the same island
-src/lib/Skaerme.svelte:108298:108353:string:khj4sj	src/lib/Skaerme.svelte	string	string @ 2170:33	Andre spillere kan slutte sig til i de første fem dage.
-src/lib/Skaerme.svelte:108357:108407:string:wcn2v8	src/lib/Skaerme.svelte	string	string @ 2170:92	Other players can join during the first five days.
-src/lib/Skaerme.svelte:108798:108809:string:x2l2cz	src/lib/Skaerme.svelte	string	string @ 2181:45	Spillernavn
-src/lib/Skaerme.svelte:108813:108824:string:1vcnxj7	src/lib/Skaerme.svelte	string	string @ 2181:60	Player name
-src/lib/Skaerme.svelte:109295:109304:string:1ofwchi	src/lib/Skaerme.svelte	string	string @ 2193:45	Øens navn
-src/lib/Skaerme.svelte:109308:109319:string:1wdgynz	src/lib/Skaerme.svelte	string	string @ 2193:58	Island name
-src/lib/Skaerme.svelte:109557:109570:string:1k4moeq	src/lib/Skaerme.svelte	string	string @ 2197:109	Foreslå ønavn
-src/lib/Skaerme.svelte:109574:109593:string:9yt8ht	src/lib/Skaerme.svelte	string	string @ 2197:126	Suggest island name
-src/lib/Skaerme.svelte:109611:109624:string:1k4moeq	src/lib/Skaerme.svelte	string	string @ 2197:163	Foreslå ønavn
-src/lib/Skaerme.svelte:109628:109647:string:9yt8ht	src/lib/Skaerme.svelte	string	string @ 2197:180	Suggest island name
-src/lib/Skaerme.svelte:110184:110198:string:1x51947	src/lib/Skaerme.svelte	string	string @ 2205:158	Start tutorial
-src/lib/Skaerme.svelte:110202:110216:string:1x51947	src/lib/Skaerme.svelte	string	string @ 2205:176	Start tutorial
-src/lib/Skaerme.svelte:110360:110368:text:11855xr	src/lib/Skaerme.svelte	text	markup @ 2207:35	Tutorial
-src/lib/Skaerme.svelte:110569:110584:attribute:mr4wyp	src/lib/Skaerme.svelte	attribute	aria-label @ 2213:65	Lokale testkort
-src/lib/Skaerme.svelte:111533:111554:string:1o1u2r	src/lib/Skaerme.svelte	string	string @ 2237:35	Offline / Flytilstand
-src/lib/Skaerme.svelte:111558:111579:string:1j2wngo	src/lib/Skaerme.svelte	string	string @ 2237:60	Offline / Flight mode
-src/lib/Skaerme.svelte:111622:111643:string:1o1u2r	src/lib/Skaerme.svelte	string	string @ 2238:40	Offline / Flytilstand
-src/lib/Skaerme.svelte:111647:111668:string:1j2wngo	src/lib/Skaerme.svelte	string	string @ 2238:65	Offline / Flight mode
-src/lib/Skaerme.svelte:111828:111839:string:l5o6i6	src/lib/Skaerme.svelte	string	string @ 2241:62	Gør klar...
-src/lib/Skaerme.svelte:111843:111855:string:v82aiz	src/lib/Skaerme.svelte	string	string @ 2241:77	Preparing...
-src/lib/Skaerme.svelte:111867:111888:string:1o1u2r	src/lib/Skaerme.svelte	string	string @ 2241:101	Offline / Flytilstand
-src/lib/Skaerme.svelte:111892:111913:string:1j2wngo	src/lib/Skaerme.svelte	string	string @ 2241:126	Offline / Flight mode
-src/lib/Skaerme.svelte:112074:112103:string:12ehak2	src/lib/Skaerme.svelte	string	string @ 2244:81	Tap here before going offline
-src/lib/Skaerme.svelte:112476:112491:string:1p9bfvk	src/lib/Skaerme.svelte	string	string @ 2252:33	Fortsæt offline
-src/lib/Skaerme.svelte:112495:112511:string:1xdpuvf	src/lib/Skaerme.svelte	string	string @ 2252:52	Continue offline
-src/lib/Skaerme.svelte:112831:112837:string:7v5ys2	src/lib/Skaerme.svelte	string	string @ 2256:92	Log ud
-src/lib/Skaerme.svelte:112841:112848:string:11y83at	src/lib/Skaerme.svelte	string	string @ 2256:102	Log out
-src/lib/Skaerme.svelte:113105:113146:string:1ywk2z0	src/lib/Skaerme.svelte	string	string @ 2266:25	Vælg din karakter, inden du går i land på
-src/lib/Skaerme.svelte:113150:113189:string:krk2jh	src/lib/Skaerme.svelte	string	string @ 2266:70	Choose your character before landing on
-src/lib/Skaerme.svelte:113395:113403:string:14xb1m4	src/lib/Skaerme.svelte	string	string @ 2268:70	1 på øen
-src/lib/Skaerme.svelte:113407:113422:string:137ny4z	src/lib/Skaerme.svelte	string	string @ 2268:82	1 on the island
-src/lib/Skaerme.svelte:113566:113569:string:kwfqv7	src/lib/Skaerme.svelte	string	string @ 2269:31	Dag
-src/lib/Skaerme.svelte:113573:113576:string:kcgjh9	src/lib/Skaerme.svelte	string	string @ 2269:38	Day
-src/lib/Skaerme.svelte:113674:113678:string:1ocp651	src/lib/Skaerme.svelte	string	string @ 2270:63	Åben
-src/lib/Skaerme.svelte:113682:113686:string:n6hn1l	src/lib/Skaerme.svelte	string	string @ 2270:71	Open
-src/lib/Skaerme.svelte:113698:113704:string:14v6ey1	src/lib/Skaerme.svelte	string	string @ 2270:87	Lukket
-src/lib/Skaerme.svelte:113708:113714:string:dvi7s5	src/lib/Skaerme.svelte	string	string @ 2270:97	Closed
-src/lib/Skaerme.svelte:113844:113900:string:yhy60j	src/lib/Skaerme.svelte	string	string @ 2273:63	Du spiller offline. Spillet bliver gemt i denne browser.
-src/lib/Skaerme.svelte:113904:113963:string:1f4r9ie	src/lib/Skaerme.svelte	string	string @ 2273:123	You are playing offline. The game is saved in this browser.
-src/lib/Skaerme.svelte:113975:114050:string:19ad29q	src/lib/Skaerme.svelte	string	string @ 2273:194	Øen har givet dig otte muligheder. Vælg den karakter, du vil gå i land som.
-src/lib/Skaerme.svelte:114054:114135:string:wl2zqo	src/lib/Skaerme.svelte	string	string @ 2273:273	The island has given you eight options. Choose the character you want to land as.
-src/lib/Skaerme.svelte:115373:115387:string:175pm4j	src/lib/Skaerme.svelte	string	string @ 2301:111	Åbn din profil
-src/lib/Skaerme.svelte:115391:115408:string:jgrqd9	src/lib/Skaerme.svelte	string	string @ 2301:129	Open your profile
-src/lib/Skaerme.svelte:115498:115505:string:1ot2045	src/lib/Skaerme.svelte	string	string @ 2302:86	Medalje
-src/lib/Skaerme.svelte:115509:115514:string:1g793kc	src/lib/Skaerme.svelte	string	string @ 2302:97	Medal
-src/lib/Skaerme.svelte:115860:115867:string:1ot2045	src/lib/Skaerme.svelte	string	string @ 2305:82	Medalje
-src/lib/Skaerme.svelte:115871:115876:string:1g793kc	src/lib/Skaerme.svelte	string	string @ 2305:93	Medal
-src/lib/Skaerme.svelte:116614:116623:string:1y01gn0	src/lib/Skaerme.svelte	string	string @ 2315:64	Pergament
-src/lib/Skaerme.svelte:116627:116636:string:6sd8fz	src/lib/Skaerme.svelte	string	string @ 2315:77	Parchment
-src/lib/Skaerme.svelte:116757:116763:text:1nd4l99	src/lib/Skaerme.svelte	text	markup @ 2317:47	Score:
-src/lib/Skaerme.svelte:116899:116904:string:1bzexzk	src/lib/Skaerme.svelte	string	string @ 2321:56	Døden
-src/lib/Skaerme.svelte:116908:116913:string:14eksml	src/lib/Skaerme.svelte	string	string @ 2321:65	Death
-src/lib/Skaerme.svelte:117299:117316:string:wt8xuk	src/lib/Skaerme.svelte	string	string @ 2330:70	Same island again
-src/lib/Skaerme.svelte:117990:118003:string:18uzozt	src/lib/Skaerme.svelte	string	string @ 2345:69	Øens topliste
-src/lib/Skaerme.svelte:118007:118025:string:1ruzwe3	src/lib/Skaerme.svelte	string	string @ 2345:86	Island leaderboard
-src/lib/Skaerme.svelte:118152:118165:string:110a7io	src/lib/Skaerme.svelte	string	string @ 2347:37	Toplisten for
-src/lib/Skaerme.svelte:118169:118184:string:17tc0or	src/lib/Skaerme.svelte	string	string @ 2347:54	Leaderboard for
-src/lib/Skaerme.svelte:118369:118383:string:1ugjqjq	src/lib/Skaerme.svelte	string	string @ 2349:84	No results yet
-src/lib/Skaerme.svelte:119676:119700:string:6p3m1p	src/lib/Skaerme.svelte	string	string @ 2364:76	Gemt lokalt i browseren.
-src/lib/Skaerme.svelte:119704:119733:string:1vwdfd2	src/lib/Skaerme.svelte	string	string @ 2364:104	Saved locally in the browser.
-src/lib/Skaerme.svelte:119867:119898:string:4myq8e	src/lib/Skaerme.svelte	string	string @ 2366:76	Log ind for at gemme din score.
-src/lib/Skaerme.svelte:119902:119928:string:5c7tlr	src/lib/Skaerme.svelte	string	string @ 2366:111	Log in to save your score.
-src/lib/Skaerme.svelte:120273:120308:string:13uq2xi	src/lib/Skaerme.svelte	string	string @ 2371:149	Vis de forrige 10 resultater på øen
-src/lib/Skaerme.svelte:120312:120349:string:yykw6	src/lib/Skaerme.svelte	string	string @ 2371:188	Show previous 10 scores on the island
-src/lib/Skaerme.svelte:120386:120390:text:16bg5am	src/lib/Skaerme.svelte	text	markup @ 2372:33	&lt;
-src/lib/Skaerme.svelte:120560:120593:string:h4uk5e	src/lib/Skaerme.svelte	string	string @ 2374:130	Vis de næste 10 resultater på øen
-src/lib/Skaerme.svelte:120597:120630:string:1ql65w2	src/lib/Skaerme.svelte	string	string @ 2374:167	Show next 10 scores on the island
-src/lib/Skaerme.svelte:120667:120671:text:ul9v7n	src/lib/Skaerme.svelte	text	markup @ 2375:33	&gt;
-src/lib/Skaerme.svelte:121421:121435:string:175pm4j	src/lib/Skaerme.svelte	string	string @ 2396:111	Åbn din profil
-src/lib/Skaerme.svelte:121439:121456:string:jgrqd9	src/lib/Skaerme.svelte	string	string @ 2396:129	Open your profile
-src/lib/Skaerme.svelte:121546:121553:string:1ot2045	src/lib/Skaerme.svelte	string	string @ 2397:86	Medalje
-src/lib/Skaerme.svelte:121557:121562:string:1g793kc	src/lib/Skaerme.svelte	string	string @ 2397:97	Medal
-src/lib/Skaerme.svelte:121908:121915:string:1ot2045	src/lib/Skaerme.svelte	string	string @ 2400:82	Medalje
-src/lib/Skaerme.svelte:121919:121924:string:1g793kc	src/lib/Skaerme.svelte	string	string @ 2400:93	Medal
-src/lib/Skaerme.svelte:122675:122684:string:1y01gn0	src/lib/Skaerme.svelte	string	string @ 2410:64	Pergament
-src/lib/Skaerme.svelte:122688:122697:string:6sd8fz	src/lib/Skaerme.svelte	string	string @ 2410:77	Parchment
-src/lib/Skaerme.svelte:122818:122824:text:1nd4l99	src/lib/Skaerme.svelte	text	markup @ 2412:47	Score:
-src/lib/Skaerme.svelte:123261:123278:string:wt8xuk	src/lib/Skaerme.svelte	string	string @ 2423:70	Same island again
-src/lib/Skaerme.svelte:123950:123963:string:18uzozt	src/lib/Skaerme.svelte	string	string @ 2438:69	Øens topliste
-src/lib/Skaerme.svelte:123967:123985:string:1ruzwe3	src/lib/Skaerme.svelte	string	string @ 2438:86	Island leaderboard
-src/lib/Skaerme.svelte:124112:124125:string:110a7io	src/lib/Skaerme.svelte	string	string @ 2440:37	Toplisten for
-src/lib/Skaerme.svelte:124129:124144:string:17tc0or	src/lib/Skaerme.svelte	string	string @ 2440:54	Leaderboard for
-src/lib/Skaerme.svelte:124329:124343:string:1ugjqjq	src/lib/Skaerme.svelte	string	string @ 2442:84	No results yet
-src/lib/Skaerme.svelte:125636:125660:string:6p3m1p	src/lib/Skaerme.svelte	string	string @ 2457:76	Gemt lokalt i browseren.
-src/lib/Skaerme.svelte:125664:125693:string:1vwdfd2	src/lib/Skaerme.svelte	string	string @ 2457:104	Saved locally in the browser.
-src/lib/Skaerme.svelte:125827:125858:string:4myq8e	src/lib/Skaerme.svelte	string	string @ 2459:76	Log ind for at gemme din score.
-src/lib/Skaerme.svelte:125862:125888:string:5c7tlr	src/lib/Skaerme.svelte	string	string @ 2459:111	Log in to save your score.
-src/lib/Skaerme.svelte:126233:126268:string:13uq2xi	src/lib/Skaerme.svelte	string	string @ 2464:149	Vis de forrige 10 resultater på øen
-src/lib/Skaerme.svelte:126272:126309:string:yykw6	src/lib/Skaerme.svelte	string	string @ 2464:188	Show previous 10 scores on the island
-src/lib/Skaerme.svelte:126346:126350:text:16bg5am	src/lib/Skaerme.svelte	text	markup @ 2465:33	&lt;
-src/lib/Skaerme.svelte:126520:126553:string:h4uk5e	src/lib/Skaerme.svelte	string	string @ 2467:130	Vis de næste 10 resultater på øen
-src/lib/Skaerme.svelte:126557:126590:string:1ql65w2	src/lib/Skaerme.svelte	string	string @ 2467:167	Show next 10 scores on the island
-src/lib/Skaerme.svelte:126627:126631:text:ul9v7n	src/lib/Skaerme.svelte	text	markup @ 2468:33	&gt;
-src/lib/Skaerme.svelte:127422:127452:string:n90vvy	src/lib/Skaerme.svelte	string	string @ 2493:48	Øen er lukket for nye spillere
-src/lib/Skaerme.svelte:127456:127491:string:i6ox3m	src/lib/Skaerme.svelte	string	string @ 2493:82	The island is closed to new players
-src/lib/Skaerme.svelte:133621:133627:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 2637:100	Cinzel
-src/lib/Skaerme.svelte:134390:134396:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 2664:23	Cinzel
-src/lib/Skaerme.svelte:134650:134656:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 2673:23	Cinzel
-src/lib/Skaerme.svelte:137097:137103:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 2726:130	Cinzel
-src/lib/Skaerme.svelte:137503:137509:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 2736:23	Cinzel
-src/lib/Skaerme.svelte:148176:148182:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3083:23	Cinzel
-src/lib/Skaerme.svelte:152552:152558:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3248:23	Cinzel
-src/lib/Skaerme.svelte:155675:155681:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3365:23	Cinzel
-src/lib/Skaerme.svelte:155762:155768:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3369:23	Cinzel
-src/lib/Skaerme.svelte:161883:161889:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3600:23	Cinzel
-src/lib/Skaerme.svelte:162881:162887:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3624:87	Cinzel
-src/lib/Skaerme.svelte:164511:164517:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3642:69	Cinzel
-src/lib/Skaerme.svelte:164610:164616:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3643:68	Cinzel
-src/lib/Skaerme.svelte:165083:165089:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3648:141	Cinzel
-src/lib/Skaerme.svelte:166058:166064:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3674:23	Cinzel
-src/lib/Skaerme.svelte:168106:168112:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3747:169	Cinzel
-src/lib/Skaerme.svelte:168867:168873:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3754:141	Cinzel
-src/lib/Skaerme.svelte:170648:170654:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3786:23	Cinzel
-src/lib/Skaerme.svelte:170919:170925:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3796:23	Cinzel
-src/lib/Skaerme.svelte:172236:172242:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3842:23	Cinzel
-src/lib/Skaerme.svelte:174101:174107:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3907:89	Cinzel
-src/lib/Skaerme.svelte:178580:178586:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 4047:23	Cinzel
-src/lib/Skaerme.svelte:179635:179641:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 4089:23	Cinzel
-src/lib/Skaerme.svelte:181017:181023:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 4138:23	Cinzel
-src/lib/Skaerme.svelte:183520:183526:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 4225:23	Cinzel
-src/lib/Skaerme.svelte:186181:186187:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 4324:23	Cinzel
-src/lib/Skaerme.svelte:191955:191961:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 4536:23	Cinzel
+src/lib/Skaerme.svelte:26085:26091:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 566:55	Ukendt
+src/lib/Skaerme.svelte:26095:26102:string:1kmy72x	src/lib/Skaerme.svelte	string	string @ 566:65	Unknown
+src/lib/Skaerme.svelte:26221:26232:string:7zj9hd	src/lib/Skaerme.svelte	string	string @ 570:43	Sluppet væk
+src/lib/Skaerme.svelte:26236:26243:string:yze5eu	src/lib/Skaerme.svelte	string	string @ 570:58	Escaped
+src/lib/Skaerme.svelte:26459:26462:string:ky5fgv	src/lib/Skaerme.svelte	string	string @ 573:22	Død
+src/lib/Skaerme.svelte:26466:26470:string:7z6slj	src/lib/Skaerme.svelte	string	string @ 573:29	Dead
+src/lib/Skaerme.svelte:26496:26502:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 574:23	Ukendt
+src/lib/Skaerme.svelte:26506:26513:string:1kmy72x	src/lib/Skaerme.svelte	string	string @ 574:33	Unknown
+src/lib/Skaerme.svelte:26680:26691:string:7zj9hd	src/lib/Skaerme.svelte	string	string @ 578:42	Sluppet væk
+src/lib/Skaerme.svelte:26695:26702:string:yze5eu	src/lib/Skaerme.svelte	string	string @ 578:57	Escaped
+src/lib/Skaerme.svelte:26746:26753:string:ltt27n	src/lib/Skaerme.svelte	string	string @ 579:41	I tågen
+src/lib/Skaerme.svelte:26757:26767:string:fo1h9p	src/lib/Skaerme.svelte	string	string @ 579:52	In the fog
+src/lib/Skaerme.svelte:26959:26962:string:ky5fgv	src/lib/Skaerme.svelte	string	string @ 582:22	Død
+src/lib/Skaerme.svelte:26966:26970:string:7z6slj	src/lib/Skaerme.svelte	string	string @ 582:29	Dead
+src/lib/Skaerme.svelte:27086:27097:string:199raw	src/lib/Skaerme.svelte	string	string @ 586:39	Ukendt dato
+src/lib/Skaerme.svelte:27101:27113:string:t060q7	src/lib/Skaerme.svelte	string	string @ 586:54	Unknown date
+src/lib/Skaerme.svelte:27215:27226:string:199raw	src/lib/Skaerme.svelte	string	string @ 588:57	Ukendt dato
+src/lib/Skaerme.svelte:27230:27242:string:t060q7	src/lib/Skaerme.svelte	string	string @ 588:72	Unknown date
+src/lib/Skaerme.svelte:27292:27297:string:1a9vu1o	src/lib/Skaerme.svelte	string	string @ 589:47	da-DK
+src/lib/Skaerme.svelte:27301:27306:string:191jr7d	src/lib/Skaerme.svelte	string	string @ 589:56	en-US
+src/lib/Skaerme.svelte:29637:29643:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 654:94	Ukendt
+src/lib/Skaerme.svelte:29647:29654:string:1kmy72x	src/lib/Skaerme.svelte	string	string @ 654:104	Unknown
+src/lib/Skaerme.svelte:29713:29717:string:taf2ay	src/lib/Skaerme.svelte	string	string @ 656:16	Solo
+src/lib/Skaerme.svelte:33798:33808:string:5y827i	src/lib/Skaerme.svelte	string	string @ 731:21	Topmedalje
+src/lib/Skaerme.svelte:33833:33842:string:1y0cmqf	src/lib/Skaerme.svelte	string	string @ 732:23	Top Medal
+src/lib/Skaerme.svelte:37858:37863:string:1jstfzg	src/lib/Skaerme.svelte	string	string @ 820:43	Miner
+src/lib/Skaerme.svelte:37867:37872:string:1k2t1of	src/lib/Skaerme.svelte	string	string @ 820:52	Mines
+src/lib/Skaerme.svelte:37898:37914:string:13bih9a	src/lib/Skaerme.svelte	string	string @ 821:21	taageBevaegelser
+src/lib/Skaerme.svelte:37931:37949:string:1a68k72	src/lib/Skaerme.svelte	string	string @ 821:54	Bevægelser i tågen
+src/lib/Skaerme.svelte:37953:37962:string:wb3wsd	src/lib/Skaerme.svelte	string	string @ 821:76	Fog moves
+src/lib/Skaerme.svelte:37988:37998:string:nr76xa	src/lib/Skaerme.svelte	string	string @ 822:21	vandSkader
+src/lib/Skaerme.svelte:38015:38029:string:1fp4qg9	src/lib/Skaerme.svelte	string	string @ 822:48	Skade fra vand
+src/lib/Skaerme.svelte:38033:38045:string:un3j6p	src/lib/Skaerme.svelte	string	string @ 822:66	Water damage
+src/lib/Skaerme.svelte:38071:38087:string:fa6mfl	src/lib/Skaerme.svelte	string	string @ 823:21	magiskeGenstande
+src/lib/Skaerme.svelte:38104:38121:string:1gcbu1d	src/lib/Skaerme.svelte	string	string @ 823:54	Magiske genstande
+src/lib/Skaerme.svelte:38125:38138:string:17056px	src/lib/Skaerme.svelte	string	string @ 823:75	Magical items
+src/lib/Skaerme.svelte:38185:38189:string:1qxrbj5	src/lib/Skaerme.svelte	string	string @ 824:42	Guld
+src/lib/Skaerme.svelte:38193:38197:string:u4l1gz	src/lib/Skaerme.svelte	string	string @ 824:50	Gold
+src/lib/Skaerme.svelte:38223:38231:string:gte8oy	src/lib/Skaerme.svelte	string	string @ 825:21	healetHp
+src/lib/Skaerme.svelte:38248:38256:string:spgttp	src/lib/Skaerme.svelte	string	string @ 825:46	Helet HP
+src/lib/Skaerme.svelte:38260:38269:string:e7g3j8	src/lib/Skaerme.svelte	string	string @ 825:58	HP healed
+src/lib/Skaerme.svelte:38295:38307:string:1409w22	src/lib/Skaerme.svelte	string	string @ 826:21	kendteFelter
+src/lib/Skaerme.svelte:38324:38337:string:1jzapsy	src/lib/Skaerme.svelte	string	string @ 826:50	Kendte felter
+src/lib/Skaerme.svelte:38341:38353:string:l3mhht	src/lib/Skaerme.svelte	string	string @ 826:67	Known fields
+src/lib/Skaerme.svelte:38379:38396:string:18x0kom	src/lib/Skaerme.svelte	string	string @ 827:21	opgraderingsPoint
+src/lib/Skaerme.svelte:38413:38430:string:oreoza	src/lib/Skaerme.svelte	string	string @ 827:55	Opgraderingspoint
+src/lib/Skaerme.svelte:38434:38448:string:k3ho6u	src/lib/Skaerme.svelte	string	string @ 827:76	Upgrade points
+src/lib/Skaerme.svelte:38474:38496:string:11mv7g	src/lib/Skaerme.svelte	string	string @ 828:21	diamantRaavaerdiFundet
+src/lib/Skaerme.svelte:38513:38525:string:x4lyje	src/lib/Skaerme.svelte	string	string @ 828:60	Diamantværdi
+src/lib/Skaerme.svelte:38529:38542:string:1mhi1t6	src/lib/Skaerme.svelte	string	string @ 828:76	Diamond value
+src/lib/Skaerme.svelte:39163:39179:string:13bih9a	src/lib/Skaerme.svelte	string	string @ 844:46	taageBevaegelser
+src/lib/Skaerme.svelte:39383:39393:string:nr76xa	src/lib/Skaerme.svelte	string	string @ 848:48	vandSkader
+src/lib/Skaerme.svelte:39597:39613:string:fa6mfl	src/lib/Skaerme.svelte	string	string @ 852:47	magiskeGenstande
+src/lib/Skaerme.svelte:40005:40013:string:gte8oy	src/lib/Skaerme.svelte	string	string @ 860:48	healetHp
+src/lib/Skaerme.svelte:40211:40223:string:1409w22	src/lib/Skaerme.svelte	string	string @ 864:48	kendteFelter
+src/lib/Skaerme.svelte:40431:40448:string:18x0kom	src/lib/Skaerme.svelte	string	string @ 868:47	opgraderingsPoint
+src/lib/Skaerme.svelte:40659:40681:string:11mv7g	src/lib/Skaerme.svelte	string	string @ 872:47	diamantRaavaerdiFundet
+src/lib/Skaerme.svelte:51694:51713:string:ytviv7	src/lib/Skaerme.svelte	string	string @ 1184:46	noopener,noreferrer
+src/lib/Skaerme.svelte:56723:56740:string:1sbozcw	src/lib/Skaerme.svelte	string	string @ 1325:64	Nye trofæmedaljer
+src/lib/Skaerme.svelte:56744:56761:string:dvfc4z	src/lib/Skaerme.svelte	string	string @ 1325:85	New trophy medals
+src/lib/Skaerme.svelte:56839:56852:string:h6o7kg	src/lib/Skaerme.svelte	string	string @ 1326:74	Mytisk niveau
+src/lib/Skaerme.svelte:56856:56867:string:wt8jid	src/lib/Skaerme.svelte	string	string @ 1326:91	Mythic tier
+src/lib/Skaerme.svelte:56879:56894:string:76jytr	src/lib/Skaerme.svelte	string	string @ 1326:114	Ny trofæmedalje
+src/lib/Skaerme.svelte:56898:56914:string:1baiowi	src/lib/Skaerme.svelte	string	string @ 1326:133	New trophy medal
+src/lib/Skaerme.svelte:58830:58839:string:zzkq54	src/lib/Skaerme.svelte	string	string @ 1362:21	Opgørelse
+src/lib/Skaerme.svelte:58843:58852:string:1tepclg	src/lib/Skaerme.svelte	string	string @ 1362:34	Breakdown
+src/lib/Skaerme.svelte:58922:58927:string:x1q3l7	src/lib/Skaerme.svelte	string	string @ 1363:62	Gold:
+src/lib/Skaerme.svelte:59074:59091:string:1qroiyv	src/lib/Skaerme.svelte	string	string @ 1365:54	Overlevelsesbonus
+src/lib/Skaerme.svelte:59095:59109:string:848abw	src/lib/Skaerme.svelte	string	string @ 1365:75	Survival bonus
+src/lib/Skaerme.svelte:59121:59130:string:elwjuu	src/lib/Skaerme.svelte	string	string @ 1365:101	Fremdrift
+src/lib/Skaerme.svelte:59134:59142:string:79u6hy	src/lib/Skaerme.svelte	string	string @ 1365:114	Progress
+src/lib/Skaerme.svelte:59295:59307:string:1i8djts	src/lib/Skaerme.svelte	string	string @ 1368:69	Exploration:
+src/lib/Skaerme.svelte:59432:59452:string:12y2i4d	src/lib/Skaerme.svelte	string	string @ 1370:27	Territorium (miner):
+src/lib/Skaerme.svelte:59456:59474:string:16yxgoc	src/lib/Skaerme.svelte	string	string @ 1370:51	Territory (mines):
+src/lib/Skaerme.svelte:59616:59626:string:1nhmu6v	src/lib/Skaerme.svelte	string	string @ 1373:64	Equipment:
+src/lib/Skaerme.svelte:59941:59955:string:k53zyv	src/lib/Skaerme.svelte	string	string @ 1378:62	Helbredsbonus:
+src/lib/Skaerme.svelte:59959:59972:string:1ylv76q	src/lib/Skaerme.svelte	string	string @ 1378:80	Health bonus:
+src/lib/Skaerme.svelte:60171:60186:string:1mtczx	src/lib/Skaerme.svelte	string	string @ 1381:62	Flere spillere:
+src/lib/Skaerme.svelte:60190:60202:string:1fspjoj	src/lib/Skaerme.svelte	string	string @ 1381:81	Multiplayer:
+src/lib/Skaerme.svelte:60367:60379:string:1bgd9bn	src/lib/Skaerme.svelte	string	string @ 1383:70	Total score:
+src/lib/Skaerme.svelte:60540:60555:string:dba8tj	src/lib/Skaerme.svelte	string	string @ 1389:21	Alle karakterer
+src/lib/Skaerme.svelte:60559:60573:string:1esna0w	src/lib/Skaerme.svelte	string	string @ 1389:40	All characters
+src/lib/Skaerme.svelte:61322:61327:attribute:x9tsfp	src/lib/Skaerme.svelte	attribute	title @ 1401:38	Score
+src/lib/Skaerme.svelte:61639:61662:string:oqx737	src/lib/Skaerme.svelte	string	string @ 1411:59	Resultat fra tutorialen
+src/lib/Skaerme.svelte:61666:61681:string:vlfqb0	src/lib/Skaerme.svelte	string	string @ 1411:86	Tutorial result
+src/lib/Skaerme.svelte:61756:61772:string:188zneo	src/lib/Skaerme.svelte	string	string @ 1413:27	Din tutorialrang
+src/lib/Skaerme.svelte:61776:61794:string:11bn5ee	src/lib/Skaerme.svelte	string	string @ 1413:47	Your tutorial rank
+src/lib/Skaerme.svelte:62375:62385:string:1cno57o	src/lib/Skaerme.svelte	string	string @ 1428:63	Next rank:
+src/lib/Skaerme.svelte:62468:62474:string:16m3fsd	src/lib/Skaerme.svelte	string	string @ 1428:156	point.
+src/lib/Skaerme.svelte:62478:62485:string:1j9q8fs	src/lib/Skaerme.svelte	string	string @ 1428:166	points.
+src/lib/Skaerme.svelte:62593:62636:string:1usmpn	src/lib/Skaerme.svelte	string	string @ 1430:85	You have reached the highest tutorial rank.
+src/lib/Skaerme.svelte:62787:62869:string:1fjkx7o	src/lib/Skaerme.svelte	string	string @ 1432:130	This rank is for practice only. It is not saved and does not count in other games.
+src/lib/Skaerme.svelte:63398:63408:string:oqce4a	src/lib/Skaerme.svelte	string	string @ 1445:75	Logget ind
+src/lib/Skaerme.svelte:63412:63421:string:hfeve2	src/lib/Skaerme.svelte	string	string @ 1445:89	Logged in
+src/lib/Skaerme.svelte:63489:63516:string:e3ph8p	src/lib/Skaerme.svelte	string	string @ 1446:56	Gæsteprofil i denne browser
+src/lib/Skaerme.svelte:63520:63549:string:1mhra57	src/lib/Skaerme.svelte	string	string @ 1446:87	Guest profile in this browser
+src/lib/Skaerme.svelte:63742:63752:string:1jh88e2	src/lib/Skaerme.svelte	string	string @ 1449:99	Åbn profil
+src/lib/Skaerme.svelte:63756:63768:string:16qitn8	src/lib/Skaerme.svelte	string	string @ 1449:113	Open profile
+src/lib/Skaerme.svelte:63859:63872:string:1ewy4wt	src/lib/Skaerme.svelte	string	string @ 1451:60	Dine medaljer
+src/lib/Skaerme.svelte:63876:63887:string:1izmcsa	src/lib/Skaerme.svelte	string	string @ 1451:77	Your medals
+src/lib/Skaerme.svelte:65101:65210:string:5fw6x5	src/lib/Skaerme.svelte	string	string @ 1472:65	Profilen er gemt i denne browser. Tilknyt din e-mail, hvis du også vil kunne bruge profilen på andre enheder.
+src/lib/Skaerme.svelte:65214:65321:string:3cqq2p	src/lib/Skaerme.svelte	string	string @ 1472:178	This profile is saved in this browser. Add your email if you also want to use the profile on other devices.
+src/lib/Skaerme.svelte:65551:65564:string:5g5uf5	src/lib/Skaerme.svelte	string	string @ 1477:45	E-mailadresse
+src/lib/Skaerme.svelte:65568:65581:string:1cdit03	src/lib/Skaerme.svelte	string	string @ 1477:62	Email address
+src/lib/Skaerme.svelte:65901:65910:string:1gxet22	src/lib/Skaerme.svelte	string	string @ 1481:52	Sender...
+src/lib/Skaerme.svelte:65914:65924:string:2q3xjh	src/lib/Skaerme.svelte	string	string @ 1481:65	Sending...
+src/lib/Skaerme.svelte:65936:65950:string:qn2qm7	src/lib/Skaerme.svelte	string	string @ 1481:87	Tilknyt e-mail
+src/lib/Skaerme.svelte:65954:65963:string:xwo7x0	src/lib/Skaerme.svelte	string	string @ 1481:105	Add email
+src/lib/Skaerme.svelte:66178:66319:string:rc55p6	src/lib/Skaerme.svelte	string	string @ 1489:26	Her på itch kan du prøve spillet uden en konto. I live-versionen får du den nyeste udgave, en gemt profil og adgang til de globale toplister.
+src/lib/Skaerme.svelte:66347:66501:string:kkjee2	src/lib/Skaerme.svelte	string	string @ 1490:26	Here on itch, you can try the game without an account. The live version gives you the latest build, a saved profile and access to the global leaderboards.
+src/lib/Skaerme.svelte:66638:66669:string:1lni6vw	src/lib/Skaerme.svelte	string	string @ 1493:92	Medaljer du kan gemme med login
+src/lib/Skaerme.svelte:66673:66703:string:f5khy2	src/lib/Skaerme.svelte	string	string @ 1493:127	Medals you can save with login
+src/lib/Skaerme.svelte:67721:67755:string:1ovk63c	src/lib/Skaerme.svelte	string	string @ 1512:33	Spil nyeste version og opret konto
+src/lib/Skaerme.svelte:67759:67800:string:1frjmbv	src/lib/Skaerme.svelte	string	string @ 1512:71	Play latest version and create an account
+src/lib/Skaerme.svelte:67868:67902:string:maj14j	src/lib/Skaerme.svelte	string	string @ 1514:35	Prøv itch-versionen uden en konto.
+src/lib/Skaerme.svelte:67906:67946:string:jautuf	src/lib/Skaerme.svelte	string	string @ 1514:73	Try the itch version without an account.
+src/lib/Skaerme.svelte:68193:68352:string:kn7mxy	src/lib/Skaerme.svelte	string	string @ 1517:194	Enter your player name and a name for the island. You can begin without an email and add one later if you want to save the profile and use it on other devices.
+src/lib/Skaerme.svelte:68447:68478:string:1lni6vw	src/lib/Skaerme.svelte	string	string @ 1518:88	Medaljer du kan gemme med login
+src/lib/Skaerme.svelte:68482:68512:string:f5khy2	src/lib/Skaerme.svelte	string	string @ 1518:123	Medals you can save with login
+src/lib/Skaerme.svelte:69498:69511:string:5g5uf5	src/lib/Skaerme.svelte	string	string @ 1539:41	E-mailadresse
+src/lib/Skaerme.svelte:69515:69528:string:1cdit03	src/lib/Skaerme.svelte	string	string @ 1539:58	Email address
+src/lib/Skaerme.svelte:69812:69821:string:1gxet22	src/lib/Skaerme.svelte	string	string @ 1543:48	Sender...
+src/lib/Skaerme.svelte:69825:69835:string:2q3xjh	src/lib/Skaerme.svelte	string	string @ 1543:61	Sending...
+src/lib/Skaerme.svelte:69847:69865:string:1lnjh57	src/lib/Skaerme.svelte	string	string @ 1543:83	Log ind med e-mail
+src/lib/Skaerme.svelte:69869:69886:string:11sdta8	src/lib/Skaerme.svelte	string	string @ 1543:105	Log in with email
+src/lib/Skaerme.svelte:71472:71493:string:1vbgrxb	src/lib/Skaerme.svelte	string	string @ 1581:32	Mytisk niveau opnået.
+src/lib/Skaerme.svelte:71497:71518:string:1coyhbg	src/lib/Skaerme.svelte	string	string @ 1581:57	Mythic tier achieved.
+src/lib/Skaerme.svelte:71598:71617:string:g568u2	src/lib/Skaerme.svelte	string	string @ 1582:73	Mythic requirement:
+src/lib/Skaerme.svelte:71876:71888:string:10y18fq	src/lib/Skaerme.svelte	string	string @ 1585:66	Requirement:
+src/lib/Skaerme.svelte:72058:72077:string:g568u2	src/lib/Skaerme.svelte	string	string @ 1587:77	Mythic requirement:
+src/lib/Skaerme.svelte:72349:72352:string:1ej2e9v	src/lib/Skaerme.svelte	string	string @ 1592:96	Luk
+src/lib/Skaerme.svelte:72356:72361:string:1l0xxoj	src/lib/Skaerme.svelte	string	string @ 1592:103	Close
+src/lib/Skaerme.svelte:73052:73071:string:1ul5cu3	src/lib/Skaerme.svelte	string	string @ 1608:48	Vælg profilkarakter
+src/lib/Skaerme.svelte:73075:73099:string:7m1edi	src/lib/Skaerme.svelte	string	string @ 1608:71	Choose profile character
+src/lib/Skaerme.svelte:73145:73164:string:1ul5cu3	src/lib/Skaerme.svelte	string	string @ 1609:43	Vælg profilkarakter
+src/lib/Skaerme.svelte:73168:73192:string:7m1edi	src/lib/Skaerme.svelte	string	string @ 1609:66	Choose profile character
+src/lib/Skaerme.svelte:73576:73586:string:1m0jmpb	src/lib/Skaerme.svelte	string	string @ 1618:37	Min profil
+src/lib/Skaerme.svelte:73590:73600:string:151h1ju	src/lib/Skaerme.svelte	string	string @ 1618:51	My profile
+src/lib/Skaerme.svelte:73839:73866:string:e3ph8p	src/lib/Skaerme.svelte	string	string @ 1622:40	Gæsteprofil i denne browser
+src/lib/Skaerme.svelte:73870:73899:string:1mhra57	src/lib/Skaerme.svelte	string	string @ 1622:71	Guest profile in this browser
+src/lib/Skaerme.svelte:74192:74195:string:1ej2e9v	src/lib/Skaerme.svelte	string	string @ 1628:39	Luk
+src/lib/Skaerme.svelte:74199:74204:string:1l0xxoj	src/lib/Skaerme.svelte	string	string @ 1628:46	Close
+src/lib/Skaerme.svelte:74385:74399:string:12ee6dy	src/lib/Skaerme.svelte	string	string @ 1633:73	Profilkarakter
+src/lib/Skaerme.svelte:74403:74420:string:dpam1p	src/lib/Skaerme.svelte	string	string @ 1633:91	Profile character
+src/lib/Skaerme.svelte:74719:74723:string:540b06	src/lib/Skaerme.svelte	string	string @ 1639:43	Auto
+src/lib/Skaerme.svelte:74727:74731:string:540b06	src/lib/Skaerme.svelte	string	string @ 1639:51	Auto
+src/lib/Skaerme.svelte:74782:74794:string:ux7zwf	src/lib/Skaerme.svelte	string	string @ 1640:41	Mest spillet
+src/lib/Skaerme.svelte:74798:74809:string:3p15m1	src/lib/Skaerme.svelte	string	string @ 1640:57	Most played
+src/lib/Skaerme.svelte:75200:75204:string:540b06	src/lib/Skaerme.svelte	string	string @ 1647:43	Auto
+src/lib/Skaerme.svelte:75208:75212:string:540b06	src/lib/Skaerme.svelte	string	string @ 1647:51	Auto
+src/lib/Skaerme.svelte:75263:75276:string:vzz6q0	src/lib/Skaerme.svelte	string	string @ 1648:41	Højeste score
+src/lib/Skaerme.svelte:75280:75293:string:ozya99	src/lib/Skaerme.svelte	string	string @ 1648:58	Highest score
+src/lib/Skaerme.svelte:76710:76725:string:ugx8dw	src/lib/Skaerme.svelte	string	string @ 1674:35	Ret spillernavn
+src/lib/Skaerme.svelte:76729:76745:string:1b82eol	src/lib/Skaerme.svelte	string	string @ 1674:54	Edit player name
+src/lib/Skaerme.svelte:76934:76937:string:1glrrp8	src/lib/Skaerme.svelte	string	string @ 1677:75	Gem
+src/lib/Skaerme.svelte:76941:76945:string:lewgh4	src/lib/Skaerme.svelte	string	string @ 1677:82	Save
+src/lib/Skaerme.svelte:77180:77184:string:127rswj	src/lib/Skaerme.svelte	string	string @ 1683:83	Spil
+src/lib/Skaerme.svelte:77188:77193:string:w6fxh8	src/lib/Skaerme.svelte	string	string @ 1683:91	Games
+src/lib/Skaerme.svelte:77293:77298:string:llq6w8	src/lib/Skaerme.svelte	string	string @ 1684:84	Sejre
+src/lib/Skaerme.svelte:77302:77306:string:zv33ge	src/lib/Skaerme.svelte	string	string @ 1684:93	Wins
+src/lib/Skaerme.svelte:77410:77418:string:14pcgwd	src/lib/Skaerme.svelte	string	string @ 1685:88	Dødsfald
+src/lib/Skaerme.svelte:77422:77428:string:1oy72d6	src/lib/Skaerme.svelte	string	string @ 1685:100	Deaths
+src/lib/Skaerme.svelte:77534:77546:string:1f7anq4	src/lib/Skaerme.svelte	string	string @ 1686:90	Bedste score
+src/lib/Skaerme.svelte:77550:77560:string:5xow45	src/lib/Skaerme.svelte	string	string @ 1686:106	Best score
+src/lib/Skaerme.svelte:77670:77680:string:1rrd157	src/lib/Skaerme.svelte	string	string @ 1687:94	Gns. score
+src/lib/Skaerme.svelte:77684:77694:string:5crpod	src/lib/Skaerme.svelte	string	string @ 1687:108	Avg. score
+src/lib/Skaerme.svelte:77797:77806:string:e1rwo8	src/lib/Skaerme.svelte	string	string @ 1688:87	Mest guld
+src/lib/Skaerme.svelte:77810:77819:string:13vdlw4	src/lib/Skaerme.svelte	string	string @ 1688:100	Most gold
+src/lib/Skaerme.svelte:77923:77935:string:1kunwcw	src/lib/Skaerme.svelte	string	string @ 1689:88	Længste spil
+src/lib/Skaerme.svelte:77939:77951:string:y9jon9	src/lib/Skaerme.svelte	string	string @ 1689:104	Longest game
+src/lib/Skaerme.svelte:78057:78069:string:1ypdsax	src/lib/Skaerme.svelte	string	string @ 1690:90	Flest felter
+src/lib/Skaerme.svelte:78073:78084:string:1yrjvw3	src/lib/Skaerme.svelte	string	string @ 1690:106	Most fields
+src/lib/Skaerme.svelte:78189:78200:string:hsz3dq	src/lib/Skaerme.svelte	string	string @ 1691:89	Flest miner
+src/lib/Skaerme.svelte:78204:78214:string:p5egg2	src/lib/Skaerme.svelte	string	string @ 1691:104	Most mines
+src/lib/Skaerme.svelte:78338:78350:string:ux7zwf	src/lib/Skaerme.svelte	string	string @ 1692:108	Mest spillet
+src/lib/Skaerme.svelte:78354:78365:string:3p15m1	src/lib/Skaerme.svelte	string	string @ 1692:124	Most played
+src/lib/Skaerme.svelte:78500:78514:string:drgdhz	src/lib/Skaerme.svelte	string	string @ 1696:69	Profilmedaljer
+src/lib/Skaerme.svelte:78518:78532:string:jar3py	src/lib/Skaerme.svelte	string	string @ 1696:87	Profile medals
+src/lib/Skaerme.svelte:80628:80642:string:321be2	src/lib/Skaerme.svelte	string	string @ 1729:41	Find dine spil
+src/lib/Skaerme.svelte:80646:80660:string:4kir0t	src/lib/Skaerme.svelte	string	string @ 1729:59	Find your runs
+src/lib/Skaerme.svelte:80711:80771:string:10zw14e	src/lib/Skaerme.svelte	string	string @ 1730:43	Søg på ø, karakter eller dato – eller angiv en mindstescore.
+src/lib/Skaerme.svelte:80775:80838:string:15fyubg	src/lib/Skaerme.svelte	string	string @ 1730:107	Search by island, character or date – or enter a minimum score.
+src/lib/Skaerme.svelte:81072:81113:string:becece	src/lib/Skaerme.svelte	string	string @ 1735:49	Søg i spil eller skriv en mindstescore...
+src/lib/Skaerme.svelte:81117:81156:string:1n6jpo1	src/lib/Skaerme.svelte	string	string @ 1735:94	Search runs or enter a minimum score...
+src/lib/Skaerme.svelte:81207:81228:string:10trzuo	src/lib/Skaerme.svelte	string	string @ 1736:48	Søg i dine gemte spil
+src/lib/Skaerme.svelte:81232:81254:string:1xxnccv	src/lib/Skaerme.svelte	string	string @ 1736:73	Search your saved runs
+src/lib/Skaerme.svelte:81396:81419:string:1gdrsr8	src/lib/Skaerme.svelte	string	string @ 1739:40	Ingen gemte spil endnu.
+src/lib/Skaerme.svelte:81423:81441:string:1froc2z	src/lib/Skaerme.svelte	string	string @ 1739:67	No saved runs yet.
+src/lib/Skaerme.svelte:81564:81595:string:1h83s0t	src/lib/Skaerme.svelte	string	string @ 1741:40	Ingen spil matcher din søgning.
+src/lib/Skaerme.svelte:81599:81625:string:1beslui	src/lib/Skaerme.svelte	string	string @ 1741:75	No runs match your search.
+src/lib/Skaerme.svelte:82098:82106:string:1ihj37y	src/lib/Skaerme.svelte	string	string @ 1747:91	Ukendt ø
+src/lib/Skaerme.svelte:82110:82124:string:hd8niq	src/lib/Skaerme.svelte	string	string @ 1747:103	Unknown island
+src/lib/Skaerme.svelte:82441:82447:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 1751:90	Ukendt
+src/lib/Skaerme.svelte:82451:82458:string:1kmy72x	src/lib/Skaerme.svelte	string	string @ 1751:100	Unknown
+src/lib/Skaerme.svelte:83349:83417:string:14xk3w2	src/lib/Skaerme.svelte	string	string @ 1761:142	Showing the first results. Search more precisely to find older runs.
+src/lib/Skaerme.svelte:83665:83732:string:1tnsilj	src/lib/Skaerme.svelte	string	string @ 1766:126	No statistics yet. Your runs are saved here when you are logged in.
+src/lib/Skaerme.svelte:84095:84112:string:gyrms0	src/lib/Skaerme.svelte	string	string @ 1776:134	Luk spillerprofil
+src/lib/Skaerme.svelte:84116:84136:string:1dnp0gp	src/lib/Skaerme.svelte	string	string @ 1776:155	Close player profile
+src/lib/Skaerme.svelte:84247:84269:string:1pupr41	src/lib/Skaerme.svelte	string	string @ 1777:98	offentlig-profil-title
+src/lib/Skaerme.svelte:84492:84514:string:1pupr41	src/lib/Skaerme.svelte	string	string @ 1781:33	offentlig-profil-title
+src/lib/Skaerme.svelte:84766:84769:string:1ej2e9v	src/lib/Skaerme.svelte	string	string @ 1784:97	Luk
+src/lib/Skaerme.svelte:84773:84778:string:1l0xxoj	src/lib/Skaerme.svelte	string	string @ 1784:104	Close
+src/lib/Skaerme.svelte:84955:84980:string:1ie6n3d	src/lib/Skaerme.svelte	string	string @ 1788:89	Loading player profile...
+src/lib/Skaerme.svelte:85094:85113:string:cwu5fa	src/lib/Skaerme.svelte	string	string @ 1790:83	Spillerens medaljer
+src/lib/Skaerme.svelte:85117:85130:string:ct00bc	src/lib/Skaerme.svelte	string	string @ 1790:106	Player medals
+src/lib/Skaerme.svelte:87207:87227:string:h5xtrh	src/lib/Skaerme.svelte	string	string @ 1819:101	No saved medals yet.
+src/lib/Skaerme.svelte:87620:87638:string:1u4x8p0	src/lib/Skaerme.svelte	string	string @ 1831:119	Luk scoreopgørelse
+src/lib/Skaerme.svelte:87642:87663:string:1fqkpu6	src/lib/Skaerme.svelte	string	string @ 1831:141	Close score breakdown
+src/lib/Skaerme.svelte:87774:87796:string:j123aq	src/lib/Skaerme.svelte	string	string @ 1832:98	highscore-detail-title
+src/lib/Skaerme.svelte:88178:88200:string:j123aq	src/lib/Skaerme.svelte	string	string @ 1840:37	highscore-detail-title
+src/lib/Skaerme.svelte:88830:88836:string:1itwhp2	src/lib/Skaerme.svelte	string	string @ 1852:41	Ukendt
+src/lib/Skaerme.svelte:88840:88847:string:1kmy72x	src/lib/Skaerme.svelte	string	string @ 1852:51	Unknown
+src/lib/Skaerme.svelte:89547:89550:string:1ej2e9v	src/lib/Skaerme.svelte	string	string @ 1866:82	Luk
+src/lib/Skaerme.svelte:89554:89559:string:1l0xxoj	src/lib/Skaerme.svelte	string	string @ 1866:89	Close
+src/lib/Skaerme.svelte:89685:89697:string:1jday8f	src/lib/Skaerme.svelte	string	string @ 1870:35	SAMLET SCORE
+src/lib/Skaerme.svelte:89701:89712:string:1v9efgb	src/lib/Skaerme.svelte	string	string @ 1870:51	TOTAL SCORE
+src/lib/Skaerme.svelte:89911:89918:string:1ot2045	src/lib/Skaerme.svelte	string	string @ 1874:37	Medalje
+src/lib/Skaerme.svelte:89922:89927:string:1g793kc	src/lib/Skaerme.svelte	string	string @ 1874:48	Medal
+src/lib/Skaerme.svelte:90325:90345:string:1aj3r2i	src/lib/Skaerme.svelte	string	string @ 1881:85	Loading breakdown...
+src/lib/Skaerme.svelte:90648:90681:string:trx4z4	src/lib/Skaerme.svelte	string	string @ 1885:87	Trofæmedaljer opnået i dette spil
+src/lib/Skaerme.svelte:90685:90717:string:19plikc	src/lib/Skaerme.svelte	string	string @ 1885:124	Trophy medals earned in this run
+src/lib/Skaerme.svelte:90764:90784:string:mgmst7	src/lib/Skaerme.svelte	string	string @ 1886:43	Trofæmedaljer opnået
+src/lib/Skaerme.svelte:90788:90808:string:1qed700	src/lib/Skaerme.svelte	string	string @ 1886:67	Trophy medals earned
+src/lib/Skaerme.svelte:92272:92278:string:1obkoi7	src/lib/Skaerme.svelte	string	string @ 1908:81	Logbog
+src/lib/Skaerme.svelte:92282:92289:string:18rn4f8	src/lib/Skaerme.svelte	string	string @ 1908:91	Logbook
+src/lib/Skaerme.svelte:92332:92338:string:1obkoi7	src/lib/Skaerme.svelte	string	string @ 1909:39	Logbog
+src/lib/Skaerme.svelte:92342:92349:string:18rn4f8	src/lib/Skaerme.svelte	string	string @ 1909:49	Logbook
+src/lib/Skaerme.svelte:92493:92503:string:ltlcbq	src/lib/Skaerme.svelte	string	string @ 1910:134	Åbn logbog
+src/lib/Skaerme.svelte:92507:92519:string:d0wx52	src/lib/Skaerme.svelte	string	string @ 1910:148	Open logbook
+src/lib/Skaerme.svelte:92537:92547:string:ltlcbq	src/lib/Skaerme.svelte	string	string @ 1910:178	Åbn logbog
+src/lib/Skaerme.svelte:92551:92563:string:d0wx52	src/lib/Skaerme.svelte	string	string @ 1910:192	Open logbook
+src/lib/Skaerme.svelte:92864:92878:string:dhrajh	src/lib/Skaerme.svelte	string	string @ 1916:88	Trofæfremdrift
+src/lib/Skaerme.svelte:92882:92897:string:13fs63i	src/lib/Skaerme.svelte	string	string @ 1916:106	Trophy progress
+src/lib/Skaerme.svelte:93677:93681:string:1bud7az	src/lib/Skaerme.svelte	string	string @ 1929:83	Rute
+src/lib/Skaerme.svelte:93685:93690:string:1nvxkfy	src/lib/Skaerme.svelte	string	string @ 1929:91	Route
+src/lib/Skaerme.svelte:93737:93741:string:1bud7az	src/lib/Skaerme.svelte	string	string @ 1930:43	Rute
+src/lib/Skaerme.svelte:93745:93750:string:1nvxkfy	src/lib/Skaerme.svelte	string	string @ 1930:51	Route
+src/lib/Skaerme.svelte:93912:93925:string:4w8g9n	src/lib/Skaerme.svelte	string	string @ 1932:86	xMidYMid meet
+src/lib/Skaerme.svelte:94139:94164:string:11631gw	src/lib/Skaerme.svelte	string	string @ 1936:49	rgba(255, 255, 255, 0.88)
+src/lib/Skaerme.svelte:95009:95095:string:1m8ml38	src/lib/Skaerme.svelte	string	string @ 1949:143	This score was saved before detailed breakdowns, so only the total score is available.
+src/lib/Skaerme.svelte:95455:95460:string:xq4t6	src/lib/Skaerme.svelte	string	string @ 1956:101	Skjul
+src/lib/Skaerme.svelte:95464:95468:string:1qfy6dp	src/lib/Skaerme.svelte	string	string @ 1956:110	Hide
+src/lib/Skaerme.svelte:95656:95671:string:mm5b3p	src/lib/Skaerme.svelte	string	string @ 1959:89	Loading list...
+src/lib/Skaerme.svelte:95850:95867:string:4mov36	src/lib/Skaerme.svelte	string	string @ 1961:98	No results found.
+src/lib/Skaerme.svelte:97144:97154:string:f22tq3	src/lib/Skaerme.svelte	string	string @ 1983:133	Luk logbog
+src/lib/Skaerme.svelte:97158:97171:string:5sric8	src/lib/Skaerme.svelte	string	string @ 1983:147	Close logbook
+src/lib/Skaerme.svelte:97449:97455:string:1obkoi7	src/lib/Skaerme.svelte	string	string @ 1986:66	Logbog
+src/lib/Skaerme.svelte:97459:97466:string:18rn4f8	src/lib/Skaerme.svelte	string	string @ 1986:76	Logbook
+src/lib/Skaerme.svelte:97584:97594:string:f22tq3	src/lib/Skaerme.svelte	string	string @ 1987:110	Luk logbog
+src/lib/Skaerme.svelte:97598:97611:string:5sric8	src/lib/Skaerme.svelte	string	string @ 1987:124	Close logbook
+src/lib/Skaerme.svelte:97623:97626:string:1ej2e9v	src/lib/Skaerme.svelte	string	string @ 1987:149	Luk
+src/lib/Skaerme.svelte:97630:97635:string:1l0xxoj	src/lib/Skaerme.svelte	string	string @ 1987:156	Close
+src/lib/Skaerme.svelte:98092:98136:string:pjphbd	src/lib/Skaerme.svelte	string	string @ 1995:44	Logbogen er ikke gemt for denne score endnu.
+src/lib/Skaerme.svelte:98140:98190:string:ic2i5u	src/lib/Skaerme.svelte	string	string @ 1995:92	The logbook has not been saved for this score yet.
+src/lib/Skaerme.svelte:98581:98596:string:1uf469s	src/lib/Skaerme.svelte	string	string @ 2009:31	Gemmer score...
+src/lib/Skaerme.svelte:98600:98615:string:1esvarp	src/lib/Skaerme.svelte	string	string @ 2009:50	Saving score...
+src/lib/Skaerme.svelte:98705:98727:string:52r6lb	src/lib/Skaerme.svelte	string	string @ 2011:60	Scoren blev ikke gemt.
+src/lib/Skaerme.svelte:98731:98755:string:pulv39	src/lib/Skaerme.svelte	string	string @ 2011:86	The score was not saved.
+src/lib/Skaerme.svelte:98835:98844:string:1ia72p8	src/lib/Skaerme.svelte	string	string @ 2012:70	Prøv igen
+src/lib/Skaerme.svelte:98848:98857:string:982hh6	src/lib/Skaerme.svelte	string	string @ 2012:83	Try again
+src/lib/Skaerme.svelte:99104:99138:string:1ovk63c	src/lib/Skaerme.svelte	string	string @ 2016:37	Spil nyeste version og opret konto
+src/lib/Skaerme.svelte:99142:99183:string:1frjmbv	src/lib/Skaerme.svelte	string	string @ 2016:75	Play latest version and create an account
+src/lib/Skaerme.svelte:99524:99547:string:1wl64cl	src/lib/Skaerme.svelte	string	string @ 2024:49	E-mailadresse til login
+src/lib/Skaerme.svelte:99551:99574:string:h91jx5	src/lib/Skaerme.svelte	string	string @ 2024:76	Email address for login
+src/lib/Skaerme.svelte:99891:99900:string:1gxet22	src/lib/Skaerme.svelte	string	string @ 2028:56	Sender...
+src/lib/Skaerme.svelte:99904:99914:string:2q3xjh	src/lib/Skaerme.svelte	string	string @ 2028:69	Sending...
+src/lib/Skaerme.svelte:99926:99938:string:3g9slf	src/lib/Skaerme.svelte	string	string @ 2028:91	Log ind igen
+src/lib/Skaerme.svelte:99942:99954:string:jhq7bw	src/lib/Skaerme.svelte	string	string @ 2028:107	Log in again
+src/lib/Skaerme.svelte:100466:100488:string:iga951	src/lib/Skaerme.svelte	string	string @ 2043:58	Ugens globale topliste
+src/lib/Skaerme.svelte:100492:100522:string:1w0g1ez	src/lib/Skaerme.svelte	string	string @ 2043:84	This week's global leaderboard
+src/lib/Skaerme.svelte:100662:100680:string:j5hwvv	src/lib/Skaerme.svelte	string	string @ 2045:61	Leaderboard · week
+src/lib/Skaerme.svelte:100839:100863:string:wngsze	src/lib/Skaerme.svelte	string	string @ 2047:84	No results yet this week
+src/lib/Skaerme.svelte:102071:102113:string:upg190	src/lib/Skaerme.svelte	string	string @ 2064:143	Vis de forrige 10 resultater fra denne uge
+src/lib/Skaerme.svelte:102117:102155:string:vbmu1z	src/lib/Skaerme.svelte	string	string @ 2064:189	Show previous 10 scores from this week
+src/lib/Skaerme.svelte:102180:102184:text:16bg5am	src/lib/Skaerme.svelte	text	markup @ 2065:21	&lt;
+src/lib/Skaerme.svelte:102334:102374:string:pisjfs	src/lib/Skaerme.svelte	string	string @ 2067:124	Vis de næste 10 resultater fra denne uge
+src/lib/Skaerme.svelte:102378:102412:string:ntxy6z	src/lib/Skaerme.svelte	string	string @ 2067:168	Show next 10 scores from this week
+src/lib/Skaerme.svelte:102437:102441:text:ul9v7n	src/lib/Skaerme.svelte	text	markup @ 2068:21	&gt;
+src/lib/Skaerme.svelte:102719:102734:string:bxa9j8	src/lib/Skaerme.svelte	string	string @ 2078:58	Global topliste
+src/lib/Skaerme.svelte:102738:102756:string:18zxbdp	src/lib/Skaerme.svelte	string	string @ 2078:77	Global leaderboard
+src/lib/Skaerme.svelte:102860:102875:string:bxa9j8	src/lib/Skaerme.svelte	string	string @ 2080:25	Global topliste
+src/lib/Skaerme.svelte:102879:102897:string:18zxbdp	src/lib/Skaerme.svelte	string	string @ 2080:44	Global leaderboard
+src/lib/Skaerme.svelte:103016:103027:string:fqfdkg	src/lib/Skaerme.svelte	string	string @ 2082:66	No data yet
+src/lib/Skaerme.svelte:104228:104264:string:16xcu4g	src/lib/Skaerme.svelte	string	string @ 2099:138	Vis de forrige 10 globale resultater
+src/lib/Skaerme.svelte:104268:104298:string:1scl1kc	src/lib/Skaerme.svelte	string	string @ 2099:178	Show previous 10 global scores
+src/lib/Skaerme.svelte:104323:104327:text:16bg5am	src/lib/Skaerme.svelte	text	markup @ 2100:21	&lt;
+src/lib/Skaerme.svelte:104474:104508:string:1iq4j5g	src/lib/Skaerme.svelte	string	string @ 2102:119	Vis de næste 10 globale resultater
+src/lib/Skaerme.svelte:104512:104538:string:r45vew	src/lib/Skaerme.svelte	string	string @ 2102:157	Show next 10 global scores
+src/lib/Skaerme.svelte:104563:104567:text:ul9v7n	src/lib/Skaerme.svelte	text	markup @ 2103:21	&gt;
+src/lib/Skaerme.svelte:104867:104895:string:5cpjno	src/lib/Skaerme.svelte	string	string @ 2113:58	Topliste for karakterklassen
+src/lib/Skaerme.svelte:104899:104926:string:1ggpo47	src/lib/Skaerme.svelte	string	string @ 2113:90	Character class leaderboard
+src/lib/Skaerme.svelte:105030:105039:string:14eamp3	src/lib/Skaerme.svelte	string	string @ 2115:25	Toplisten
+src/lib/Skaerme.svelte:105043:105054:string:1i5w5ak	src/lib/Skaerme.svelte	string	string @ 2115:38	Leaderboard
+src/lib/Skaerme.svelte:105196:105207:string:fqfdkg	src/lib/Skaerme.svelte	string	string @ 2117:66	No data yet
+src/lib/Skaerme.svelte:106406:106454:string:e5g195	src/lib/Skaerme.svelte	string	string @ 2134:138	Vis de forrige 10 resultater for karakterklassen
+src/lib/Skaerme.svelte:106458:106505:string:lv51ui	src/lib/Skaerme.svelte	string	string @ 2134:190	Show previous 10 scores for the character class
+src/lib/Skaerme.svelte:106530:106534:text:16bg5am	src/lib/Skaerme.svelte	text	markup @ 2135:21	&lt;
+src/lib/Skaerme.svelte:106681:106727:string:1r7eekt	src/lib/Skaerme.svelte	string	string @ 2137:119	Vis de næste 10 resultater for karakterklassen
+src/lib/Skaerme.svelte:106731:106774:string:17wrkli	src/lib/Skaerme.svelte	string	string @ 2137:169	Show next 10 scores for the character class
+src/lib/Skaerme.svelte:106799:106803:text:ul9v7n	src/lib/Skaerme.svelte	text	markup @ 2138:21	&gt;
+src/lib/Skaerme.svelte:107633:107648:string:1lrylrl	src/lib/Skaerme.svelte	string	string @ 2162:68	Båd ved tågeøen
+src/lib/Skaerme.svelte:107652:107674:string:16humuo	src/lib/Skaerme.svelte	string	string @ 2162:87	Boat by the fog island
+src/lib/Skaerme.svelte:107855:107874:string:hi9mha	src/lib/Skaerme.svelte	string	string @ 2165:72	A new island awaits
+src/lib/Skaerme.svelte:107931:107940:string:1q5q03g	src/lib/Skaerme.svelte	string	string @ 2166:50	Tågeøerne
+src/lib/Skaerme.svelte:107944:107954:string:3mclic	src/lib/Skaerme.svelte	string	string @ 2166:63	Fog Island
+src/lib/Skaerme.svelte:108077:108147:string:s25usc	src/lib/Skaerme.svelte	string	string @ 2167:115	Explore the island, stay ahead of the fog and find a boat to the east.
+src/lib/Skaerme.svelte:108270:108310:string:osfe3o	src/lib/Skaerme.svelte	string	string @ 2172:31	Det samme ønavn skaber altid den samme ø
+src/lib/Skaerme.svelte:108314:108365:string:16erw8e	src/lib/Skaerme.svelte	string	string @ 2172:75	The same island name always creates the same island
+src/lib/Skaerme.svelte:108408:108463:string:khj4sj	src/lib/Skaerme.svelte	string	string @ 2173:33	Andre spillere kan slutte sig til i de første fem dage.
+src/lib/Skaerme.svelte:108467:108517:string:wcn2v8	src/lib/Skaerme.svelte	string	string @ 2173:92	Other players can join during the first five days.
+src/lib/Skaerme.svelte:108908:108919:string:x2l2cz	src/lib/Skaerme.svelte	string	string @ 2184:45	Spillernavn
+src/lib/Skaerme.svelte:108923:108934:string:1vcnxj7	src/lib/Skaerme.svelte	string	string @ 2184:60	Player name
+src/lib/Skaerme.svelte:109405:109414:string:1ofwchi	src/lib/Skaerme.svelte	string	string @ 2196:45	Øens navn
+src/lib/Skaerme.svelte:109418:109429:string:1wdgynz	src/lib/Skaerme.svelte	string	string @ 2196:58	Island name
+src/lib/Skaerme.svelte:109667:109680:string:1k4moeq	src/lib/Skaerme.svelte	string	string @ 2200:109	Foreslå ønavn
+src/lib/Skaerme.svelte:109684:109703:string:9yt8ht	src/lib/Skaerme.svelte	string	string @ 2200:126	Suggest island name
+src/lib/Skaerme.svelte:109721:109734:string:1k4moeq	src/lib/Skaerme.svelte	string	string @ 2200:163	Foreslå ønavn
+src/lib/Skaerme.svelte:109738:109757:string:9yt8ht	src/lib/Skaerme.svelte	string	string @ 2200:180	Suggest island name
+src/lib/Skaerme.svelte:110294:110308:string:1x51947	src/lib/Skaerme.svelte	string	string @ 2208:158	Start tutorial
+src/lib/Skaerme.svelte:110312:110326:string:1x51947	src/lib/Skaerme.svelte	string	string @ 2208:176	Start tutorial
+src/lib/Skaerme.svelte:110470:110478:text:11855xr	src/lib/Skaerme.svelte	text	markup @ 2210:35	Tutorial
+src/lib/Skaerme.svelte:110679:110694:attribute:mr4wyp	src/lib/Skaerme.svelte	attribute	aria-label @ 2216:65	Lokale testkort
+src/lib/Skaerme.svelte:111643:111664:string:1o1u2r	src/lib/Skaerme.svelte	string	string @ 2240:35	Offline / Flytilstand
+src/lib/Skaerme.svelte:111668:111689:string:1j2wngo	src/lib/Skaerme.svelte	string	string @ 2240:60	Offline / Flight mode
+src/lib/Skaerme.svelte:111732:111753:string:1o1u2r	src/lib/Skaerme.svelte	string	string @ 2241:40	Offline / Flytilstand
+src/lib/Skaerme.svelte:111757:111778:string:1j2wngo	src/lib/Skaerme.svelte	string	string @ 2241:65	Offline / Flight mode
+src/lib/Skaerme.svelte:111938:111949:string:l5o6i6	src/lib/Skaerme.svelte	string	string @ 2244:62	Gør klar...
+src/lib/Skaerme.svelte:111953:111965:string:v82aiz	src/lib/Skaerme.svelte	string	string @ 2244:77	Preparing...
+src/lib/Skaerme.svelte:111977:111998:string:1o1u2r	src/lib/Skaerme.svelte	string	string @ 2244:101	Offline / Flytilstand
+src/lib/Skaerme.svelte:112002:112023:string:1j2wngo	src/lib/Skaerme.svelte	string	string @ 2244:126	Offline / Flight mode
+src/lib/Skaerme.svelte:112184:112213:string:12ehak2	src/lib/Skaerme.svelte	string	string @ 2247:81	Tap here before going offline
+src/lib/Skaerme.svelte:112586:112601:string:1p9bfvk	src/lib/Skaerme.svelte	string	string @ 2255:33	Fortsæt offline
+src/lib/Skaerme.svelte:112605:112621:string:1xdpuvf	src/lib/Skaerme.svelte	string	string @ 2255:52	Continue offline
+src/lib/Skaerme.svelte:112941:112947:string:7v5ys2	src/lib/Skaerme.svelte	string	string @ 2259:92	Log ud
+src/lib/Skaerme.svelte:112951:112958:string:11y83at	src/lib/Skaerme.svelte	string	string @ 2259:102	Log out
+src/lib/Skaerme.svelte:113215:113256:string:1ywk2z0	src/lib/Skaerme.svelte	string	string @ 2269:25	Vælg din karakter, inden du går i land på
+src/lib/Skaerme.svelte:113260:113299:string:krk2jh	src/lib/Skaerme.svelte	string	string @ 2269:70	Choose your character before landing on
+src/lib/Skaerme.svelte:113505:113513:string:14xb1m4	src/lib/Skaerme.svelte	string	string @ 2271:70	1 på øen
+src/lib/Skaerme.svelte:113517:113532:string:137ny4z	src/lib/Skaerme.svelte	string	string @ 2271:82	1 on the island
+src/lib/Skaerme.svelte:113676:113679:string:kwfqv7	src/lib/Skaerme.svelte	string	string @ 2272:31	Dag
+src/lib/Skaerme.svelte:113683:113686:string:kcgjh9	src/lib/Skaerme.svelte	string	string @ 2272:38	Day
+src/lib/Skaerme.svelte:113784:113788:string:1ocp651	src/lib/Skaerme.svelte	string	string @ 2273:63	Åben
+src/lib/Skaerme.svelte:113792:113796:string:n6hn1l	src/lib/Skaerme.svelte	string	string @ 2273:71	Open
+src/lib/Skaerme.svelte:113808:113814:string:14v6ey1	src/lib/Skaerme.svelte	string	string @ 2273:87	Lukket
+src/lib/Skaerme.svelte:113818:113824:string:dvi7s5	src/lib/Skaerme.svelte	string	string @ 2273:97	Closed
+src/lib/Skaerme.svelte:113954:114010:string:yhy60j	src/lib/Skaerme.svelte	string	string @ 2276:63	Du spiller offline. Spillet bliver gemt i denne browser.
+src/lib/Skaerme.svelte:114014:114073:string:1f4r9ie	src/lib/Skaerme.svelte	string	string @ 2276:123	You are playing offline. The game is saved in this browser.
+src/lib/Skaerme.svelte:114085:114160:string:19ad29q	src/lib/Skaerme.svelte	string	string @ 2276:194	Øen har givet dig otte muligheder. Vælg den karakter, du vil gå i land som.
+src/lib/Skaerme.svelte:114164:114245:string:wl2zqo	src/lib/Skaerme.svelte	string	string @ 2276:273	The island has given you eight options. Choose the character you want to land as.
+src/lib/Skaerme.svelte:115483:115497:string:175pm4j	src/lib/Skaerme.svelte	string	string @ 2304:111	Åbn din profil
+src/lib/Skaerme.svelte:115501:115518:string:jgrqd9	src/lib/Skaerme.svelte	string	string @ 2304:129	Open your profile
+src/lib/Skaerme.svelte:115608:115615:string:1ot2045	src/lib/Skaerme.svelte	string	string @ 2305:86	Medalje
+src/lib/Skaerme.svelte:115619:115624:string:1g793kc	src/lib/Skaerme.svelte	string	string @ 2305:97	Medal
+src/lib/Skaerme.svelte:115970:115977:string:1ot2045	src/lib/Skaerme.svelte	string	string @ 2308:82	Medalje
+src/lib/Skaerme.svelte:115981:115986:string:1g793kc	src/lib/Skaerme.svelte	string	string @ 2308:93	Medal
+src/lib/Skaerme.svelte:116724:116733:string:1y01gn0	src/lib/Skaerme.svelte	string	string @ 2318:64	Pergament
+src/lib/Skaerme.svelte:116737:116746:string:6sd8fz	src/lib/Skaerme.svelte	string	string @ 2318:77	Parchment
+src/lib/Skaerme.svelte:116867:116873:text:1nd4l99	src/lib/Skaerme.svelte	text	markup @ 2320:47	Score:
+src/lib/Skaerme.svelte:117009:117014:string:1bzexzk	src/lib/Skaerme.svelte	string	string @ 2324:56	Døden
+src/lib/Skaerme.svelte:117018:117023:string:14eksml	src/lib/Skaerme.svelte	string	string @ 2324:65	Death
+src/lib/Skaerme.svelte:117409:117426:string:wt8xuk	src/lib/Skaerme.svelte	string	string @ 2333:70	Same island again
+src/lib/Skaerme.svelte:118100:118113:string:18uzozt	src/lib/Skaerme.svelte	string	string @ 2348:69	Øens topliste
+src/lib/Skaerme.svelte:118117:118135:string:1ruzwe3	src/lib/Skaerme.svelte	string	string @ 2348:86	Island leaderboard
+src/lib/Skaerme.svelte:118262:118275:string:110a7io	src/lib/Skaerme.svelte	string	string @ 2350:37	Toplisten for
+src/lib/Skaerme.svelte:118279:118294:string:17tc0or	src/lib/Skaerme.svelte	string	string @ 2350:54	Leaderboard for
+src/lib/Skaerme.svelte:118479:118493:string:1ugjqjq	src/lib/Skaerme.svelte	string	string @ 2352:84	No results yet
+src/lib/Skaerme.svelte:119786:119810:string:6p3m1p	src/lib/Skaerme.svelte	string	string @ 2367:76	Gemt lokalt i browseren.
+src/lib/Skaerme.svelte:119814:119843:string:1vwdfd2	src/lib/Skaerme.svelte	string	string @ 2367:104	Saved locally in the browser.
+src/lib/Skaerme.svelte:119977:120008:string:4myq8e	src/lib/Skaerme.svelte	string	string @ 2369:76	Log ind for at gemme din score.
+src/lib/Skaerme.svelte:120012:120038:string:5c7tlr	src/lib/Skaerme.svelte	string	string @ 2369:111	Log in to save your score.
+src/lib/Skaerme.svelte:120383:120418:string:13uq2xi	src/lib/Skaerme.svelte	string	string @ 2374:149	Vis de forrige 10 resultater på øen
+src/lib/Skaerme.svelte:120422:120459:string:yykw6	src/lib/Skaerme.svelte	string	string @ 2374:188	Show previous 10 scores on the island
+src/lib/Skaerme.svelte:120496:120500:text:16bg5am	src/lib/Skaerme.svelte	text	markup @ 2375:33	&lt;
+src/lib/Skaerme.svelte:120670:120703:string:h4uk5e	src/lib/Skaerme.svelte	string	string @ 2377:130	Vis de næste 10 resultater på øen
+src/lib/Skaerme.svelte:120707:120740:string:1ql65w2	src/lib/Skaerme.svelte	string	string @ 2377:167	Show next 10 scores on the island
+src/lib/Skaerme.svelte:120777:120781:text:ul9v7n	src/lib/Skaerme.svelte	text	markup @ 2378:33	&gt;
+src/lib/Skaerme.svelte:121531:121545:string:175pm4j	src/lib/Skaerme.svelte	string	string @ 2399:111	Åbn din profil
+src/lib/Skaerme.svelte:121549:121566:string:jgrqd9	src/lib/Skaerme.svelte	string	string @ 2399:129	Open your profile
+src/lib/Skaerme.svelte:121656:121663:string:1ot2045	src/lib/Skaerme.svelte	string	string @ 2400:86	Medalje
+src/lib/Skaerme.svelte:121667:121672:string:1g793kc	src/lib/Skaerme.svelte	string	string @ 2400:97	Medal
+src/lib/Skaerme.svelte:122018:122025:string:1ot2045	src/lib/Skaerme.svelte	string	string @ 2403:82	Medalje
+src/lib/Skaerme.svelte:122029:122034:string:1g793kc	src/lib/Skaerme.svelte	string	string @ 2403:93	Medal
+src/lib/Skaerme.svelte:122785:122794:string:1y01gn0	src/lib/Skaerme.svelte	string	string @ 2413:64	Pergament
+src/lib/Skaerme.svelte:122798:122807:string:6sd8fz	src/lib/Skaerme.svelte	string	string @ 2413:77	Parchment
+src/lib/Skaerme.svelte:122928:122934:text:1nd4l99	src/lib/Skaerme.svelte	text	markup @ 2415:47	Score:
+src/lib/Skaerme.svelte:123371:123388:string:wt8xuk	src/lib/Skaerme.svelte	string	string @ 2426:70	Same island again
+src/lib/Skaerme.svelte:124060:124073:string:18uzozt	src/lib/Skaerme.svelte	string	string @ 2441:69	Øens topliste
+src/lib/Skaerme.svelte:124077:124095:string:1ruzwe3	src/lib/Skaerme.svelte	string	string @ 2441:86	Island leaderboard
+src/lib/Skaerme.svelte:124222:124235:string:110a7io	src/lib/Skaerme.svelte	string	string @ 2443:37	Toplisten for
+src/lib/Skaerme.svelte:124239:124254:string:17tc0or	src/lib/Skaerme.svelte	string	string @ 2443:54	Leaderboard for
+src/lib/Skaerme.svelte:124439:124453:string:1ugjqjq	src/lib/Skaerme.svelte	string	string @ 2445:84	No results yet
+src/lib/Skaerme.svelte:125746:125770:string:6p3m1p	src/lib/Skaerme.svelte	string	string @ 2460:76	Gemt lokalt i browseren.
+src/lib/Skaerme.svelte:125774:125803:string:1vwdfd2	src/lib/Skaerme.svelte	string	string @ 2460:104	Saved locally in the browser.
+src/lib/Skaerme.svelte:125937:125968:string:4myq8e	src/lib/Skaerme.svelte	string	string @ 2462:76	Log ind for at gemme din score.
+src/lib/Skaerme.svelte:125972:125998:string:5c7tlr	src/lib/Skaerme.svelte	string	string @ 2462:111	Log in to save your score.
+src/lib/Skaerme.svelte:126343:126378:string:13uq2xi	src/lib/Skaerme.svelte	string	string @ 2467:149	Vis de forrige 10 resultater på øen
+src/lib/Skaerme.svelte:126382:126419:string:yykw6	src/lib/Skaerme.svelte	string	string @ 2467:188	Show previous 10 scores on the island
+src/lib/Skaerme.svelte:126456:126460:text:16bg5am	src/lib/Skaerme.svelte	text	markup @ 2468:33	&lt;
+src/lib/Skaerme.svelte:126630:126663:string:h4uk5e	src/lib/Skaerme.svelte	string	string @ 2470:130	Vis de næste 10 resultater på øen
+src/lib/Skaerme.svelte:126667:126700:string:1ql65w2	src/lib/Skaerme.svelte	string	string @ 2470:167	Show next 10 scores on the island
+src/lib/Skaerme.svelte:126737:126741:text:ul9v7n	src/lib/Skaerme.svelte	text	markup @ 2471:33	&gt;
+src/lib/Skaerme.svelte:127532:127562:string:n90vvy	src/lib/Skaerme.svelte	string	string @ 2496:48	Øen er lukket for nye spillere
+src/lib/Skaerme.svelte:127566:127601:string:i6ox3m	src/lib/Skaerme.svelte	string	string @ 2496:82	The island is closed to new players
+src/lib/Skaerme.svelte:133731:133737:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 2640:100	Cinzel
+src/lib/Skaerme.svelte:134500:134506:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 2667:23	Cinzel
+src/lib/Skaerme.svelte:134760:134766:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 2676:23	Cinzel
+src/lib/Skaerme.svelte:137207:137213:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 2729:130	Cinzel
+src/lib/Skaerme.svelte:137613:137619:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 2739:23	Cinzel
+src/lib/Skaerme.svelte:148286:148292:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3086:23	Cinzel
+src/lib/Skaerme.svelte:152662:152668:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3251:23	Cinzel
+src/lib/Skaerme.svelte:155785:155791:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3368:23	Cinzel
+src/lib/Skaerme.svelte:155872:155878:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3372:23	Cinzel
+src/lib/Skaerme.svelte:161993:161999:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3603:23	Cinzel
+src/lib/Skaerme.svelte:162991:162997:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3627:87	Cinzel
+src/lib/Skaerme.svelte:164621:164627:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3645:69	Cinzel
+src/lib/Skaerme.svelte:164720:164726:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3646:68	Cinzel
+src/lib/Skaerme.svelte:165193:165199:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3651:141	Cinzel
+src/lib/Skaerme.svelte:166168:166174:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3677:23	Cinzel
+src/lib/Skaerme.svelte:168216:168222:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3750:169	Cinzel
+src/lib/Skaerme.svelte:168977:168983:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3757:141	Cinzel
+src/lib/Skaerme.svelte:170758:170764:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3789:23	Cinzel
+src/lib/Skaerme.svelte:171029:171035:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3799:23	Cinzel
+src/lib/Skaerme.svelte:172346:172352:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3845:23	Cinzel
+src/lib/Skaerme.svelte:174211:174217:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 3910:89	Cinzel
+src/lib/Skaerme.svelte:178690:178696:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 4050:23	Cinzel
+src/lib/Skaerme.svelte:179745:179751:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 4092:23	Cinzel
+src/lib/Skaerme.svelte:181127:181133:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 4141:23	Cinzel
+src/lib/Skaerme.svelte:183630:183636:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 4228:23	Cinzel
+src/lib/Skaerme.svelte:186291:186297:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 4327:23	Cinzel
+src/lib/Skaerme.svelte:192065:192071:string:xlvu1w	src/lib/Skaerme.svelte	string	string @ 4539:23	Cinzel
 src/lib/SprogKnap.svelte:431:441:string:7vk9fh	src/lib/SprogKnap.svelte	string	string @ 13:76	Vælg sprog
 src/lib/SprogKnap.svelte:445:460:string:1vs4be2	src/lib/SprogKnap.svelte	string	string @ 13:90	Choose language
 src/lib/SprogKnap.svelte:618:623:string:1cw56ta	src/lib/SprogKnap.svelte	string	string @ 18:23	Dansk
@@ -2500,104 +2500,104 @@ src/lib/spilmotor.ts:127352:127428:string:1bw1fb8	src/lib/spilmotor.ts	string	st
 src/lib/spilmotor.ts:127448:127524:string:1cmdthq	src/lib/spilmotor.ts	string	string @ 3142:18	The meteor heat tears your royal clothes. They become ordinary fine clothes.
 src/lib/spilmotor.ts:127697:127736:string:11y6zs1	src/lib/spilmotor.ts	string	string @ 3148:37	Meteorens varme ødelægger dit fine tøj.
 src/lib/spilmotor.ts:127740:127780:string:1co6vye	src/lib/spilmotor.ts	string	string @ 3148:80	The meteor heat ruins your fine clothes.
-src/lib/trofaeer.ts:1203:1211:string:qyc5v6	src/lib/trofaeer.ts	string	string @ 51:17	Mineejer
-src/lib/trofaeer.ts:1232:1242:string:1dmuinx	src/lib/trofaeer.ts	string	string @ 52:19	Mine Owner
-src/lib/trofaeer.ts:1260:1290:string:1oga45a	src/lib/trofaeer.ts	string	string @ 53:16	Slip væk fra øen med 12 miner.
-src/lib/trofaeer.ts:1310:1342:string:ggwuw9	src/lib/trofaeer.ts	string	string @ 54:18	Escape the island with 12 mines.
-src/lib/trofaeer.ts:1366:1396:string:v0h1p9	src/lib/trofaeer.ts	string	string @ 55:22	Slip væk fra øen med 15 miner.
-src/lib/trofaeer.ts:1422:1454:string:13sx4be	src/lib/trofaeer.ts	string	string @ 56:24	Escape the island with 15 mines.
-src/lib/trofaeer.ts:1478:1515:string:10fpv6m	src/lib/trofaeer.ts	string	string @ 57:22	Du forlader øen som ejer af 12 miner.
-src/lib/trofaeer.ts:1541:1587:string:19o0kxj	src/lib/trofaeer.ts	string	string @ 58:24	You leave the island as the owner of 12 mines.
-src/lib/trofaeer.ts:1737:1746:string:dd0sty	src/lib/trofaeer.ts	string	string @ 64:17	Tågekonge
-src/lib/trofaeer.ts:1767:1775:string:1tuopla	src/lib/trofaeer.ts	string	string @ 65:19	Fog King
-src/lib/trofaeer.ts:1793:1837:string:j7wk2s	src/lib/trofaeer.ts	string	string @ 66:16	Slip væk efter mindst 20 bevægelser i tågen.
-src/lib/trofaeer.ts:1857:1899:string:egt8ku	src/lib/trofaeer.ts	string	string @ 67:18	Escape after at least 20 moves in the fog.
-src/lib/trofaeer.ts:1923:1968:string:lklwzr	src/lib/trofaeer.ts	string	string @ 68:22	Slip væk efter mindst 100 bevægelser i tågen.
-src/lib/trofaeer.ts:1994:2037:string:1077j73	src/lib/trofaeer.ts	string	string @ 69:24	Escape after at least 100 moves in the fog.
-src/lib/trofaeer.ts:2061:2113:string:md8ivd	src/lib/trofaeer.ts	string	string @ 70:22	Du tog 20 skridt gennem tågen og fandt alligevel ud.
-src/lib/trofaeer.ts:2139:2202:string:11wntnv	src/lib/trofaeer.ts	string	string @ 71:24	You took 20 steps through the fog and still found your way out.
-src/lib/trofaeer.ts:2360:2370:string:v4trai	src/lib/trofaeer.ts	string	string @ 77:17	Bølgebærer
-src/lib/trofaeer.ts:2391:2401:string:3h3vvx	src/lib/trofaeer.ts	string	string @ 78:19	Wavebearer
-src/lib/trofaeer.ts:2419:2483:string:1v2epwg	src/lib/trofaeer.ts	string	string @ 79:16	Start en oversvømmelse, tag skade fra vand 5 gange, og slip væk.
-src/lib/trofaeer.ts:2503:2555:string:1tc4t02	src/lib/trofaeer.ts	string	string @ 80:18	Start a flood, take water damage 5 times and escape.
-src/lib/trofaeer.ts:2579:2644:string:1rhnq78	src/lib/trofaeer.ts	string	string @ 81:22	Start en oversvømmelse, tag skade fra vand 30 gange, og slip væk.
-src/lib/trofaeer.ts:2670:2723:string:cvded0	src/lib/trofaeer.ts	string	string @ 82:24	Start a flood, take water damage 30 times and escape.
-src/lib/trofaeer.ts:2747:2806:string:3c8tlt	src/lib/trofaeer.ts	string	string @ 83:22	Du startede en oversvømmelse, tog vandets slag og nåede ud.
-src/lib/trofaeer.ts:2832:2898:string:trp5qv	src/lib/trofaeer.ts	string	string @ 84:24	You started a flood, took the hits from the water and made it out.
-src/lib/trofaeer.ts:3064:3077:string:111ms1y	src/lib/trofaeer.ts	string	string @ 90:17	Relikviejæger
-src/lib/trofaeer.ts:3098:3110:string:1bfekuq	src/lib/trofaeer.ts	string	string @ 91:19	Relic Hunter
-src/lib/trofaeer.ts:3128:3220:string:1v6qbu	src/lib/trofaeer.ts	string	string @ 92:16	Slip væk med 3 af disse 4 genstande: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.
-src/lib/trofaeer.ts:3240:3328:string:1tod1fx	src/lib/trofaeer.ts	string	string @ 93:18	Escape with 3 of these 4 items: Root Heart, Golden Distiller, Dragon Staff and Rune Rod.
-src/lib/trofaeer.ts:3352:3438:string:jqvgi0	src/lib/trofaeer.ts	string	string @ 94:22	Slip væk med alle 4 genstande: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.
-src/lib/trofaeer.ts:3464:3545:string:10bfjgz	src/lib/trofaeer.ts	string	string @ 95:24	Escape with all 4 items: Root Heart, Golden Distiller, Dragon Staff and Rune Rod.
-src/lib/trofaeer.ts:3569:3625:string:a4o4qs	src/lib/trofaeer.ts	string	string @ 96:22	Du fik tre af øens sjældneste genstande med ud af tågen.
-src/lib/trofaeer.ts:3651:3713:string:hieif0	src/lib/trofaeer.ts	string	string @ 97:24	You carried three of the island’s rarest items out of the fog.
-src/lib/trofaeer.ts:3866:3876:string:kgia4g	src/lib/trofaeer.ts	string	string @ 103:17	Guldfyrste
-src/lib/trofaeer.ts:3897:3908:string:1gajwlo	src/lib/trofaeer.ts	string	string @ 104:19	Gold Prince
-src/lib/trofaeer.ts:3926:3980:string:1phiazd	src/lib/trofaeer.ts	string	string @ 105:16	Slip væk med 5000 guld. Kun din guldbeholdning tæller.
-src/lib/trofaeer.ts:4000:4053:string:1jfa858	src/lib/trofaeer.ts	string	string @ 106:18	Escape with 5000 gold. Only the gold you hold counts.
-src/lib/trofaeer.ts:4077:4131:string:1fh3om2	src/lib/trofaeer.ts	string	string @ 107:22	Slip væk med 8000 guld. Kun din guldbeholdning tæller.
-src/lib/trofaeer.ts:4157:4210:string:1les8fn	src/lib/trofaeer.ts	string	string @ 108:24	Escape with 8000 gold. Only the gold you hold counts.
-src/lib/trofaeer.ts:4234:4264:string:1akcy0v	src/lib/trofaeer.ts	string	string @ 109:22	Du forlader øen med 5000 guld.
-src/lib/trofaeer.ts:4290:4326:string:tkmm8	src/lib/trofaeer.ts	string	string @ 110:24	You leave the island with 5000 gold.
-src/lib/trofaeer.ts:4482:4491:string:1vpl02z	src/lib/trofaeer.ts	string	string @ 116:17	Livvogter
-src/lib/trofaeer.ts:4512:4523:string:19ei2vw	src/lib/trofaeer.ts	string	string @ 117:19	Life Warden
-src/lib/trofaeer.ts:4541:4591:string:4zjp9o	src/lib/trofaeer.ts	string	string @ 118:16	Hel mindst 400 HP i løbet af spillet, og slip væk.
-src/lib/trofaeer.ts:4611:4659:string:s574jt	src/lib/trofaeer.ts	string	string @ 119:18	Heal at least 400 HP during the game and escape.
-src/lib/trofaeer.ts:4683:4734:string:l2gxx9	src/lib/trofaeer.ts	string	string @ 120:22	Hel mindst 1200 HP i løbet af spillet, og slip væk.
-src/lib/trofaeer.ts:4760:4809:string:1a40g4q	src/lib/trofaeer.ts	string	string @ 121:24	Heal at least 1200 HP during the game and escape.
-src/lib/trofaeer.ts:4833:4881:string:6udlaz	src/lib/trofaeer.ts	string	string @ 122:22	Du helede 400 HP og holdt dig i live hele vejen.
-src/lib/trofaeer.ts:4907:4954:string:1kye4z4	src/lib/trofaeer.ts	string	string @ 123:24	You healed 400 HP and stayed alive all the way.
-src/lib/trofaeer.ts:5110:5120:string:7nad2k	src/lib/trofaeer.ts	string	string @ 129:17	Korttegner
-src/lib/trofaeer.ts:5141:5153:string:2gxqer	src/lib/trofaeer.ts	string	string @ 130:19	Cartographer
-src/lib/trofaeer.ts:5171:5210:string:1hjvsff	src/lib/trofaeer.ts	string	string @ 131:16	Afslør mindst 1500 felter, og slip væk.
-src/lib/trofaeer.ts:5230:5268:string:1afr41x	src/lib/trofaeer.ts	string	string @ 132:18	Reveal at least 1500 tiles and escape.
-src/lib/trofaeer.ts:5292:5331:string:op6t47	src/lib/trofaeer.ts	string	string @ 133:22	Afslør mindst 2000 felter, og slip væk.
-src/lib/trofaeer.ts:5357:5395:string:130cs45	src/lib/trofaeer.ts	string	string @ 134:24	Reveal at least 2000 tiles and escape.
-src/lib/trofaeer.ts:5419:5462:string:1u9rog7	src/lib/trofaeer.ts	string	string @ 135:22	Du kortlagde 1500 felter og fandt vejen ud.
-src/lib/trofaeer.ts:5488:5533:string:31qfv9	src/lib/trofaeer.ts	string	string @ 136:24	You mapped 1500 tiles and found your way out.
-src/lib/trofaeer.ts:5698:5711:string:142q1xj	src/lib/trofaeer.ts	string	string @ 142:17	Udstyrsmester
-src/lib/trofaeer.ts:5732:5748:string:y3admr	src/lib/trofaeer.ts	string	string @ 143:19	Equipment Master
-src/lib/trofaeer.ts:5766:5825:string:170v8fa	src/lib/trofaeer.ts	string	string @ 144:16	Slip væk med 10 opgraderingspoint i rygsækken på samme tid.
-src/lib/trofaeer.ts:5845:5909:string:4hl1l7	src/lib/trofaeer.ts	string	string @ 145:18	Escape with 10 upgrade points in your backpack at the same time.
-src/lib/trofaeer.ts:5933:5992:string:n9ccrr	src/lib/trofaeer.ts	string	string @ 146:22	Slip væk med 13 opgraderingspoint i rygsækken på samme tid.
-src/lib/trofaeer.ts:6018:6082:string:5qx2n2	src/lib/trofaeer.ts	string	string @ 147:24	Escape with 13 upgrade points in your backpack at the same time.
-src/lib/trofaeer.ts:6106:6155:string:m8rwsn	src/lib/trofaeer.ts	string	string @ 148:22	Du fik en hel samling opgraderet udstyr med hjem.
-src/lib/trofaeer.ts:6181:6238:string:jdgbdr	src/lib/trofaeer.ts	string	string @ 149:24	You brought home a full collection of upgraded equipment.
-src/lib/trofaeer.ts:6345:6357:string:1gfx07t	src/lib/trofaeer.ts	string	string @ 154:17	Diamantjæger
-src/lib/trofaeer.ts:6378:6392:string:2zf8ab	src/lib/trofaeer.ts	string	string @ 155:19	Diamond Hunter
-src/lib/trofaeer.ts:6410:6465:string:ge57w5	src/lib/trofaeer.ts	string	string @ 156:16	Find diamanter til mindst 3000 guld i alt, og slip væk.
-src/lib/trofaeer.ts:6485:6544:string:e2s8uh	src/lib/trofaeer.ts	string	string @ 157:18	Find diamonds worth at least 3000 gold in total and escape.
-src/lib/trofaeer.ts:6624:6679:string:1fsir3u	src/lib/trofaeer.ts	string	string @ 159:22	Find diamanter til mindst 6000 guld i alt, og slip væk.
-src/lib/trofaeer.ts:6705:6764:string:1f5c7po	src/lib/trofaeer.ts	string	string @ 160:24	Find diamonds worth at least 6000 gold in total and escape.
-src/lib/trofaeer.ts:6788:6848:string:1nmhzs4	src/lib/trofaeer.ts	string	string @ 161:22	Du fandt diamanter til mindst 3000 guld og slap væk fra øen.
-src/lib/trofaeer.ts:6874:6941:string:1li7o9y	src/lib/trofaeer.ts	string	string @ 162:24	You found diamonds worth at least 3000 gold and escaped the island.
-src/lib/trofaeer.ts:7040:7063:string:7bnbqj	src/lib/trofaeer.ts	string	string @ 167:39	taage_mytiske_trofaeer:
-src/lib/trofaeer.ts:7103:7123:string:12vm1us	src/lib/trofaeer.ts	string	string @ 168:38	taage_trofae_awards:
-src/lib/trofaeer.ts:7159:7181:string:mcb0d4	src/lib/trofaeer.ts	string	string @ 169:34	taage_pending_trofaeer
-src/lib/trofaeer.ts:7224:7254:string:sfw27b	src/lib/trofaeer.ts	string	string @ 170:41	taage_pending_mytiske_trofaeer
-src/lib/trofaeer.ts:9290:9311:text:oapdt8	src/lib/trofaeer.ts	text	markup @ 257:23	(promise: PromiseLike
-src/lib/trofaeer.ts:9314:9351:text:1ypy7lp	src/lib/trofaeer.ts	text	markup @ 257:47	, ms: number, label: string): Promise
-src/lib/trofaeer.ts:16105:16145:text:1fzfan1	src/lib/trofaeer.ts	text	markup @ 423:67	trofae.id));\n    const seneste = new Map
-src/lib/trofaeer.ts:16764:16868:text:alia0m	src/lib/trofaeer.ts	text	markup @ 438:13	: award?.award_data && typeof award.award_data === 'object'\n                ? award.award_data as Record
-src/lib/trofaeer.ts:17937:17956:string:kd70j1	src/lib/trofaeer.ts	string	string @ 472:14	Gemning af trofaeer
-src/lib/trofaeer.ts:18050:18088:string:1tocsfx	src/lib/trofaeer.ts	string	string @ 476:23	Trofaeer kunne ikke gemmes i Supabase:
-src/lib/trofaeer.ts:18172:18209:string:12ad0nx	src/lib/trofaeer.ts	string	string @ 481:23	Trofæer kunne ikke gemmes i Supabase:
-src/lib/trofaeer.ts:18818:18845:string:34j4cv	src/lib/trofaeer.ts	string	string @ 503:14	Gemning af mytiske trofaeer
-src/lib/trofaeer.ts:18939:18985:string:1et5qqj	src/lib/trofaeer.ts	string	string @ 507:23	Mytiske trofaeer kunne ikke gemmes i Supabase:
-src/lib/trofaeer.ts:19069:19115:string:1et5qqj	src/lib/trofaeer.ts	string	string @ 512:23	Mytiske trofaeer kunne ikke gemmes i Supabase:
-src/lib/trofaeer.ts:21266:21295:string:bh0llj	src/lib/trofaeer.ts	string	string @ 575:36	user_id,trophy_id,trophy_tier
-src/lib/trofaeer.ts:21371:21395:string:1v5u2nj	src/lib/trofaeer.ts	string	string @ 578:14	Gemning af trofae-awards
-src/lib/trofaeer.ts:21455:21498:string:19qhi93	src/lib/trofaeer.ts	string	string @ 581:27	Trofae-awards kunne ikke gemmes i Supabase:
-src/lib/trofaeer.ts:21610:21653:string:19qhi93	src/lib/trofaeer.ts	string	string @ 586:23	Trofae-awards kunne ikke gemmes i Supabase:
-src/lib/trofaeer.ts:21956:22018:string:3kqfts	src/lib/trofaeer.ts	string	string @ 598:26	trophy_id, trophy_tier, game_result_id, award_data, awarded_at
-src/lib/trofaeer.ts:22172:22197:string:7x5myv	src/lib/trofaeer.ts	string	string @ 602:14	Hentning af trofae-awards
-src/lib/trofaeer.ts:22257:22302:string:gihokw	src/lib/trofaeer.ts	string	string @ 605:27	Trofae-awards kunne ikke hentes fra Supabase:
-src/lib/trofaeer.ts:22672:22717:string:gihokw	src/lib/trofaeer.ts	string	string @ 616:23	Trofae-awards kunne ikke hentes fra Supabase:
-src/lib/trofaeer.ts:23041:23103:string:3kqfts	src/lib/trofaeer.ts	string	string @ 628:26	trophy_id, trophy_tier, game_result_id, award_data, awarded_at
-src/lib/trofaeer.ts:23270:23309:string:13akzhi	src/lib/trofaeer.ts	string	string @ 632:14	Hentning af trofae-awards for highscore
-src/lib/trofaeer.ts:23369:23415:string:1g237tg	src/lib/trofaeer.ts	string	string @ 635:27	Trofae-awards kunne ikke hentes for highscore:
-src/lib/trofaeer.ts:23785:23831:string:1g237tg	src/lib/trofaeer.ts	string	string @ 646:23	Trofae-awards kunne ikke hentes for highscore:
+src/lib/trofaeer.ts:1248:1256:string:qyc5v6	src/lib/trofaeer.ts	string	string @ 52:17	Mineejer
+src/lib/trofaeer.ts:1277:1287:string:1dmuinx	src/lib/trofaeer.ts	string	string @ 53:19	Mine Owner
+src/lib/trofaeer.ts:1305:1335:string:1oga45a	src/lib/trofaeer.ts	string	string @ 54:16	Slip væk fra øen med 12 miner.
+src/lib/trofaeer.ts:1355:1387:string:ggwuw9	src/lib/trofaeer.ts	string	string @ 55:18	Escape the island with 12 mines.
+src/lib/trofaeer.ts:1411:1441:string:v0h1p9	src/lib/trofaeer.ts	string	string @ 56:22	Slip væk fra øen med 15 miner.
+src/lib/trofaeer.ts:1467:1499:string:13sx4be	src/lib/trofaeer.ts	string	string @ 57:24	Escape the island with 15 mines.
+src/lib/trofaeer.ts:1523:1560:string:10fpv6m	src/lib/trofaeer.ts	string	string @ 58:22	Du forlader øen som ejer af 12 miner.
+src/lib/trofaeer.ts:1586:1632:string:19o0kxj	src/lib/trofaeer.ts	string	string @ 59:24	You leave the island as the owner of 12 mines.
+src/lib/trofaeer.ts:1782:1791:string:dd0sty	src/lib/trofaeer.ts	string	string @ 65:17	Tågekonge
+src/lib/trofaeer.ts:1812:1820:string:1tuopla	src/lib/trofaeer.ts	string	string @ 66:19	Fog King
+src/lib/trofaeer.ts:1838:1882:string:j7wk2s	src/lib/trofaeer.ts	string	string @ 67:16	Slip væk efter mindst 20 bevægelser i tågen.
+src/lib/trofaeer.ts:1902:1944:string:egt8ku	src/lib/trofaeer.ts	string	string @ 68:18	Escape after at least 20 moves in the fog.
+src/lib/trofaeer.ts:1968:2013:string:lklwzr	src/lib/trofaeer.ts	string	string @ 69:22	Slip væk efter mindst 100 bevægelser i tågen.
+src/lib/trofaeer.ts:2039:2082:string:1077j73	src/lib/trofaeer.ts	string	string @ 70:24	Escape after at least 100 moves in the fog.
+src/lib/trofaeer.ts:2106:2158:string:md8ivd	src/lib/trofaeer.ts	string	string @ 71:22	Du tog 20 skridt gennem tågen og fandt alligevel ud.
+src/lib/trofaeer.ts:2184:2247:string:11wntnv	src/lib/trofaeer.ts	string	string @ 72:24	You took 20 steps through the fog and still found your way out.
+src/lib/trofaeer.ts:2405:2415:string:v4trai	src/lib/trofaeer.ts	string	string @ 78:17	Bølgebærer
+src/lib/trofaeer.ts:2436:2446:string:3h3vvx	src/lib/trofaeer.ts	string	string @ 79:19	Wavebearer
+src/lib/trofaeer.ts:2464:2528:string:1v2epwg	src/lib/trofaeer.ts	string	string @ 80:16	Start en oversvømmelse, tag skade fra vand 5 gange, og slip væk.
+src/lib/trofaeer.ts:2548:2600:string:1tc4t02	src/lib/trofaeer.ts	string	string @ 81:18	Start a flood, take water damage 5 times and escape.
+src/lib/trofaeer.ts:2624:2689:string:1rhnq78	src/lib/trofaeer.ts	string	string @ 82:22	Start en oversvømmelse, tag skade fra vand 30 gange, og slip væk.
+src/lib/trofaeer.ts:2715:2768:string:cvded0	src/lib/trofaeer.ts	string	string @ 83:24	Start a flood, take water damage 30 times and escape.
+src/lib/trofaeer.ts:2792:2851:string:3c8tlt	src/lib/trofaeer.ts	string	string @ 84:22	Du startede en oversvømmelse, tog vandets slag og nåede ud.
+src/lib/trofaeer.ts:2877:2943:string:trp5qv	src/lib/trofaeer.ts	string	string @ 85:24	You started a flood, took the hits from the water and made it out.
+src/lib/trofaeer.ts:3109:3122:string:111ms1y	src/lib/trofaeer.ts	string	string @ 91:17	Relikviejæger
+src/lib/trofaeer.ts:3143:3155:string:1bfekuq	src/lib/trofaeer.ts	string	string @ 92:19	Relic Hunter
+src/lib/trofaeer.ts:3173:3265:string:1v6qbu	src/lib/trofaeer.ts	string	string @ 93:16	Slip væk med 3 af disse 4 genstande: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.
+src/lib/trofaeer.ts:3285:3373:string:1tod1fx	src/lib/trofaeer.ts	string	string @ 94:18	Escape with 3 of these 4 items: Root Heart, Golden Distiller, Dragon Staff and Rune Rod.
+src/lib/trofaeer.ts:3397:3483:string:jqvgi0	src/lib/trofaeer.ts	string	string @ 95:22	Slip væk med alle 4 genstande: Rodhjertet, Gylden Destillator, Dragestav og Runekvist.
+src/lib/trofaeer.ts:3509:3590:string:10bfjgz	src/lib/trofaeer.ts	string	string @ 96:24	Escape with all 4 items: Root Heart, Golden Distiller, Dragon Staff and Rune Rod.
+src/lib/trofaeer.ts:3614:3670:string:a4o4qs	src/lib/trofaeer.ts	string	string @ 97:22	Du fik tre af øens sjældneste genstande med ud af tågen.
+src/lib/trofaeer.ts:3696:3758:string:hieif0	src/lib/trofaeer.ts	string	string @ 98:24	You carried three of the island’s rarest items out of the fog.
+src/lib/trofaeer.ts:3911:3921:string:kgia4g	src/lib/trofaeer.ts	string	string @ 104:17	Guldfyrste
+src/lib/trofaeer.ts:3942:3953:string:1gajwlo	src/lib/trofaeer.ts	string	string @ 105:19	Gold Prince
+src/lib/trofaeer.ts:3971:4025:string:1phiazd	src/lib/trofaeer.ts	string	string @ 106:16	Slip væk med 5000 guld. Kun din guldbeholdning tæller.
+src/lib/trofaeer.ts:4045:4098:string:1jfa858	src/lib/trofaeer.ts	string	string @ 107:18	Escape with 5000 gold. Only the gold you hold counts.
+src/lib/trofaeer.ts:4122:4176:string:1fh3om2	src/lib/trofaeer.ts	string	string @ 108:22	Slip væk med 8000 guld. Kun din guldbeholdning tæller.
+src/lib/trofaeer.ts:4202:4255:string:1les8fn	src/lib/trofaeer.ts	string	string @ 109:24	Escape with 8000 gold. Only the gold you hold counts.
+src/lib/trofaeer.ts:4279:4309:string:1akcy0v	src/lib/trofaeer.ts	string	string @ 110:22	Du forlader øen med 5000 guld.
+src/lib/trofaeer.ts:4335:4371:string:tkmm8	src/lib/trofaeer.ts	string	string @ 111:24	You leave the island with 5000 gold.
+src/lib/trofaeer.ts:4527:4536:string:1vpl02z	src/lib/trofaeer.ts	string	string @ 117:17	Livvogter
+src/lib/trofaeer.ts:4557:4568:string:19ei2vw	src/lib/trofaeer.ts	string	string @ 118:19	Life Warden
+src/lib/trofaeer.ts:4586:4636:string:4zjp9o	src/lib/trofaeer.ts	string	string @ 119:16	Hel mindst 400 HP i løbet af spillet, og slip væk.
+src/lib/trofaeer.ts:4656:4704:string:s574jt	src/lib/trofaeer.ts	string	string @ 120:18	Heal at least 400 HP during the game and escape.
+src/lib/trofaeer.ts:4728:4779:string:l2gxx9	src/lib/trofaeer.ts	string	string @ 121:22	Hel mindst 1200 HP i løbet af spillet, og slip væk.
+src/lib/trofaeer.ts:4805:4854:string:1a40g4q	src/lib/trofaeer.ts	string	string @ 122:24	Heal at least 1200 HP during the game and escape.
+src/lib/trofaeer.ts:4878:4926:string:6udlaz	src/lib/trofaeer.ts	string	string @ 123:22	Du helede 400 HP og holdt dig i live hele vejen.
+src/lib/trofaeer.ts:4952:4999:string:1kye4z4	src/lib/trofaeer.ts	string	string @ 124:24	You healed 400 HP and stayed alive all the way.
+src/lib/trofaeer.ts:5155:5165:string:7nad2k	src/lib/trofaeer.ts	string	string @ 130:17	Korttegner
+src/lib/trofaeer.ts:5186:5198:string:2gxqer	src/lib/trofaeer.ts	string	string @ 131:19	Cartographer
+src/lib/trofaeer.ts:5216:5255:string:1hjvsff	src/lib/trofaeer.ts	string	string @ 132:16	Afslør mindst 1500 felter, og slip væk.
+src/lib/trofaeer.ts:5275:5313:string:1afr41x	src/lib/trofaeer.ts	string	string @ 133:18	Reveal at least 1500 tiles and escape.
+src/lib/trofaeer.ts:5337:5376:string:op6t47	src/lib/trofaeer.ts	string	string @ 134:22	Afslør mindst 2000 felter, og slip væk.
+src/lib/trofaeer.ts:5402:5440:string:130cs45	src/lib/trofaeer.ts	string	string @ 135:24	Reveal at least 2000 tiles and escape.
+src/lib/trofaeer.ts:5464:5507:string:1u9rog7	src/lib/trofaeer.ts	string	string @ 136:22	Du kortlagde 1500 felter og fandt vejen ud.
+src/lib/trofaeer.ts:5533:5578:string:31qfv9	src/lib/trofaeer.ts	string	string @ 137:24	You mapped 1500 tiles and found your way out.
+src/lib/trofaeer.ts:5743:5756:string:142q1xj	src/lib/trofaeer.ts	string	string @ 143:17	Udstyrsmester
+src/lib/trofaeer.ts:5777:5793:string:y3admr	src/lib/trofaeer.ts	string	string @ 144:19	Equipment Master
+src/lib/trofaeer.ts:5811:5870:string:170v8fa	src/lib/trofaeer.ts	string	string @ 145:16	Slip væk med 10 opgraderingspoint i rygsækken på samme tid.
+src/lib/trofaeer.ts:5890:5954:string:4hl1l7	src/lib/trofaeer.ts	string	string @ 146:18	Escape with 10 upgrade points in your backpack at the same time.
+src/lib/trofaeer.ts:5978:6037:string:n9ccrr	src/lib/trofaeer.ts	string	string @ 147:22	Slip væk med 13 opgraderingspoint i rygsækken på samme tid.
+src/lib/trofaeer.ts:6063:6127:string:5qx2n2	src/lib/trofaeer.ts	string	string @ 148:24	Escape with 13 upgrade points in your backpack at the same time.
+src/lib/trofaeer.ts:6151:6200:string:m8rwsn	src/lib/trofaeer.ts	string	string @ 149:22	Du fik en hel samling opgraderet udstyr med hjem.
+src/lib/trofaeer.ts:6226:6283:string:jdgbdr	src/lib/trofaeer.ts	string	string @ 150:24	You brought home a full collection of upgraded equipment.
+src/lib/trofaeer.ts:6390:6402:string:1gfx07t	src/lib/trofaeer.ts	string	string @ 155:17	Diamantjæger
+src/lib/trofaeer.ts:6423:6437:string:2zf8ab	src/lib/trofaeer.ts	string	string @ 156:19	Diamond Hunter
+src/lib/trofaeer.ts:6455:6510:string:ge57w5	src/lib/trofaeer.ts	string	string @ 157:16	Find diamanter til mindst 3000 guld i alt, og slip væk.
+src/lib/trofaeer.ts:6530:6589:string:e2s8uh	src/lib/trofaeer.ts	string	string @ 158:18	Find diamonds worth at least 3000 gold in total and escape.
+src/lib/trofaeer.ts:6669:6724:string:1fsir3u	src/lib/trofaeer.ts	string	string @ 160:22	Find diamanter til mindst 6000 guld i alt, og slip væk.
+src/lib/trofaeer.ts:6750:6809:string:1f5c7po	src/lib/trofaeer.ts	string	string @ 161:24	Find diamonds worth at least 6000 gold in total and escape.
+src/lib/trofaeer.ts:6833:6893:string:1nmhzs4	src/lib/trofaeer.ts	string	string @ 162:22	Du fandt diamanter til mindst 3000 guld og slap væk fra øen.
+src/lib/trofaeer.ts:6919:6986:string:1li7o9y	src/lib/trofaeer.ts	string	string @ 163:24	You found diamonds worth at least 3000 gold and escaped the island.
+src/lib/trofaeer.ts:7085:7108:string:7bnbqj	src/lib/trofaeer.ts	string	string @ 168:39	taage_mytiske_trofaeer:
+src/lib/trofaeer.ts:7148:7168:string:12vm1us	src/lib/trofaeer.ts	string	string @ 169:38	taage_trofae_awards:
+src/lib/trofaeer.ts:7204:7226:string:mcb0d4	src/lib/trofaeer.ts	string	string @ 170:34	taage_pending_trofaeer
+src/lib/trofaeer.ts:7269:7299:string:sfw27b	src/lib/trofaeer.ts	string	string @ 171:41	taage_pending_mytiske_trofaeer
+src/lib/trofaeer.ts:9335:9356:text:oapdt8	src/lib/trofaeer.ts	text	markup @ 258:23	(promise: PromiseLike
+src/lib/trofaeer.ts:9359:9396:text:1ypy7lp	src/lib/trofaeer.ts	text	markup @ 258:47	, ms: number, label: string): Promise
+src/lib/trofaeer.ts:16150:16190:text:1fzfan1	src/lib/trofaeer.ts	text	markup @ 424:67	trofae.id));\n    const seneste = new Map
+src/lib/trofaeer.ts:16809:16913:text:alia0m	src/lib/trofaeer.ts	text	markup @ 439:13	: award?.award_data && typeof award.award_data === 'object'\n                ? award.award_data as Record
+src/lib/trofaeer.ts:17982:18001:string:kd70j1	src/lib/trofaeer.ts	string	string @ 473:14	Gemning af trofaeer
+src/lib/trofaeer.ts:18095:18133:string:1tocsfx	src/lib/trofaeer.ts	string	string @ 477:23	Trofaeer kunne ikke gemmes i Supabase:
+src/lib/trofaeer.ts:18217:18254:string:12ad0nx	src/lib/trofaeer.ts	string	string @ 482:23	Trofæer kunne ikke gemmes i Supabase:
+src/lib/trofaeer.ts:18863:18890:string:34j4cv	src/lib/trofaeer.ts	string	string @ 504:14	Gemning af mytiske trofaeer
+src/lib/trofaeer.ts:18984:19030:string:1et5qqj	src/lib/trofaeer.ts	string	string @ 508:23	Mytiske trofaeer kunne ikke gemmes i Supabase:
+src/lib/trofaeer.ts:19114:19160:string:1et5qqj	src/lib/trofaeer.ts	string	string @ 513:23	Mytiske trofaeer kunne ikke gemmes i Supabase:
+src/lib/trofaeer.ts:21311:21340:string:bh0llj	src/lib/trofaeer.ts	string	string @ 576:36	user_id,trophy_id,trophy_tier
+src/lib/trofaeer.ts:21416:21440:string:1v5u2nj	src/lib/trofaeer.ts	string	string @ 579:14	Gemning af trofae-awards
+src/lib/trofaeer.ts:21500:21543:string:19qhi93	src/lib/trofaeer.ts	string	string @ 582:27	Trofae-awards kunne ikke gemmes i Supabase:
+src/lib/trofaeer.ts:21655:21698:string:19qhi93	src/lib/trofaeer.ts	string	string @ 587:23	Trofae-awards kunne ikke gemmes i Supabase:
+src/lib/trofaeer.ts:22001:22063:string:3kqfts	src/lib/trofaeer.ts	string	string @ 599:26	trophy_id, trophy_tier, game_result_id, award_data, awarded_at
+src/lib/trofaeer.ts:22217:22242:string:7x5myv	src/lib/trofaeer.ts	string	string @ 603:14	Hentning af trofae-awards
+src/lib/trofaeer.ts:22302:22347:string:gihokw	src/lib/trofaeer.ts	string	string @ 606:27	Trofae-awards kunne ikke hentes fra Supabase:
+src/lib/trofaeer.ts:22717:22762:string:gihokw	src/lib/trofaeer.ts	string	string @ 617:23	Trofae-awards kunne ikke hentes fra Supabase:
+src/lib/trofaeer.ts:23086:23148:string:3kqfts	src/lib/trofaeer.ts	string	string @ 629:26	trophy_id, trophy_tier, game_result_id, award_data, awarded_at
+src/lib/trofaeer.ts:23315:23354:string:13akzhi	src/lib/trofaeer.ts	string	string @ 633:14	Hentning af trofae-awards for highscore
+src/lib/trofaeer.ts:23414:23460:string:1g237tg	src/lib/trofaeer.ts	string	string @ 636:27	Trofae-awards kunne ikke hentes for highscore:
+src/lib/trofaeer.ts:23830:23876:string:1g237tg	src/lib/trofaeer.ts	string	string @ 647:23	Trofae-awards kunne ikke hentes for highscore:
 src/lib/tutorial.svelte.ts:287:294:string:17v9s5z	src/lib/tutorial.svelte.ts	string	string @ 8:38	Lærling
 src/lib/tutorial.svelte.ts:331:357:string:1l4ffbl	src/lib/tutorial.svelte.ts	string	string @ 9:35	taage_tutorial_knap_skjult
 src/lib/tutorial.svelte.ts:436:446:string:1jae67b	src/lib/tutorial.svelte.ts	string	string @ 14:17	Landkrabbe
