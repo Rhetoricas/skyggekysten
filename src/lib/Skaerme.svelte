@@ -403,18 +403,10 @@
         return tekst(medalje.mytiskKrav || '', medalje.mytiskKravEn || medalje.mytiskKrav || '');
     }
 
-    function kravSomSaetningsled(krav: string) {
-        return krav ? krav.charAt(0).toLowerCase() + krav.slice(1) : '';
-    }
-
-    function danskKravSomSaetningsled(krav: string) {
-        return kravSomSaetningsled(krav).replace(/^overlev\b/, 'overleve');
-    }
-
     function mytiskKravSaetning(medalje: { mytiskKrav?: string; mytiskKravEn?: string }) {
         return tekst(
-            `For at blive Mytisk skal du ${danskKravSomSaetningsled(medalje.mytiskKrav || '')}`,
-            `To become Mythic you must ${kravSomSaetningsled(medalje.mytiskKravEn || medalje.mytiskKrav || '')}`
+            `For at blive Mytisk: ${medalje.mytiskKrav || ''}`,
+            `To become Mythic: ${medalje.mytiskKravEn || medalje.mytiskKrav || ''}`
         );
     }
 
