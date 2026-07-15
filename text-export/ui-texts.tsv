@@ -196,271 +196,259 @@ src/lib/Island.svelte:111397:111477:string:w73p4h	src/lib/Island.svelte	string	s
 src/lib/Island.svelte:111481:111575:string:1dlniaq	src/lib/Island.svelte	string	string @ 2397:132	The island could not be cleared after previous travelers. Check your connection and try again.
 src/lib/Island.svelte:113124:113130:string:1itwhp2	src/lib/Island.svelte	string	string @ 2437:80	Ukendt
 src/lib/Island.svelte:113134:113141:string:1kmy72x	src/lib/Island.svelte	string	string @ 2437:90	Unknown
-src/lib/Island.svelte:113483:113529:string:mcfxyn	src/lib/Island.svelte	string	string @ 2448:47	Gravstenen bliver stående som et minde på øen.
-src/lib/Island.svelte:113533:113584:string:c0wtcf	src/lib/Island.svelte	string	string @ 2448:97	The gravestone remains on the island as a memorial.
-src/lib/Island.svelte:113767:113777:string:s5mnmy	src/lib/Island.svelte	string	string @ 2453:100	Ukendt dag
-src/lib/Island.svelte:113781:113792:string:f1zgjr	src/lib/Island.svelte	string	string @ 2453:114	Unknown day
-src/lib/Island.svelte:114351:114359:string:whgpb3	src/lib/Island.svelte	string	string @ 2467:111	Gravsten
-src/lib/Island.svelte:114363:114373:string:1wrw3zj	src/lib/Island.svelte	string	string @ 2467:123	Gravestone
-src/lib/Island.svelte:114684:114691:string:1r6ct1o	src/lib/Island.svelte	string	string @ 2476:74	højland
-src/lib/Island.svelte:114729:114731:string:1liu8zy	src/lib/Island.svelte	string	string @ 2476:119	sø
-src/lib/Island.svelte:115543:115557:string:1hxexyz	src/lib/Island.svelte	string	string @ 2496:31	Skattekortspor
-src/lib/Island.svelte:115561:115578:string:1pvrzir	src/lib/Island.svelte	string	string @ 2496:49	Treasure map clue
-src/lib/Island.svelte:115633:115784:string:v648m4	src/lib/Island.svelte	string	string @ 2498:22	Et gammelt skattekort peger på området. Farven og krydset er et spor, ikke et udforsket felt. Kortet kan heller ikke vise, om kisten allerede er taget.
-src/lib/Island.svelte:115808:115969:string:1g24s7f	src/lib/Island.svelte	string	string @ 2499:22	An old treasure map points to this area. The color and cross are a clue, not an explored tile. The map also cannot show whether the chest has already been taken.
-src/lib/Island.svelte:116094:116105:string:ewfzfn	src/lib/Island.svelte	string	string @ 2506:31	Ukendt felt
-src/lib/Island.svelte:116109:116122:string:1qi1un9	src/lib/Island.svelte	string	string @ 2506:46	Unknown field
-src/lib/Island.svelte:116177:116286:string:1ejgc2t	src/lib/Island.svelte	string	string @ 2508:22	Du har ikke udforsket feltet endnu. Gå tættere på, eller brug en fakkel eller bedre udsyn til at afsløre det.
-src/lib/Island.svelte:116310:116405:string:1a3olri	src/lib/Island.svelte	string	string @ 2509:22	You have not explored this tile yet. Move closer, or use a torch or better vision to reveal it.
-src/lib/Island.svelte:116574:116602:string:1vkx7c1	src/lib/Island.svelte	string	string @ 2515:72	Du har udforsket dette felt.
-src/lib/Island.svelte:116606:116634:string:1jgge2b	src/lib/Island.svelte	string	string @ 2515:104	You have explored this tile.
-src/lib/Island.svelte:116680:116732:string:xcldud	src/lib/Island.svelte	string	string @ 2517:41	Tågen har taget feltet. Bliver du her, er du i fare.
-src/lib/Island.svelte:116736:116797:string:14xuh7x	src/lib/Island.svelte	string	string @ 2517:97	The fog has taken this tile. Staying here puts you in danger.
-src/lib/Island.svelte:116848:116946:string:vrwuat	src/lib/Island.svelte	string	string @ 2518:47	Vandet ødelægger almindelig rustning og kongepanser og slukker fakler. Elverrustning klarer turen.
-src/lib/Island.svelte:116950:117054:string:odlnu9	src/lib/Island.svelte	string	string @ 2518:149	The water destroys normal armor and royal armor and puts out torches. Elven armor survives the crossing.
-src/lib/Island.svelte:117105:117182:string:1ts441q	src/lib/Island.svelte	string	string @ 2519:47	Søer er indlandsvand. De er farlige uden båd, men de tæller ikke som havkyst.
-src/lib/Island.svelte:117186:117275:string:uba77k	src/lib/Island.svelte	string	string @ 2519:128	Lakes are inland water. They are dangerous without a boat, but do not count as sea coast.
-src/lib/Island.svelte:117327:117368:string:1agce0u	src/lib/Island.svelte	string	string @ 2520:48	Huler kan ødelægge soveposer og fint tøj.
-src/lib/Island.svelte:117372:117418:string:4drah4	src/lib/Island.svelte	string	string @ 2520:93	Caves can ruin sleeping bags and fine clothes.
-src/lib/Island.svelte:117470:117505:string:lal9ba	src/lib/Island.svelte	string	string @ 2521:48	I ruiner kan du miste en madration.
-src/lib/Island.svelte:117509:117545:string:1gc4bds	src/lib/Island.svelte	string	string @ 2521:87	You may lose a food ration in ruins.
-src/lib/Island.svelte:117600:117710:string:luycl5	src/lib/Island.svelte	string	string @ 2522:51	Krystaller ødelægger metaldetektorer og gyldne kikkerter. En malmviser bliver til en almindelig metaldetektor.
-src/lib/Island.svelte:117714:117816:string:m5djz2	src/lib/Island.svelte	string	string @ 2522:165	Crystals destroy metal detectors and golden spyglasses. An ore finder becomes a normal metal detector.
-src/lib/Island.svelte:117870:117958:string:1ivq4xt	src/lib/Island.svelte	string	string @ 2523:50	Ritualfelter kan ødelægge en søgekvist. En runekvist bliver til en almindelig søgekvist.
-src/lib/Island.svelte:117962:118042:string:19bq2yc	src/lib/Island.svelte	string	string @ 2523:142	Ritual tiles can destroy a dowsing rod. A rune rod becomes a normal dowsing rod.
-src/lib/Island.svelte:118179:118238:string:130kptj	src/lib/Island.svelte	string	string @ 2525:90	 : 'ligger en flugtbåd'} her. Går du ombord, har du vundet.
-src/lib/Island.svelte:118330:118382:string:1mqe54q	src/lib/Island.svelte	string	string @ 2526:90	 : 'There is an escape boat'} here. Board it to win.
-src/lib/Island.svelte:118462:118522:string:15janyh	src/lib/Island.svelte	string	string @ 2528:67	En hændelse venter her og starter, når du går ind på feltet.
-src/lib/Island.svelte:118526:118590:string:16vmk8j	src/lib/Island.svelte	string	string @ 2528:131	An encounter is waiting here and begins when you enter the tile.
-src/lib/Island.svelte:118646:118722:string:olzchl	src/lib/Island.svelte	string	string @ 2529:52	Feltet har en butik. Dagens varer deles af spillerne og genfyldes næste dag.
-src/lib/Island.svelte:118726:118811:string:96trn0	src/lib/Island.svelte	string	string @ 2529:132	This field has a shop. The daily stock is shared by players and refills the next day.
-src/lib/Island.svelte:118893:119016:string:1fkv75	src/lib/Island.svelte	string	string @ 2530:78	Feltet har et værksted, hvor udstyr kan opgraderes. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang.
-src/lib/Island.svelte:119020:119157:string:cp8u8c	src/lib/Island.svelte	string	string @ 2530:205	This field has a workshop where equipment can be upgraded. If you have a club or wallbreaker, the master only dares to work for you once.
-src/lib/Island.svelte:119322:119345:string:163ge50	src/lib/Island.svelte	string	string @ 2531:161	Der er en guldmine her.
-src/lib/Island.svelte:119349:119375:string:j4c4td	src/lib/Island.svelte	string	string @ 2531:188	There is a gold mine here.
-src/lib/Island.svelte:119467:119499:string:1j8v6jh	src/lib/Island.svelte	string	string @ 2532:88	Portalen kan flytte dig mod øst.
-src/lib/Island.svelte:119503:119532:string:1l8hfw3	src/lib/Island.svelte	string	string @ 2532:124	The portal can move you east.
-src/lib/Island.svelte:119585:119682:string:1w6wuuy	src/lib/Island.svelte	string	string @ 2533:49	Tågeblokkeren holder tågen nede på niveau 1 omkring sig, også når resten af tågen bliver tungere.
-src/lib/Island.svelte:119686:119782:string:1a6j6p0	src/lib/Island.svelte	string	string @ 2533:150	The fog blocker keeps the fog at level 1 around it, even when the rest of the fog grows heavier.
-src/lib/Island.svelte:120102:120143:string:oxgodk	src/lib/Island.svelte	string	string @ 2536:63	Gravstenen viser, at en spiller døde her.
-src/lib/Island.svelte:120147:120192:string:18nidsb	src/lib/Island.svelte	string	string @ 2536:108	The gravestone shows that a player died here.
-src/lib/Island.svelte:120264:120318:string:yvgsxt	src/lib/Island.svelte	string	string @ 2537:68	Farvelbåden viser, at en spiller slap væk fra øen her.
-src/lib/Island.svelte:120322:120384:string:1v2b5qa	src/lib/Island.svelte	string	string @ 2537:126	The farewell boat shows that a player escaped the island here.
-src/lib/Island.svelte:120431:120460:string:14vd33g	src/lib/Island.svelte	string	string @ 2538:43	Feltet er allerede gravet op.
-src/lib/Island.svelte:120464:120496:string:i5ct7t	src/lib/Island.svelte	string	string @ 2538:76	This field has already been dug.
-src/lib/Island.svelte:120551:120569:string:14pqax7	src/lib/Island.svelte	string	string @ 2539:51	Feltet kan graves.
-src/lib/Island.svelte:120573:120595:string:1c8ah7e	src/lib/Island.svelte	string	string @ 2539:73	This field can be dug.
-src/lib/Island.svelte:120630:120653:string:159q34d	src/lib/Island.svelte	string	string @ 2540:31	Feltet kan ikke graves.
-src/lib/Island.svelte:120657:120682:string:1jz91xp	src/lib/Island.svelte	string	string @ 2540:58	This field cannot be dug.
-src/lib/Island.svelte:122843:122860:string:102ooq4	src/lib/Island.svelte	string	string @ 2603:42	[data-help-title]
-src/lib/Island.svelte:122936:122947:string:ewfzfn	src/lib/Island.svelte	string	string @ 2604:51	Ukendt felt
-src/lib/Island.svelte:122951:122964:string:1qi1un9	src/lib/Island.svelte	string	string @ 2604:66	Unknown field
-src/lib/Island.svelte:123305:123310:string:yjnlk7	src/lib/Island.svelte	string	string @ 2616:57	Hjælp
-src/lib/Island.svelte:123314:123318:string:1f8350a	src/lib/Island.svelte	string	string @ 2616:66	Help
-src/lib/Island.svelte:123377:123437:string:wel0ap	src/lib/Island.svelte	string	string @ 2617:56	Tryk på et felt, ikon eller en knap for at få en forklaring.
-src/lib/Island.svelte:123441:123491:string:3yy9eq	src/lib/Island.svelte	string	string @ 2617:120	Tap a field, icon or button to get an explanation.
-src/lib/Island.svelte:126695:126730:string:1kfnata	src/lib/Island.svelte	string	string @ 2704:52	Øen svarer langsomt. Prøver igen...
-src/lib/Island.svelte:126734:126782:string:1xdu5h9	src/lib/Island.svelte	string	string @ 2704:91	The island is responding slowly. Trying again...
-src/lib/Island.svelte:130418:130432:string:o0zsq3	src/lib/Island.svelte	string	string @ 2817:27	Fokuser på dig
-src/lib/Island.svelte:130436:130448:string:kw2kf3	src/lib/Island.svelte	string	string @ 2817:45	Focus on you
-src/lib/Island.svelte:130483:130497:string:o0zsq3	src/lib/Island.svelte	string	string @ 2818:32	Fokuser på dig
-src/lib/Island.svelte:130501:130513:string:kw2kf3	src/lib/Island.svelte	string	string @ 2818:50	Focus on you
-src/lib/Island.svelte:130693:130723:string:il8x1	src/lib/Island.svelte	string	string @ 2822:26	M24 7v8M24 33v8M7 24h8M33 24h8
-src/lib/Island.svelte:130977:130992:string:1ez5279	src/lib/Island.svelte	string	string @ 2830:42	Slå hjælpen fra
-src/lib/Island.svelte:130996:131009:string:1fipu0w	src/lib/Island.svelte	string	string @ 2830:61	Turn help off
-src/lib/Island.svelte:131021:131036:string:1rcpmo3	src/lib/Island.svelte	string	string @ 2830:86	Slå hjælpen til
-src/lib/Island.svelte:131040:131052:string:1rq86ke	src/lib/Island.svelte	string	string @ 2830:105	Turn help on
-src/lib/Island.svelte:131102:131117:string:1ez5279	src/lib/Island.svelte	string	string @ 2831:47	Slå hjælpen fra
-src/lib/Island.svelte:131121:131134:string:1fipu0w	src/lib/Island.svelte	string	string @ 2831:66	Turn help off
-src/lib/Island.svelte:131146:131161:string:1rcpmo3	src/lib/Island.svelte	string	string @ 2831:91	Slå hjælpen til
-src/lib/Island.svelte:131165:131177:string:1rq86ke	src/lib/Island.svelte	string	string @ 2831:110	Turn help on
-src/lib/Island.svelte:131309:131359:string:p8zves	src/lib/Island.svelte	string	string @ 2834:26	M18 18a6.5 6.5 0 0 1 12.2 3.2c0 5.8-6.2 5.5-6.2 11
-src/lib/Island.svelte:131636:131640:string:r953rm	src/lib/Island.svelte	string	string @ 2842:58	Zoom
-src/lib/Island.svelte:131813:131821:string:94g213	src/lib/Island.svelte	string	string @ 2843:169	Zoom ind
-src/lib/Island.svelte:131825:131832:string:19blqjd	src/lib/Island.svelte	string	string @ 2843:181	Zoom in
-src/lib/Island.svelte:132016:132023:string:1jshihz	src/lib/Island.svelte	string	string @ 2844:170	Zoom ud
-src/lib/Island.svelte:132027:132035:string:110wpq2	src/lib/Island.svelte	string	string @ 2844:181	Zoom out
-src/lib/Island.svelte:132205:132213:string:11855xr	src/lib/Island.svelte	string	string @ 2851:33	Tutorial
-src/lib/Island.svelte:132217:132225:string:11855xr	src/lib/Island.svelte	string	string @ 2851:45	Tutorial
-src/lib/Island.svelte:132260:132351:string:ccl6d1	src/lib/Island.svelte	string	string @ 2852:32	Tutorialboksen viser din næste øvelse. Tutorialen påvirker ikke gemte spil eller toplister.
-src/lib/Island.svelte:132355:132455:string:195483o	src/lib/Island.svelte	string	string @ 2852:127	The tutorial box shows your next exercise. The tutorial does not affect saved games or leaderboards.
-src/lib/Island.svelte:137132:137140:string:1g9a8ys	src/lib/Island.svelte	string	string @ 2930:73	Flugtbåd
-src/lib/Island.svelte:137144:137155:string:olkseo	src/lib/Island.svelte	string	string @ 2930:85	Escape boat
-src/lib/Island.svelte:137217:137225:string:1g9a8ys	src/lib/Island.svelte	string	string @ 2930:158	Flugtbåd
-src/lib/Island.svelte:137229:137240:string:olkseo	src/lib/Island.svelte	string	string @ 2930:170	Escape boat
-src/lib/Island.svelte:137267:137343:string:s56lcy	src/lib/Island.svelte	string	string @ 2930:208	Gå ind på feltet, og tag båden væk fra øen. Hver båd kan kun bruges én gang.
-src/lib/Island.svelte:137347:137428:string:jv1iza	src/lib/Island.svelte	string	string @ 2930:288	Enter the tile and take the boat off the island. Each boat can only be used once.
-src/lib/Island.svelte:138531:138546:string:1jp9swl	src/lib/Island.svelte	string	string @ 2945:169	Ødelagt afgrøde
-src/lib/Island.svelte:138550:138561:string:3uzk9g	src/lib/Island.svelte	string	string @ 2945:188	Ruined crop
-src/lib/Island.svelte:138588:138647:string:1twg1w5	src/lib/Island.svelte	string	string @ 2945:226	Afgrøden er ødelagt og giver ikke længere mad eller heling.
-src/lib/Island.svelte:138651:138706:string:xh3ty9	src/lib/Island.svelte	string	string @ 2945:289	The crop is ruined and no longer gives food or healing.
-src/lib/Island.svelte:138992:139005:string:1hgaa4p	src/lib/Island.svelte	string	string @ 2948:168	Moden afgrøde
-src/lib/Island.svelte:139009:139018:string:13zjm17	src/lib/Island.svelte	string	string @ 2948:185	Ripe crop
-src/lib/Island.svelte:139045:139143:string:8xc7g8	src/lib/Island.svelte	string	string @ 2948:221	En moden afgrøde. Når du går ind på feltet, kan den give lidt HP, medmindre en insektplage rammer.
-src/lib/Island.svelte:139147:139242:string:4qy2mr	src/lib/Island.svelte	string	string @ 2948:323	A ripe crop. When you enter the field, it can give a little HP unless an insect plague strikes.
-src/lib/Island.svelte:139463:139479:string:6ey38d	src/lib/Island.svelte	string	string @ 2950:175	Voksende afgrøde
-src/lib/Island.svelte:139483:139495:string:1nes21o	src/lib/Island.svelte	string	string @ 2950:195	Growing crop
-src/lib/Island.svelte:139522:139610:string:1jix1u0	src/lib/Island.svelte	string	string @ 2950:234	Afgrøden er ikke moden endnu. Hvis du tramper gennem den for tidligt, bliver den skadet.
-src/lib/Island.svelte:139614:139691:string:jih241	src/lib/Island.svelte	string	string @ 2950:326	The crop is not ripe yet. If you trample through it too early, it is damaged.
-src/lib/Island.svelte:140054:140064:string:lra3st	src/lib/Island.svelte	string	string @ 2956:162	Meteorsten
-src/lib/Island.svelte:140068:140080:string:1ow59g8	src/lib/Island.svelte	string	string @ 2956:176	Meteor stone
-src/lib/Island.svelte:140107:140217:string:vh1ge	src/lib/Island.svelte	string	string @ 2956:215	Meteorstenen varsler en særlig hændelse med sin egen fare og belønning. Gå ind på feltet for at undersøge den.
-src/lib/Island.svelte:140221:140331:string:15y2bqg	src/lib/Island.svelte	string	string @ 2956:329	The meteor stone signals a special encounter with its own danger and reward. Enter the tile to investigate it.
-src/lib/Island.svelte:140558:140569:string:nq0znh	src/lib/Island.svelte	string	string @ 2960:113	Fog blocker
-src/lib/Island.svelte:140597:140608:string:8njl74	src/lib/Island.svelte	string	string @ 2960:152	Tågeblokker
-src/lib/Island.svelte:140612:140623:string:nq0znh	src/lib/Island.svelte	string	string @ 2960:167	Fog blocker
-src/lib/Island.svelte:140650:140739:string:1izznh1	src/lib/Island.svelte	string	string @ 2960:205	Holder tågen på det laveste niveau omkring sig, selv når den bliver tættere andre steder.
-src/lib/Island.svelte:140743:140827:string:1jbnnbo	src/lib/Island.svelte	string	string @ 2960:298	Keeps the surrounding fog at its lowest level, even when it grows thicker elsewhere.
-src/lib/Island.svelte:141026:141041:string:5metf8	src/lib/Island.svelte	string	string @ 2964:77	Jordskælvskryds
-src/lib/Island.svelte:141045:141060:string:1a183dt	src/lib/Island.svelte	string	string @ 2964:96	Earthquake mark
-src/lib/Island.svelte:141136:141151:string:5metf8	src/lib/Island.svelte	string	string @ 2964:187	Jordskælvskryds
-src/lib/Island.svelte:141155:141170:string:1a183dt	src/lib/Island.svelte	string	string @ 2964:206	Earthquake mark
-src/lib/Island.svelte:141197:141321:string:1u4azbp	src/lib/Island.svelte	string	string @ 2964:248	Jordskælvet har mærket dette nye bjergfelt. Ét af krydserne skjuler en kiste; de andre kan udløse farlige sammenstyrtninger.
-src/lib/Island.svelte:141325:141439:string:1thejj	src/lib/Island.svelte	string	string @ 2964:376	The earthquake marked this new mountain tile. One cross hides a chest; the others may trigger dangerous collapses.
-src/lib/Island.svelte:141882:141892:string:16d3o6g	src/lib/Island.svelte	string	string @ 2970:81	Mulig skat
-src/lib/Island.svelte:141896:141913:string:16ep6c3	src/lib/Island.svelte	string	string @ 2970:95	Possible treasure
-src/lib/Island.svelte:141968:141978:string:16d3o6g	src/lib/Island.svelte	string	string @ 2970:167	Mulig skat
-src/lib/Island.svelte:141982:141999:string:16ep6c3	src/lib/Island.svelte	string	string @ 2970:181	Possible treasure
-src/lib/Island.svelte:142026:142143:string:j6w9rt	src/lib/Island.svelte	string	string @ 2970:225	Skattekortet peger på dette område. Et af felterne kan gemme kisten, men kortet viser ikke, om den allerede er taget.
-src/lib/Island.svelte:142147:142280:string:1kzcvsh	src/lib/Island.svelte	string	string @ 2970:346	The treasure map points to this area. One of the tiles may hide the chest, but the map cannot show whether it has already been taken.
-src/lib/Island.svelte:142547:142555:string:cmohgv	src/lib/Island.svelte	string	string @ 2973:115	Guldspor
-src/lib/Island.svelte:142559:142569:string:xwurbe	src/lib/Island.svelte	string	string @ 2973:127	Gold trace
-src/lib/Island.svelte:142611:142740:string:7oc65	src/lib/Island.svelte	string	string @ 2973:179	Din malmviser mærker skjult guld på kendte felter op til tre felter væk. Grav her for at få guldet frem; malmviseren øger fundet.
-src/lib/Island.svelte:142744:142877:string:1c3k6cm	src/lib/Island.svelte	string	string @ 2973:312	Your ore finder senses hidden gold on known tiles up to three tiles away. Dig here to reveal it; the ore finder increases the amount.
-src/lib/Island.svelte:142889:142997:string:9ckw9u	src/lib/Island.svelte	string	string @ 2973:457	Din metaldetektor mærker skjult guld på kendte felter op til tre felter væk. Grav her for at få guldet frem.
-src/lib/Island.svelte:143001:143101:string:1vt4jwb	src/lib/Island.svelte	string	string @ 2973:569	Your metal detector senses hidden gold on known tiles up to three tiles away. Dig here to reveal it.
-src/lib/Island.svelte:143448:143455:string:1w9uu2s	src/lib/Island.svelte	string	string @ 2976:114	Rodspor
-src/lib/Island.svelte:143459:143469:string:1vmd4s	src/lib/Island.svelte	string	string @ 2976:125	Root trace
-src/lib/Island.svelte:143511:143650:string:ukpz1s	src/lib/Island.svelte	string	string @ 2976:177	Runekvisten mærker helende rødder på kendte felter op til tre felter væk. Mangler du HP, trækker den rødderne op, når du går ind på feltet.
-src/lib/Island.svelte:143654:143796:string:3d9c6z	src/lib/Island.svelte	string	string @ 2976:320	The rune rod senses healing roots on known tiles up to three tiles away. If you are missing HP, it pulls up the roots when you enter the tile.
-src/lib/Island.svelte:143808:143908:string:rfcjpm	src/lib/Island.svelte	string	string @ 2976:474	Søgekvisten mærker helende rødder på kendte felter op til tre felter væk. Grav her for at finde dem.
-src/lib/Island.svelte:143912:144010:string:1iuj3hy	src/lib/Island.svelte	string	string @ 2976:578	The dowsing rod senses healing roots on known tiles up to three tiles away. Dig here to find them.
-src/lib/Island.svelte:144358:144368:string:vhm5qk	src/lib/Island.svelte	string	string @ 2981:112	Udgravning
-src/lib/Island.svelte:144372:144380:string:q3va96	src/lib/Island.svelte	string	string @ 2981:126	Dig site
-src/lib/Island.svelte:144407:144484:string:1e9t5mx	src/lib/Island.svelte	string	string @ 2981:161	Feltet er allerede gravet op. Her er ingen skjulte fund eller fælder tilbage.
-src/lib/Island.svelte:144488:144555:string:1o1p452	src/lib/Island.svelte	string	string @ 2981:242	This tile has already been dug up. No hidden finds or traps remain.
-src/lib/Island.svelte:144736:144751:string:1sjt7wh	src/lib/Island.svelte	string	string @ 2985:79	Tom skattekiste
-src/lib/Island.svelte:144755:144775:string:1xf1if2	src/lib/Island.svelte	string	string @ 2985:98	Empty treasure chest
-src/lib/Island.svelte:144831:144846:string:1sjt7wh	src/lib/Island.svelte	string	string @ 2985:174	Tom skattekiste
-src/lib/Island.svelte:144850:144870:string:1xf1if2	src/lib/Island.svelte	string	string @ 2985:193	Empty treasure chest
-src/lib/Island.svelte:144897:144954:string:xafsyi	src/lib/Island.svelte	string	string @ 2985:240	Skatten er taget. Den tomme kiste viser kun, hvor den lå.
-src/lib/Island.svelte:144958:145025:string:1hr8a0w	src/lib/Island.svelte	string	string @ 2985:301	The treasure is gone. The empty chest only marks where it once lay.
-src/lib/Island.svelte:145234:145242:string:nrd0be	src/lib/Island.svelte	string	string @ 2989:85	Guldmine
-src/lib/Island.svelte:145246:145255:string:6rjpqq	src/lib/Island.svelte	string	string @ 2989:97	Gold mine
-src/lib/Island.svelte:145552:145635:string:1lj8f16	src/lib/Island.svelte	string	string @ 2989:403	Guldmine giver guld og score, når du overtager den. Besøg den igen for at låse den.
-src/lib/Island.svelte:145639:145721:string:wxdav4	src/lib/Island.svelte	string	string @ 2989:490	A gold mine gives gold and score when you take it over. Visit it again to lock it.
-src/lib/Island.svelte:145802:145810:string:nrd0be	src/lib/Island.svelte	string	string @ 2990:77	Guldmine
-src/lib/Island.svelte:145814:145823:string:6rjpqq	src/lib/Island.svelte	string	string @ 2990:89	Gold mine
-src/lib/Island.svelte:146216:146220:string:gbrtyh	src/lib/Island.svelte	string	string @ 2993:219	Ejer
-src/lib/Island.svelte:146224:146229:string:171lv90	src/lib/Island.svelte	string	string @ 2993:227	Owner
-src/lib/Island.svelte:146285:146296:string:bzk50v	src/lib/Island.svelte	string	string @ 2993:288	Minens ejer
-src/lib/Island.svelte:146300:146310:string:ao3tct	src/lib/Island.svelte	string	string @ 2993:303	Mine owner
-src/lib/Island.svelte:146563:146572:string:1d7oa4s	src/lib/Island.svelte	string	string @ 2995:93	Låst mine
-src/lib/Island.svelte:146576:146587:string:lkccuq	src/lib/Island.svelte	string	string @ 2995:106	Locked mine
-src/lib/Island.svelte:146614:146668:string:wczgt	src/lib/Island.svelte	string	string @ 2995:144	Minen er låst af ejeren og kan ikke overtages lige nu.
-src/lib/Island.svelte:146672:146739:string:1vwqmnq	src/lib/Island.svelte	string	string @ 2995:202	The mine is locked by the owner and cannot be taken over right now.
-src/lib/Island.svelte:147209:147216:string:2zkoz9	src/lib/Island.svelte	string	string @ 3004:118	Lejrbål
-src/lib/Island.svelte:147220:147228:string:1bwxzco	src/lib/Island.svelte	string	string @ 3004:129	Campfire
-src/lib/Island.svelte:147255:147350:string:1avm765	src/lib/Island.svelte	string	string @ 3004:164	Ved lejrbålet venter en hændelse eller et hvilested. Gå ind på feltet for at se, hvad der sker.
-src/lib/Island.svelte:147354:147445:string:1obryin	src/lib/Island.svelte	string	string @ 3004:263	An encounter or a place to rest awaits at the campfire. Enter the tile to see what happens.
-src/lib/Island.svelte:147635:147643:string:k5x9p8	src/lib/Island.svelte	string	string @ 3006:114	Hændelse
-src/lib/Island.svelte:147647:147656:string:1pvrtp6	src/lib/Island.svelte	string	string @ 3006:126	Encounter
-src/lib/Island.svelte:147683:147761:string:plkkp2	src/lib/Island.svelte	string	string @ 3006:162	Noget venter på dette felt. Når du går ind, møder du en situation med et valg.
-src/lib/Island.svelte:147765:147847:string:144v4yg	src/lib/Island.svelte	string	string @ 3006:244	Something is waiting on this tile. Enter it to face a situation and make a choice.
-src/lib/Island.svelte:148091:148097:string:1sof6az	src/lib/Island.svelte	string	string @ 3011:71	Portal
-src/lib/Island.svelte:148101:148107:string:1sof6az	src/lib/Island.svelte	string	string @ 3011:81	Portal
-src/lib/Island.svelte:148155:148161:string:1sof6az	src/lib/Island.svelte	string	string @ 3011:135	Portal
-src/lib/Island.svelte:148165:148171:string:1sof6az	src/lib/Island.svelte	string	string @ 3011:145	Portal
-src/lib/Island.svelte:148198:148308:string:1k3x2j9	src/lib/Island.svelte	string	string @ 3011:178	Portalen slynger dig 4, 5 eller 6 felter mod øst. Det, der venter på landingsfeltet, rammer dig med det samme.
-src/lib/Island.svelte:148312:148416:string:qixi6z	src/lib/Island.svelte	string	string @ 3011:292	The portal throws you 4, 5 or 6 tiles east. Whatever awaits on the landing tile affects you immediately.
-src/lib/Island.svelte:148831:148838:string:1poa9xb	src/lib/Island.svelte	string	string @ 3019:79	Bybutik
-src/lib/Island.svelte:148842:148851:string:nz0ftf	src/lib/Island.svelte	string	string @ 3019:90	Town shop
-src/lib/Island.svelte:148863:148869:string:1dr8mv5	src/lib/Island.svelte	string	string @ 3019:111	Marked
-src/lib/Island.svelte:148873:148879:string:19bezrl	src/lib/Island.svelte	string	string @ 3019:121	Market
-src/lib/Island.svelte:148938:149114:string:15sqw2	src/lib/Island.svelte	string	string @ 3020:56	Butikken sælger dagens varer for guld. Spillerne deles om varerne, og de faste varer kommer igen næste dag. Har du kølle eller murknuser, handler købmanden kun med dig én gang.
-src/lib/Island.svelte:149118:149300:string:1ccyl2o	src/lib/Island.svelte	string	string @ 3020:236	The shop sells today's goods for gold. Players share the goods, and the regular stock returns the next day. If you have a club or wallbreaker, the merchant only trades with you once.
-src/lib/Island.svelte:149815:149823:string:1vjzexo	src/lib/Island.svelte	string	string @ 3030:57	Værksted
-src/lib/Island.svelte:149827:149835:string:1qr5r8s	src/lib/Island.svelte	string	string @ 3030:69	Workshop
-src/lib/Island.svelte:149894:150040:string:fr8cld	src/lib/Island.svelte	string	string @ 3031:56	Værkstedet opgraderer dit udstyr og erstatter den gamle genstand med den nye. Har du kølle eller murknuser, arbejder mesteren kun for dig én gang.
-src/lib/Island.svelte:150044:150195:string:1lgsr0p	src/lib/Island.svelte	string	string @ 3031:206	The workshop upgrades your equipment and replaces the old item with the new one. If you have a club or wallbreaker, the master only works for you once.
-src/lib/Island.svelte:150435:150443:string:9uu0d1	src/lib/Island.svelte	string	string @ 3036:77	Indbrudt
-src/lib/Island.svelte:150447:150454:string:nrb710	src/lib/Island.svelte	string	string @ 3036:89	Burgled
-src/lib/Island.svelte:150482:150489:string:kqnw1v	src/lib/Island.svelte	string	string @ 3036:124	Indbrud
-src/lib/Island.svelte:150493:150501:string:1az7u5d	src/lib/Island.svelte	string	string @ 3036:135	Burglary
-src/lib/Island.svelte:150528:150578:string:82it15	src/lib/Island.svelte	string	string @ 3036:170	Låsen markerer, at der allerede har været indbrud.
-src/lib/Island.svelte:150582:150639:string:195liqw	src/lib/Island.svelte	string	string @ 3036:224	The lock shows that a burglary has already happened here.
-src/lib/Island.svelte:151239:151247:string:whgpb3	src/lib/Island.svelte	string	string @ 3047:57	Gravsten
-src/lib/Island.svelte:151251:151261:string:1wrw3zj	src/lib/Island.svelte	string	string @ 3047:69	Gravestone
-src/lib/Island.svelte:151517:151520:string:ky5fgv	src/lib/Island.svelte	string	string @ 3051:77	Død
-src/lib/Island.svelte:151524:151528:string:7z6slj	src/lib/Island.svelte	string	string @ 3051:84	Dead
-src/lib/Island.svelte:151677:151683:string:b6r2dl	src/lib/Island.svelte	string	string @ 3053:74	Faldet
-src/lib/Island.svelte:151687:151693:string:1nonxs3	src/lib/Island.svelte	string	string @ 3053:84	Fallen
-src/lib/Island.svelte:152481:152490:string:1hya4s0	src/lib/Island.svelte	string	string @ 3066:87	Farvelbåd
-src/lib/Island.svelte:152494:152507:string:1jwu4h9	src/lib/Island.svelte	string	string @ 3066:100	Farewell boat
-src/lib/Island.svelte:153006:153017:string:7zj9hd	src/lib/Island.svelte	string	string @ 3068:80	Sluppet væk
-src/lib/Island.svelte:153021:153028:string:yze5eu	src/lib/Island.svelte	string	string @ 3068:95	Escaped
-src/lib/Island.svelte:153864:153878:string:1gu3ci7	src/lib/Island.svelte	string	string @ 3080:103	Ukendt spiller
-src/lib/Island.svelte:153882:153896:string:1010o7e	src/lib/Island.svelte	string	string @ 3080:121	Unknown player
-src/lib/Island.svelte:154028:154101:string:okkl7h	src/lib/Island.svelte	string	string @ 3080:267	Du kan høre en anden spillers alarm her, men du kan ikke se, hvem det er.
-src/lib/Island.svelte:154105:154177:string:1snv7c	src/lib/Island.svelte	string	string @ 3080:344	You can hear another player's alarm here, but you cannot see who it is.
-src/lib/Island.svelte:154189:154232:string:1bg248t	src/lib/Island.svelte	string	string @ 3080:428	En spiller er tæt på, men uden for dit syn.
-src/lib/Island.svelte:154236:154280:string:la79s3	src/lib/Island.svelte	string	string @ 3080:475	A player is nearby, but outside your vision.
-src/lib/Island.svelte:154927:154930:string:ghfqyz	src/lib/Island.svelte	string	string @ 3087:79	Dig
-src/lib/Island.svelte:154934:154937:string:1efd4xo	src/lib/Island.svelte	string	string @ 3087:86	You
-src/lib/Island.svelte:154964:155024:string:1isf4o6	src/lib/Island.svelte	string	string @ 3087:116	Din karakter står her. Tryk på nabofelter for at bevæge dig.
-src/lib/Island.svelte:155028:155092:string:1bdiy91	src/lib/Island.svelte	string	string @ 3087:180	Your character is standing here. Tap neighboring fields to move.
-src/lib/Island.svelte:156176:156183:string:2syeav	src/lib/Island.svelte	string	string @ 3107:76	Afrejse
-src/lib/Island.svelte:156187:156196:string:nj6qdr	src/lib/Island.svelte	string	string @ 3107:87	Departure
-src/lib/Island.svelte:156223:156275:string:dmxfif	src/lib/Island.svelte	string	string @ 3107:123	Du er på vej væk fra øen. Om lidt ser du resultatet.
-src/lib/Island.svelte:156279:156339:string:rjalmq	src/lib/Island.svelte	string	string @ 3107:179	You are leaving the island. Your result will appear shortly.
-src/lib/Island.svelte:156447:156455:string:1g9a8ys	src/lib/Island.svelte	string	string @ 3108:65	Flugtbåd
-src/lib/Island.svelte:156459:156470:string:olkseo	src/lib/Island.svelte	string	string @ 3108:77	Escape boat
-src/lib/Island.svelte:159824:159842:string:ukgm6b	src/lib/Island.svelte	string	string @ 3169:45	rgb(255, 255, 255)
-src/lib/Island.svelte:161476:161500:string:l8eqzi	src/lib/Island.svelte	string	string @ 3196:62	rgba(192, 238, 78, 0.82)
-src/lib/Island.svelte:163744:163794:string:p8zves	src/lib/Island.svelte	string	string @ 3249:26	M18 18a6.5 6.5 0 0 1 12.2 3.2c0 5.8-6.2 5.5-6.2 11
-src/lib/Island.svelte:164371:164381:string:14ay7fm	src/lib/Island.svelte	string	string @ 3272:70	Startvideo
-src/lib/Island.svelte:164385:164396:string:1aze84	src/lib/Island.svelte	string	string @ 3272:84	Start video
-src/lib/Island.svelte:164464:164473:string:r4486o	src/lib/Island.svelte	string	string @ 3273:64	video/mp4
-src/lib/Island.svelte:164594:164599:string:3fah14	src/lib/Island.svelte	string	string @ 3277:25	Dag 1
-src/lib/Island.svelte:164603:164608:string:1cfg1oi	src/lib/Island.svelte	string	string @ 3277:34	Day 1
-src/lib/Island.svelte:165139:165148:string:13drgnf	src/lib/Island.svelte	string	string @ 3284:84	Gå i land
-src/lib/Island.svelte:165152:165161:string:ivpwzp	src/lib/Island.svelte	string	string @ 3284:97	Go ashore
-src/lib/Island.svelte:165854:165865:string:1fns23x	src/lib/Island.svelte	string	string @ 3297:64	Du slap væk
-src/lib/Island.svelte:165869:165880:string:19r7lh5	src/lib/Island.svelte	string	string @ 3297:79	You escaped
-src/lib/Island.svelte:165892:165899:string:6yv471	src/lib/Island.svelte	string	string @ 3297:102	Du døde
-src/lib/Island.svelte:165903:165911:string:ad5vzu	src/lib/Island.svelte	string	string @ 3297:113	You died
-src/lib/Island.svelte:166395:166406:string:7zj9hd	src/lib/Island.svelte	string	string @ 3307:55	Sluppet væk
-src/lib/Island.svelte:166410:166417:string:yze5eu	src/lib/Island.svelte	string	string @ 3307:70	Escaped
-src/lib/Island.svelte:166587:166590:string:ky5fgv	src/lib/Island.svelte	string	string @ 3307:247	Død
-src/lib/Island.svelte:166594:166598:string:7z6slj	src/lib/Island.svelte	string	string @ 3307:254	Dead
-src/lib/Island.svelte:166611:166618:string:ltt27n	src/lib/Island.svelte	string	string @ 3307:271	I tågen
-src/lib/Island.svelte:166622:166632:string:fo1h9p	src/lib/Island.svelte	string	string @ 3307:282	In the fog
-src/lib/Island.svelte:166748:166753:attribute:x9tsfp	src/lib/Island.svelte	attribute	title @ 3310:38	Score
-src/lib/Island.svelte:166814:166818:string:1qxrbj5	src/lib/Island.svelte	string	string @ 3311:45	Guld
-src/lib/Island.svelte:166822:166826:string:u4l1gz	src/lib/Island.svelte	string	string @ 3311:53	Gold
-src/lib/Island.svelte:167024:167041:string:1vbiydp	src/lib/Island.svelte	string	string @ 3317:87	Læs din fulde log
-src/lib/Island.svelte:167045:167063:string:1mbhznf	src/lib/Island.svelte	string	string @ 3317:108	Read your full log
-src/lib/Island.svelte:167121:167124:string:18wtqlt	src/lib/Island.svelte	string	string @ 3318:54	Log
-src/lib/Island.svelte:167128:167131:string:18wtqlt	src/lib/Island.svelte	string	string @ 3318:61	Log
-src/lib/Island.svelte:167164:167170:string:1obkoi7	src/lib/Island.svelte	string	string @ 3319:27	Logbog
-src/lib/Island.svelte:167174:167181:string:18rn4f8	src/lib/Island.svelte	string	string @ 3319:37	Logbook
-src/lib/Island.svelte:167367:167385:string:82ku5y	src/lib/Island.svelte	string	string @ 3323:21	Se point-fordeling
-src/lib/Island.svelte:167389:167408:string:542jh9	src/lib/Island.svelte	string	string @ 3323:43	See score breakdown
-src/lib/Island.svelte:167677:167683:string:1obkoi7	src/lib/Island.svelte	string	string @ 3332:25	Logbog
-src/lib/Island.svelte:167687:167694:string:18rn4f8	src/lib/Island.svelte	string	string @ 3332:35	Logbook
-src/lib/Island.svelte:167966:167969:string:1ej2e9v	src/lib/Island.svelte	string	string @ 3338:85	Luk
-src/lib/Island.svelte:167973:167978:string:1l0xxoj	src/lib/Island.svelte	string	string @ 3338:92	Close
-src/lib/Island.svelte:171854:171860:string:xlvu1w	src/lib/Island.svelte	string	string @ 3483:23	Cinzel
-src/lib/Island.svelte:173106:173112:string:xlvu1w	src/lib/Island.svelte	string	string @ 3533:23	Cinzel
-src/lib/Island.svelte:175599:175605:string:xlvu1w	src/lib/Island.svelte	string	string @ 3617:23	Cinzel
-src/lib/Island.svelte:178116:178122:string:xlvu1w	src/lib/Island.svelte	string	string @ 3704:23	Cinzel
-src/lib/Island.svelte:180245:180251:string:xlvu1w	src/lib/Island.svelte	string	string @ 3774:23	Cinzel
-src/lib/Island.svelte:182750:182756:string:xlvu1w	src/lib/Island.svelte	string	string @ 3834:23	Cinzel
-src/lib/Island.svelte:193866:193872:string:xlvu1w	src/lib/Island.svelte	string	string @ 4107:23	Cinzel
-src/lib/Island.svelte:195590:195596:string:xlvu1w	src/lib/Island.svelte	string	string @ 4139:72	Cinzel
-src/lib/Island.svelte:196032:196038:string:xlvu1w	src/lib/Island.svelte	string	string @ 4150:38	Cinzel
-src/lib/Island.svelte:197235:197241:string:xlvu1w	src/lib/Island.svelte	string	string @ 4167:37	Cinzel
-src/lib/Island.svelte:197911:197917:string:xlvu1w	src/lib/Island.svelte	string	string @ 4174:66	Cinzel
+src/lib/Island.svelte:113498:113505:string:1r6ct1o	src/lib/Island.svelte	string	string @ 2447:74	højland
+src/lib/Island.svelte:113543:113545:string:1liu8zy	src/lib/Island.svelte	string	string @ 2447:119	sø
+src/lib/Island.svelte:114357:114371:string:1hxexyz	src/lib/Island.svelte	string	string @ 2467:31	Skattekortspor
+src/lib/Island.svelte:114375:114392:string:1pvrzir	src/lib/Island.svelte	string	string @ 2467:49	Treasure map clue
+src/lib/Island.svelte:114447:114598:string:v648m4	src/lib/Island.svelte	string	string @ 2469:22	Et gammelt skattekort peger på området. Farven og krydset er et spor, ikke et udforsket felt. Kortet kan heller ikke vise, om kisten allerede er taget.
+src/lib/Island.svelte:114622:114783:string:1g24s7f	src/lib/Island.svelte	string	string @ 2470:22	An old treasure map points to this area. The color and cross are a clue, not an explored tile. The map also cannot show whether the chest has already been taken.
+src/lib/Island.svelte:114908:114919:string:ewfzfn	src/lib/Island.svelte	string	string @ 2477:31	Ukendt felt
+src/lib/Island.svelte:114923:114936:string:1qi1un9	src/lib/Island.svelte	string	string @ 2477:46	Unknown field
+src/lib/Island.svelte:114991:115100:string:1ejgc2t	src/lib/Island.svelte	string	string @ 2479:22	Du har ikke udforsket feltet endnu. Gå tættere på, eller brug en fakkel eller bedre udsyn til at afsløre det.
+src/lib/Island.svelte:115124:115219:string:1a3olri	src/lib/Island.svelte	string	string @ 2480:22	You have not explored this tile yet. Move closer, or use a torch or better vision to reveal it.
+src/lib/Island.svelte:115388:115416:string:1vkx7c1	src/lib/Island.svelte	string	string @ 2486:72	Du har udforsket dette felt.
+src/lib/Island.svelte:115420:115448:string:1jgge2b	src/lib/Island.svelte	string	string @ 2486:104	You have explored this tile.
+src/lib/Island.svelte:115494:115546:string:xcldud	src/lib/Island.svelte	string	string @ 2488:41	Tågen har taget feltet. Bliver du her, er du i fare.
+src/lib/Island.svelte:115550:115611:string:14xuh7x	src/lib/Island.svelte	string	string @ 2488:97	The fog has taken this tile. Staying here puts you in danger.
+src/lib/Island.svelte:115662:115760:string:vrwuat	src/lib/Island.svelte	string	string @ 2489:47	Vandet ødelægger almindelig rustning og kongepanser og slukker fakler. Elverrustning klarer turen.
+src/lib/Island.svelte:115764:115868:string:odlnu9	src/lib/Island.svelte	string	string @ 2489:149	The water destroys normal armor and royal armor and puts out torches. Elven armor survives the crossing.
+src/lib/Island.svelte:115919:115996:string:1ts441q	src/lib/Island.svelte	string	string @ 2490:47	Søer er indlandsvand. De er farlige uden båd, men de tæller ikke som havkyst.
+src/lib/Island.svelte:116000:116089:string:uba77k	src/lib/Island.svelte	string	string @ 2490:128	Lakes are inland water. They are dangerous without a boat, but do not count as sea coast.
+src/lib/Island.svelte:116141:116182:string:1agce0u	src/lib/Island.svelte	string	string @ 2491:48	Huler kan ødelægge soveposer og fint tøj.
+src/lib/Island.svelte:116186:116232:string:4drah4	src/lib/Island.svelte	string	string @ 2491:93	Caves can ruin sleeping bags and fine clothes.
+src/lib/Island.svelte:116284:116319:string:lal9ba	src/lib/Island.svelte	string	string @ 2492:48	I ruiner kan du miste en madration.
+src/lib/Island.svelte:116323:116359:string:1gc4bds	src/lib/Island.svelte	string	string @ 2492:87	You may lose a food ration in ruins.
+src/lib/Island.svelte:116414:116524:string:luycl5	src/lib/Island.svelte	string	string @ 2493:51	Krystaller ødelægger metaldetektorer og gyldne kikkerter. En malmviser bliver til en almindelig metaldetektor.
+src/lib/Island.svelte:116528:116630:string:m5djz2	src/lib/Island.svelte	string	string @ 2493:165	Crystals destroy metal detectors and golden spyglasses. An ore finder becomes a normal metal detector.
+src/lib/Island.svelte:116684:116772:string:1ivq4xt	src/lib/Island.svelte	string	string @ 2494:50	Ritualfelter kan ødelægge en søgekvist. En runekvist bliver til en almindelig søgekvist.
+src/lib/Island.svelte:116776:116856:string:19bq2yc	src/lib/Island.svelte	string	string @ 2494:142	Ritual tiles can destroy a dowsing rod. A rune rod becomes a normal dowsing rod.
+src/lib/Island.svelte:116993:117052:string:130kptj	src/lib/Island.svelte	string	string @ 2496:90	 : 'ligger en flugtbåd'} her. Går du ombord, har du vundet.
+src/lib/Island.svelte:117144:117196:string:1mqe54q	src/lib/Island.svelte	string	string @ 2497:90	 : 'There is an escape boat'} here. Board it to win.
+src/lib/Island.svelte:117276:117336:string:15janyh	src/lib/Island.svelte	string	string @ 2499:67	En hændelse venter her og starter, når du går ind på feltet.
+src/lib/Island.svelte:117340:117404:string:16vmk8j	src/lib/Island.svelte	string	string @ 2499:131	An encounter is waiting here and begins when you enter the tile.
+src/lib/Island.svelte:117460:117536:string:olzchl	src/lib/Island.svelte	string	string @ 2500:52	Feltet har en butik. Dagens varer deles af spillerne og genfyldes næste dag.
+src/lib/Island.svelte:117540:117625:string:96trn0	src/lib/Island.svelte	string	string @ 2500:132	This field has a shop. The daily stock is shared by players and refills the next day.
+src/lib/Island.svelte:117707:117830:string:1fkv75	src/lib/Island.svelte	string	string @ 2501:78	Feltet har et værksted, hvor udstyr kan opgraderes. Har du kølle eller murknuser, tør mesteren kun arbejde for dig én gang.
+src/lib/Island.svelte:117834:117971:string:cp8u8c	src/lib/Island.svelte	string	string @ 2501:205	This field has a workshop where equipment can be upgraded. If you have a club or wallbreaker, the master only dares to work for you once.
+src/lib/Island.svelte:118136:118159:string:163ge50	src/lib/Island.svelte	string	string @ 2502:161	Der er en guldmine her.
+src/lib/Island.svelte:118163:118189:string:j4c4td	src/lib/Island.svelte	string	string @ 2502:188	There is a gold mine here.
+src/lib/Island.svelte:118281:118313:string:1j8v6jh	src/lib/Island.svelte	string	string @ 2503:88	Portalen kan flytte dig mod øst.
+src/lib/Island.svelte:118317:118346:string:1l8hfw3	src/lib/Island.svelte	string	string @ 2503:124	The portal can move you east.
+src/lib/Island.svelte:118399:118496:string:1w6wuuy	src/lib/Island.svelte	string	string @ 2504:49	Tågeblokkeren holder tågen nede på niveau 1 omkring sig, også når resten af tågen bliver tungere.
+src/lib/Island.svelte:118500:118596:string:1a6j6p0	src/lib/Island.svelte	string	string @ 2504:150	The fog blocker keeps the fog at level 1 around it, even when the rest of the fog grows heavier.
+src/lib/Island.svelte:118668:118722:string:yvgsxt	src/lib/Island.svelte	string	string @ 2505:68	Farvelbåden viser, at en spiller slap væk fra øen her.
+src/lib/Island.svelte:118726:118788:string:1v2b5qa	src/lib/Island.svelte	string	string @ 2505:126	The farewell boat shows that a player escaped the island here.
+src/lib/Island.svelte:118835:118864:string:14vd33g	src/lib/Island.svelte	string	string @ 2506:43	Feltet er allerede gravet op.
+src/lib/Island.svelte:118868:118900:string:i5ct7t	src/lib/Island.svelte	string	string @ 2506:76	This field has already been dug.
+src/lib/Island.svelte:118955:118973:string:14pqax7	src/lib/Island.svelte	string	string @ 2507:51	Feltet kan graves.
+src/lib/Island.svelte:118977:118999:string:1c8ah7e	src/lib/Island.svelte	string	string @ 2507:73	This field can be dug.
+src/lib/Island.svelte:119034:119057:string:159q34d	src/lib/Island.svelte	string	string @ 2508:31	Feltet kan ikke graves.
+src/lib/Island.svelte:119061:119086:string:1jz91xp	src/lib/Island.svelte	string	string @ 2508:58	This field cannot be dug.
+src/lib/Island.svelte:121247:121264:string:102ooq4	src/lib/Island.svelte	string	string @ 2571:42	[data-help-title]
+src/lib/Island.svelte:121340:121351:string:ewfzfn	src/lib/Island.svelte	string	string @ 2572:51	Ukendt felt
+src/lib/Island.svelte:121355:121368:string:1qi1un9	src/lib/Island.svelte	string	string @ 2572:66	Unknown field
+src/lib/Island.svelte:121709:121714:string:yjnlk7	src/lib/Island.svelte	string	string @ 2584:57	Hjælp
+src/lib/Island.svelte:121718:121722:string:1f8350a	src/lib/Island.svelte	string	string @ 2584:66	Help
+src/lib/Island.svelte:121781:121841:string:wel0ap	src/lib/Island.svelte	string	string @ 2585:56	Tryk på et felt, ikon eller en knap for at få en forklaring.
+src/lib/Island.svelte:121845:121895:string:3yy9eq	src/lib/Island.svelte	string	string @ 2585:120	Tap a field, icon or button to get an explanation.
+src/lib/Island.svelte:125099:125134:string:1kfnata	src/lib/Island.svelte	string	string @ 2672:52	Øen svarer langsomt. Prøver igen...
+src/lib/Island.svelte:125138:125186:string:1xdu5h9	src/lib/Island.svelte	string	string @ 2672:91	The island is responding slowly. Trying again...
+src/lib/Island.svelte:128822:128836:string:o0zsq3	src/lib/Island.svelte	string	string @ 2785:27	Fokuser på dig
+src/lib/Island.svelte:128840:128852:string:kw2kf3	src/lib/Island.svelte	string	string @ 2785:45	Focus on you
+src/lib/Island.svelte:128887:128901:string:o0zsq3	src/lib/Island.svelte	string	string @ 2786:32	Fokuser på dig
+src/lib/Island.svelte:128905:128917:string:kw2kf3	src/lib/Island.svelte	string	string @ 2786:50	Focus on you
+src/lib/Island.svelte:129097:129127:string:il8x1	src/lib/Island.svelte	string	string @ 2790:26	M24 7v8M24 33v8M7 24h8M33 24h8
+src/lib/Island.svelte:129381:129396:string:1ez5279	src/lib/Island.svelte	string	string @ 2798:42	Slå hjælpen fra
+src/lib/Island.svelte:129400:129413:string:1fipu0w	src/lib/Island.svelte	string	string @ 2798:61	Turn help off
+src/lib/Island.svelte:129425:129440:string:1rcpmo3	src/lib/Island.svelte	string	string @ 2798:86	Slå hjælpen til
+src/lib/Island.svelte:129444:129456:string:1rq86ke	src/lib/Island.svelte	string	string @ 2798:105	Turn help on
+src/lib/Island.svelte:129506:129521:string:1ez5279	src/lib/Island.svelte	string	string @ 2799:47	Slå hjælpen fra
+src/lib/Island.svelte:129525:129538:string:1fipu0w	src/lib/Island.svelte	string	string @ 2799:66	Turn help off
+src/lib/Island.svelte:129550:129565:string:1rcpmo3	src/lib/Island.svelte	string	string @ 2799:91	Slå hjælpen til
+src/lib/Island.svelte:129569:129581:string:1rq86ke	src/lib/Island.svelte	string	string @ 2799:110	Turn help on
+src/lib/Island.svelte:129713:129763:string:p8zves	src/lib/Island.svelte	string	string @ 2802:26	M18 18a6.5 6.5 0 0 1 12.2 3.2c0 5.8-6.2 5.5-6.2 11
+src/lib/Island.svelte:130040:130044:string:r953rm	src/lib/Island.svelte	string	string @ 2810:58	Zoom
+src/lib/Island.svelte:130217:130225:string:94g213	src/lib/Island.svelte	string	string @ 2811:169	Zoom ind
+src/lib/Island.svelte:130229:130236:string:19blqjd	src/lib/Island.svelte	string	string @ 2811:181	Zoom in
+src/lib/Island.svelte:130420:130427:string:1jshihz	src/lib/Island.svelte	string	string @ 2812:170	Zoom ud
+src/lib/Island.svelte:130431:130439:string:110wpq2	src/lib/Island.svelte	string	string @ 2812:181	Zoom out
+src/lib/Island.svelte:130609:130617:string:11855xr	src/lib/Island.svelte	string	string @ 2819:33	Tutorial
+src/lib/Island.svelte:130621:130629:string:11855xr	src/lib/Island.svelte	string	string @ 2819:45	Tutorial
+src/lib/Island.svelte:130664:130755:string:ccl6d1	src/lib/Island.svelte	string	string @ 2820:32	Tutorialboksen viser din næste øvelse. Tutorialen påvirker ikke gemte spil eller toplister.
+src/lib/Island.svelte:130759:130859:string:195483o	src/lib/Island.svelte	string	string @ 2820:127	The tutorial box shows your next exercise. The tutorial does not affect saved games or leaderboards.
+src/lib/Island.svelte:135536:135544:string:1g9a8ys	src/lib/Island.svelte	string	string @ 2898:73	Flugtbåd
+src/lib/Island.svelte:135548:135559:string:olkseo	src/lib/Island.svelte	string	string @ 2898:85	Escape boat
+src/lib/Island.svelte:135621:135629:string:1g9a8ys	src/lib/Island.svelte	string	string @ 2898:158	Flugtbåd
+src/lib/Island.svelte:135633:135644:string:olkseo	src/lib/Island.svelte	string	string @ 2898:170	Escape boat
+src/lib/Island.svelte:135671:135747:string:s56lcy	src/lib/Island.svelte	string	string @ 2898:208	Gå ind på feltet, og tag båden væk fra øen. Hver båd kan kun bruges én gang.
+src/lib/Island.svelte:135751:135832:string:jv1iza	src/lib/Island.svelte	string	string @ 2898:288	Enter the tile and take the boat off the island. Each boat can only be used once.
+src/lib/Island.svelte:136935:136950:string:1jp9swl	src/lib/Island.svelte	string	string @ 2913:169	Ødelagt afgrøde
+src/lib/Island.svelte:136954:136965:string:3uzk9g	src/lib/Island.svelte	string	string @ 2913:188	Ruined crop
+src/lib/Island.svelte:136992:137051:string:1twg1w5	src/lib/Island.svelte	string	string @ 2913:226	Afgrøden er ødelagt og giver ikke længere mad eller heling.
+src/lib/Island.svelte:137055:137110:string:xh3ty9	src/lib/Island.svelte	string	string @ 2913:289	The crop is ruined and no longer gives food or healing.
+src/lib/Island.svelte:137396:137409:string:1hgaa4p	src/lib/Island.svelte	string	string @ 2916:168	Moden afgrøde
+src/lib/Island.svelte:137413:137422:string:13zjm17	src/lib/Island.svelte	string	string @ 2916:185	Ripe crop
+src/lib/Island.svelte:137449:137547:string:8xc7g8	src/lib/Island.svelte	string	string @ 2916:221	En moden afgrøde. Når du går ind på feltet, kan den give lidt HP, medmindre en insektplage rammer.
+src/lib/Island.svelte:137551:137646:string:4qy2mr	src/lib/Island.svelte	string	string @ 2916:323	A ripe crop. When you enter the field, it can give a little HP unless an insect plague strikes.
+src/lib/Island.svelte:137867:137883:string:6ey38d	src/lib/Island.svelte	string	string @ 2918:175	Voksende afgrøde
+src/lib/Island.svelte:137887:137899:string:1nes21o	src/lib/Island.svelte	string	string @ 2918:195	Growing crop
+src/lib/Island.svelte:137926:138014:string:1jix1u0	src/lib/Island.svelte	string	string @ 2918:234	Afgrøden er ikke moden endnu. Hvis du tramper gennem den for tidligt, bliver den skadet.
+src/lib/Island.svelte:138018:138095:string:jih241	src/lib/Island.svelte	string	string @ 2918:326	The crop is not ripe yet. If you trample through it too early, it is damaged.
+src/lib/Island.svelte:138458:138468:string:lra3st	src/lib/Island.svelte	string	string @ 2924:162	Meteorsten
+src/lib/Island.svelte:138472:138484:string:1ow59g8	src/lib/Island.svelte	string	string @ 2924:176	Meteor stone
+src/lib/Island.svelte:138511:138621:string:vh1ge	src/lib/Island.svelte	string	string @ 2924:215	Meteorstenen varsler en særlig hændelse med sin egen fare og belønning. Gå ind på feltet for at undersøge den.
+src/lib/Island.svelte:138625:138735:string:15y2bqg	src/lib/Island.svelte	string	string @ 2924:329	The meteor stone signals a special encounter with its own danger and reward. Enter the tile to investigate it.
+src/lib/Island.svelte:138962:138973:string:nq0znh	src/lib/Island.svelte	string	string @ 2928:113	Fog blocker
+src/lib/Island.svelte:139001:139012:string:8njl74	src/lib/Island.svelte	string	string @ 2928:152	Tågeblokker
+src/lib/Island.svelte:139016:139027:string:nq0znh	src/lib/Island.svelte	string	string @ 2928:167	Fog blocker
+src/lib/Island.svelte:139054:139143:string:1izznh1	src/lib/Island.svelte	string	string @ 2928:205	Holder tågen på det laveste niveau omkring sig, selv når den bliver tættere andre steder.
+src/lib/Island.svelte:139147:139231:string:1jbnnbo	src/lib/Island.svelte	string	string @ 2928:298	Keeps the surrounding fog at its lowest level, even when it grows thicker elsewhere.
+src/lib/Island.svelte:139430:139445:string:5metf8	src/lib/Island.svelte	string	string @ 2932:77	Jordskælvskryds
+src/lib/Island.svelte:139449:139464:string:1a183dt	src/lib/Island.svelte	string	string @ 2932:96	Earthquake mark
+src/lib/Island.svelte:139540:139555:string:5metf8	src/lib/Island.svelte	string	string @ 2932:187	Jordskælvskryds
+src/lib/Island.svelte:139559:139574:string:1a183dt	src/lib/Island.svelte	string	string @ 2932:206	Earthquake mark
+src/lib/Island.svelte:139601:139725:string:1u4azbp	src/lib/Island.svelte	string	string @ 2932:248	Jordskælvet har mærket dette nye bjergfelt. Ét af krydserne skjuler en kiste; de andre kan udløse farlige sammenstyrtninger.
+src/lib/Island.svelte:139729:139843:string:1thejj	src/lib/Island.svelte	string	string @ 2932:376	The earthquake marked this new mountain tile. One cross hides a chest; the others may trigger dangerous collapses.
+src/lib/Island.svelte:140286:140296:string:16d3o6g	src/lib/Island.svelte	string	string @ 2938:81	Mulig skat
+src/lib/Island.svelte:140300:140317:string:16ep6c3	src/lib/Island.svelte	string	string @ 2938:95	Possible treasure
+src/lib/Island.svelte:140372:140382:string:16d3o6g	src/lib/Island.svelte	string	string @ 2938:167	Mulig skat
+src/lib/Island.svelte:140386:140403:string:16ep6c3	src/lib/Island.svelte	string	string @ 2938:181	Possible treasure
+src/lib/Island.svelte:140430:140547:string:j6w9rt	src/lib/Island.svelte	string	string @ 2938:225	Skattekortet peger på dette område. Et af felterne kan gemme kisten, men kortet viser ikke, om den allerede er taget.
+src/lib/Island.svelte:140551:140684:string:1kzcvsh	src/lib/Island.svelte	string	string @ 2938:346	The treasure map points to this area. One of the tiles may hide the chest, but the map cannot show whether it has already been taken.
+src/lib/Island.svelte:140951:140959:string:cmohgv	src/lib/Island.svelte	string	string @ 2941:115	Guldspor
+src/lib/Island.svelte:140963:140973:string:xwurbe	src/lib/Island.svelte	string	string @ 2941:127	Gold trace
+src/lib/Island.svelte:141015:141144:string:7oc65	src/lib/Island.svelte	string	string @ 2941:179	Din malmviser mærker skjult guld på kendte felter op til tre felter væk. Grav her for at få guldet frem; malmviseren øger fundet.
+src/lib/Island.svelte:141148:141281:string:1c3k6cm	src/lib/Island.svelte	string	string @ 2941:312	Your ore finder senses hidden gold on known tiles up to three tiles away. Dig here to reveal it; the ore finder increases the amount.
+src/lib/Island.svelte:141293:141401:string:9ckw9u	src/lib/Island.svelte	string	string @ 2941:457	Din metaldetektor mærker skjult guld på kendte felter op til tre felter væk. Grav her for at få guldet frem.
+src/lib/Island.svelte:141405:141505:string:1vt4jwb	src/lib/Island.svelte	string	string @ 2941:569	Your metal detector senses hidden gold on known tiles up to three tiles away. Dig here to reveal it.
+src/lib/Island.svelte:141852:141859:string:1w9uu2s	src/lib/Island.svelte	string	string @ 2944:114	Rodspor
+src/lib/Island.svelte:141863:141873:string:1vmd4s	src/lib/Island.svelte	string	string @ 2944:125	Root trace
+src/lib/Island.svelte:141915:142054:string:ukpz1s	src/lib/Island.svelte	string	string @ 2944:177	Runekvisten mærker helende rødder på kendte felter op til tre felter væk. Mangler du HP, trækker den rødderne op, når du går ind på feltet.
+src/lib/Island.svelte:142058:142200:string:3d9c6z	src/lib/Island.svelte	string	string @ 2944:320	The rune rod senses healing roots on known tiles up to three tiles away. If you are missing HP, it pulls up the roots when you enter the tile.
+src/lib/Island.svelte:142212:142312:string:rfcjpm	src/lib/Island.svelte	string	string @ 2944:474	Søgekvisten mærker helende rødder på kendte felter op til tre felter væk. Grav her for at finde dem.
+src/lib/Island.svelte:142316:142414:string:1iuj3hy	src/lib/Island.svelte	string	string @ 2944:578	The dowsing rod senses healing roots on known tiles up to three tiles away. Dig here to find them.
+src/lib/Island.svelte:142762:142772:string:vhm5qk	src/lib/Island.svelte	string	string @ 2949:112	Udgravning
+src/lib/Island.svelte:142776:142784:string:q3va96	src/lib/Island.svelte	string	string @ 2949:126	Dig site
+src/lib/Island.svelte:142811:142888:string:1e9t5mx	src/lib/Island.svelte	string	string @ 2949:161	Feltet er allerede gravet op. Her er ingen skjulte fund eller fælder tilbage.
+src/lib/Island.svelte:142892:142959:string:1o1p452	src/lib/Island.svelte	string	string @ 2949:242	This tile has already been dug up. No hidden finds or traps remain.
+src/lib/Island.svelte:143140:143155:string:1sjt7wh	src/lib/Island.svelte	string	string @ 2953:79	Tom skattekiste
+src/lib/Island.svelte:143159:143179:string:1xf1if2	src/lib/Island.svelte	string	string @ 2953:98	Empty treasure chest
+src/lib/Island.svelte:143235:143250:string:1sjt7wh	src/lib/Island.svelte	string	string @ 2953:174	Tom skattekiste
+src/lib/Island.svelte:143254:143274:string:1xf1if2	src/lib/Island.svelte	string	string @ 2953:193	Empty treasure chest
+src/lib/Island.svelte:143301:143358:string:xafsyi	src/lib/Island.svelte	string	string @ 2953:240	Skatten er taget. Den tomme kiste viser kun, hvor den lå.
+src/lib/Island.svelte:143362:143429:string:1hr8a0w	src/lib/Island.svelte	string	string @ 2953:301	The treasure is gone. The empty chest only marks where it once lay.
+src/lib/Island.svelte:143638:143646:string:nrd0be	src/lib/Island.svelte	string	string @ 2957:85	Guldmine
+src/lib/Island.svelte:143650:143659:string:6rjpqq	src/lib/Island.svelte	string	string @ 2957:97	Gold mine
+src/lib/Island.svelte:143956:144039:string:1lj8f16	src/lib/Island.svelte	string	string @ 2957:403	Guldmine giver guld og score, når du overtager den. Besøg den igen for at låse den.
+src/lib/Island.svelte:144043:144125:string:wxdav4	src/lib/Island.svelte	string	string @ 2957:490	A gold mine gives gold and score when you take it over. Visit it again to lock it.
+src/lib/Island.svelte:144206:144214:string:nrd0be	src/lib/Island.svelte	string	string @ 2958:77	Guldmine
+src/lib/Island.svelte:144218:144227:string:6rjpqq	src/lib/Island.svelte	string	string @ 2958:89	Gold mine
+src/lib/Island.svelte:144620:144624:string:gbrtyh	src/lib/Island.svelte	string	string @ 2961:219	Ejer
+src/lib/Island.svelte:144628:144633:string:171lv90	src/lib/Island.svelte	string	string @ 2961:227	Owner
+src/lib/Island.svelte:144689:144700:string:bzk50v	src/lib/Island.svelte	string	string @ 2961:288	Minens ejer
+src/lib/Island.svelte:144704:144714:string:ao3tct	src/lib/Island.svelte	string	string @ 2961:303	Mine owner
+src/lib/Island.svelte:144967:144976:string:1d7oa4s	src/lib/Island.svelte	string	string @ 2963:93	Låst mine
+src/lib/Island.svelte:144980:144991:string:lkccuq	src/lib/Island.svelte	string	string @ 2963:106	Locked mine
+src/lib/Island.svelte:145018:145072:string:wczgt	src/lib/Island.svelte	string	string @ 2963:144	Minen er låst af ejeren og kan ikke overtages lige nu.
+src/lib/Island.svelte:145076:145143:string:1vwqmnq	src/lib/Island.svelte	string	string @ 2963:202	The mine is locked by the owner and cannot be taken over right now.
+src/lib/Island.svelte:145613:145620:string:2zkoz9	src/lib/Island.svelte	string	string @ 2972:118	Lejrbål
+src/lib/Island.svelte:145624:145632:string:1bwxzco	src/lib/Island.svelte	string	string @ 2972:129	Campfire
+src/lib/Island.svelte:145659:145754:string:1avm765	src/lib/Island.svelte	string	string @ 2972:164	Ved lejrbålet venter en hændelse eller et hvilested. Gå ind på feltet for at se, hvad der sker.
+src/lib/Island.svelte:145758:145849:string:1obryin	src/lib/Island.svelte	string	string @ 2972:263	An encounter or a place to rest awaits at the campfire. Enter the tile to see what happens.
+src/lib/Island.svelte:146039:146047:string:k5x9p8	src/lib/Island.svelte	string	string @ 2974:114	Hændelse
+src/lib/Island.svelte:146051:146060:string:1pvrtp6	src/lib/Island.svelte	string	string @ 2974:126	Encounter
+src/lib/Island.svelte:146087:146165:string:plkkp2	src/lib/Island.svelte	string	string @ 2974:162	Noget venter på dette felt. Når du går ind, møder du en situation med et valg.
+src/lib/Island.svelte:146169:146251:string:144v4yg	src/lib/Island.svelte	string	string @ 2974:244	Something is waiting on this tile. Enter it to face a situation and make a choice.
+src/lib/Island.svelte:146495:146501:string:1sof6az	src/lib/Island.svelte	string	string @ 2979:71	Portal
+src/lib/Island.svelte:146505:146511:string:1sof6az	src/lib/Island.svelte	string	string @ 2979:81	Portal
+src/lib/Island.svelte:146559:146565:string:1sof6az	src/lib/Island.svelte	string	string @ 2979:135	Portal
+src/lib/Island.svelte:146569:146575:string:1sof6az	src/lib/Island.svelte	string	string @ 2979:145	Portal
+src/lib/Island.svelte:146602:146712:string:1k3x2j9	src/lib/Island.svelte	string	string @ 2979:178	Portalen slynger dig 4, 5 eller 6 felter mod øst. Det, der venter på landingsfeltet, rammer dig med det samme.
+src/lib/Island.svelte:146716:146820:string:qixi6z	src/lib/Island.svelte	string	string @ 2979:292	The portal throws you 4, 5 or 6 tiles east. Whatever awaits on the landing tile affects you immediately.
+src/lib/Island.svelte:147235:147242:string:1poa9xb	src/lib/Island.svelte	string	string @ 2987:79	Bybutik
+src/lib/Island.svelte:147246:147255:string:nz0ftf	src/lib/Island.svelte	string	string @ 2987:90	Town shop
+src/lib/Island.svelte:147267:147273:string:1dr8mv5	src/lib/Island.svelte	string	string @ 2987:111	Marked
+src/lib/Island.svelte:147277:147283:string:19bezrl	src/lib/Island.svelte	string	string @ 2987:121	Market
+src/lib/Island.svelte:147342:147518:string:15sqw2	src/lib/Island.svelte	string	string @ 2988:56	Butikken sælger dagens varer for guld. Spillerne deles om varerne, og de faste varer kommer igen næste dag. Har du kølle eller murknuser, handler købmanden kun med dig én gang.
+src/lib/Island.svelte:147522:147704:string:1ccyl2o	src/lib/Island.svelte	string	string @ 2988:236	The shop sells today's goods for gold. Players share the goods, and the regular stock returns the next day. If you have a club or wallbreaker, the merchant only trades with you once.
+src/lib/Island.svelte:148219:148227:string:1vjzexo	src/lib/Island.svelte	string	string @ 2998:57	Værksted
+src/lib/Island.svelte:148231:148239:string:1qr5r8s	src/lib/Island.svelte	string	string @ 2998:69	Workshop
+src/lib/Island.svelte:148298:148444:string:fr8cld	src/lib/Island.svelte	string	string @ 2999:56	Værkstedet opgraderer dit udstyr og erstatter den gamle genstand med den nye. Har du kølle eller murknuser, arbejder mesteren kun for dig én gang.
+src/lib/Island.svelte:148448:148599:string:1lgsr0p	src/lib/Island.svelte	string	string @ 2999:206	The workshop upgrades your equipment and replaces the old item with the new one. If you have a club or wallbreaker, the master only works for you once.
+src/lib/Island.svelte:148839:148847:string:9uu0d1	src/lib/Island.svelte	string	string @ 3004:77	Indbrudt
+src/lib/Island.svelte:148851:148858:string:nrb710	src/lib/Island.svelte	string	string @ 3004:89	Burgled
+src/lib/Island.svelte:148886:148893:string:kqnw1v	src/lib/Island.svelte	string	string @ 3004:124	Indbrud
+src/lib/Island.svelte:148897:148905:string:1az7u5d	src/lib/Island.svelte	string	string @ 3004:135	Burglary
+src/lib/Island.svelte:148932:148982:string:82it15	src/lib/Island.svelte	string	string @ 3004:170	Låsen markerer, at der allerede har været indbrud.
+src/lib/Island.svelte:148986:149043:string:195liqw	src/lib/Island.svelte	string	string @ 3004:224	The lock shows that a burglary has already happened here.
+src/lib/Island.svelte:150032:150037:string:2vb9n6	src/lib/Island.svelte	string	string @ 3019:129	Dag ?
+src/lib/Island.svelte:150041:150046:string:1czf92g	src/lib/Island.svelte	string	string @ 3019:138	Day ?
+src/lib/Island.svelte:150611:150620:string:1hya4s0	src/lib/Island.svelte	string	string @ 3029:87	Farvelbåd
+src/lib/Island.svelte:150624:150637:string:1jwu4h9	src/lib/Island.svelte	string	string @ 3029:100	Farewell boat
+src/lib/Island.svelte:151136:151147:string:7zj9hd	src/lib/Island.svelte	string	string @ 3031:80	Sluppet væk
+src/lib/Island.svelte:151151:151158:string:yze5eu	src/lib/Island.svelte	string	string @ 3031:95	Escaped
+src/lib/Island.svelte:151994:152008:string:1gu3ci7	src/lib/Island.svelte	string	string @ 3043:103	Ukendt spiller
+src/lib/Island.svelte:152012:152026:string:1010o7e	src/lib/Island.svelte	string	string @ 3043:121	Unknown player
+src/lib/Island.svelte:152158:152231:string:okkl7h	src/lib/Island.svelte	string	string @ 3043:267	Du kan høre en anden spillers alarm her, men du kan ikke se, hvem det er.
+src/lib/Island.svelte:152235:152307:string:1snv7c	src/lib/Island.svelte	string	string @ 3043:344	You can hear another player's alarm here, but you cannot see who it is.
+src/lib/Island.svelte:152319:152362:string:1bg248t	src/lib/Island.svelte	string	string @ 3043:428	En spiller er tæt på, men uden for dit syn.
+src/lib/Island.svelte:152366:152410:string:la79s3	src/lib/Island.svelte	string	string @ 3043:475	A player is nearby, but outside your vision.
+src/lib/Island.svelte:153057:153060:string:ghfqyz	src/lib/Island.svelte	string	string @ 3050:79	Dig
+src/lib/Island.svelte:153064:153067:string:1efd4xo	src/lib/Island.svelte	string	string @ 3050:86	You
+src/lib/Island.svelte:153094:153154:string:1isf4o6	src/lib/Island.svelte	string	string @ 3050:116	Din karakter står her. Tryk på nabofelter for at bevæge dig.
+src/lib/Island.svelte:153158:153222:string:1bdiy91	src/lib/Island.svelte	string	string @ 3050:180	Your character is standing here. Tap neighboring fields to move.
+src/lib/Island.svelte:154306:154313:string:2syeav	src/lib/Island.svelte	string	string @ 3070:76	Afrejse
+src/lib/Island.svelte:154317:154326:string:nj6qdr	src/lib/Island.svelte	string	string @ 3070:87	Departure
+src/lib/Island.svelte:154353:154405:string:dmxfif	src/lib/Island.svelte	string	string @ 3070:123	Du er på vej væk fra øen. Om lidt ser du resultatet.
+src/lib/Island.svelte:154409:154469:string:rjalmq	src/lib/Island.svelte	string	string @ 3070:179	You are leaving the island. Your result will appear shortly.
+src/lib/Island.svelte:154577:154585:string:1g9a8ys	src/lib/Island.svelte	string	string @ 3071:65	Flugtbåd
+src/lib/Island.svelte:154589:154600:string:olkseo	src/lib/Island.svelte	string	string @ 3071:77	Escape boat
+src/lib/Island.svelte:157954:157972:string:ukgm6b	src/lib/Island.svelte	string	string @ 3132:45	rgb(255, 255, 255)
+src/lib/Island.svelte:159606:159630:string:l8eqzi	src/lib/Island.svelte	string	string @ 3159:62	rgba(192, 238, 78, 0.82)
+src/lib/Island.svelte:161874:161924:string:p8zves	src/lib/Island.svelte	string	string @ 3212:26	M18 18a6.5 6.5 0 0 1 12.2 3.2c0 5.8-6.2 5.5-6.2 11
+src/lib/Island.svelte:162501:162511:string:14ay7fm	src/lib/Island.svelte	string	string @ 3235:70	Startvideo
+src/lib/Island.svelte:162515:162526:string:1aze84	src/lib/Island.svelte	string	string @ 3235:84	Start video
+src/lib/Island.svelte:162594:162603:string:r4486o	src/lib/Island.svelte	string	string @ 3236:64	video/mp4
+src/lib/Island.svelte:162724:162729:string:3fah14	src/lib/Island.svelte	string	string @ 3240:25	Dag 1
+src/lib/Island.svelte:162733:162738:string:1cfg1oi	src/lib/Island.svelte	string	string @ 3240:34	Day 1
+src/lib/Island.svelte:163269:163278:string:13drgnf	src/lib/Island.svelte	string	string @ 3247:84	Gå i land
+src/lib/Island.svelte:163282:163291:string:ivpwzp	src/lib/Island.svelte	string	string @ 3247:97	Go ashore
+src/lib/Island.svelte:163984:163995:string:1fns23x	src/lib/Island.svelte	string	string @ 3260:64	Du slap væk
+src/lib/Island.svelte:163999:164010:string:19r7lh5	src/lib/Island.svelte	string	string @ 3260:79	You escaped
+src/lib/Island.svelte:164022:164029:string:6yv471	src/lib/Island.svelte	string	string @ 3260:102	Du døde
+src/lib/Island.svelte:164033:164041:string:ad5vzu	src/lib/Island.svelte	string	string @ 3260:113	You died
+src/lib/Island.svelte:164525:164536:string:7zj9hd	src/lib/Island.svelte	string	string @ 3270:55	Sluppet væk
+src/lib/Island.svelte:164540:164547:string:yze5eu	src/lib/Island.svelte	string	string @ 3270:70	Escaped
+src/lib/Island.svelte:164717:164720:string:ky5fgv	src/lib/Island.svelte	string	string @ 3270:247	Død
+src/lib/Island.svelte:164724:164728:string:7z6slj	src/lib/Island.svelte	string	string @ 3270:254	Dead
+src/lib/Island.svelte:164741:164748:string:ltt27n	src/lib/Island.svelte	string	string @ 3270:271	I tågen
+src/lib/Island.svelte:164752:164762:string:fo1h9p	src/lib/Island.svelte	string	string @ 3270:282	In the fog
+src/lib/Island.svelte:164878:164883:attribute:x9tsfp	src/lib/Island.svelte	attribute	title @ 3273:38	Score
+src/lib/Island.svelte:164944:164948:string:1qxrbj5	src/lib/Island.svelte	string	string @ 3274:45	Guld
+src/lib/Island.svelte:164952:164956:string:u4l1gz	src/lib/Island.svelte	string	string @ 3274:53	Gold
+src/lib/Island.svelte:165154:165171:string:1vbiydp	src/lib/Island.svelte	string	string @ 3280:87	Læs din fulde log
+src/lib/Island.svelte:165175:165193:string:1mbhznf	src/lib/Island.svelte	string	string @ 3280:108	Read your full log
+src/lib/Island.svelte:165251:165254:string:18wtqlt	src/lib/Island.svelte	string	string @ 3281:54	Log
+src/lib/Island.svelte:165258:165261:string:18wtqlt	src/lib/Island.svelte	string	string @ 3281:61	Log
+src/lib/Island.svelte:165294:165300:string:1obkoi7	src/lib/Island.svelte	string	string @ 3282:27	Logbog
+src/lib/Island.svelte:165304:165311:string:18rn4f8	src/lib/Island.svelte	string	string @ 3282:37	Logbook
+src/lib/Island.svelte:165497:165515:string:82ku5y	src/lib/Island.svelte	string	string @ 3286:21	Se point-fordeling
+src/lib/Island.svelte:165519:165538:string:542jh9	src/lib/Island.svelte	string	string @ 3286:43	See score breakdown
+src/lib/Island.svelte:165807:165813:string:1obkoi7	src/lib/Island.svelte	string	string @ 3295:25	Logbog
+src/lib/Island.svelte:165817:165824:string:18rn4f8	src/lib/Island.svelte	string	string @ 3295:35	Logbook
+src/lib/Island.svelte:166096:166099:string:1ej2e9v	src/lib/Island.svelte	string	string @ 3301:85	Luk
+src/lib/Island.svelte:166103:166108:string:1l0xxoj	src/lib/Island.svelte	string	string @ 3301:92	Close
+src/lib/Island.svelte:169984:169990:string:xlvu1w	src/lib/Island.svelte	string	string @ 3446:23	Cinzel
+src/lib/Island.svelte:171236:171242:string:xlvu1w	src/lib/Island.svelte	string	string @ 3496:23	Cinzel
+src/lib/Island.svelte:173729:173735:string:xlvu1w	src/lib/Island.svelte	string	string @ 3580:23	Cinzel
+src/lib/Island.svelte:176246:176252:string:xlvu1w	src/lib/Island.svelte	string	string @ 3667:23	Cinzel
+src/lib/Island.svelte:178375:178381:string:xlvu1w	src/lib/Island.svelte	string	string @ 3737:23	Cinzel
+src/lib/Island.svelte:180880:180886:string:xlvu1w	src/lib/Island.svelte	string	string @ 3797:23	Cinzel
+src/lib/Island.svelte:192283:192289:string:xlvu1w	src/lib/Island.svelte	string	string @ 4107:23	Cinzel
+src/lib/Island.svelte:194007:194013:string:xlvu1w	src/lib/Island.svelte	string	string @ 4139:72	Cinzel
+src/lib/Island.svelte:194449:194455:string:xlvu1w	src/lib/Island.svelte	string	string @ 4150:38	Cinzel
+src/lib/Island.svelte:195652:195658:string:xlvu1w	src/lib/Island.svelte	string	string @ 4167:37	Cinzel
+src/lib/Island.svelte:196328:196334:string:xlvu1w	src/lib/Island.svelte	string	string @ 4174:66	Cinzel
 src/lib/ShopModal.svelte:2073:2132:string:1r2vhjf	src/lib/ShopModal.svelte	string	string @ 43:26	Du har allerede en skovl. Den kan forbedres på et værksted.
 src/lib/ShopModal.svelte:2136:2196:string:1a93f47	src/lib/ShopModal.svelte	string	string @ 43:89	You already have a shovel. You can improve it at a workshop.
 src/lib/ShopModal.svelte:2282:2340:string:1gem9ss	src/lib/ShopModal.svelte	string	string @ 45:30	Du har allerede en stav. Den kan forbedres på et værksted.

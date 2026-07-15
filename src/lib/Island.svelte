@@ -2438,37 +2438,8 @@
         return [];
     }
 
-    function nyesteGravsten(felt: Felt) {
-        const liste = gravstenListeForFelt(felt);
-        return liste[liste.length - 1] || null;
-    }
-
-    function gravstenHjaelpetekst(felt: Felt) {
-        const liste = gravstenListeForFelt(felt);
-        if (liste.length === 0) return tekst('Gravstenen bliver stående som et minde på øen.', 'The gravestone remains on the island as a memorial.');
-
-        return [...liste]
-            .reverse()
-            .map((minde) => {
-                const dag = minde.dag > 0 ? tekst(`Dag ${minde.dag}`, `Day ${minde.dag}`) : tekst('Ukendt dag', 'Unknown day');
-                const mindeTekst = minde.tekst ? ` - ${minde.tekst}` : '';
-                return `${dag}: ${minde.navn}${mindeTekst}`;
-            })
-            .join('\n');
-    }
-
-    function visGravsten(e: MouseEvent, felt: Felt) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const liste = gravstenListeForFelt(felt);
-        const placering = placerInspectBoble(e.clientX, e.clientY);
-        inspectBoble = {
-            titel: liste.length > 1 ? tekst(`${liste.length} døde her`, `${liste.length} died here`) : tekst('Gravsten', 'Gravestone'),
-            tekst: gravstenHjaelpetekst(felt),
-            ...placering
-        };
-        inspectAktiv = false;
+    function senesteGravstenForFelt(felt: Felt) {
+        return [...gravstenListeForFelt(felt)].reverse().slice(0, 3);
     }
 
     function formaterBiomeNavn(biome: string | undefined) {
@@ -2531,9 +2502,6 @@
         if (felt.hasGoldmine) dele.push(felt.mineOwner ? tekst(`Guldminen ejes af ${felt.mineOwner}.`, `The gold mine is owned by ${felt.mineOwner}.`) : tekst('Der er en guldmine her.', 'There is a gold mine here.'));
         if (felt.hasPortal && !(felt.eventID && !felt.eventFuldført)) dele.push(tekst('Portalen kan flytte dig mod øst.', 'The portal can move you east.'));
         if (felt.taageBlokker) dele.push(tekst('Tågeblokkeren holder tågen nede på niveau 1 omkring sig, også når resten af tågen bliver tungere.', 'The fog blocker keeps the fog at level 1 around it, even when the rest of the fog grows heavier.'));
-        const gravstenListe = gravstenListeForFelt(felt);
-        if (gravstenListe.length > 1) dele.push(tekst(`Gravstenen viser, at ${gravstenListe.length} spillere døde her.`, `The gravestone shows that ${gravstenListe.length} players died here.`));
-        else if (gravstenListe.length === 1) dele.push(tekst('Gravstenen viser, at en spiller døde her.', 'The gravestone shows that a player died here.'));
         if (farvelBaadeForFelt(index).length > 0) dele.push(tekst('Farvelbåden viser, at en spiller slap væk fra øen her.', 'The farewell boat shows that a player escaped the island here.'));
         if (felt.gravet) dele.push(tekst('Feltet er allerede gravet op.', 'This field has already been dug.'));
         else if (felt.kanGraves) dele.push(tekst('Feltet kan graves.', 'This field can be dug.'));
@@ -3039,23 +3007,18 @@ function udførBevægelse(nytIndeks: number) {
                         {/if}
 
                         {#if erUdforsket && gravstenListeForFelt(felt).length > 0}
-                            {@const gravstenListe = gravstenListeForFelt(felt)}
-                            {@const gravsten = nyesteGravsten(felt)}
-                            <button
-                                type="button"
-                                class="gravsten-container"
-                                data-help-title={tekst('Gravsten', 'Gravestone')}
-                                data-help-body={gravstenHjaelpetekst(felt)}
-                                onclick={(e) => visGravsten(e, felt)}
-                            >
-                                <img src="/tiles/gravsted.webp" alt={tekst('Død', 'Dead')} class="gravsten-ikon" />
-                                {#if gravsten}
-                                    <img src={gravsten.ikon} alt={tekst('Faldet', 'Fallen')} class="gravsten-portraet" />
+                            {@const senesteGravsten = senesteGravstenForFelt(felt)}
+                            <div class="gravsten-lille">
+                                <img src="/tiles/gravsted.webp" alt="" class="gravsten-lille-ikon" />
+                                {#if senesteGravsten[0]}
+                                    <img src={senesteGravsten[0].ikon} alt="" class="gravsten-lille-portraet" />
                                 {/if}
-                                {#if gravstenListe.length > 1}
-                                    <span class="gravsten-count">{gravstenListe.length}</span>
-                                {/if}
-                            </button>
+                            </div>
+                            <div class="gravsten-tekster">
+                                {#each senesteGravsten as minde}
+                                    <span>{minde.navn}: {minde.dag > 0 ? tekst(`Dag ${minde.dag}`, `Day ${minde.dag}`) : tekst('Dag ?', 'Day ?')}</span>
+                                {/each}
+                            </div>
                         {/if}
                         
                         {#if erUdforsket}
@@ -3998,23 +3961,60 @@ function udførBevægelse(nytIndeks: number) {
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     
     .modstander-icon { position: absolute; top: 10px; z-index: 16; display: flex; justify-content: center; width: 100%; }
-    .gravsten-container {
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 46px; z-index: 13;
-        display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto;
-        height: 46px; border: 0; padding: 0; margin: 0; background: transparent; cursor: pointer;
+    .gravsten-lille {
+        position: absolute;
+        top: 56%;
+        left: 50%;
+        z-index: 13;
+        width: 46px;
+        height: 46px;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
     }
-    .gravsten-ikon { position: absolute; width: 100%; height: auto; z-index: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
-    .gravsten-portraet {
-        position: relative; z-index: 2; width: 29px; margin-top: -6px;
-        filter: grayscale(100%) sepia(10%) brightness(0.6) contrast(1.2); opacity: 0.85;
+    .gravsten-lille-ikon {
+        position: absolute;
+        z-index: 1;
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.85));
     }
-    .gravsten-count {
-        position: absolute; right: 1px; bottom: 0; z-index: 3;
-        min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box;
-        display: inline-flex; align-items: center; justify-content: center;
-        border-radius: 999px; background: rgba(20, 20, 20, 0.88); color: #f1f1f1;
-        font-size: 0.64rem; font-weight: 800; line-height: 1;
-        border: 1px solid rgba(255, 255, 255, 0.5);
+    .gravsten-lille-portraet {
+        position: relative;
+        z-index: 2;
+        width: 29px;
+        height: auto;
+        margin-top: -6px;
+        opacity: 0.85;
+        filter: grayscale(100%) sepia(10%) brightness(0.6) contrast(1.2);
+    }
+    .gravsten-tekster {
+        position: absolute;
+        top: 22px;
+        left: 50%;
+        z-index: 18;
+        width: 84px;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        pointer-events: none;
+        color: #fff;
+        font-size: 0.58rem;
+        font-weight: 800;
+        line-height: 1.15;
+        text-align: center;
+        text-shadow: 0 1px 2px #000, 0 0 4px #000;
+    }
+    .gravsten-tekster span {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .farvel-baade-container {
