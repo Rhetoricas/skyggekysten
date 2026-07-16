@@ -1893,9 +1893,10 @@
 
                 {#if valgtHighscore.henterDetaljer}
                     <p class="highscore-detail-note">{tekst('Henter opgørelse...', 'Loading breakdown...')}</p>
-                {:else if valgtHighscore.oeNulstillet}
-                    <p class="highscore-detail-note">{tekst('Alle øer blev nulstillet den 17/7 kl. 02. Denne score er fra før nulstillingen.', 'All islands were reset on 17 July at 02:00. This score is from before the reset.')}</p>
                 {:else if harHighscoreDetaljer(valgtHighscore)}
+                    {#if valgtHighscore.oeNulstillet}
+                        <p class="highscore-detail-note">{tekst('Alle øer blev nulstillet den 17/7 kl. 02. Denne score er fra før nulstillingen.', 'All islands were reset on 17 July at 02:00. This score is from before the reset.')}</p>
+                    {/if}
                     {@const miniRute = highscoreMiniRute(valgtHighscore)}
                     {#if highscoreTrofaeer(valgtHighscore).length > 0}
                         <section class="highscore-detail-trofaeer" aria-label={tekst('Trofæmedaljer opnået i dette spil', 'Trophy medals earned in this run')}>
