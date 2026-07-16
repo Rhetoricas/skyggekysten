@@ -1,5 +1,5 @@
 import { spilTilstand } from './spilTilstand.svelte';
-import { STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
+import { KORT_VERSION, STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 import { taelScoreSpillere } from './score';
 import type { Karakter } from './types';
 import { hentKarakterNavneIKlasse } from './spildata';
@@ -27,6 +27,7 @@ export interface OfflineScore {
 
 interface OfflineSnapshot {
     version: 1 | 2;
+    kortVersion?: number;
     savedAt: string;
     spillerNavn: string;
     rumKode: string;
@@ -70,7 +71,18 @@ function harLocalStorage() {
 
 export function harOfflineSpil() {
     if (!harLocalStorage()) return false;
-    return !!localStorage.getItem(OFFLINE_GAME_KEY);
+    const gemt = localStorage.getItem(OFFLINE_GAME_KEY);
+    if (!gemt) return false;
+
+    try {
+        const data = JSON.parse(gemt) as OfflineSnapshot;
+        if (data.kortVersion === KORT_VERSION) return true;
+    } catch {
+        // En ulæselig gemning kan ikke fortsættes sikkert.
+    }
+
+    localStorage.removeItem(OFFLINE_GAME_KEY);
+    return false;
 }
 
 export function hentOfflineSpilInfo() {
@@ -80,6 +92,7 @@ export function hentOfflineSpilInfo() {
         const gemt = localStorage.getItem(OFFLINE_GAME_KEY);
         if (!gemt) return null;
         const data = JSON.parse(gemt) as OfflineSnapshot;
+        if (data.kortVersion !== KORT_VERSION) return null;
         return {
             spillerNavn: data.spillerNavn,
             rumKode: data.rumKode,
@@ -99,6 +112,7 @@ export function gemOfflineSpil() {
 
     const snapshot: OfflineSnapshot = {
         version: 2,
+        kortVersion: KORT_VERSION,
         savedAt: new Date().toISOString(),
         spillerNavn: spilTilstand.spillerNavn,
         rumKode: spilTilstand.rumKode,
@@ -146,6 +160,10 @@ export function indlaesOfflineSpil() {
         const gemt = localStorage.getItem(OFFLINE_GAME_KEY);
         if (!gemt) return false;
         const data = JSON.parse(gemt) as OfflineSnapshot;
+        if (data.kortVersion !== KORT_VERSION) {
+            localStorage.removeItem(OFFLINE_GAME_KEY);
+            return false;
+        }
 
         spilTilstand.offlineMode = true;
         spilTilstand.gameMode = data.gameMode === 'open' ? 'open' : 'offline';

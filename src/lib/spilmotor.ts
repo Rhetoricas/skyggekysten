@@ -2539,6 +2539,9 @@ export function initialiserGitter(breddeInput?: number | null, hoejdeInput?: num
         felt.grundEvent = felt.eventID;
         felt.grundIsCampfire = !!felt.isCampfire;
         felt.grundHasWorkshop = !!felt.hasWorkshop;
+        felt.grundHasGoldmine = !!felt.hasGoldmine;
+        felt.grundHasPortal = !!felt.hasPortal;
+        felt.grundAfgroede = felt.afgroede;
         felt.grundShopItems = felt.shopItems ? [...felt.shopItems] : undefined;
         felt.grundShopBasisItems = felt.shopBasisItems ? [...felt.shopBasisItems] : undefined;
     }
@@ -3188,6 +3191,9 @@ export function nulstilKort() {
         felt.hasMeteorStone = false;
         felt.taagenHoldtTilDag = undefined;
         felt.taageBlokker = undefined;
+        felt.katastrofeFraBiome = undefined;
+        felt.katastrofeVisuelAktiv = undefined;
+        felt.katastrofeVisuelId = undefined;
 
         if (felt.grundBiome) {
             const grundIsCampfire = felt.grundIsCampfire ?? (felt.grundEvent === 'campfire' || !!felt.isCampfire);
@@ -3203,6 +3209,9 @@ export function nulstilKort() {
             felt.eventID = felt.grundEvent;
             felt.isCampfire = grundIsCampfire;
             felt.hasWorkshop = grundHasWorkshop;
+            felt.hasGoldmine = !!felt.grundHasGoldmine;
+            felt.hasPortal = !!felt.grundHasPortal;
+            felt.afgroede = felt.grundAfgroede;
 
             if (grundShopBasisItems && grundShopBasisItems.length > 0) {
                 felt.shopBasisItems = [...grundShopBasisItems];
@@ -3215,6 +3224,7 @@ export function nulstilKort() {
             }
             
             const hemmeligheder = genererUndergrund(felt.grundBiome as string);
+            felt.kanGraves = hemmeligheder.kanGraves;
             felt.skjultGuld = hemmeligheder.skjultGuld;
             felt.skjultLiv = hemmeligheder.skjultLiv;
             felt.skjultFaelde = hemmeligheder.skjultFaelde;

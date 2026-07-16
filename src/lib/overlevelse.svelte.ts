@@ -120,7 +120,7 @@ function tilfoejGravsten(felt: Felt, mindeTekst: string) {
         tekst: mindeTekst
     };
 
-    felt.gravstenListe = [...eksisterende, minde];
+    felt.gravstenListe = [...eksisterende, minde].slice(-3);
     felt.gravstenIkon = minde.ikon;
 }
 

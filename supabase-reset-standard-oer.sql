@@ -1,68 +1,112 @@
--- Reset af standardøer efter motor-/kortændringer.
+-- Hård overgang til kortversion 2.
 --
--- Hvad scriptet gør:
--- 1. Gemmer en let backup af de øer og scores, der slettes.
--- 2. Sletter scores i game_results for de berørte øer.
--- 3. Sletter ø-sessionerne i spil_sessioner, så de bliver genskabt med ny motor,
---    nye kortmål og ny generator næste gang øen åbnes.
+-- Kør dette script i Supabase SQL-editoren umiddelbart FØR version 2 af
+-- klienten deployes. I det korte mellemrum vil gamle klienter ikke kunne gemme.
+-- Eksisterende ø-sessioner og aktive ture slettes. Øerne bliver genereret
+-- igen, når de næste gang besøges.
 --
--- Sikkerhed:
--- Scriptet stopper, hvis der ligger mere end 64 øer i spil_sessioner.
--- Hvis du har flere end 64 rækker og kun vil resettes bestemte øer,
--- så skal delete/backup-filtrene ændres til en eksplicit liste af rum_kode.
---
--- Denne version bruger ingen temp-tabeller, fordi Supabase SQL-editorens
--- RLS-flow kan køre statements på en måde, hvor temp-tabeller forsvinder.
+-- Bevares urørt:
+-- - resultater og highscores i public.game_results (rutesporene nulstilles)
+-- - public.profiles
+-- - login, trofæer og øvrige tabeller
 
 begin;
 
+create table if not exists public.kort_migrationer (
+    kort_version integer primary key,
+    udfoert_tidspunkt timestamptz not null default now()
+);
+
+alter table public.kort_migrationer enable row level security;
+
 do $$
-declare
-    antal_oer integer;
 begin
-    select count(*) into antal_oer
-    from public.spil_sessioner;
-
-    if antal_oer = 0 then
-        raise exception 'Ingen øer fundet i public.spil_sessioner.';
+    if exists (
+        select 1
+        from public.kort_migrationer
+        where kort_version = 2
+    ) then
+        raise exception 'Kortversion 2-reset er allerede udført. Scriptet stopper uden at slette noget.';
     end if;
+end;
+$$;
 
-    if antal_oer > 64 then
-        raise exception 'Stopper: % øer matcher. Brug en eksplicit liste, hvis kun de 64 standardøer skal resettes.', antal_oer;
-    end if;
-end $$;
+alter table public.spil_sessioner
+    add column if not exists kort_version integer not null default 2;
 
-create table if not exists public.reset_backup_spil_sessioner as
-select now() as backup_tidspunkt, s.*
-from public.spil_sessioner s
-where false;
+alter table public.spil_sessioner
+    alter column kort_version set default 2;
 
-create table if not exists public.reset_backup_game_results as
-select now() as backup_tidspunkt, g.*
-from public.game_results g
-where false;
+create table if not exists public.kort_v2_reset_backup (
+    id bigint generated always as identity primary key,
+    backup_tidspunkt timestamptz not null default now(),
+    row_data jsonb not null
+);
 
-alter table public.reset_backup_spil_sessioner enable row level security;
-alter table public.reset_backup_game_results enable row level security;
+alter table public.kort_v2_reset_backup enable row level security;
 
-insert into public.reset_backup_spil_sessioner
-select now() as backup_tidspunkt, s.*
+insert into public.kort_v2_reset_backup (row_data)
+select to_jsonb(s)
 from public.spil_sessioner s;
 
-insert into public.reset_backup_game_results
-select now() as backup_tidspunkt, g.*
-from public.game_results g
-where g.room_code in (
-    select s.rum_kode
-    from public.spil_sessioner s
-);
-
-delete from public.game_results g
-where g.room_code in (
-    select s.rum_kode
-    from public.spil_sessioner s
-);
-
 delete from public.spil_sessioner;
+
+-- Gamle ruteindekser tilhører de slettede kort. Scorerne bevares, men
+-- rutetegningerne fjernes. DO-blokken virker også på installationer, hvor
+-- de valgfrie rutekolonner endnu ikke er oprettet.
+do $$
+begin
+    if exists (
+        select 1 from information_schema.columns
+        where table_schema = 'public' and table_name = 'game_results' and column_name = 'route_indices'
+    ) then
+        execute 'update public.game_results set route_indices = null';
+    end if;
+
+    if exists (
+        select 1 from information_schema.columns
+        where table_schema = 'public' and table_name = 'game_results' and column_name = 'route_width'
+    ) then
+        execute 'update public.game_results set route_width = null';
+    end if;
+
+    if exists (
+        select 1 from information_schema.columns
+        where table_schema = 'public' and table_name = 'game_results' and column_name = 'route_height'
+    ) then
+        execute 'update public.game_results set route_height = null';
+    end if;
+end;
+$$;
+
+alter table public.spil_sessioner
+    drop constraint if exists spil_sessioner_kort_version_minimum;
+
+alter table public.spil_sessioner
+    add constraint spil_sessioner_kort_version_minimum
+    check (kort_version >= 2);
+
+create or replace function public.forhindr_kort_version_nedgradering()
+returns trigger
+language plpgsql
+as $$
+begin
+    if new.kort_version < old.kort_version then
+        raise exception 'Kortversion kan ikke nedgraderes fra % til %', old.kort_version, new.kort_version;
+    end if;
+    return new;
+end;
+$$;
+
+drop trigger if exists spil_sessioner_forhindr_kort_version_nedgradering
+    on public.spil_sessioner;
+
+create trigger spil_sessioner_forhindr_kort_version_nedgradering
+before update on public.spil_sessioner
+for each row
+execute function public.forhindr_kort_version_nedgradering();
+
+insert into public.kort_migrationer (kort_version)
+values (2);
 
 commit;

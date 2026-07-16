@@ -4,12 +4,12 @@
 alter table public.spil_sessioner
     add column if not exists kort_bredde integer not null default 100,
     add column if not exists kort_hoejde integer not null default 20,
-    add column if not exists kort_version integer not null default 1;
+    add column if not exists kort_version integer not null default 2;
 
 alter table public.spil_sessioner
     alter column kort_bredde set default 100,
     alter column kort_hoejde set default 20,
-    alter column kort_version set default 1;
+    alter column kort_version set default 2;
 
 do $$
 begin

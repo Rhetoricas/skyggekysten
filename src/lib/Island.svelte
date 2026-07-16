@@ -755,7 +755,23 @@
     function ruteArkivStorageNoegle(navn = spilTilstand.spillerNavn, rumKode = spilTilstand.rumKode) {
         const oeNoegle = encodeURIComponent((rumKode || '').trim().toLowerCase() || 'oe');
         const spillerNoegle = encodeURIComponent(ruteArkivNoegle(navn) || 'spiller');
-        return `${RUTE_ARKIV_STORAGE_PREFIX}:${oeNoegle}:${spillerNoegle}`;
+        return `${RUTE_ARKIV_STORAGE_PREFIX}:v${KORT_VERSION}:${oeNoegle}:${spillerNoegle}`;
+    }
+
+    function rydForaeldedeRuteArkiver() {
+        if (!browser) return;
+        const alleRuteNoegler: string[] = [];
+        const aktuelPrefix = `${RUTE_ARKIV_STORAGE_PREFIX}:v${KORT_VERSION}:`;
+        const enhverRutePrefix = `${RUTE_ARKIV_STORAGE_PREFIX}:`;
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const noegle = localStorage.key(i);
+            if (noegle?.startsWith(enhverRutePrefix) && !noegle.startsWith(aktuelPrefix)) {
+                alleRuteNoegler.push(noegle);
+            }
+        }
+
+        for (const noegle of alleRuteNoegler) localStorage.removeItem(noegle);
     }
 
     function ruteSignatur(rute: number[]) {
@@ -1214,11 +1230,76 @@
             .subscribe();
 
         try {
-            const { data, error } = await hentSpilSession(spilTilstand.rumKode);
+            const { data: hentetData, error } = await hentSpilSession(spilTilstand.rumKode);
             if (error) {
                 console.error("Netværksfejl:", error);
                 spilTilstand.statusBesked = tekst('Forbindelsen til øen mislykkedes. Tjek forbindelsen, og prøv igen om lidt.', 'The connection to the island failed. Check your connection and try again in a moment.');
                 return;
+            }
+
+            let data = hentetData;
+            if (data && Number(data.kort_version || 1) !== KORT_VERSION) {
+                const gammelKortVersion = Number(data.kort_version || 1);
+                if (gammelKortVersion > KORT_VERSION) {
+                    spilTilstand.statusBesked = tekst(
+                        'Spillet er blevet opdateret. Genindlæs siden for at besøge øen.',
+                        'The game has been updated. Reload the page to visit the island.'
+                    );
+                    return;
+                }
+
+                const dimensioner = vaelgStandardKortDimensioner();
+                saetKortDimensioner(dimensioner.bredde, dimensioner.hoejde);
+                spilTilstand.alleSpillere = {};
+                spilTilstand.fogX = 0;
+                initialiserGitter(spilTilstand.kortBredde, spilTilstand.kortHoejde);
+
+                const nytKort = spilTilstand.gitter;
+                const nytStartIndex = spilTilstand.spillerIndex;
+                const { error: versionsError, count } = await medRetry(() => medTimeout(
+                    supabase
+                        .from('spil_sessioner')
+                        .update({
+                            kort: nytKort,
+                            start_index: nytStartIndex,
+                            spillere: {},
+                            fog_x: 0,
+                            ...kortSessionMeta()
+                        }, { count: 'exact' })
+                        .eq('rum_kode', spilTilstand.rumKode)
+                        .eq('kort_version', gammelKortVersion)
+                ));
+
+                if (versionsError) {
+                    spilTilstand.statusBesked = tekst(
+                        'Øen kunne ikke opdateres til den nye kortversion. Prøv igen om lidt.',
+                        'The island could not be updated to the new map version. Try again shortly.'
+                    );
+                    return;
+                }
+
+                if (count === 0) {
+                    const { data: samtidigtOpdateret, error: genhentError } = await hentSpilSession(spilTilstand.rumKode);
+                    if (genhentError || !samtidigtOpdateret || Number(samtidigtOpdateret.kort_version) !== KORT_VERSION) {
+                        spilTilstand.statusBesked = tekst(
+                            'Øen blev opdateret fra en anden enhed. Prøv at forbinde igen.',
+                            'The island was updated from another device. Try connecting again.'
+                        );
+                        return;
+                    }
+                    data = samtidigtOpdateret;
+                } else {
+                    data = {
+                        ...data,
+                        kort: nytKort,
+                        start_index: nytStartIndex,
+                        spillere: {},
+                        fog_x: 0,
+                        kort_bredde: spilTilstand.kortBredde,
+                        kort_hoejde: spilTilstand.kortHoejde,
+                        kort_version: KORT_VERSION
+                    };
+                }
             }
 
             if (data) {
@@ -1675,6 +1756,7 @@
         initSprog();
         initAuth();
         preloadFiler();
+        rydForaeldedeRuteArkiver();
         let genopretterForbindelse = false;
         let sidstGenopfrisketVedFokus = 0;
         const pendingStart = laesPendingStart();

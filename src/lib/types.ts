@@ -155,6 +155,9 @@ export interface Felt {
     grundEvent?: string;
     grundIsCampfire?: boolean;
     grundHasWorkshop?: boolean;
+    grundHasGoldmine?: boolean;
+    grundHasPortal?: boolean;
+    grundAfgroede?: 'hvede' | 'boenner';
     grundShopItems?: string[];
     grundShopBasisItems?: string[];
     katastrofeFraBiome?: string | Biome;

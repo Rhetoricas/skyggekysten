@@ -1,6 +1,6 @@
 export const STANDARD_KORT_BREDDE = 100;
 export const STANDARD_KORT_HOEJDE = 20;
-export const KORT_VERSION = 1;
+export const KORT_VERSION = 2;
 export const STANDARD_KORT_BREDDE_MIN = 100;
 export const STANDARD_KORT_BREDDE_MAX = 110;
 export const STANDARD_KORT_HOEJDE_MIN = 20;

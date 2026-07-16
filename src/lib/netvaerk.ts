@@ -29,7 +29,7 @@ export function realtimeRumNoegle(rumKode: string) {
     }
 
     const laesbarDel = normaliseret.replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '').slice(0, 24) || 'oe';
-    return `${laesbarDel}_${(hash >>> 0).toString(36)}`;
+    return `${laesbarDel}_${(hash >>> 0).toString(36)}_v${KORT_VERSION}`;
 }
 
 type ScoreRaekke = {
@@ -495,7 +495,7 @@ async function udfoerDbUpload(sendKort: boolean) {
     const { data: aktuelSession, error: hentError } = await medTimeout(
         supabase
             .from('spil_sessioner')
-            .select('spillere')
+            .select('spillere,kort_version')
             .eq('rum_kode', aktivRumKode)
             .maybeSingle(),
         12000,
@@ -507,6 +507,14 @@ async function udfoerDbUpload(sendKort: boolean) {
         spilTilstand.statusBesked = tekst(
             'Øen blev ikke gemt. Tjek forbindelsen, og prøv igen om lidt.',
             'The island was not saved. Check your connection and try again in a moment.'
+        );
+        return false;
+    }
+
+    if (Number(aktuelSession?.kort_version) !== KORT_VERSION) {
+        spilTilstand.statusBesked = tekst(
+            'Spillet er blevet opdateret. Genindlæs siden, før du fortsætter.',
+            'The game has been updated. Reload the page before continuing.'
         );
         return false;
     }
@@ -539,7 +547,8 @@ async function udfoerDbUpload(sendKort: boolean) {
         supabase
             .from('spil_sessioner')
             .update(opdatering, { count: 'exact' })
-            .eq('rum_kode', aktivRumKode),
+            .eq('rum_kode', aktivRumKode)
+            .eq('kort_version', KORT_VERSION),
         12000,
         'Gemning af øen'
     );
@@ -720,7 +729,7 @@ export async function gemAfsluttetSpillerISession() {
     const { data, error: hentError } = await medTimeout(
         supabase
             .from('spil_sessioner')
-            .select('spillere')
+            .select('spillere,kort_version')
             .eq('rum_kode', aktivRumKode)
             .maybeSingle(),
         12000,
@@ -729,6 +738,11 @@ export async function gemAfsluttetSpillerISession() {
 
     if (hentError) {
         console.error('Kunne ikke hente ø-session ved afslutning', hentError);
+        return false;
+    }
+
+    if (Number(data?.kort_version) !== KORT_VERSION) {
+        console.error('Kunne ikke gemme afsluttet spiller: kortversionen matcher ikke klienten');
         return false;
     }
 
@@ -749,7 +763,8 @@ export async function gemAfsluttetSpillerISession() {
                 kort_hoejde: spilTilstand.kortHoejde,
                 kort_version: KORT_VERSION
             })
-            .eq('rum_kode', aktivRumKode),
+            .eq('rum_kode', aktivRumKode)
+            .eq('kort_version', KORT_VERSION),
         12000,
         'Gemning af afsluttet spiller'
     ).catch((error) => ({ error }));
