@@ -48,7 +48,7 @@
     type OffentligProfilMedalje = { id?: string; sti: string; label: string; labelEn?: string; mytisk?: boolean; opnaaet?: boolean; bedste?: boolean; krav?: string; kravEn?: string; mytiskKrav?: string; mytiskKravEn?: string; episkTekst?: string; episkTekstEn?: string; award?: TrofaeAward | null };
     type OffentligSpillerProfil = { navn: string; userId?: string; profilKarakterId?: string; profilTitelScore?: number; scores: GlobalScore[]; trofaeer: OffentligProfilMedalje[]; henter: boolean };
     const HIGHSCORE_DRILLDOWN_ANTAL = 3;
-    const OE_RESET_TIDSPUNKT = Date.parse('2026-07-17T00:00:00+02:00');
+    const OE_RESET_TIDSPUNKT = Date.parse('2026-07-17T02:00:00+02:00');
     const PROFIL_BEDSTE_SCORE_PREFIX = 'taage_profile_best_score:';
     const ER_ITCH_BUILD = __ITCH_BUILD__;
     const LIVE_APP_URL = __LIVE_APP_URL__;
@@ -1894,7 +1894,7 @@
                 {#if valgtHighscore.henterDetaljer}
                     <p class="highscore-detail-note">{tekst('Henter opgørelse...', 'Loading breakdown...')}</p>
                 {:else if valgtHighscore.oeNulstillet}
-                    <p class="highscore-detail-note">{tekst('Alle øer blev nulstillet den 17/7. Denne score er fra før nulstillingen.', 'All islands were reset on 17 July. This score is from before the reset.')}</p>
+                    <p class="highscore-detail-note">{tekst('Alle øer blev nulstillet den 17/7 kl. 02. Denne score er fra før nulstillingen.', 'All islands were reset on 17 July at 02:00. This score is from before the reset.')}</p>
                 {:else if harHighscoreDetaljer(valgtHighscore)}
                     {@const miniRute = highscoreMiniRute(valgtHighscore)}
                     {#if highscoreTrofaeer(valgtHighscore).length > 0}
