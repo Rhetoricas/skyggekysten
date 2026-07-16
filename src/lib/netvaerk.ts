@@ -55,6 +55,7 @@ type ScoreRaekke = {
     route_width?: number | null;
     route_height?: number | null;
     trophy_stats?: Record<string, unknown> | null;
+    created_at?: string;
 };
 
 type HighscorePayload = {
@@ -1206,16 +1207,20 @@ export async function hentOffentligProfil(userId: string | null | undefined) {
 export async function hentHighscoreDetaljer(id: number) {
     if (spilTilstand.offlineMode) return null;
 
-    let { data, error }: { data: any; error: any } = await supabase
-        .from('game_results')
-        .select('is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count, final_log, medal_path, medal_level, route_indices, route_width, route_height, trophy_stats')
-        .eq('id', id)
-        .single();
+    let { data, error }: { data: any; error: any } = await medTimeout(
+        supabase
+            .from('game_results')
+            .select('is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count, final_log, medal_path, medal_level, route_indices, route_width, route_height, trophy_stats, created_at')
+            .eq('id', id)
+            .single(),
+        8000,
+        'Hentning af highscore-detaljer'
+    ).catch((fangetFejl) => ({ data: null, error: fangetFejl }));
 
     if (error && erManglendeEkstraHighscoreKolonneFejl(error)) {
         const fallback = await supabase
             .from('game_results')
-            .select('is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count, final_log')
+            .select('is_winner, is_dead, death_cause, days, gold, max_column, known_fields_count, mines_owned, player_count, final_log, created_at')
             .eq('id', id)
             .single();
         data = fallback.data;
@@ -1243,7 +1248,8 @@ export async function hentHighscoreDetaljer(id: number) {
         rute: Array.isArray(data.route_indices) ? data.route_indices.filter((index: unknown) => typeof index === 'number' && Number.isFinite(index)) : undefined,
         ruteBredde: data.route_width,
         ruteHoejde: data.route_height,
-        trophyStats: data.trophy_stats && typeof data.trophy_stats === 'object' ? data.trophy_stats : undefined
+        trophyStats: data.trophy_stats && typeof data.trophy_stats === 'object' ? data.trophy_stats : undefined,
+        createdAt: data.created_at
     };
 }
 
