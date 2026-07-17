@@ -104,6 +104,7 @@
     let visTutorialStartKnap = $state(!erTutorialKnapSkjult());
     let globalHighscoreSide = $state(0);
     let ugensGlobalHighscoreSide = $state(0);
+    let startToplisteVisning = $state<'uge' | 'global'>('uge');
     let klasseHighscoreSide = $state(0);
     let lokalHighscoreSide = $state(0);
     let valgtHighscore = $state<ValgtHighscore | null>(null);
@@ -2086,10 +2087,22 @@
                 </button>
             </div>
         {/if}
+        <button
+            type="button"
+            class="topliste-skift"
+            onclick={() => startToplisteVisning = 'global'}
+            title={tekst('Vis global topliste', 'Show global leaderboard')}
+            aria-label={tekst('Skift fra ugens topliste til global topliste', "Switch from this week's leaderboard to the global leaderboard")}
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="8.5" />
+                <path d="M3.8 12h16.4M12 3.5c2.4 2.2 3.7 5.1 3.7 8.5S14.4 18.3 12 20.5M12 3.5C9.6 5.7 8.3 8.6 8.3 12s1.3 6.3 3.7 8.5" />
+            </svg>
+        </button>
     </div>
 {/snippet}
 
-{#snippet globalHighscoreTavle()}
+{#snippet globalHighscoreTavle(visUgeSkift: boolean)}
     {@const sideStart = highscoreSideStart(globalHighscoreSide, globaleScores)}
     <div class="tavle">
         <img src="/screens/boardglobal.webp" alt={tekst('Global topliste', 'Global leaderboard')} class="tavle-billede" />
@@ -2120,6 +2133,20 @@
                     &gt;
                 </button>
             </div>
+        {/if}
+        {#if visUgeSkift}
+            <button
+                type="button"
+                class="topliste-skift"
+                onclick={() => startToplisteVisning = 'uge'}
+                title={tekst('Vis ugens topliste', "Show this week's leaderboard")}
+                aria-label={tekst('Skift fra global topliste til ugens topliste', "Switch from the global leaderboard to this week's leaderboard")}
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3.5" y="5" width="17" height="15.5" rx="2" />
+                    <path d="M7.5 3v4M16.5 3v4M3.5 9h17M7.5 12.5h2M11 12.5h2M14.5 12.5h2M7.5 16h2M11 16h2M14.5 16h2" />
+                </svg>
+            </button>
         {/if}
     </div>
 {/snippet}
@@ -2244,7 +2271,11 @@
             <p class="status larger-status">{spilTilstand.statusBesked}</p>
             
             <div class="start-tavle">
-                {@render ugensGlobalHighscoreTavle()}
+                {#if startToplisteVisning === 'uge'}
+                    {@render ugensGlobalHighscoreTavle()}
+                {:else}
+                    {@render globalHighscoreTavle(true)}
+                {/if}
             </div>
 
             <div class="offline-bottom">
@@ -2401,7 +2432,7 @@
                     {@render klasseHighscoreTavle()}
                 {/if}
                 {#if !spilTilstand.offlineMode}
-                    {@render globalHighscoreTavle()}
+                    {@render globalHighscoreTavle(false)}
                 {/if}
             </div>
             {/if}
@@ -2494,7 +2525,7 @@
                     {@render klasseHighscoreTavle()}
                 {/if}
                 {#if !spilTilstand.offlineMode}
-                    {@render globalHighscoreTavle()}
+                    {@render globalHighscoreTavle(false)}
                 {/if}
             </div>
             {/if}
@@ -3976,6 +4007,42 @@
         display: inline-flex; align-items: center; justify-content: center;
     }
     .highscore-naeste:hover { background: rgba(245, 208, 113, 0.14); }
+    .topliste-skift {
+        position: absolute;
+        right: 12%;
+        bottom: 8%;
+        z-index: 3;
+        width: 38px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px;
+        border: 1px solid rgba(245, 208, 113, 0.58);
+        border-radius: 50%;
+        background: rgba(11, 19, 20, 0.78);
+        color: #f5d071;
+        cursor: pointer;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.72), inset 0 0 8px rgba(245, 208, 113, 0.08);
+        transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
+    }
+    .topliste-skift svg {
+        width: 100%;
+        height: 100%;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.65;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .topliste-skift:hover,
+    .topliste-skift:focus-visible {
+        transform: scale(1.07);
+        background: rgba(245, 208, 113, 0.17);
+        color: #ffe29a;
+        outline: 2px solid rgba(245, 208, 113, 0.38);
+        outline-offset: 2px;
+    }
     .status { color: #ccc; margin-top: 15px; }
 
     .highscore-detail-overlay {
