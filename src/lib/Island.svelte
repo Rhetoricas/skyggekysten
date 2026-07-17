@@ -8,7 +8,7 @@
     import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { M10_SCORE, beregnSpillerScore, beskrivSlutSalg } from '$lib/score';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, hentGlobalTopHundredeIUgen, flushVentendeSync, flushVentendeGravsten, synkroniserPermanenteGravsten, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje, hentAktueltHighscoreResultatId, rensKortTilLagring } from '$lib/netvaerk';
+    import { hentHighscores, gemHighscore, sikrAktueltResultatLokalt, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, hentGlobalTopHundredeIUgen, flushVentendeSync, flushVentendeGravsten, synkroniserPermanenteGravsten, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje, hentAktueltHighscoreResultatId, rensKortTilLagring } from '$lib/netvaerk';
     import { fletOfflineGravstenIGitter, harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
     import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, beregnBevaegelsesEnergiPris, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, tjekAutoSpillerMoede, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
     import { grav, nulstilUndergrundKlientState } from '$lib/undergrund.svelte';
@@ -1204,10 +1204,10 @@
             return;
         }
 
-        if (aktivScoreGemningRunId !== null) {
+        if (!sikrAktueltResultatLokalt()) {
             alert(tekst(
-                'Vent et øjeblik, mens resultatet bliver gemt, før du starter øen forfra.',
-                'Please wait while the result is being saved before restarting the island.'
+                'Resultatet kunne ikke gemmes på denne enhed. Bliv på siden, og prøv igen.',
+                'The result could not be saved on this device. Stay on this page and try again.'
             ));
             return;
         }
@@ -1896,6 +1896,14 @@
     }
 
     function nulstilHukommelse() {
+        if (!sikrAktueltResultatLokalt()) {
+            scoreGemningFejlet = true;
+            spilTilstand.statusBesked = tekst(
+                'Resultatet kunne ikke gemmes på denne enhed. Siden er ikke blevet genindlæst.',
+                'The result could not be saved on this device. The page was not reloaded.'
+            );
+            return;
+        }
         arkiverAktuelleRuterForNaesteTur();
         if (spilTilstand.offlineMode) {
             sletOfflineSpil();
@@ -2021,6 +2029,9 @@
         };
 
         const gemHvisSidenForsvinder = () => {
+            if (['win', 'win_map', 'dead', 'dead_map'].includes(spilTilstand.gameState)) {
+                sikrAktueltResultatLokalt();
+            }
             void flushVentendeSync();
         };
         const gemHvisSkjult = () => {
@@ -2355,8 +2366,16 @@
             return;
         }
         if (aktivScoreGemningRunId !== null) return;
+        opdaterSamletScore();
+        const resultatSikretLokalt = sikrAktueltResultatLokalt();
         scoreGemningFejlet = false;
         scoreGemmer = true;
+        if (!resultatSikretLokalt) {
+            spilTilstand.statusBesked = tekst(
+                'Resultatet kunne ikke sikres lokalt. Hold siden åben, mens vi prøver at gemme det online.',
+                'The result could not be secured locally. Keep this page open while we try to save it online.'
+            );
+        }
         const token: ScoreGemningToken = {
             id: ++scoreGemningRunId,
             rundeId: spilTilstand.rundeSeed
@@ -2366,6 +2385,8 @@
             if (scoreGemmer && erAktuelScoreGemning(token)) {
                 scoreGemmer = false;
                 scoreGemningFejlet = true;
+                if (aktivScoreGemningRunId === token.id) aktivScoreGemningRunId = null;
+                scoreGemningRunId++;
                 spilTilstand.statusBesked = tekst('Det tager længere tid end ventet at sende scoren. Den er gemt på denne enhed, og vi prøver automatisk igen.', 'Sending the score is taking longer than expected. It is saved on this device, and we will try again automatically.');
             }
         }, 45000);

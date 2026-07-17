@@ -186,19 +186,25 @@ function hentVentendeHighscores() {
 }
 
 function gemVentendeHighscores(scores: VentendeHighscore[]) {
-    if (!harLocalStorage()) return;
-    localStorage.setItem(VENTENDE_HIGHSCORE_KEY, JSON.stringify(scores.slice(-20)));
+    if (!harLocalStorage()) return false;
+    try {
+        localStorage.setItem(VENTENDE_HIGHSCORE_KEY, JSON.stringify(scores.slice(-20)));
+        return true;
+    } catch (error) {
+        console.warn('Kunne ikke gemme scorekøen lokalt', error);
+        return false;
+    }
 }
 
 function huskVentendeHighscore(payload: HighscorePayload) {
     const pending_id = highscorePendingId(payload);
     const scores = hentVentendeHighscores().filter((score) => score.pending_id !== pending_id);
     scores.push({ ...payload, pending_id, created_at: new Date().toISOString() });
-    gemVentendeHighscores(scores);
-    return pending_id;
+    return gemVentendeHighscores(scores) ? pending_id : null;
 }
 
-function fjernVentendeHighscore(pendingId: string) {
+function fjernVentendeHighscore(pendingId: string | null) {
+    if (!pendingId) return;
     gemVentendeHighscores(hentVentendeHighscores().filter((score) => score.pending_id !== pendingId));
 }
 
@@ -1008,12 +1014,9 @@ async function udfoerDbUpload(sendKort: boolean, forventetRundeId = spilTilstand
     return true;
 }
 
-export async function gemHighscore() {
-    if (!spilTilstand.spillerNavn || !spilTilstand.rumKode || spilTilstand.samletScore <= 0) return false;
-    if (spilTilstand.offlineMode) {
-        gemOfflineScore();
-        return true;
-    }
+function lavAktueltHighscorePayload(userId?: string): HighscorePayload | null {
+    if (!spilTilstand.spillerNavn || !spilTilstand.rumKode || spilTilstand.samletScore <= 0) return null;
+
     const minePoint = spilTilstand.gitter.filter(f => f.hasGoldmine && f.mineOwner === spilTilstand.spillerNavn).length;
     const antalSpillere = taelScoreSpillere(spilTilstand.alleSpillere);
     const aktuelSpiller = spilTilstand.alleSpillere[spilTilstand.spillerNavn];
@@ -1028,6 +1031,7 @@ export async function gemHighscore() {
     // Frys hele resultatet før første await. Ellers kan et langsomt login-tjek
     // nå at læse state fra en efterfølgende runde og gemme et blandet resultat.
     const frossetPayload: HighscorePayload = {
+        user_id: userId,
         player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
         room_code: spilTilstand.rumKode,
         score: spilTilstand.samletScore,
@@ -1053,10 +1057,26 @@ export async function gemHighscore() {
         frossetPayload.route_height = spilTilstand.kortHoejde;
     }
 
-    const lavPayload = (userId?: string): HighscorePayload => ({
-        ...frossetPayload,
-        user_id: userId
-    });
+    return frossetPayload;
+}
+
+// Resultatet skal ligge i den vedvarende browserkø, før den første
+// netværksoperation begynder. Så overlever det genindlæsning, rundeskift og
+// forbindelsesudfald og kan sendes af retryVentendeHighscores senere.
+export function sikrAktueltResultatLokalt() {
+    if (spilTilstand.offlineMode) return true;
+    if (spilTilstand.samletScore <= 0) return true;
+    const payload = lavAktueltHighscorePayload(authState.user?.id);
+    return payload ? huskVentendeHighscore(payload) !== null : false;
+}
+
+export async function gemHighscore() {
+    if (spilTilstand.offlineMode) {
+        gemOfflineScore();
+        return true;
+    }
+    const frossetPayload = lavAktueltHighscorePayload();
+    if (!frossetPayload) return false;
 
     const sessionResultat = await medTimeout(supabase.auth.getSession(), 12000, 'Login-tjek').catch((error) => {
         console.error('Kunne ikke tjekke login før scoregemning', error);
@@ -1065,7 +1085,7 @@ export async function gemHighscore() {
     const sessionUser = sessionResultat?.data.session?.user;
     if (!sessionUser) {
         markerLoginUdlobet();
-        huskVentendeHighscore(lavPayload());
+        huskVentendeHighscore(frossetPayload);
         gemOfflineScore(true);
         spilTilstand.statusBesked = tekst(
             'Du er blevet logget ud. Scoren er gemt på denne enhed og sendes, næste gang du logger ind.',
@@ -1074,7 +1094,7 @@ export async function gemHighscore() {
         return false;
     }
 
-    const payload = lavPayload(sessionUser.id);
+    const payload = { ...frossetPayload, user_id: sessionUser.id };
 
     const pendingId = huskVentendeHighscore(payload);
     const error = await sendHighscorePayload(payload);
