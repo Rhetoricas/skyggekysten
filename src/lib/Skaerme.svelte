@@ -4022,9 +4022,9 @@
         justify-content: center;
         padding: 7px;
         border: 0;
-        border-radius: 50%;
+        border-radius: 0;
         background: transparent;
-        color: #20282a;
+        color: #d9b95f;
         cursor: pointer;
         box-shadow: none;
         transform: translateX(-50%);
@@ -4038,14 +4038,18 @@
         stroke-width: 1.65;
         stroke-linecap: round;
         stroke-linejoin: round;
+        filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
     }
     .topliste-skift:hover,
     .topliste-skift:focus-visible {
         transform: translateX(-50%) scale(1.08);
-        background: rgba(255, 255, 255, 0.11);
-        color: #111718;
-        outline: 2px solid rgba(245, 208, 113, 0.5);
-        outline-offset: 1px;
+        background: transparent;
+        color: #ffe08a;
+        outline: none;
+    }
+    .topliste-skift:focus-visible svg,
+    .topliste-skift:hover svg {
+        filter: drop-shadow(0 0 4px rgba(255, 215, 112, 0.58)) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
     }
     .status { color: #ccc; margin-top: 15px; }
 
