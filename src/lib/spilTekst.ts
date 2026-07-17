@@ -57,32 +57,32 @@ const karakterTekster: Record<string, TekstPar> = {
     },
     royal_m: {
         navn: 'Duke',
-        fordel: 'Nobility: You gain 20% more gold, can pressure merchants on price and collect tax from other players in multiplayer.',
+        fordel: 'Nobility: You gain 20% more gold and can pressure merchants on price. In multiplayer, you collect tax from other players you meet.',
         ulempe: 'You have only 6 energy, take 10% more damage and start without a weapon. Digging costs a full 9 energy.'
     },
     royal_f: {
         navn: 'Queen',
-        fordel: 'Nobility: You gain 20% more gold, can pressure merchants on price and collect tax from other players in multiplayer.',
+        fordel: 'Nobility: You gain 20% more gold and can pressure merchants on price. In multiplayer, you collect tax from other players you meet.',
         ulempe: 'You have only 6 energy, take 10% more damage and start without a weapon. Digging costs a full 9 energy.'
     },
     hunter_m: {
         navn: 'Hunter',
-        fordel: 'Scouts: You can see farther than most. You can track other players you meet.',
+        fordel: 'Scouts: You can see farther than most. In multiplayer, you can track other players you meet.',
         ulempe: 'You start with 90 HP and 20 gold and take 10% more damage. Digging costs 5 energy.'
     },
     hunter_f: {
         navn: 'Archer',
-        fordel: 'Scouts: You can see farther than most. You can track other players you meet.',
+        fordel: 'Scouts: You can see farther than most. In multiplayer, you can track other players you meet.',
         ulempe: 'You start with 90 HP and 20 gold and take 10% more damage. Digging costs 5 energy.'
     },
     pirate_m: {
         navn: 'Captain',
-        fordel: 'Sea Raiders: You land with a treasure map and find more gold than others. With your sabre, you can ambush other players.',
+        fordel: 'Sea Raiders: You land with a treasure map and find more gold than others. In multiplayer, you can ambush other players with your sabre.',
         ulempe: 'You start without a sleeping bag and can see only 1 tile. Find or buy healing along the way.'
     },
     pirate_f: {
         navn: 'Corsair',
-        fordel: 'Sea Raiders: You land with a treasure map and find more gold than others. With your sabre, you can ambush other players.',
+        fordel: 'Sea Raiders: You land with a treasure map and find more gold than others. In multiplayer, you can ambush other players with your sabre.',
         ulempe: 'You start without a sleeping bag and can see only 1 tile. Find or buy healing along the way.'
     },
     dwarf_m: {
