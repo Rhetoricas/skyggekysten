@@ -190,9 +190,6 @@
     ));
     const erLocalhost = () => browser && ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
-    const SKATTEKORT_STOP_AFSTAND = 200;
-    const SKATTEKORT_MIN_LINJE_LAENGDE = 40;
-
     let harSkattekortAktivt = $derived((spilTilstand.mineSkattekortFelter?.length || 0) > 0);
 
     function taageNiveauForFelt(index: number, erOpslugt: boolean) {
@@ -239,6 +236,23 @@
             ?? klynge[Math.floor(klynge.length / 2)];
     }
 
+    function beregnSkattekortRadius(klynge: number[], centerIndex: number) {
+        const center = hexMidtpunkt(centerIndex);
+        const afstande = klynge
+            .filter((index) => index !== centerIndex)
+            .map((index) => {
+                const punkt = hexMidtpunkt(index);
+                return Math.hypot(punkt.x - center.x, punkt.y - center.y);
+            });
+
+        // Pixelgitterets afrundede ROW_H gør de seks afstande højst ca. én
+        // pixel forskellige. Middelradius giver derfor den cirkel, der går
+        // gennem alle seks nabomidtpunkter med den rigtige klynge-midte.
+        return afstande.length > 0
+            ? afstande.reduce((sum, afstand) => sum + afstand, 0) / afstande.length
+            : Math.hypot(HEX_W / 2, ROW_H);
+    }
+
     function erSkatteKlyngeAfsluttet(klynge: number[]) {
         return klynge.some((index) =>
             (spilTilstand.devVisHeleKort || spilTilstand.mineKendteFelter.includes(index)) &&
@@ -257,16 +271,28 @@
         }
 
         return Array.from(klynger.entries())
-            .map(([id, klynge]) => ({
-                id,
-                klynge,
-                center: findSkatteKlyngeCenter(klynge)
-            }))
+            .map(([id, klynge]) => {
+                const center = findSkatteKlyngeCenter(klynge);
+                return {
+                    id,
+                    klynge,
+                    center,
+                    radius: beregnSkattekortRadius(klynge, center)
+                };
+            })
             .filter(({ klynge }) => !erSkatteKlyngeAfsluttet(klynge));
     }
 
     let aktiveSkattekortFelter = $derived.by(() =>
         hentAktiveSkattekortKlynger().flatMap(({ klynge }) => klynge)
+    );
+
+    let skattekortCirkler = $derived.by(() =>
+        hentAktiveSkattekortKlynger().map(({ id, center, radius }) => ({
+            id,
+            center: hexMidtpunkt(center),
+            radius
+        }))
     );
 
     function forskydPunktMod(
@@ -284,24 +310,21 @@
         };
     }
 
-    function lavSkattekortLinje(fra: { x: number; y: number }, centerIndex: number, startForskydning = 0) {
-        const center = hexMidtpunkt(centerIndex);
-        const start = startForskydning > 0 ? forskydPunktMod(fra, center, startForskydning) : fra;
-        const dx = center.x - start.x;
-        const dy = center.y - start.y;
-        const laengde = Math.hypot(dx, dy);
-        const linjeLaengde = Math.min(
-            laengde,
-            Math.max(SKATTEKORT_MIN_LINJE_LAENGDE, laengde - SKATTEKORT_STOP_AFSTAND)
-        );
-        const fremdrift = laengde === 0 ? 0 : linjeLaengde / laengde;
+    function lavSkattekortLinje(
+        fraCenter: { x: number; y: number },
+        tilCenter: { x: number; y: number },
+        fraRadius: number,
+        tilRadius: number
+    ) {
+        const afstand = Math.hypot(tilCenter.x - fraCenter.x, tilCenter.y - fraCenter.y);
+        if (afstand === 0) return { fra: fraCenter, til: tilCenter };
 
+        // Ved overlappende cirkler samles enderne på midten, så linjen
+        // aldrig vender retning eller fortsætter ind gennem et skatteområde.
+        const skala = Math.min(1, afstand / Math.max(1, fraRadius + tilRadius));
         return {
-            fra: start,
-            til: {
-                x: start.x + dx * fremdrift,
-                y: start.y + dy * fremdrift
-            }
+            fra: forskydPunktMod(fraCenter, tilCenter, fraRadius * skala),
+            til: forskydPunktMod(tilCenter, fraCenter, tilRadius * skala)
         };
     }
 
@@ -323,13 +346,18 @@
             kildeIndex = naeste.center;
         }
 
-        let fra = hexMidtpunkt(spilTilstand.spillerIndex);
+        let fraCenter = hexMidtpunkt(spilTilstand.spillerIndex);
+        let fraRadius = 34;
         return sorteret.map((klynge, index) => {
+            const tilCenter = hexMidtpunkt(klynge.center);
             const linje = {
                 id: klynge.id,
-                ...lavSkattekortLinje(fra, klynge.center, index === 0 ? 34 : 0)
+                ...lavSkattekortLinje(fraCenter, tilCenter, index === 0 ? 34 : fraRadius, klynge.radius)
             };
-            fra = linje.til;
+            // Rækkefølge og retning beregnes fortsat fra den sande midte;
+            // kun den synlige streg klippes ved cirklens omkreds.
+            fraCenter = tilCenter;
+            fraRadius = klynge.radius;
             return linje;
         });
     });
@@ -3335,6 +3363,14 @@ function udførBevægelse(nytIndeks: number) {
 
             {#if skattekortLinjer.length > 0}
                 <svg class="skattekort-linje-canvas" aria-hidden="true">
+                    {#each skattekortCirkler as cirkel (cirkel.id)}
+                        <circle
+                            cx={cirkel.center.x}
+                            cy={cirkel.center.y}
+                            r={cirkel.radius}
+                            class="skattekort-cirkel"
+                        />
+                    {/each}
                     {#each skattekortLinjer as linje (linje.id)}
                         <line
                             x1={linje.fra.x}
@@ -4117,6 +4153,14 @@ function udførBevægelse(nytIndeks: number) {
     }
 
     .skattekort-linje {
+        stroke: rgba(210, 58, 42, 0.56);
+        stroke-width: 1.55;
+        stroke-linecap: round;
+        stroke-dasharray: 5 7;
+    }
+
+    .skattekort-cirkel {
+        fill: none;
         stroke: rgba(210, 58, 42, 0.56);
         stroke-width: 1.55;
         stroke-linecap: round;
