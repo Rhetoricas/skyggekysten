@@ -2091,12 +2091,12 @@
             type="button"
             class="topliste-skift"
             onclick={() => startToplisteVisning = 'global'}
-            title={tekst('Vis global topliste', 'Show global leaderboard')}
-            aria-label={tekst('Skift fra ugens topliste til global topliste', "Switch from this week's leaderboard to the global leaderboard")}
+            title={tekst('Ugens topliste · skift til global', "This week's leaderboard · switch to global")}
+            aria-label={tekst('Ugens topliste. Skift til global topliste', "This week's leaderboard. Switch to the global leaderboard")}
         >
             <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="8.5" />
-                <path d="M3.8 12h16.4M12 3.5c2.4 2.2 3.7 5.1 3.7 8.5S14.4 18.3 12 20.5M12 3.5C9.6 5.7 8.3 8.6 8.3 12s1.3 6.3 3.7 8.5" />
+                <rect x="3.5" y="5" width="17" height="15.5" rx="2" />
+                <path d="M7.5 3v4M16.5 3v4M3.5 9h17M7.5 12.5h2M11 12.5h2M14.5 12.5h2M7.5 16h2M11 16h2M14.5 16h2" />
             </svg>
         </button>
     </div>
@@ -2139,12 +2139,12 @@
                 type="button"
                 class="topliste-skift"
                 onclick={() => startToplisteVisning = 'uge'}
-                title={tekst('Vis ugens topliste', "Show this week's leaderboard")}
-                aria-label={tekst('Skift fra global topliste til ugens topliste', "Switch from the global leaderboard to this week's leaderboard")}
+                title={tekst('Global topliste · skift til uge', 'Global leaderboard · switch to week')}
+                aria-label={tekst('Global topliste. Skift til ugens topliste', "Global leaderboard. Switch to this week's leaderboard")}
             >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <rect x="3.5" y="5" width="17" height="15.5" rx="2" />
-                    <path d="M7.5 3v4M16.5 3v4M3.5 9h17M7.5 12.5h2M11 12.5h2M14.5 12.5h2M7.5 16h2M11 16h2M14.5 16h2" />
+                    <circle cx="12" cy="12" r="8.5" />
+                    <path d="M3.8 12h16.4M12 3.5c2.4 2.2 3.7 5.1 3.7 8.5S14.4 18.3 12 20.5M12 3.5C9.6 5.7 8.3 8.6 8.3 12s1.3 6.3 3.7 8.5" />
                 </svg>
             </button>
         {/if}
@@ -4009,21 +4009,25 @@
     .highscore-naeste:hover { background: rgba(245, 208, 113, 0.14); }
     .topliste-skift {
         position: absolute;
-        right: 12%;
-        bottom: 8%;
+        left: 50%;
+        top: 0.8%;
         z-index: 3;
-        width: 38px;
-        height: 38px;
+        width: 13%;
+        min-width: 30px;
+        max-width: 42px;
+        height: auto;
+        aspect-ratio: 1;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         padding: 7px;
-        border: 1px solid rgba(245, 208, 113, 0.58);
+        border: 0;
         border-radius: 50%;
-        background: rgba(11, 19, 20, 0.78);
-        color: #f5d071;
+        background: transparent;
+        color: #20282a;
         cursor: pointer;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.72), inset 0 0 8px rgba(245, 208, 113, 0.08);
+        box-shadow: none;
+        transform: translateX(-50%);
         transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
     }
     .topliste-skift svg {
@@ -4037,11 +4041,11 @@
     }
     .topliste-skift:hover,
     .topliste-skift:focus-visible {
-        transform: scale(1.07);
-        background: rgba(245, 208, 113, 0.17);
-        color: #ffe29a;
-        outline: 2px solid rgba(245, 208, 113, 0.38);
-        outline-offset: 2px;
+        transform: translateX(-50%) scale(1.08);
+        background: rgba(255, 255, 255, 0.11);
+        color: #111718;
+        outline: 2px solid rgba(245, 208, 113, 0.5);
+        outline-offset: 1px;
     }
     .status { color: #ccc; margin-top: 15px; }
 
