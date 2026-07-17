@@ -105,6 +105,7 @@
     let globalHighscoreSide = $state(0);
     let ugensGlobalHighscoreSide = $state(0);
     let startToplisteVisning = $state<'uge' | 'global'>('uge');
+    let slutToplisteVisning = $state<'uge' | 'global'>('global');
     let klasseHighscoreSide = $state(0);
     let lokalHighscoreSide = $state(0);
     let valgtHighscore = $state<ValgtHighscore | null>(null);
@@ -2055,7 +2056,7 @@
     {/if}
 {/snippet}
 
-{#snippet ugensGlobalHighscoreTavle()}
+{#snippet ugensGlobalHighscoreTavle(kontekst: 'start' | 'slut')}
     {@const sideStart = highscoreSideStart(ugensGlobalHighscoreSide, ugensGlobaleScores)}
     <div class="tavle">
         <img src="/screens/boardglobal.webp" alt={tekst('Ugens globale topliste', "This week's global leaderboard")} class="tavle-billede" />
@@ -2090,7 +2091,7 @@
         <button
             type="button"
             class="topliste-skift"
-            onclick={() => startToplisteVisning = 'global'}
+            onclick={() => kontekst === 'start' ? startToplisteVisning = 'global' : slutToplisteVisning = 'global'}
             title={tekst('Ugens topliste · skift til global', "This week's leaderboard · switch to global")}
             aria-label={tekst('Ugens topliste. Skift til global topliste', "This week's leaderboard. Switch to the global leaderboard")}
         >
@@ -2102,7 +2103,7 @@
     </div>
 {/snippet}
 
-{#snippet globalHighscoreTavle(visUgeSkift: boolean)}
+{#snippet globalHighscoreTavle(kontekst: 'start' | 'slut')}
     {@const sideStart = highscoreSideStart(globalHighscoreSide, globaleScores)}
     <div class="tavle">
         <img src="/screens/boardglobal.webp" alt={tekst('Global topliste', 'Global leaderboard')} class="tavle-billede" />
@@ -2134,20 +2135,18 @@
                 </button>
             </div>
         {/if}
-        {#if visUgeSkift}
-            <button
-                type="button"
-                class="topliste-skift"
-                onclick={() => startToplisteVisning = 'uge'}
-                title={tekst('Global topliste · skift til uge', 'Global leaderboard · switch to week')}
-                aria-label={tekst('Global topliste. Skift til ugens topliste', "Global leaderboard. Switch to this week's leaderboard")}
-            >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="12" r="8.5" />
-                    <path d="M3.8 12h16.4M12 3.5c2.4 2.2 3.7 5.1 3.7 8.5S14.4 18.3 12 20.5M12 3.5C9.6 5.7 8.3 8.6 8.3 12s1.3 6.3 3.7 8.5" />
-                </svg>
-            </button>
-        {/if}
+        <button
+            type="button"
+            class="topliste-skift"
+            onclick={() => kontekst === 'start' ? startToplisteVisning = 'uge' : slutToplisteVisning = 'uge'}
+            title={tekst('Global topliste · skift til uge', 'Global leaderboard · switch to week')}
+            aria-label={tekst('Global topliste. Skift til ugens topliste', "Global leaderboard. Switch to this week's leaderboard")}
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="8.5" />
+                <path d="M3.8 12h16.4M12 3.5c2.4 2.2 3.7 5.1 3.7 8.5S14.4 18.3 12 20.5M12 3.5C9.6 5.7 8.3 8.6 8.3 12s1.3 6.3 3.7 8.5" />
+            </svg>
+        </button>
     </div>
 {/snippet}
 
@@ -2272,9 +2271,9 @@
             
             <div class="start-tavle">
                 {#if startToplisteVisning === 'uge'}
-                    {@render ugensGlobalHighscoreTavle()}
+                    {@render ugensGlobalHighscoreTavle('start')}
                 {:else}
-                    {@render globalHighscoreTavle(true)}
+                    {@render globalHighscoreTavle('start')}
                 {/if}
             </div>
 
@@ -2432,7 +2431,11 @@
                     {@render klasseHighscoreTavle()}
                 {/if}
                 {#if !spilTilstand.offlineMode}
-                    {@render globalHighscoreTavle(false)}
+                    {#if slutToplisteVisning === 'uge'}
+                        {@render ugensGlobalHighscoreTavle('slut')}
+                    {:else}
+                        {@render globalHighscoreTavle('slut')}
+                    {/if}
                 {/if}
             </div>
             {/if}
@@ -2525,7 +2528,11 @@
                     {@render klasseHighscoreTavle()}
                 {/if}
                 {#if !spilTilstand.offlineMode}
-                    {@render globalHighscoreTavle(false)}
+                    {#if slutToplisteVisning === 'uge'}
+                        {@render ugensGlobalHighscoreTavle('slut')}
+                    {:else}
+                        {@render globalHighscoreTavle('slut')}
+                    {/if}
                 {/if}
             </div>
             {/if}
