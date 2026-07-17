@@ -4028,7 +4028,7 @@
         cursor: pointer;
         box-shadow: none;
         transform: translateX(-50%);
-        transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
+        transition: color 0.16s ease;
     }
     .topliste-skift svg {
         width: 100%;
@@ -4039,16 +4039,21 @@
         stroke-linecap: round;
         stroke-linejoin: round;
         filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+        transform: scale(1);
+        transform-box: fill-box;
+        transform-origin: center;
+        transition: transform 0.16s ease, filter 0.16s ease;
     }
     .topliste-skift:hover,
     .topliste-skift:focus-visible {
-        transform: translateX(-50%) scale(1.08);
+        transform: translateX(-50%);
         background: transparent;
         color: #ffe08a;
         outline: none;
     }
     .topliste-skift:focus-visible svg,
     .topliste-skift:hover svg {
+        transform: scale(1.08);
         filter: drop-shadow(0 0 4px rgba(255, 215, 112, 0.58)) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
     }
     .status { color: #ccc; margin-top: 15px; }
