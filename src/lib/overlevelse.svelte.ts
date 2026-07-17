@@ -5,8 +5,9 @@ import { brugFraRygsæk, hentKortBredde, hentKortHoejde, hentNaboIRetning } from
 import { erBeskyttetAfTaageblokker, erFeltITaagen } from './taage';
 import { erFriskAktivSpiller } from './aktivSpiller';
 import { registrerHeling, registrerVandSkade } from './trofaeer';
-import type { Felt, GravstenMinde } from './types';
+import type { Felt } from './types';
 import { tekst } from './i18n.svelte';
+import { registrerDoedsGravsten } from './gravsten';
 
 function erVandBiome(biome: string | null | undefined) {
     return biome === 'hav' || biome === 'soe';
@@ -79,6 +80,11 @@ function rydTaageramteFelter() {
 }
 
 let sidstBrugtEliksir = 0;
+
+export function nulstilOverlevelseKlientState() {
+    sidstBrugtEliksir = 0;
+    spilTilstand.erBevidstløs = false;
+}
 const BERSAERK_MIN_HP_TAB = 5;
 const SKADE_TAL_SUFFIX = /\s*\(-\d+\s*HP\)\s*$/i;
 
@@ -105,23 +111,6 @@ export function udloesBersaerkHvisRelevant(faktiskSkade: number) {
         ' Smerten vækker din bersærkergang. Din næste handling med energiforbrug er gratis.',
         ' The pain awakens your berserk rage. Your next action with an energy cost is free.'
     );
-}
-
-function tilfoejGravsten(felt: Felt, mindeTekst: string) {
-    if (!spilTilstand.valgtKarakter) return;
-
-    const eksisterende = felt.gravstenListe ?? (felt.gravstenIkon
-        ? [{ ikon: felt.gravstenIkon, navn: tekst('Ukendt', 'Unknown'), dag: 0 }]
-        : []);
-    const minde: GravstenMinde = {
-        ikon: spilTilstand.valgtKarakter.ikon,
-        navn: spilTilstand.spillerNavn || tekst('Ukendt', 'Unknown'),
-        dag: spilTilstand.dag || 1,
-        tekst: mindeTekst
-    };
-
-    felt.gravstenListe = [...eksisterende, minde].slice(-3);
-    felt.gravstenIkon = minde.ikon;
 }
 
 function hentMuligeFlugtbaadFelter() {
@@ -289,8 +278,7 @@ export function tagSkadeOgTjekDød(skade: number, besked: string, doedsBesked?: 
 
         const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
         if (aktueltFelt && spilTilstand.valgtKarakter) {
-            tilfoejGravsten(aktueltFelt, doedsBesked || tekst(`${beskedMedTal} Du dør.`, `${beskedMedTal} You die.`));
-            broadcastFelt(spilTilstand.spillerIndex, aktueltFelt);
+            registrerDoedsGravsten(spilTilstand.spillerIndex, doedsBesked || tekst(`${beskedMedTal} Du dør.`, `${beskedMedTal} You die.`));
         }
         
         spilTilstand.logBesked = doedsBesked || tekst(`${beskedMedTal} Du dør.`, `${beskedMedTal} You die.`);
@@ -316,8 +304,7 @@ function druknSpiller(besked: string) {
 
     const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
     if (aktueltFelt && spilTilstand.valgtKarakter) {
-        tilfoejGravsten(aktueltFelt, besked);
-        broadcastFelt(spilTilstand.spillerIndex, aktueltFelt);
+        registrerDoedsGravsten(spilTilstand.spillerIndex, besked);
     }
 
     spilTilstand.logBesked = besked;
@@ -343,8 +330,7 @@ export function tjekOverlevelse() {
 
         const aktueltFelt = spilTilstand.gitter[spilTilstand.spillerIndex];
         if (aktueltFelt && spilTilstand.valgtKarakter) {
-            tilfoejGravsten(aktueltFelt, tekst('Tågen lukker sig om dig. Du dør i den giftige luft.', 'The fog closes around you. You die in the toxic air.'));
-            broadcastFelt(spilTilstand.spillerIndex, aktueltFelt);
+            registrerDoedsGravsten(spilTilstand.spillerIndex, tekst('Tågen lukker sig om dig. Du dør i den giftige luft.', 'The fog closes around you. You die in the toxic air.'));
         }
 
         spilTilstand.logBesked = tekst('Tågen lukker sig om dig. Du dør i den giftige luft.', 'The fog closes around you. You die in the toxic air.');
@@ -488,8 +474,22 @@ export function fremtvingKollaps(brugerdefineretAarsag?: string) {
     
     fremrykTid();
 
+    const gameStateEfterTid: string = spilTilstand.gameState;
+    if (gameStateEfterTid === 'dead_map' || gameStateEfterTid === 'dead') {
+        spilTilstand.erBevidstløs = false;
+        return;
+    }
+
+    const kollapsRundeId = spilTilstand.rundeSeed;
+    const kollapsSpiller = spilTilstand.spillerNavn;
     setTimeout(() => {
-        if (spilTilstand.gameState !== 'dead_map' && spilTilstand.gameState !== 'dead') {
+        if (
+            spilTilstand.rundeSeed === kollapsRundeId &&
+            spilTilstand.spillerNavn === kollapsSpiller &&
+            spilTilstand.erBevidstløs &&
+            spilTilstand.gameState !== 'dead_map' &&
+            spilTilstand.gameState !== 'dead'
+        ) {
             spilTilstand.livspoint = 10;
             spilTilstand.erBevidstløs = false;
             spilTilstand.logBesked = mistetGuld > 0 

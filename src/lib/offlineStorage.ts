@@ -1,12 +1,16 @@
 import { spilTilstand } from './spilTilstand.svelte';
 import { KORT_VERSION, STANDARD_KORT_BREDDE, STANDARD_KORT_HOEJDE } from './kortDimensioner';
 import { taelScoreSpillere } from './score';
-import type { Karakter } from './types';
+import type { Felt, GravstenMinde, Karakter } from './types';
 import { hentKarakterNavneIKlasse } from './spildata';
 import { tekst } from './i18n.svelte';
+import { TROFAE_GENERATION } from './klientVersioner';
 
 const OFFLINE_GAME_KEY = 'taage_offline_spil';
 const OFFLINE_SCORES_KEY = 'taage_offline_scores';
+const OFFLINE_GRAVSTEN_KEY = 'taage_offline_gravsten_v1';
+
+type OfflineGravstenStore = Record<string, Record<string, GravstenMinde[]>>;
 
 export interface OfflineScore {
     navn: string;
@@ -28,6 +32,7 @@ export interface OfflineScore {
 interface OfflineSnapshot {
     version: 1 | 2;
     kortVersion?: number;
+    trofaeGeneration?: number;
     savedAt: string;
     spillerNavn: string;
     rumKode: string;
@@ -69,6 +74,136 @@ function harLocalStorage() {
     return typeof localStorage !== 'undefined';
 }
 
+function normaliserRumKode(rumKode: string) {
+    return (rumKode || '').trim().toLowerCase().slice(0, 20);
+}
+
+function normaliserGravstenMinde(minde: unknown): GravstenMinde | null {
+    if (!minde || typeof minde !== 'object') return null;
+    const data = minde as Partial<GravstenMinde>;
+    if (typeof data.ikon !== 'string' || !data.ikon || typeof data.navn !== 'string' || !data.navn) return null;
+
+    const dag = Number(data.dag);
+    return {
+        ...(typeof data.id === 'string' && data.id ? { id: data.id } : {}),
+        ikon: data.ikon,
+        navn: data.navn,
+        dag: Number.isFinite(dag) ? Math.max(0, Math.floor(dag)) : 0,
+        ...(typeof data.tekst === 'string' && data.tekst ? { tekst: data.tekst } : {}),
+        ...(typeof data.tidspunkt === 'string' && data.tidspunkt ? { tidspunkt: data.tidspunkt } : {})
+    };
+}
+
+function gravstenNoegle(minde: GravstenMinde) {
+    return minde.id || [minde.ikon, minde.navn, minde.dag, minde.tekst || '', minde.tidspunkt || ''].join('\u0000');
+}
+
+function fletGravstenMinder(...samlinger: unknown[]): GravstenMinde[] {
+    const resultat: GravstenMinde[] = [];
+
+    for (const samling of samlinger) {
+        if (!Array.isArray(samling)) continue;
+        for (const raMinde of samling) {
+            const minde = normaliserGravstenMinde(raMinde);
+            if (!minde) continue;
+            const noegle = gravstenNoegle(minde);
+            const eksisterendeIndex = resultat.findIndex((andet) => gravstenNoegle(andet) === noegle);
+            if (eksisterendeIndex >= 0) resultat.splice(eksisterendeIndex, 1);
+            resultat.push(minde);
+        }
+    }
+
+    return resultat.slice(-3);
+}
+
+function hentOfflineGravstenStore(): OfflineGravstenStore {
+    if (!harLocalStorage()) return {};
+    try {
+        const gemt = localStorage.getItem(OFFLINE_GRAVSTEN_KEY);
+        const data = gemt ? JSON.parse(gemt) : null;
+        return data && typeof data === 'object' && !Array.isArray(data) ? data as OfflineGravstenStore : {};
+    } catch {
+        return {};
+    }
+}
+
+function gemOfflineGravstenStore(store: OfflineGravstenStore) {
+    if (!harLocalStorage()) return;
+    localStorage.setItem(OFFLINE_GRAVSTEN_KEY, JSON.stringify(store));
+}
+
+function indlejredeGravsten(felt: Felt): GravstenMinde[] {
+    if (felt.gravstenListe?.length) return fletGravstenMinder(felt.gravstenListe);
+    if (felt.gravstenIkon) return [{ ikon: felt.gravstenIkon, navn: 'Ukendt', dag: 0 }];
+    return [];
+}
+
+function huskOfflineGravstenFraGitter(rumKode: string, gitter: Felt[]) {
+    const noegle = normaliserRumKode(rumKode);
+    if (!harLocalStorage() || !noegle || !Array.isArray(gitter)) return;
+
+    const store = hentOfflineGravstenStore();
+    const oeStore = { ...(store[noegle] || {}) };
+    let aendret = false;
+
+    gitter.forEach((felt, index) => {
+        const indlejrede = indlejredeGravsten(felt);
+        if (indlejrede.length === 0) return;
+        oeStore[String(index)] = fletGravstenMinder(oeStore[String(index)], indlejrede);
+        aendret = true;
+    });
+
+    if (aendret) {
+        store[noegle] = oeStore;
+        gemOfflineGravstenStore(store);
+    }
+}
+
+export function fletOfflineGravstenIGitter(rumKode: string, gitter: Felt[]): Felt[] {
+    const noegle = normaliserRumKode(rumKode);
+    if (!noegle || !Array.isArray(gitter)) return gitter;
+
+    huskOfflineGravstenFraGitter(noegle, gitter);
+    const oeStore = hentOfflineGravstenStore()[noegle] || {};
+
+    return gitter.map((felt, index) => {
+        const minder = fletGravstenMinder(indlejredeGravsten(felt), oeStore[String(index)]);
+        if (minder.length === 0) return felt;
+        return {
+            ...felt,
+            gravstenListe: minder,
+            gravstenIkon: minder[minder.length - 1].ikon
+        };
+    });
+}
+
+export function gemOfflineGravsten(rumKode: string, feltIndex: number, minde: GravstenMinde): GravstenMinde[] {
+    const noegle = normaliserRumKode(rumKode);
+    if (!harLocalStorage() || !noegle || !Number.isInteger(feltIndex) || feltIndex < 0) return [];
+
+    const store = hentOfflineGravstenStore();
+    const oeStore = { ...(store[noegle] || {}) };
+    const minder = fletGravstenMinder(oeStore[String(feltIndex)], [minde]);
+    oeStore[String(feltIndex)] = minder;
+    store[noegle] = oeStore;
+    gemOfflineGravstenStore(store);
+    return minder;
+}
+
+function erAktueltSnapshot(data: OfflineSnapshot) {
+    return data.kortVersion === KORT_VERSION && data.trofaeGeneration === TROFAE_GENERATION;
+}
+
+function rensKatastrofeVisuals(gitter: typeof spilTilstand.gitter) {
+    return (gitter || []).map((felt) => {
+        const renset = { ...felt };
+        delete renset.katastrofeFraBiome;
+        delete renset.katastrofeVisuelAktiv;
+        delete renset.katastrofeVisuelId;
+        return renset;
+    });
+}
+
 export function harOfflineSpil() {
     if (!harLocalStorage()) return false;
     const gemt = localStorage.getItem(OFFLINE_GAME_KEY);
@@ -76,7 +211,8 @@ export function harOfflineSpil() {
 
     try {
         const data = JSON.parse(gemt) as OfflineSnapshot;
-        if (data.kortVersion === KORT_VERSION) return true;
+        if (erAktueltSnapshot(data)) return true;
+        huskOfflineGravstenFraGitter(data.rumKode, data.gitter || []);
     } catch {
         // En ulæselig gemning kan ikke fortsættes sikkert.
     }
@@ -92,7 +228,7 @@ export function hentOfflineSpilInfo() {
         const gemt = localStorage.getItem(OFFLINE_GAME_KEY);
         if (!gemt) return null;
         const data = JSON.parse(gemt) as OfflineSnapshot;
-        if (data.kortVersion !== KORT_VERSION) return null;
+        if (!erAktueltSnapshot(data)) return null;
         return {
             spillerNavn: data.spillerNavn,
             rumKode: data.rumKode,
@@ -110,9 +246,12 @@ export function gemOfflineSpil() {
     if (spilTilstand.gameMode === 'tutorial') return;
     if (!spilTilstand.spillerNavn || !spilTilstand.rumKode) return;
 
+    spilTilstand.gitter = fletOfflineGravstenIGitter(spilTilstand.rumKode, spilTilstand.gitter);
+
     const snapshot: OfflineSnapshot = {
         version: 2,
         kortVersion: KORT_VERSION,
+        trofaeGeneration: TROFAE_GENERATION,
         savedAt: new Date().toISOString(),
         spillerNavn: spilTilstand.spillerNavn,
         rumKode: spilTilstand.rumKode,
@@ -120,7 +259,7 @@ export function gemOfflineSpil() {
         gameMode: spilTilstand.gameMode,
         erHost: spilTilstand.erHost,
         gameState: spilTilstand.gameState,
-        gitter: spilTilstand.gitter,
+        gitter: rensKatastrofeVisuals(spilTilstand.gitter),
         kortBredde: spilTilstand.kortBredde,
         kortHoejde: spilTilstand.kortHoejde,
         spillerIndex: spilTilstand.spillerIndex,
@@ -160,7 +299,8 @@ export function indlaesOfflineSpil() {
         const gemt = localStorage.getItem(OFFLINE_GAME_KEY);
         if (!gemt) return false;
         const data = JSON.parse(gemt) as OfflineSnapshot;
-        if (data.kortVersion !== KORT_VERSION) {
+        if (!erAktueltSnapshot(data)) {
+            huskOfflineGravstenFraGitter(data.rumKode, data.gitter || []);
             localStorage.removeItem(OFFLINE_GAME_KEY);
             return false;
         }
@@ -174,7 +314,10 @@ export function indlaesOfflineSpil() {
         spilTilstand.gameState = data.gameState || 'start';
         spilTilstand.kortBredde = data.kortBredde || STANDARD_KORT_BREDDE;
         spilTilstand.kortHoejde = data.kortHoejde || STANDARD_KORT_HOEJDE;
-        spilTilstand.gitter = data.gitter || [];
+        spilTilstand.gitter = fletOfflineGravstenIGitter(
+            data.rumKode,
+            rensKatastrofeVisuals(data.gitter || [])
+        );
         spilTilstand.spillerIndex = data.spillerIndex || 0;
         spilTilstand.maxLivspoint = data.maxLivspoint || 100;
         spilTilstand.livspoint = data.livspoint ?? data.maxLivspoint ?? 100;

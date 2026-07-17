@@ -8,11 +8,11 @@
     import { authState, initAuth } from '$lib/auth.svelte';
     import { skabKamera } from '$lib/kamera.svelte';
     import { M10_SCORE, beregnSpillerScore, beskrivSlutSalg } from '$lib/score';
-    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, hentGlobalTopHundredeIUgen, flushVentendeSync, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje, hentAktueltHighscoreResultatId } from '$lib/netvaerk';
-    import { harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
+    import { hentHighscores, gemHighscore, syncTilDb, startRealtime, stopRealtime, hentGlobalTopHundrede, hentGlobalTopHundredeIUgen, flushVentendeSync, flushVentendeGravsten, synkroniserPermanenteGravsten, annullerVentendeNetvaerkSync, realtimeRumNoegle, retryVentendeHighscores, gemAfsluttetSpillerISession, opdaterHighscoreMedalje, hentAktueltHighscoreResultatId, rensKortTilLagring } from '$lib/netvaerk';
+    import { fletOfflineGravstenIGitter, harOfflineSpil, hentOfflineSpilInfo, indlaesOfflineSpil, sletOfflineSpil } from '$lib/offlineStorage';
     import { hvil, hentNaboIndices, hentNaboIRetning, afslørOmraade, initialiserGitter, tilfoejTilRygsæk, regnHexAfstand, udfoerPortalTeleport, nulstilKort, udloesOversvoemmelse, udloesJordskaelv, udfoerBevaegelse, beregnBevaegelsesEnergiPris, erTrackerAktivPaa, opdaterTrackerSyn, tjekAutoTracker, tjekAutoSpillerMoede, anvendFaellesEventEffekt, saetKortDimensioner } from '$lib/spilmotor';
-    import { grav } from '$lib/undergrund.svelte';
-    import { erSpillerITaagen } from '$lib/overlevelse.svelte';    
+    import { grav, nulstilUndergrundKlientState } from '$lib/undergrund.svelte';
+    import { erSpillerITaagen, nulstilOverlevelseKlientState } from '$lib/overlevelse.svelte';
     import { eventState, startEvent, lukEvent as motorLukEvent } from '$lib/eventMotor.svelte';
     import { erFriskAktivSpiller } from '$lib/aktivSpiller';
     import {
@@ -43,7 +43,7 @@
     import LydKnap from '$lib/LydKnap.svelte';
     import SprogKnap from '$lib/SprogKnap.svelte';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
-    import { erVenteTidUdlobet, lukVenteSpil } from '$lib/ventespil.svelte';
+    import { erVenteTidUdlobet, lukVenteSpil, nulstilVenteSpilKlientState } from '$lib/ventespil.svelte';
     import { initSprog, tekst } from '$lib/i18n.svelte';
     import {
         TUTORIAL_BREDDE,
@@ -65,7 +65,7 @@
     const cam = skabKamera();
     const MAX_DAGE_FORAN = 5;
     const VENTE_TAAGE_VARSEL_FELTER = 2;
-    const SESSION_SELECT = 'rum_kode,kort,start_index,spillere,fog_x,kort_bredde,kort_hoejde,kort_version';
+    const SESSION_SELECT = 'rum_kode,kort,start_index,spillere,fog_x,kort_bredde,kort_hoejde,kort_version,runde_id';
     const START_AUTO_REFRESH_MS = 10000;
     const START_AUTO_REFRESH_KEY = 'taage_pending_start';
     const RUTE_ARKIV_STORAGE_PREFIX = 'taage_route_archive';
@@ -77,6 +77,8 @@
     let ugensGlobaleScores = $state<Array<{ id?: number; spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);
     
     let flytterNu = false;
+    let kameraTimerGeneration = 0;
+    let bevaegelsesTimerGeneration = 0;
     let sejlendeBaadIndex = $state<number | null>(null);
     let visDoedsLog = $state(false);
     let langsomtKamera = $state(false);
@@ -396,6 +398,7 @@
     let scoreGemmer = $state(false);
     let scoreGemningFejlet = $state(false);
     let scoreGemningRunId = 0;
+    let aktivScoreGemningRunId: number | null = null;
     let nyGlobalRekord = $state(false);
     let harGemtOfflineSpil = $state(false);
     let offlineSpilInfo = $state<ReturnType<typeof hentOfflineSpilInfo>>(null);
@@ -476,14 +479,21 @@
         const fokus = spilTilstand.kameraFokus;
         if (fokus !== null) {
             untrack(() => {
+                const generation = ++kameraTimerGeneration;
+                const rundeId = spilTilstand.rundeSeed;
                 langsomtKamera = true;
                 cam.centrerPåHex(fokus, kortBredde, HEX_W, ROW_H);
                 spilTilstand.kameraFokus = null;
                 
                 setTimeout(() => {
+                    if (kameraTimerGeneration !== generation || spilTilstand.rundeSeed !== rundeId) return;
                     if (spilTilstand.gameState === 'play') {
                         cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
-                        setTimeout(() => langsomtKamera = false, 1500);
+                        setTimeout(() => {
+                            if (kameraTimerGeneration === generation && spilTilstand.rundeSeed === rundeId) {
+                                langsomtKamera = false;
+                            }
+                        }, 1500);
                     } else {
                         langsomtKamera = false;
                     }
@@ -511,11 +521,16 @@
         if (kikkertMode === sidsteKikkertMode) return;
         sidsteKikkertMode = kikkertMode;
 
-        if (spilTilstand.gameState !== 'play' || !kikkertMode) return;
+        if (spilTilstand.gameState !== 'play' || !kikkertMode || langsomtKamera) return;
 
         untrack(() => {
+            const generation = ++kameraTimerGeneration;
+            const rundeId = spilTilstand.rundeSeed;
             setTimeout(() => {
-                if (spilTilstand.gameState === 'play') {
+                if (kameraTimerGeneration === generation &&
+                    spilTilstand.rundeSeed === rundeId &&
+                    spilTilstand.gameState === 'play' &&
+                    !langsomtKamera) {
                     cam.centrerPåHex(spilTilstand.spillerIndex, kortBredde, HEX_W, ROW_H);
                 }
             }, 0);
@@ -866,41 +881,113 @@
         return `${spilTilstand.rumKode || 'oe'}:${Date.now().toString(36)}:${Math.random().toString(36).slice(2)}`;
     }
 
-    function hentAktivRundeSeedFraSpillere() {
-        return Object.values(spilTilstand.alleSpillere)
-            .find((spiller) => !spiller.isDead && !spiller.isWinner && !!spiller.rundeSeed)
-            ?.rundeSeed || '';
-    }
-
-    function overtagAktivRundeSeed() {
-        const seed = hentAktivRundeSeedFraSpillere();
-        if (seed) spilTilstand.rundeSeed = seed;
-        return seed;
-    }
-
-    function overtagRundeSeedVedIndgang(rentNavn: string, browserId: string) {
-        const egenEntry = Object.entries(spilTilstand.alleSpillere).find(([navn, spiller]) =>
-            navn.toLowerCase() === rentNavn.toLowerCase() &&
-            !!spiller.rundeSeed &&
-            (erSammeSpiller(spiller, browserId) || !spiller.isDead && !spiller.isWinner)
-        );
-        if (egenEntry?.[1].rundeSeed) {
-            spilTilstand.rundeSeed = egenEntry[1].rundeSeed;
-            return egenEntry[1].rundeSeed;
-        }
-
-        return overtagAktivRundeSeed();
-    }
-
     function startNyRundeSeed() {
         spilTilstand.rundeSeed = genererRundeSeed();
         return spilTilstand.rundeSeed;
     }
 
     function sikrRundeSeed() {
-        if (overtagAktivRundeSeed()) return spilTilstand.rundeSeed;
         if (!spilTilstand.rundeSeed) return startNyRundeSeed();
         return spilTilstand.rundeSeed;
+    }
+
+    function nulstilFlygtigRundeState() {
+        nulstilUndergrundKlientState();
+        nulstilOverlevelseKlientState();
+        nulstilVenteSpilKlientState();
+        motorLukEvent();
+        spilTilstand.aktivShop = null;
+        spilTilstand.aktivVaerksted = false;
+        spilTilstand.venteSpilAktiv = false;
+        spilTilstand.ventePuljeGuld = 0;
+        spilTilstand.ventePuljeLiv = 0;
+        spilTilstand.venteFase = 'venter';
+        spilTilstand.sidsteVenteDag = 0;
+        spilTilstand.venteRunde = 0;
+        spilTilstand.venteStartTid = 0;
+        spilTilstand.venteFriIndtilDag = 0;
+        spilTilstand.venteGratisFeltBrugt = null;
+        spilTilstand.venteKort = [];
+        spilTilstand.aktiveTal = [];
+        spilTilstand.aktiveEnergiKugler = [];
+        spilTilstand.aktiveEnergiTal = [];
+        spilTilstand.kameraFokus = null;
+        kameraTimerGeneration++;
+        bevaegelsesTimerGeneration++;
+
+        sejlendeBaadIndex = null;
+        visDoedsLog = false;
+        introAktiv = false;
+        flytterNu = false;
+        langsomtKamera = false;
+        sidstePinchAfstand = 0;
+        ruteOverblikState = '';
+        preloadedEvents.clear();
+        lukInspect();
+        cam.nulstil();
+
+        scoreGemningRunId++;
+        aktivScoreGemningRunId = null;
+        scoreErGemt = false;
+        scoreGemmer = false;
+        scoreGemningFejlet = false;
+        nyGlobalRekord = false;
+
+        if (typeof document !== 'undefined') {
+            document.body.classList.remove('jordskaelv', 'katastrofe-lys');
+        }
+    }
+
+    function forberedNyRundeLokalt() {
+        annullerVentendeNetvaerkSync();
+        nulstilFlygtigRundeState();
+        spilTilstand.alleSpillere = {};
+        startNyRundeSeed();
+        spilTilstand.fogX = 0;
+        spilTilstand.dag = 1;
+        spilTilstand.historik = [];
+        spilTilstand.logHistorik = [];
+        spilTilstand.valgtKarakter = null;
+        spilTilstand.maxLivspoint = 100;
+        spilTilstand.livspoint = 100;
+        spilTilstand.guldTotal = 0;
+        spilTilstand.maxKolonne = 0;
+        spilTilstand.doedsAarsag = null;
+        spilTilstand.nuvaerendeEnergi = 0;
+        spilTilstand.mitUdstyr = [];
+        spilTilstand.mineKendteFelter = [];
+        spilTilstand.mineSkattekortFelter = [];
+        spilTilstand.trofaeStats = nulstilTrofaeStats();
+        spilTilstand.nyeTrofaeIds = [];
+        spilTilstand.nyeMytiskeTrofaeIds = [];
+        spilTilstand.samletScore = 0;
+        spilTilstand.gratisNaesteBevaegelse = false;
+        spilTilstand.gratisBevaegelseKilde = '';
+        spilTilstand.sidsteBersaerkDag = 0;
+        spilTilstand.harEnergisyn = false;
+        nulstilKort();
+        spilTilstand.gameState = 'select';
+    }
+
+    async function genindlaesSessionEfterTabtReset() {
+        const { data, error } = await hentSpilSession(spilTilstand.rumKode);
+        if (error || !data || typeof data.runde_id !== 'string') {
+            startRealtime(true);
+            return false;
+        }
+
+        laesSessionDimensioner(data);
+        spilTilstand.rundeSeed = data.runde_id;
+        spilTilstand.gitter = data.kort || [];
+        spilTilstand.alleSpillere = filtrerSpillereTilKanal(
+            data.spillere || {},
+            realtimeRumNoegle(spilTilstand.rumKode)
+        );
+        spilTilstand.fogX = data.fog_x || 0;
+        spilTilstand.erHost = false;
+        startRealtime(true);
+        await synkroniserPermanenteGravsten(spilTilstand.rumKode);
+        return true;
     }
 
     let kameraStyle = $derived(`
@@ -1046,6 +1133,7 @@
         stopTutorial();
         stopRealtime();
         annullerVentendeNetvaerkSync();
+        nulstilFlygtigRundeState();
         motorLukEvent();
         spilTilstand.aktivShop = null;
         spilTilstand.aktivVaerksted = false;
@@ -1088,6 +1176,22 @@
             return;
         }
 
+        if (aktivScoreGemningRunId !== null) {
+            alert(tekst(
+                'Vent et øjeblik, mens resultatet bliver gemt, før du starter øen forfra.',
+                'Please wait while the result is being saved before restarting the island.'
+            ));
+            return;
+        }
+
+        if (!spilTilstand.offlineMode && !(await flushVentendeGravsten(spilTilstand.rundeSeed))) {
+            alert(tekst(
+                'Gravstenen er endnu ikke nået frem til øen. Tjek forbindelsen, og prøv igen, før du starter forfra.',
+                'The memorial has not reached the island yet. Check the connection and try again before restarting.'
+            ));
+            return;
+        }
+
         const aktiveSpillere = Object.values(spilTilstand.alleSpillere).filter(erAktivSessionSpiller);
 
         if (!spilTilstand.offlineMode && aktiveSpillere.length > 0 && spilTilstand.rumKode) {
@@ -1101,57 +1205,26 @@
         stopRealtime();
         annullerVentendeNetvaerkSync();
         arkiverAktuelleRuterForNaesteTur();
-
-        spilTilstand.logHistorik = [];
-        spilTilstand.logBesked = '';
-        visDoedsLog = false;
-        
-        cam.nulstil();
-
-        spilTilstand.alleSpillere = {};
-        startNyRundeSeed();
-
-        spilTilstand.fogX = 0;
-        spilTilstand.dag = 1;
-        spilTilstand.historik = [];
-        spilTilstand.valgtKarakter = null;
-        spilTilstand.maxLivspoint = 100;
-        spilTilstand.livspoint = 100;
-        spilTilstand.guldTotal = 0;
-        spilTilstand.maxKolonne = 0;
-        spilTilstand.doedsAarsag = null;
-        spilTilstand.nuvaerendeEnergi = 0;
-        spilTilstand.mitUdstyr = [];
-        spilTilstand.mineKendteFelter = [];
-        spilTilstand.mineSkattekortFelter = [];
-        spilTilstand.trofaeStats = nulstilTrofaeStats();
-        spilTilstand.nyeTrofaeIds = [];
-        spilTilstand.nyeMytiskeTrofaeIds = [];
-        spilTilstand.samletScore = 0;
-        spilTilstand.venteGratisFeltBrugt = null;
-        spilTilstand.gratisNaesteBevaegelse = false;
-        spilTilstand.gratisBevaegelseKilde = '';
-        spilTilstand.sidsteBersaerkDag = 0;
-        spilTilstand.harEnergisyn = false;
-        spilTilstand.venteFriIndtilDag = 0;
-        
-        nulstilKort();
-
-        spilTilstand.gameState = 'select';
+        const gammelRundeId = spilTilstand.rundeSeed;
+        forberedNyRundeLokalt();
         if (spilTilstand.offlineMode) {
             await syncTilDb(true);
             return;
         }
 
-        const { error: resetError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
-            kort: spilTilstand.gitter,
+        const { error: resetError, count: resetCount } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
+            kort: rensKortTilLagring(spilTilstand.gitter),
             start_index: spilTilstand.spillerIndex,
             spillere: {},
             fog_x: 0,
             ...kortSessionMeta()
-        }).eq('rum_kode', spilTilstand.rumKode)));
+        }, { count: 'exact' })
+            .eq('rum_kode', spilTilstand.rumKode)
+            .eq('kort_version', KORT_VERSION)
+            .eq('runde_id', gammelRundeId)));
 
-        if (resetError) {
+        if (resetError || resetCount !== 1) {
+            await genindlaesSessionEfterTabtReset();
             spilTilstand.statusBesked = tekst('Øen kunne ikke gøres klar til et nyt spil. Tjek forbindelsen, og prøv igen.', 'The island could not be prepared for a new game. Check your connection and try again.');
             spilTilstand.gameState = 'start';
             return;
@@ -1179,6 +1252,7 @@
 
         stopRealtime();
         annullerVentendeNetvaerkSync();
+        nulstilFlygtigRundeState();
         if (alarmKanal) {
             supabase.removeChannel(alarmKanal);
             alarmKanal = null;
@@ -1204,19 +1278,19 @@
         alarmKanal = supabase
             .channel(`room:${aktivKanalNoegle}:events`)
             .on('broadcast', { event: 'alarm' }, ({ payload }) => {
-                if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
+                if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode || !payload.rundeId || payload.rundeId !== spilTilstand.rundeSeed || spilTilstand.gameState !== 'play') return;
                 if (payload.senderNavn === spilTilstand.spillerNavn) return;
                 if (spilTilstand.alleSpillere[payload.senderNavn]) {
                     spilTilstand.alleSpillere[payload.senderNavn].activeAlarm = true;
                 }
             })
             .on('broadcast', { event: 'baal' }, ({ payload }) => {
-                if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
+                if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode || !payload.rundeId || payload.rundeId !== spilTilstand.rundeSeed || spilTilstand.gameState !== 'play') return;
                 afslørOmraade(payload.centerIndex, payload.radius);
                 syncTilDb();
             })
             .on('broadcast', { event: 'syn_signal' }, ({ payload }) => {
-                if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
+                if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode || !payload.rundeId || payload.rundeId !== spilTilstand.rundeSeed || spilTilstand.gameState !== 'play') return;
                 afslørOmraade(payload.centerIndex, payload.radius);
                 if (typeof payload.fokusIndex === 'number') {
                     spilTilstand.kameraFokus = payload.fokusIndex;
@@ -1224,7 +1298,7 @@
                 syncTilDb();
             })
             .on('broadcast', { event: 'faelles_event' }, ({ payload }) => {
-                if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode) return;
+                if (payload.kanalNoegle !== aktivKanalNoegle || spilTilstand.rumKode !== aktivRumKode || !payload.rundeId || payload.rundeId !== spilTilstand.rundeSeed || spilTilstand.gameState !== 'play') return;
                 anvendFaellesEventEffekt(payload);
             })
             .subscribe();
@@ -1238,6 +1312,17 @@
             }
 
             let data = hentetData;
+            if (data) {
+                const serverRundeId = typeof data.runde_id === 'string' ? data.runde_id : '';
+                if (!serverRundeId) {
+                    spilTilstand.statusBesked = tekst(
+                        'Øen mangler den nye rundebeskyttelse. Kør Supabase-migrationen, og prøv igen.',
+                        'The island is missing the new round protection. Run the Supabase migration and try again.'
+                    );
+                    return;
+                }
+                spilTilstand.rundeSeed = serverRundeId;
+            }
             if (data && Number(data.kort_version || 1) !== KORT_VERSION) {
                 const gammelKortVersion = Number(data.kort_version || 1);
                 if (gammelKortVersion > KORT_VERSION) {
@@ -1260,7 +1345,7 @@
                     supabase
                         .from('spil_sessioner')
                         .update({
-                            kort: nytKort,
+                            kort: rensKortTilLagring(nytKort),
                             start_index: nytStartIndex,
                             spillere: {},
                             fog_x: 0,
@@ -1268,6 +1353,7 @@
                         }, { count: 'exact' })
                         .eq('rum_kode', spilTilstand.rumKode)
                         .eq('kort_version', gammelKortVersion)
+                        .eq('runde_id', spilTilstand.rundeSeed)
                 ));
 
                 if (versionsError) {
@@ -1291,7 +1377,7 @@
                 } else {
                     data = {
                         ...data,
-                        kort: nytKort,
+                        kort: rensKortTilLagring(nytKort),
                         start_index: nytStartIndex,
                         spillere: {},
                         fog_x: 0,
@@ -1306,7 +1392,6 @@
                 laesSessionDimensioner(data);
                 spilTilstand.gitter = data.kort;
                 spilTilstand.alleSpillere = filtrerSpillereTilKanal(data.spillere || {}, aktivKanalNoegle);
-                overtagRundeSeedVedIndgang(rentNavn, mitBrowserId);
                 spilTilstand.fogX = data.fog_x || 0;
                 spilTilstand.erHost = false;
 
@@ -1347,7 +1432,14 @@
                         let tidligereRuter = samlTidligereRuter(eksisterende);
                         if (aktiveSpillere.length === 0) {
                             tidligereRuter = arkiverRuterForNaesteTur(fundetNavn, eksisterende);
+                            const gammelRundeId = spilTilstand.rundeSeed;
+                            if (!spilTilstand.offlineMode && !(await flushVentendeGravsten(gammelRundeId))) {
+                                spilTilstand.statusBesked = tekst('Dødsfaldet kunne ikke gemmes endnu. Tjek forbindelsen, og prøv igen.', 'The death could not be saved yet. Check the connection and try again.');
+                                return;
+                            }
                             spilTilstand.erHost = true;
+                            annullerVentendeNetvaerkSync();
+                            nulstilFlygtigRundeState();
                             spilTilstand.alleSpillere = {};
                             startNyRundeSeed();
                             spilTilstand.fogX = 0;
@@ -1367,15 +1459,19 @@
                             spilTilstand.venteFriIndtilDag = 0;
                             nulstilKort();
 
-                            const { error: resetError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
-                                kort: spilTilstand.gitter,
+                            const { error: resetError, count: resetCount } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
+                                kort: rensKortTilLagring(spilTilstand.gitter),
                                 start_index: spilTilstand.spillerIndex,
                                 spillere: {},
                                 fog_x: 0,
                                 ...kortSessionMeta()
-                            }).eq('rum_kode', spilTilstand.rumKode)));
+                            }, { count: 'exact' })
+                                .eq('rum_kode', spilTilstand.rumKode)
+                                .eq('kort_version', KORT_VERSION)
+                                .eq('runde_id', gammelRundeId)));
 
-                            if (resetError) {
+                            if (resetError || resetCount !== 1) {
+                                await genindlaesSessionEfterTabtReset();
                                 spilTilstand.statusBesked = tekst('Øen kunne ikke gøres klar til et nyt spil. Tjek forbindelsen, og prøv igen.', 'The island could not be prepared for a new game. Check your connection and try again.');
                                 return;
                             }
@@ -1468,8 +1564,15 @@
                         return;
                     }
 
-                    if ((spillereArr.length > 0 && aktiveSpillere.length === 0) || (spillereArr.length === 0 && erTomSessionForurenet(data))) {
+                    if (spillereArr.length > 0 && aktiveSpillere.length === 0) {
+                        const gammelRundeId = spilTilstand.rundeSeed;
+                        if (!spilTilstand.offlineMode && !(await flushVentendeGravsten(gammelRundeId))) {
+                            spilTilstand.statusBesked = tekst('Dødsfaldet kunne ikke gemmes endnu. Tjek forbindelsen, og prøv igen.', 'The death could not be saved yet. Check the connection and try again.');
+                            return;
+                        }
                         spilTilstand.erHost = true;
+                        annullerVentendeNetvaerkSync();
+                        nulstilFlygtigRundeState();
                         spilTilstand.alleSpillere = {};
                         startNyRundeSeed();
                         spilTilstand.fogX = 0;
@@ -1489,15 +1592,19 @@
                         spilTilstand.venteFriIndtilDag = 0;
                         nulstilKort();
 
-                        const { error: resetError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
-                            kort: spilTilstand.gitter,
+                        const { error: resetError, count: resetCount } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
+                            kort: rensKortTilLagring(spilTilstand.gitter),
                             start_index: spilTilstand.spillerIndex,
                             spillere: {},
                             fog_x: 0,
                             ...kortSessionMeta()
-                        }).eq('rum_kode', spilTilstand.rumKode)));
+                        }, { count: 'exact' })
+                            .eq('rum_kode', spilTilstand.rumKode)
+                            .eq('kort_version', KORT_VERSION)
+                            .eq('runde_id', gammelRundeId)));
 
-                        if (resetError) {
+                        if (resetError || resetCount !== 1) {
+                            await genindlaesSessionEfterTabtReset();
                             spilTilstand.statusBesked = tekst('Øen kunne ikke gøres klar til et nyt spil. Tjek forbindelsen, og prøv igen.', 'The island could not be prepared for a new game. Check your connection and try again.');
                             return;
                         }
@@ -1528,7 +1635,7 @@
                 initialiserGitter(spilTilstand.kortBredde, spilTilstand.kortHoejde);
                 const { error: insertError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').insert([{
                     rum_kode: spilTilstand.rumKode,
-                    kort: spilTilstand.gitter,
+                    kort: rensKortTilLagring(spilTilstand.gitter),
                     start_index: spilTilstand.spillerIndex,
                     spillere: {},
                     fog_x: 0,
@@ -1544,7 +1651,13 @@
                         return;
                     }
 
+                    if (typeof eksisterendeSession.runde_id !== 'string') {
+                        spilTilstand.statusBesked = tekst('Øen mangler rundebeskyttelse. Kør Supabase-migrationen, og prøv igen.', 'The island is missing round protection. Run the Supabase migration and try again.');
+                        spilTilstand.gameState = 'start';
+                        return;
+                    }
                     laesSessionDimensioner(eksisterendeSession);
+                    spilTilstand.rundeSeed = eksisterendeSession.runde_id;
                     spilTilstand.gitter = eksisterendeSession.kort;
                     spilTilstand.alleSpillere = filtrerSpillereTilKanal(eksisterendeSession.spillere || {}, aktivKanalNoegle);
                     spilTilstand.fogX = eksisterendeSession.fog_x || 0;
@@ -1580,6 +1693,8 @@
         }
 
         stopRealtime();
+        annullerVentendeNetvaerkSync();
+        nulstilFlygtigRundeState();
         if (alarmKanal) {
             supabase.removeChannel(alarmKanal);
             alarmKanal = null;
@@ -1606,6 +1721,7 @@
         scoreErGemt = false;
         nyGlobalRekord = false;
         initialiserGitter(spilTilstand.kortBredde, spilTilstand.kortHoejde);
+        spilTilstand.gitter = fletOfflineGravstenIGitter(spilTilstand.rumKode, spilTilstand.gitter);
         spilTilstand.gameState = 'select';
         await syncTilDb(true);
     }
@@ -1613,6 +1729,7 @@
     function startTutorialSpil() {
         stopRealtime();
         annullerVentendeNetvaerkSync();
+        nulstilFlygtigRundeState();
         if (alarmKanal) {
             supabase.removeChannel(alarmKanal);
             alarmKanal = null;
@@ -1712,12 +1829,20 @@
         nyGlobalRekord = false;
         spilTilstand.gameState = 'play';
 
+        const kameraGeneration = ++kameraTimerGeneration;
+        const tutorialRundeId = spilTilstand.rundeSeed;
         window.setTimeout(() => {
-            cam.centrerPåHex(TUTORIAL_START_INDEX, TUTORIAL_BREDDE, HEX_W, ROW_H);
+            if (kameraTimerGeneration === kameraGeneration &&
+                spilTilstand.rundeSeed === tutorialRundeId &&
+                spilTilstand.gameMode === 'tutorial') {
+                cam.centrerPåHex(TUTORIAL_START_INDEX, TUTORIAL_BREDDE, HEX_W, ROW_H);
+            }
         }, 0);
     }
 
     function fortsaetOfflineSpil() {
+        annullerVentendeNetvaerkSync();
+        nulstilFlygtigRundeState();
         if (!indlaesOfflineSpil()) {
             spilTilstand.statusBesked = tekst('Der blev ikke fundet et offline-spil.', 'No offline game was found.');
             harGemtOfflineSpil = false;
@@ -2021,11 +2146,39 @@
         }
     }
 
-    async function gemNyeTrofaeAwardsForHighscore(highscoreGemt: boolean) {
-        if (!highscoreGemt || !authState.user?.id || spilTilstand.offlineMode) return;
+    type ScoreGemningToken = { id: number; rundeId: string };
+
+    function erAktuelScoreGemning(token: ScoreGemningToken) {
+        return scoreGemningRunId === token.id && spilTilstand.rundeSeed === token.rundeId;
+    }
+
+    async function gemNyeTrofaeAwardsForHighscore(highscoreGemt: boolean, token: ScoreGemningToken) {
+        const brugerId = authState.user?.id;
+        if (!erAktuelScoreGemning(token) || !highscoreGemt || !brugerId || spilTilstand.offlineMode) return;
+
         const nyeIds = normaliserTrofaeIds(spilTilstand.nyeTrofaeIds || []);
         const nyeMytiskeIds = normaliserTrofaeIds(spilTilstand.nyeMytiskeTrofaeIds || []);
         if (nyeIds.length === 0 && nyeMytiskeIds.length === 0) return;
+
+        // Alt award-indhold fryses før første await. Så kan en afsluttet rundes
+        // trofæ stadig knyttes til dens eget resultat, selv hvis spilleren når
+        // videre til en ny runde, mens Supabase svarer.
+        const ownerKey = lavTrofaeOwnerKey(brugerId, spilTilstand.spillerNavn);
+        const awardedAt = new Date().toISOString();
+        const awardGrundlag = [
+            ...nyeIds.map((id) => ({
+                id,
+                tier: 'normal' as const,
+                awardedAt,
+                awardData: lavTrofaeAwardData(id)
+            })),
+            ...nyeMytiskeIds.map((id) => ({
+                id,
+                tier: 'mythic' as const,
+                awardedAt,
+                awardData: lavTrofaeAwardData(id)
+            }))
+        ];
 
         const gameResultId = await medTimeout(hentAktueltHighscoreResultatId(), 10000).catch((error) => {
             console.warn('Kunne ikke finde highscore-id til trofae-award', error);
@@ -2033,49 +2186,47 @@
         });
         if (!gameResultId) return;
 
-        const ownerKey = lavTrofaeOwnerKey(authState.user.id, spilTilstand.spillerNavn);
         const eksisterendeAwards = hentGemteTrofaeAwards(ownerKey);
-        const nyeAwards = [
-            ...nyeIds.map((id) => ({
-                id,
-                tier: 'normal' as const,
-                gameResultId,
-                awardedAt: new Date().toISOString(),
-                awardData: lavTrofaeAwardData(id)
-            })),
-            ...nyeMytiskeIds.map((id) => ({
-                id,
-                tier: 'mythic' as const,
-                gameResultId,
-                awardedAt: new Date().toISOString(),
-                awardData: lavTrofaeAwardData(id)
-            }))
-        ];
+        const nyeAwards = awardGrundlag.map((award) => ({ ...award, gameResultId }));
         const samledeAwards = normaliserTrofaeAwards([...eksisterendeAwards, ...nyeAwards]);
         gemTrofaeAwards(ownerKey, samledeAwards);
-        void gemSupabaseTrofaeAwards(authState.user.id, nyeAwards);
+        void gemSupabaseTrofaeAwards(brugerId, nyeAwards);
     }
 
-    async function opdaterScoreTavlerEfterGemning(highscoreGemt: boolean, afslutningGemt: boolean) {
+    async function opdaterScoreTavlerEfterGemning(
+        highscoreGemt: boolean,
+        afslutningGemt: boolean,
+        token: ScoreGemningToken
+    ) {
+        const klasse = aktuelHighscoreKlasse();
+        const afsluttetScore = spilTilstand.samletScore;
+        const highscoreNavn = authState.profil?.display_name || spilTilstand.spillerNavn;
+        const oeNavn = spilTilstand.rumKode;
+        const karakterNavn = spilTilstand.valgtKarakter?.navn;
+        const offlineMode = spilTilstand.gameMode === 'offline';
+
         try {
-            await gemNyeTrofaeAwardsForHighscore(highscoreGemt);
+            await gemNyeTrofaeAwardsForHighscore(highscoreGemt, token);
+            if (!erAktuelScoreGemning(token)) return;
 
             if (highscoreGemt && !afslutningGemt) {
                 await medTimeout(gemAfsluttetSpillerISession(), 15000).catch((error) => {
                     console.warn('Kunne ikke eftergemme oe-session efter score', error);
                     return false;
                 });
+                if (!erAktuelScoreGemning(token)) return;
             }
 
-            const klasse = aktuelHighscoreKlasse();
             nyGlobalRekord = false;
 
-            lokaleScores = await medTimeout(hentHighscores(), 10000).catch((error) => {
+            const nyeLokaleScores = await medTimeout(hentHighscores(), 10000).catch((error) => {
                 console.warn('Kunne ikke genhente lokale highscores efter score', error);
                 return lokaleScores;
             });
+            if (!erAktuelScoreGemning(token)) return;
+            lokaleScores = nyeLokaleScores;
 
-            if (spilTilstand.gameMode === 'offline') return;
+            if (offlineMode) return;
 
             const [nyeKlasseScores, nyeGlobaleScores, nyeUgensGlobaleScores] = await medTimeout(
                 Promise.all([
@@ -2088,33 +2239,33 @@
                 console.warn('Kunne ikke genhente globale highscores efter score', error);
                 return [klasseScores, globaleScores, ugensGlobaleScores] as const;
             });
+            if (!erAktuelScoreGemning(token)) return;
 
             klasseScores = nyeKlasseScores;
             globaleScores = nyeGlobaleScores;
             ugensGlobaleScores = nyeUgensGlobaleScores;
 
             const kanTjekkeUgeTop = highscoreGemt && !!authState.user;
-            const highscoreNavn = authState.profil?.display_name || spilTilstand.spillerNavn;
             const ugensTopScore = ugensGlobaleScores[0];
             nyGlobalRekord = !!kanTjekkeUgeTop &&
-                spilTilstand.samletScore >= M10_SCORE &&
-                ugensTopScore?.point === spilTilstand.samletScore &&
+                afsluttetScore >= M10_SCORE &&
+                ugensTopScore?.point === afsluttetScore &&
                 ugensTopScore.spillerNavn === highscoreNavn &&
-                ugensTopScore.oeNavn === spilTilstand.rumKode &&
-                ugensTopScore.karakter === spilTilstand.valgtKarakter?.navn;
-            const gemtScore = ugensGlobaleScores.find((score) =>
-                score.point === spilTilstand.samletScore &&
-                score.spillerNavn === highscoreNavn &&
-                score.oeNavn === spilTilstand.rumKode &&
-                score.karakter === spilTilstand.valgtKarakter?.navn
-            ) || globaleScores.find((score) =>
-                score.point === spilTilstand.samletScore &&
-                score.spillerNavn === highscoreNavn &&
-                score.oeNavn === spilTilstand.rumKode &&
-                score.karakter === spilTilstand.valgtKarakter?.navn
+                ugensTopScore.oeNavn === oeNavn &&
+                ugensTopScore.karakter === karakterNavn;
+            const gemtScore = ugensGlobaleScores.find((resultat) =>
+                resultat.point === afsluttetScore &&
+                resultat.spillerNavn === highscoreNavn &&
+                resultat.oeNavn === oeNavn &&
+                resultat.karakter === karakterNavn
+            ) || globaleScores.find((resultat) =>
+                resultat.point === afsluttetScore &&
+                resultat.spillerNavn === highscoreNavn &&
+                resultat.oeNavn === oeNavn &&
+                resultat.karakter === karakterNavn
             );
 
-            await medTimeout(opdaterHighscoreMedalje(gemtScore?.id, spilTilstand.samletScore, nyGlobalRekord), 10000).catch((error) => {
+            await medTimeout(opdaterHighscoreMedalje(gemtScore?.id, afsluttetScore, nyGlobalRekord), 10000).catch((error) => {
                 console.warn('Kunne ikke opdatere highscore-medalje efter score', error);
                 return false;
             });
@@ -2123,29 +2274,37 @@
         }
     }
 
-    async function opdaterOgGemHighscore() {
+    async function opdaterOgGemHighscore(token: ScoreGemningToken) {
         try {
+            if (!erAktuelScoreGemning(token)) return;
             opdaterSamletScore();
             opdaterLokaleTrofaeer();
             await syncTilDb(true);
+            if (!erAktuelScoreGemning(token)) return;
             let sessionGemt = await flushVentendeSync();
+            if (!erAktuelScoreGemning(token)) return;
             if (!sessionGemt) {
                 await syncTilDb(true);
+                if (!erAktuelScoreGemning(token)) return;
                 sessionGemt = await flushVentendeSync();
+                if (!erAktuelScoreGemning(token)) return;
             }
             const afslutningGemt = await gemAfsluttetSpillerISession();
+            if (!erAktuelScoreGemning(token)) return;
             sessionGemt = sessionGemt && afslutningGemt;
             if (!sessionGemt) {
                 console.warn('Ø-sessionen blev ikke gemt før highscore. Forsøger stadig at gemme scoren.');
             }
             
             const highscoreGemt = await gemHighscore();
+            if (!erAktuelScoreGemning(token)) return;
             harGemtOfflineSpil = harOfflineSpil();
             offlineSpilInfo = hentOfflineSpilInfo();
             scoreErGemt = highscoreGemt;
             scoreGemningFejlet = !highscoreGemt;
-            void opdaterScoreTavlerEfterGemning(highscoreGemt, afslutningGemt);
+            void opdaterScoreTavlerEfterGemning(highscoreGemt, afslutningGemt, token);
         } catch (error) {
+            if (!erAktuelScoreGemning(token)) return;
             console.error('Score-flowet fejlede', error);
             spilTilstand.statusBesked = tekst(
                 'Scoren blev ikke gemt. Tjek forbindelsen, og prøv igen.',
@@ -2153,7 +2312,10 @@
             );
             scoreGemningFejlet = true;
         } finally {
-            scoreGemmer = false;
+            if (erAktuelScoreGemning(token)) {
+                scoreGemmer = false;
+                if (aktivScoreGemningRunId === token.id) aktivScoreGemningRunId = null;
+            }
         }
     }
 
@@ -2164,18 +2326,22 @@
             scoreGemningFejlet = false;
             return;
         }
-        if (scoreGemmer) return;
+        if (aktivScoreGemningRunId !== null) return;
         scoreGemningFejlet = false;
         scoreGemmer = true;
-        const aktuelGemning = ++scoreGemningRunId;
+        const token: ScoreGemningToken = {
+            id: ++scoreGemningRunId,
+            rundeId: spilTilstand.rundeSeed
+        };
+        aktivScoreGemningRunId = token.id;
         window.setTimeout(() => {
-            if (scoreGemmer && scoreGemningRunId === aktuelGemning) {
+            if (scoreGemmer && erAktuelScoreGemning(token)) {
                 scoreGemmer = false;
                 scoreGemningFejlet = true;
                 spilTilstand.statusBesked = tekst('Det tager længere tid end ventet at sende scoren. Den er gemt på denne enhed, og vi prøver automatisk igen.', 'Sending the score is taking longer than expected. It is saved on this device, and we will try again automatically.');
             }
         }, 45000);
-        opdaterOgGemHighscore();
+        void opdaterOgGemHighscore(token);
     }
 
     async function bekræftValg(karakter: Karakter) {
@@ -2186,6 +2352,7 @@
             return;
         }
 
+        nulstilFlygtigRundeState();
         sikrRundeSeed();
         spilTilstand.valgtKarakter = karakter;
         spilTilstand.maxLivspoint = karakter.startHp || 100;
@@ -2282,7 +2449,7 @@
         
         if (spilTilstand.erHost && !spilTilstand.offlineMode) {
             const { data, error } = await medTimeout(
-                supabase.from('spil_sessioner').select('rum_kode').eq('rum_kode', spilTilstand.rumKode).maybeSingle()
+                supabase.from('spil_sessioner').select('rum_kode,runde_id').eq('rum_kode', spilTilstand.rumKode).maybeSingle()
             );
             if (error) {
                 spilTilstand.statusBesked = tekst('Øen kunne ikke oprettes. Tjek forbindelsen, og prøv igen om lidt.', 'The island could not be created. Check your connection and try again in a moment.');
@@ -2293,7 +2460,7 @@
             if (!data) {
                 const { error: insertError } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').insert([{
                     rum_kode: spilTilstand.rumKode,
-                    kort: spilTilstand.gitter,
+                    kort: rensKortTilLagring(spilTilstand.gitter),
                     start_index: spilTilstand.spillerIndex,
                     spillere: {},
                     fog_x: 0,
@@ -2305,6 +2472,10 @@
                     spilTilstand.gameState = 'start';
                     return;
                 }
+            } else if (data.runde_id !== spilTilstand.rundeSeed) {
+                spilTilstand.statusBesked = tekst('En ny runde er allerede startet. Tryk START igen for at deltage i den.', 'A new round has already started. Press START again to join it.');
+                spilTilstand.gameState = 'start';
+                return;
             }
         }
         
@@ -2383,7 +2554,7 @@
 
     function erAktivSessionSpiller(spiller: SpillerData) {
         if (!erFriskAktivSpiller(spiller)) return false;
-        return !spilTilstand.rundeSeed || !spiller.rundeSeed || spiller.rundeSeed === spilTilstand.rundeSeed;
+        return !!spilTilstand.rundeSeed && spiller.rundeSeed === spilTilstand.rundeSeed;
     }
 
     function erSammeSpiller(spiller: SpillerData, browserId: string) {
@@ -2424,7 +2595,14 @@
         );
 
         if (aktiveUafsluttede.length === 0) {
+            const gammelRundeId = spilTilstand.rundeSeed;
+            if (!spilTilstand.offlineMode && !(await flushVentendeGravsten(gammelRundeId))) {
+                spilTilstand.statusBesked = tekst('Dødsfaldet kunne ikke gemmes endnu. Tjek forbindelsen, og prøv igen.', 'The death could not be saved yet. Check the connection and try again.');
+                return false;
+            }
             spilTilstand.erHost = true;
+            annullerVentendeNetvaerkSync();
+            nulstilFlygtigRundeState();
             spilTilstand.alleSpillere = {};
             startNyRundeSeed();
             spilTilstand.fogX = 0;
@@ -2444,15 +2622,19 @@
             spilTilstand.venteFriIndtilDag = 0;
             nulstilKort();
 
-            const { error } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
-                kort: spilTilstand.gitter,
+            const { error, count } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
+                kort: rensKortTilLagring(spilTilstand.gitter),
                 start_index: spilTilstand.spillerIndex,
                 spillere: {},
                 fog_x: 0,
                 ...kortSessionMeta()
-            }).eq('rum_kode', spilTilstand.rumKode), 8000));
+            }, { count: 'exact' })
+                .eq('rum_kode', spilTilstand.rumKode)
+                .eq('kort_version', KORT_VERSION)
+                .eq('runde_id', gammelRundeId), 8000));
 
-            if (error) {
+            if (error || count !== 1) {
+                await genindlaesSessionEfterTabtReset();
                 spilTilstand.statusBesked = tekst('Øen kunne ikke gøres klar til nye rejsende. Tjek forbindelsen, og prøv igen.', 'The island could not be prepared for new travelers. Check your connection and try again.');
                 return false;
             }
@@ -2471,11 +2653,14 @@
         if (Object.keys(rensede).length === alleEntries.length) return true;
 
         spilTilstand.alleSpillere = rensede;
-        const { error } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
+        const { error, count } = await medRetry(() => medTimeout(supabase.from('spil_sessioner').update({
             spillere: rensede
-        }).eq('rum_kode', spilTilstand.rumKode), 8000));
+        }, { count: 'exact' })
+            .eq('rum_kode', spilTilstand.rumKode)
+            .eq('kort_version', KORT_VERSION)
+            .eq('runde_id', spilTilstand.rundeSeed), 8000));
 
-        if (error) {
+        if (error || count !== 1) {
             spilTilstand.statusBesked = tekst('Øen kunne ikke ryddes efter tidligere rejsende. Tjek forbindelsen, og prøv igen.', 'The island could not be cleared after previous travelers. Check your connection and try again.');
             return false;
         }
@@ -2486,6 +2671,7 @@
     function filtrerSpillereTilKanal(spillere: Record<string, SpillerData>, kanalNoegle: string) {
         return Object.fromEntries(
             Object.entries(spillere).filter(([, spiller]) => {
+                if (spilTilstand.rundeSeed && spiller.rundeSeed !== spilTilstand.rundeSeed) return false;
                 if (spiller.kanalNoegle) return spiller.kanalNoegle === kanalNoegle;
                 if (spiller.rumKode) return spiller.rumKode === spilTilstand.rumKode;
                 return true;
@@ -2717,29 +2903,13 @@
         return {
             kort_bredde: spilTilstand.kortBredde,
             kort_hoejde: spilTilstand.kortHoejde,
-            kort_version: KORT_VERSION
+            kort_version: KORT_VERSION,
+            runde_id: spilTilstand.rundeSeed
         };
     }
 
     function laesSessionDimensioner(data: { kort_bredde?: number | null; kort_hoejde?: number | null } | null | undefined) {
         saetKortDimensioner(data?.kort_bredde ?? BREDDE, data?.kort_hoejde ?? HOEJDE);
-    }
-
-    function erTomSessionForurenet(data: { kort?: Felt[] | null; fog_x?: number | null } | null | undefined) {
-        if (!data) return false;
-        if ((data.fog_x || 0) !== 0) return true;
-        return (data.kort || []).some((felt) =>
-            !!felt.mineOwner ||
-            !!felt.gravet ||
-            !!felt.udforsket ||
-            !!felt.eventFuldført ||
-            !!felt.indbrudt ||
-            !!felt.plyndret ||
-            !!felt.taageLukketShop ||
-            !!felt.taageLukketVaerksted ||
-            (felt.naegterHandelFor?.length || 0) > 0 ||
-            !!felt.shopGenopfyldtDag
-        );
     }
 
     async function medRetry<T>(kald: () => PromiseLike<T>, antalForsoeg = 2): Promise<T> {
@@ -2773,6 +2943,8 @@ function udførBevægelse(nytIndeks: number) {
     if (flytterNu || !spilTilstand.valgtKarakter) return;
 
     flytterNu = true;
+    const bevaegelsesGeneration = ++bevaegelsesTimerGeneration;
+    const bevaegelsesRundeId = spilTilstand.rundeSeed;
     const gammelIndex = spilTilstand.spillerIndex;
     udfoerBevaegelse(nytIndeks, {
         erITaagen: erITågen,
@@ -2791,7 +2963,12 @@ function udførBevægelse(nytIndeks: number) {
         skjulTutorialKnap();
     }
 
-    setTimeout(() => flytterNu = false, 200);
+    setTimeout(() => {
+        if (bevaegelsesTimerGeneration === bevaegelsesGeneration &&
+            spilTilstand.rundeSeed === bevaegelsesRundeId) {
+            flytterNu = false;
+        }
+    }, 200);
 }
 
     function flytHex(retning: string) {

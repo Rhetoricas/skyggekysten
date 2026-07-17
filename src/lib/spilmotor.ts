@@ -16,6 +16,7 @@ import { startEvent } from '$lib/eventMotor.svelte';
 import { erFriskAktivSpiller } from '$lib/aktivSpiller';
 import { tekst } from '$lib/i18n.svelte';
 import { itemNavn } from '$lib/spilTekst';
+import { registrerDoedsGravsten } from '$lib/gravsten';
 
 function eventKanalNavn() {
     return `room:${realtimeRumNoegle(spilTilstand.rumKode)}:events`;
@@ -24,7 +25,8 @@ function eventKanalNavn() {
 function eventKanalPayload() {
     return {
         kanalNoegle: realtimeRumNoegle(spilTilstand.rumKode),
-        rumKode: spilTilstand.rumKode
+        rumKode: spilTilstand.rumKode,
+        rundeId: spilTilstand.rundeSeed
     };
 }
 
@@ -70,12 +72,14 @@ export function erVandBiome(biome: string | Biome | null | undefined) {
 interface FaellesEventEffekt {
     senderNavn: string;
     besked: string;
+    rundeId?: string;
     targetNavn?: string;
     guldAendring?: number;
     skade?: number;
 }
 
 let katastrofeVisuelId = 0;
+let skaermRystGeneration = 0;
 
 function animerKatastrofeFelter(centerIndex: number, fraBiomer: Map<number, string | Biome>) {
     const id = ++katastrofeVisuelId;
@@ -110,10 +114,13 @@ function animerKatastrofeFelter(centerIndex: number, fraBiomer: Map<number, stri
 }
 
 export function rystSkaerm(varighed: number = 1200) {
+    const generation = ++skaermRystGeneration;
+    const rundeId = spilTilstand.rundeSeed;
     if (typeof document !== 'undefined') {
         document.body.classList.add('jordskaelv');
         document.body.classList.add('katastrofe-lys');
         setTimeout(() => {
+            if (skaermRystGeneration !== generation || spilTilstand.rundeSeed !== rundeId) return;
             document.body.classList.remove('jordskaelv');
             document.body.classList.remove('katastrofe-lys');
         }, varighed);
@@ -228,6 +235,7 @@ export async function sendAnonymAlarm() {
 
 export function anvendFaellesEventEffekt(payload: FaellesEventEffekt) {
     if (!payload || payload.senderNavn === spilTilstand.spillerNavn) return;
+    if (!payload.rundeId || payload.rundeId !== spilTilstand.rundeSeed) return;
     if (payload.targetNavn && payload.targetNavn !== spilTilstand.spillerNavn) return;
     if (spilTilstand.gameState === 'dead_map' || spilTilstand.gameState === 'win_map') return;
 
@@ -976,6 +984,7 @@ export function udfoerBevaegelse(nytIndeks: number, options: BevaegelseOptions) 
             "Du har været væk for længe. Tågen har indhentet dig, og du overlever ikke.",
             "You were away too long. The fog caught up with you, and you do not survive."
         );
+        registrerDoedsGravsten(spilTilstand.spillerIndex, spilTilstand.logBesked);
         syncTilDb(true);
         return false;
     }
@@ -1264,7 +1273,11 @@ function haandterAnkomstPaaFelt(nytIndeks: number, ankomstKilde: AnkomstKilde, o
         mapAendret = true;
         spilTilstand.gitter = [...spilTilstand.gitter];
         syncTilDb(true);
+        const vinderRundeId = spilTilstand.rundeSeed;
+        const vinderNavn = spilTilstand.spillerNavn;
         setTimeout(() => {
+            if (!vinderRundeId || spilTilstand.rundeSeed !== vinderRundeId || spilTilstand.spillerNavn !== vinderNavn) return;
+            if (!spilTilstand.alleSpillere[vinderNavn]?.isWinner) return;
             spilTilstand.gameState = 'win_map';
             syncTilDb(true); 
         }, 3000);
@@ -3171,6 +3184,13 @@ function flensToejPaaMeteor() {
 }
 
 export function nulstilKort() {
+    skaermRystGeneration++;
+    katastrofeVisuelId++;
+    if (typeof document !== 'undefined') {
+        document.body.classList.remove('jordskaelv', 'katastrofe-lys');
+    }
+    // Gravsten og gravstenListe nulstilles med vilje ikke. De er oeens
+    // permanente mindesmaerker og begraenses til de tre seneste ved doedsfald.
     spilTilstand.gitter.forEach(felt => {
         felt.gravet = false;
         felt.eventFuldført = false;
@@ -3223,6 +3243,7 @@ export function nulstilKort() {
                 felt.shopGenopfyldtDag = undefined;
             }
             
+            // Undergrunden rulles frisk for hver runde.
             const hemmeligheder = genererUndergrund(felt.grundBiome as string);
             felt.kanGraves = hemmeligheder.kanGraves;
             felt.skjultGuld = hemmeligheder.skjultGuld;
@@ -3232,5 +3253,6 @@ export function nulstilKort() {
         }
     });
 
+    // Gamle skatteklynger ryddes inde i plantSkat, foer nye placeres.
     plantSkat(spilTilstand.gitter);
 }

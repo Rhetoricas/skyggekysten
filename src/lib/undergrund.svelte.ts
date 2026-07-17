@@ -80,9 +80,16 @@ export function genererUndergrund(biome: Biome | string) {
 }
 
 let graverNu = false; 
+let graveKlientGeneration = 0;
+
+export function nulstilUndergrundKlientState() {
+    graverNu = false;
+    graveKlientGeneration++;
+}
 
 export function grav() {
     if (graverNu) return; 
+    const aktuelGeneration = graveKlientGeneration;
 
     if (spilTilstand.erBevidstløs || !spilTilstand.valgtKarakter) return;
     
@@ -237,6 +244,7 @@ export function grav() {
     }
 
     setTimeout(() => {
+        if (aktuelGeneration !== graveKlientGeneration) return;
         graverNu = false;
     }, 1000);
 }

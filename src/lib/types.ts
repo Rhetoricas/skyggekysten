@@ -87,10 +87,12 @@ export interface SpillerData {
 }
 
 export interface GravstenMinde {
+    id?: string;
     ikon: string;
     navn: string;
     dag: number;
     tekst?: string;
+    tidspunkt?: string;
 }
 
 export interface Felt {

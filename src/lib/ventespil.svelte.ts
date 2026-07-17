@@ -8,6 +8,13 @@ export const VENTE_FRI_DAGE = 5;
 
 let rundeGuld = 0;
 let rundeLiv = 0;
+let venteKlientGeneration = 0;
+
+export function nulstilVenteSpilKlientState() {
+    rundeGuld = 0;
+    rundeLiv = 0;
+    venteKlientGeneration++;
+}
 
 export function venteTidTilbageMs(now = Date.now()) {
     const startTid = spilTilstand.venteStartTid || now;
@@ -107,6 +114,7 @@ export function startVenteSpil(kosterPenge: boolean = false) {
 
 export function vendKort(indeks: number) {
     if (spilTilstand.venteFase !== 'spiller' || spilTilstand.venteKort[indeks].afsloeret) return;
+    const aktuelGeneration = venteKlientGeneration;
 
     const kort = spilTilstand.venteKort[indeks];
     kort.afsloeret = true;
@@ -126,6 +134,7 @@ export function vendKort(indeks: number) {
         syncTilDb();
 
         setTimeout(() => {
+            if (aktuelGeneration !== venteKlientGeneration) return;
             if (spilTilstand.venteSpilAktiv) {
                 spilTilstand.venteKort = spilTilstand.venteKort.map(k => ({...k, afsloeret: true}));
             }
@@ -146,14 +155,17 @@ export function vendKort(indeks: number) {
         syncTilDb();
 
         setTimeout(() => {
+            if (aktuelGeneration !== venteKlientGeneration) return;
             if (spilTilstand.venteSpilAktiv && spilTilstand.venteFase === 'viser_gevinst') {
                 spilTilstand.venteKort = spilTilstand.venteKort.map(k => ({...k, afsloeret: true}));
                 
                 setTimeout(() => {
+                    if (aktuelGeneration !== venteKlientGeneration) return;
                     if (spilTilstand.venteSpilAktiv && spilTilstand.venteFase === 'viser_gevinst') {
                         spilTilstand.venteKort = spilTilstand.venteKort.map(k => ({...k, afsloeret: false}));
                         
                         setTimeout(() => {
+                            if (aktuelGeneration !== venteKlientGeneration) return;
                             if (spilTilstand.venteSpilAktiv && spilTilstand.venteFase === 'viser_gevinst') {
                                 delNyeKort();
                                 spilTilstand.venteFase = 'spiller';

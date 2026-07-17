@@ -2,6 +2,7 @@ import { supabase } from './supabaseClient';
 import { spilTilstand } from './spilTilstand.svelte';
 import { taelScoreSpillere } from './score';
 import type { RygsækTing } from './types';
+import { TROFAE_GENERATION } from './klientVersioner';
 
 export type TrofaeId =
     | 'mineejeren'
@@ -164,11 +165,11 @@ export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     }
 ];
 
-const TROFAE_STORAGE_PREFIX = 'taage_trofaeer:';
-const MYTISK_TROFAE_STORAGE_PREFIX = 'taage_mytiske_trofaeer:';
-const TROFAE_AWARD_STORAGE_PREFIX = 'taage_trofae_awards:';
-const TROFAE_PENDING_SYNC_KEY = 'taage_pending_trofaeer';
-const MYTISK_TROFAE_PENDING_SYNC_KEY = 'taage_pending_mytiske_trofaeer';
+const TROFAE_STORAGE_PREFIX = `taage_trofaeer:v${TROFAE_GENERATION}:`;
+const MYTISK_TROFAE_STORAGE_PREFIX = `taage_mytiske_trofaeer:v${TROFAE_GENERATION}:`;
+const TROFAE_AWARD_STORAGE_PREFIX = `taage_trofae_awards:v${TROFAE_GENERATION}:`;
+const TROFAE_PENDING_SYNC_KEY = `taage_pending_trofaeer:v${TROFAE_GENERATION}`;
+const MYTISK_TROFAE_PENDING_SYNC_KEY = `taage_pending_mytiske_trofaeer:v${TROFAE_GENERATION}`;
 const TROFAE_SUPABASE_TIMEOUT_MS = 8000;
 const TROFAE_KRAV = {
     miner: 12,
@@ -214,6 +215,7 @@ const OPGRADERINGS_POINT = new Map<string, number>([
 const MAGISKE_GENSTANDE = new Set(['rodhjertet', 'gylden_destillator', 'dragestav', 'runekvist']);
 
 type VentendeTrofaeSync = {
+    generation: number;
     userId: string;
     ids: TrofaeId[];
     nyeIds: TrofaeId[];
@@ -271,12 +273,13 @@ function hentVentendeTrofaeSyncs(): VentendeTrofaeSync[] {
         if (!Array.isArray(data)) return [];
         return data
             .map((sync) => ({
+                generation: Number(sync?.generation),
                 userId: typeof sync?.userId === 'string' ? sync.userId : '',
                 ids: normaliserTrofaeIds(sync?.ids),
                 nyeIds: normaliserTrofaeIds(sync?.nyeIds),
                 updatedAt: typeof sync?.updatedAt === 'string' ? sync.updatedAt : new Date().toISOString()
             }))
-            .filter((sync) => sync.userId && sync.ids.length > 0);
+            .filter((sync) => sync.generation === TROFAE_GENERATION && sync.userId && sync.ids.length > 0);
     } catch {
         return [];
     }
@@ -294,12 +297,13 @@ function hentVentendeMytiskeTrofaeSyncs(): VentendeTrofaeSync[] {
         if (!Array.isArray(data)) return [];
         return data
             .map((sync) => ({
+                generation: Number(sync?.generation),
                 userId: typeof sync?.userId === 'string' ? sync.userId : '',
                 ids: normaliserTrofaeIds(sync?.ids),
                 nyeIds: normaliserTrofaeIds(sync?.nyeIds),
                 updatedAt: typeof sync?.updatedAt === 'string' ? sync.updatedAt : new Date().toISOString()
             }))
-            .filter((sync) => sync.userId && sync.ids.length > 0);
+            .filter((sync) => sync.generation === TROFAE_GENERATION && sync.userId && sync.ids.length > 0);
     } catch {
         return [];
     }
@@ -323,7 +327,7 @@ export function huskVentendeSupabaseTrofaeer(userId: string | null | undefined, 
         eksisterende.nyeIds = normaliserTrofaeIds([...eksisterende.nyeIds, ...nyeTrofaeIds]);
         eksisterende.updatedAt = new Date().toISOString();
     } else {
-        syncs.push({ userId, ids: alleIds, nyeIds: nyeTrofaeIds, updatedAt: new Date().toISOString() });
+        syncs.push({ generation: TROFAE_GENERATION, userId, ids: alleIds, nyeIds: nyeTrofaeIds, updatedAt: new Date().toISOString() });
     }
     gemVentendeTrofaeSyncs(syncs);
 }
@@ -341,7 +345,7 @@ export function huskVentendeSupabaseMytiskeTrofaeer(userId: string | null | unde
         eksisterende.nyeIds = normaliserTrofaeIds([...eksisterende.nyeIds, ...nyeTrofaeIds]);
         eksisterende.updatedAt = new Date().toISOString();
     } else {
-        syncs.push({ userId, ids: alleIds, nyeIds: nyeTrofaeIds, updatedAt: new Date().toISOString() });
+        syncs.push({ generation: TROFAE_GENERATION, userId, ids: alleIds, nyeIds: nyeTrofaeIds, updatedAt: new Date().toISOString() });
     }
     gemVentendeMytiskeTrofaeSyncs(syncs);
 }
