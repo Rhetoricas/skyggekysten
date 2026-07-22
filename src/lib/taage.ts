@@ -7,6 +7,21 @@ function feltPosX(index: number, bredde: number) {
     return kolonne * HEX_W + (raekke % 2 !== 0 ? HEX_W / 2 : 0);
 }
 
+function taagePassage(fogX: number, kortPixelBredde: number) {
+    if (fogX >= 0) return { nummer: 0, afstand: fogX };
+
+    const samletAfstand = Math.abs(fogX);
+    const nummer = Math.max(1, Math.ceil(samletAfstand / kortPixelBredde));
+    const afstand = samletAfstand - ((nummer - 1) * kortPixelBredde);
+    return { nummer, afstand };
+}
+
+function passageHarNaaetFelt(passage: number, afstand: number, posX: number, kortPixelBredde: number) {
+    return passage % 2 === 0
+        ? posX <= afstand
+        : posX >= kortPixelBredde - afstand;
+}
+
 export function erBeskyttetAfTaageblokker(gitter: Felt[], index: number, bredde = STANDARD_KORT_BREDDE) {
     const raekke = Math.floor(index / bredde);
     const posX = feltPosX(index, bredde);
@@ -24,16 +39,32 @@ export function erBeskyttetAfTaageblokker(gitter: Felt[], index: number, bredde 
     return false;
 }
 
-export function erFeltITaagen(gitter: Felt[], index: number, fogX: number, bredde = STANDARD_KORT_BREDDE) {
+export function hentTaageNiveauForFelt(gitter: Felt[], index: number, fogX: number, bredde = STANDARD_KORT_BREDDE) {
+    const kortPixelBredde = bredde * HEX_W;
     const posX = feltPosX(index, bredde);
+    const aktuelPassage = taagePassage(fogX, kortPixelBredde);
+    const beskyttetFraVest = erBeskyttetAfTaageblokker(gitter, index, bredde);
+    let niveau = 0;
 
-    if (fogX < 0) {
-        const kortBredde = bredde * HEX_W;
-        const frontFraOest = kortBredde - Math.abs(fogX);
-        const opslugtFraVest = posX <= kortBredde && !erBeskyttetAfTaageblokker(gitter, index, bredde);
-        const opslugtFraOest = posX >= frontFraOest;
-        return opslugtFraVest || opslugtFraOest;
+    // Niveau 3 er loftet. Derfor er kun de første fire passager relevante:
+    // vest→øst, øst→vest, vest→øst og eventuelt øst→vest igen bag en blokker.
+    for (let passage = 0; passage <= Math.min(aktuelPassage.nummer, 3) && niveau < 3; passage++) {
+        const erAfsluttet = passage < aktuelPassage.nummer;
+        const erNaaet = erAfsluttet || passageHarNaaetFelt(
+            passage,
+            aktuelPassage.afstand,
+            posX,
+            kortPixelBredde
+        );
+        if (!erNaaet) continue;
+
+        const kommerFraVest = passage % 2 === 0;
+        if (passage === 0 || !kommerFraVest || !beskyttetFraVest) niveau++;
     }
 
-    return posX <= fogX && !erBeskyttetAfTaageblokker(gitter, index, bredde);
+    return niveau;
+}
+
+export function erFeltITaagen(gitter: Felt[], index: number, fogX: number, bredde = STANDARD_KORT_BREDDE) {
+    return hentTaageNiveauForFelt(gitter, index, fogX, bredde) > 0;
 }

@@ -12,7 +12,7 @@ function ladFeltetStaa(logBesked: string, logBeskedEn: string) {
     }
     syncTilDb();
     syncKortTilDbSenere();
-    return { logBesked, logBeskedEn };
+    return { logBesked, logBeskedEn, bevarEvent: true };
 }
 
 function erKrigertype() {

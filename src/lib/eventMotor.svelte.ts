@@ -145,6 +145,7 @@ export function tagValg(valg: Valg) {
 
     let samletLogTekst = "";
     let kvittering = gratisEnergiKvittering;
+    let bevarEvent = false;
 
     if (valg.udfaldListe && valg.udfaldListe.length > 0) {
         const resultat = { ...valg.udfaldListe[Math.floor(Math.random() * valg.udfaldListe.length)] };
@@ -232,6 +233,7 @@ export function tagValg(valg: Valg) {
         const valgMedEffekt = valg as any;
         const resultat = valgMedEffekt.effekt(betaltItem);
         samletLogTekst = effektLog(resultat);
+        bevarEvent = resultat.bevarEvent === true;
 
         if (resultat.maxHpAendring) {
             spilTilstand.maxLivspoint += resultat.maxHpAendring;
@@ -315,7 +317,7 @@ export function tagValg(valg: Valg) {
     if (!eventState.naesteTrin) {
         const felt = spilTilstand.gitter[afsluttetFeltIndex];
         if (felt && felt.eventID === afsluttetEventId) {
-            felt.eventFuldført = true;
+            felt.eventFuldført = !bevarEvent;
             broadcastFelt(afsluttetFeltIndex, felt);
         }
         fremrykTid();

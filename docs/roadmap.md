@@ -1,6 +1,6 @@
 # Roadmap og idebank
 
-Senest opdateret: 2026-05-30
+Senest opdateret: 2026-07-19
 
 Dette dokument er til ideer, balancering og designspor, som skal være nemme at finde igen. Det er ikke en kravspecifikation. Når noget herfra skal laves, skal vi stadig tale det igennem først, især hvis det ændrer centrale regler.
 
@@ -104,47 +104,54 @@ Nuværende retning:
 
 Roadmap-status:
 
-- Ikke implementeret endnu.
-- Nuværende system gemmer standardmedalje ud fra score.
-- Næste designspor er at give hver afsluttet tur højst én særlig trofævariant oven på standardmedaljen.
-- Trofæet skal vælges ved spilslut ud fra en analyse af turen. Backend skal gemme resultatet, men ikke være dommer undervejs.
-- Toplister må stadig ikke hente log/rute/tung detaljedata, før spilleren klikker på en konkret score.
+- Implementeret: standardmedalje ud fra score samt ni trofætyper med almindelig og mytisk variant.
+- De præcise krav kan ses ved at åbne trofæerne på profilen.
+- Almindelige trofæer kræver, at spilleren slipper levende væk. Mytiske trofæer kræver desuden et solospil og det almindelige trofæ i samme samling.
+- En gennemspilning kan opfylde flere trofækrav. Nye trofæer gemmes på profilen og knyttes til spillets resultat.
+- Resultatet gemmer lette trofæmålinger, så opgørelsen kan vises uden at hente log/rute/tung detaljedata på toplisten.
 
-Grundmodel:
+### Spillertips til medaljer og trofæer
 
-- Spilleren får altid en standardmedalje baseret på score.
-- Hvis turen har en markant særlig bedrift, kan standardmedaljen få en trofævariant.
-- Der vises kun ét trofæ på medaljen pr. spil, så medaljen er let at aflæse.
-- Spillet kan godt beregne flere kandidater, men den stærkeste kandidat vinder.
-- Man skal ikke jage lave medaljeniveauer. Trofætypen samles som bedrift, og score afgør hvor flot versionen bliver.
-- Eksempel: En tur udløser Minekronen og scorer til medaljeniveau 8. Resultatet bliver "M8 Minekronen". En senere bedre tur kan blive "M10 Minekronen".
+Formål:
 
-Mulig teknisk model:
+- Giv spilleren strategisk hjælp til at gå efter en bestemt medalje eller et bestemt trofæ uden at love en sikker opskrift.
+- Skeln mellem **krav** og **tip**: kravteksten siger, hvad der tæller; tippet foreslår, hvordan spilleren kan bygge sin tur op.
+- Bevar opdagelse og genspilningsværdi. Tips må gerne nævne relevante systemer og afvejninger, men bør ikke afsløre faste kortplaceringer, eventtabeller eller optimale facitlister.
+- Skriv korte, konkrete råd i spillets tone. Ét godt råd er bedre end en lang guide.
 
-- Tilføj et lille `achievementStats`-objekt i spiltilstanden til ting, som ikke kan udledes sikkert bagefter.
-- Eksempler: samlet skade, tågeskade, vandskade, kollaps, livseliksir-redninger, opgraderinger, relikvier, katastrofer overlevet, særlige events.
-- Ved spilslut kører en funktion, fx `findTrophyType(spilTilstand, achievementStats)`.
-- Gem evt. `trophy_type` og `achievement_stats` i `game_results`, ud over eksisterende `medal_path`/`medal_level`.
+Anbefalet placering:
 
-Foreslåede trofætyper:
+- Vis et kort "Sådan kan du gå efter den" under kravteksten, når et låst eller opnået trofæ åbnes på profilen.
+- Vis generelle medaljetips ved scoreopgørelsen eller som roterende tips før en ny tur.
+- Lad mytiske varianter genbruge grundtippet og tilføje en tydelig note om, at de kun kan opnås solo.
+- Overvej senere fremdrift fra seneste afsluttede spil, fx "8/12 miner", men undgå en permanent HUD-tjekliste under selve turen.
 
-- Standardmedaljen: fallback når ingen særlig bedrift dominerer.
-- Minekronen: mange miner, minekontrol, mine-overtagelser eller høj mine-score.
-- Tågevandreren: overlever meget tåge, tågeskade, blodofring eller flugt sent i tågen.
-- Havmærket: vand, hav, druknefare, oversvømmelse eller tabt udstyr i vand.
-- Relikviejægeren: sjældne/magiske ting som Rodhjertet, Gylden Destillator, dragestav, runekvist eller malmviser.
-- Handelsfyrsten: ekstrem guldøkonomi, handel, tøjbonus, salg/køb, tyveri eller indbrud.
-- Blodprisen: lav HP, mange skadeshændelser, livseliksir-redning, kollaps, max-HP-tab eller blodofring.
-- Korttegneren: mange kendte felter, lang rute, høj max-kolonne, kikkert/fakkel/syn eller skattekortspor.
-- Udstyrsmesteren: mange opgraderinger, værkstedsbrug eller stærk gear-progression.
-- Skæbnebruddet: usandsynligt comeback, katastrofer overlevet, ekstrem risiko eller en tur der egentlig burde være mislykkedes.
+Generelle medaljetips:
 
-Åbne designspørgsmål:
+- Forklar, at medaljescoren kommer fra flere spor: guld, udforskning, miner, resterende udstyr og at slippe væk. Spilleren behøver derfor ikke satse alt på én aktivitet.
+- Gør det tydeligt, at høj resterende HP løfter hele grundscoren. En rig tur med meget lav HP er ikke nødvendigvis den bedste scoretur.
+- Mind spilleren om, at flugt giver en stor fremdriftsbonus, og at udstyr i rygsækken stadig har pointværdi ved spilslut.
+- Højere medaljer bør beskrives som et valg mellem grådighed og sikker hjemrejse: byg værdien op, men planlæg udgangen, før tågen eller skaderne lukker turen.
+- Medalje 11 bør fortsat have sit særskilte, præcise råd: mindst 12.500 point og en placering i ugens top ti.
 
-- Skal trofæsamling vises på profilsiden som bedste version pr. trofætype?
-- Skal enkelte trofæer have klassebonus i vurderingen, eller skal alle klasser kunne få alle trofæer?
-- Hvordan prioriteres to lige stærke kandidater, fx Minekronen vs Handelsfyrsten?
-- Skal gamle scores uden `achievementStats` altid vises som standardmedaljer?
+Forslag til trofæspecifikke tips:
+
+- **Mineejer:** Læg en rute gennem områder med mange miner, og behold ressourcer nok til at overtage dem. Det er de miner, du stadig ejer ved flugten, der tæller.
+- **Tågekonge:** Forbered heling, mad og en kendt vej mod udgangen, før du bevidst tager mange bevægelser i tågen. Overlevelsen er stadig en del af kravet.
+- **Bølgebærer:** Start først oversvømmelsen, når du har HP, heling og en realistisk flugtvej. Kun vandhændelser, der faktisk giver skade, tæller.
+- **Relikviejæger:** Behold Rodhjertet, Gylden Destillator, Dragestav og Runekvist, når du finder dem. Planlæg turen omkring flere kilder til sjældne genstande, og undgå at sælge eller ofre dem før flugten.
+- **Guldfyrste:** Det er guldbeholdningen ved flugten, der tæller. Sælg overflødigt udstyr nær slutningen, og undgå dyre sidsteøjeblikskøb, når målet er tæt på.
+- **Livvogter:** Kun HP, der faktisk bliver gendannet, tæller. Spred helingen over turen, og sørg for at have mistet HP, før du bruger stærke helinger.
+- **Korttegner:** Prioritér udsyn, udforskning og kontrollerede omveje frem for den korteste rute. Sørg samtidig for at vende om i tide, så den lange kortlægning ender med flugt.
+- **Udstyrsmester:** Saml forskellige opgraderede genstande og behold dem samtidig i rygsækken. Royalt tøj er særligt værdifuldt, fordi det tæller som to opgraderingspoint.
+- **Diamantjæger:** Det er den fulde råværdi af alle diamanter fundet i turen, der tæller, så tidligere fund tæller fortsat, selv hvis diamanterne senere sælges. Opsøg flere diamantkilder frem for kun at håbe på ét stort fund.
+
+Åbne designspørgsmål for tips:
+
+- Skal alle tips være synlige fra starten, eller skal et mere konkret tip låses op efter første mislykkede forsøg på trofæet?
+- Skal tips være faste pr. trofæ eller rotere mellem 2-3 korte råd?
+- Skal seneste trofæmålinger kun vises efter spilslut, eller også på profilen som hjælp til næste forsøg?
+- Skal tips nævne bestemte karakterer og klassefordele, eller holdes karakterneutrale for at undgå én oplevet facitløsning?
 
 ## Multiplayer og forbindelse
 

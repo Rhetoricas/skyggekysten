@@ -48,6 +48,7 @@ export interface Valg {
         energisyn?: boolean;
         itemUd?: string;
         naesteEvent?: string;
+        bevarEvent?: boolean;
     };
 }
 

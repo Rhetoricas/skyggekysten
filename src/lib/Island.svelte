@@ -30,7 +30,7 @@
     import type { Felt, GravstenMinde, Karakter, SpillerData } from '$lib/types';
     import { eventBibliotek } from '$lib/eventBibliotek';
     import { erAfgroedeModen, hentAfgroedeBlok, hentInsektPlageBlok } from '$lib/afgroeder';
-    import { erBeskyttetAfTaageblokker, erFeltITaagen } from '$lib/taage';
+    import { erFeltITaagen, hentTaageNiveauForFelt } from '$lib/taage';
     import { findNyeMytiskeTrofaeer, findNyeTrofaeer, gemMytiskeTrofaeIds, gemSupabaseTrofaeAwards, gemTrofaeAwards, gemTrofaeIds, hentGemteMytiskeTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, huskVentendeSupabaseMytiskeTrofaeer, huskVentendeSupabaseTrofaeer, lavTrofaeAwardData, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, nulstilTrofaeStats, retryVentendeSupabaseMytiskeTrofaeer, retryVentendeSupabaseTrofaeer } from '$lib/trofaeer';
 
     import Skaerme from './Skaerme.svelte';
@@ -81,6 +81,7 @@
     let bevaegelsesTimerGeneration = 0;
     let sejlendeBaadIndex = $state<number | null>(null);
     let visDoedsLog = $state(false);
+    let visTutorialPanel = $state(true);
     let langsomtKamera = $state(false);
     let sidsteKikkertMode = '';
     let ruteOverblikState = '';
@@ -194,10 +195,7 @@
 
     function taageNiveauForFelt(index: number, erOpslugt: boolean) {
         if (!erOpslugt) return 0;
-        if (erBeskyttetAfTaageblokker(spilTilstand.gitter, index, kortBredde)) return 1;
-        if (spilTilstand.fogX <= -(kortBredde * HEX_W)) return 3;
-        if (spilTilstand.fogX < 0) return 2;
-        return 1;
+        return hentTaageNiveauForFelt(spilTilstand.gitter, index, spilTilstand.fogX, kortBredde);
     }
 
     function hexMidtpunkt(index: number) {
@@ -1104,6 +1102,11 @@
             return true;
         }
 
+        if (tutorialState.aktiv && visTutorialPanel) {
+            visTutorialPanel = false;
+            return true;
+        }
+
         return false;
     }
 
@@ -1767,6 +1770,7 @@
         spilTilstand.aktivVaerksted = false;
         sejlendeBaadIndex = null;
         visDoedsLog = false;
+        visTutorialPanel = true;
         introAktiv = false;
         flytterNu = false;
         lukInspect();
@@ -3114,6 +3118,18 @@ function udførBevægelse(nytIndeks: number) {
         <Regelbog onOpen={() => markerTutorialHandling('rulebook')} />
         <SprogKnap />
         <LydKnap />
+        {#if tutorialState.aktiv && !visTutorialPanel}
+            <button
+                type="button"
+                class="tutorial-aabn-knap"
+                onclick={() => visTutorialPanel = true}
+                title={tekst('Åbn tutorial', 'Open tutorial')}
+                aria-label={tekst('Åbn tutorial', 'Open tutorial')}
+            >
+                <span aria-hidden="true">?</span>
+                <span>{tekst('Tutorial', 'Tutorial')}</span>
+            </button>
+        {/if}
     </div>
     <div class="zoom-actions" aria-label={tekst('Zoom', 'Zoom')}>
         <button type="button" onclick={() => cam.justerZoom(0.18, !!eventState.aktivt || !!spilTilstand.aktivShop || !!spilTilstand.aktivVaerksted)} aria-label={tekst('Zoom ind', 'Zoom in')}>+</button>
@@ -3121,12 +3137,20 @@ function udførBevægelse(nytIndeks: number) {
     </div>
 {/if}
 
-{#if tutorialState.aktiv && spilTilstand.gameState === 'play'}
+{#if tutorialState.aktiv && spilTilstand.gameState === 'play' && visTutorialPanel}
     <aside
         class="tutorial-panel"
+        aria-label={tekst('Tutorial', 'Tutorial')}
         data-help-title={tekst('Tutorial', 'Tutorial')}
         data-help-body={tekst('Tutorialboksen viser din næste øvelse. Tutorialen påvirker ikke gemte spil eller toplister.', 'The tutorial box shows your next exercise. The tutorial does not affect saved games or leaderboards.')}
     >
+        <button
+            type="button"
+            class="tutorial-luk-knap"
+            onclick={() => visTutorialPanel = false}
+            title={tekst('Luk tutorial', 'Close tutorial')}
+            aria-label={tekst('Luk tutorial', 'Close tutorial')}
+        >×</button>
         <span class="tutorial-progress">
             {Math.min(tutorialState.trin + 1, tutorialTrinAntal)}/{tutorialTrinAntal}
         </span>
@@ -3739,6 +3763,59 @@ function udførBevægelse(nytIndeks: number) {
         box-shadow: 0 16px 42px rgba(0, 0, 0, 0.48);
         pointer-events: auto;
     }
+    .tutorial-luk-knap {
+        position: absolute;
+        top: 7px;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        color: #f5efe2;
+        font: 700 1.35rem/1 system-ui, sans-serif;
+        cursor: pointer;
+    }
+    .tutorial-luk-knap:hover,
+    .tutorial-luk-knap:focus-visible {
+        background: rgba(195, 65, 53, 0.4);
+        outline: 2px solid #ffd66f;
+        outline-offset: 1px;
+    }
+    .tutorial-aabn-knap {
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 11px;
+        border: 1px solid rgba(245, 208, 113, 0.55);
+        border-radius: 999px;
+        background: rgba(14, 18, 16, 0.9);
+        color: #fff8e8;
+        font: 700 0.78rem/1 'Cinzel', Georgia, serif;
+        cursor: pointer;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.36);
+    }
+    .tutorial-aabn-knap > span:first-child {
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(195, 65, 53, 0.3);
+        color: #ffd66f;
+        font-family: system-ui, sans-serif;
+        font-size: 0.95rem;
+    }
+    .tutorial-aabn-knap:hover,
+    .tutorial-aabn-knap:focus-visible {
+        border-color: #ffd66f;
+        background: rgba(35, 40, 35, 0.96);
+        outline: 2px solid rgba(255, 214, 111, 0.45);
+        outline-offset: 2px;
+    }
     .tutorial-progress {
         width: 46px;
         height: 46px;
@@ -3755,6 +3832,7 @@ function udførBevægelse(nytIndeks: number) {
     }
     .tutorial-copy {
         min-width: 0;
+        padding-right: 28px;
     }
     .tutorial-copy h2 {
         margin: 0 0 4px;

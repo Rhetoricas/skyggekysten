@@ -2,7 +2,7 @@ import { spilTilstand } from './spilTilstand.svelte';
 import { syncTilDb, broadcastFelt, broadcastFelter } from './netvaerk';
 import { HEX_W } from './spildata';
 import { brugFraRygsæk, hentKortBredde, hentKortHoejde, hentNaboIRetning } from './spilmotor';
-import { erBeskyttetAfTaageblokker, erFeltITaagen } from './taage';
+import { erFeltITaagen, hentTaageNiveauForFelt } from './taage';
 import { erFriskAktivSpiller } from './aktivSpiller';
 import { registrerHeling, registrerVandSkade } from './trofaeer';
 import type { Felt } from './types';
@@ -15,22 +15,6 @@ function erVandBiome(biome: string | null | undefined) {
 
 export function erSpillerITaagen() {
     return erFeltITaagen(spilTilstand.gitter, spilTilstand.spillerIndex, spilTilstand.fogX, hentKortBredde());
-}
-
-function erOestTaageAktiv() {
-    return spilTilstand.fogX < 0;
-}
-
-function erTaagenVendtTilbageFraVest() {
-    return spilTilstand.fogX <= -(hentKortBredde() * HEX_W);
-}
-
-function erSpillerBeskyttetAfTaageblokker() {
-    return erBeskyttetAfTaageblokker(
-        spilTilstand.gitter,
-        spilTilstand.spillerIndex,
-        hentKortBredde()
-    );
 }
 
 function rydTaageramteFelter() {
@@ -347,7 +331,7 @@ export function fremrykTid() {
     const antalLevende = Object.values(spilTilstand.alleSpillere).filter(erFriskAktivSpiller).length || 1;
     
     const gammelDag = spilTilstand.dag || 1;
-    let taagenVendte = false;
+    let taagenVendteVed: 'oest' | 'vest' | null = null;
     let taagenRykkede = false;
 
     while (spilTilstand.nuvaerendeEnergi <= 0) {
@@ -364,14 +348,19 @@ export function fremrykTid() {
 
             if (spilTilstand.fogX >= oestkant) {
                 spilTilstand.fogX = -fremrykning;
-                taagenVendte = true;
+                taagenVendteVed = 'oest';
             } else if (spilTilstand.fogX < 0) {
+                const gammelPassage = Math.max(1, Math.ceil(Math.abs(spilTilstand.fogX) / oestkant));
                 spilTilstand.fogX -= fremrykning;
+                const nyPassage = Math.max(1, Math.ceil(Math.abs(spilTilstand.fogX) / oestkant));
+                if (nyPassage > gammelPassage) {
+                    taagenVendteVed = nyPassage % 2 === 0 ? 'vest' : 'oest';
+                }
             } else {
                 spilTilstand.fogX += fremrykning;
                 if (spilTilstand.fogX >= oestkant) {
                     spilTilstand.fogX = -1;
-                    taagenVendte = true;
+                    taagenVendteVed = 'oest';
                 }
             }
         }
@@ -398,23 +387,31 @@ export function fremrykTid() {
             spilTilstand.logBesked = samletLog.trim();
         }
 
-        if (taagenVendte) {
-            spilTilstand.logBesked = tekst(
-                'Vinden vender ved østkysten. Tågen når niveau 2 og giver dobbelt skade, medmindre en tågeblokker beskytter dig.',
-                'The wind turns at the east coast. The fog reaches level 2 and deals double damage unless a fog blocker protects you.'
-            );
+        if (taagenVendteVed) {
+            spilTilstand.logBesked = taagenVendteVed === 'oest'
+                ? tekst(
+                    'Vinden vender ved østkysten. Tågen bevæger sig nu mod vest. Felterne stiger først i tågeniveau, når fronten rammer dem.',
+                    'The wind turns at the east coast. The fog now moves west. Tiles only rise in fog level when the front reaches them.'
+                )
+                : tekst(
+                    'Vinden vender ved vestkysten. Tågen bevæger sig nu mod øst. Tågeblokkere holder de beskyttede felter på deres nuværende niveau.',
+                    'The wind turns at the west coast. The fog now moves east. Fog blockers keep protected tiles at their current level.'
+                );
         }
     }
 
     if (erSpillerITaagen()) {
-        const beskyttetAfBlokker = erSpillerBeskyttetAfTaageblokker();
-        const tredobbeltTaage = erTaagenVendtTilbageFraVest() && !beskyttetAfBlokker;
-        const dobbeltTaage = erOestTaageAktiv() && !beskyttetAfBlokker;
+        const taageNiveau = hentTaageNiveauForFelt(
+            spilTilstand.gitter,
+            spilTilstand.spillerIndex,
+            spilTilstand.fogX,
+            hentKortBredde()
+        );
         tagSkadeOgTjekDød(
-            tredobbeltTaage ? 90 : dobbeltTaage ? 60 : 30,
-            tredobbeltTaage
+            taageNiveau >= 3 ? 90 : taageNiveau === 2 ? 60 : 30,
+            taageNiveau >= 3
                 ? tekst('Tågen har krydset hele øen og nået niveau 3. Den giver dig tredobbelt skade.', 'The fog has crossed the entire island and reached level 3. It deals triple damage to you.')
-                : dobbeltTaage
+                : taageNiveau === 2
                 ? tekst('Tågen er på niveau 2 og giver dig dobbelt skade.', 'The fog is at level 2 and deals double damage to you.')
                 : tekst('Den giftige tåge ætser dine lunger.', 'The toxic fog burns your lungs.')
         );
