@@ -1466,7 +1466,7 @@
         <div class="highscore-detail-maalinger slut-trofae-maalinger">
             <div>
                 {#each aktuelleTrofaeMaalinger() as maaling (maaling.key)}
-                    <p><span>{maaling.label}</span><strong>{maaling.value}</strong></p>
+                    <p class:skjul-guld-mobil={maaling.key === 'guld'}><span>{maaling.label}</span><strong>{maaling.value}</strong></p>
                 {/each}
             </div>
         </div>
@@ -5188,8 +5188,12 @@
         .slut-naermeste-trofae img {
             width: 125px;
             height: 125px;
-            margin-top: -42px;
-            margin-bottom: -28px;
+            margin-top: -24px;
+            margin-bottom: -10px;
+        }
+
+        .skjul-guld-mobil {
+            display: none;
         }
 
         .point-kvittering,
