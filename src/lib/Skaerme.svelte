@@ -122,10 +122,6 @@
     let visJoinLukketModal = $state(false);
     let karaktervalgStatus = $derived(hentKaraktervalgStatus());
     const HIGHSCORE_SIDE_STOERRELSE = 10;
-    function karakterStatsTekst(karakter: Karakter) {
-        return `HP: ${karakter.startHp} | ${tekst('Guld', 'Gold')}: ${karakter.startGuld} | ${tekst('Energi', 'Energy')}: ${karakter.baseEnergi}`;
-    }
-
     function karakterStartUdstyrTekst(karakter: Karakter) {
         const udstyr = karakter.startUdstyr?.length
             ? karakter.startUdstyr.map((id) => itemNavn(id)).join(', ')
@@ -396,6 +392,25 @@
         const fordel = karakterFordel(karakter);
         const kolon = fordel.indexOf(':');
         return kolon >= 0 ? fordel.slice(kolon + 1).trim() : fordel;
+    }
+
+    function karakterKlasseNavnEntal(karakter: Karakter) {
+        const klasse = hentKarakterKlasseNoegle(karakter);
+        const navne: Record<string, [string, string]> = {
+            knight: ['Ridder', 'Knight'],
+            magician: ['Magiker', 'Mage'],
+            thief: ['Lovløs', 'Outlaw'],
+            explorer: ['Udforsker', 'Explorer'],
+            viking: ['Nordbo', 'Northerner'],
+            royal: ['Adelig', 'Noble'],
+            hunter: ['Spejder', 'Scout'],
+            pirate: ['Sørøver', 'Sea Raider'],
+            dwarf: ['Bjergbo', 'Mountain dweller'],
+            orc: ['Ork', 'Orc'],
+            joker: ['Fantast', 'Wildcard']
+        };
+        const navn = klasse ? navne[klasse] : undefined;
+        return navn ? tekst(navn[0], navn[1]) : visKarakterKlasseNavn(karakter);
     }
 
     function medaljeLabel(medalje: { label: string; labelEn?: string }) {
@@ -2320,7 +2335,7 @@
                 <strong>{karaktervalgStatus.kanJoine ? tekst('Åben', 'Open') : tekst('Lukket', 'Closed')}</strong>
             </div>
             <p class="instruktion">
-                {spilTilstand.gameMode === 'offline' ? tekst('Du spiller offline. Spillet bliver gemt i denne browser.', 'You are playing offline. The game is saved in this browser.') : tekst('Øen har givet dig otte muligheder. Vælg den karakter, du vil gå i land som.', 'The island has given you eight options. Choose the character you want to land as.')}
+                {tekst('Øen har givet dig otte muligheder.', 'The island has given you eight options.')}
             </p>
             
             <div class="character-gallery">
@@ -2334,8 +2349,18 @@
                     >
                         <img src={k.ikon} alt={karakterNavn(k)} class="char-icon" />
                         <h3>{karakterNavn(k)}</h3>
-                        <p class="stats">{karakterStatsTekst(k)}</p>
-                        <p class="desc positive"><span class="klasse-navn">{visKarakterKlasseNavn(k)}:</span> {karakterFordelUdenKlasse(k)}</p>
+                        <div class="stats">
+                            <div class="stats-toplinje">
+                                <span>HP: {k.startHp}</span>
+                                <span class="stats-skilletegn" aria-hidden="true">|</span>
+                                <span>{tekst('Energi', 'Energy')}: {k.baseEnergi}</span>
+                            </div>
+                            <div class="stats-guld">
+                                <span class="stats-skilletegn" aria-hidden="true">|</span>
+                                <span>{tekst('Guld', 'Gold')}: {k.startGuld}</span>
+                            </div>
+                        </div>
+                        <p class="desc positive"><span class="klasse-navn">{karakterKlasseNavnEntal(k)}:</span> {karakterFordelUdenKlasse(k)}</p>
                         <p class="desc negative">{karakterStartUdstyrTekst(k)}</p>
                     </div>
                 {/each}
@@ -3604,7 +3629,7 @@
         margin: 9px 0 0;
     }
 
-    .character-select { position: relative; background: #1a1a1a; padding: 30px; border-radius: 12px; border: 1px solid #333; max-width: 1100px; width: 95%; max-height: none; overflow: visible; text-align: center; }
+    .character-select { position: relative; background: #1a1a1a; padding: 30px; border-radius: 12px; max-width: 1100px; width: 95%; max-height: none; overflow: visible; text-align: center; }
     .select-island-status {
         display: inline-flex;
         align-items: center;
@@ -3677,11 +3702,18 @@
         background: #3a3a3a;
     }
     .character-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
-    .char-card { background: #222; border: 2px solid #444; padding: 20px; text-align: center; cursor: pointer; border-radius: 8px; transition: 0.2s; display: flex; flex-direction: column; align-items: center; }
+    .char-card { container-type: inline-size; background: #222; border: 2px solid #444; padding: 20px; text-align: center; cursor: pointer; border-radius: 8px; transition: 0.2s; display: flex; flex-direction: column; align-items: center; }
     .char-card:hover { border-color: #fff; transform: scale(1.02); }
     .char-card h3 { margin: 10px 0 4px; color: #fff; font-size: 1.3rem; font-family: 'Cinzel', serif; }
     .char-icon { height: 90px; width: auto; margin-bottom: 10px; }
-    .stats { font-weight: bold; color: #aaa; margin: 2px 0 12px; font-family: monospace; white-space: nowrap; }
+    .stats { display: flex; align-items: center; justify-content: center; gap: 0.65ch; font-weight: bold; color: #aaa; margin: 2px 0 12px; font-family: monospace; white-space: nowrap; }
+    .stats-toplinje { display: flex; align-items: center; gap: 0.65ch; }
+    .stats-guld { display: flex; align-items: center; gap: 0.65ch; }
+
+    @container (max-width: 230px) {
+        .stats { flex-direction: column; gap: 2px; }
+        .stats-guld .stats-skilletegn { display: none; }
+    }
     .desc { font-size: 0.9rem; margin: 4px 0; line-height: 1.3; font-style: italic; }
     .desc .klasse-navn { font-style: normal; font-weight: 700; }
     .positive { color: #ccc; }
