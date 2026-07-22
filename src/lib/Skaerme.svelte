@@ -14,7 +14,7 @@
     import { hentBedsteHighscoreForBruger, hentBedsteHighscoreForBrugerKarakter, hentGlobalHighscoresForFilter, hentHighscoreDetaljer, hentHighscoreResultat, hentOffentligProfil, hentSpillerTopScores } from '$lib/netvaerk';
     import { hentLydVolumen, lydKontrol } from '$lib/lydKontrol.svelte';
     import { OE_NAVN_EFTERLED, OE_NAVN_FORLED } from '$lib/oeNavne';
-    import { TROFAE_DEFINITIONER, findTrofae, gemMytiskeTrofaeIds, gemTrofaeAwards, gemTrofaeIds, hentGemteMytiskeTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, hentSupabaseTrofaeAwards, hentSupabaseTrofaeAwardsForHighscore, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, type TrofaeAward } from '$lib/trofaeer';
+    import { TROFAE_DEFINITIONER, findTrofae, gemMytiskeTrofaeIds, gemTrofaeAwards, gemTrofaeIds, hentGemteMytiskeTrofaeIds, hentGemteTrofaeAwards, hentGemteTrofaeIds, hentSupabaseTrofaeAwards, hentSupabaseTrofaeAwardsForHighscore, hentTrofaeFremdrift, lavTrofaeMaalinger, lavTrofaeOwnerKey, normaliserTrofaeAwards, normaliserTrofaeIds, type TrofaeAward, type TrofaeFremdrift } from '$lib/trofaeer';
     import { TUTORIAL_RUMKODE, erTutorialKnapSkjult, hentTutorialRang, hentTutorialRangtrin, tutorialKarakter } from '$lib/tutorial.svelte';
     import type { Karakter, SpillerData } from '$lib/types';
 
@@ -47,6 +47,7 @@
     type HighscoreDrilldown = { titel: string; scores: GlobalScore[]; henter: boolean };
     type OffentligProfilMedalje = { id?: string; sti: string; label: string; labelEn?: string; mytisk?: boolean; opnaaet?: boolean; bedste?: boolean; krav?: string; kravEn?: string; mytiskKrav?: string; mytiskKravEn?: string; episkTekst?: string; episkTekstEn?: string; award?: TrofaeAward | null };
     type OffentligSpillerProfil = { navn: string; userId?: string; profilKarakterId?: string; profilTitelScore?: number; scores: GlobalScore[]; trofaeer: OffentligProfilMedalje[]; henter: boolean };
+    type SlutTrofaeForslag = (typeof TROFAE_DEFINITIONER)[number] & { mytisk: boolean; fremdrift: TrofaeFremdrift };
     const HIGHSCORE_DRILLDOWN_ANTAL = 3;
     const OE_RESET_TIDSPUNKT = Date.parse('2026-07-17T02:00:00+02:00');
     const PROFIL_BEDSTE_SCORE_PREFIX = 'taage_profile_best_score:';
@@ -840,8 +841,7 @@
         return score?.trophyStats || {};
     }
 
-    function highscoreTrofaeMaalinger(score: HighscoreDetaljer | null) {
-        const data = highscoreTrofaeData(score);
+    function trofaeMaalingerFraData(data: Record<string, unknown>) {
         const maalinger = [
             { key: 'miner', label: tekst('Miner', 'Mines') },
             { key: 'taageBevaegelser', label: tekst('Bevægelser i tågen', 'Fog moves') },
@@ -857,6 +857,78 @@
         return maalinger
             .map((maaling) => ({ ...maaling, value: awardTal(data, maaling.key) }))
             .filter((maaling) => maaling.value !== null);
+    }
+
+    function highscoreTrofaeMaalinger(score: HighscoreDetaljer | null) {
+        return trofaeMaalingerFraData(highscoreTrofaeData(score));
+    }
+
+    function aktuelleTrofaeMaalinger() {
+        return trofaeMaalingerFraData(lavTrofaeMaalinger());
+    }
+
+    function stabiltTilfaeldigtTrofaeIndeks(antal: number) {
+        if (antal <= 1) return 0;
+        const grundlag = `${spilTilstand.rundeSeed}:${spilTilstand.rumKode}:${spilTilstand.spillerNavn}:trofae-forslag`;
+        let hash = 2166136261;
+        for (let i = 0; i < grundlag.length; i++) {
+            hash ^= grundlag.charCodeAt(i);
+            hash = Math.imul(hash, 16777619);
+        }
+        return (hash >>> 0) % antal;
+    }
+
+    function findSlutTrofaeForslag(): SlutTrofaeForslag | null {
+        const opnaaede = new Set(lokaleTrofaeIds);
+        const mytiskOpnaaede = new Set(lokaleMytiskeTrofaeIds);
+        const erSolo = taelScoreSpillere(spilTilstand.alleSpillere) === 1;
+        const kandidater: SlutTrofaeForslag[] = [];
+
+        for (const trofae of TROFAE_DEFINITIONER) {
+            if (!opnaaede.has(trofae.id)) {
+                kandidater.push({ ...trofae, mytisk: false, fremdrift: hentTrofaeFremdrift(trofae.id) });
+            } else if (erSolo && !mytiskOpnaaede.has(trofae.id)) {
+                kandidater.push({ ...trofae, mytisk: true, fremdrift: hentTrofaeFremdrift(trofae.id, true) });
+            }
+        }
+
+        const taetteKandidater = kandidater
+            .filter((trofae) => trofae.fremdrift.andel >= 0.8)
+            .sort((a, b) => b.fremdrift.andel - a.fremdrift.andel);
+        if (taetteKandidater.length > 0) return taetteKandidater[0];
+        return kandidater[stabiltTilfaeldigtTrofaeIndeks(kandidater.length)] || null;
+    }
+
+    function trofaeFremdriftTekst(trofae: SlutTrofaeForslag) {
+        const { vaerdi, oversvoemmelseStartet } = trofae.fremdrift;
+        switch (trofae.id) {
+            case 'mineejeren':
+                return tekst(`Du ejede ${vaerdi} miner.`, `You owned ${vaerdi} mines.`);
+            case 'taagekonge':
+                return tekst(`Du tog ${vaerdi} bevægelser i tågen.`, `You made ${vaerdi} moves in the fog.`);
+            case 'boelgebaereren':
+                return tekst(
+                    `Oversvømmelse ${oversvoemmelseStartet ? 'startet' : 'ikke startet'} · ${vaerdi} vandskader.`,
+                    `Flood ${oversvoemmelseStartet ? 'started' : 'not started'} · ${vaerdi} water hits.`
+                );
+            case 'relikviejaegeren':
+                return tekst(`Du havde ${vaerdi} magiske genstande.`, `You had ${vaerdi} magical items.`);
+            case 'guldfyrsten':
+                return tekst(`Du havde ${vaerdi} guld.`, `You held ${vaerdi} gold.`);
+            case 'livsvogteren':
+                return tekst(`Du helede ${vaerdi} HP.`, `You healed ${vaerdi} HP.`);
+            case 'korttegneren':
+                return tekst(`Du afslørede ${vaerdi} felter.`, `You revealed ${vaerdi} tiles.`);
+            case 'udstyrsmesteren':
+                return tekst(`Du havde ${vaerdi} opgraderingspoint.`, `You had ${vaerdi} upgrade points.`);
+            case 'diamantjaegeren':
+                return tekst(`Du fandt diamanter til ${vaerdi} guld.`, `You found diamonds worth ${vaerdi} gold.`);
+        }
+    }
+
+    function trofaeKravOpfyldtUdenFlugt(trofae: SlutTrofaeForslag) {
+        const erDoed = spilTilstand.gameState === 'dead' || spilTilstand.gameState === 'dead_map';
+        return erDoed && trofae.fremdrift.andel >= 1;
     }
 
     function trofaeAwardDetalje(trofae: { id?: string; award?: TrofaeAward | null }) {
@@ -1386,6 +1458,58 @@
             </div>
         </section>
     {/if}
+{/snippet}
+
+{#snippet slutTrofaeStatus()}
+    {@const foreslaaetTrofae = findSlutTrofaeForslag()}
+    <section class="slut-trofae-status" aria-label={tekst('Trofæfremdrift', 'Trophy progress')}>
+        <div class="highscore-detail-maalinger slut-trofae-maalinger">
+            <div>
+                {#each aktuelleTrofaeMaalinger() as maaling (maaling.key)}
+                    <p><span>{maaling.label}</span><strong>{maaling.value}</strong></p>
+                {/each}
+            </div>
+        </div>
+
+        {#if foreslaaetTrofae}
+            <div class="slut-naermeste-trofae">
+                <img
+                    src={foreslaaetTrofae.mytisk ? foreslaaetTrofae.mytiskSti || foreslaaetTrofae.sti : foreslaaetTrofae.sti}
+                    alt={medaljeLabel(foreslaaetTrofae)}
+                    draggable="false"
+                />
+                <div>
+                    <p class="slut-trofae-kicker">
+                        {#if trofaeKravOpfyldtUdenFlugt(foreslaaetTrofae)}
+                            {tekst('Du opfyldte trofækravet, men slap ikke væk', 'You met the trophy requirement but did not escape')}
+                        {:else if foreslaaetTrofae.fremdrift.andel >= 0.8}
+                            {tekst('Du var tæt på en ny trofæmedalje', 'You were close to a new trophy medal')}
+                        {:else}
+                            {tekst('Du var ikke tæt på en ny trofæmedalje', 'You were not close to a new trophy medal')}
+                            <span>{tekst('En mulig trofæmedalje kunne være:', 'One possible trophy medal could be:')}</span>
+                        {/if}
+                    </p>
+                    <h3>
+                        {medaljeLabel(foreslaaetTrofae)}{foreslaaetTrofae.mytisk ? tekst(' – mytisk', ' – mythic') : ''}
+                    </h3>
+                    <p class="slut-trofae-resultat">{trofaeFremdriftTekst(foreslaaetTrofae)}</p>
+                    <p class="slut-trofae-krav">
+                        {#if trofaeKravOpfyldtUdenFlugt(foreslaaetTrofae)}
+                            {tekst('Trofæmedaljen kræver, at du slipper levende væk.', 'The trophy medal requires you to escape alive.')}
+                        {:else}
+                            <strong>{tekst('Krav:', 'Requirement:')}</strong>
+                            {foreslaaetTrofae.mytisk ? medaljeMytiskKrav(foreslaaetTrofae) : medaljeKrav(foreslaaetTrofae)}
+                        {/if}
+                    </p>
+                </div>
+            </div>
+        {:else}
+            <div class="slut-alle-trofaeer">
+                <h3>{tekst('Alle tilgængelige trofæer er opnået', 'All available trophies completed')}</h3>
+                <p>{tekst('Du ejer allerede alle trofæer, der kan opnås i denne spiltype.', 'You already own every trophy available in this game mode.')}</p>
+            </div>
+        {/if}
+    </section>
 {/snippet}
 
 {#snippet pointSpecifikation()}
@@ -2382,6 +2506,7 @@
             </div>
             
             <h1 class="doeds-titel">{tekst(`${formaterNavn(spilTilstand.spillerNavn)} døde på ${formaterNavn(spilTilstand.rumKode)}`, `${formaterNavn(spilTilstand.spillerNavn)} died on ${formaterNavn(spilTilstand.rumKode)}`)}</h1>
+            <img src="/screens/death.webp" alt={tekst('Døden', 'Death')} class="doeds-symbol" />
             <p class="beskrivelse">
                 {spilTilstand.logBesked} {hentMinHistorie(false)}
             </p>
@@ -2393,12 +2518,14 @@
                 </h2>
             </div>
 
-            <img src="/screens/death.webp" alt={tekst('Døden', 'Death')} class="doeds-symbol" />
-
             <div class="spec-paneler">
                 {@render pointSpecifikation()}
                 {@render sessionTavle()}
             </div>
+
+            {#if spilTilstand.gameMode !== 'tutorial'}
+                {@render slutTrofaeStatus()}
+            {/if}
             
             <div class="slut-knapper">
                 <button class="spil-knap slut-knap-styled" onclick={genstartBane}>
@@ -2496,6 +2623,10 @@
                 {@render pointSpecifikation()}
                 {@render sessionTavle()}
             </div>
+
+            {#if spilTilstand.gameMode !== 'tutorial'}
+                {@render slutTrofaeStatus()}
+            {/if}
             
             <div class="slut-knapper">
                 <button class="spil-knap slut-knap-styled" onclick={genstartBane}>
@@ -3818,6 +3949,80 @@
         z-index: 1;
     }
 
+    .slut-trofae-status {
+        width: min(900px, 100%);
+        margin: 26px auto 10px;
+        box-sizing: border-box;
+    }
+    .slut-trofae-maalinger {
+        margin: 0;
+        padding: 0;
+    }
+    .slut-naermeste-trofae {
+        display: grid;
+        grid-template-columns: 150px minmax(0, 1fr);
+        align-items: center;
+        gap: 24px;
+        width: min(760px, 100%);
+        margin: 26px auto 0;
+        padding-top: 24px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        text-align: left;
+    }
+    .slut-naermeste-trofae img {
+        width: 150px;
+        height: 150px;
+        object-fit: contain;
+        margin-top: -44px;
+        opacity: 0.42;
+        filter: grayscale(1) brightness(0.78) drop-shadow(0 7px 10px rgba(0, 0, 0, 0.48));
+        position: relative;
+        z-index: 1;
+    }
+    .slut-trofae-kicker {
+        margin: 0 0 5px;
+        color: #d8c895;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+    .slut-trofae-kicker span {
+        display: block;
+        margin-top: 5px;
+    }
+    .slut-naermeste-trofae h3,
+    .slut-alle-trofaeer h3 {
+        margin: 0;
+        color: #fff;
+        font-family: 'Cinzel', serif;
+        font-size: clamp(1.35rem, 3vw, 2rem);
+    }
+    .slut-trofae-resultat {
+        margin: 7px 0 0;
+        color: #e1e1e1;
+        font-size: 1.05rem;
+    }
+    .slut-trofae-krav {
+        margin: 8px 0 0;
+        color: #bdbdbd;
+        line-height: 1.45;
+    }
+    .slut-trofae-krav strong {
+        color: #ded4b5;
+        margin-right: 4px;
+    }
+    .slut-alle-trofaeer {
+        width: min(760px, 100%);
+        margin: 26px auto 0;
+        padding-top: 24px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .slut-alle-trofaeer p {
+        margin: 8px 0 0;
+        color: #c8c8c8;
+    }
+
     .spec-paneler {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -4962,6 +5167,20 @@
         .episk-trofae img {
             width: min(42vw, 150px);
             height: min(42vw, 150px);
+        }
+
+        .slut-naermeste-trofae {
+            grid-template-columns: 1fr;
+            justify-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .slut-naermeste-trofae img {
+            width: 125px;
+            height: 125px;
+            margin-top: -42px;
+            margin-bottom: -28px;
         }
 
         .point-kvittering,

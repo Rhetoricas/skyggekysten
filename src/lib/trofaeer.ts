@@ -45,6 +45,15 @@ export interface TrofaeAward {
     awardData?: Record<string, unknown>;
 }
 
+export interface TrofaeFremdrift {
+    id: TrofaeId;
+    mytisk: boolean;
+    vaerdi: number;
+    maal: number;
+    andel: number;
+    oversvoemmelseStartet?: boolean;
+}
+
 export const TROFAE_DEFINITIONER: TrofaeDefinition[] = [
     {
         id: 'mineejeren',
@@ -714,6 +723,58 @@ export function lavTrofaeMaalinger(): Record<string, unknown> {
         opgraderingsPoint: antalOpgraderingsPoint(items),
         diamantRaavaerdiFundet: t.diamantRaavaerdiFundet
     };
+}
+
+export function hentTrofaeFremdrift(id: TrofaeId, mytisk = false): TrofaeFremdrift {
+    const t = stats();
+    const items = spilTilstand.mitUdstyr || [];
+    const krav = mytisk ? MYTISK_TROFAE_KRAV : TROFAE_KRAV;
+    let vaerdi = 0;
+    let maal = 1;
+    let andel = 0;
+
+    switch (id) {
+        case 'mineejeren':
+            vaerdi = antalMiner();
+            maal = krav.miner;
+            break;
+        case 'taagekonge':
+            vaerdi = t.taageBevaegelser;
+            maal = krav.taageBevaegelser;
+            break;
+        case 'boelgebaereren':
+            vaerdi = t.vandSkader;
+            maal = krav.vandSkader;
+            andel = t.oversvoemmelseStartet ? Math.min(vaerdi / maal, 1) : 0;
+            return { id, mytisk, vaerdi, maal, andel, oversvoemmelseStartet: t.oversvoemmelseStartet };
+        case 'relikviejaegeren':
+            vaerdi = antalItemsFraSet(items, MAGISKE_GENSTANDE);
+            maal = krav.magiskeGenstande;
+            break;
+        case 'guldfyrsten':
+            vaerdi = spilTilstand.guldTotal;
+            maal = krav.guld;
+            break;
+        case 'livsvogteren':
+            vaerdi = t.healetHp;
+            maal = krav.healetHp;
+            break;
+        case 'korttegneren':
+            vaerdi = spilTilstand.mineKendteFelter?.length || 0;
+            maal = krav.kendteFelter;
+            break;
+        case 'udstyrsmesteren':
+            vaerdi = antalOpgraderingsPoint(items);
+            maal = krav.opgraderedeItems;
+            break;
+        case 'diamantjaegeren':
+            vaerdi = t.diamantRaavaerdiFundet;
+            maal = krav.diamantRaavaerdi;
+            break;
+    }
+
+    andel = Math.min(vaerdi / maal, 1);
+    return { id, mytisk, vaerdi, maal, andel };
 }
 
 function antalMiner() {
