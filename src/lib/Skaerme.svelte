@@ -68,9 +68,9 @@
         nyGlobalRekord,
         harGemtOfflineSpil,
         offlineSpilInfo,
-        gemScoreIgen,
         scoreGemmer,
-        scoreGemningFejlet
+        scoreGemningFejlet,
+        scoreGemningSekunderTilbage
     } = $props<{
         opretEllerDeltag: () => void;
         startOfflineSpil: () => void;
@@ -86,9 +86,9 @@
         nyGlobalRekord: boolean;
         harGemtOfflineSpil: boolean;
         offlineSpilInfo: { spillerNavn: string; rumKode: string; gameState: string; dag: number; savedAt: string } | null;
-        gemScoreIgen: () => void;
         scoreGemmer: boolean;
         scoreGemningFejlet: boolean;
+        scoreGemningSekunderTilbage: number;
     }>();
 
     let lydStart: HTMLAudioElement | null = null;
@@ -2165,9 +2165,14 @@
         <div class="score-save-status" class:fejl={scoreGemningFejlet}>
             {#if scoreGemmer}
                 <span>{tekst('Gemmer score...', 'Saving score...')}</span>
+                <span class="score-save-countdown">
+                    {tekst(
+                        `Forsøget opgives om ${scoreGemningSekunderTilbage} sek.`,
+                        `The attempt will stop in ${scoreGemningSekunderTilbage} sec.`
+                    )}
+                </span>
             {:else}
                 <span>{spilTilstand.statusBesked || tekst('Scoren blev ikke gemt.', 'The score was not saved.')}</span>
-                <button type="button" onclick={gemScoreIgen}>{tekst('Prøv igen', 'Try again')}</button>
                 {#if !authState.user && ER_ITCH_BUILD}
                     <div class="score-login-redning konto-live-link">
                         <button type="button" onclick={aabnLiveVersion}>
@@ -4161,6 +4166,10 @@
         border-color: #a66;
         background: rgba(80, 20, 20, 0.45);
         color: #f0d0d0;
+    }
+    .score-save-countdown {
+        color: #bdbdbd;
+        font-variant-numeric: tabular-nums;
     }
     .score-save-status button {
         border: 1px solid #888;

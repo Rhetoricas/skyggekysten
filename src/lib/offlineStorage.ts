@@ -13,6 +13,7 @@ const OFFLINE_GRAVSTEN_KEY = 'taage_offline_gravsten_v1';
 type OfflineGravstenStore = Record<string, Record<string, GravstenMinde[]>>;
 
 export interface OfflineScore {
+    rundeId?: string;
     navn: string;
     score: number;
     karakter?: string;
@@ -362,6 +363,7 @@ export function gemOfflineScore(force = false) {
 
     const scores = hentOfflineScores();
     const score: OfflineScore = {
+        rundeId: spilTilstand.rundeSeed || undefined,
         navn: spilTilstand.spillerNavn,
         score: spilTilstand.samletScore,
         karakter: spilTilstand.valgtKarakter?.navn,
@@ -378,9 +380,29 @@ export function gemOfflineScore(force = false) {
         antalSpillere: taelScoreSpillere(spilTilstand.alleSpillere)
     };
 
-    scores.push(score);
-    scores.sort((a, b) => b.score - a.score);
-    localStorage.setItem(OFFLINE_SCORES_KEY, JSON.stringify(scores.slice(0, 500)));
+    const unikkeScores = new Map<string, OfflineScore>();
+    for (const gemtScore of [...scores, score]) {
+        const noegle = gemtScore.rundeId
+            ? `runde:${gemtScore.rundeId}:${gemtScore.navn}`
+            : [
+                gemtScore.navn,
+                gemtScore.oeNavn,
+                gemtScore.score,
+                gemtScore.karakter || '',
+                gemtScore.erVinder ? 'w' : 'nw',
+                gemtScore.erDoed ? 'd' : 'nd',
+                gemtScore.dage || 0,
+                gemtScore.guld || 0,
+                gemtScore.maxKolonne || 0,
+                gemtScore.kendteFelter || 0,
+                gemtScore.miner || 0,
+                gemtScore.antalSpillere || 0
+            ].join('|');
+        unikkeScores.set(noegle, gemtScore);
+    }
+
+    const sorteredeScores = [...unikkeScores.values()].sort((a, b) => b.score - a.score);
+    localStorage.setItem(OFFLINE_SCORES_KEY, JSON.stringify(sorteredeScores.slice(0, 500)));
 }
 
 export function hentOfflineScores(oeNavn?: string, karakterKlasse?: string | null) {

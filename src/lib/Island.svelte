@@ -70,6 +70,7 @@
     const START_AUTO_REFRESH_KEY = 'taage_pending_start';
     const RUTE_ARKIV_STORAGE_PREFIX = 'taage_route_archive';
     const RUTE_ARKIV_MAX_RUNS = 50;
+    const SCORE_GEMNING_TIMEOUT_MS = 30000;
 
     let lokaleScores = $state<Array<{ navn: string; score: number; karakter?: string }>>([]);
     let klasseScores = $state<Array<{ id?: number; spillerNavn: string; oeNavn: string; point: number; karakter?: string }>>([]);
@@ -423,6 +424,8 @@
     let scoreErGemt = $state(false);
     let scoreGemmer = $state(false);
     let scoreGemningFejlet = $state(false);
+    let scoreGemningDeadline = $state<number | null>(null);
+    let scoreGemningSekunderTilbage = $state(0);
     let scoreGemningRunId = 0;
     let aktivScoreGemningRunId: number | null = null;
     let nyGlobalRekord = $state(false);
@@ -465,6 +468,8 @@
                 scoreErGemt = false;
                 scoreGemmer = false;
                 scoreGemningFejlet = false;
+                scoreGemningDeadline = null;
+                scoreGemningSekunderTilbage = 0;
                 nyGlobalRekord = false;
                 spilTilstand.nyeTrofaeIds = [];
                 spilTilstand.nyeMytiskeTrofaeIds = [];
@@ -477,6 +482,8 @@
                     scoreErGemt = true;
                     scoreGemmer = false;
                     scoreGemningFejlet = false;
+                    scoreGemningDeadline = null;
+                    scoreGemningSekunderTilbage = 0;
                     return;
                 }
 
@@ -957,6 +964,8 @@
         scoreErGemt = false;
         scoreGemmer = false;
         scoreGemningFejlet = false;
+        scoreGemningDeadline = null;
+        scoreGemningSekunderTilbage = 0;
         nyGlobalRekord = false;
 
         if (typeof document !== 'undefined') {
@@ -1199,6 +1208,8 @@
         scoreErGemt = false;
         scoreGemmer = false;
         scoreGemningFejlet = false;
+        scoreGemningDeadline = null;
+        scoreGemningSekunderTilbage = 0;
     }
 
     async function genstartBane() {
@@ -1858,6 +1869,8 @@
         scoreErGemt = true;
         scoreGemmer = false;
         scoreGemningFejlet = false;
+        scoreGemningDeadline = null;
+        scoreGemningSekunderTilbage = 0;
         nyGlobalRekord = false;
         spilTilstand.gameState = 'play';
 
@@ -1936,8 +1949,11 @@
             rydPendingStart();
         }
 
-        const venteUrTimer = window.setInterval(() => {
+        const sekundTimer = window.setInterval(() => {
             if (spilTilstand.venteSpilAktiv) venteUrTick = Date.now();
+            if (scoreGemmer && scoreGemningDeadline !== null) {
+                scoreGemningSekunderTilbage = Math.max(1, Math.ceil((scoreGemningDeadline - Date.now()) / 1000));
+            }
         }, 1000);
 
         const erAktivtOnlinespil = () => spilTilstand.gameState === 'play' && !spilTilstand.offlineMode;
@@ -2075,7 +2091,7 @@
         })();
 
         return () => {
-            window.clearInterval(venteUrTimer);
+            window.clearInterval(sekundTimer);
             window.clearInterval(heartbeatTimer);
             document.removeEventListener('visibilitychange', gemHvisSkjult);
             window.removeEventListener('focus', haandterOnline);
@@ -2357,6 +2373,8 @@
         } finally {
             if (erAktuelScoreGemning(token)) {
                 scoreGemmer = false;
+                scoreGemningDeadline = null;
+                scoreGemningSekunderTilbage = 0;
                 if (aktivScoreGemningRunId === token.id) aktivScoreGemningRunId = null;
             }
         }
@@ -2367,6 +2385,8 @@
             scoreErGemt = true;
             scoreGemmer = false;
             scoreGemningFejlet = false;
+            scoreGemningDeadline = null;
+            scoreGemningSekunderTilbage = 0;
             return;
         }
         if (aktivScoreGemningRunId !== null) return;
@@ -2374,6 +2394,8 @@
         const resultatSikretLokalt = sikrAktueltResultatLokalt();
         scoreGemningFejlet = false;
         scoreGemmer = true;
+        scoreGemningDeadline = Date.now() + SCORE_GEMNING_TIMEOUT_MS;
+        scoreGemningSekunderTilbage = Math.ceil(SCORE_GEMNING_TIMEOUT_MS / 1000);
         if (!resultatSikretLokalt) {
             spilTilstand.statusBesked = tekst(
                 'Resultatet kunne ikke sikres lokalt. Hold siden åben, mens vi prøver at gemme det online.',
@@ -2389,11 +2411,13 @@
             if (scoreGemmer && erAktuelScoreGemning(token)) {
                 scoreGemmer = false;
                 scoreGemningFejlet = true;
+                scoreGemningDeadline = null;
+                scoreGemningSekunderTilbage = 0;
                 if (aktivScoreGemningRunId === token.id) aktivScoreGemningRunId = null;
                 scoreGemningRunId++;
                 spilTilstand.statusBesked = tekst('Det tager længere tid end ventet at sende scoren. Den er gemt på denne enhed, og vi prøver automatisk igen.', 'Sending the score is taking longer than expected. It is saved on this device, and we will try again automatically.');
             }
-        }, 45000);
+        }, SCORE_GEMNING_TIMEOUT_MS);
         void opdaterOgGemHighscore(token);
     }
 
@@ -3083,9 +3107,9 @@ function udførBevægelse(nytIndeks: number) {
     {nyGlobalRekord}
     {harGemtOfflineSpil}
     {offlineSpilInfo}
-    {gemScoreIgen}
     {scoreGemmer}
     {scoreGemningFejlet}
+    {scoreGemningSekunderTilbage}
 />
 
 {#if spilTilstand.gameState === 'play'}

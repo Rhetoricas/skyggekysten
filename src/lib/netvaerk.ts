@@ -20,6 +20,7 @@ let kortSaveKoe: ReturnType<typeof setTimeout> | null = null;
 let kortSaveKoeRundeId = '';
 let subRumKode = '';
 const aktiveGravstenGemninger = new Map<string, Promise<boolean>>();
+const aktiveHighscoreGemninger = new Map<string, Promise<Error | null>>();
 const ventendeGravstenIHukommelse = new Map<string, VentendeGravsten>();
 let gravstenSynkKoe: Promise<void> = Promise.resolve();
 let gravstenSynkGeneration = 0;
@@ -69,6 +70,7 @@ type ScoreRaekke = {
 };
 
 type HighscorePayload = {
+    local_result_id?: string;
     user_id?: string;
     player_name: string;
     room_code: string;
@@ -158,8 +160,8 @@ function harLocalStorage() {
 }
 
 function highscorePendingId(payload: HighscorePayload) {
+    if (payload.local_result_id) return `runde:${payload.local_result_id}:${payload.player_name}`;
     return [
-        payload.user_id ?? 'venter-paa-login',
         payload.player_name,
         payload.room_code,
         payload.score,
@@ -174,12 +176,27 @@ function highscorePendingId(payload: HighscorePayload) {
     ].join('|');
 }
 
+function highscoreLaasNavn(pendingId: string) {
+    let hash = 2166136261;
+    for (let i = 0; i < pendingId.length; i++) {
+        hash ^= pendingId.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+    }
+    return `taage-highscore-${(hash >>> 0).toString(36)}`;
+}
+
 function hentVentendeHighscores() {
     if (!harLocalStorage()) return [] as VentendeHighscore[];
 
     try {
         const gemt = localStorage.getItem(VENTENDE_HIGHSCORE_KEY);
-        return gemt ? JSON.parse(gemt) as VentendeHighscore[] : [];
+        const scores = gemt ? JSON.parse(gemt) as VentendeHighscore[] : [];
+        const unikke = new Map<string, VentendeHighscore>();
+        for (const score of Array.isArray(scores) ? scores : []) {
+            const pending_id = highscorePendingId(score);
+            unikke.set(pending_id, { ...score, pending_id });
+        }
+        return [...unikke.values()];
     } catch {
         return [];
     }
@@ -1031,6 +1048,7 @@ function lavAktueltHighscorePayload(userId?: string): HighscorePayload | null {
     // Frys hele resultatet før første await. Ellers kan et langsomt login-tjek
     // nå at læse state fra en efterfølgende runde og gemme et blandet resultat.
     const frossetPayload: HighscorePayload = {
+        local_result_id: spilTilstand.rundeSeed || undefined,
         user_id: userId,
         player_name: authState.profil?.display_name || spilTilstand.spillerNavn,
         room_code: spilTilstand.rumKode,
@@ -1272,6 +1290,27 @@ export async function retryVentendeHighscores() {
 }
 
 async function sendHighscorePayload(payload: HighscorePayload) {
+    const gemningsNoegle = highscorePendingId(payload);
+    const aktivGemning = aktiveHighscoreGemninger.get(gemningsNoegle);
+    if (aktivGemning) return aktivGemning;
+
+    const udfoerGemning = () => sendHighscorePayloadUdenDublet(payload);
+    const gemning: Promise<Error | null> = (
+        typeof navigator !== 'undefined' && navigator.locks
+            ? navigator.locks.request(highscoreLaasNavn(gemningsNoegle), udfoerGemning)
+            : udfoerGemning()
+    ).finally(() => {
+        if (aktiveHighscoreGemninger.get(gemningsNoegle) === gemning) {
+            aktiveHighscoreGemninger.delete(gemningsNoegle);
+        }
+    });
+    aktiveHighscoreGemninger.set(gemningsNoegle, gemning);
+    return gemning;
+}
+
+async function sendHighscorePayloadUdenDublet(payload: HighscorePayload) {
+    const { local_result_id, ...serverPayload } = payload;
+    void local_result_id;
     const sessionResultat = await medTimeout(supabase.auth.getSession(), 12000, 'Login-tjek').catch((error) => {
         console.error('Kunne ikke tjekke login før scoregemning', error);
         return null;
@@ -1282,7 +1321,7 @@ async function sendHighscorePayload(payload: HighscorePayload) {
         markerLoginUdlobet();
         return new Error('Du er ikke logget ind længere. Scoren er gemt på denne enhed og sendes, når du logger ind igen.');
     }
-    let payloadMedBruger = { ...payload, user_id: payload.user_id ?? sessionUser.id };
+    let payloadMedBruger = { ...serverPayload, user_id: serverPayload.user_id ?? sessionUser.id };
 
     let sidsteFejl: Error | null = null;
 
