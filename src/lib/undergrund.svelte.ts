@@ -69,6 +69,12 @@ export function genererUndergrund(biome: Biome | string) {
         if (terningKast < 40) feltData.skjultGuld = tilfaeldigtTal(5, 10);
         else if (terningKast < 60) feltData.skjultFaelde = true;
         else if (terningKast < 78) feltData.skjultLoot = 'diamant';
+    } else if (biome === 'ruin' || biome === 'hule') {
+        if (terningKast < 52) feltData.skjultGuld = tilfaeldigtTal(60, 120);
+        else if (terningKast < 64) feltData.skjultLiv = tilfaeldigtTal(10, 20);
+        else if (terningKast < 76) feltData.skjultFaelde = true;
+        else if (terningKast < 88) feltData.skjultLoot = 'livseliksir';
+        else feltData.skjultLoot = 'diamant';
     } else if (farlige.includes(biome)) {
         if (terningKast < 45) feltData.skjultGuld = tilfaeldigtTal(25, 50);
         else if (terningKast < 55) feltData.skjultLiv = tilfaeldigtTal(10, 20);
